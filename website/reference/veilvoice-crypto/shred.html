@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-crypto/src/shred.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="Secure erasure &#8212; the self-destruct.">
+<meta name="description" content="Secure erasure, the self-destruct.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -51,14 +51,14 @@
 </nav>
 <div>
 <section id="s-about">
-<p>Secure erasure &#8212; the self-destruct.</p>
+<p>Secure erasure, the self-destruct.</p>
 <h2 id="read-this-before-relying-on-it">Read this before relying on it</h2>
 <p>Overwriting a file does not reliably destroy it on modern storage, and any tool that tells you otherwise is selling something. This module does the best that software can do from userspace, reports honestly what that is worth on your storage, and points at the thing that actually works.</p>
-<p><strong>On a spinning disk</strong>, overwriting is genuinely effective. The write goes to the same physical sectors, and the belief that a scanning-microscope recovery of overwritten magnetic media is practical does not survive contact with the literature &#8212; Gutmann&#x27;s 1996 paper, whose 35-pass pattern is still cited, says so himself in its own epilogue about modern drives.</p>
+<p><strong>On a spinning disk</strong>, overwriting is genuinely effective. The write goes to the same physical sectors, and the belief that a scanning-microscope recovery of overwritten magnetic media is practical does not survive contact with the literature. Gutmann&#x27;s 1996 paper, whose 35-pass pattern is still cited, says so himself in its own epilogue about modern drives.</p>
 <p><strong>On an SSD, or any flash media</strong>, it is not reliable and cannot be made so. Wear levelling means the controller writes your &quot;overwrite&quot; to <em>different</em> physical cells and marks the old ones free. The original data still exists in flash, out of reach of every write you can issue. The same applies to SD cards, USB sticks, eMMC and NVMe. It also applies through copy-on-write filesystems (Btrfs, ZFS, APFS), snapshots, journals and any backup that has already run.</p>
 <p><strong>The answer that does work is full-disk encryption.</strong> If the volume is encrypted, destroying the key destroys everything on it at once, wherever the controller chose to put the blocks. LUKS, BitLocker and FileVault all do this. Use it, and treat this module as a second line rather than a first.</p>
 <h2 id="why-not-35-passes">Why not 35 passes</h2>
-<p>Because passes stopped being the interesting variable decades ago. Against a drive that honours writes, one pass is enough; against one that does not, no number of passes reaches the retained cells. The default here is three &#8212; random, complement, random &#8212; which satisfies the common three-pass expectation without pretending that thirty-five would be stronger. Time is better spent enabling disk encryption than on passes 4 through 35.</p>
+<p>Because passes stopped being the interesting variable decades ago. Against a drive that honours writes, one pass is enough; against one that does not, no number of passes reaches the retained cells. The default here is three, random then complement then random, which satisfies the common three-pass expectation without pretending that thirty-five would be stronger. Time is better spent enabling disk encryption than on passes 4 through 35.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>This is meant to destroy a file, and the first thing it does is tell you how much that is worth.</p>
 <p>On the drives most computers now have, overwriting a file does not reliably remove it. The drive puts the new data somewhere else and leaves the original sitting in a place no ordinary program can reach, until it is cleaned up later, which may be never.</p>

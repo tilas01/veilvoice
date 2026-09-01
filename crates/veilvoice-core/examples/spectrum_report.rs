@@ -5,10 +5,10 @@
 //! processing, as multiples of the STFT bin grid. It is the quickest way to see
 //! the two synthesis modes described in `spectral.rs`:
 //!
-//! * **accent off** — the legacy channel-vocoder path. Each harmonic smears into
+//! * **accent off**, the legacy channel-vocoder path. Each harmonic smears into
 //!   a cluster of neighbouring grid frequencies (187.5 *and* 234.4 Hz around one
 //!   partial), which is what makes it sound metallic.
-//! * **accent on** — an exact harmonic series at the canonical register
+//! * **accent on**, an exact harmonic series at the canonical register
 //!   (140.6 Hz and its multiples), whatever pitch went in.
 //!
 //! Run with `cargo run -p veilvoice-core --example diag_spectrum`.

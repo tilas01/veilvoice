@@ -444,7 +444,7 @@
 <span class="ln" id="L341">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;e2).<span class="tok-fn">unwrap</span>(), s2);</span>
 <span class="ln" id="L342">    }</span>
 <span class="ln" id="L343"></span>
-<span class="ln" id="L344">    <span class="tok-com">/// The hybrid must fail if the classical half is tampered with &#8212; otherwise</span></span>
+<span class="ln" id="L344">    <span class="tok-com">/// The hybrid must fail if the classical half is tampered with, because otherwise</span></span>
 <span class="ln" id="L345">    <span class="tok-com">/// it would be no stronger than ML-KEM alone.</span></span>
 <span class="ln" id="L346">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L347">    <span class="tok-kw">fn</span> <span class="tok-fn">tampering_with_the_x25519_half_changes_the_secret</span>() {</span>

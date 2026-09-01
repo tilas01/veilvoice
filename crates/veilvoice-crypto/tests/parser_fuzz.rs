@@ -45,7 +45,7 @@
 
 use veilvoice_crypto::{container, kdf, lock};
 
-/// xorshift32. Deterministic, seeded, and twenty lines — a dependency here
+/// xorshift32. Deterministic, seeded, and twenty lines. A dependency here
 /// would be a dependency in the audit surface for no benefit.
 struct Rng(u32);
 
@@ -100,7 +100,7 @@ fn mutate(rng: &mut Rng, seed_bytes: &[u8]) -> Vec<u8> {
                 out[i] = rng.byte();
             }
         }
-        // Truncate — the classic way a length field outruns the buffer.
+        // Truncate, which is the classic way a length field outruns the buffer.
         2 => {
             let n = rng.below(out.len() + 1);
             out.truncate(n);
@@ -163,7 +163,7 @@ fn weak() -> kdf::KdfParams {
 
 /// Whether it is worth actually running the KDF for these parameters.
 ///
-/// Mutation cheerfully produces costs that are *valid* and enormous — a
+/// Mutation cheerfully produces costs that are *valid* and enormous: a
 /// 4 GiB-and-three-passes Argon2 is a perfectly legal header. Executing those
 /// turns a campaign into a benchmark, so the KDF-running half of each round is
 /// limited to cheap parameters and the expensive ones are covered by the unit
@@ -220,7 +220,7 @@ fn the_container_header_parser_survives_hostile_input() {
             // This is the check that stops an absurd cost reaching Argon2.
             let _ = header.kdf.checked();
             // And the full open path, which is what actually faces a hostile
-            // file — only for costs cheap enough to run: see `cheap`.
+            // file, only for costs cheap enough to run: see `cheap`.
             if cheap(header.kdf) {
                 let _ = container::open_with_password(b"pw", &bytes);
             }
@@ -249,7 +249,7 @@ fn the_app_lock_parser_survives_hostile_input() {
                 "seed {seed}: lock file does not round-trip"
             );
             // The cooldown must be a finite answer whatever the stored counters
-            // say — including a failure count of u32::MAX and a timestamp from
+            // say, including a failure count of u32::MAX and a timestamp from
             // the far future, which mutation reaches often.
             let _ = parsed.cooldown();
             assert!(lock::delay_secs(parsed.failures()) <= 15 * 60);

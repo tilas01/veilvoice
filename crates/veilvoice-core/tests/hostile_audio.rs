@@ -9,7 +9,7 @@
 //! That matters more than it might sound, because the engine keeps *persistent*
 //! state: the accent neutraliser's long-term spectrum is an exponential moving
 //! average, so a single non-finite sample folded into it never washes out. The
-//! audit found exactly that — one NaN, and every output sample for the rest of
+//! audit found exactly that: one NaN, and every output sample for the rest of
 //! the session was NaN, silently.
 //!
 //! # In plain words
@@ -194,8 +194,8 @@ fn hostile_input_is_survived_with_accent_neutralisation_off() {
 // second door onto the same failure, which the audit found still open: the
 // engine was built from a configuration nobody had validated, and a `NaN`
 // sample rate produced `NaN` output for every sample without a sample ever
-// having been bad. The value is reachable from a file — a WAV's `fmt ` chunk
-// carries a `u32` sample rate that `symphonia` passes straight through — and
+// having been bad. The value is reachable from a file, because a WAV's `fmt `
+// chunk carries a `u32` sample rate that `symphonia` passes straight through, and
 // from any project using these crates as libraries, which the README invites.
 // ---------------------------------------------------------------------------
 

@@ -65,7 +65,7 @@
 <span class="ln" id="L22"><span class="tok-com">//! ```</span></span>
 <span class="ln" id="L23"><span class="tok-com">//!</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! **The entire header is the AEAD&#x27;s associated data.** Editing any byte of it</span></span>
-<span class="ln" id="L25"><span class="tok-com">//! &#8212; downgrading the KDF cost, swapping the mode, corrupting the salt &#8212; makes</span></span>
+<span class="ln" id="L25"><span class="tok-com">//! by downgrading the KDF cost, swapping the mode or corrupting the salt, makes</span></span>
 <span class="ln" id="L26"><span class="tok-com">//! decryption fail rather than silently changing behaviour. Unused fields are</span></span>
 <span class="ln" id="L27"><span class="tok-com">//! written as zero and are still authenticated, so they cannot be used as a</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! covert channel or a downgrade vector.</span></span>
@@ -221,8 +221,8 @@
 <span class="ln" id="L159"><span class="tok-com">/// The conventional path of the sealed form of `path`.</span></span>
 <span class="ln" id="L160"><span class="tok-com">///</span></span>
 <span class="ln" id="L161"><span class="tok-com">/// `.veil` is *appended* rather than substituted, so `recording.veiled.wav`</span></span>
-<span class="ln" id="L162"><span class="tok-com">/// becomes `recording.veiled.wav.veil` and the original name &#8212; including what</span></span>
-<span class="ln" id="L163"><span class="tok-com">/// kind of file it is &#8212; survives decryption without being guessed at.</span></span>
+<span class="ln" id="L162"><span class="tok-com">/// becomes `recording.veiled.wav.veil` and the original name, including what</span></span>
+<span class="ln" id="L163"><span class="tok-com">/// kind of file it is, survives decryption without being guessed at.</span></span>
 <span class="ln" id="L164"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">veil_path</span>(path: &amp;std::path::Path) -&gt; std::path::PathBuf {</span>
 <span class="ln" id="L165">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> name = path.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">to_os_string</span>();</span>
 <span class="ln" id="L166">    name.<span class="tok-fn">push</span>(<span class="tok-str">&quot;.veil&quot;</span>);</span>
@@ -295,10 +295,10 @@
 <span class="ln" id="L223"><span class="tok-com">/// The cost travels with the file so that a container written years ago still</span></span>
 <span class="ln" id="L224"><span class="tok-com">/// opens after the defaults are raised. The price is that a *hostile* file can</span></span>
 <span class="ln" id="L225"><span class="tok-com">/// declare a legitimate-but-large cost and make itself slow and expensive to</span></span>
-<span class="ln" id="L226"><span class="tok-com">/// open &#8212; see F-3&#x27;s residual in `docs/AUDIT.md`. When a person chose the file</span></span>
+<span class="ln" id="L226"><span class="tok-com">/// open. See F-3&#x27;s residual in `docs/AUDIT.md`. When a person chose the file</span></span>
 <span class="ln" id="L227"><span class="tok-com">/// and can stop waiting, that is an acceptable price and</span></span>
-<span class="ln" id="L228"><span class="tok-com">/// [`open_with_password`] pays it. When nothing human is present &#8212; a batch</span></span>
-<span class="ln" id="L229"><span class="tok-com">/// job, a service, anything handed files it did not choose &#8212; pass</span></span>
+<span class="ln" id="L228"><span class="tok-com">/// [`open_with_password`] pays it. When nothing human is present, such as a</span></span>
+<span class="ln" id="L229"><span class="tok-com">/// batch job, a service or anything handed files it did not choose, pass</span></span>
 <span class="ln" id="L230"><span class="tok-com">/// [`kdf::KdfParams::UNATTENDED_MAX_M_COST`] here and get</span></span>
 <span class="ln" id="L231"><span class="tok-com">/// [`Error::KdfCostRefused`] instead of the memory.</span></span>
 <span class="ln" id="L232"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open_with_password_within</span>(</span>
@@ -515,7 +515,7 @@
 <span class="ln" id="L440">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unattended_caller_can_refuse_an_expensive_container</span>() {</span>
 <span class="ln" id="L442">        <span class="tok-kw">let</span> expensive = kdf::KdfParams {</span>
-<span class="ln" id="L443">            m_cost: <span class="tok-num">64</span> * <span class="tok-num">1024</span>, <span class="tok-com">// 64 MiB &#8212; legal, and more than we will allow</span></span>
+<span class="ln" id="L443">            m_cost: <span class="tok-num">64</span> * <span class="tok-num">1024</span>, <span class="tok-com">// 64 MiB, legal and more than we will allow</span></span>
 <span class="ln" id="L444">            t_cost: <span class="tok-num">1</span>,</span>
 <span class="ln" id="L445">            p_cost: <span class="tok-num">1</span>,</span>
 <span class="ln" id="L446">        };</span>

@@ -5,7 +5,7 @@
 //! new random target every `frames_per_target` STFT frames, and a one-pole
 //! filter glides continuously toward it. Because the transform is therefore
 //! non-stationary and unpredictable, an attacker cannot "undo" it by assuming a
-//! single fixed shift — there is no single shift to undo, and the target
+//! single fixed shift: there is no single shift to undo, and the target
 //! sequence is unknowable without the seed (which never leaves the process and
 //! is zeroized on drop).
 //!
@@ -113,7 +113,7 @@ impl Modulator {
     /// # Why a ratchet rather than fresh OS entropy
     ///
     /// The new seed is 32 bytes of ChaCha20 output from the stream being
-    /// replaced. That buys the property that matters — **forward secrecy**.
+    /// replaced. That buys the property that matters, **forward secrecy**.
     /// ChaCha20 is not invertible, so an adversary who somehow learned the
     /// current seed could generate everything from this moment on but could not
     /// walk backwards to recover any earlier one. Each roll permanently closes
@@ -122,7 +122,7 @@ impl Modulator {
     /// Reading fresh entropy from the OS instead would mean a syscall inside an
     /// audio callback every couple of seconds, which is exactly the kind of
     /// thing that causes a dropout, and it would make
-    /// [`crate::Deidentifier::from_seed`] non-deterministic — losing the
+    /// [`crate::Deidentifier::from_seed`] non-deterministic, and losing the
     /// reproducibility the test suite depends on. The chain is seeded from the
     /// OS CSPRNG once at construction; the ratchet carries that unpredictability
     /// forward without ever going back to the kernel.

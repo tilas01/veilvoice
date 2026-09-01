@@ -30,21 +30,21 @@ and amnesic secret storage for VeilVoice.
 
 [`veilvoice_core`](../../../crates/veilvoice-core/README.md) makes a voice
 unrecognisable; it does not hide the *words*, and it is not meant to. When a
-recording needs to stay secret as well — at rest on disk, or in transit to
-someone else — that is this crate's job.
+recording needs to stay secret as well, at rest on disk or in transit to
+someone else, that is this crate's job.
 
-- `kdf` — Argon2id, for turning a password into a key.
-- `hybrid` — X25519 + ML-KEM-768, so a recording captured today is not
+- `kdf`, Argon2id, for turning a password into a key.
+- `hybrid`, X25519 + ML-KEM-768, so a recording captured today is not
 readable by a quantum adversary tomorrow.
-- `aead` — XChaCha20-Poly1305, with random nonces and authenticated
+- `aead`, XChaCha20-Poly1305, with random nonces and authenticated
 associated data.
-- `container` — the `.veil` file format that ties the three together.
-- `amnesia` — page-locked, zeroizing, constant-time-comparable secrets.
-- `shred` — secure erasure, and an honest account of what that is worth
+- `container`, the `.veil` file format that ties the three together.
+- `amnesia`, page-locked, zeroizing, constant-time-comparable secrets.
+- `shred`, secure erasure, and an honest account of what that is worth
 on flash storage.
-- `privatefile` — writing a file that is owner-only from the moment it
+- `privatefile`, writing a file that is owner-only from the moment it
 exists, rather than world-readable until a second syscall tightens it.
-- `lock` — the application lock: an Argon2id verifier with a rate limit,
+- `lock`, the application lock: an Argon2id verifier with a rate limit,
 which protects against casual access and says so rather than pretending to
 be tamper-proof.
 
@@ -72,7 +72,7 @@ assert!(container::open_with_password(b"wrong", &sealed).is_err());
 # }
 ```
 
-VeilVoice contains **no `unsafe` code at all** — including the page-locking
+VeilVoice contains **no `unsafe` code at all**, including the page-locking
 in `amnesia`, which goes through a safe wrapper.
 
 # In plain words

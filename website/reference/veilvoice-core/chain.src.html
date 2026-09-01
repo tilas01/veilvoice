@@ -220,7 +220,7 @@
 <span class="ln" id="L176">    <span class="tok-com">/// short, independently-sealed ones.</span></span>
 <span class="ln" id="L177">    <span class="tok-com">///</span></span>
 <span class="ln" id="L178">    <span class="tok-com">/// Two seconds by default, which is frequent enough to keep each segment</span></span>
-<span class="ln" id="L179">    <span class="tok-com">/// small and far too slow to hear &#8212; the parameters glide across a roll and</span></span>
+<span class="ln" id="L179">    <span class="tok-com">/// small and far too slow to hear: the parameters glide across a roll and</span></span>
 <span class="ln" id="L180">    <span class="tok-com">/// the phase offsets ease to their new values over about half a second.</span></span>
 <span class="ln" id="L181">    <span class="tok-com">/// Set to `0.0` to keep a single stream for the whole session.</span></span>
 <span class="ln" id="L182">    <span class="tok-com">///</span></span>
@@ -547,8 +547,8 @@
 <span class="ln" id="L475">    <span class="tok-com">/// Every value in here is reachable from a file: a WAV&#x27;s `fmt ` chunk</span></span>
 <span class="ln" id="L476">    <span class="tok-com">/// carries a **`u32`** sample rate, and `symphonia` passes whatever it</span></span>
 <span class="ln" id="L477">    <span class="tok-com">/// finds straight through. That number then sizes the delay lines in</span></span>
-<span class="ln" id="L478">    <span class="tok-com">/// `effects.rs` &#8212; `Reverb`&#x27;s comb is `0.0297 &#215; sample_rate` samples and the</span></span>
-<span class="ln" id="L479">    <span class="tok-com">/// chorus voices are similar &#8212; so a four-kilobyte file declaring</span></span>
+<span class="ln" id="L478">    <span class="tok-com">/// `effects.rs`, where `Reverb`&#x27;s comb is `0.0297 &#215; sample_rate` samples and</span></span>
+<span class="ln" id="L479">    <span class="tok-com">/// the chorus voices are similar, so a four-kilobyte file declaring</span></span>
 <span class="ln" id="L480">    <span class="tok-com">/// `u32::MAX` asks for roughly two gigabytes of buffers before a single</span></span>
 <span class="ln" id="L481">    <span class="tok-com">/// sample is processed. A failed allocation in Rust aborts the process,</span></span>
 <span class="ln" id="L482">    <span class="tok-com">/// which is the same shape as F-3: opening a hostile file kills the</span></span>
@@ -575,7 +575,7 @@
 <span class="ln" id="L499">    <span class="tok-com">///</span></span>
 <span class="ln" id="L500">    <span class="tok-com">/// Every float is checked for finiteness, not merely for range. A `NaN`</span></span>
 <span class="ln" id="L501">    <span class="tok-com">/// compares false against every bound, so a bare `self.sample_rate &lt;</span></span>
-<span class="ln" id="L502">    <span class="tok-com">/// 8_000.0` test *passes* `NaN` &#8212; and an engine built at a `NaN` sample</span></span>
+<span class="ln" id="L502">    <span class="tok-com">/// 8_000.0` test *passes* `NaN`, and an engine built at a `NaN` sample</span></span>
 <span class="ln" id="L503">    <span class="tok-com">/// rate produced `NaN` for every output sample, for the whole session,</span></span>
 <span class="ln" id="L504">    <span class="tok-com">/// with nothing reported. That is F-5 arriving through a second door: F-5</span></span>
 <span class="ln" id="L505">    <span class="tok-com">/// sanitised the samples, and nothing sanitised the configuration they were</span></span>
@@ -635,7 +635,7 @@
 <span class="ln" id="L559">            }</span>
 <span class="ln" id="L560">        }</span>
 <span class="ln" id="L561">        <span class="tok-com">// The remaining floats are all clamped rather than refused, because</span></span>
-<span class="ln" id="L562">        <span class="tok-com">// every one of them has a meaningful nearest legal value &#8212; but a `NaN`</span></span>
+<span class="ln" id="L562">        <span class="tok-com">// every one of them has a meaningful nearest legal value. A `NaN`</span></span>
 <span class="ln" id="L563">        <span class="tok-com">// does not clamp, it propagates, so it is refused by name.</span></span>
 <span class="ln" id="L564">        <span class="tok-kw">for</span> (name, value) <span class="tok-kw">in</span> [</span>
 <span class="ln" id="L565">            (<span class="tok-str">&quot;intensity&quot;</span>, <span class="tok-kw">self</span>.intensity),</span>
@@ -1501,7 +1501,7 @@
 <span class="ln" id="L1396">        );</span>
 <span class="ln" id="L1397">    }</span>
 <span class="ln" id="L1398"></span>
-<span class="ln" id="L1399">    <span class="tok-com">/// Rolling must not cost determinism &#8212; reproducible builds and the whole</span></span>
+<span class="ln" id="L1399">    <span class="tok-com">/// Rolling must not cost determinism, because reproducible builds and the whole</span></span>
 <span class="ln" id="L1400">    <span class="tok-com">/// test suite depend on `from_seed` being repeatable.</span></span>
 <span class="ln" id="L1401">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L1402">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_stays_deterministic_for_a_given_seed</span>() {</span>

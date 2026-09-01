@@ -118,7 +118,7 @@
 <span class="src-item" id="fn-kdfparams-default">
 <span class="ln" id="L73">    <span class="tok-com">/// RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but</span></span>
 <span class="ln" id="L74">    <span class="tok-com">/// 256 MiB with three passes is the sweet spot for an interactive desktop</span></span>
-<span class="ln" id="L75">    <span class="tok-com">/// unlock &#8212; strong against offline cracking while still opening a file in</span></span>
+<span class="ln" id="L75">    <span class="tok-com">/// unlock: strong against offline cracking while still opening a file in</span></span>
 <span class="ln" id="L76">    <span class="tok-com">/// well under a second on ordinary hardware.</span></span>
 <span class="ln" id="L77">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
 <span class="ln" id="L78">        Self {</span>
@@ -150,14 +150,14 @@
 </span>
 <span class="ln" id="L100"></span>
 <span class="src-item" id="fn-kdfparams-max_m_cost">
-<span class="ln" id="L101">    <span class="tok-com">/// The largest memory cost this build will attempt, in KiB &#8212; 4 GiB.</span></span>
+<span class="ln" id="L101">    <span class="tok-com">/// The largest memory cost this build will attempt, in KiB, which is 4 GiB.</span></span>
 <span class="ln" id="L102">    <span class="tok-com">///</span></span>
 <span class="ln" id="L103">    <span class="tok-com">/// A ceiling is necessary because `m_cost` arrives from the file. Argon2</span></span>
 <span class="ln" id="L104">    <span class="tok-com">/// allocates that much memory before it does anything else, so a header</span></span>
 <span class="ln" id="L105">    <span class="tok-com">/// claiming `u32::MAX` asks for four *terabytes*: the allocation fails, and</span></span>
 <span class="ln" id="L106">    <span class="tok-com">/// a failed allocation in Rust aborts the process. Merely *attempting to</span></span>
 <span class="ln" id="L107">    <span class="tok-com">/// open* a hostile `.veil` would kill the program, and for the app lock it</span></span>
-<span class="ln" id="L108">    <span class="tok-com">/// is worse &#8212; that file is read before anyone has authenticated, so</span></span>
+<span class="ln" id="L108">    <span class="tok-com">/// is worse, because that file is read before anyone has authenticated, so</span></span>
 <span class="ln" id="L109">    <span class="tok-com">/// anything that can write it can stop VeilVoice from starting at all.</span></span>
 <span class="ln" id="L110">    <span class="tok-com">///</span></span>
 <span class="ln" id="L111">    <span class="tok-com">/// 4 GiB is chosen to sit well above every parameter set anyone would</span></span>
@@ -226,7 +226,7 @@
 <span class="ln" id="L170">    <span class="tok-com">/// four times this crate&#x27;s default and still opens in a few seconds, while</span></span>
 <span class="ln" id="L171">    <span class="tok-com">/// refusing a header that asks for four gigabytes of someone else&#x27;s memory.</span></span>
 <span class="ln" id="L172">    <span class="tok-com">///</span></span>
-<span class="ln" id="L173">    <span class="tok-com">/// This is a *policy*, not a security boundary &#8212; the honest framing is that</span></span>
+<span class="ln" id="L173">    <span class="tok-com">/// This is a *policy*, not a security boundary. The honest framing is that</span></span>
 <span class="ln" id="L174">    <span class="tok-com">/// it bounds the cost of being handed a hostile file, not that it makes one</span></span>
 <span class="ln" id="L175">    <span class="tok-com">/// safe.</span></span>
 <span class="ln" id="L176">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> UNATTENDED_MAX_M_COST: u32 = <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
@@ -238,8 +238,8 @@
 <span class="ln" id="L180">    <span class="tok-com">///</span></span>
 <span class="ln" id="L181">    <span class="tok-com">/// Opening a container whose declared cost is legitimate but large is slow</span></span>
 <span class="ln" id="L182">    <span class="tok-com">/// by design, and that is the price of shipping the cost with the file so</span></span>
-<span class="ln" id="L183">    <span class="tok-com">/// old files keep opening. A caller running without a human present &#8212; a</span></span>
-<span class="ln" id="L184">    <span class="tok-com">/// batch job, a service, anything processing files it did not choose &#8212; can</span></span>
+<span class="ln" id="L183">    <span class="tok-com">/// old files keep opening. A caller running without a human present, such</span></span>
+<span class="ln" id="L184">    <span class="tok-com">/// as a batch job, a service or anything processing files it did not choose, can</span></span>
 <span class="ln" id="L185">    <span class="tok-com">/// use this to decline instead of spending the memory. Pass</span></span>
 <span class="ln" id="L186">    <span class="tok-com">/// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a</span></span>
 <span class="ln" id="L187">    <span class="tok-com">/// reason for something else.</span></span>
@@ -270,14 +270,14 @@
 <span class="ln" id="L210">    <span class="tok-com">/// This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in</span></span>
 <span class="ln" id="L211">    <span class="tok-com">/// the wrong order: `Params::new` evaluates `m_cost &lt; p_cost * 8` before it</span></span>
 <span class="ln" id="L212">    <span class="tok-com">/// checks `p_cost &gt; MAX_P_COST`, so a `p_cost` above `u32::MAX / 8`</span></span>
-<span class="ln" id="L213">    <span class="tok-com">/// overflows the multiplication. With overflow checks on &#8212; every debug</span></span>
-<span class="ln" id="L214">    <span class="tok-com">/// build, and any consumer of this crate as a library &#8212; that is a **panic</span></span>
+<span class="ln" id="L213">    <span class="tok-com">/// overflows the multiplication. With overflow checks on, which is every</span></span>
+<span class="ln" id="L214">    <span class="tok-com">/// debug build and any consumer of this crate as a library, that is a **panic</span></span>
 <span class="ln" id="L215">    <span class="tok-com">/// on attacker-controlled input**, since `p_cost` is read verbatim from a</span></span>
 <span class="ln" id="L216">    <span class="tok-com">/// `.veil` header or an app-lock file. Found by the campaign in</span></span>
 <span class="ln" id="L217">    <span class="tok-com">/// `tests/parser_fuzz.rs`.</span></span>
 <span class="ln" id="L218">    <span class="tok-com">///</span></span>
 <span class="ln" id="L219">    <span class="tok-com">/// VeilVoice&#x27;s own release profile disables overflow checks, where the</span></span>
-<span class="ln" id="L220">    <span class="tok-com">/// multiplication wraps and the `MAX_P_COST` test then rejects it anyway &#8212;</span></span>
+<span class="ln" id="L220">    <span class="tok-com">/// multiplication wraps and the `MAX_P_COST` test then rejects it anyway,</span></span>
 <span class="ln" id="L221">    <span class="tok-com">/// but &quot;our release profile happens to make the panic unreachable&quot; is not a</span></span>
 <span class="ln" id="L222">    <span class="tok-com">/// property to rely on, and it is not true for anyone building against</span></span>
 <span class="ln" id="L223">    <span class="tok-com">/// these crates. So the bound is enforced here, in the one place every</span></span>
@@ -528,7 +528,7 @@
 <span class="ln" id="L457"></span>
 <span class="ln" id="L458">    <span class="tok-com">/// The other half of the same finding: `m_cost` is the number of KiB</span></span>
 <span class="ln" id="L459">    <span class="tok-com">/// Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation</span></span>
-<span class="ln" id="L460">    <span class="tok-com">/// fails, and a failed allocation aborts the process &#8212; so simply *trying to</span></span>
+<span class="ln" id="L460">    <span class="tok-com">/// fails, and a failed allocation aborts the process, so simply *trying to</span></span>
 <span class="ln" id="L461">    <span class="tok-com">/// open* a hostile file would kill the program.</span></span>
 <span class="ln" id="L462">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L463">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_memory_cost_is_rejected_rather_than_allocated</span>() {</span>

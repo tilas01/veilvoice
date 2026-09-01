@@ -4,7 +4,8 @@
 //! # What this is for
 //!
 //! By default every speaker VeilVoice processes comes out as **the same
-//! voice** — one pitch register, one vocal-tract scale, one long-term spectrum.
+//! voice**, with one pitch register, one vocal-tract scale and one long-term
+//! spectrum.
 //! That is the many-to-one mapping the whole project rests on, and for a single
 //! speaker it is exactly right.
 //!
@@ -18,14 +19,14 @@
 //!
 //! The property that matters is that **the output voice is a function of the
 //! slot, not of the speaker**. Every input mapped onto slot 3 comes out as
-//! voice 3, whoever they were. The mapping is still many-to-one — there are
-//! still infinitely many inputs per output — so there is still no inverse to
+//! voice 3, whoever they were. The mapping is still many-to-one, with
+//! infinitely many inputs per output, so there is still no inverse to
 //! compute. What changes is the number of buckets, from one to at most ten.
 //!
 //! This is why a voice is **never derived from the speaker**. Choosing a
-//! destination by measuring the input — the obvious implementation, and the one
-//! that would sound most natural — would make the output voice a function of the
-//! input voice, which is precisely the linkage the project exists to destroy.
+//! destination by measuring the input is the obvious implementation, and the
+//! one that would sound most natural. It would make the output voice a function
+//! of the input voice, which is precisely the linkage the project exists to destroy.
 //! Slots are assigned by turn order, and turn order is something the *user*
 //! supplies.
 //!
@@ -37,7 +38,7 @@
 //! * **How many people were talking.** Ten voices in the output means ten
 //!   speakers in the input.
 //! * **Who spoke when, and for how long.** Turn-taking structure is preserved
-//!   on purpose — it is the thing that makes the result usable — and turn
+//!   on purpose, because it is the thing that makes the result usable, and turn
 //!   structure is information about a conversation. Overlaps, interruptions,
 //!   the length of each answer and the rhythm of the exchange all survive.
 //! * **Nothing about who they were.** The voiceprint of each speaker is
@@ -53,7 +54,7 @@
 //! sound and the table was wrong, because it measured the wrong thing.
 //!
 //! When accent neutralisation is on, [`crate::spectral`] does not resample the
-//! excitation — it **replaces** it with a harmonic comb at the canonical
+//! excitation. It **replaces** it with a harmonic comb at the canonical
 //! fundamental, quantised to the nearest whole FFT bin so that every comb line
 //! sits on a bin centre and the frames overlap-add coherently. The rendered
 //! fundamental is therefore not the number in the table. It is
@@ -64,7 +65,7 @@
 //!
 //! At the default 1024-point frame and 48 kHz that spacing is **46.875 Hz**, so
 //! the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625,
-//! 140.625, 187.5 and 187.5 — three distinct pitches, not five. Two pairs of
+//! 140.625, 187.5 and 187.5, which is three distinct pitches, not five. Two pairs of
 //! speakers would have shared a register with nothing in the interface saying
 //! so. It was found by measuring the fundamental of an actual rendered file,
 //! not by reading the code, and the tests below now measure the same thing the
@@ -72,9 +73,9 @@
 //!
 //! So the registers are **bin-exact by construction**: each is a whole number
 //! of bins at the default configuration. Inside the range where a resynthesised
-//! voice stays intelligible — roughly 90 to 240 Hz, below which the comb has too
+//! voice stays intelligible, roughly 90 to 240 Hz, below which the comb has too
 //! few harmonics under the vowels and above which it stops being a speaking
-//! register — there are exactly four:
+//! register, there are exactly four:
 //!
 //! | bin | rendered |
 //! |---:|---:|
@@ -86,14 +87,14 @@
 //! # Ten voices, from four registers and three vocal tracts
 //!
 //! The second axis is the canonical vocal-tract scale, which is a continuous
-//! warp and is **not** quantised — so it is free to take values the ear can
+//! warp and is **not** quantised, so it is free to take values the ear can
 //! separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all
 //! inside the range where the vowels stay natural.
 //!
 //! Four registers times three tracts is twelve, and [`MAX_VOICES`] ships ten of
 //! them. Twenty, which was asked for, is not available: it would need either
-//! registers a single bin apart at a frame size four times longer — which
-//! quadruples the latency — or vocal tracts close enough to be heard as the
+//! registers a single bin apart at a frame size four times longer, which
+//! quadruples the latency, or vocal tracts close enough to be heard as the
 //! same person on a different day.
 //!
 //! # If you change the frame size, check the table again
@@ -102,7 +103,7 @@
 //! [`crate::DeidConfig::frame_size`] or the sample rate moves the bin grid
 //! underneath them, and two registers can collide again.
 //! [`Voice::rendered_f0_hz`] reports what a given configuration will actually
-//! produce, and [`distinct_voices`] counts how many of the ten survive it — so
+//! produce, and [`distinct_voices`] counts how many of the ten survive it, so
 //! a front end can say "this frame size gives you six distinguishable voices"
 //! rather than handing out ten labels for six sounds.
 //!
@@ -134,10 +135,10 @@ pub struct Voice {
     /// Pitch register, in hertz.
     ///
     /// What is *asked for*. What is rendered is this quantised to the FFT bin
-    /// grid — see [`Voice::rendered_f0_hz`], and the module documentation for
+    /// grid. See [`Voice::rendered_f0_hz`], and the module documentation for
     /// why that distinction cost a wrong table once already.
     pub target_f0_hz: f32,
-    /// Canonical long-term envelope centroid, in hertz — the vocal-tract scale.
+    /// Canonical long-term envelope centroid, in hertz, which is the vocal-tract scale.
     ///
     /// A continuous warp, so this one is rendered as asked.
     pub target_centroid_hz: f32,
@@ -148,8 +149,8 @@ pub struct Voice {
 impl Voice {
     /// Apply this voice to an [`AccentConfig`].
     ///
-    /// Only the three canonical targets are replaced. The *strengths* —
-    /// how hard the neutraliser pushes toward them — are left alone, because
+    /// Only the three canonical targets are replaced. The *strengths*, meaning
+    /// how hard the neutraliser pushes toward them, are left alone, because
     /// they are the user's setting and a slot is a destination, not a policy
     /// about how firmly to arrive at it.
     pub fn applied_to(&self, mut accent: AccentConfig) -> AccentConfig {
@@ -281,8 +282,8 @@ pub fn bin_hz(config: &DeidConfig) -> f32 {
 /// voice in every recording anybody has already made.
 const REGISTERS_HZ: [f32; 4] = [93.75, 140.625, 187.5, 234.375];
 
-/// The three vocal-tract scales, about 22 % apart. Not quantised — the warp is
-/// continuous — so these render as asked.
+/// The three vocal-tract scales, about 22 % apart. Not quantised, because the
+/// warp is continuous, so these render as asked.
 const TRACTS: [(f32, f32); 3] = [
     // (centroid Hz, tilt dB per octave)
     (620.0, -5.0),
@@ -318,8 +319,8 @@ const TABLE: [(usize, usize); MAX_VOICES] = [
 /// The destination voice for slot `index`.
 ///
 /// Wraps rather than failing past [`MAX_VOICES`]: an eleventh speaker gets the
-/// first voice again. That is a real collision — two people sharing one output
-/// voice — and it is why [`MAX_VOICES`] is stated and why a front end should
+/// first voice again. That is a real collision, with two people sharing one
+/// output voice, and it is why [`MAX_VOICES`] is stated and why a front end should
 /// refuse rather than rely on this. Wrapping is here so the function is total,
 /// not because reusing a voice is acceptable.
 pub fn voice(index: usize) -> Voice {
@@ -377,7 +378,7 @@ pub fn separation(a: &Voice, b: &Voice, config: &DeidConfig) -> f32 {
 
 /// The separation below which two voices should not be handed to two people.
 ///
-/// **Three semitones — a ratio of 1.19.**
+/// **Three semitones, a ratio of 1.19.**
 ///
 /// A semitone is about 6 % and is audible when two sounds are played back to
 /// back for comparison. That is not the task here. The task is following a
@@ -388,7 +389,7 @@ pub fn separation(a: &Voice, b: &Voice, config: &DeidConfig) -> f32 {
 ///
 /// Deliberately conservative, because being wrong in the other direction is
 /// worse. A group set up with two voices the listener cannot separate produces
-/// a recording in which two people sound like one — which is not a privacy
+/// a recording in which two people sound like one, which is not a privacy
 /// failure but is a failure of the thing the feature is *for*, and it is only
 /// discovered after the recording exists.
 pub const CLEAR_SEPARATION: f32 = 1.19;

@@ -42,7 +42,7 @@
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
-<span class="ln" id="L2"><span class="tok-com">//! Secure erasure &#8212; the self-destruct.</span></span>
+<span class="ln" id="L2"><span class="tok-com">//! Secure erasure, the self-destruct.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! # Read this before relying on it</span></span>
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
@@ -54,7 +54,7 @@
 <span class="ln" id="L11"><span class="tok-com">//! **On a spinning disk**, overwriting is genuinely effective. The write goes to</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! the same physical sectors, and the belief that a scanning-microscope recovery</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! of overwritten magnetic media is practical does not survive contact with the</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! literature &#8212; Gutmann&#x27;s 1996 paper, whose 35-pass pattern is still cited, says</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! literature. Gutmann&#x27;s 1996 paper, whose 35-pass pattern is still cited, says</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! so himself in its own epilogue about modern drives.</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! **On an SSD, or any flash media**, it is not reliable and cannot be made so.</span></span>
@@ -74,8 +74,8 @@
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! Because passes stopped being the interesting variable decades ago. Against a</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! drive that honours writes, one pass is enough; against one that does not, no</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! number of passes reaches the retained cells. The default here is three &#8212;</span></span>
-<span class="ln" id="L35"><span class="tok-com">//! random, complement, random &#8212; which satisfies the common</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! number of passes reaches the retained cells. The default here is three,</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! random then complement then random, which satisfies the common</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! three-pass expectation without pretending that thirty-five would be stronger.</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! Time is better spent enabling disk encryption than on passes 4 through 35.</span></span>
 <span class="ln" id="L38"><span class="tok-com">//!</span></span>
@@ -142,7 +142,7 @@
 <span class="ln" id="L92">    <span class="tok-kw">pub</span> removed: bool,</span>
 <span class="ln" id="L93">    <span class="tok-com">/// Whether the data was flushed to the device rather than left in cache.</span></span>
 <span class="ln" id="L94">    <span class="tok-kw">pub</span> synced: bool,</span>
-<span class="ln" id="L95">    <span class="tok-com">/// Caveats that apply to this erasure, in plain words. Never empty &#8212; there</span></span>
+<span class="ln" id="L95">    <span class="tok-com">/// Caveats that apply to this erasure, in plain words. Never empty, because there</span></span>
 <span class="ln" id="L96">    <span class="tok-com">/// is always something honest to say about the limits.</span></span>
 <span class="ln" id="L97">    <span class="tok-kw">pub</span> caveats: Vec&lt;String&gt;,</span>
 <span class="ln" id="L98">}</span>
@@ -151,13 +151,13 @@
 <span class="src-item" id="fn-shred_file">
 <span class="ln" id="L100"><span class="tok-com">/// Overwrite a file&#x27;s contents, then delete it.</span></span>
 <span class="ln" id="L101"><span class="tok-com">///</span></span>
-<span class="ln" id="L102"><span class="tok-com">/// The file is opened for writing in place &#8212; never truncated, never copied &#8212;</span></span>
+<span class="ln" id="L102"><span class="tok-com">/// The file is opened for writing in place, never truncated and never copied,</span></span>
 <span class="ln" id="L103"><span class="tok-com">/// so the bytes on disk are the ones being overwritten, as far as the operating</span></span>
 <span class="ln" id="L104"><span class="tok-com">/// system and the drive allow.</span></span>
 <span class="ln" id="L105"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">shred_file</span>(path: &amp;Path, passes: Passes) -&gt; Result&lt;ShredReport, Error&gt; {</span>
 <span class="ln" id="L106">    <span class="tok-com">// `symlink_metadata` does *not* follow the link, which is the whole point.</span></span>
-<span class="ln" id="L107">    <span class="tok-com">// Overwriting through a symlink destroys whatever it points at &#8212; someone</span></span>
-<span class="ln" id="L108">    <span class="tok-com">// else&#x27;s key, a config file, `~/.bashrc` &#8212; and then unlinks only the link,</span></span>
+<span class="ln" id="L107">    <span class="tok-com">// Overwriting through a symlink destroys whatever it points at, such as</span></span>
+<span class="ln" id="L108">    <span class="tok-com">// someone else&#x27;s key, a config file or `~/.bashrc`, and then unlinks only the link,</span></span>
 <span class="ln" id="L109">    <span class="tok-com">// so the report would say &quot;removed&quot; about a file that is still there while</span></span>
 <span class="ln" id="L110">    <span class="tok-com">// an unrelated one has been filled with random bytes. A destructive</span></span>
 <span class="ln" id="L111">    <span class="tok-com">// operation must refuse to be redirected.</span></span>
@@ -182,7 +182,7 @@
 <span class="ln" id="L130">    <span class="tok-kw">let</span> count = passes.<span class="tok-fn">count</span>();</span>
 <span class="ln" id="L131"></span>
 <span class="ln" id="L132">    <span class="tok-com">// Computed in `u64` and only then narrowed. `length as usize` truncates on</span></span>
-<span class="ln" id="L133">    <span class="tok-com">// a 32-bit target &#8212; and VeilVoice ships an ARMv7 build &#8212; so a file of</span></span>
+<span class="ln" id="L133">    <span class="tok-com">// a 32-bit target, and VeilVoice ships an ARMv7 build, so a file of</span></span>
 <span class="ln" id="L134">    <span class="tok-com">// exactly 4 GiB gave a zero-length buffer, `take` was then always zero,</span></span>
 <span class="ln" id="L135">    <span class="tok-com">// `remaining` never decreased and the loop **never terminated**: the erase</span></span>
 <span class="ln" id="L136">    <span class="tok-com">// hung forever and the file was left intact. The same 32-bit-only shape as</span></span>
@@ -412,7 +412,7 @@
 <span class="ln" id="L357">    }</span>
 <span class="ln" id="L358"></span>
 <span class="ln" id="L359">    <span class="tok-com">/// The same on Windows, where a symlink needs either Developer Mode or</span></span>
-<span class="ln" id="L360">    <span class="tok-com">/// elevation to create &#8212; so the test skips rather than fails when it</span></span>
+<span class="ln" id="L360">    <span class="tok-com">/// elevation to create, so the test skips rather than fails when it</span></span>
 <span class="ln" id="L361">    <span class="tok-com">/// cannot make one.</span></span>
 <span class="ln" id="L362">    <span class="tok-attr">#[cfg</span>(windows)]</span>
 <span class="ln" id="L363">    <span class="tok-attr">#[test</span>]</span>

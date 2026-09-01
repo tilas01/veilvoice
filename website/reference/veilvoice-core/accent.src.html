@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-core/src/accent.rs</code></h1>
-<p style="color:var(--muted)"><a href="accent.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 696 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="accent.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 697 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -49,16 +49,16 @@
 <span class="ln" id="L6"><span class="tok-com">//! Accent is carried by two very different kinds of cue, and they have opposite</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! answers here:</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! * **Suprasegmental cues** &#8212; intonation contour and pitch range, long-term</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! * **Suprasegmental cues**, meaning intonation contour and pitch range, long-term</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!   voice quality and spectral tilt, and the fixed vocal-tract scale behind a</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!   speaker&#x27;s vowel space. These are *properties of the signal*, they are</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!   strongly speaker- and region-identifying, and this module removes them by</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!   mapping every speaker onto one canonical target.</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! * **Segmental cues** &#8212; *which phonemes the speaker actually produced*:</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! * **Segmental cues**, meaning *which phonemes the speaker actually produced*:</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!   rhoticity, vowel mergers, dental-fricative substitution, aspiration</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!   patterns. These are not a colouration laid over the words; at this level</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!   they **are** the words. Removing them means deciding a different phoneme</span></span>
-<span class="ln" id="L18"><span class="tok-com">//!   was said, which no filter can do &#8212; it requires recognising the speech and</span></span>
+<span class="ln" id="L18"><span class="tok-com">//!   was said, which no filter can do: it requires recognising the speech and</span></span>
 <span class="ln" id="L19"><span class="tok-com">//!   re-synthesising it (see the planned text-to-speech mode, which sidesteps</span></span>
 <span class="ln" id="L20"><span class="tok-com">//!   this entirely by never carrying the original signal at all).</span></span>
 <span class="ln" id="L21"><span class="tok-com">//!</span></span>
@@ -74,7 +74,7 @@
 <span class="ln" id="L31"><span class="tok-com">//! Every step here is *many-to-one*: a whole population of input f0 contours,</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! spectral tilts and vocal-tract lengths is collapsed onto a single canonical</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! value. That destroys information rather than displacing it, so it composes</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! with the phase discard in [`crate::spectral`] &#8212; the two are independent</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! with the phase discard in [`crate::spectral`], because the two are independent</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! one-way steps, and normalising the speaker&#x27;s *mean* pitch and vocal-tract</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! length removes two of the strongest biometric features there are.</span></span>
 <span class="ln" id="L37"><span class="tok-com">//!</span></span>
@@ -160,7 +160,7 @@
 <span class="ln" id="L96">    <span class="tok-com">/// Master switch. When false the neutraliser is bypassed entirely.</span></span>
 <span class="ln" id="L97">    <span class="tok-kw">pub</span> enabled: bool,</span>
 <span class="ln" id="L98">    <span class="tok-com">/// How much of the speaker&#x27;s intonation contour is replaced by a canonical</span></span>
-<span class="ln" id="L99">    <span class="tok-com">/// one. At 1.0 &#8212; the default &#8212; the output sits at a steady</span></span>
+<span class="ln" id="L99">    <span class="tok-com">/// one. At 1.0, which is the default, the output sits at a steady</span></span>
 <span class="ln" id="L100">    <span class="tok-com">/// [`AccentConfig::target_f0_hz`], which removes the intonation pattern</span></span>
 <span class="ln" id="L101">    <span class="tok-com">/// entirely; the melody of an accent is one of its strongest cues, and a</span></span>
 <span class="ln" id="L102">    <span class="tok-com">/// constant carries no speaker information at all.</span></span>
@@ -174,12 +174,12 @@
 <span class="ln" id="L110">    <span class="tok-kw">pub</span> target_f0_hz: f32,</span>
 <span class="ln" id="L111">    <span class="tok-com">/// How much of the speaker&#x27;s vocal-tract scale is normalised away.</span></span>
 <span class="ln" id="L112">    <span class="tok-kw">pub</span> vtln_strength: f32,</span>
-<span class="ln" id="L113">    <span class="tok-com">/// Canonical long-term envelope centroid, in hertz &#8212; the vocal-tract scale</span></span>
+<span class="ln" id="L113">    <span class="tok-com">/// Canonical long-term envelope centroid, in hertz, which is the vocal-tract scale</span></span>
 <span class="ln" id="L114">    <span class="tok-com">/// every speaker is mapped onto.</span></span>
 <span class="ln" id="L115">    <span class="tok-kw">pub</span> target_centroid_hz: f32,</span>
 <span class="ln" id="L116">    <span class="tok-com">/// How much of the speaker&#x27;s long-term spectral tilt is rotated onto the</span></span>
 <span class="ln" id="L117">    <span class="tok-com">/// canonical slope. Deliberately a broad tilt only, never a bin-by-bin</span></span>
-<span class="ln" id="L118">    <span class="tok-com">/// match &#8212; see [`AccentNeutralizer::shape`].</span></span>
+<span class="ln" id="L118">    <span class="tok-com">/// match. See [`AccentNeutralizer::shape`].</span></span>
 <span class="ln" id="L119">    <span class="tok-kw">pub</span> ltas_strength: f32,</span>
 <span class="ln" id="L120">    <span class="tok-com">/// Slope of the canonical long-term spectrum, in dB per octave.</span></span>
 <span class="ln" id="L121">    <span class="tok-kw">pub</span> target_tilt_db_oct: f32,</span>
@@ -388,407 +388,408 @@
 <span class="ln" id="L302">    <span class="tok-com">/// formant warping applied upstream.</span></span>
 <span class="ln" id="L303">    <span class="tok-com">///</span></span>
 <span class="ln" id="L304">    <span class="tok-com">/// The correction is renormalised to preserve the frame&#x27;s energy exactly.</span></span>
-<span class="ln" id="L305">    <span class="tok-com">/// Centring the ramp only makes it *approximately* level-neutral &#8212; the</span></span>
-<span class="ln" id="L306">    <span class="tok-com">/// centroid is an energy-weighted quantity and a dB-symmetric curve is not</span></span>
-<span class="ln" id="L307">    <span class="tok-com">/// energy-symmetric &#8212; so the level is pinned explicitly rather than assumed.</span></span>
-<span class="ln" id="L308">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, env: &amp;<span class="tok-kw">mut</span> [f32]) {</span>
-<span class="ln" id="L309">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.cfg.enabled {</span>
-<span class="ln" id="L310">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L311">        }</span>
-<span class="ln" id="L312">        <span class="tok-com">// Apply the curve computed from previous frames, preserving energy.</span></span>
-<span class="ln" id="L313">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.started {</span>
-<span class="ln" id="L314">            <span class="tok-kw">let</span> before: f64 = env.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64) * (*v <span class="tok-kw">as</span> f64)).<span class="tok-fn">sum</span>();</span>
-<span class="ln" id="L315">            <span class="tok-kw">for</span> (e, &amp;db) <span class="tok-kw">in</span> env.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">zip</span>(<span class="tok-kw">self</span>.shape_db.<span class="tok-fn">iter</span>()) {</span>
-<span class="ln" id="L316">                *e *= <span class="tok-fn">db_to_gain</span>(db);</span>
-<span class="ln" id="L317">            }</span>
-<span class="ln" id="L318">            <span class="tok-kw">let</span> after: f64 = env.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64) * (*v <span class="tok-kw">as</span> f64)).<span class="tok-fn">sum</span>();</span>
-<span class="ln" id="L319">            <span class="tok-kw">if</span> after &gt; 1e-<span class="tok-num">30</span> &amp;&amp; before &gt; <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L320">                <span class="tok-kw">let</span> g = (before / after).<span class="tok-fn">sqrt</span>() <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L321">                <span class="tok-kw">for</span> e <span class="tok-kw">in</span> env.<span class="tok-fn">iter_mut</span>() {</span>
-<span class="ln" id="L322">                    *e *= g;</span>
-<span class="ln" id="L323">                }</span>
-<span class="ln" id="L324">            }</span>
-<span class="ln" id="L325">        }</span>
-<span class="ln" id="L326">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.last_pitch.voiced {</span>
-<span class="ln" id="L327">            <span class="tok-kw">return</span>; <span class="tok-com">// silence and consonant noise must not steer the average</span></span>
-<span class="ln" id="L328">        }</span>
-<span class="ln" id="L329"></span>
-<span class="ln" id="L330">        <span class="tok-com">// Fold the corrected envelope into the long-term average.</span></span>
-<span class="ln" id="L331">        <span class="tok-kw">let</span> a = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.started { <span class="tok-kw">self</span>.a_ltas } <span class="tok-kw">else</span> { <span class="tok-num">1.0</span> };</span>
-<span class="ln" id="L332">        <span class="tok-kw">for</span> (avg, &amp;e) <span class="tok-kw">in</span> <span class="tok-kw">self</span>.ltas_db.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">zip</span>(env.<span class="tok-fn">iter</span>()) {</span>
-<span class="ln" id="L333">            *avg += (<span class="tok-fn">gain_to_db</span>(e) - *avg) * a;</span>
-<span class="ln" id="L334">        }</span>
-<span class="ln" id="L335">        <span class="tok-kw">self</span>.started = true;</span>
-<span class="ln" id="L336">        <span class="tok-kw">self</span>.<span class="tok-fn">recompute_shape</span>();</span>
-<span class="ln" id="L337">    }</span>
+<span class="ln" id="L305">    <span class="tok-com">/// Centring the ramp only makes it *approximately* level-neutral, because</span></span>
+<span class="ln" id="L306">    <span class="tok-com">/// the centroid is an energy-weighted quantity and a dB-symmetric curve is</span></span>
+<span class="ln" id="L307">    <span class="tok-com">/// not energy-symmetric, so the level is pinned explicitly rather than</span></span>
+<span class="ln" id="L308">    <span class="tok-com">/// assumed.</span></span>
+<span class="ln" id="L309">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, env: &amp;<span class="tok-kw">mut</span> [f32]) {</span>
+<span class="ln" id="L310">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.cfg.enabled {</span>
+<span class="ln" id="L311">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L312">        }</span>
+<span class="ln" id="L313">        <span class="tok-com">// Apply the curve computed from previous frames, preserving energy.</span></span>
+<span class="ln" id="L314">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.started {</span>
+<span class="ln" id="L315">            <span class="tok-kw">let</span> before: f64 = env.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64) * (*v <span class="tok-kw">as</span> f64)).<span class="tok-fn">sum</span>();</span>
+<span class="ln" id="L316">            <span class="tok-kw">for</span> (e, &amp;db) <span class="tok-kw">in</span> env.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">zip</span>(<span class="tok-kw">self</span>.shape_db.<span class="tok-fn">iter</span>()) {</span>
+<span class="ln" id="L317">                *e *= <span class="tok-fn">db_to_gain</span>(db);</span>
+<span class="ln" id="L318">            }</span>
+<span class="ln" id="L319">            <span class="tok-kw">let</span> after: f64 = env.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64) * (*v <span class="tok-kw">as</span> f64)).<span class="tok-fn">sum</span>();</span>
+<span class="ln" id="L320">            <span class="tok-kw">if</span> after &gt; 1e-<span class="tok-num">30</span> &amp;&amp; before &gt; <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L321">                <span class="tok-kw">let</span> g = (before / after).<span class="tok-fn">sqrt</span>() <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L322">                <span class="tok-kw">for</span> e <span class="tok-kw">in</span> env.<span class="tok-fn">iter_mut</span>() {</span>
+<span class="ln" id="L323">                    *e *= g;</span>
+<span class="ln" id="L324">                }</span>
+<span class="ln" id="L325">            }</span>
+<span class="ln" id="L326">        }</span>
+<span class="ln" id="L327">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.last_pitch.voiced {</span>
+<span class="ln" id="L328">            <span class="tok-kw">return</span>; <span class="tok-com">// silence and consonant noise must not steer the average</span></span>
+<span class="ln" id="L329">        }</span>
+<span class="ln" id="L330"></span>
+<span class="ln" id="L331">        <span class="tok-com">// Fold the corrected envelope into the long-term average.</span></span>
+<span class="ln" id="L332">        <span class="tok-kw">let</span> a = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.started { <span class="tok-kw">self</span>.a_ltas } <span class="tok-kw">else</span> { <span class="tok-num">1.0</span> };</span>
+<span class="ln" id="L333">        <span class="tok-kw">for</span> (avg, &amp;e) <span class="tok-kw">in</span> <span class="tok-kw">self</span>.ltas_db.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">zip</span>(env.<span class="tok-fn">iter</span>()) {</span>
+<span class="ln" id="L334">            *avg += (<span class="tok-fn">gain_to_db</span>(e) - *avg) * a;</span>
+<span class="ln" id="L335">        }</span>
+<span class="ln" id="L336">        <span class="tok-kw">self</span>.started = true;</span>
+<span class="ln" id="L337">        <span class="tok-kw">self</span>.<span class="tok-fn">recompute_shape</span>();</span>
+<span class="ln" id="L338">    }</span>
 </span>
-<span class="ln" id="L338"></span>
+<span class="ln" id="L339"></span>
 <span class="src-item" id="fn-accentneutralizer-recompute_shape">
-<span class="ln" id="L339">    <span class="tok-com">/// Rebuild the correction curve from the current long-term average.</span></span>
-<span class="ln" id="L340">    <span class="tok-com">///</span></span>
-<span class="ln" id="L341">    <span class="tok-com">/// The curve is deliberately **a straight line in log-frequency and nothing</span></span>
-<span class="ln" id="L342">    <span class="tok-com">/// more**: the measured long-term spectrum is reduced to a single slope, and</span></span>
-<span class="ln" id="L343">    <span class="tok-com">/// the correction is the rotation that carries that slope onto the canonical</span></span>
-<span class="ln" id="L344">    <span class="tok-com">/// one. This is the strongest form of long-term colour correction that is</span></span>
-<span class="ln" id="L345">    <span class="tok-com">/// *structurally incapable* of damaging intelligibility &#8212; a smooth monotone</span></span>
-<span class="ln" id="L346">    <span class="tok-com">/// ramp adds the same offset to every speaker&#x27;s vowels, so formant-scale</span></span>
-<span class="ln" id="L347">    <span class="tok-com">/// contrast passes through untouched. Matching the long-term spectrum</span></span>
-<span class="ln" id="L348">    <span class="tok-com">/// bin-by-bin would remove more speaker colour, but it also flattens the</span></span>
-<span class="ln" id="L349">    <span class="tok-com">/// per-frame differences that distinguish one vowel from another, which is</span></span>
-<span class="ln" id="L350">    <span class="tok-com">/// not a trade this project is willing to make.</span></span>
-<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">recompute_shape</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L352">        <span class="tok-kw">let</span> (lo, hi) = (<span class="tok-kw">self</span>.ltas_lo, <span class="tok-kw">self</span>.ltas_hi);</span>
-<span class="ln" id="L353">        <span class="tok-kw">if</span> hi &lt;= lo {</span>
-<span class="ln" id="L354">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L355">        }</span>
-<span class="ln" id="L356"></span>
-<span class="ln" id="L357">        <span class="tok-com">// Weighted least-squares line fit of measured dB against log-frequency.</span></span>
-<span class="ln" id="L358">        <span class="tok-com">// Weighting by 1/k makes every octave count equally; FFT bins are linear</span></span>
-<span class="ln" id="L359">        <span class="tok-com">// in frequency, so an unweighted fit would be dominated by the top</span></span>
-<span class="ln" id="L360">        <span class="tok-com">// octave alone.</span></span>
-<span class="ln" id="L361">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> sw, <span class="tok-kw">mut</span> su, <span class="tok-kw">mut</span> suu, <span class="tok-kw">mut</span> sy, <span class="tok-kw">mut</span> suy) = (<span class="tok-num">0</span>.0f32, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L362">        <span class="tok-kw">for</span> k <span class="tok-kw">in</span> lo..=hi {</span>
-<span class="ln" id="L363">            <span class="tok-kw">let</span> u = ((k <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ).<span class="tok-fn">log2</span>();</span>
-<span class="ln" id="L364">            <span class="tok-kw">let</span> y = <span class="tok-kw">self</span>.ltas_db[k];</span>
-<span class="ln" id="L365">            <span class="tok-kw">let</span> w = <span class="tok-num">1.0</span> / k <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L366">            sw += w;</span>
-<span class="ln" id="L367">            su += w * u;</span>
-<span class="ln" id="L368">            suu += w * u * u;</span>
-<span class="ln" id="L369">            sy += w * y;</span>
-<span class="ln" id="L370">            suy += w * u * y;</span>
-<span class="ln" id="L371">        }</span>
-<span class="ln" id="L372">        <span class="tok-kw">let</span> denom = sw * suu - su * su;</span>
-<span class="ln" id="L373">        <span class="tok-kw">if</span> denom.<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">12</span> {</span>
-<span class="ln" id="L374">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L375">        }</span>
-<span class="ln" id="L376">        <span class="tok-kw">let</span> measured_tilt = (sw * suy - su * sy) / denom;</span>
-<span class="ln" id="L377">        <span class="tok-kw">let</span> u_mid = su / sw;</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379">        <span class="tok-com">// Rotate about the band&#x27;s log-frequency centroid by the slope error.</span></span>
-<span class="ln" id="L380">        <span class="tok-kw">let</span> s = <span class="tok-kw">self</span>.cfg.ltas_strength.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>) * <span class="tok-kw">self</span>.warmup;</span>
-<span class="ln" id="L381">        <span class="tok-kw">let</span> delta = (<span class="tok-kw">self</span>.cfg.target_tilt_db_oct - measured_tilt) * s;</span>
-<span class="ln" id="L382">        <span class="tok-kw">let</span> (u_lo, u_hi) = (</span>
-<span class="ln" id="L383">            ((lo <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ).<span class="tok-fn">log2</span>(),</span>
-<span class="ln" id="L384">            ((hi <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ).<span class="tok-fn">log2</span>(),</span>
-<span class="ln" id="L385">        );</span>
-<span class="ln" id="L386">        <span class="tok-kw">for</span> (k, db) <span class="tok-kw">in</span> <span class="tok-kw">self</span>.shape_db.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L387">            <span class="tok-com">// Outside the band the ramp is held at its edge value rather than</span></span>
-<span class="ln" id="L388">            <span class="tok-com">// dropped to zero, which would put a step at the band edge.</span></span>
-<span class="ln" id="L389">            <span class="tok-kw">let</span> u = ((k <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ)</span>
-<span class="ln" id="L390">                .<span class="tok-fn">log2</span>()</span>
-<span class="ln" id="L391">                .<span class="tok-fn">clamp</span>(u_lo, u_hi);</span>
-<span class="ln" id="L392">            *db = (delta * (u - u_mid)).<span class="tok-fn">clamp</span>(-MAX_SHAPE_DB, MAX_SHAPE_DB);</span>
-<span class="ln" id="L393">        }</span>
-<span class="ln" id="L394">    }</span>
+<span class="ln" id="L340">    <span class="tok-com">/// Rebuild the correction curve from the current long-term average.</span></span>
+<span class="ln" id="L341">    <span class="tok-com">///</span></span>
+<span class="ln" id="L342">    <span class="tok-com">/// The curve is deliberately **a straight line in log-frequency and nothing</span></span>
+<span class="ln" id="L343">    <span class="tok-com">/// more**: the measured long-term spectrum is reduced to a single slope, and</span></span>
+<span class="ln" id="L344">    <span class="tok-com">/// the correction is the rotation that carries that slope onto the canonical</span></span>
+<span class="ln" id="L345">    <span class="tok-com">/// one. This is the strongest form of long-term colour correction that is</span></span>
+<span class="ln" id="L346">    <span class="tok-com">/// *structurally incapable* of damaging intelligibility, because a smooth monotone</span></span>
+<span class="ln" id="L347">    <span class="tok-com">/// ramp adds the same offset to every speaker&#x27;s vowels, so formant-scale</span></span>
+<span class="ln" id="L348">    <span class="tok-com">/// contrast passes through untouched. Matching the long-term spectrum</span></span>
+<span class="ln" id="L349">    <span class="tok-com">/// bin-by-bin would remove more speaker colour, but it also flattens the</span></span>
+<span class="ln" id="L350">    <span class="tok-com">/// per-frame differences that distinguish one vowel from another, which is</span></span>
+<span class="ln" id="L351">    <span class="tok-com">/// not a trade this project is willing to make.</span></span>
+<span class="ln" id="L352">    <span class="tok-kw">fn</span> <span class="tok-fn">recompute_shape</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L353">        <span class="tok-kw">let</span> (lo, hi) = (<span class="tok-kw">self</span>.ltas_lo, <span class="tok-kw">self</span>.ltas_hi);</span>
+<span class="ln" id="L354">        <span class="tok-kw">if</span> hi &lt;= lo {</span>
+<span class="ln" id="L355">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L356">        }</span>
+<span class="ln" id="L357"></span>
+<span class="ln" id="L358">        <span class="tok-com">// Weighted least-squares line fit of measured dB against log-frequency.</span></span>
+<span class="ln" id="L359">        <span class="tok-com">// Weighting by 1/k makes every octave count equally; FFT bins are linear</span></span>
+<span class="ln" id="L360">        <span class="tok-com">// in frequency, so an unweighted fit would be dominated by the top</span></span>
+<span class="ln" id="L361">        <span class="tok-com">// octave alone.</span></span>
+<span class="ln" id="L362">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> sw, <span class="tok-kw">mut</span> su, <span class="tok-kw">mut</span> suu, <span class="tok-kw">mut</span> sy, <span class="tok-kw">mut</span> suy) = (<span class="tok-num">0</span>.0f32, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L363">        <span class="tok-kw">for</span> k <span class="tok-kw">in</span> lo..=hi {</span>
+<span class="ln" id="L364">            <span class="tok-kw">let</span> u = ((k <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ).<span class="tok-fn">log2</span>();</span>
+<span class="ln" id="L365">            <span class="tok-kw">let</span> y = <span class="tok-kw">self</span>.ltas_db[k];</span>
+<span class="ln" id="L366">            <span class="tok-kw">let</span> w = <span class="tok-num">1.0</span> / k <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L367">            sw += w;</span>
+<span class="ln" id="L368">            su += w * u;</span>
+<span class="ln" id="L369">            suu += w * u * u;</span>
+<span class="ln" id="L370">            sy += w * y;</span>
+<span class="ln" id="L371">            suy += w * u * y;</span>
+<span class="ln" id="L372">        }</span>
+<span class="ln" id="L373">        <span class="tok-kw">let</span> denom = sw * suu - su * su;</span>
+<span class="ln" id="L374">        <span class="tok-kw">if</span> denom.<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">12</span> {</span>
+<span class="ln" id="L375">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L376">        }</span>
+<span class="ln" id="L377">        <span class="tok-kw">let</span> measured_tilt = (sw * suy - su * sy) / denom;</span>
+<span class="ln" id="L378">        <span class="tok-kw">let</span> u_mid = su / sw;</span>
+<span class="ln" id="L379"></span>
+<span class="ln" id="L380">        <span class="tok-com">// Rotate about the band&#x27;s log-frequency centroid by the slope error.</span></span>
+<span class="ln" id="L381">        <span class="tok-kw">let</span> s = <span class="tok-kw">self</span>.cfg.ltas_strength.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>) * <span class="tok-kw">self</span>.warmup;</span>
+<span class="ln" id="L382">        <span class="tok-kw">let</span> delta = (<span class="tok-kw">self</span>.cfg.target_tilt_db_oct - measured_tilt) * s;</span>
+<span class="ln" id="L383">        <span class="tok-kw">let</span> (u_lo, u_hi) = (</span>
+<span class="ln" id="L384">            ((lo <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ).<span class="tok-fn">log2</span>(),</span>
+<span class="ln" id="L385">            ((hi <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ).<span class="tok-fn">log2</span>(),</span>
+<span class="ln" id="L386">        );</span>
+<span class="ln" id="L387">        <span class="tok-kw">for</span> (k, db) <span class="tok-kw">in</span> <span class="tok-kw">self</span>.shape_db.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L388">            <span class="tok-com">// Outside the band the ramp is held at its edge value rather than</span></span>
+<span class="ln" id="L389">            <span class="tok-com">// dropped to zero, which would put a step at the band edge.</span></span>
+<span class="ln" id="L390">            <span class="tok-kw">let</span> u = ((k <span class="tok-kw">as</span> f32 * <span class="tok-kw">self</span>.bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) / TILT_REF_HZ)</span>
+<span class="ln" id="L391">                .<span class="tok-fn">log2</span>()</span>
+<span class="ln" id="L392">                .<span class="tok-fn">clamp</span>(u_lo, u_hi);</span>
+<span class="ln" id="L393">            *db = (delta * (u - u_mid)).<span class="tok-fn">clamp</span>(-MAX_SHAPE_DB, MAX_SHAPE_DB);</span>
+<span class="ln" id="L394">        }</span>
+<span class="ln" id="L395">    }</span>
 </span>
-<span class="ln" id="L395">}</span>
-<span class="ln" id="L396"></span>
+<span class="ln" id="L396">}</span>
+<span class="ln" id="L397"></span>
 <span class="src-item" id="fn-log_centroid">
-<span class="ln" id="L397"><span class="tok-com">/// Energy-weighted geometric-mean frequency of `env` over `[lo, hi]` bins.</span></span>
-<span class="ln" id="L398"><span class="tok-com">///</span></span>
-<span class="ln" id="L399"><span class="tok-com">/// The geometric (log-frequency) mean is the right measure here: vocal-tract</span></span>
-<span class="ln" id="L400"><span class="tok-com">/// length scales the whole spectrum multiplicatively, so a log-domain centroid</span></span>
-<span class="ln" id="L401"><span class="tok-com">/// moves by a constant offset when the tract scales, and the ratio of two</span></span>
-<span class="ln" id="L402"><span class="tok-com">/// centroids is exactly the warp factor between two speakers.</span></span>
-<span class="ln" id="L403"><span class="tok-kw">fn</span> <span class="tok-fn">log_centroid</span>(env: &amp;[f32], lo: usize, hi: usize, bin_hz: f32) -&gt; Option&lt;f32&gt; {</span>
-<span class="ln" id="L404">    <span class="tok-kw">if</span> hi &lt;= lo || hi &gt;= env.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L405">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L406">    }</span>
-<span class="ln" id="L407">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wsum = <span class="tok-num">0</span>.0f32;</span>
-<span class="ln" id="L408">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lsum = <span class="tok-num">0</span>.0f32;</span>
-<span class="ln" id="L409">    <span class="tok-kw">for</span> (i, &amp;v) <span class="tok-kw">in</span> env[lo..=hi].<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L410">        <span class="tok-kw">let</span> w = v.<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L411">        <span class="tok-kw">let</span> f = ((lo + i) <span class="tok-kw">as</span> f32 * bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L412">        lsum += w * f.<span class="tok-fn">ln</span>();</span>
-<span class="ln" id="L413">        wsum += w;</span>
-<span class="ln" id="L414">    }</span>
-<span class="ln" id="L415">    <span class="tok-kw">if</span> wsum &lt;= 1e-<span class="tok-num">12</span> {</span>
-<span class="ln" id="L416">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L417">    }</span>
-<span class="ln" id="L418">    <span class="tok-kw">let</span> c = (lsum / wsum).<span class="tok-fn">exp</span>();</span>
-<span class="ln" id="L419">    c.<span class="tok-fn">is_finite</span>().<span class="tok-fn">then_some</span>(c)</span>
-<span class="ln" id="L420">}</span>
+<span class="ln" id="L398"><span class="tok-com">/// Energy-weighted geometric-mean frequency of `env` over `[lo, hi]` bins.</span></span>
+<span class="ln" id="L399"><span class="tok-com">///</span></span>
+<span class="ln" id="L400"><span class="tok-com">/// The geometric (log-frequency) mean is the right measure here: vocal-tract</span></span>
+<span class="ln" id="L401"><span class="tok-com">/// length scales the whole spectrum multiplicatively, so a log-domain centroid</span></span>
+<span class="ln" id="L402"><span class="tok-com">/// moves by a constant offset when the tract scales, and the ratio of two</span></span>
+<span class="ln" id="L403"><span class="tok-com">/// centroids is exactly the warp factor between two speakers.</span></span>
+<span class="ln" id="L404"><span class="tok-kw">fn</span> <span class="tok-fn">log_centroid</span>(env: &amp;[f32], lo: usize, hi: usize, bin_hz: f32) -&gt; Option&lt;f32&gt; {</span>
+<span class="ln" id="L405">    <span class="tok-kw">if</span> hi &lt;= lo || hi &gt;= env.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L406">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L407">    }</span>
+<span class="ln" id="L408">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wsum = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L409">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lsum = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L410">    <span class="tok-kw">for</span> (i, &amp;v) <span class="tok-kw">in</span> env[lo..=hi].<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L411">        <span class="tok-kw">let</span> w = v.<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L412">        <span class="tok-kw">let</span> f = ((lo + i) <span class="tok-kw">as</span> f32 * bin_hz).<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L413">        lsum += w * f.<span class="tok-fn">ln</span>();</span>
+<span class="ln" id="L414">        wsum += w;</span>
+<span class="ln" id="L415">    }</span>
+<span class="ln" id="L416">    <span class="tok-kw">if</span> wsum &lt;= 1e-<span class="tok-num">12</span> {</span>
+<span class="ln" id="L417">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L418">    }</span>
+<span class="ln" id="L419">    <span class="tok-kw">let</span> c = (lsum / wsum).<span class="tok-fn">exp</span>();</span>
+<span class="ln" id="L420">    c.<span class="tok-fn">is_finite</span>().<span class="tok-fn">then_some</span>(c)</span>
+<span class="ln" id="L421">}</span>
 </span>
-<span class="ln" id="L421"></span>
+<span class="ln" id="L422"></span>
 <span class="src-item" id="fn-gain_to_db">
-<span class="ln" id="L422"><span class="tok-kw">fn</span> <span class="tok-fn">gain_to_db</span>(x: f32) -&gt; f32 {</span>
-<span class="ln" id="L423">    <span class="tok-num">20.0</span> * (x.<span class="tok-fn">abs</span>() + 1e-<span class="tok-num">9</span>).<span class="tok-fn">log10</span>()</span>
-<span class="ln" id="L424">}</span>
+<span class="ln" id="L423"><span class="tok-kw">fn</span> <span class="tok-fn">gain_to_db</span>(x: f32) -&gt; f32 {</span>
+<span class="ln" id="L424">    <span class="tok-num">20.0</span> * (x.<span class="tok-fn">abs</span>() + 1e-<span class="tok-num">9</span>).<span class="tok-fn">log10</span>()</span>
+<span class="ln" id="L425">}</span>
 </span>
-<span class="ln" id="L425"></span>
+<span class="ln" id="L426"></span>
 <span class="src-item" id="fn-db_to_gain">
-<span class="ln" id="L426"><span class="tok-kw">fn</span> <span class="tok-fn">db_to_gain</span>(db: f32) -&gt; f32 {</span>
-<span class="ln" id="L427">    10f32.<span class="tok-fn">powf</span>(db / <span class="tok-num">20.0</span>)</span>
-<span class="ln" id="L428">}</span>
+<span class="ln" id="L427"><span class="tok-kw">fn</span> <span class="tok-fn">db_to_gain</span>(db: f32) -&gt; f32 {</span>
+<span class="ln" id="L428">    10f32.<span class="tok-fn">powf</span>(db / <span class="tok-num">20.0</span>)</span>
+<span class="ln" id="L429">}</span>
 </span>
-<span class="ln" id="L429"></span>
-<span class="ln" id="L430"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L431"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L432">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L433">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::spectral::box_smooth;</span>
-<span class="ln" id="L434"></span>
-<span class="ln" id="L435">    <span class="tok-kw">const</span> SR: f32 = <span class="tok-num">48_000.0</span>;</span>
-<span class="ln" id="L436">    <span class="tok-kw">const</span> N: usize = <span class="tok-num">1024</span>;</span>
-<span class="ln" id="L437">    <span class="tok-kw">const</span> HOP: usize = <span class="tok-num">256</span>;</span>
-<span class="ln" id="L438">    <span class="tok-kw">const</span> HALF: usize = N / <span class="tok-num">2</span> + <span class="tok-num">1</span>;</span>
-<span class="ln" id="L439"></span>
-<span class="ln" id="L440">    <span class="tok-com">/// The neutraliser plus the pitch tracker the chain normally drives it with,</span></span>
-<span class="ln" id="L441">    <span class="tok-com">/// so tests can feed raw frames the way `Deidentifier` does.</span></span>
-<span class="ln" id="L442">    <span class="tok-kw">struct</span> Rig {</span>
-<span class="ln" id="L443">        inner: AccentNeutralizer,</span>
-<span class="ln" id="L444">        tracker: <span class="tok-kw">crate</span>::pitch::PitchTracker,</span>
-<span class="ln" id="L445">    }</span>
-<span class="ln" id="L446"></span>
-<span class="ln" id="L447">    <span class="tok-kw">impl</span> Rig {</span>
-<span class="ln" id="L448">        <span class="tok-kw">fn</span> <span class="tok-fn">observe_frame</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, frame: &amp;[f32], hop: usize) {</span>
-<span class="ln" id="L449">            <span class="tok-kw">self</span>.tracker.<span class="tok-fn">push</span>(&amp;frame[frame.<span class="tok-fn">len</span>() - hop..]);</span>
-<span class="ln" id="L450">            <span class="tok-kw">let</span> est = <span class="tok-kw">self</span>.tracker.<span class="tok-fn">estimate</span>();</span>
-<span class="ln" id="L451">            <span class="tok-kw">self</span>.inner.<span class="tok-fn">observe</span>(est);</span>
-<span class="ln" id="L452">        }</span>
-<span class="ln" id="L453">    }</span>
-<span class="ln" id="L454"></span>
-<span class="ln" id="L455">    <span class="tok-kw">impl</span> std::ops::Deref <span class="tok-kw">for</span> Rig {</span>
-<span class="ln" id="L456">        <span class="tok-kw">type</span> Target = AccentNeutralizer;</span>
-<span class="ln" id="L457">        <span class="tok-kw">fn</span> <span class="tok-fn">deref</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;AccentNeutralizer {</span>
-<span class="ln" id="L458">            &amp;<span class="tok-kw">self</span>.inner</span>
-<span class="ln" id="L459">        }</span>
-<span class="ln" id="L460">    }</span>
-<span class="ln" id="L461"></span>
-<span class="ln" id="L462">    <span class="tok-kw">impl</span> std::ops::DerefMut <span class="tok-kw">for</span> Rig {</span>
-<span class="ln" id="L463">        <span class="tok-kw">fn</span> <span class="tok-fn">deref_mut</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; &amp;<span class="tok-kw">mut</span> AccentNeutralizer {</span>
-<span class="ln" id="L464">            &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.inner</span>
-<span class="ln" id="L465">        }</span>
-<span class="ln" id="L466">    }</span>
-<span class="ln" id="L467"></span>
-<span class="ln" id="L468">    <span class="tok-kw">fn</span> <span class="tok-fn">neutralizer</span>(cfg: AccentConfig) -&gt; Rig {</span>
-<span class="ln" id="L469">        Rig {</span>
-<span class="ln" id="L470">            inner: AccentNeutralizer::<span class="tok-fn">new</span>(cfg, SR, N, HOP, HALF),</span>
-<span class="ln" id="L471">            tracker: <span class="tok-kw">crate</span>::pitch::PitchTracker::<span class="tok-fn">new</span>(SR),</span>
-<span class="ln" id="L472">        }</span>
-<span class="ln" id="L473">    }</span>
-<span class="ln" id="L474"></span>
-<span class="ln" id="L475">    <span class="tok-com">/// A voiced frame: sawtooth excitation shaped by a vocal tract of a given</span></span>
-<span class="ln" id="L476">    <span class="tok-com">/// scale (`vtl` &gt; 1 = longer tract = lower formants).</span></span>
-<span class="ln" id="L477">    <span class="tok-kw">fn</span> <span class="tok-fn">voiced_frame</span>(f0: f32, vtl: f32, i0: usize) -&gt; Vec&lt;f32&gt; {</span>
-<span class="ln" id="L478">        (<span class="tok-num">0</span>..N)</span>
-<span class="ln" id="L479">            .<span class="tok-fn">map</span>(|i| {</span>
-<span class="ln" id="L480">                <span class="tok-kw">let</span> t = (i0 + i) <span class="tok-kw">as</span> f32 / SR;</span>
-<span class="ln" id="L481">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L482">                <span class="tok-kw">for</span> h <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">24</span> {</span>
-<span class="ln" id="L483">                    <span class="tok-kw">let</span> f = f0 * h <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L484">                    <span class="tok-kw">if</span> f &gt; SR * <span class="tok-num">0.45</span> {</span>
-<span class="ln" id="L485">                        break;</span>
-<span class="ln" id="L486">                    }</span>
-<span class="ln" id="L487">                    <span class="tok-com">// Three formants, scaled by vocal-tract length.</span></span>
-<span class="ln" id="L488">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> g = <span class="tok-num">1.0</span> / h <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L489">                    <span class="tok-kw">for</span> &amp;cf <span class="tok-kw">in</span> &amp;[<span class="tok-num">700</span>.0f32, <span class="tok-num">1220.0</span>, <span class="tok-num">2600.0</span>] {</span>
-<span class="ln" id="L490">                        <span class="tok-kw">let</span> c = cf / vtl;</span>
-<span class="ln" id="L491">                        g += <span class="tok-num">0.9</span> / (<span class="tok-num">1.0</span> + ((f - c) / <span class="tok-num">110.0</span>).<span class="tok-fn">powi</span>(<span class="tok-num">2</span>)) / h <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L492">                    }</span>
-<span class="ln" id="L493">                    s += g * (std::f32::consts::TAU * f * t).<span class="tok-fn">sin</span>();</span>
-<span class="ln" id="L494">                }</span>
-<span class="ln" id="L495">                s * <span class="tok-num">0.1</span></span>
-<span class="ln" id="L496">            })</span>
-<span class="ln" id="L497">            .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L498">    }</span>
-<span class="ln" id="L499"></span>
-<span class="ln" id="L500">    <span class="tok-com">/// Smooth spectral envelope of a frame, matching what the chain feeds in.</span></span>
-<span class="ln" id="L501">    <span class="tok-kw">fn</span> <span class="tok-fn">envelope_of</span>(frame: &amp;[f32]) -&gt; Vec&lt;f32&gt; {</span>
-<span class="ln" id="L502">        <span class="tok-kw">use</span> realfft::num_complex::Complex;</span>
-<span class="ln" id="L503">        <span class="tok-kw">use</span> realfft::RealFftPlanner;</span>
-<span class="ln" id="L504">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> planner = RealFftPlanner::&lt;f32&gt;::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L505">        <span class="tok-kw">let</span> r2c = planner.<span class="tok-fn">plan_fft_forward</span>(N);</span>
-<span class="ln" id="L506">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> input: Vec&lt;f32&gt; = frame</span>
-<span class="ln" id="L507">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L508">            .<span class="tok-fn">enumerate</span>()</span>
-<span class="ln" id="L509">            .<span class="tok-fn">map</span>(|(i, x)| {</span>
-<span class="ln" id="L510">                <span class="tok-kw">let</span> w = <span class="tok-num">0.5</span> - <span class="tok-num">0.5</span> * (std::f32::consts::TAU * i <span class="tok-kw">as</span> f32 / N <span class="tok-kw">as</span> f32).<span class="tok-fn">cos</span>();</span>
-<span class="ln" id="L511">                x * w</span>
-<span class="ln" id="L512">            })</span>
-<span class="ln" id="L513">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L514">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> spec = vec![Complex::<span class="tok-fn">new</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>); HALF];</span>
-<span class="ln" id="L515">        r2c.<span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> input, &amp;<span class="tok-kw">mut</span> spec).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L516">        <span class="tok-kw">let</span> mag: Vec&lt;f32&gt; = spec.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|c| c.<span class="tok-fn">norm</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tmp = vec![<span class="tok-num">0.0</span>; HALF];</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> env = vec![<span class="tok-num">0.0</span>; HALF];</span>
-<span class="ln" id="L519">        <span class="tok-fn">box_smooth</span>(&amp;mag, <span class="tok-num">21</span>, &amp;<span class="tok-kw">mut</span> tmp);</span>
-<span class="ln" id="L520">        <span class="tok-fn">box_smooth</span>(&amp;tmp, <span class="tok-num">21</span>, &amp;<span class="tok-kw">mut</span> env);</span>
-<span class="ln" id="L521">        env</span>
-<span class="ln" id="L522">    }</span>
-<span class="ln" id="L523"></span>
-<span class="ln" id="L524">    <span class="tok-com">/// Run a synthetic speaker through the neutraliser and report the ratios it</span></span>
-<span class="ln" id="L525">    <span class="tok-com">/// settles on, plus the centroid it measured.</span></span>
-<span class="ln" id="L526">    <span class="tok-kw">fn</span> <span class="tok-fn">settle</span>(f0: f32, vtl: f32, cfg: AccentConfig) -&gt; (f32, f32, f32) {</span>
-<span class="ln" id="L527">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(cfg);</span>
-<span class="ln" id="L528">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">400</span> {</span>
-<span class="ln" id="L529">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(f0, vtl, f * HOP);</span>
-<span class="ln" id="L530">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
-<span class="ln" id="L531">            <span class="tok-kw">let</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
-<span class="ln" id="L532">            a.<span class="tok-fn">measure_envelope</span>(&amp;env);</span>
-<span class="ln" id="L533">        }</span>
-<span class="ln" id="L534">        <span class="tok-kw">let</span> s = a.<span class="tok-fn">stats</span>();</span>
-<span class="ln" id="L535">        (s.prosody_ratio, s.vtln_ratio, s.speaker_centroid_hz)</span>
-<span class="ln" id="L536">    }</span>
-<span class="ln" id="L537"></span>
-<span class="ln" id="L538">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L539">    <span class="tok-kw">fn</span> <span class="tok-fn">two_speakers_converge_to_one_pitch_register</span>() {</span>
-<span class="ln" id="L540">        <span class="tok-kw">let</span> cfg = AccentConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L541">        <span class="tok-kw">let</span> low = <span class="tok-fn">settle</span>(<span class="tok-num">105.0</span>, <span class="tok-num">1.12</span>, cfg); <span class="tok-com">// deeper voice, longer tract</span></span>
-<span class="ln" id="L542">        <span class="tok-kw">let</span> high = <span class="tok-fn">settle</span>(<span class="tok-num">225.0</span>, <span class="tok-num">0.88</span>, cfg); <span class="tok-com">// higher voice, shorter tract</span></span>
-<span class="ln" id="L543"></span>
-<span class="ln" id="L544">        <span class="tok-kw">let</span> out_low = <span class="tok-num">105.0</span> * low.<span class="tok-num">0</span>;</span>
-<span class="ln" id="L545">        <span class="tok-kw">let</span> out_high = <span class="tok-num">225.0</span> * high.<span class="tok-num">0</span>;</span>
-<span class="ln" id="L546">        <span class="tok-kw">let</span> before = (<span class="tok-num">225</span>.0f32 / <span class="tok-num">105.0</span>).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L547">        <span class="tok-kw">let</span> after = (out_high / out_low).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L548"></span>
-<span class="ln" id="L549">        assert!(</span>
-<span class="ln" id="L550">            after &lt; before * <span class="tok-num">0.3</span>,</span>
-<span class="ln" id="L551">            <span class="tok-str">&quot;pitch registers should converge: {before:.3} octaves before, \</span></span>
-<span class="ln" id="L552"><span class="tok-str">             {after:.3} after ({out_low:.0} Hz vs {out_high:.0} Hz)&quot;</span></span>
-<span class="ln" id="L553">        );</span>
-<span class="ln" id="L554">        <span class="tok-kw">for</span> out <span class="tok-kw">in</span> [out_low, out_high] {</span>
-<span class="ln" id="L555">            <span class="tok-kw">let</span> err = (out / cfg.target_f0_hz).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L556">            assert!(err &lt; <span class="tok-num">0.35</span>, <span class="tok-str">&quot;{out:.0} Hz is far from the canonical register&quot;</span>);</span>
-<span class="ln" id="L557">        }</span>
-<span class="ln" id="L558">    }</span>
-<span class="ln" id="L559"></span>
-<span class="ln" id="L560">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L561">    <span class="tok-kw">fn</span> <span class="tok-fn">two_speakers_converge_to_one_vocal_tract</span>() {</span>
-<span class="ln" id="L562">        <span class="tok-kw">let</span> cfg = AccentConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L563">        <span class="tok-kw">let</span> (_, r_long, c_long) = <span class="tok-fn">settle</span>(<span class="tok-num">105.0</span>, <span class="tok-num">1.20</span>, cfg);</span>
-<span class="ln" id="L564">        <span class="tok-kw">let</span> (_, r_short, c_short) = <span class="tok-fn">settle</span>(<span class="tok-num">225.0</span>, <span class="tok-num">0.85</span>, cfg);</span>
-<span class="ln" id="L565"></span>
-<span class="ln" id="L566">        <span class="tok-kw">let</span> before = (c_short / c_long).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L567">        <span class="tok-kw">let</span> after = ((c_short * r_short) / (c_long * r_long)).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L568">        assert!(before &gt; <span class="tok-num">0.15</span>, <span class="tok-str">&quot;test speakers should differ to begin with&quot;</span>);</span>
-<span class="ln" id="L569">        assert!(</span>
-<span class="ln" id="L570">            after &lt; before * <span class="tok-num">0.4</span>,</span>
-<span class="ln" id="L571">            <span class="tok-str">&quot;vocal tracts should converge: {before:.3} octaves before, {after:.3} after&quot;</span></span>
-<span class="ln" id="L572">        );</span>
-<span class="ln" id="L573">    }</span>
-<span class="ln" id="L574"></span>
-<span class="ln" id="L575">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L576">    <span class="tok-kw">fn</span> <span class="tok-fn">flatten_zero_leaves_intonation_alone</span>() {</span>
-<span class="ln" id="L577">        <span class="tok-kw">let</span> cfg = AccentConfig {</span>
-<span class="ln" id="L578">            prosody_flatten: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L579">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L580">        };</span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> (ratio, _, _) = <span class="tok-fn">settle</span>(<span class="tok-num">105.0</span>, <span class="tok-num">1.0</span>, cfg);</span>
-<span class="ln" id="L582">        assert!((ratio - <span class="tok-num">1.0</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.02</span>, <span class="tok-str">&quot;ratio={ratio}&quot;</span>);</span>
-<span class="ln" id="L583">    }</span>
-<span class="ln" id="L584"></span>
-<span class="ln" id="L585">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L586">    <span class="tok-kw">fn</span> <span class="tok-fn">full_flatten_hits_the_canonical_register</span>() {</span>
-<span class="ln" id="L587">        <span class="tok-kw">let</span> cfg = AccentConfig {</span>
-<span class="ln" id="L588">            prosody_flatten: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L589">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L590">        };</span>
-<span class="ln" id="L591">        <span class="tok-kw">for</span> &amp;f0 <span class="tok-kw">in</span> &amp;[<span class="tok-num">105</span>.0f32, <span class="tok-num">155.0</span>, <span class="tok-num">225.0</span>] {</span>
-<span class="ln" id="L592">            <span class="tok-kw">let</span> (ratio, _, _) = <span class="tok-fn">settle</span>(f0, <span class="tok-num">1.0</span>, cfg);</span>
-<span class="ln" id="L593">            <span class="tok-kw">let</span> out = f0 * ratio;</span>
-<span class="ln" id="L594">            assert!(</span>
-<span class="ln" id="L595">                (out / cfg.target_f0_hz).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.1</span>,</span>
-<span class="ln" id="L596">                <span class="tok-str">&quot;f0={f0} -&gt; {out:.0} Hz, want {}&quot;</span>,</span>
-<span class="ln" id="L597">                cfg.target_f0_hz</span>
-<span class="ln" id="L598">            );</span>
-<span class="ln" id="L599">        }</span>
-<span class="ln" id="L600">    }</span>
-<span class="ln" id="L601"></span>
-<span class="ln" id="L602">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L603">    <span class="tok-kw">fn</span> <span class="tok-fn">disabled_is_a_true_bypass</span>() {</span>
-<span class="ln" id="L604">        <span class="tok-kw">let</span> cfg = AccentConfig {</span>
-<span class="ln" id="L605">            enabled: false,</span>
-<span class="ln" id="L606">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L607">        };</span>
-<span class="ln" id="L608">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(cfg);</span>
-<span class="ln" id="L609">        <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">120.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L610">        a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
-<span class="ln" id="L611">        <span class="tok-kw">let</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
-<span class="ln" id="L612">        a.<span class="tok-fn">measure_envelope</span>(&amp;env);</span>
-<span class="ln" id="L613">        assert_eq!(a.<span class="tok-fn">prosody_ratio</span>(), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L614">        assert_eq!(a.<span class="tok-fn">vtln_ratio</span>(), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L615"></span>
-<span class="ln" id="L616">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shaped = env.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L617">        a.<span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> shaped);</span>
-<span class="ln" id="L618">        assert_eq!(shaped, env, <span class="tok-str">&quot;shaping must not touch the envelope when off&quot;</span>);</span>
-<span class="ln" id="L619">    }</span>
-<span class="ln" id="L620"></span>
-<span class="ln" id="L621">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L622">    <span class="tok-kw">fn</span> <span class="tok-fn">shaping_is_gain_neutral_and_finite</span>() {</span>
-<span class="ln" id="L623">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(AccentConfig::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L624">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> energy_in = <span class="tok-num">0</span>.0f64;</span>
-<span class="ln" id="L625">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> energy_out = <span class="tok-num">0</span>.0f64;</span>
-<span class="ln" id="L626">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">300</span> {</span>
-<span class="ln" id="L627">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">140.0</span>, <span class="tok-num">1.05</span>, f * HOP);</span>
-<span class="ln" id="L628">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
-<span class="ln" id="L629">            <span class="tok-kw">let</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
-<span class="ln" id="L630">            a.<span class="tok-fn">measure_envelope</span>(&amp;env);</span>
-<span class="ln" id="L631">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shaped = env.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L632">            a.<span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> shaped);</span>
-<span class="ln" id="L633">            assert!(shaped.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
-<span class="ln" id="L634">            <span class="tok-kw">if</span> f &gt; <span class="tok-num">200</span> {</span>
-<span class="ln" id="L635">                energy_in += env.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64).<span class="tok-fn">powi</span>(<span class="tok-num">2</span>)).sum::&lt;f64&gt;();</span>
-<span class="ln" id="L636">                energy_out += shaped.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64).<span class="tok-fn">powi</span>(<span class="tok-num">2</span>)).sum::&lt;f64&gt;();</span>
-<span class="ln" id="L637">            }</span>
-<span class="ln" id="L638">        }</span>
-<span class="ln" id="L639">        <span class="tok-kw">let</span> ratio = energy_out / energy_in;</span>
-<span class="ln" id="L640">        assert!(</span>
-<span class="ln" id="L641">            (<span class="tok-num">0.4</span>..<span class="tok-num">2.5</span>).<span class="tok-fn">contains</span>(&amp;ratio),</span>
-<span class="ln" id="L642">            <span class="tok-str">&quot;long-term shaping changed the level by {ratio:.2}x&quot;</span></span>
-<span class="ln" id="L643">        );</span>
-<span class="ln" id="L644">    }</span>
-<span class="ln" id="L645"></span>
-<span class="ln" id="L646">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L647">    <span class="tok-kw">fn</span> <span class="tok-fn">per_frame_vowel_contrast_survives</span>() {</span>
-<span class="ln" id="L648">        <span class="tok-com">// The whole intelligibility argument: normalisation is long-term, so two</span></span>
-<span class="ln" id="L649">        <span class="tok-com">// different vowels from the same speaker must stay clearly different.</span></span>
-<span class="ln" id="L650">        <span class="tok-kw">let</span> cfg = AccentConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L651">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(cfg);</span>
-<span class="ln" id="L652">        <span class="tok-com">// Settle on the speaker using an /a/-like frame.</span></span>
-<span class="ln" id="L653">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">300</span> {</span>
-<span class="ln" id="L654">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">140.0</span>, <span class="tok-num">1.0</span>, f * HOP);</span>
-<span class="ln" id="L655">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
-<span class="ln" id="L656">            a.<span class="tok-fn">measure_envelope</span>(&amp;<span class="tok-fn">envelope_of</span>(&amp;frame));</span>
-<span class="ln" id="L657">        }</span>
-<span class="ln" id="L658">        <span class="tok-com">// Now compare two distinct vowels shaped by the settled curve.</span></span>
-<span class="ln" id="L659">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shaped = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L660">        <span class="tok-kw">for</span> &amp;vtl <span class="tok-kw">in</span> &amp;[<span class="tok-num">0</span>.75f32, <span class="tok-num">1.35</span>] {</span>
-<span class="ln" id="L661">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">140.0</span>, vtl, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L662">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
-<span class="ln" id="L663">            a.<span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> env);</span>
-<span class="ln" id="L664">            shaped.<span class="tok-fn">push</span>(<span class="tok-fn">log_centroid</span>(&amp;env, a.cent_lo, a.cent_hi, a.bin_hz).<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L665">        }</span>
-<span class="ln" id="L666">        <span class="tok-kw">let</span> sep = (shaped[<span class="tok-num">0</span>] / shaped[<span class="tok-num">1</span>]).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L667">        assert!(sep &gt; <span class="tok-num">0.15</span>, <span class="tok-str">&quot;vowel contrast collapsed to {sep:.3} octaves&quot;</span>);</span>
-<span class="ln" id="L668">    }</span>
-<span class="ln" id="L669"></span>
-<span class="ln" id="L670">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L671">    <span class="tok-kw">fn</span> <span class="tok-fn">warmup_ramps_corrections_in_from_nothing</span>() {</span>
-<span class="ln" id="L672">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(AccentConfig::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L673">        assert_eq!(a.<span class="tok-fn">stats</span>().warmup, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L674">        assert_eq!(a.<span class="tok-fn">prosody_ratio</span>(), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L675">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">400</span> {</span>
-<span class="ln" id="L676">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">220.0</span>, <span class="tok-num">1.0</span>, f * HOP);</span>
-<span class="ln" id="L677">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
-<span class="ln" id="L678">            a.<span class="tok-fn">measure_envelope</span>(&amp;<span class="tok-fn">envelope_of</span>(&amp;frame));</span>
-<span class="ln" id="L679">        }</span>
-<span class="ln" id="L680">        assert_eq!(a.<span class="tok-fn">stats</span>().warmup, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L681">        assert!(a.<span class="tok-fn">prosody_ratio</span>() &lt; <span class="tok-num">0.95</span>, <span class="tok-str">&quot;correction never engaged&quot;</span>);</span>
-<span class="ln" id="L682">    }</span>
-<span class="ln" id="L683"></span>
-<span class="ln" id="L684">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L685">    <span class="tok-kw">fn</span> <span class="tok-fn">unvoiced_input_leaves_state_untouched</span>() {</span>
-<span class="ln" id="L686">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(AccentConfig::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L687">        <span class="tok-kw">let</span> quiet = vec![<span class="tok-num">0</span>.0f32; N];</span>
-<span class="ln" id="L688">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
-<span class="ln" id="L689">            a.<span class="tok-fn">observe_frame</span>(&amp;quiet, HOP);</span>
-<span class="ln" id="L690">            a.<span class="tok-fn">measure_envelope</span>(&amp;vec![<span class="tok-num">0</span>.0f32; HALF]);</span>
-<span class="ln" id="L691">        }</span>
-<span class="ln" id="L692">        assert_eq!(a.<span class="tok-fn">prosody_ratio</span>(), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L693">        assert_eq!(a.<span class="tok-fn">vtln_ratio</span>(), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L694">        assert_eq!(a.<span class="tok-fn">stats</span>().warmup, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L695">    }</span>
-<span class="ln" id="L696">}</span>
+<span class="ln" id="L430"></span>
+<span class="ln" id="L431"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L432"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L433">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L434">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::spectral::box_smooth;</span>
+<span class="ln" id="L435"></span>
+<span class="ln" id="L436">    <span class="tok-kw">const</span> SR: f32 = <span class="tok-num">48_000.0</span>;</span>
+<span class="ln" id="L437">    <span class="tok-kw">const</span> N: usize = <span class="tok-num">1024</span>;</span>
+<span class="ln" id="L438">    <span class="tok-kw">const</span> HOP: usize = <span class="tok-num">256</span>;</span>
+<span class="ln" id="L439">    <span class="tok-kw">const</span> HALF: usize = N / <span class="tok-num">2</span> + <span class="tok-num">1</span>;</span>
+<span class="ln" id="L440"></span>
+<span class="ln" id="L441">    <span class="tok-com">/// The neutraliser plus the pitch tracker the chain normally drives it with,</span></span>
+<span class="ln" id="L442">    <span class="tok-com">/// so tests can feed raw frames the way `Deidentifier` does.</span></span>
+<span class="ln" id="L443">    <span class="tok-kw">struct</span> Rig {</span>
+<span class="ln" id="L444">        inner: AccentNeutralizer,</span>
+<span class="ln" id="L445">        tracker: <span class="tok-kw">crate</span>::pitch::PitchTracker,</span>
+<span class="ln" id="L446">    }</span>
+<span class="ln" id="L447"></span>
+<span class="ln" id="L448">    <span class="tok-kw">impl</span> Rig {</span>
+<span class="ln" id="L449">        <span class="tok-kw">fn</span> <span class="tok-fn">observe_frame</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, frame: &amp;[f32], hop: usize) {</span>
+<span class="ln" id="L450">            <span class="tok-kw">self</span>.tracker.<span class="tok-fn">push</span>(&amp;frame[frame.<span class="tok-fn">len</span>() - hop..]);</span>
+<span class="ln" id="L451">            <span class="tok-kw">let</span> est = <span class="tok-kw">self</span>.tracker.<span class="tok-fn">estimate</span>();</span>
+<span class="ln" id="L452">            <span class="tok-kw">self</span>.inner.<span class="tok-fn">observe</span>(est);</span>
+<span class="ln" id="L453">        }</span>
+<span class="ln" id="L454">    }</span>
+<span class="ln" id="L455"></span>
+<span class="ln" id="L456">    <span class="tok-kw">impl</span> std::ops::Deref <span class="tok-kw">for</span> Rig {</span>
+<span class="ln" id="L457">        <span class="tok-kw">type</span> Target = AccentNeutralizer;</span>
+<span class="ln" id="L458">        <span class="tok-kw">fn</span> <span class="tok-fn">deref</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;AccentNeutralizer {</span>
+<span class="ln" id="L459">            &amp;<span class="tok-kw">self</span>.inner</span>
+<span class="ln" id="L460">        }</span>
+<span class="ln" id="L461">    }</span>
+<span class="ln" id="L462"></span>
+<span class="ln" id="L463">    <span class="tok-kw">impl</span> std::ops::DerefMut <span class="tok-kw">for</span> Rig {</span>
+<span class="ln" id="L464">        <span class="tok-kw">fn</span> <span class="tok-fn">deref_mut</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; &amp;<span class="tok-kw">mut</span> AccentNeutralizer {</span>
+<span class="ln" id="L465">            &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.inner</span>
+<span class="ln" id="L466">        }</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468"></span>
+<span class="ln" id="L469">    <span class="tok-kw">fn</span> <span class="tok-fn">neutralizer</span>(cfg: AccentConfig) -&gt; Rig {</span>
+<span class="ln" id="L470">        Rig {</span>
+<span class="ln" id="L471">            inner: AccentNeutralizer::<span class="tok-fn">new</span>(cfg, SR, N, HOP, HALF),</span>
+<span class="ln" id="L472">            tracker: <span class="tok-kw">crate</span>::pitch::PitchTracker::<span class="tok-fn">new</span>(SR),</span>
+<span class="ln" id="L473">        }</span>
+<span class="ln" id="L474">    }</span>
+<span class="ln" id="L475"></span>
+<span class="ln" id="L476">    <span class="tok-com">/// A voiced frame: sawtooth excitation shaped by a vocal tract of a given</span></span>
+<span class="ln" id="L477">    <span class="tok-com">/// scale (`vtl` &gt; 1 = longer tract = lower formants).</span></span>
+<span class="ln" id="L478">    <span class="tok-kw">fn</span> <span class="tok-fn">voiced_frame</span>(f0: f32, vtl: f32, i0: usize) -&gt; Vec&lt;f32&gt; {</span>
+<span class="ln" id="L479">        (<span class="tok-num">0</span>..N)</span>
+<span class="ln" id="L480">            .<span class="tok-fn">map</span>(|i| {</span>
+<span class="ln" id="L481">                <span class="tok-kw">let</span> t = (i0 + i) <span class="tok-kw">as</span> f32 / SR;</span>
+<span class="ln" id="L482">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L483">                <span class="tok-kw">for</span> h <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">24</span> {</span>
+<span class="ln" id="L484">                    <span class="tok-kw">let</span> f = f0 * h <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L485">                    <span class="tok-kw">if</span> f &gt; SR * <span class="tok-num">0.45</span> {</span>
+<span class="ln" id="L486">                        break;</span>
+<span class="ln" id="L487">                    }</span>
+<span class="ln" id="L488">                    <span class="tok-com">// Three formants, scaled by vocal-tract length.</span></span>
+<span class="ln" id="L489">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> g = <span class="tok-num">1.0</span> / h <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L490">                    <span class="tok-kw">for</span> &amp;cf <span class="tok-kw">in</span> &amp;[<span class="tok-num">700</span>.0f32, <span class="tok-num">1220.0</span>, <span class="tok-num">2600.0</span>] {</span>
+<span class="ln" id="L491">                        <span class="tok-kw">let</span> c = cf / vtl;</span>
+<span class="ln" id="L492">                        g += <span class="tok-num">0.9</span> / (<span class="tok-num">1.0</span> + ((f - c) / <span class="tok-num">110.0</span>).<span class="tok-fn">powi</span>(<span class="tok-num">2</span>)) / h <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L493">                    }</span>
+<span class="ln" id="L494">                    s += g * (std::f32::consts::TAU * f * t).<span class="tok-fn">sin</span>();</span>
+<span class="ln" id="L495">                }</span>
+<span class="ln" id="L496">                s * <span class="tok-num">0.1</span></span>
+<span class="ln" id="L497">            })</span>
+<span class="ln" id="L498">            .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L499">    }</span>
+<span class="ln" id="L500"></span>
+<span class="ln" id="L501">    <span class="tok-com">/// Smooth spectral envelope of a frame, matching what the chain feeds in.</span></span>
+<span class="ln" id="L502">    <span class="tok-kw">fn</span> <span class="tok-fn">envelope_of</span>(frame: &amp;[f32]) -&gt; Vec&lt;f32&gt; {</span>
+<span class="ln" id="L503">        <span class="tok-kw">use</span> realfft::num_complex::Complex;</span>
+<span class="ln" id="L504">        <span class="tok-kw">use</span> realfft::RealFftPlanner;</span>
+<span class="ln" id="L505">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> planner = RealFftPlanner::&lt;f32&gt;::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L506">        <span class="tok-kw">let</span> r2c = planner.<span class="tok-fn">plan_fft_forward</span>(N);</span>
+<span class="ln" id="L507">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> input: Vec&lt;f32&gt; = frame</span>
+<span class="ln" id="L508">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L509">            .<span class="tok-fn">enumerate</span>()</span>
+<span class="ln" id="L510">            .<span class="tok-fn">map</span>(|(i, x)| {</span>
+<span class="ln" id="L511">                <span class="tok-kw">let</span> w = <span class="tok-num">0.5</span> - <span class="tok-num">0.5</span> * (std::f32::consts::TAU * i <span class="tok-kw">as</span> f32 / N <span class="tok-kw">as</span> f32).<span class="tok-fn">cos</span>();</span>
+<span class="ln" id="L512">                x * w</span>
+<span class="ln" id="L513">            })</span>
+<span class="ln" id="L514">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L515">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> spec = vec![Complex::<span class="tok-fn">new</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>); HALF];</span>
+<span class="ln" id="L516">        r2c.<span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> input, &amp;<span class="tok-kw">mut</span> spec).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L517">        <span class="tok-kw">let</span> mag: Vec&lt;f32&gt; = spec.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|c| c.<span class="tok-fn">norm</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L518">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tmp = vec![<span class="tok-num">0.0</span>; HALF];</span>
+<span class="ln" id="L519">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> env = vec![<span class="tok-num">0.0</span>; HALF];</span>
+<span class="ln" id="L520">        <span class="tok-fn">box_smooth</span>(&amp;mag, <span class="tok-num">21</span>, &amp;<span class="tok-kw">mut</span> tmp);</span>
+<span class="ln" id="L521">        <span class="tok-fn">box_smooth</span>(&amp;tmp, <span class="tok-num">21</span>, &amp;<span class="tok-kw">mut</span> env);</span>
+<span class="ln" id="L522">        env</span>
+<span class="ln" id="L523">    }</span>
+<span class="ln" id="L524"></span>
+<span class="ln" id="L525">    <span class="tok-com">/// Run a synthetic speaker through the neutraliser and report the ratios it</span></span>
+<span class="ln" id="L526">    <span class="tok-com">/// settles on, plus the centroid it measured.</span></span>
+<span class="ln" id="L527">    <span class="tok-kw">fn</span> <span class="tok-fn">settle</span>(f0: f32, vtl: f32, cfg: AccentConfig) -&gt; (f32, f32, f32) {</span>
+<span class="ln" id="L528">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(cfg);</span>
+<span class="ln" id="L529">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">400</span> {</span>
+<span class="ln" id="L530">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(f0, vtl, f * HOP);</span>
+<span class="ln" id="L531">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
+<span class="ln" id="L532">            <span class="tok-kw">let</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
+<span class="ln" id="L533">            a.<span class="tok-fn">measure_envelope</span>(&amp;env);</span>
+<span class="ln" id="L534">        }</span>
+<span class="ln" id="L535">        <span class="tok-kw">let</span> s = a.<span class="tok-fn">stats</span>();</span>
+<span class="ln" id="L536">        (s.prosody_ratio, s.vtln_ratio, s.speaker_centroid_hz)</span>
+<span class="ln" id="L537">    }</span>
+<span class="ln" id="L538"></span>
+<span class="ln" id="L539">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L540">    <span class="tok-kw">fn</span> <span class="tok-fn">two_speakers_converge_to_one_pitch_register</span>() {</span>
+<span class="ln" id="L541">        <span class="tok-kw">let</span> cfg = AccentConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L542">        <span class="tok-kw">let</span> low = <span class="tok-fn">settle</span>(<span class="tok-num">105.0</span>, <span class="tok-num">1.12</span>, cfg); <span class="tok-com">// deeper voice, longer tract</span></span>
+<span class="ln" id="L543">        <span class="tok-kw">let</span> high = <span class="tok-fn">settle</span>(<span class="tok-num">225.0</span>, <span class="tok-num">0.88</span>, cfg); <span class="tok-com">// higher voice, shorter tract</span></span>
+<span class="ln" id="L544"></span>
+<span class="ln" id="L545">        <span class="tok-kw">let</span> out_low = <span class="tok-num">105.0</span> * low.<span class="tok-num">0</span>;</span>
+<span class="ln" id="L546">        <span class="tok-kw">let</span> out_high = <span class="tok-num">225.0</span> * high.<span class="tok-num">0</span>;</span>
+<span class="ln" id="L547">        <span class="tok-kw">let</span> before = (<span class="tok-num">225</span>.0f32 / <span class="tok-num">105.0</span>).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L548">        <span class="tok-kw">let</span> after = (out_high / out_low).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L549"></span>
+<span class="ln" id="L550">        assert!(</span>
+<span class="ln" id="L551">            after &lt; before * <span class="tok-num">0.3</span>,</span>
+<span class="ln" id="L552">            <span class="tok-str">&quot;pitch registers should converge: {before:.3} octaves before, \</span></span>
+<span class="ln" id="L553"><span class="tok-str">             {after:.3} after ({out_low:.0} Hz vs {out_high:.0} Hz)&quot;</span></span>
+<span class="ln" id="L554">        );</span>
+<span class="ln" id="L555">        <span class="tok-kw">for</span> out <span class="tok-kw">in</span> [out_low, out_high] {</span>
+<span class="ln" id="L556">            <span class="tok-kw">let</span> err = (out / cfg.target_f0_hz).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L557">            assert!(err &lt; <span class="tok-num">0.35</span>, <span class="tok-str">&quot;{out:.0} Hz is far from the canonical register&quot;</span>);</span>
+<span class="ln" id="L558">        }</span>
+<span class="ln" id="L559">    }</span>
+<span class="ln" id="L560"></span>
+<span class="ln" id="L561">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L562">    <span class="tok-kw">fn</span> <span class="tok-fn">two_speakers_converge_to_one_vocal_tract</span>() {</span>
+<span class="ln" id="L563">        <span class="tok-kw">let</span> cfg = AccentConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L564">        <span class="tok-kw">let</span> (_, r_long, c_long) = <span class="tok-fn">settle</span>(<span class="tok-num">105.0</span>, <span class="tok-num">1.20</span>, cfg);</span>
+<span class="ln" id="L565">        <span class="tok-kw">let</span> (_, r_short, c_short) = <span class="tok-fn">settle</span>(<span class="tok-num">225.0</span>, <span class="tok-num">0.85</span>, cfg);</span>
+<span class="ln" id="L566"></span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> before = (c_short / c_long).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> after = ((c_short * r_short) / (c_long * r_long)).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L569">        assert!(before &gt; <span class="tok-num">0.15</span>, <span class="tok-str">&quot;test speakers should differ to begin with&quot;</span>);</span>
+<span class="ln" id="L570">        assert!(</span>
+<span class="ln" id="L571">            after &lt; before * <span class="tok-num">0.4</span>,</span>
+<span class="ln" id="L572">            <span class="tok-str">&quot;vocal tracts should converge: {before:.3} octaves before, {after:.3} after&quot;</span></span>
+<span class="ln" id="L573">        );</span>
+<span class="ln" id="L574">    }</span>
+<span class="ln" id="L575"></span>
+<span class="ln" id="L576">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L577">    <span class="tok-kw">fn</span> <span class="tok-fn">flatten_zero_leaves_intonation_alone</span>() {</span>
+<span class="ln" id="L578">        <span class="tok-kw">let</span> cfg = AccentConfig {</span>
+<span class="ln" id="L579">            prosody_flatten: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L580">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L581">        };</span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> (ratio, _, _) = <span class="tok-fn">settle</span>(<span class="tok-num">105.0</span>, <span class="tok-num">1.0</span>, cfg);</span>
+<span class="ln" id="L583">        assert!((ratio - <span class="tok-num">1.0</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.02</span>, <span class="tok-str">&quot;ratio={ratio}&quot;</span>);</span>
+<span class="ln" id="L584">    }</span>
+<span class="ln" id="L585"></span>
+<span class="ln" id="L586">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L587">    <span class="tok-kw">fn</span> <span class="tok-fn">full_flatten_hits_the_canonical_register</span>() {</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> cfg = AccentConfig {</span>
+<span class="ln" id="L589">            prosody_flatten: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L590">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L591">        };</span>
+<span class="ln" id="L592">        <span class="tok-kw">for</span> &amp;f0 <span class="tok-kw">in</span> &amp;[<span class="tok-num">105</span>.0f32, <span class="tok-num">155.0</span>, <span class="tok-num">225.0</span>] {</span>
+<span class="ln" id="L593">            <span class="tok-kw">let</span> (ratio, _, _) = <span class="tok-fn">settle</span>(f0, <span class="tok-num">1.0</span>, cfg);</span>
+<span class="ln" id="L594">            <span class="tok-kw">let</span> out = f0 * ratio;</span>
+<span class="ln" id="L595">            assert!(</span>
+<span class="ln" id="L596">                (out / cfg.target_f0_hz).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.1</span>,</span>
+<span class="ln" id="L597">                <span class="tok-str">&quot;f0={f0} -&gt; {out:.0} Hz, want {}&quot;</span>,</span>
+<span class="ln" id="L598">                cfg.target_f0_hz</span>
+<span class="ln" id="L599">            );</span>
+<span class="ln" id="L600">        }</span>
+<span class="ln" id="L601">    }</span>
+<span class="ln" id="L602"></span>
+<span class="ln" id="L603">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L604">    <span class="tok-kw">fn</span> <span class="tok-fn">disabled_is_a_true_bypass</span>() {</span>
+<span class="ln" id="L605">        <span class="tok-kw">let</span> cfg = AccentConfig {</span>
+<span class="ln" id="L606">            enabled: false,</span>
+<span class="ln" id="L607">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L608">        };</span>
+<span class="ln" id="L609">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(cfg);</span>
+<span class="ln" id="L610">        <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">120.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L611">        a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
+<span class="ln" id="L612">        <span class="tok-kw">let</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
+<span class="ln" id="L613">        a.<span class="tok-fn">measure_envelope</span>(&amp;env);</span>
+<span class="ln" id="L614">        assert_eq!(a.<span class="tok-fn">prosody_ratio</span>(), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L615">        assert_eq!(a.<span class="tok-fn">vtln_ratio</span>(), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L616"></span>
+<span class="ln" id="L617">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shaped = env.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L618">        a.<span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> shaped);</span>
+<span class="ln" id="L619">        assert_eq!(shaped, env, <span class="tok-str">&quot;shaping must not touch the envelope when off&quot;</span>);</span>
+<span class="ln" id="L620">    }</span>
+<span class="ln" id="L621"></span>
+<span class="ln" id="L622">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L623">    <span class="tok-kw">fn</span> <span class="tok-fn">shaping_is_gain_neutral_and_finite</span>() {</span>
+<span class="ln" id="L624">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(AccentConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L625">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> energy_in = <span class="tok-num">0</span>.0f64;</span>
+<span class="ln" id="L626">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> energy_out = <span class="tok-num">0</span>.0f64;</span>
+<span class="ln" id="L627">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">300</span> {</span>
+<span class="ln" id="L628">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">140.0</span>, <span class="tok-num">1.05</span>, f * HOP);</span>
+<span class="ln" id="L629">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
+<span class="ln" id="L630">            <span class="tok-kw">let</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
+<span class="ln" id="L631">            a.<span class="tok-fn">measure_envelope</span>(&amp;env);</span>
+<span class="ln" id="L632">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shaped = env.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L633">            a.<span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> shaped);</span>
+<span class="ln" id="L634">            assert!(shaped.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
+<span class="ln" id="L635">            <span class="tok-kw">if</span> f &gt; <span class="tok-num">200</span> {</span>
+<span class="ln" id="L636">                energy_in += env.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64).<span class="tok-fn">powi</span>(<span class="tok-num">2</span>)).sum::&lt;f64&gt;();</span>
+<span class="ln" id="L637">                energy_out += shaped.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| (*v <span class="tok-kw">as</span> f64).<span class="tok-fn">powi</span>(<span class="tok-num">2</span>)).sum::&lt;f64&gt;();</span>
+<span class="ln" id="L638">            }</span>
+<span class="ln" id="L639">        }</span>
+<span class="ln" id="L640">        <span class="tok-kw">let</span> ratio = energy_out / energy_in;</span>
+<span class="ln" id="L641">        assert!(</span>
+<span class="ln" id="L642">            (<span class="tok-num">0.4</span>..<span class="tok-num">2.5</span>).<span class="tok-fn">contains</span>(&amp;ratio),</span>
+<span class="ln" id="L643">            <span class="tok-str">&quot;long-term shaping changed the level by {ratio:.2}x&quot;</span></span>
+<span class="ln" id="L644">        );</span>
+<span class="ln" id="L645">    }</span>
+<span class="ln" id="L646"></span>
+<span class="ln" id="L647">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L648">    <span class="tok-kw">fn</span> <span class="tok-fn">per_frame_vowel_contrast_survives</span>() {</span>
+<span class="ln" id="L649">        <span class="tok-com">// The whole intelligibility argument: normalisation is long-term, so two</span></span>
+<span class="ln" id="L650">        <span class="tok-com">// different vowels from the same speaker must stay clearly different.</span></span>
+<span class="ln" id="L651">        <span class="tok-kw">let</span> cfg = AccentConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L652">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(cfg);</span>
+<span class="ln" id="L653">        <span class="tok-com">// Settle on the speaker using an /a/-like frame.</span></span>
+<span class="ln" id="L654">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">300</span> {</span>
+<span class="ln" id="L655">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">140.0</span>, <span class="tok-num">1.0</span>, f * HOP);</span>
+<span class="ln" id="L656">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
+<span class="ln" id="L657">            a.<span class="tok-fn">measure_envelope</span>(&amp;<span class="tok-fn">envelope_of</span>(&amp;frame));</span>
+<span class="ln" id="L658">        }</span>
+<span class="ln" id="L659">        <span class="tok-com">// Now compare two distinct vowels shaped by the settled curve.</span></span>
+<span class="ln" id="L660">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shaped = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L661">        <span class="tok-kw">for</span> &amp;vtl <span class="tok-kw">in</span> &amp;[<span class="tok-num">0</span>.75f32, <span class="tok-num">1.35</span>] {</span>
+<span class="ln" id="L662">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">140.0</span>, vtl, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L663">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> env = <span class="tok-fn">envelope_of</span>(&amp;frame);</span>
+<span class="ln" id="L664">            a.<span class="tok-fn">shape</span>(&amp;<span class="tok-kw">mut</span> env);</span>
+<span class="ln" id="L665">            shaped.<span class="tok-fn">push</span>(<span class="tok-fn">log_centroid</span>(&amp;env, a.cent_lo, a.cent_hi, a.bin_hz).<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L666">        }</span>
+<span class="ln" id="L667">        <span class="tok-kw">let</span> sep = (shaped[<span class="tok-num">0</span>] / shaped[<span class="tok-num">1</span>]).<span class="tok-fn">log2</span>().<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L668">        assert!(sep &gt; <span class="tok-num">0.15</span>, <span class="tok-str">&quot;vowel contrast collapsed to {sep:.3} octaves&quot;</span>);</span>
+<span class="ln" id="L669">    }</span>
+<span class="ln" id="L670"></span>
+<span class="ln" id="L671">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L672">    <span class="tok-kw">fn</span> <span class="tok-fn">warmup_ramps_corrections_in_from_nothing</span>() {</span>
+<span class="ln" id="L673">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(AccentConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L674">        assert_eq!(a.<span class="tok-fn">stats</span>().warmup, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L675">        assert_eq!(a.<span class="tok-fn">prosody_ratio</span>(), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L676">        <span class="tok-kw">for</span> f <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">400</span> {</span>
+<span class="ln" id="L677">            <span class="tok-kw">let</span> frame = <span class="tok-fn">voiced_frame</span>(<span class="tok-num">220.0</span>, <span class="tok-num">1.0</span>, f * HOP);</span>
+<span class="ln" id="L678">            a.<span class="tok-fn">observe_frame</span>(&amp;frame, HOP);</span>
+<span class="ln" id="L679">            a.<span class="tok-fn">measure_envelope</span>(&amp;<span class="tok-fn">envelope_of</span>(&amp;frame));</span>
+<span class="ln" id="L680">        }</span>
+<span class="ln" id="L681">        assert_eq!(a.<span class="tok-fn">stats</span>().warmup, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L682">        assert!(a.<span class="tok-fn">prosody_ratio</span>() &lt; <span class="tok-num">0.95</span>, <span class="tok-str">&quot;correction never engaged&quot;</span>);</span>
+<span class="ln" id="L683">    }</span>
+<span class="ln" id="L684"></span>
+<span class="ln" id="L685">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L686">    <span class="tok-kw">fn</span> <span class="tok-fn">unvoiced_input_leaves_state_untouched</span>() {</span>
+<span class="ln" id="L687">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> a = <span class="tok-fn">neutralizer</span>(AccentConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L688">        <span class="tok-kw">let</span> quiet = vec![<span class="tok-num">0</span>.0f32; N];</span>
+<span class="ln" id="L689">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
+<span class="ln" id="L690">            a.<span class="tok-fn">observe_frame</span>(&amp;quiet, HOP);</span>
+<span class="ln" id="L691">            a.<span class="tok-fn">measure_envelope</span>(&amp;vec![<span class="tok-num">0</span>.0f32; HALF]);</span>
+<span class="ln" id="L692">        }</span>
+<span class="ln" id="L693">        assert_eq!(a.<span class="tok-fn">prosody_ratio</span>(), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L694">        assert_eq!(a.<span class="tok-fn">vtln_ratio</span>(), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L695">        assert_eq!(a.<span class="tok-fn">stats</span>().warmup, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L696">    }</span>
+<span class="ln" id="L697">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

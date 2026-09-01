@@ -45,7 +45,7 @@
 <span class="ln" id="L2"><span class="tok-com">//! Frequency-domain de-identification transform.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! For every STFT frame we:</span></span>
-<span class="ln" id="L5"><span class="tok-com">//!   1. take the magnitude spectrum and **discard the measured phase** &#8212; this is</span></span>
+<span class="ln" id="L5"><span class="tok-com">//!   1. take the magnitude spectrum and **discard the measured phase**. This is</span></span>
 <span class="ln" id="L6"><span class="tok-com">//!      the irreversible step, it permanently erases the speaker&#x27;s waveform /</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!      micro-timing;</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!   2. estimate a smooth spectral **envelope** (the vocal-tract / formant</span></span>
@@ -59,7 +59,7 @@
 <span class="ln" id="L16"><span class="tok-com">//! ## Voiced frames: an explicit harmonic comb</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
 <span class="ln" id="L18"><span class="tok-com">//! Step 4 has two modes. On **unvoiced** frames each bin accumulates its own</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! centre frequency &#8212; the classic channel-vocoder phase, exactly right for</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! centre frequency, which is the classic channel-vocoder phase, exactly right for</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! fricatives and noise.</span></span>
 <span class="ln" id="L21"><span class="tok-com">//!</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! On **voiced** frames that alone is not enough, and it is audible. Bin centres</span></span>
@@ -71,7 +71,7 @@
 <span class="ln" id="L28"><span class="tok-com">//! register [`crate::accent`] aims for unreachable.</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! So when the frame is voiced and accent neutralisation is active, the</span></span>
-<span class="ln" id="L31"><span class="tok-com">//! excitation is not resampled at all &#8212; it is **replaced** by an ideal harmonic</span></span>
+<span class="ln" id="L31"><span class="tok-com">//! excitation is not resampled at all. It is **replaced** by an ideal harmonic</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! comb at the canonical fundamental, quantised to the nearest whole bin. This</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! is the textbook source-filter model of voiced speech (an impulse train</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! through the vocal-tract filter), and because every comb line then sits</span></span>
@@ -81,7 +81,7 @@
 <span class="ln" id="L38"><span class="tok-com">//! formants, so the vowels are untouched.</span></span>
 <span class="ln" id="L39"><span class="tok-com">//!</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! Snapping to the bin grid is what buys that coherence, and it costs pitch</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! resolution &#8212; the grid step is coarse. That is not a problem for the default</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! resolution, so the grid step is coarse. That is not a problem for the default</span></span>
 <span class="ln" id="L42"><span class="tok-com">//! configuration, which maps every speaker onto a *single constant* register</span></span>
 <span class="ln" id="L43"><span class="tok-com">//! that need only be snapped once; it does mean any residual intonation</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! (`prosody_flatten` below 1.0) is quantised to the same grid. Lifting that</span></span>
@@ -90,7 +90,7 @@
 <span class="ln" id="L47"><span class="tok-com">//!</span></span>
 <span class="ln" id="L48"><span class="tok-com">//! None of this weakens irreversibility. The measured phase is still discarded</span></span>
 <span class="ln" id="L49"><span class="tok-com">//! in full, and pinning the output to one canonical fundamental destroys *more*</span></span>
-<span class="ln" id="L50"><span class="tok-com">//! pitch information than randomising it would &#8212; a constant carries nothing.</span></span>
+<span class="ln" id="L50"><span class="tok-com">//! pitch information than randomising it would, because a constant carries nothing.</span></span>
 <span class="ln" id="L51"><span class="tok-com">//!</span></span>
 <span class="ln" id="L52"><span class="tok-com">//! Between steps 2 and 4 the optional [`crate::accent`] neutraliser folds in its</span></span>
 <span class="ln" id="L53"><span class="tok-com">//! long-term corrections: it reads the unwarped envelope to measure the</span></span>
@@ -98,7 +98,7 @@
 <span class="ln" id="L55"><span class="tok-com">//! rotates the warped envelope toward a canonical spectral tilt.</span></span>
 <span class="ln" id="L56"><span class="tok-com">//!</span></span>
 <span class="ln" id="L57"><span class="tok-com">//! The measured phase is never reused, so no amount of downstream processing can</span></span>
-<span class="ln" id="L58"><span class="tok-com">//! reconstruct the original excitation phase &#8212; the transform is one-way.</span></span>
+<span class="ln" id="L58"><span class="tok-com">//! reconstruct the original excitation phase: the transform is one-way.</span></span>
 <span class="ln" id="L59"><span class="tok-com">//!</span></span>
 <span class="ln" id="L60"><span class="tok-com">//! # In plain words</span></span>
 <span class="ln" id="L61"><span class="tok-com">//!</span></span>
@@ -184,7 +184,7 @@
 <span class="ln" id="L136">    <span class="tok-com">/// Called when the modulation stream rolls onto a new seed. The offsets are</span></span>
 <span class="ln" id="L137">    <span class="tok-com">/// **glided** to, never assigned: they are added directly to each bin&#x27;s</span></span>
 <span class="ln" id="L138">    <span class="tok-com">/// synthesis phase, so replacing them outright would step every partial&#x27;s</span></span>
-<span class="ln" id="L139">    <span class="tok-com">/// phase at once &#8212; an audible click, every couple of seconds, forever.</span></span>
+<span class="ln" id="L139">    <span class="tok-com">/// phase at once, which is an audible click, every couple of seconds, forever.</span></span>
 <span class="ln" id="L140">    <span class="tok-com">///</span></span>
 <span class="ln" id="L141">    <span class="tok-com">/// Gliding turns that step into a brief, tiny detune instead. The move is</span></span>
 <span class="ln" id="L142">    <span class="tok-com">/// taken the short way around the circle, so the worst case is half a turn</span></span>

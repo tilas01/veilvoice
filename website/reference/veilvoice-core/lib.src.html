@@ -49,8 +49,8 @@
 <span class="ln" id="L6"><span class="tok-com">//!</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! ## What it guarantees (and what it deliberately does not)</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! VeilVoice destroys the *biometric voiceprint* &#8212; fundamental pitch, formant</span></span>
-<span class="ln" id="L10"><span class="tok-com">//! structure, timbre, accent and micro-timing &#8212; so that neither software nor a</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! VeilVoice destroys the *biometric voiceprint*, meaning fundamental pitch,</span></span>
+<span class="ln" id="L10"><span class="tok-com">//! formant structure, timbre, accent and micro-timing, so that neither software nor a</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! human can re-identify the speaker or reconstruct the original waveform. It</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! does **not** hide the words: intelligibility is preserved on purpose, because</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! a scrambler you cannot understand or transcribe is useless. &quot;Fill the whole</span></span>
@@ -61,8 +61,8 @@
 <span class="ln" id="L18"><span class="tok-com">//!</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! [`AccentConfig`] additionally maps every speaker onto one canonical pitch</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! register, vocal-tract scale and long-term spectrum, so the *melody and</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! colour* of an accent &#8212; along with two of the strongest biometric features</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! there are &#8212; do not survive. What no signal-level transform can remove is the</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! colour* of an accent, along with two of the strongest biometric features</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! there are, do not survive. What no signal-level transform can remove is the</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! **segmental** side of an accent: which phonemes were actually produced. At</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! that level the accent and the words are the same thing, and changing it means</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! changing what was said. See [`AccentConfig`] for the full argument and the</span></span>
@@ -71,8 +71,8 @@
 <span class="ln" id="L28"><span class="tok-com">//! ## Why it is one-way</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! Every STFT frame has its **measured phase discarded** and resynthesised from</span></span>
-<span class="ln" id="L31"><span class="tok-com">//! scratch (see [`spectral`]). The original excitation phase &#8212; which encodes the</span></span>
-<span class="ln" id="L32"><span class="tok-com">//! precise waveform and a speaker&#x27;s micro-timing &#8212; is never stored and never</span></span>
+<span class="ln" id="L31"><span class="tok-com">//! scratch (see [`spectral`]). The original excitation phase, which encodes the</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! precise waveform and a speaker&#x27;s micro-timing, is never stored and never</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! reused, so no downstream process can recover it. On top of that, the pitch</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! and formant shifts are driven every frame by a ChaCha20 CSPRNG</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! ([`modulation`]) whose seed never leaves the process and is zeroized on drop,</span></span>
