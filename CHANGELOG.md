@@ -12,8 +12,9 @@ Nothing yet. The next release goes here.
 
 ## v0.1.16
 
-A verifier that no longer calls a genuine release unverified, and an interface
-with no dashes in it.
+A verifier that no longer calls a genuine release unverified, no em dash left
+anywhere in the repository, and the audit's own arithmetic checked by a
+machine instead of by hand.
 
 ### The eighteenth audit round, run against the published v0.1.15
 
@@ -31,17 +32,70 @@ inside it. Not a fixture: the artefacts on the release page.
   files in the extracted release matched the signed contents list, with nothing
   else in the folder.
 
-### The interface text no longer uses dashes
+### No em dash anywhere, in any encoding
 
-Fifty em dashes in `veilvoice-cli` and four elsewhere that reach a user are
-gone, from `--help` output, warnings, errors and printed results. Every
-sentence was rewritten rather than having its punctuation swapped, and the ten
-committed CLI screenshots were re-captured from the built binary, so the
-gallery shows what the program prints.
+Fifty in `veilvoice-cli` and four elsewhere that reach a user went first, from
+`--help` output, warnings, errors and printed results, with the ten committed
+CLI screenshots re-captured from the built binary so the gallery shows what the
+program prints.
 
-349 remain in `//!` and `///` doc comments, which the rule covers and which
-nobody sees while using VeilVoice. That is a stated remainder, not a claim of
-completion.
+The rest followed: every `//!` and `///` doc comment in all twenty-seven
+crates, the Markdown, the workflows, the site tests, the build files, the
+generators and the hand-written website pages. Every one is a rewritten
+sentence rather than a swapped character, because a dash carrying a "because"
+or a "so" leaves a comma splice behind when it is simply deleted.
+
+**The remainder this file stated last was measured with the wrong instrument.**
+"349 remain" was accurate over every file `grep -r` reaches, and blind to the
+roughly 2,800 `&mdash;` and `&#8212;` in the website, which no search for the
+character had ever looked for. A number is only as honest as the search that
+produced it.
+
+Three places keep the character on purpose, because all three read it as input
+rather than writing it: the roff translation table, the roadmap parser's
+spelling of an empty estimate, and the Markdown renderer's entity decoder.
+
+Eight comma splices were introduced by the sweep and caught before release,
+seven by reading the rendered website and one by grepping the diff for a comma
+followed by a new independent clause. Both passes were needed: the site suites
+pass on a splice, and the mechanical check found what reading had missed.
+
+### The nineteenth and twentieth audit rounds
+
+- **F-105** The audit's verdict claimed one hundred and four defects and then
+  broke them down into sixty-five. The headline had been maintained every
+  round; the breakdown under it had not been touched in eleven, so every
+  conclusion in the document's most quotable paragraph was a seventh-round
+  conclusion written in the present tense. The breakdown is gone rather than
+  corrected, because a corrected one drifts again for the same reason.
+- **F-93 and F-94 were fixed in code and never written up.** Both were real,
+  both were described in full in the commit that fixed them, and neither had an
+  entry, so the finding numbers ran to 104 with a hole at 94 and nothing said
+  so. Writing them up forced an honest qualification of this project's
+  "no confidentiality failure" claim, which had never mentioned the two
+  encrypted-volume defects; the claim stands as defined, and the audit is now
+  explicit about which side of the line they fall on.
+- **F-106** A test deleted another test's fixture. Two tests take a scratch
+  GnuPG home and each removes it when it finishes, and the helper named that
+  directory after the clock alone. Two threads reading the same tick get the
+  same path, `create_dir_all` reports success because the directory is already
+  there, and the faster test's cleanup destroyed the slower one's keyring
+  mid-run. Impossible on Linux, where the nanoseconds always differ, and it
+  happened on macOS, where the clock is coarser. Caught by CI on a commit that
+  changed no Rust at all, which is the honest signature of a defect that was
+  always there.
+
+### The audit's arithmetic is measured now
+
+`docs/MEASURED.md` records how many findings the audit writes up and the
+highest number it hands out, read from the document's own headings. They agree
+exactly when no number has been skipped, so F-94's absence would have shown as
+103 against 104 rather than as nothing.
+
+A new site suite checks the README's count and range and the verdict's count
+and range against those measured numbers, never against each other: that is
+F-71, where a guard compared one hand-typed claim to another and passed while
+both were wrong. Its four failure modes were tested by reintroducing them.
 
 ### The seventeenth audit round, run on the screenshots
 
