@@ -22,5 +22,5 @@ own: what it does, and the same thing in plain words.
 | [`website/js/search.js`](website-js-search-js.md) | 496 | Search across the whole repository and this website |
 | [`website/js/theme.js`](website-js-theme-js.md) | 104 | Theme switching |
 | [`website/js/verify.js`](website-js-verify-js.md) | 211 | In-browser SHA-256 verification for downloaded release archives |
-| [`website/css/main.css`](website-css-main-css.md) | 2437 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
+| [`website/css/main.css`](website-css-main-css.md) | 2448 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
 | [`website/css/themes.css`](website-css-themes-css.md) | 174 | Colour schemes |

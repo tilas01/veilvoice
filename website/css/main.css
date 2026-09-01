@@ -1760,13 +1760,26 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
  * attributes give the browser the aspect ratio before the bytes arrive, so the
  * page does not jump as each picture loads, and this stops that ratio being
  * applied as a fixed pixel height once it has. */
+/* No border, no radius and no background behind these.
+ *
+ * The corners are in the file. `tools/shots/round.py` rounds them into the
+ * alpha channel, because the README is rendered by GitHub, which strips styles
+ * from images, and a picture that is only round on the website is not round.
+ *
+ * Once the shape is in the pixels, painting it again here does harm rather
+ * than nothing. `border-radius` on an `img` clips the content box, and these
+ * are displayed at roughly a third of their captured width, so the file's
+ * 14-pixel radius arrives on screen as about five while a fixed 9 here would
+ * cut into the picture past it. A `background` is worse: it shows through the
+ * corners the file made transparent, as a wedge of inset colour in each one.
+ * And a square 1px border crosses the rounded corner it is meant to follow.
+ *
+ * The captures already carry the application's own window frame, which is the
+ * edge a reader sees. */
 .shot img {
   display: block;
   width: 100%;
   height: auto;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--bg-inset);
 }
 
 .shot figcaption, .cast figcaption {
@@ -2367,7 +2380,6 @@ html:not(.js) .js-toggle-lock { display: inline; }
  * keyboard.
  */
 .shot img {
-  border-radius: 10px;
   cursor: zoom-in;
 }
 
@@ -2396,7 +2408,6 @@ html:not(.js) .js-toggle-lock { display: inline; }
   max-height: 100%;
   width: auto;
   height: auto;
-  border-radius: 10px;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6);
 }
 
