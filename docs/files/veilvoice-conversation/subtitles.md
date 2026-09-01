@@ -29,8 +29,8 @@ Subtitles, from the same plan the audio is rendered from.
 
 **WebVTT** is what a browser plays alongside a `<video>`, and it is the one
 to use with anything this project renders. **SubRip** (`.srt`) is what every
-other player on earth reads. They differ in three small ways — a header, a
-cue counter, and a comma instead of a full stop in the timestamp — so both
+other player on earth reads. They differ in three small ways, being a header,
+a cue counter, and a comma instead of a full stop in the timestamp, so both
 come from one function with a flag rather than from two that drift.
 
 No library. The workspace carries no subtitle crate and this is forty lines;
@@ -41,7 +41,7 @@ this project is worth trusting for.
 # What goes in a cue when nobody wrote down the words
 
 VeilVoice does not transcribe. Where a turn has no text, the cue carries the
-**speaker's name and nothing else** — which is still worth having: after
+**speaker's name and nothing else**, which is still worth having: after
 every voice has been replaced, a caption track saying who is talking is
 often the only way to follow a recording at all.
 
@@ -50,7 +50,7 @@ often the only way to follow a recording at all.
 Worth saying twice, because it is the mistake this feature invites. The
 audio has had its voiceprints destroyed. The subtitle file is a text file
 containing whatever names were typed into it, sitting next to the recording.
-If the names matter, use labels rather than names — the plan does not care
+If the names matter, use labels rather than names, because the plan does not care
 which, and `crate::SCOPE` says so where a user will read it.
 
 # In plain words

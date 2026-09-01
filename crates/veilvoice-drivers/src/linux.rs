@@ -5,7 +5,7 @@
 //!
 //! The kernel publishes the loaded module list as a file, so this reads it.
 //! Nothing is spawned, nothing needs privileges, and the whole operation costs
-//! two directory reads — cheap enough to run on a timer without becoming the
+//! two directory reads, cheap enough to run on a timer without becoming the
 //! reason the interface stopped painting.
 //!
 //! # The format
@@ -17,7 +17,7 @@
 //! Name, size in bytes, reference count, the modules that depend on it, the
 //! state, and the load address. The address is **not** recorded: on most
 //! systems `kptr_restrict` makes it read as zeros for an unprivileged reader,
-//! and on the rest it changes at every boot — so recording it would make every
+//! and on the rest it changes at every boot, so recording it would make every
 //! module look altered after a restart, which is a report nobody reads.
 //!
 //! # The cross-view check
@@ -32,7 +32,7 @@
 //!
 //! One honest wrinkle: `/sys/module` also lists built-in modules and boot
 //! parameters, which were never in `/proc/modules` and never will be. Those
-//! have no `initstate` file, so only directories that have one are compared —
+//! have no `initstate` file, so only directories that have one are compared,
 //! otherwise the check would produce dozens of discrepancies on every machine
 //! and be switched off within a day.
 //!
@@ -123,7 +123,7 @@ pub(crate) fn read() -> (Vec<Module>, Vec<String>, Vec<String>) {
 /// The names under `/sys/module` that correspond to loadable modules.
 ///
 /// Only directories with an `initstate` file. The rest are built-ins and boot
-/// parameters, which are never in `/proc/modules` — including them would report
+/// parameters, which are never in `/proc/modules`. Including them would report
 /// dozens of discrepancies on an ordinary machine, and a check that cries wolf
 /// every time is a check somebody turns off.
 #[cfg(target_os = "linux")]

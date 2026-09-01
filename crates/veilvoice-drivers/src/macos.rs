@@ -6,7 +6,7 @@
 //! `kextstat` is the old one and is deprecated; `kmutil` is the replacement and
 //! does not exist on older systems. Both are tried, newest first, and if
 //! neither answers the reason is reported rather than an empty list being
-//! passed off as "no kernel extensions" — which would be false on every Mac
+//! passed off as "no kernel extensions", which would be false on every Mac
 //! ever made.
 //!
 //! Both print the same shape, which is why one parser handles both:
@@ -27,7 +27,7 @@
 //!
 //! The native answer is IOKit, which is FFI. `#![forbid(unsafe_code)]` holds
 //! here as everywhere else in the workspace, so this asks a tool the system
-//! already ships — the same trade the Windows and Linux readers make.
+//! already ships, the same trade the Windows and Linux readers make.
 //!
 //! # In plain words
 //!

@@ -54,14 +54,14 @@
 <section id="s-about">
 <p>Linux: <code>/proc/modules</code>, cross-checked against <code>/sys/module</code>.</p>
 <h2 id="two-files-no-subprocess">Two files, no subprocess</h2>
-<p>The kernel publishes the loaded module list as a file, so this reads it. Nothing is spawned, nothing needs privileges, and the whole operation costs two directory reads &#8212; cheap enough to run on a timer without becoming the reason the interface stopped painting.</p>
+<p>The kernel publishes the loaded module list as a file, so this reads it. Nothing is spawned, nothing needs privileges, and the whole operation costs two directory reads, cheap enough to run on a timer without becoming the reason the interface stopped painting.</p>
 <h2 id="the-format">The format</h2>
 <pre><code>nvidia 56807424 42 nvidia_uvm,nvidia_modeset, Live 0xffffffffc0e00000</code></pre>
-<p>Name, size in bytes, reference count, the modules that depend on it, the state, and the load address. The address is <strong>not</strong> recorded: on most systems <code>kptr_restrict</code> makes it read as zeros for an unprivileged reader, and on the rest it changes at every boot &#8212; so recording it would make every module look altered after a restart, which is a report nobody reads.</p>
+<p>Name, size in bytes, reference count, the modules that depend on it, the state, and the load address. The address is <strong>not</strong> recorded: on most systems <code>kptr_restrict</code> makes it read as zeros for an unprivileged reader, and on the rest it changes at every boot, so recording it would make every module look altered after a restart, which is a report nobody reads.</p>
 <h2 id="the-cross-view-check">The cross-view check</h2>
 <p><code>/sys/module</code> has a directory per module, and the two lists should agree. A name in one and not the other is worth reporting: unlinking from <code>/proc/modules</code> and forgetting <code>/sys/module</code> is a mistake real rootkits have made.</p>
 <p>It catches carelessness only. Both lists come from the same kernel, so anything with the privilege to edit one has the privilege to edit both.</p>
-<p>One honest wrinkle: <code>/sys/module</code> also lists built-in modules and boot parameters, which were never in <code>/proc/modules</code> and never will be. Those have no <code>initstate</code> file, so only directories that have one are compared &#8212; otherwise the check would produce dozens of discrepancies on every machine and be switched off within a day.</p>
+<p>One honest wrinkle: <code>/sys/module</code> also lists built-in modules and boot parameters, which were never in <code>/proc/modules</code> and never will be. Those have no <code>initstate</code> file, so only directories that have one are compared, otherwise the check would produce dozens of discrepancies on every machine and be switched off within a day.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Asks Linux which kernel modules are loaded, by reading two files the system keeps.</p>
 <p>Nothing is run at all: the answer is already written down. Both files are read and compared, because a module that appears in one and not the other is itself worth reporting.</p>

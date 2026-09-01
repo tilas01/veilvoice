@@ -48,7 +48,7 @@
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! Deciding which person is speaking at each moment is *speaker diarisation*,</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! and doing it from the audio alone needs a trained model. This project ships</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! no model, talks to no server, and is not about to start doing either &#8212; so</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! no model, talks to no server, and is not about to start doing either, so</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! the turns come from the user, and there are exactly two honest ways to get</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! them:</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
@@ -60,7 +60,7 @@
 <span class="ln" id="L17"><span class="tok-com">//!   transcripts.</span></span>
 <span class="ln" id="L18"><span class="tok-com">//!</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! What would be worse than either is guessing. A wrong guess maps two people</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! onto one voice &#8212; which is a privacy *improvement* and a usability disaster &#8212;</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! onto one voice, which is a privacy *improvement* and a usability disaster,</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! or splits one person across two voices, which invites a listener to believe</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! there was somebody in the room who was not. Neither failure would be visible</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! in the output, and both would be blamed on the recording rather than on the</span></span>
@@ -124,7 +124,7 @@
 <span class="ln" id="L78">    <span class="tok-com">/// A picture to show for them in a rendered video, if there is one.</span></span>
 <span class="ln" id="L79">    <span class="tok-com">///</span></span>
 <span class="ln" id="L80">    <span class="tok-com">/// `None` means a plain filled circle in their colour, which is what most</span></span>
-<span class="ln" id="L81">    <span class="tok-com">/// people will use &#8212; and which reveals nothing, unlike a photograph.</span></span>
+<span class="ln" id="L81">    <span class="tok-com">/// people will use, and which reveals nothing, unlike a photograph.</span></span>
 <span class="ln" id="L82">    <span class="tok-kw">pub</span> picture: Option&lt;PathBuf&gt;,</span>
 <span class="ln" id="L83">}</span>
 </span>
@@ -199,7 +199,7 @@
 <span class="ln" id="L141">    <span class="tok-com">/// Add a speaker, and return the index they were given.</span></span>
 <span class="ln" id="L142">    <span class="tok-com">///</span></span>
 <span class="ln" id="L143">    <span class="tok-com">/// The index is also the destination-voice slot, so the first speaker added</span></span>
-<span class="ln" id="L144">    <span class="tok-com">/// gets [`veilvoice_core::voices::voice`] 0 and the second gets voice 1 &#8212;</span></span>
+<span class="ln" id="L144">    <span class="tok-com">/// gets [`veilvoice_core::voices::voice`] 0 and the second gets voice 1,</span></span>
 <span class="ln" id="L145">    <span class="tok-com">/// which are the two furthest apart in the table, because two people is the</span></span>
 <span class="ln" id="L146">    <span class="tok-com">/// common case.</span></span>
 <span class="ln" id="L147">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">add_speaker</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, speaker: Speaker) -&gt; Result&lt;usize, Error&gt; {</span>
@@ -286,7 +286,7 @@
 <span class="ln" id="L224">    <span class="tok-com">/// The count has to match exactly. A plan naming three speakers renamed</span></span>
 <span class="ln" id="L225">    <span class="tok-com">/// from a list of two would either leave one person with a stale name or</span></span>
 <span class="ln" id="L226">    <span class="tok-com">/// silently drop a slot, and a dropped slot means somebody&#x27;s audio comes</span></span>
-<span class="ln" id="L227">    <span class="tok-com">/// out in another person&#x27;s voice &#8212; the one mistake here that cannot be</span></span>
+<span class="ln" id="L227">    <span class="tok-com">/// out in another person&#x27;s voice, which is the one mistake here that cannot be</span></span>
 <span class="ln" id="L228">    <span class="tok-com">/// heard in the result, because both voices are unfamiliar.</span></span>
 <span class="ln" id="L229">    <span class="tok-com">///</span></span>
 <span class="ln" id="L230">    <span class="tok-com">/// Every name is validated exactly as [`Conversation::add_speaker`]</span></span>

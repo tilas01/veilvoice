@@ -67,8 +67,8 @@
 <span class="ln" id="L24"><span class="tok-com">//! # A limitation of typing a password into a window</span></span>
 <span class="ln" id="L25"><span class="tok-com">//!</span></span>
 <span class="ln" id="L26"><span class="tok-com">//! A text field owns a `String`, so a passphrase exists as ordinary heap bytes</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! while it is being typed. That window cannot be removed &#8212; something has to</span></span>
-<span class="ln" id="L28"><span class="tok-com">//! receive the keystrokes &#8212; but it can be kept short, and it is:</span></span>
+<span class="ln" id="L27"><span class="tok-com">//! while it is being typed. That window cannot be removed, because something has</span></span>
+<span class="ln" id="L28"><span class="tok-com">//! to receive the keystrokes, but it can be kept short, and it is:</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! - the typing buffer is wiped the moment the passphrase is confirmed;</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! - the confirmed passphrase is held only as a [`veilvoice_crypto::Secret`],</span></span>
@@ -1221,7 +1221,7 @@
 <span class="ln" id="L1115">    <span class="tok-com">/// `params` is the caller&#x27;s, rather than being read from</span></span>
 <span class="ln" id="L1116">    <span class="tok-com">/// [`kdf::KdfParams::default`] in here. The app passes the default; the</span></span>
 <span class="ln" id="L1117">    <span class="tok-com">/// tests pass a cheap profile, because a unit test that allocates 256 MiB</span></span>
-<span class="ln" id="L1118">    <span class="tok-com">/// and runs three passes of Argon2 is not testing the thing it claims to &#8212;</span></span>
+<span class="ln" id="L1118">    <span class="tok-com">/// and runs three passes of Argon2 is not testing the thing it claims to,</span></span>
 <span class="ln" id="L1119">    <span class="tok-com">/// it is testing the runner&#x27;s memory, and on a CI machine running several</span></span>
 <span class="ln" id="L1120">    <span class="tok-com">/// such tests at once it stops being a test at all.</span></span>
 <span class="ln" id="L1121">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">write</span>(</span>
@@ -1258,7 +1258,7 @@
 <span class="ln" id="L1151">}</span>
 <span class="ln" id="L1152"></span>
 <span class="ln" id="L1153"><span class="tok-com">/// Deliberately opaque about the passphrase, so a plan cannot reach a log line</span></span>
-<span class="ln" id="L1154"><span class="tok-com">/// through `{:?}` &#8212; the same rule [`veilvoice_crypto::Secret`] follows.</span></span>
+<span class="ln" id="L1154"><span class="tok-com">/// through `{:?}`, the same rule [`veilvoice_crypto::Secret`] follows.</span></span>
 <span class="ln" id="L1155"><span class="tok-kw">impl</span> std::fmt::Debug <span class="tok-kw">for</span> Plan {</span>
 <span class="src-item" id="fn-plan-fmt">
 <span class="ln" id="L1156">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>

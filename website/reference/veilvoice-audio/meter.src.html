@@ -48,7 +48,7 @@
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! [`crate::live::LiveStats`] reports a peak, and both front ends draw it. They</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! drew it *differently*: both were linear, and the desktop one printed a</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! decibel number beside a bar filled linearly &#8212; so the number said -12 dB and</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! decibel number beside a bar filled linearly, so the number said -12 dB and</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! the bar showed a quarter. Two meters disagreeing about the same reading is</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! worse than one bad meter, because it makes the reader doubt the number.</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
@@ -70,7 +70,7 @@
 <span class="ln" id="L27"><span class="tok-com">//! window and a weighting curve, and answers a different question. This one</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! answers &quot;am I being recorded, and am I clipping&quot;.</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
-<span class="ln" id="L30"><span class="tok-com">//! It also cannot see an **inter-sample peak** &#8212; a waveform that passes above</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! It also cannot see an **inter-sample peak**, which is a waveform that passes above</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! full scale between two samples and clips in a converter without any single</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! sample exceeding 1.0. Catching those needs oversampling. A front end may say</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! `CLIP` when a sample reaches full scale, and must not imply it caught the</span></span>
@@ -118,7 +118,7 @@
 <span class="ln" id="L70"><span class="tok-com">///</span></span>
 <span class="ln" id="L71"><span class="tok-com">/// # The two ways a reading can be nonsense, answered differently</span></span>
 <span class="ln" id="L72"><span class="tok-com">///</span></span>
-<span class="ln" id="L73"><span class="tok-com">/// **NaN** is not a level at all, and is read as silence &#8212; nothing can be</span></span>
+<span class="ln" id="L73"><span class="tok-com">/// **NaN** is not a level at all, and is read as silence, because nothing can be</span></span>
 <span class="ln" id="L74"><span class="tok-com">/// inferred from it.</span></span>
 <span class="ln" id="L75"><span class="tok-com">///</span></span>
 <span class="ln" id="L76"><span class="tok-com">/// **Positive infinity** is read as **full scale**. Both are wrong readings,</span></span>

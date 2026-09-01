@@ -19,7 +19,7 @@
 //! [`VoiceMode::Distinct`] gives each speaker their own voice. It is the
 //! obvious arrangement and it is what most recordings want, and it is capped at
 //! the measured limit, because handing two people voices nobody can separate
-//! produces a recording in which two speakers sound like one — discovered only
+//! produces a recording in which two speakers sound like one, discovered only
 //! after the recording exists.
 //!
 //! [`VoiceMode::Uniform`] gives **everybody the same voice**, and the speakers
@@ -30,7 +30,7 @@
 //! * **It is more private.** In distinct mode the output carries one bit of
 //!   structure the input had: *this is speaker three*. Anybody who obtains two
 //!   recordings of the same group can align them by voice slot. Uniform mode
-//!   does not have that structure to leak — every speaker is the same voice, so
+//!   does not have that structure to leak, because every speaker is the same voice, so
 //!   there is nothing to align.
 //! * **It is harder to follow by ear alone.** A listener with no subtitles and
 //!   no picture cannot tell who is speaking. That is the price, and it is why

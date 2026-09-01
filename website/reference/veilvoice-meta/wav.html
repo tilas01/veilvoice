@@ -53,9 +53,9 @@
 <section id="s-about">
 <p>Chunk-level RIFF/WAVE metadata removal.</p>
 <h2 id="why-wav-gets-its-own-path">Why WAV gets its own path</h2>
-<p><code>lofty</code> handles tags in every other container, but it cannot remove an ID3v2 block from a WAV file &#8212; the attempt fails with an encoding error and the tag stays put. Silently leaving metadata in place is exactly the failure this crate exists to prevent, and WAV is the format VeilVoice writes itself, so it gets a direct implementation rather than a caveat.</p>
+<p><code>lofty</code> handles tags in every other container, but it cannot remove an ID3v2 block from a WAV file: the attempt fails with an encoding error and the tag stays put. Silently leaving metadata in place is exactly the failure this crate exists to prevent, and WAV is the format VeilVoice writes itself, so it gets a direct implementation rather than a caveat.</p>
 <h2 id="whitelist-not-blacklist">Whitelist, not blacklist</h2>
-<p>A RIFF file is a flat list of chunks, and metadata hides in a lot of them: <code>LIST</code>/<code>INFO</code> (artist, software, comments), <code>id3 </code> and <code>ID3 </code>, <code>bext</code> (broadcast extension &#8212; originator, date, even a coding history), <code>iXML</code>, <code>_PMX</code> (XMP), <code>axml</code>, <code>cart</code>. Enumerating those would leave every chunk nobody thought of, and new ones keep being invented.</p>
+<p>A RIFF file is a flat list of chunks, and metadata hides in a lot of them: <code>LIST</code>/<code>INFO</code> (artist, software, comments), <code>id3 </code> and <code>ID3 </code>, <code>bext</code> (the broadcast extension, carrying originator, date and even a coding history), <code>iXML</code>, <code>_PMX</code> (XMP), <code>axml</code>, <code>cart</code>. Enumerating those would leave every chunk nobody thought of, and new ones keep being invented.</p>
 <p>So this keeps only the chunks needed to decode the audio and drops everything else. Anything unrecognised is discarded by default, which is the right bias for a privacy tool: the worst case is a lost non-essential chunk, not a leaked identity.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Strips the hidden information out of a WAV file specifically.</p>

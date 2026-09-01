@@ -53,7 +53,7 @@
 <span class="ln" id="L10"><span class="tok-com">//! [`Posture::is_at_least_as_strict_as`] exists so a test can hold it.</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! Anybody adding a variant should read [`crate`]&#x27;s documentation first. A</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! loosening variant does not merely add a feature &#8212; it removes the reason the</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! loosening variant does not merely add a feature: it removes the reason the</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! plain file can be read without a passphrase.</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! # Format</span></span>
@@ -186,7 +186,7 @@
 <span class="src-item" id="fn-posture">
 <span class="ln" id="L131"><span class="tok-com">/// The settings a policy can reach, as a front end holds them.</span></span>
 <span class="ln" id="L132"><span class="tok-com">///</span></span>
-<span class="ln" id="L133"><span class="tok-com">/// Deliberately small. This is not a copy of the preferences file &#8212; it is the</span></span>
+<span class="ln" id="L133"><span class="tok-com">/// Deliberately small. This is not a copy of the preferences file. It is the</span></span>
 <span class="ln" id="L134"><span class="tok-com">/// subset a policy is allowed to constrain, which is the subset where being</span></span>
 <span class="ln" id="L135"><span class="tok-com">/// *more* strict is never a loss.</span></span>
 <span class="ln" id="L136"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq)]</span>
@@ -462,7 +462,7 @@
 <span class="ln" id="L372">    <span class="tok-com">/// Seal the policy under a passphrase.</span></span>
 <span class="ln" id="L373">    <span class="tok-com">///</span></span>
 <span class="ln" id="L374">    <span class="tok-com">/// The sealed copy is what proves the plain one is the policy that was</span></span>
-<span class="ln" id="L375">    <span class="tok-com">/// written. It is not what makes the policy apply &#8212; see [`crate`].</span></span>
+<span class="ln" id="L375">    <span class="tok-com">/// written. It is not what makes the policy apply. See [`crate`].</span></span>
 <span class="ln" id="L376">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">seal</span>(&amp;<span class="tok-kw">self</span>, password: &amp;[u8]) -&gt; Result&lt;Vec&lt;u8&gt;, Error&gt; {</span>
 <span class="ln" id="L377">        <span class="tok-fn">Ok</span>(veilvoice_crypto::container::<span class="tok-fn">seal_with_password</span>(</span>
 <span class="ln" id="L378">            password,</span>

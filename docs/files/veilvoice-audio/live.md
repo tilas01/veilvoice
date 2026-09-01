@@ -45,7 +45,7 @@ update is skipped rather than the audio stalling.
 
 Total latency is the input buffer, plus the ring backlog, plus the engine's
 one-frame group delay (~21 ms at the defaults), plus the output buffer. The
-ring is intentionally short — enough to absorb jitter between two clocks
+ring is intentionally short, enough to absorb jitter between two clocks
 that are not synchronised, not enough to accumulate a delay the user would
 notice while speaking.
 

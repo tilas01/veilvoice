@@ -28,14 +28,14 @@ Linux detection, via open file handles in `/proc`.
 # How it works
 
 A process using the microphone has a file descriptor open on an ALSA PCM
-capture node — `/dev/snd/pcmC0D0c`, where the trailing `c` means capture as
+capture node, `/dev/snd/pcmC0D0c`, where the trailing `c` means capture as
 opposed to `p` for playback. A process using the camera has one open on
 `/dev/video*`. Walking `/proc/*/fd` and resolving the symlinks finds them,
 along with the PID and the process name, with no dependency and no daemon.
 
 Capture and playback are distinguished deliberately. Treating every open
 `/dev/snd` handle as microphone use would report a music player as
-listening to you, and a monitor that cries wolf gets ignored — which is the
+listening to you, and a monitor that cries wolf gets ignored, which is the
 worst possible outcome for this feature.
 
 # Sound servers

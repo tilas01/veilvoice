@@ -23,8 +23,8 @@ and the detached OpenPGP signature over that list.
 
 `veilvoice-verify` did all of this and did it inside a binary crate, which
 has no consumers by construction. The desktop application was asked for a
-**verify tab** — drag a download onto the window and be told whether it is
-the published one — and there were two ways to have that:
+**verify tab**, where you drag a download onto the window and are told
+whether it is the published one, and there were two ways to have that:
 
 * link `eframe` into the 1.5 MB portable verifier, which is the one binary
 in this project whose smallness is a feature: it is what somebody
@@ -41,7 +41,7 @@ A good signature over `SHA256SUMS`, plus a matching hash, proves the file is
 **the one the holder of this key published**. It does not prove the file is
 safe, that the source compiles to it, or that the key belongs to anybody in
 particular. The second of those is the check worth having and it is the one
-this project cannot perform for you — it needs somebody other than the
+this project cannot perform for you, because it needs somebody other than the
 author to have built the same tag and got the same hash.
 
 Every front end that uses this has to say so. The words are here, in

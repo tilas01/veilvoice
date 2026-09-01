@@ -32,7 +32,7 @@ to tell those apart by counting files is claiming something it cannot do.
 
 So the output is numbers plus a `Concern` level against a `Threshold`
 **the user sets**, and the front end's job is to say "this many files
-changed in this long, was that you?" — a question, which the person at the
+changed in this long, was that you?", which is a question, and the person at the
 keyboard can answer instantly and this crate never can.
 
 # Modification times can be set by whatever did the modifying
@@ -51,7 +51,7 @@ there are two signals here rather than one.
 
 `Limits` caps how many files and how deep, and a snapshot that hit a cap
 is marked `Snapshot::truncated`. A truncated snapshot compared against
-another truncated snapshot is still useful — both walked in the same order —
+another truncated snapshot is still useful, because both walked in the same order,
 but the count is of what was looked at, not of what is there, and every
 report carries that flag so a front end cannot present it as complete.
 
@@ -62,7 +62,7 @@ directory make this crate report on files outside it.
 # Format
 
 A snapshot has to survive between two runs of the program, or the only
-comparison possible is one taken inside a single session — which measures
+comparison possible is one taken inside a single session, which measures
 the minute you were looking and nothing else. So it is written to disk, in
 text, one record per line, for the same reason the tamper manifest is text:
 the point of the file is to be checkable without this crate.

@@ -53,12 +53,12 @@
 <section id="s-about">
 <p>Who is in the recording, and who is speaking when.</p>
 <h2 id="veilvoice-does-not-work-out-who-is-talking-and-will-not-guess">VeilVoice does not work out who is talking, and will not guess</h2>
-<p>Deciding which person is speaking at each moment is <em>speaker diarisation</em>, and doing it from the audio alone needs a trained model. This project ships no model, talks to no server, and is not about to start doing either &#8212; so the turns come from the user, and there are exactly two honest ways to get them:</p>
+<p>Deciding which person is speaking at each moment is <em>speaker diarisation</em>, and doing it from the audio alone needs a trained model. This project ships no model, talks to no server, and is not about to start doing either, so the turns come from the user, and there are exactly two honest ways to get them:</p>
 <ul>
 <li><strong>One microphone each.</strong> If the recording has a channel per person, the split is already there and is exact. <code>Conversation::from_channels</code> builds the plan from that.</li>
 <li><strong>A list of turns.</strong> Times and speakers, in a text file, written by whoever was there or produced by whatever tool they already use for transcripts.</li>
 </ul>
-<p>What would be worse than either is guessing. A wrong guess maps two people onto one voice &#8212; which is a privacy <em>improvement</em> and a usability disaster &#8212; or splits one person across two voices, which invites a listener to believe there was somebody in the room who was not. Neither failure would be visible in the output, and both would be blamed on the recording rather than on the tool.</p>
+<p>What would be worse than either is guessing. A wrong guess maps two people onto one voice, which is a privacy <em>improvement</em> and a usability disaster, or splits one person across two voices, which invites a listener to believe there was somebody in the room who was not. Neither failure would be visible in the output, and both would be blamed on the recording rather than on the tool.</p>
 <h2 id="format">Format</h2>
 <p>Text, one record per line, for the same reason everything else here is text: a file describing who said what is worth more if it can be read, checked and edited without this program.</p>
 <pre><code>VEILCONV1

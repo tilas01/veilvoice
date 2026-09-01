@@ -11,7 +11,7 @@
 //! a reader can check with `cargo tree` in ten seconds.
 //!
 //! So the honest arrangement is the one the rest of the project already uses
-//! for exactly this kind of problem — the download in `veilvoice-verify`, the
+//! for exactly this kind of problem: the download in `veilvoice-verify`, the
 //! registry in `veilvoice-watch`, the driver list in `veilvoice-drivers`. Find
 //! the tool the machine already has, prepare the exact command, and let the
 //! person decide.
@@ -19,7 +19,7 @@
 //! # And VeilVoice will not run it for you
 //!
 //! [`command`] builds the argument list. Running it is the caller's, and a
-//! front end should print it rather than execute it silently — the same rule
+//! front end should print it rather than execute it silently, the same rule
 //! the companion installer follows, for the same reason.
 //!
 //! # If the machine has no ffmpeg, nothing has failed
@@ -268,7 +268,7 @@ pub fn is_container(path: &Path) -> bool {
 /// The command as one line, for printing.
 ///
 /// Quoted where a part contains a space. For a person to read and paste, not
-/// for a shell this program runs — nothing here runs it.
+/// for a shell this program runs. Nothing here runs it.
 pub fn command_line(argv: &[String]) -> String {
     argv.iter()
         .map(|part| {

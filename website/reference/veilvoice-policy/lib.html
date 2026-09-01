@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-policy/src/lib.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="Settings somebody else decided, sealed so they cannot be edited without a passphrase &#8212; and, more importantly, built so that editing them without one buys nothing worth having.">
+<meta name="description" content="Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -52,14 +52,14 @@
 </nav>
 <div>
 <section id="s-about">
-<p>Settings somebody else decided, sealed so they cannot be edited without a passphrase &#8212; and, more importantly, built so that editing them without one buys nothing worth having.</p>
+<p>Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having.</p>
 <h3 id="the-design-decision-this-crate-turns-on">The design decision this crate turns on</h3>
 <p>A policy file has an obvious problem. To <em>apply</em> a policy at every launch, the program has to be able to read it at every launch. If reading it needs a passphrase, the user types one every time, and if it does not, then anybody who can write the file can rewrite the policy.</p>
 <p>The usual answers are a privileged daemon holding the key, or a key hidden in the binary, and neither is honest here: this project needs no privileges, and a key in a binary anybody can download is not a key.</p>
-<p>So the constraint is moved into the shape of the data. <strong>A requirement can only make VeilVoice stricter.</strong> There is no requirement that turns encryption off, none that lowers the de-identification floor, none that disables the app lock &#8212; and there is no room in <code>Requirement</code> to express one, because every variant is a tightening and the type has no other kind.</p>
-<p>Then somebody who edits the plain policy file without the passphrase can do exactly one thing: make this machine&#x27;s VeilVoice <strong>more</strong> restrictive than its owner asked for. That is a nuisance, and it is not a privacy failure &#8212; which is the failure this project exists to avoid. The passphrase-sealed copy is what proves the policy is the one the administrator wrote; the shape of the type is what makes the answer survive the seal not having been checked yet.</p>
+<p>So the constraint is moved into the shape of the data. <strong>A requirement can only make VeilVoice stricter.</strong> There is no requirement that turns encryption off, none that lowers the de-identification floor, none that disables the app lock, and there is no room in <code>Requirement</code> to express one, because every variant is a tightening and the type has no other kind.</p>
+<p>Then somebody who edits the plain policy file without the passphrase can do exactly one thing: make this machine&#x27;s VeilVoice <strong>more</strong> restrictive than its owner asked for. That is a nuisance, and it is not a privacy failure: which is the failure this project exists to avoid. The passphrase-sealed copy is what proves the policy is the one the administrator wrote; the shape of the type is what makes the answer survive the seal not having been checked yet.</p>
 <h3 id="what-the-seal-is-for-and-what-it-is-not">What the seal is for, and what it is not</h3>
-<p><code>Policy::seal</code> uses the same container as everything else here &#8212; Argon2id over the passphrase, X25519 with ML-KEM-768 for the hybrid modes, XChaCha20-Poly1305 for the contents. <code>verify</code> opens the sealed copy and compares it against the plain one, which is how anybody with the passphrase establishes that the policy in force is the policy that was written.</p>
+<p><code>Policy::seal</code> uses the same container as everything else here: Argon2id over the passphrase, X25519 with ML-KEM-768 for the hybrid modes, XChaCha20-Poly1305 for the contents. <code>verify</code> opens the sealed copy and compares it against the plain one, which is how anybody with the passphrase establishes that the policy in force is the policy that was written.</p>
 <p>It is <strong>not</strong> enforcement. Anything with write access to VeilVoice&#x27;s own executable can replace VeilVoice, and no file it reads can prevent that. Anything running as the user can delete the policy entirely. What a sealed policy gives is a policy that cannot be <em>quietly rewritten into something weaker</em>, and that is a smaller claim than &quot;enforced&quot; on purpose. See <code>SCOPE</code>.</p>
 <p>Detecting deletion is <code>veilvoice-guard</code>&#x27;s job, not this one&#x27;s: put the policy files in a tamper manifest and the removal shows up there.</p>
 <h3 id="reading-a-policy-costs-nothing">Reading a policy costs nothing</h3>

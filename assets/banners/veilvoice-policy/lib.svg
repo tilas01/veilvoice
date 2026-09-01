@@ -31,6 +31,6 @@
 <rect x="359.0" y="37.4" width="7.0" height="75.1" rx="3" fill="#bb9af7" opacity="0.92"/>
 <text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">lib.rs</text>
 <text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Settings somebody else decided, sealed so they cannot be edited without a</text>
-<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">passphrase &#8212; and, more importantly, built so that editing them without one buys &#8230;</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">passphrase, and, more importantly, built so that editing them without one buys &#8230;</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">POLICY</text>
 </svg>

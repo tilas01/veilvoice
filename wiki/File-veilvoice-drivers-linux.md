@@ -20,7 +20,7 @@ Linux: `/proc/modules`, cross-checked against `/sys/module`.
 
 The kernel publishes the loaded module list as a file, so this reads it.
 Nothing is spawned, nothing needs privileges, and the whole operation costs
-two directory reads — cheap enough to run on a timer without becoming the
+two directory reads, cheap enough to run on a timer without becoming the
 reason the interface stopped painting.
 
 # The format
@@ -32,7 +32,7 @@ nvidia 56807424 42 nvidia_uvm,nvidia_modeset, Live 0xffffffffc0e00000
 Name, size in bytes, reference count, the modules that depend on it, the
 state, and the load address. The address is **not** recorded: on most
 systems `kptr_restrict` makes it read as zeros for an unprivileged reader,
-and on the rest it changes at every boot — so recording it would make every
+and on the rest it changes at every boot, so recording it would make every
 module look altered after a restart, which is a report nobody reads.
 
 # The cross-view check
@@ -47,7 +47,7 @@ anything with the privilege to edit one has the privilege to edit both.
 
 One honest wrinkle: `/sys/module` also lists built-in modules and boot
 parameters, which were never in `/proc/modules` and never will be. Those
-have no `initstate` file, so only directories that have one are compared —
+have no `initstate` file, so only directories that have one are compared,
 otherwise the check would produce dozens of discrepancies on every machine
 and be switched off within a day.
 

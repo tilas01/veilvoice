@@ -53,12 +53,12 @@
 <section id="s-about">
 <p>Everything between the sound hardware and <code>veilvoice_core</code>(veilvoice-core.html): device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</p>
 <ul>
-<li><code>io</code> &#8212; decode any common audio file to mono <code>f32</code>, write 16-bit WAV, or encode one in memory so it can be encrypted without ever landing on disk in the clear.</li>
-<li><code>devices</code> &#8212; enumerate inputs and outputs, and spot a virtual audio cable.</li>
-<li><code>live</code> &#8212; run the engine live between two devices.</li>
+<li><code>io</code>, to decode any common audio file to mono <code>f32</code>, write 16-bit WAV, or encode one in memory so it can be encrypted without ever landing on disk in the clear.</li>
+<li><code>devices</code>, to enumerate inputs and outputs and spot a virtual audio cable.</li>
+<li><code>live</code>, to run the engine live between two devices.</li>
 </ul>
 <h3 id="the-live-feature">The <code>live</code> feature</h3>
-<p><code>devices</code> and <code>live</code> sit behind the default-on <code>live</code> feature. They are the only part of this crate that needs <code>cpal</code>, and <code>cpal</code> has no backend for the BSDs. Everything else &#8212; decoding, encoding, and running the engine over a buffer &#8212; is pure Rust and builds anywhere, so turning the feature off keeps file processing working on platforms that cannot do live capture rather than failing to build at all.</p>
+<p><code>devices</code> and <code>live</code> sit behind the default-on <code>live</code> feature. They are the only part of this crate that needs <code>cpal</code>, and <code>cpal</code> has no backend for the BSDs. Everything else, meaning decoding, encoding and running the engine over a buffer, is pure Rust and builds anywhere, so turning the feature off keeps file processing working on platforms that cannot do live capture rather than failing to build at all.</p>
 <h3 id="routing-and-why-a-virtual-cable-matters">Routing, and why a virtual cable matters</h3>
 <p>Scrambling a microphone is only useful if other applications can hear the result. Selecting a virtual audio cable as the output makes the veiled voice appear as an ordinary microphone to any call, stream or recorder on the machine, with no per-application setup. <code>devices::find_virtual_cable</code> detects an installed one so the UI can offer it directly.</p>
 <h2 id="in-plain-words">In plain words</h2>

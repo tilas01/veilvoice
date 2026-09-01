@@ -53,7 +53,7 @@
 <div>
 <section id="s-about">
 <p>Audio tag removal and replacement.</p>
-<p>Tags are handled through <code>lofty</code>, which understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE, so one code path covers every format VeilVoice imports. Only the tag blocks are rewritten &#8212; the audio stream is never re-encoded, so cleaning a file is lossless.</p>
+<p>Tags are handled through <code>lofty</code>, which understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE, so one code path covers every format VeilVoice imports. Only the tag blocks are rewritten: the audio stream is never re-encoded, so cleaning a file is lossless.</p>
 <h2 id="what-tags-give-away">What tags give away</h2>
 <p>Far more than a title. Recording software writes its own name and version; phones write a device model; some encoders write a timestamp, and a few write a serial number or a user name taken from the account that made the file. None of that is audible, all of it survives de-identification untouched, and any of it can identify a speaker whose <em>voice</em> no longer does.</p>
 <p>Stripping the voiceprint and leaving the tags would be a complete failure wearing the appearance of success, which is why this crate exists and why the CLI cleans by default.</p>

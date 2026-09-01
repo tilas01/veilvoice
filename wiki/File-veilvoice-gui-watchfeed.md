@@ -20,13 +20,13 @@ The device monitor, moved off the thread that paints.
 
 The monitor used to be polled straight from `update`, which is the
 user-interface thread. Asking the operating system which applications hold
-the microphone is not free — on Windows it means running `reg.exe`, and on
-Linux it means walking `/proc` — and anything that costs tens of
+the microphone is not free, because on Windows it means running `reg.exe`
+and on Linux it means walking `/proc`, and anything that costs tens of
 milliseconds is several frames.
 
 The shipped v0.1.12 did it the expensive way as well as in the wrong place:
-two subprocesses per application — 68 of them on the machine this was found
-on, costing at least 449 ms measured — every two seconds, on the thread that
+two subprocesses per application, 68 of them on the machine this was found
+on, costing at least 449 ms measured, every two seconds, on the thread that
 draws. The window froze repeatedly. `veilvoice-watch` now costs two
 subprocesses whatever is installed, and this file makes sure the remaining
 cost never lands on a frame.
@@ -39,8 +39,8 @@ a machine slower than the one it was tested on, and it would come back.
 
 Not one per poll. Spawning a thread every two seconds to do 45 ms of work is
 most of a thread's lifetime spent being created, and it would put the
-monitor's own state — which is what makes "started" and "stopped" different
-from "is using" — somewhere it has to be moved back and forth.
+monitor's own state, which is what makes "started" and "stopped" different
+from "is using", somewhere it has to be moved back and forth.
 
 So the worker owns the `veilvoice_watch::Monitor` and keeps it. It polls,
 sends, sleeps, repeats. The window drains whatever has arrived once a frame
@@ -49,7 +49,7 @@ and never waits.
 # It stops when the window does
 
 Nothing tells the thread to exit. When the window closes the receiver is
-dropped, the next `send` fails, and the loop ends — which is the whole
+dropped, the next `send` fails, and the loop ends, which is the whole
 shutdown protocol and needs no flag, no channel back and no chance of
 hanging on exit waiting for a sleep to finish.
 

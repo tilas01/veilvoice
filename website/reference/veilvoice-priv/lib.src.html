@@ -49,14 +49,14 @@
 <span class="ln" id="L6"><span class="tok-com">//!</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! # Three levels, and the third one this project does not ship</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! * [`Level::User`] &#8212; VeilVoice as you. Everything the de-identifier does</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! * [`Level::User`] is VeilVoice as you. Everything the de-identifier does</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!   happens here, and nothing about the engine, the container format or the</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!   app lock needs any more than this.</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! * [`Level::Elevated`] &#8212; running as administrator or root. The monitoring</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! * [`Level::Elevated`] is running as administrator or root. The monitoring</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!   features see further: processes belonging to other users, service</span></span>
 <span class="ln" id="L14"><span class="tok-com">//!   accounts, and a few registry and system paths that are unreadable</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!   otherwise.</span></span>
-<span class="ln" id="L16"><span class="tok-com">//! * **Kernel level** &#8212; not shipped, and not for want of trying. Loading a</span></span>
+<span class="ln" id="L16"><span class="tok-com">//! * **Kernel level** is not shipped, and not for want of trying. Loading a</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!   kernel driver on 64-bit Windows needs an EV code-signing certificate</span></span>
 <span class="ln" id="L18"><span class="tok-com">//!   issued to a verified legal entity plus Microsoft&#x27;s attestation signing;</span></span>
 <span class="ln" id="L19"><span class="tok-com">//!   macOS needs an Apple Developer ID and an entitlement granted case by</span></span>
@@ -73,7 +73,7 @@
 <span class="ln" id="L30"><span class="tok-com">//!</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! That is not caution for its own sake. A privacy tool that silently acquires</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! administrator rights is a privacy tool nobody can reason about, and one that</span></span>
-<span class="ln" id="L33"><span class="tok-com">//! installs a background service without being asked is worse &#8212; a service</span></span>
+<span class="ln" id="L33"><span class="tok-com">//! installs a background service without being asked is worse, because a service</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! outlives the window it was started from, and somebody who tried VeilVoice</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! once should not find it still running next month.</span></span>
 <span class="ln" id="L36"><span class="tok-com">//!</span></span>
@@ -81,7 +81,7 @@
 <span class="ln" id="L38"><span class="tok-com">//!</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! There is no `am_i_admin()` in the standard library and reaching the real</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! answer is FFI on every platform here. So this asks a tool the system already</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! ships, exactly as `veilvoice-watch` asks the registry &#8212; and when the tool</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! ships, exactly as `veilvoice-watch` asks the registry, and when the tool</span></span>
 <span class="ln" id="L42"><span class="tok-com">//! cannot be run, the answer is [`Level::Unknown`] rather than a guess.</span></span>
 <span class="ln" id="L43"><span class="tok-com">//!</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! **`Unknown` is not `User`.** Reporting &quot;not elevated&quot; when the truth is &quot;I</span></span>
@@ -91,7 +91,7 @@
 <span class="ln" id="L48"><span class="tok-com">//!</span></span>
 <span class="ln" id="L49"><span class="tok-com">//! # In plain words</span></span>
 <span class="ln" id="L50"><span class="tok-com">//!</span></span>
-<span class="ln" id="L51"><span class="tok-com">//! Most of VeilVoice needs no special permissions at all &#8212; changing a voice is</span></span>
+<span class="ln" id="L51"><span class="tok-com">//! Most of VeilVoice needs no special permissions at all, because changing a voice is</span></span>
 <span class="ln" id="L52"><span class="tok-com">//! something any program can do with your own account.</span></span>
 <span class="ln" id="L53"><span class="tok-com">//!</span></span>
 <span class="ln" id="L54"><span class="tok-com">//! The parts that *watch* your machine can see more when VeilVoice is run as an</span></span>
@@ -101,8 +101,8 @@
 <span class="ln" id="L58"><span class="tok-com">//!</span></span>
 <span class="ln" id="L59"><span class="tok-com">//! It will not do that for you. Running as administrator, or installing a</span></span>
 <span class="ln" id="L60"><span class="tok-com">//! background service, is a change to your computer and it should be one you</span></span>
-<span class="ln" id="L61"><span class="tok-com">//! made on purpose. And there is a third level &#8212; inside the operating system</span></span>
-<span class="ln" id="L62"><span class="tok-com">//! itself &#8212; that VeilVoice does not reach and says so rather than implying it</span></span>
+<span class="ln" id="L61"><span class="tok-com">//! made on purpose. And there is a third level, inside the operating system</span></span>
+<span class="ln" id="L62"><span class="tok-com">//! itself, that VeilVoice does not reach and says so rather than implying it</span></span>
 <span class="ln" id="L63"><span class="tok-com">//! does.</span></span>
 <span class="ln" id="L64"></span>
 <span class="ln" id="L65"><span class="tok-kw">use</span> std::process::Command;</span>
@@ -120,7 +120,7 @@
 <span class="ln" id="L76">    <span class="tok-com">///</span></span>
 <span class="ln" id="L77">    <span class="tok-com">/// Deliberately not [`Level::User`]. &quot;I could not tell&quot; and &quot;you are not</span></span>
 <span class="ln" id="L78">    <span class="tok-com">/// elevated&quot; lead to different actions, and reporting the second when the</span></span>
-<span class="ln" id="L79">    <span class="tok-com">/// first is true understates what VeilVoice can see &#8212; which sounds like</span></span>
+<span class="ln" id="L79">    <span class="tok-com">/// first is true understates what VeilVoice can see, which sounds like</span></span>
 <span class="ln" id="L80">    <span class="tok-com">/// the cautious direction and is not.</span></span>
 <span class="ln" id="L81">    Unknown,</span>
 <span class="ln" id="L82">}</span>

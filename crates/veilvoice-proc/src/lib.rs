@@ -166,7 +166,7 @@ fn spawned() -> (Vec<String>, Vec<String>) {
 /// Handles both shapes with one function: `tasklist /FO CSV` quotes its first
 /// field, and `ps -Ao comm=` gives a bare path per line. Taking the first
 /// comma-separated field, stripping quotes, and then stripping any directory
-/// covers both — and one parser cannot drift from the other.
+/// covers both, and one parser cannot drift from the other.
 #[cfg(any(target_os = "windows", target_os = "macos", test))]
 fn parse(text: &str) -> Vec<String> {
     let mut names = Vec::new();

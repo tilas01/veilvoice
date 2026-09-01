@@ -30,7 +30,7 @@ Colours: the site's own tokens, and one per speaker.
 The hexes below are Tokyo Night, and they are the same ones
 `website/css/themes.css` declares. They are written out here rather than
 parsed at run time because a crate should not need the website to be on disk
-to draw a circle — and a test reads that stylesheet and fails if the two ever
+to draw a circle, and a test reads that stylesheet and fails if the two ever
 disagree, which is the same arrangement `veilvoice-gui` has had since the
 themes existed.
 
@@ -42,13 +42,13 @@ Night set, chosen to sit between the tokens.
 The **order** was first written down by looking at a hue wheel, and it was
 wrong: a test comparing every pair found a further-apart pair than the one
 put first. So the order is now computed rather than judged, by
-`distance` — the "redmean" approximation, which is the cheap standard
+`distance`, the "redmean" approximation, which is the cheap standard
 stand-in for perceptual difference and weights green most because the eye
 does.
 
 Slot 0 and slot 1 are **the** furthest-apart pair in the set, because two
 speakers is the common case. Every slot after that is the colour whose
-nearest neighbour among the ones already used is furthest away — a maximin
+nearest neighbour among the ones already used is furthest away, which is a maximin
 order, so the table degrades gracefully: a recording with four people uses
 four colours chosen to be as separable as four can be, rather than the first
 four somebody listed.
@@ -59,7 +59,7 @@ closest pair is only ever reached by a recording with nine or ten people in
 it.
 
 One colour is deliberately not a hue at all: the near-white foreground
-token, separated from every saturated colour by **lightness** — the axis
+token, separated from every saturated colour by **lightness**, the axis
 that is still free once the wheel is full.
 
 # Colour is never the only signal

@@ -49,7 +49,7 @@
 <span class="ln" id="L6"><span class="tok-com">//! `kextstat` is the old one and is deprecated; `kmutil` is the replacement and</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! does not exist on older systems. Both are tried, newest first, and if</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! neither answers the reason is reported rather than an empty list being</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! passed off as &quot;no kernel extensions&quot; &#8212; which would be false on every Mac</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! passed off as &quot;no kernel extensions&quot;, which would be false on every Mac</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! ever made.</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! Both print the same shape, which is why one parser handles both:</span></span>
@@ -70,7 +70,7 @@
 <span class="ln" id="L27"><span class="tok-com">//!</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! The native answer is IOKit, which is FFI. `#![forbid(unsafe_code)]` holds</span></span>
 <span class="ln" id="L29"><span class="tok-com">//! here as everywhere else in the workspace, so this asks a tool the system</span></span>
-<span class="ln" id="L30"><span class="tok-com">//! already ships &#8212; the same trade the Windows and Linux readers make.</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! already ships, the same trade the Windows and Linux readers make.</span></span>
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! # In plain words</span></span>
 <span class="ln" id="L33"><span class="tok-com">//!</span></span>

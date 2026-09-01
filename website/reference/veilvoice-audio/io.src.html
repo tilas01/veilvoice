@@ -111,8 +111,8 @@
 <span class="ln" id="L67"><span class="tok-com">/// decodes to 48 000 `f32` per second, which is a **forty-eight-fold**</span></span>
 <span class="ln" id="L68"><span class="tok-com">/// expansion, so a hundred-megabyte download becomes some five gigabytes of</span></span>
 <span class="ln" id="L69"><span class="tok-com">/// samples. Rust aborts the process when an allocation fails, so an unbounded</span></span>
-<span class="ln" id="L70"><span class="tok-com">/// decode turns &quot;someone sent me a recording&quot; &#8212; the ordinary use this tool is</span></span>
-<span class="ln" id="L71"><span class="tok-com">/// for &#8212; into a way to kill it.</span></span>
+<span class="ln" id="L70"><span class="tok-com">/// decode turns &quot;someone sent me a recording&quot;, the ordinary use this tool is</span></span>
+<span class="ln" id="L71"><span class="tok-com">/// for, into a way to kill it.</span></span>
 <span class="ln" id="L72"><span class="tok-com">///</span></span>
 <span class="ln" id="L73"><span class="tok-com">/// Twelve hours is far past any interview or call anyone will veil, and the</span></span>
 <span class="ln" id="L74"><span class="tok-com">/// refusal names the limit rather than truncating silently, because a recording</span></span>
@@ -133,12 +133,12 @@
 <span class="ln" id="L87"><span class="tok-com">/// `fmt ` chunk declares a **sample rate of zero** makes `symphonia` panic</span></span>
 <span class="ln" id="L88"><span class="tok-com">/// inside `Probe::format`, at `TimeBase::new`, before this crate is handed</span></span>
 <span class="ln" id="L89"><span class="tok-com">/// anything it could check. VeilVoice&#x27;s release profile sets `panic = &quot;abort&quot;`,</span></span>
-<span class="ln" id="L90"><span class="tok-com">/// so that panic is not an error a caller can handle &#8212; it is the process</span></span>
+<span class="ln" id="L90"><span class="tok-com">/// so that panic is not an error a caller can handle. It is the process</span></span>
 <span class="ln" id="L91"><span class="tok-com">/// ending. `veilvoice anonymise` on a four-kilobyte file somebody sent you was</span></span>
 <span class="ln" id="L92"><span class="tok-com">/// enough.</span></span>
 <span class="ln" id="L93"><span class="tok-com">///</span></span>
-<span class="ln" id="L94"><span class="tok-com">/// Every other malformed value tried during the audit &#8212; zero channels, 65535</span></span>
-<span class="ln" id="L95"><span class="tok-com">/// channels, zero or 65535 bits per sample, a mismatched format tag &#8212; is</span></span>
+<span class="ln" id="L94"><span class="tok-com">/// Every other malformed value tried during the audit, meaning zero channels,</span></span>
+<span class="ln" id="L95"><span class="tok-com">/// 65535 channels, zero or 65535 bits per sample and a mismatched format tag, is</span></span>
 <span class="ln" id="L96"><span class="tok-com">/// already refused cleanly by `symphonia` itself, so nothing else is duplicated</span></span>
 <span class="ln" id="L97"><span class="tok-com">/// here. Checking what the decoder already checks would be a second parser to</span></span>
 <span class="ln" id="L98"><span class="tok-com">/// keep in step, which is its own bug source.</span></span>
@@ -334,7 +334,7 @@
 <span class="ln" id="L278"><span class="tok-com">///</span></span>
 <span class="ln" id="L279"><span class="tok-com">/// A single `read` is allowed to return fewer bytes than asked for even when</span></span>
 <span class="ln" id="L280"><span class="tok-com">/// more are available, and `read_exact` would fail outright on a file shorter</span></span>
-<span class="ln" id="L281"><span class="tok-com">/// than the buffer &#8212; which most test fixtures are.</span></span>
+<span class="ln" id="L281"><span class="tok-com">/// than the buffer, which most test fixtures are.</span></span>
 <span class="ln" id="L282"><span class="tok-kw">fn</span> <span class="tok-fn">read_up_to</span>(file: &amp;<span class="tok-kw">mut</span> std::fs::File, buf: &amp;<span class="tok-kw">mut</span> [u8]) -&gt; Result&lt;usize, Error&gt; {</span>
 <span class="ln" id="L283">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> filled = <span class="tok-num">0</span>;</span>
 <span class="ln" id="L284">    while filled &lt; buf.<span class="tok-fn">len</span>() {</span>
@@ -544,7 +544,7 @@
 <span class="ln" id="L483">    <span class="tok-com">/// The regression, and the reason `preflight` exists.</span></span>
 <span class="ln" id="L484">    <span class="tok-com">///</span></span>
 <span class="ln" id="L485">    <span class="tok-com">/// A WAV declaring a sample rate of zero made `symphonia` panic inside</span></span>
-<span class="ln" id="L486">    <span class="tok-com">/// `Probe::format`, at `TimeBase::new` &#8212; before this crate saw anything it</span></span>
+<span class="ln" id="L486">    <span class="tok-com">/// `Probe::format`, at `TimeBase::new`, before this crate saw anything it</span></span>
 <span class="ln" id="L487">    <span class="tok-com">/// could check. Under the shipped `panic = &quot;abort&quot;` profile that is the</span></span>
 <span class="ln" id="L488">    <span class="tok-com">/// process dying, not an error, so `veilvoice anonymise` on a file somebody</span></span>
 <span class="ln" id="L489">    <span class="tok-com">/// sent you was enough to kill it. If this test ever *panics* rather than</span></span>
@@ -578,7 +578,7 @@
 <span class="ln" id="L517">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;\xff\xfb\x90\x00 an mp3 frame header&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
 <span class="ln" id="L518">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;RIFF____AVI LIST&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
 <span class="ln" id="L519">        <span class="tok-com">// Truncated inside the header, and a chunk size that would overflow a</span></span>
-<span class="ln" id="L520">        <span class="tok-com">// 32-bit `usize` &#8212; neither may panic or loop.</span></span>
+<span class="ln" id="L520">        <span class="tok-com">// 32-bit `usize`. Neither may panic or loop.</span></span>
 <span class="ln" id="L521">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> truncated = <span class="tok-fn">handmade_wav</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>);</span>
 <span class="ln" id="L522">        <span class="tok-kw">for</span> n <span class="tok-kw">in</span> <span class="tok-num">0</span>..truncated.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">40</span>) {</span>
 <span class="ln" id="L523">            assert!(<span class="tok-fn">preflight</span>(&amp;truncated[..n]).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;truncated at {n}&quot;</span>);</span>

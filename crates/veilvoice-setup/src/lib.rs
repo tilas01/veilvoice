@@ -10,7 +10,7 @@
 //!
 //! It was part of the command line. `install.rs` lived inside the
 //! `veilvoice-cli` **binary** crate, which meant the desktop application could
-//! not call a single line of it — a binary crate has no consumers. The choice
+//! not call a single line of it, because a binary crate has no consumers. The choice
 //! was to reimplement the installer behind the graphical front end, or to move
 //! the logic somewhere both front ends can reach. Reimplementing it would have
 //! produced two programs that edit `PATH`, drifting apart at whatever rate
@@ -31,23 +31,23 @@
 //! is verifying what you run has no business being casual about that.
 //!
 //! **It never asks for administrator rights.** Everything [`install`] does is
-//! inside the user's own account. Where a companion genuinely needs privilege
-//! — a system package manager, an audio driver — that fact is reported and the
+//! inside the user's own account. Where a companion genuinely needs privilege,
+//! such as a system package manager or an audio driver, that fact is reported and the
 //! command is handed over rather than run, because a graphical program cannot
 //! honestly collect a `sudo` password and this one does not try.
 //!
 //! **Nothing is ticked by default.** There are no checkboxes at all: each
 //! companion is a separate, deliberate action. The rule that predates this
-//! crate — detect, say what it is and who makes it, act only on an explicit
-//! yes — is unchanged by the interface getting prettier.
+//! crate, which is to detect, say what it is and who makes it, and act only on
+//! an explicit yes, is unchanged by the interface getting prettier.
 //!
 //! # No `unsafe`, and therefore some subprocesses
 //!
 //! `#![forbid(unsafe_code)]` holds here as everywhere else in the workspace,
 //! so the Windows registry is reached through `reg.exe` rather than the Win32
 //! API. [`command`] wraps every spawn so that none of them flashes a console
-//! window when the desktop application is the caller — the defect that shipped
-//! in v0.1.10 — and a test reads this crate's own source to catch a spawn that
+//! window when the desktop application is the caller, which is the defect that
+//! shipped in v0.1.10, and a test reads this crate's own source to catch a spawn that
 //! forgets.
 //!
 //! # In plain words

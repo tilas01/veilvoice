@@ -4,14 +4,14 @@
 //! # How it works
 //!
 //! A process using the microphone has a file descriptor open on an ALSA PCM
-//! capture node — `/dev/snd/pcmC0D0c`, where the trailing `c` means capture as
+//! capture node, `/dev/snd/pcmC0D0c`, where the trailing `c` means capture as
 //! opposed to `p` for playback. A process using the camera has one open on
 //! `/dev/video*`. Walking `/proc/*/fd` and resolving the symlinks finds them,
 //! along with the PID and the process name, with no dependency and no daemon.
 //!
 //! Capture and playback are distinguished deliberately. Treating every open
 //! `/dev/snd` handle as microphone use would report a music player as
-//! listening to you, and a monitor that cries wolf gets ignored — which is the
+//! listening to you, and a monitor that cries wolf gets ignored, which is the
 //! worst possible outcome for this feature.
 //!
 //! # Sound servers
@@ -104,7 +104,7 @@ fn classify(target: &Path) -> Option<DeviceKind> {
     let path = target.to_str()?;
 
     if let Some(node) = path.strip_prefix("/dev/snd/") {
-        // pcmC0D0c — capture. pcmC0D0p — playback. Only the former counts.
+        // pcmC0D0c is capture, pcmC0D0p is playback. Only the former counts.
         if node.starts_with("pcm") && node.ends_with('c') {
             return Some(DeviceKind::Microphone);
         }
@@ -129,7 +129,7 @@ fn process_name(pid: u32) -> Option<String> {
 
 /// When the process started, from the modification time of its `/proc` entry.
 ///
-/// This is the process start time, not the moment it opened the device — the
+/// This is the process start time, not the moment it opened the device. The
 /// kernel does not record the latter. It is reported as the best available
 /// answer rather than omitted, since "running since" is still useful context.
 fn started_at(proc_dir: &Path) -> Option<SystemTime> {

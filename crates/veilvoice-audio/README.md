@@ -27,18 +27,18 @@ Everything between the sound hardware and
 [`veilvoice_core`](../veilvoice-core/README.md): device enumeration, file
 import and export, and the real-time capture → de-identify → playback path.
 
-- `io` — decode any common audio file to mono `f32`, write 16-bit WAV, or
+- `io`, to decode any common audio file to mono `f32`, write 16-bit WAV, or
 encode one in memory so it can be encrypted without ever landing on disk
 in the clear.
-- `devices` — enumerate inputs and outputs, and spot a virtual audio cable.
-- `live` — run the engine live between two devices.
+- `devices`, to enumerate inputs and outputs and spot a virtual audio cable.
+- `live`, to run the engine live between two devices.
 
 ## The `live` feature
 
 `devices` and `live` sit behind the default-on `live` feature. They are the
 only part of this crate that needs `cpal`, and `cpal` has no backend for the
-BSDs. Everything else — decoding, encoding, and running the engine over a
-buffer — is pure Rust and builds anywhere, so turning the feature off keeps
+BSDs. Everything else, meaning decoding, encoding and running the engine over
+a buffer, is pure Rust and builds anywhere, so turning the feature off keeps
 file processing working on platforms that cannot do live capture rather than
 failing to build at all.
 

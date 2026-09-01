@@ -26,7 +26,7 @@ destination voice each becomes.
 Group mode changes what a recording is *treated as*. A mode that survives a
 restart is a mode somebody eventually forgets is on, and for this tool that
 means a single-speaker recording rendered against a plan that does not
-describe it — which silences everything the plan does not claim. So the
+describe it, which silences everything the plan does not claim. So the
 toggle is per-run and off by default, and there is a second, explicit tick
 for "always start in group mode" which is the only thing written to disk.
 
@@ -43,7 +43,7 @@ which is the linkage this whole project exists to destroy. Slot 0 and slot 1
 are the furthest-apart pair in the table because two people is the common
 case; every slot after that is the colour whose nearest neighbour among the
 ones already used is furthest away. That order was computed rather than
-judged — see `veilvoice_video::palette`.
+judged. See `veilvoice_video::palette`.
 
 A colour can be **overridden** per speaker, from any colour in any of the
 nine palettes the website offers. An override is a person's choice about

@@ -67,8 +67,8 @@ use symphonia::core::probe::Hint;
 /// decodes to 48 000 `f32` per second, which is a **forty-eight-fold**
 /// expansion, so a hundred-megabyte download becomes some five gigabytes of
 /// samples. Rust aborts the process when an allocation fails, so an unbounded
-/// decode turns "someone sent me a recording" — the ordinary use this tool is
-/// for — into a way to kill it.
+/// decode turns "someone sent me a recording", the ordinary use this tool is
+/// for, into a way to kill it.
 ///
 /// Twelve hours is far past any interview or call anyone will veil, and the
 /// refusal names the limit rather than truncating silently, because a recording
@@ -87,12 +87,12 @@ pub const MAX_DECODED_SAMPLES: usize = 48_000 * 60 * 60 * 12;
 /// `fmt ` chunk declares a **sample rate of zero** makes `symphonia` panic
 /// inside `Probe::format`, at `TimeBase::new`, before this crate is handed
 /// anything it could check. VeilVoice's release profile sets `panic = "abort"`,
-/// so that panic is not an error a caller can handle — it is the process
+/// so that panic is not an error a caller can handle. It is the process
 /// ending. `veilvoice anonymise` on a four-kilobyte file somebody sent you was
 /// enough.
 ///
-/// Every other malformed value tried during the audit — zero channels, 65535
-/// channels, zero or 65535 bits per sample, a mismatched format tag — is
+/// Every other malformed value tried during the audit, meaning zero channels,
+/// 65535 channels, zero or 65535 bits per sample and a mismatched format tag, is
 /// already refused cleanly by `symphonia` itself, so nothing else is duplicated
 /// here. Checking what the decoder already checks would be a second parser to
 /// keep in step, which is its own bug source.
@@ -278,7 +278,7 @@ pub fn load(path: &Path) -> Result<Audio, Error> {
 ///
 /// A single `read` is allowed to return fewer bytes than asked for even when
 /// more are available, and `read_exact` would fail outright on a file shorter
-/// than the buffer — which most test fixtures are.
+/// than the buffer, which most test fixtures are.
 fn read_up_to(file: &mut std::fs::File, buf: &mut [u8]) -> Result<usize, Error> {
     let mut filled = 0;
     while filled < buf.len() {
@@ -483,7 +483,7 @@ mod tests {
     /// The regression, and the reason `preflight` exists.
     ///
     /// A WAV declaring a sample rate of zero made `symphonia` panic inside
-    /// `Probe::format`, at `TimeBase::new` — before this crate saw anything it
+    /// `Probe::format`, at `TimeBase::new`, before this crate saw anything it
     /// could check. Under the shipped `panic = "abort"` profile that is the
     /// process dying, not an error, so `veilvoice anonymise` on a file somebody
     /// sent you was enough to kill it. If this test ever *panics* rather than
@@ -517,7 +517,7 @@ mod tests {
         assert!(preflight(b"\xff\xfb\x90\x00 an mp3 frame header").is_ok());
         assert!(preflight(b"RIFF____AVI LIST").is_ok());
         // Truncated inside the header, and a chunk size that would overflow a
-        // 32-bit `usize` — neither may panic or loop.
+        // 32-bit `usize`. Neither may panic or loop.
         let mut truncated = handmade_wav(48_000, 1, 16);
         for n in 0..truncated.len().min(40) {
             assert!(preflight(&truncated[..n]).is_ok(), "truncated at {n}");

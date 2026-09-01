@@ -63,7 +63,7 @@
 <h2 id="what-the-lock-is-worth">What the lock is worth</h2>
 <p>Not much against an attacker with the disk, and the UI says so in <code>veilvoice_crypto::lock::SCOPE</code>, shown on the unlock screen itself rather than buried in an about page. It stops the person who picks up your unlocked laptop. It does not stop someone who takes the drive.</p>
 <h2 id="a-limitation-of-typing-a-password-into-a-window">A limitation of typing a password into a window</h2>
-<p>A text field owns a <code>String</code>, so a passphrase exists as ordinary heap bytes while it is being typed. That window cannot be removed &#8212; something has to receive the keystrokes &#8212; but it can be kept short, and it is:</p>
+<p>A text field owns a <code>String</code>, so a passphrase exists as ordinary heap bytes while it is being typed. That window cannot be removed, because something has to receive the keystrokes, but it can be kept short, and it is:</p>
 <ul>
 <li>the typing buffer is wiped the moment the passphrase is confirmed;</li>
 <li>the confirmed passphrase is held only as a <code>veilvoice_crypto::Secret</code>, page-locked and zeroized on drop, for the rest of the session;</li>

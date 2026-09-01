@@ -54,14 +54,14 @@
 <section id="s-about">
 <p>Windows: <code>driverquery.exe</code>, which the system already ships.</p>
 <h2 id="why-a-subprocess">Why a subprocess</h2>
-<p>The native answer is <code>EnumDeviceDrivers</code> or a service-control enumeration, and both are FFI. <code>#![forbid(unsafe_code)]</code> holds in this crate as it does everywhere else in the workspace, so this shells out to a tool Windows installs by default &#8212; the same trade <code>veilvoice-watch</code> makes for the registry and <code>veilvoice-verify</code> makes for downloading.</p>
+<p>The native answer is <code>EnumDeviceDrivers</code> or a service-control enumeration, and both are FFI. <code>#![forbid(unsafe_code)]</code> holds in this crate as it does everywhere else in the workspace, so this shells out to a tool Windows installs by default, the same trade <code>veilvoice-watch</code> makes for the registry and <code>veilvoice-verify</code> makes for downloading.</p>
 <p><code>driverquery.exe</code> is resolved by absolute path under <code>%SystemRoot%</code>. Never by bare name: Windows searches the current directory before most of <code>PATH</code>, so running from a folder containing a <code>driverquery.exe</code> somebody else wrote would run that one instead. This is a security tool asking what is loaded in the kernel; it is a poor place to be relaxed about which program answers.</p>
 <h2 id="the-format">The format</h2>
 <p><code>/FO CSV /NH</code> gives one quoted record per line:</p>
 <pre><code>&quot;ACPI&quot;,&quot;Microsoft ACPI Driver&quot;,&quot;Kernel &quot;,&quot;1/1/1970 12:00:00 AM&quot;</code></pre>
-<p>Module name, display name, driver type, link date. The link date is kept &#8212; unlike the Linux load address it is a property of the file rather than of this boot, so it does not change under a machine that has not changed.</p>
+<p>Module name, display name, driver type, link date. The link date is kept, unlike the Linux load address it is a property of the file rather than of this boot, so it does not change under a machine that has not changed.</p>
 <h2 id="what-it-lists-and-what-that-means">What it lists, and what that means</h2>
-<p>Installed drivers, which is a superset of what is loaded right now. A driver appearing here is therefore &quot;something installed a driver&quot;, not &quot;something is running in the kernel&quot; &#8212; a real distinction, and the front end wording keeps it.</p>
+<p>Installed drivers, which is a superset of what is loaded right now. A driver appearing here is therefore &quot;something installed a driver&quot;, not &quot;something is running in the kernel&quot;, which is a real distinction, and the front end wording keeps it.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Asks Windows which drivers are loaded, using a tool Windows already ships.</p>
 <p>A driver runs inside the operating system itself, so one that arrived without you installing it is worth knowing about. Reading that list directly would mean writing code that talks to Windows at a level this project has chosen not to, so it asks the existing tool and reads the answer.</p>

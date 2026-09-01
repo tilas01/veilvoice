@@ -30,7 +30,7 @@ The picture: one still for a preview, and one page that plays.
 
 It needs nothing installed, it contacts nothing, and it opens on every
 browser and every phone. A video file needs an encoder this project does not
-ship — see `crate::ffmpeg` — so the page is the thing that always exists
+ship, as `crate::ffmpeg` explains, so the page is the thing that always exists
 and the file is the extra.
 
 It is also the honest artefact for this particular job. What is being drawn
@@ -40,8 +40,8 @@ screen rather than being resampled from a fixed grid of pixels.
 
 # The layout, and why the padding is a setting
 
-A title across the top, a row of circles under it — one per speaker, in
-their colour, with their name beneath — and the waveform along the bottom
+A title across the top, a row of circles under it, one per speaker, in
+their colour and with their name beneath, and the waveform along the bottom
 with a line that moves through it. `Look::padding` is a setting because
 the same picture is wanted at very different sizes: a thumbnail wants little
 and a full-screen render wants a lot, and a fixed margin looks wrong at one
@@ -52,14 +52,14 @@ end or the other.
 Names and titles are typed by a person and end up inside markup. They are
 escaped on the way in, every time, through one function. A name containing
 `</text>` would otherwise end the element it is in and the rest of the file
-would be whatever that person wrote — which is a nuisance in a local file
+would be whatever that person wrote, which is a nuisance in a local file
 and a real problem in one that gets sent to somebody.
 
 # The script, and what happens without it
 
 Lighting the circle of whoever is speaking means knowing where the audio has
 got to, and only the audio element knows that. There is a small inline
-script — no file, no library, no network — and a `<noscript>` saying what it
+script, with no file, no library and no network, and a `<noscript>` saying what it
 does. Without it the audio plays, the subtitles appear, the waveform is
 drawn and the circles simply stay dim.
 
