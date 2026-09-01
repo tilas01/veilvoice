@@ -38,6 +38,93 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-first round: the verifier where a person actually stands, and 2.19 billion inputs
+
+One defect (F-107), found by running the verifier the way somebody
+downloading a release runs it, and a coverage-guided campaign at twice the
+length of any before it, which found nothing.
+
+### F-107 -- the verifier could not find the release it was standing in
+
+`veilvoice-verify/src/discover.rs`.
+
+Downloaded v0.1.15 from the release page, extracted it, opened the folder that
+appeared and ran `./veilvoice-verify` with no arguments, which is what the
+program's own help tells people to do and what a double-click does. It said:
+
+    FAILED: no VeilVoice release was found to check
+
+Every archive tool unpacks `veilvoice-vX.Y.Z-linux-x86_64.tar.gz` into a folder
+of that name, beside the archive. So the folder somebody opens contains the
+binaries and none of the things they are checked against: `SHA256SUMS`, its
+signature and the archive itself are all one level above. The search looked in
+the directory given, the current directory, the directory holding the program,
+Downloads and Desktop, and in the parent of none of them.
+
+The comment above that code reads "Where somebody who unpacked the archive and
+ran the verifier inside it will be." The case was anticipated, named, and
+pointed one directory too low.
+
+Fixed by searching one level up from the explicit directory, the current one
+and the program's own. One level, not more: two would start reading
+directories that have nothing to do with the download, and a verifier that
+wanders through a stranger's filesystem looking for something to check is a
+worse thing than one that asks for a directory. Both halves are tested, the
+finding and the bound.
+
+Verified against the published release rather than a fixture: signature over
+the hash list good, archive hash matched, **341 of 341 extracted files as
+published**, and the machine's own GnuPG asked, given the key, and agreeing. It
+also refused a binary that had been copied into the folder during the test,
+naming it as not part of the release, which is step 4 doing exactly what it is
+for.
+
+**What made this findable is that it was run, not read.** The discovery code
+had been read in an earlier round and its tests pass; they build a directory
+and ask about that directory, which is the arrangement the code already
+handled. The arrangement it did not handle is the one nobody had typed out,
+because it is the one nobody thinks to describe: the folder you are already
+standing in. This is the third finding in four rounds whose cause was a check
+that had never been run in the shape a person meets it, after F-104 and the
+release notes.
+
+### The campaign, at twenty minutes a target
+
+All seven targets, `-max_total_time=1200 -max_len=65536 -rss_limit_mb=6144`, on
+x86-64 Linux. Twice the ten minutes of the eleventh round, and the first run to
+include `release_contents`.
+
+| Target | Inputs in 20 minutes | Artefacts |
+|---|---:|---|
+| `hybrid_keys` | 896,300,257 | none |
+| `wav_preflight` | 767,672,904 | none |
+| `wav_chunks` | 207,840,598 | none |
+| `release_contents` | 43,001,711 | none |
+| `guard_manifest` | 12,712,943 | none |
+| `lock_file` | 267,508 | one slow unit |
+| `container_header` | 37,348 | none new |
+
+**2,127,796,269 inputs. No crash, no hang, no out-of-memory on any target.**
+
+The one new artefact is a slow unit on `lock_file`, and it was opened rather
+than assumed. It declares 569 MiB of memory, ten passes and 127 lanes: legal on
+every axis, against ceilings of 4 GiB, sixteen passes and 0x00ffffff lanes. It
+is a lock file that is expensive to verify because it asks to be, which is the
+class F-91 bounded and the tenth round already recorded twice. Not a finding.
+
+The two crypto targets again run four and five orders of magnitude fewer inputs
+than the rest, and again that is the campaign working: both parse a header
+carrying Argon2id costs, so an input that gets past the header checks buys a
+real key derivation. Everything else parses bytes and returns.
+
+**A null result at this length is worth stating plainly and worth not
+overstating.** Doubling the time found nothing new, which is evidence that the
+five targets that have never found anything are converged on the structure they
+can reach, and is not evidence that the parsers are correct. Three of the seven
+have still never produced a finding, no corpus is committed for five of them,
+and nobody has run any of this on Windows or macOS. Those sentences are the
+same ones the eleventh round wrote, with a bigger number in front of them.
+
 ## The twentieth round: a test that deleted another test's fixture
 
 One defect (F-106), found by CI failing on macOS on a commit that changed
@@ -3366,9 +3453,17 @@ the top of this document now says.
    `guard_manifest`'s minimised corpus alone is 3.9 MB, which is a great many
    committed bytes to save a target no time at all.
 
-   What is still open: ten minutes is not convergence either, three of the six
-   targets have never found anything, and nobody has run any of it on Windows
-   or macOS. `fuzz/README.md` carries the run counts and the seed measurement
+   **Run again at twenty minutes a target, over all seven, in the twenty-first
+   round: 2,127,796,269 inputs, no crash, no hang, no out-of-memory.** The one
+   new artefact was a slow unit on `lock_file` declaring 569 MiB, ten passes
+   and 127 lanes, which is legal on every axis and is the class F-91 bounded.
+
+   What is still open, and doubling the time did not change any of it: twenty
+   minutes is not convergence either, three of the seven targets have never
+   found anything, five of them have no committed corpus, and nobody has run
+   any of it on Windows or macOS. A null result at this length is evidence
+   that the targets are converged on the structure they can reach, and is not
+   evidence that the parsers are correct. `fuzz/README.md` carries the run counts and the seed measurement
    and says the same thing in its own words.
 
 3. **32-bit targets are now exercised in CI, and this entry says what that
@@ -3539,7 +3634,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and six defects found and fixed (F-1 to F-106), across twenty
+**One hundred and seven defects found and fixed (F-1 to F-107), across twenty-one
 rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
