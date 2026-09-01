@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/atrest.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 286 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 414 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs)
 
 ## Contents
 
@@ -49,7 +49,7 @@ Writing one unencrypted is allowed, and asks first.
 
 ## What this file contains
 
-286 lines defining **5 functions** (4 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+414 lines defining **7 functions** (4 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -58,10 +58,10 @@ Writing one unencrypted is allowed, and asks first.
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `seal_to_disk` (line 71) -- Seal plaintext and write it to <path>.veil, returning where it landed.
-  - reaches: `read_new_password`, `into_secret`
+  - reaches: `read_new_password`, `can_prompt`, `into_secret`, `no_terminal`
 - `confirm_plaintext` (line 122) -- Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
-- `prompt_secret` (line 173) -- Prompt once, without echoing, and keep the answer in a Secret.
-  - reaches: `into_secret`
+- `prompt_secret` (line 228) -- Prompt once, without echoing, and keep the answer in a Secret.
+  - reaches: `can_prompt`, `into_secret`, `no_terminal`
 
 ## What calls what
 
@@ -80,22 +80,30 @@ flowchart TD
     n_seal_to_disk(["seal_to_disk<br/>line 71"])
     n_confirm_plaintext(["confirm_plaintext<br/>line 122"])
     n_into_secret["into_secret<br/>line 165"]
-    n_prompt_secret(["prompt_secret<br/>line 173"])
-    n_read_new_password["read_new_password<br/>line 179"]
+    n_no_terminal["no_terminal<br/>line 192"]
+    n_can_prompt["can_prompt<br/>line 223"]
+    n_prompt_secret(["prompt_secret<br/>line 228"])
+    n_read_new_password["read_new_password<br/>line 237"]
+    n_prompt_secret --> n_can_prompt
     n_prompt_secret --> n_into_secret
+    n_prompt_secret --> n_no_terminal
+    n_read_new_password --> n_can_prompt
     n_read_new_password --> n_into_secret
+    n_read_new_password --> n_no_terminal
     n_seal_to_disk --> n_read_new_password
     click n_seal_to_disk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71" "open the source"
     click n_confirm_plaintext href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122" "open the source"
     click n_into_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165" "open the source"
-    click n_prompt_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L173" "open the source"
-    click n_read_new_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L179" "open the source"
+    click n_no_terminal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L192" "open the source"
+    click n_can_prompt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L223" "open the source"
+    click n_prompt_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L228" "open the source"
+    click n_read_new_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L237" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_read_new_password api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_into_secret helper
+    class n_into_secret,n_no_terminal,n_can_prompt helper
 ```
 
 </details>
@@ -109,5 +117,8 @@ flowchart TD
 | `seal_to_disk` <sub>pub fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71) | Seal plaintext and write it to <path>.veil, returning where it landed. |
 | `confirm_plaintext` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122) | Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing. |
 | `into_secret` <sub>fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165) | Move a typed password into page-locked, zeroizing storage, wiping the String it arrived in. |
-| `prompt_secret` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L173) | Prompt once, without echoing, and keep the answer in a Secret. |
-| `read_new_password` <sub>pub fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L179) | Read a password twice, without echoing it, and check the two agree. |
+| `no_terminal` <sub>fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L192) | What to say when there is no terminal to ask on. |
+| `can_prompt` <sub>fn</sub> | [223](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L223) | Whether a passphrase can be asked for at all. |
+| `prompt_secret` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L228) | Prompt once, without echoing, and keep the answer in a Secret. |
+| `read_new_password` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L237) | Read a password twice, without echoing it, and check the two agree. |
+| `no_terminal_tests` <sub>mod</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L350) |  |

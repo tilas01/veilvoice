@@ -169,14 +169,75 @@ fn into_secret(mut typed: String) -> Secret {
     secret
 }
 
+/// What to say when there is no terminal to ask on.
+///
+/// **F-109.** Every one of these prompts used to surface the operating
+/// system's own error, so `veilvoice anonymise recording.wav` run from a
+/// script, a cron job, a CI step or anything with its input redirected failed
+/// with:
+///
+/// ```text
+/// ✗ No such device or address (os error 6)
+/// ```
+///
+/// That is `ENXIO` from opening the console, and it says nothing: not what was
+/// being asked for, not why it failed, and not one of the three ways to
+/// proceed. The message is also different on Windows, so nobody could search
+/// for it and find the same answer twice.
+///
+/// `confirm_plaintext` in this same file already got this right, checking for
+/// a terminal before asking anything. The prompts did not, which is the same
+/// defect in the same file with a different door, and is the shape this
+/// project has recorded most often.
+fn no_terminal(asked_for: &str) -> String {
+    // Built line by line rather than as one continued literal, so the
+    // indentation in this file is not the indentation on the reader's screen.
+    let lines = [
+        "",
+        "  This is what happens in a script, a scheduled job, or anything with",
+        "  its input redirected. Three ways on, in the order they are usually",
+        "  wanted:",
+        "",
+        "    --encrypt-to <PUBKEY>   seal to a public key. Nothing is typed, so",
+        "                            this is the one that works in a script.",
+        "                            Make the key once, in a terminal, with",
+        "                            veilvoice keygen",
+        "    run it in a terminal    if a person is there to type",
+        "    --encrypt false --yes   write it unencrypted, which is a recording",
+        "                            of every word that was said",
+        "",
+        "  Nothing was written.",
+    ];
+    format!(
+        "there is no terminal here to ask for {asked_for}.\n{}",
+        lines.join("\n")
+    )
+}
+
+/// Whether a passphrase can be asked for at all.
+///
+/// Checked before prompting rather than after failing, so the answer is the
+/// same on every platform. `rpassword` reports a missing console differently
+/// on Windows and Unix, and a message a reader can search for should not
+/// depend on which.
+fn can_prompt() -> bool {
+    std::io::stdin().is_terminal()
+}
+
 /// Prompt once, without echoing, and keep the answer in a [`Secret`].
 pub fn prompt_secret(prompt: &str) -> Result<Secret, String> {
+    if !can_prompt() {
+        return Err(no_terminal("a passphrase"));
+    }
     let typed = rpassword::prompt_password(prompt).map_err(|e| e.to_string())?;
     Ok(into_secret(typed))
 }
 
 /// Read a password twice, without echoing it, and check the two agree.
 pub fn read_new_password() -> Result<Secret, String> {
+    if !can_prompt() {
+        return Err(no_terminal("a passphrase"));
+    }
     let first = rpassword::prompt_password("Passphrase: ").map_err(|e| e.to_string())?;
     if first.is_empty() {
         return Err("passphrase must not be empty".into());
@@ -282,5 +343,72 @@ mod tests {
             Recipient::PublicKey(&missing),
         );
         assert!(result.is_err());
+    }
+}
+
+#[cfg(test)]
+mod no_terminal_tests {
+    use super::*;
+
+    /// **F-109.** No terminal is explained, not reported as an errno.
+    ///
+    /// `veilvoice anonymise recording.wav` from a script, a scheduled job or
+    /// anything with its input redirected used to fail with
+    /// `No such device or address (os error 6)`, which is `ENXIO` from opening
+    /// the console. It names nothing that was being asked for, nothing about
+    /// why, and none of the ways on. It is also a different string on Windows,
+    /// so nobody could search for it and get the same answer twice.
+    #[test]
+    fn the_no_terminal_message_says_what_was_wanted_and_how_to_proceed() {
+        let message = no_terminal("a passphrase");
+
+        assert!(
+            message.starts_with("there is no terminal here to ask for a passphrase."),
+            "the first line has to say what could not be asked for: {message}"
+        );
+
+        // Every remedy the message offers, and each one is real: the first
+        // and third were run end to end against a two-second recording with
+        // stdin closed, and both wrote a file.
+        for remedy in ["--encrypt-to", "veilvoice keygen", "--encrypt false --yes"] {
+            assert!(
+                message.contains(remedy),
+                "the message no longer mentions {remedy}: {message}"
+            );
+        }
+
+        assert!(
+            message.contains("Nothing was written."),
+            "a refusal has to say that nothing was written, or the reader \
+             cannot tell whether a half-finished file is lying around"
+        );
+
+        // The operating system's own words are what this replaced.
+        assert!(
+            !message.contains("os error"),
+            "the errno is back in the message: {message}"
+        );
+    }
+
+    /// The same guidance whichever prompt could not run.
+    ///
+    /// Two functions prompt, and both refuse through here. A reader who hits
+    /// one and then the other should not get two different accounts of the
+    /// same situation.
+    #[test]
+    fn both_prompts_refuse_with_the_same_explanation() {
+        let source = include_str!("atrest.rs").replace("\r\n", "\n");
+        for function in ["pub fn prompt_secret(", "pub fn read_new_password("] {
+            let body = source
+                .split(function)
+                .nth(1)
+                .unwrap_or_else(|| panic!("{function} has to be findable"));
+            let body = body.split("\npub fn ").next().unwrap();
+            assert!(
+                body.contains("can_prompt()") && body.contains("no_terminal("),
+                "{function} does not check for a terminal before prompting, so \
+                 it will surface the operating system's error instead"
+            );
+        }
     }
 }
