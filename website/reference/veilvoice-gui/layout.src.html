@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/layout.rs</code></h1>
-<p style="color:var(--muted)"><a href="layout.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 242 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="layout.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 247 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -142,149 +142,154 @@
 <span class="ln" id="L98">        egui::<span class="tok-fn">pos2</span>(end.<span class="tok-fn">max</span>(start), band.<span class="tok-fn">bottom</span>()),</span>
 <span class="ln" id="L99">    );</span>
 <span class="ln" id="L100"></span>
-<span class="ln" id="L101">    <span class="tok-kw">let</span> measured = end - start;</span>
-<span class="ln" id="L102">    <span class="tok-kw">if</span> remembered != <span class="tok-fn">Some</span>(measured) {</span>
-<span class="ln" id="L103">        ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">memory_mut</span>(|m| m.data.<span class="tok-fn">insert_temp</span>(id, measured));</span>
-<span class="ln" id="L104">        <span class="tok-com">// Draw again straight away, so the corrected position is on screen on</span></span>
-<span class="ln" id="L105">        <span class="tok-com">// the next frame rather than whenever something else happens to move.</span></span>
-<span class="ln" id="L106">        ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">request_repaint</span>();</span>
-<span class="ln" id="L107">    }</span>
-<span class="ln" id="L108"></span>
-<span class="ln" id="L109">    InnerResponse::<span class="tok-fn">new</span>(inner.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the row body runs exactly once&quot;</span>), response)</span>
-<span class="ln" id="L110">}</span>
+<span class="ln" id="L101">    <span class="tok-com">// The cursor sits one item-spacing past the last widget, because egui has</span></span>
+<span class="ln" id="L102">    <span class="tok-com">// already made room for whatever might come next. Including that would</span></span>
+<span class="ln" id="L103">    <span class="tok-com">// centre the row plus a trailing gap, which puts the visible row half a</span></span>
+<span class="ln" id="L104">    <span class="tok-com">// spacing left of centre: measured at 4px on an 8px spacing, in a capture</span></span>
+<span class="ln" id="L105">    <span class="tok-com">// of the running window.</span></span>
+<span class="ln" id="L106">    <span class="tok-kw">let</span> measured = (end - start - ui.<span class="tok-fn">spacing</span>().item_spacing.x).<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L107">    <span class="tok-kw">if</span> remembered != <span class="tok-fn">Some</span>(measured) {</span>
+<span class="ln" id="L108">        ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">memory_mut</span>(|m| m.data.<span class="tok-fn">insert_temp</span>(id, measured));</span>
+<span class="ln" id="L109">        <span class="tok-com">// Draw again straight away, so the corrected position is on screen on</span></span>
+<span class="ln" id="L110">        <span class="tok-com">// the next frame rather than whenever something else happens to move.</span></span>
+<span class="ln" id="L111">        ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">request_repaint</span>();</span>
+<span class="ln" id="L112">    }</span>
+<span class="ln" id="L113"></span>
+<span class="ln" id="L114">    InnerResponse::<span class="tok-fn">new</span>(inner.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the row body runs exactly once&quot;</span>), response)</span>
+<span class="ln" id="L115">}</span>
 </span>
-<span class="ln" id="L111"></span>
-<span class="ln" id="L112"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L113"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L114">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L115"></span>
-<span class="ln" id="L116">    <span class="tok-com">/// Lay the same content out twice through one `Ui`, so the second call</span></span>
-<span class="ln" id="L117">    <span class="tok-com">/// sees what the first remembered. Returns where the row starts each time.</span></span>
-<span class="ln" id="L118">    <span class="tok-com">/// A context whose window really is `width` across.</span></span>
-<span class="ln" id="L119">    <span class="tok-com">///</span></span>
-<span class="ln" id="L120">    <span class="tok-com">/// `Ui::set_width` does not do this: it sets a minimum, and the panel goes</span></span>
-<span class="ln" id="L121">    <span class="tok-com">/// on offering the whole screen, which in a default test context is nearly</span></span>
-<span class="ln" id="L122">    <span class="tok-com">/// ten thousand points. Centring inside that is centring inside the wrong</span></span>
-<span class="ln" id="L123">    <span class="tok-com">/// number, so the screen itself is sized here.</span></span>
-<span class="ln" id="L124">    <span class="tok-kw">fn</span> <span class="tok-fn">input</span>(width: f32) -&gt; egui::RawInput {</span>
-<span class="ln" id="L125">        egui::RawInput {</span>
-<span class="ln" id="L126">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
-<span class="ln" id="L127">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L128">                egui::<span class="tok-fn">vec2</span>(width, <span class="tok-num">400.0</span>),</span>
-<span class="ln" id="L129">            )),</span>
-<span class="ln" id="L130">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L131">        }</span>
-<span class="ln" id="L132">    }</span>
-<span class="ln" id="L133"></span>
-<span class="ln" id="L134">    <span class="tok-kw">fn</span> <span class="tok-fn">twice</span>(width: f32, <span class="tok-kw">mut</span> body: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> Ui)) -&gt; (f32, f32, f32) {</span>
-<span class="ln" id="L135">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L136">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lefts = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L137">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> available = <span class="tok-num">0</span>.0_f32;</span>
-<span class="ln" id="L138">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L139">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(<span class="tok-fn">input</span>(width), |ctx| {</span>
-<span class="ln" id="L140">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L141">                    <span class="tok-kw">let</span> origin = ui.<span class="tok-fn">min_rect</span>().<span class="tok-fn">left</span>();</span>
-<span class="ln" id="L142">                    available = ui.<span class="tok-fn">available_width</span>();</span>
-<span class="ln" id="L143">                    <span class="tok-kw">let</span> left = <span class="tok-fn">centred_row</span>(ui, |ui| <span class="tok-fn">body</span>(ui)).response.rect.<span class="tok-fn">left</span>();</span>
-<span class="ln" id="L144">                    lefts.<span class="tok-fn">push</span>(left - origin);</span>
-<span class="ln" id="L145">                });</span>
-<span class="ln" id="L146">            });</span>
-<span class="ln" id="L147">        }</span>
-<span class="ln" id="L148">        (lefts[<span class="tok-num">0</span>], lefts[<span class="tok-num">1</span>], available)</span>
-<span class="ln" id="L149">    }</span>
-<span class="ln" id="L150"></span>
-<span class="ln" id="L151">    <span class="tok-com">/// The row lands in the middle once its width is known.</span></span>
-<span class="ln" id="L152">    <span class="tok-com">///</span></span>
-<span class="ln" id="L153">    <span class="tok-com">/// Both halves matter. Asserting only that the centred row is centred</span></span>
-<span class="ln" id="L154">    <span class="tok-com">/// would pass just as happily if egui had been centring rows all along,</span></span>
-<span class="ln" id="L155">    <span class="tok-com">/// and the helper would be dead weight nobody could tell was dead. So the</span></span>
-<span class="ln" id="L156">    <span class="tok-com">/// same content is drawn as a plain row too, and the two must differ.</span></span>
-<span class="ln" id="L157">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L158">    <span class="tok-kw">fn</span> <span class="tok-fn">a_centred_row_is_centred_and_a_plain_row_is_not</span>() {</span>
-<span class="ln" id="L159">        <span class="tok-kw">let</span> (first, second, available) = <span class="tok-fn">twice</span>(<span class="tok-num">600.0</span>, |ui| {</span>
-<span class="ln" id="L160">            ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;password&quot;</span>);</span>
-<span class="ln" id="L161">            <span class="tok-kw">let</span> _ = ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;unlock&quot;</span>);</span>
-<span class="ln" id="L162">        });</span>
-<span class="ln" id="L163"></span>
-<span class="ln" id="L164">        assert!(</span>
-<span class="ln" id="L165">            available &gt; <span class="tok-num">100.0</span>,</span>
-<span class="ln" id="L166">            <span class="tok-str">&quot;the test ui has no room to centre within&quot;</span></span>
-<span class="ln" id="L167">        );</span>
+<span class="ln" id="L116"></span>
+<span class="ln" id="L117"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L118"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L119">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L120"></span>
+<span class="ln" id="L121">    <span class="tok-com">/// Lay the same content out twice through one `Ui`, so the second call</span></span>
+<span class="ln" id="L122">    <span class="tok-com">/// sees what the first remembered. Returns where the row starts each time.</span></span>
+<span class="ln" id="L123">    <span class="tok-com">/// A context whose window really is `width` across.</span></span>
+<span class="ln" id="L124">    <span class="tok-com">///</span></span>
+<span class="ln" id="L125">    <span class="tok-com">/// `Ui::set_width` does not do this: it sets a minimum, and the panel goes</span></span>
+<span class="ln" id="L126">    <span class="tok-com">/// on offering the whole screen, which in a default test context is nearly</span></span>
+<span class="ln" id="L127">    <span class="tok-com">/// ten thousand points. Centring inside that is centring inside the wrong</span></span>
+<span class="ln" id="L128">    <span class="tok-com">/// number, so the screen itself is sized here.</span></span>
+<span class="ln" id="L129">    <span class="tok-kw">fn</span> <span class="tok-fn">input</span>(width: f32) -&gt; egui::RawInput {</span>
+<span class="ln" id="L130">        egui::RawInput {</span>
+<span class="ln" id="L131">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
+<span class="ln" id="L132">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L133">                egui::<span class="tok-fn">vec2</span>(width, <span class="tok-num">400.0</span>),</span>
+<span class="ln" id="L134">            )),</span>
+<span class="ln" id="L135">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L136">        }</span>
+<span class="ln" id="L137">    }</span>
+<span class="ln" id="L138"></span>
+<span class="ln" id="L139">    <span class="tok-kw">fn</span> <span class="tok-fn">twice</span>(width: f32, <span class="tok-kw">mut</span> body: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> Ui)) -&gt; (f32, f32, f32) {</span>
+<span class="ln" id="L140">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L141">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lefts = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L142">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> available = <span class="tok-num">0</span>.0_f32;</span>
+<span class="ln" id="L143">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L144">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(<span class="tok-fn">input</span>(width), |ctx| {</span>
+<span class="ln" id="L145">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L146">                    <span class="tok-kw">let</span> origin = ui.<span class="tok-fn">min_rect</span>().<span class="tok-fn">left</span>();</span>
+<span class="ln" id="L147">                    available = ui.<span class="tok-fn">available_width</span>();</span>
+<span class="ln" id="L148">                    <span class="tok-kw">let</span> left = <span class="tok-fn">centred_row</span>(ui, |ui| <span class="tok-fn">body</span>(ui)).response.rect.<span class="tok-fn">left</span>();</span>
+<span class="ln" id="L149">                    lefts.<span class="tok-fn">push</span>(left - origin);</span>
+<span class="ln" id="L150">                });</span>
+<span class="ln" id="L151">            });</span>
+<span class="ln" id="L152">        }</span>
+<span class="ln" id="L153">        (lefts[<span class="tok-num">0</span>], lefts[<span class="tok-num">1</span>], available)</span>
+<span class="ln" id="L154">    }</span>
+<span class="ln" id="L155"></span>
+<span class="ln" id="L156">    <span class="tok-com">/// The row lands in the middle once its width is known.</span></span>
+<span class="ln" id="L157">    <span class="tok-com">///</span></span>
+<span class="ln" id="L158">    <span class="tok-com">/// Both halves matter. Asserting only that the centred row is centred</span></span>
+<span class="ln" id="L159">    <span class="tok-com">/// would pass just as happily if egui had been centring rows all along,</span></span>
+<span class="ln" id="L160">    <span class="tok-com">/// and the helper would be dead weight nobody could tell was dead. So the</span></span>
+<span class="ln" id="L161">    <span class="tok-com">/// same content is drawn as a plain row too, and the two must differ.</span></span>
+<span class="ln" id="L162">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L163">    <span class="tok-kw">fn</span> <span class="tok-fn">a_centred_row_is_centred_and_a_plain_row_is_not</span>() {</span>
+<span class="ln" id="L164">        <span class="tok-kw">let</span> (first, second, available) = <span class="tok-fn">twice</span>(<span class="tok-num">600.0</span>, |ui| {</span>
+<span class="ln" id="L165">            ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;password&quot;</span>);</span>
+<span class="ln" id="L166">            <span class="tok-kw">let</span> _ = ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;unlock&quot;</span>);</span>
+<span class="ln" id="L167">        });</span>
 <span class="ln" id="L168"></span>
-<span class="ln" id="L169">        <span class="tok-com">// First frame has nothing remembered, so it sits at the left. That is</span></span>
-<span class="ln" id="L170">        <span class="tok-com">// the documented cost, asserted rather than hoped for.</span></span>
-<span class="ln" id="L171">        assert!(</span>
-<span class="ln" id="L172">            first &lt; <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L173">            <span class="tok-str">&quot;the first frame should be left-aligned, and started at {first}&quot;</span></span>
-<span class="ln" id="L174">        );</span>
-<span class="ln" id="L175"></span>
-<span class="ln" id="L176">        <span class="tok-com">// Second frame knows the width and centres it.</span></span>
-<span class="ln" id="L177">        assert!(</span>
-<span class="ln" id="L178">            second &gt; <span class="tok-num">100.0</span>,</span>
-<span class="ln" id="L179">            <span class="tok-str">&quot;the second frame did not centre the row: it starts at {second} \</span></span>
-<span class="ln" id="L180"><span class="tok-str">             of {available} available&quot;</span></span>
-<span class="ln" id="L181">        );</span>
-<span class="ln" id="L182"></span>
-<span class="ln" id="L183">        <span class="tok-com">// And the row is as far from the right edge as from the left.</span></span>
-<span class="ln" id="L184">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L185">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> gaps = (<span class="tok-num">0</span>.0_f32, <span class="tok-num">0</span>.0_f32);</span>
-<span class="ln" id="L186">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L187">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(<span class="tok-fn">input</span>(<span class="tok-num">600.0</span>), |ctx| {</span>
-<span class="ln" id="L188">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L189">                    <span class="tok-kw">let</span> origin = ui.<span class="tok-fn">min_rect</span>().<span class="tok-fn">left</span>();</span>
-<span class="ln" id="L190">                    <span class="tok-kw">let</span> room = ui.<span class="tok-fn">available_width</span>();</span>
-<span class="ln" id="L191">                    <span class="tok-kw">let</span> rect = <span class="tok-fn">centred_row</span>(ui, |ui| {</span>
-<span class="ln" id="L192">                        ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;password&quot;</span>);</span>
-<span class="ln" id="L193">                        <span class="tok-kw">let</span> _ = ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;unlock&quot;</span>);</span>
-<span class="ln" id="L194">                    })</span>
-<span class="ln" id="L195">                    .response</span>
-<span class="ln" id="L196">                    .rect;</span>
-<span class="ln" id="L197">                    gaps = (rect.<span class="tok-fn">left</span>() - origin, room - (rect.<span class="tok-fn">right</span>() - origin));</span>
-<span class="ln" id="L198">                });</span>
-<span class="ln" id="L199">            });</span>
-<span class="ln" id="L200">        }</span>
-<span class="ln" id="L201">        assert!(</span>
-<span class="ln" id="L202">            (gaps.<span class="tok-num">0</span> - gaps.<span class="tok-num">1</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">12.0</span>,</span>
-<span class="ln" id="L203">            <span class="tok-str">&quot;not centred: {} to the left, {} to the right&quot;</span>,</span>
-<span class="ln" id="L204">            gaps.<span class="tok-num">0</span>,</span>
-<span class="ln" id="L205">            gaps.<span class="tok-num">1</span></span>
-<span class="ln" id="L206">        );</span>
-<span class="ln" id="L207">    }</span>
-<span class="ln" id="L208"></span>
-<span class="ln" id="L209">    <span class="tok-com">/// A row too wide for the window starts at the left, not off both edges.</span></span>
-<span class="ln" id="L210">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L211">    <span class="tok-kw">fn</span> <span class="tok-fn">a_row_wider_than_the_window_is_not_pushed_off_both_edges</span>() {</span>
-<span class="ln" id="L212">        <span class="tok-kw">let</span> (_, second, _) = <span class="tok-fn">twice</span>(<span class="tok-num">40.0</span>, |ui| {</span>
-<span class="ln" id="L213">            ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;a label a great deal wider than forty points across&quot;</span>);</span>
-<span class="ln" id="L214">        });</span>
-<span class="ln" id="L215">        assert!(</span>
-<span class="ln" id="L216">            second &gt;= -<span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L217">            <span class="tok-str">&quot;the row was pushed to {second}, off the left edge&quot;</span></span>
-<span class="ln" id="L218">        );</span>
-<span class="ln" id="L219">    }</span>
-<span class="ln" id="L220"></span>
-<span class="ln" id="L221">    <span class="tok-com">/// The body runs once per frame, however many times the row is measured.</span></span>
-<span class="ln" id="L222">    <span class="tok-com">///</span></span>
-<span class="ln" id="L223">    <span class="tok-com">/// This is the constraint the whole design exists for: the unlock row</span></span>
-<span class="ln" id="L224">    <span class="tok-com">/// spawns a key derivation when its button reports a click, and a helper</span></span>
-<span class="ln" id="L225">    <span class="tok-com">/// that ran its closure twice could spawn it twice from one press.</span></span>
-<span class="ln" id="L226">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L227">    <span class="tok-kw">fn</span> <span class="tok-fn">the_row_body_runs_exactly_once_per_frame</span>() {</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L229">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> runs = 0_u32;</span>
-<span class="ln" id="L230">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
-<span class="ln" id="L231">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L232">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L233">                    <span class="tok-fn">centred_row</span>(ui, |ui| {</span>
-<span class="ln" id="L234">                        runs += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L235">                        ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;once&quot;</span>);</span>
-<span class="ln" id="L236">                    });</span>
-<span class="ln" id="L237">                });</span>
-<span class="ln" id="L238">            });</span>
-<span class="ln" id="L239">        }</span>
-<span class="ln" id="L240">        assert_eq!(runs, <span class="tok-num">3</span>, <span class="tok-str">&quot;the body ran {runs} times across three frames&quot;</span>);</span>
-<span class="ln" id="L241">    }</span>
-<span class="ln" id="L242">}</span>
+<span class="ln" id="L169">        assert!(</span>
+<span class="ln" id="L170">            available &gt; <span class="tok-num">100.0</span>,</span>
+<span class="ln" id="L171">            <span class="tok-str">&quot;the test ui has no room to centre within&quot;</span></span>
+<span class="ln" id="L172">        );</span>
+<span class="ln" id="L173"></span>
+<span class="ln" id="L174">        <span class="tok-com">// First frame has nothing remembered, so it sits at the left. That is</span></span>
+<span class="ln" id="L175">        <span class="tok-com">// the documented cost, asserted rather than hoped for.</span></span>
+<span class="ln" id="L176">        assert!(</span>
+<span class="ln" id="L177">            first &lt; <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L178">            <span class="tok-str">&quot;the first frame should be left-aligned, and started at {first}&quot;</span></span>
+<span class="ln" id="L179">        );</span>
+<span class="ln" id="L180"></span>
+<span class="ln" id="L181">        <span class="tok-com">// Second frame knows the width and centres it.</span></span>
+<span class="ln" id="L182">        assert!(</span>
+<span class="ln" id="L183">            second &gt; <span class="tok-num">100.0</span>,</span>
+<span class="ln" id="L184">            <span class="tok-str">&quot;the second frame did not centre the row: it starts at {second} \</span></span>
+<span class="ln" id="L185"><span class="tok-str">             of {available} available&quot;</span></span>
+<span class="ln" id="L186">        );</span>
+<span class="ln" id="L187"></span>
+<span class="ln" id="L188">        <span class="tok-com">// And the row is as far from the right edge as from the left.</span></span>
+<span class="ln" id="L189">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L190">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> gaps = (<span class="tok-num">0</span>.0_f32, <span class="tok-num">0</span>.0_f32);</span>
+<span class="ln" id="L191">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L192">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(<span class="tok-fn">input</span>(<span class="tok-num">600.0</span>), |ctx| {</span>
+<span class="ln" id="L193">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L194">                    <span class="tok-kw">let</span> origin = ui.<span class="tok-fn">min_rect</span>().<span class="tok-fn">left</span>();</span>
+<span class="ln" id="L195">                    <span class="tok-kw">let</span> room = ui.<span class="tok-fn">available_width</span>();</span>
+<span class="ln" id="L196">                    <span class="tok-kw">let</span> rect = <span class="tok-fn">centred_row</span>(ui, |ui| {</span>
+<span class="ln" id="L197">                        ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;password&quot;</span>);</span>
+<span class="ln" id="L198">                        <span class="tok-kw">let</span> _ = ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;unlock&quot;</span>);</span>
+<span class="ln" id="L199">                    })</span>
+<span class="ln" id="L200">                    .response</span>
+<span class="ln" id="L201">                    .rect;</span>
+<span class="ln" id="L202">                    gaps = (rect.<span class="tok-fn">left</span>() - origin, room - (rect.<span class="tok-fn">right</span>() - origin));</span>
+<span class="ln" id="L203">                });</span>
+<span class="ln" id="L204">            });</span>
+<span class="ln" id="L205">        }</span>
+<span class="ln" id="L206">        assert!(</span>
+<span class="ln" id="L207">            (gaps.<span class="tok-num">0</span> - gaps.<span class="tok-num">1</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">12.0</span>,</span>
+<span class="ln" id="L208">            <span class="tok-str">&quot;not centred: {} to the left, {} to the right&quot;</span>,</span>
+<span class="ln" id="L209">            gaps.<span class="tok-num">0</span>,</span>
+<span class="ln" id="L210">            gaps.<span class="tok-num">1</span></span>
+<span class="ln" id="L211">        );</span>
+<span class="ln" id="L212">    }</span>
+<span class="ln" id="L213"></span>
+<span class="ln" id="L214">    <span class="tok-com">/// A row too wide for the window starts at the left, not off both edges.</span></span>
+<span class="ln" id="L215">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L216">    <span class="tok-kw">fn</span> <span class="tok-fn">a_row_wider_than_the_window_is_not_pushed_off_both_edges</span>() {</span>
+<span class="ln" id="L217">        <span class="tok-kw">let</span> (_, second, _) = <span class="tok-fn">twice</span>(<span class="tok-num">40.0</span>, |ui| {</span>
+<span class="ln" id="L218">            ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;a label a great deal wider than forty points across&quot;</span>);</span>
+<span class="ln" id="L219">        });</span>
+<span class="ln" id="L220">        assert!(</span>
+<span class="ln" id="L221">            second &gt;= -<span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L222">            <span class="tok-str">&quot;the row was pushed to {second}, off the left edge&quot;</span></span>
+<span class="ln" id="L223">        );</span>
+<span class="ln" id="L224">    }</span>
+<span class="ln" id="L225"></span>
+<span class="ln" id="L226">    <span class="tok-com">/// The body runs once per frame, however many times the row is measured.</span></span>
+<span class="ln" id="L227">    <span class="tok-com">///</span></span>
+<span class="ln" id="L228">    <span class="tok-com">/// This is the constraint the whole design exists for: the unlock row</span></span>
+<span class="ln" id="L229">    <span class="tok-com">/// spawns a key derivation when its button reports a click, and a helper</span></span>
+<span class="ln" id="L230">    <span class="tok-com">/// that ran its closure twice could spawn it twice from one press.</span></span>
+<span class="ln" id="L231">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L232">    <span class="tok-kw">fn</span> <span class="tok-fn">the_row_body_runs_exactly_once_per_frame</span>() {</span>
+<span class="ln" id="L233">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> runs = 0_u32;</span>
+<span class="ln" id="L235">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
+<span class="ln" id="L236">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L237">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L238">                    <span class="tok-fn">centred_row</span>(ui, |ui| {</span>
+<span class="ln" id="L239">                        runs += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L240">                        ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;once&quot;</span>);</span>
+<span class="ln" id="L241">                    });</span>
+<span class="ln" id="L242">                });</span>
+<span class="ln" id="L243">            });</span>
+<span class="ln" id="L244">        }</span>
+<span class="ln" id="L245">        assert_eq!(runs, <span class="tok-num">3</span>, <span class="tok-str">&quot;the body ran {runs} times across three frames&quot;</span>);</span>
+<span class="ln" id="L246">    }</span>
+<span class="ln" id="L247">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
