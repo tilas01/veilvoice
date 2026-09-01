@@ -727,23 +727,67 @@ mod tests {
     }
 
     /// Somewhere for a keyring that is nobody's real one.
+    ///
+    /// # Unique per call, not per instant
+    ///
+    /// F-106. This used to name the directory after the clock alone, and every
+    /// test that takes one deletes it when it finishes. Cargo runs these tests
+    /// on threads at the same moment, so two calls landing in the same tick
+    /// share a directory, and the first test to finish deletes the second
+    /// test's keyring out from under it. On Linux the nanoseconds always
+    /// differed and it never happened; on macOS the clock is coarser and it
+    /// did, as a keyring that existed for the first import and was gone for
+    /// the second.
+    ///
+    /// So the name carries a counter that is unique within the process
+    /// whatever the clock does, and the clock only separates one run from the
+    /// next. `create_dir` rather than `create_dir_all` is the other half:
+    /// `create_dir_all` treats "it is already there" as success, which is
+    /// exactly the case that must not be silent.
     fn scratch_home() -> Option<PathBuf> {
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static NEXT: AtomicU64 = AtomicU64::new(0);
+
         let stamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_nanos())
             .unwrap_or(0);
+        let seat = NEXT.fetch_add(1, Ordering::Relaxed);
         // Short, and not under a long temporary path: GnuPG puts an agent
         // socket in here and a long directory name overflows the sockaddr,
         // which fails as "error running gpg-agent" and looks like a bug in
         // this code. Measured while writing this test.
-        let path = std::env::temp_dir().join(format!("vvg{stamp:x}"));
-        std::fs::create_dir_all(&path).ok()?;
+        let path = std::env::temp_dir().join(format!("vvg{:x}{seat:x}", stamp as u64));
+        std::fs::create_dir(&path).ok()?;
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt as _;
             std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).ok()?;
         }
         Some(path)
+    }
+
+    /// Two scratch homes are two directories, however close together they are
+    /// asked for.
+    ///
+    /// The defect this exists to stop coming back is F-106, and it was
+    /// invisible precisely because it needed two calls in one clock tick.
+    /// Asking for a hundred in a loop is the cheapest way to make that
+    /// certain: with the clock alone as the key, a run of these collides on
+    /// any machine whose clock is coarser than the loop is fast.
+    #[test]
+    fn scratch_homes_are_never_the_same_directory_twice() {
+        let mut made = Vec::new();
+        for _ in 0..100 {
+            if let Some(home) = scratch_home() {
+                assert!(!made.contains(&home), "{home:?} was handed out twice");
+                made.push(home);
+            }
+        }
+        assert!(!made.is_empty(), "no scratch home could be made at all");
+        for home in made {
+            std::fs::remove_dir_all(&home).ok();
+        }
     }
 
     /// The real key, into a real GnuPG, twice.
