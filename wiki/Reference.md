@@ -170,6 +170,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &middot; Asking for a file without stopping the window.
 - [[`group.rs`|File-veilvoice-gui-group]] &middot; Group mode: several people in one recording, each with a name and a colour.
 - [[`integrity.rs`|File-veilvoice-gui-integrity]] &middot; The integrity record, taken and checked by the window rather than by hand.
+- [[`layout.rs`|File-veilvoice-gui-layout]] &middot; Centring a row of widgets, which egui does not do by nesting.
 - [[`lib.rs`|File-veilvoice-gui-lib]] &middot; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
 - [[`main.rs`|File-veilvoice-gui-main]] &middot; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
 - [[`monitor.rs`|File-veilvoice-gui-monitor]] &middot; The live monitor: what is going in, and what is coming out, wherever you are.

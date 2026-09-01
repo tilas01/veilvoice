@@ -121,8 +121,15 @@ COMMANDS = [
 # So the picture gets taller instead of wider, which is the axis a page can
 # afford, and the text is all there.
 MAX_COLUMNS = 96
-# A capture longer than this is cut too. These are illustrations, not manuals.
-MAX_LINES = 44
+# There is no cap on how many lines a capture may have.
+#
+# There was, at 44, with an ellipsis on the end to mark the cut, and the
+# reasoning was that these are illustrations rather than manuals. It is the
+# same mistake the width had: a picture of `--help` whose whole job is showing
+# what the flags are, ending three flags early, is not an illustration of
+# anything. The height is the axis a page can afford, and `draw` already sizes
+# the canvas from the number of lines, so a longer capture simply produces a
+# taller picture.
 
 
 def binary():
@@ -282,14 +289,9 @@ def wrap_line(line, width):
 def draw(name, title, note, text):
     """One terminal window, as SVG."""
     lines = text.replace("\r\n", "\n").rstrip("\n").split("\n")
-    cut_lines = len(lines) > MAX_LINES
-    if cut_lines:
-        lines = lines[:MAX_LINES]
     body = []
     for line in lines:
         body.extend(wrap_line(line.rstrip(), MAX_COLUMNS))
-    if cut_lines:
-        body.append("…")
 
     columns = max([len(line) for line in body] + [len(title) + 4])
     width = PAD_X * 2 + columns * CHAR_W

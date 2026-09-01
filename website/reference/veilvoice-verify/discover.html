@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/discover.svg" alt="discover.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/discover.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 364 lines &middot; <a href="discover.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 460 lines &middot; <a href="discover.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists">Why this exists</a>
@@ -63,11 +63,11 @@
 <p>A file whose name starts <code>veilvoice-</code> and ends in one of the archive extensions this project publishes. That is a <strong>filename</strong> test and it proves nothing at all: it is how candidates are found, never how they are judged. Every candidate still has to survive the signature and the hash, and a file that merely looks the part fails exactly as loudly as one that does not.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Looks for a downloaded release to check, so you can double-click the verifier and have it work.</p>
-<p>It looks in the folder it is in, the current folder, and your Downloads and Desktop. If it finds nothing it says exactly where it looked, rather than reporting a failure that leaves you guessing.</p>
+<p>It looks in the folder it is in, the current folder, one level up from each of those, and your Downloads and Desktop. If it finds nothing it says exactly where it looked, rather than reporting a failure that leaves you guessing.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>364 lines defining <strong>7 functions</strong> (7 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>460 lines defining <strong>7 functions</strong> (7 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Found</code> <span style="color:var(--muted)">line 65</span> &middot; What was found in one directory.</li>
 </ul>
@@ -78,7 +78,7 @@
 </li>
 <li><code>Found::missing</code> <span style="color:var(--muted)">line 90</span> &middot; What is missing, in words, for a message to the user.
 </li>
-<li><code>search</code> <span style="color:var(--muted)">line 191</span> &middot; Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up.
+<li><code>search</code> <span style="color:var(--muted)">line 223</span> &middot; Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>look_in</code>, <code>places</code>, <code>looks_like_archive</code></span>
 </li>
 </ul>
@@ -132,7 +132,7 @@
 <a href="discover.src.html#fn-search">
 <rect x="464.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">search</text>
-<text x="510.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
+<text x="510.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -155,7 +155,7 @@ flowchart TD
     n_looks_like_archive[&quot;looks_like_archive&lt;br/&gt;line 108&quot;]
     n_look_in[&quot;look_in&lt;br/&gt;line 114&quot;]
     n_places[&quot;places&lt;br/&gt;line 150&quot;]
-    n_search([&quot;search&lt;br/&gt;line 191&quot;])
+    n_search([&quot;search&lt;br/&gt;line 223&quot;])
     n_look_in --&gt; n_looks_like_archive
     n_search --&gt; n_look_in
     n_search --&gt; n_places
@@ -165,7 +165,7 @@ flowchart TD
     click n_looks_like_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L108&quot; &quot;open the source&quot;
     click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L114&quot; &quot;open the source&quot;
     click n_places href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L150&quot; &quot;open the source&quot;
-    click n_search href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L191&quot; &quot;open the source&quot;
+    click n_search href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L223&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_complete,n_is_empty,n_missing,n_search entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -187,7 +187,7 @@ flowchart TD
 <tr><td><code>looks_like_archive</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-looks_like_archive">108</a></td><td>Whether a filename looks like one of this project&#x27;s release archives.</td></tr>
 <tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-look_in">114</a></td><td>Look in one directory, one level deep.</td></tr>
 <tr><td><code>places</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-places">150</a></td><td>Every place worth looking, in order, without duplicates.</td></tr>
-<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-search">191</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up.</td></tr>
+<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-search">223</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up.</td></tr>
 </tbody></table>
 </section>
 </div></div>

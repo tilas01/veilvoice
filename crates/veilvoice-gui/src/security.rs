@@ -585,7 +585,11 @@ impl Security {
         let cooldown = self.store.as_ref().and_then(|s| s.cooldown());
         let busy = self.busy();
 
-        ui.horizontal(|ui| {
+        // Centred under the mark, rather than pinned to the left edge while
+        // everything above it sits in the middle. `vertical_centered` centres
+        // each child it is given, and a `horizontal` row counts as one child,
+        // so the label, the field and the button move together as a group.
+        crate::layout::centred_row(ui, |ui| {
             ui.label(RichText::new("password").color(p::muted()));
             let field = ui.add_enabled(
                 !busy && cooldown.is_none(),
@@ -607,23 +611,25 @@ impl Security {
         });
 
         if busy {
-            ui.horizontal(|ui| {
+            crate::layout::centred_row(ui, |ui| {
                 ui.spinner();
                 ui.label(RichText::new("deriving key…").color(p::muted()));
             });
         }
 
-        if let Some(wait) = cooldown {
-            ui.label(
-                RichText::new(format!(
-                    "too many attempts, {} s before the next one",
-                    wait.as_secs()
-                ))
-                .color(p::yellow()),
-            );
-        } else if let Some((text, colour)) = &self.message {
-            ui.label(RichText::new(text).color(*colour));
-        }
+        ui.vertical_centered(|ui| {
+            if let Some(wait) = cooldown {
+                ui.label(
+                    RichText::new(format!(
+                        "too many attempts, {} s before the next one",
+                        wait.as_secs()
+                    ))
+                    .color(p::yellow()),
+                );
+            } else if let Some((text, colour)) = &self.message {
+                ui.label(RichText::new(text).color(*colour));
+            }
+        });
 
         // The count of failed attempts is not shown here either. It tells the
         // owner nothing they did not just do, and it tells somebody else how
@@ -765,9 +771,9 @@ impl Security {
             ui.add_space(8.0);
 
             ui.add_enabled_ui(!busy, |ui| {
-                password_row(ui, "current   ", &mut self.current);
-                password_row(ui, "new       ", &mut self.fresh);
-                password_row(ui, "repeat    ", &mut self.repeat);
+                password_row(ui, "current", &mut self.current);
+                password_row(ui, "new", &mut self.fresh);
+                password_row(ui, "repeat", &mut self.repeat);
             });
             let matched = !self.fresh.is_empty() && self.fresh == self.repeat;
 
@@ -816,8 +822,8 @@ impl Security {
                 .small(),
             );
             ui.add_enabled_ui(!busy, |ui| {
-                password_row(ui, "password  ", &mut self.fresh);
-                password_row(ui, "repeat    ", &mut self.repeat);
+                password_row(ui, "password", &mut self.fresh);
+                password_row(ui, "repeat", &mut self.repeat);
             });
             let matched = !self.fresh.is_empty() && self.fresh == self.repeat;
             if ui
@@ -945,7 +951,7 @@ impl Security {
             }
             Sealing::Password => {
                 password_row(ui, "passphrase", &mut self.passphrase);
-                password_row(ui, "repeat    ", &mut self.passphrase_repeat);
+                password_row(ui, "repeat", &mut self.passphrase_repeat);
                 let matched =
                     !self.passphrase.is_empty() && self.passphrase == self.passphrase_repeat;
                 if ui
@@ -1220,20 +1226,123 @@ fn reopen(path: Option<&std::path::Path>) -> Option<LockStore> {
     path.and_then(|p| LockStore::open(p).ok().flatten())
 }
 
-fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) {
+/// The width every passphrase label is given, so every field starts level.
+///
+/// Wide enough for "passphrase", which is the longest of them.
+const PASSWORD_LABEL_WIDTH: f32 = 82.0;
+
+/// One labelled passphrase field, with the field in the same place every time.
+///
+/// # Why the label gets a column of its own
+///
+/// These labels used to be padded with trailing spaces to line the fields up:
+/// `"current"`, `"new"`, `"repeat"`, `"password"`, against a
+/// bare `"passphrase"`. That aligns nothing outside a terminal. The interface
+/// font is proportional, so a space is not the width of a letter and eight
+/// letters plus two spaces is not the width of ten letters; and egui gives
+/// trailing whitespace no reliable width at all.
+///
+/// The visible result was that fields sat at slightly different places on
+/// different screens, and the screens that differed most were the ones drawn
+/// only after setup, because those carry the labels that needed the most
+/// padding. Buttons underneath inherited the same drift. Giving the label a
+/// fixed column puts every field, and everything lined up beneath it, at one
+/// x on every screen.
+///
+/// Returns the field itself, so a caller, or a test, can ask where it landed.
+fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) -> egui::Response {
     ui.horizontal(|ui| {
-        ui.label(RichText::new(label).color(p::muted()));
+        ui.allocate_ui_with_layout(
+            egui::vec2(PASSWORD_LABEL_WIDTH, ui.spacing().interact_size.y),
+            egui::Layout::left_to_right(egui::Align::Center),
+            |ui| {
+                // `allocate_ui_with_layout` asks for this width but gives back
+                // only what the contents used, so a short label would consume a
+                // short column and the field would move left again.
+                // `set_min_width` is what makes the column a column.
+                ui.set_min_width(PASSWORD_LABEL_WIDTH);
+                ui.label(RichText::new(label).color(p::muted()))
+            },
+        );
         ui.add(
             egui::TextEdit::singleline(value)
                 .password(true)
                 .desired_width(260.0),
-        );
-    });
+        )
+    })
+    .inner
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every passphrase field starts at the same x, whatever its label says.
+    ///
+    /// The defect: the labels were padded with trailing spaces to fake a
+    /// column, which lines nothing up in a proportional font. Screens drawn
+    /// only after setup carry the labels that needed the most padding, so
+    /// their fields, and the buttons under them, sat at a different place
+    /// from the ones present at launch.
+    ///
+    /// The shortest and the longest label in use are drawn here. If the fields
+    /// ever part company again this fails with both positions.
+    #[test]
+    fn every_passphrase_field_starts_in_the_same_place() {
+        let ctx = egui::Context::default();
+        let input = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(
+                egui::pos2(0.0, 0.0),
+                egui::vec2(640.0, 400.0),
+            )),
+            ..Default::default()
+        };
+
+        let mut starts: Vec<(&str, f32)> = Vec::new();
+        let _ = ctx.run(input, |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                for label in ["new", "password", "passphrase"] {
+                    let mut value = String::new();
+                    // Where the field actually landed, read back from the
+                    // widget. Deriving it from the column width instead would
+                    // be the test agreeing with itself: it would pass whether
+                    // or not the column was ever applied.
+                    let field = password_row(ui, label, &mut value);
+                    starts.push((label, field.rect.left()));
+                }
+            });
+        });
+
+        let first = starts[0].1;
+        for (label, at) in &starts {
+            assert!(
+                (at - first).abs() < 0.5,
+                "the field after {label:?} starts at {at}, and the first starts at {first}"
+            );
+        }
+    }
+
+    /// No passphrase label is padded with spaces to fake its width.
+    ///
+    /// The column is what aligns these now. A label that comes back padded is
+    /// somebody reaching for the old trick, and it would drift again the first
+    /// time the font changed.
+    #[test]
+    fn no_passphrase_label_is_padded_with_spaces() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        for line in source.lines() {
+            let trimmed = line.trim_start();
+            if !trimmed.starts_with("password_row(ui, \"") {
+                continue;
+            }
+            let label = trimmed.split('"').nth(1).expect("a quoted label");
+            assert_eq!(
+                label,
+                label.trim(),
+                "the label {label:?} is padded with spaces; give it the column instead"
+            );
+        }
+    }
 
     /// **Marker 74.** The locked window explains nothing.
     ///
