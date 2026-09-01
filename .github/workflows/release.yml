@@ -269,9 +269,9 @@ jobs:
               echo "microphone scrambling."
               echo
               echo "The desktop app needs the GTK and OpenGL stack for this"
-              echo "architecture, and live capture needs ALSA headers for it, and neither"
-              echo "is available to a cross or statically linked build. Everything"
-              echo "else works: anonymise, clean, encrypt, decrypt, keygen, shred."
+              echo "architecture, and live capture needs ALSA headers for it. Neither is"
+              echo "available to a cross or statically linked build. Everything else"
+              echo "works: anonymise, clean, encrypt, decrypt, keygen, shred."
               echo
               echo "Run 'veilvoice info' to confirm what this binary supports."
               echo "To get live scrambling, build natively on the target machine."
@@ -326,8 +326,9 @@ jobs:
   #
   # It is CLI-only and deliberately so: `cpal` has no backend for the BSDs, so
   # live capture cannot work there. Everything else, meaning file
-  # de-identification, encryption and metadata cleaning, is pure Rust and runs fine, which is why the
-  # `live` feature exists to be turned off rather than the whole build failing.
+  # de-identification, encryption and metadata cleaning, is pure Rust and runs
+  # fine, which is why the `live` feature exists to be turned off rather than
+  # the whole build failing.
   #
   # Marked continue-on-error: a third-party VM action failing should not hold up
   # a release for the four first-class platforms. When it fails, the release
@@ -365,7 +366,7 @@ jobs:
           cp -r assets/linux "dist/$out/desktop"
           {
             echo "This FreeBSD build has no live microphone scrambling: cpal, the"
-            echo "audio device library, has no BSD backend. Everything else works,"
+            echo "audio device library, has no BSD backend. Everything else works:"
             echo "anonymise, clean, encrypt, decrypt, keygen."
             echo
             echo "Run 'veilvoice info' to confirm what this binary supports."
@@ -418,7 +419,7 @@ jobs:
           cp -r assets/linux "dist/$out/desktop"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
-            echo "device library, has no BSD backend. Everything else works,"
+            echo "device library, has no BSD backend. Everything else works:"
             echo "anonymise, clean, encrypt, decrypt, keygen, shred."
             echo
             echo "OpenBSD's pledge/unveil are not used: VeilVoice opens files the user names, and a sandbox it configures for itself would be a claim this project has not tested."
@@ -475,7 +476,7 @@ jobs:
           cp -r assets/linux "dist/$out/desktop"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
-            echo "device library, has no BSD backend. Everything else works,"
+            echo "device library, has no BSD backend. Everything else works:"
             echo "anonymise, clean, encrypt, decrypt, keygen, shred."
             echo
             echo "Built against pkgsrc's Rust, which may lag the pinned toolchain; that is why this archive is marked not-verified for reproducibility."
