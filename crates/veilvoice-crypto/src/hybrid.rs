@@ -341,7 +341,7 @@ mod tests {
         assert_eq!(sk.decapsulate(&e2).unwrap(), s2);
     }
 
-    /// The hybrid must fail if the classical half is tampered with — otherwise
+    /// The hybrid must fail if the classical half is tampered with, because otherwise
     /// it would be no stronger than ML-KEM alone.
     #[test]
     fn tampering_with_the_x25519_half_changes_the_secret() {

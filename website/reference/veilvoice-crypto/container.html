@@ -64,7 +64,7 @@
 64     4  encapsulation length (little-endian)
 68     N  encapsulation                            hybrid mode only
 68+N     &#8230;  ciphertext &#8214; Poly1305 tag</code></pre>
-<p><strong>The entire header is the AEAD&#x27;s associated data.</strong> Editing any byte of it &#8212; downgrading the KDF cost, swapping the mode, corrupting the salt &#8212; makes decryption fail rather than silently changing behaviour. Unused fields are written as zero and are still authenticated, so they cannot be used as a covert channel or a downgrade vector.</p>
+<p><strong>The entire header is the AEAD&#x27;s associated data.</strong> Editing any byte of it by downgrading the KDF cost, swapping the mode or corrupting the salt, makes decryption fail rather than silently changing behaviour. Unused fields are written as zero and are still authenticated, so they cannot be used as a covert channel or a downgrade vector.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>The shape of an encrypted <code>.veil</code> file.</p>
 <p>Everything needed to open it travels inside it, apart from the passphrase or the key. That means a file made today still opens years later, even after VeilVoice has changed how hard it makes the encryption by default: the file remembers what it was made with.</p>

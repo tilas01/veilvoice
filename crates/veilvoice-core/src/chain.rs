@@ -176,7 +176,7 @@ pub struct DeidConfig {
     /// short, independently-sealed ones.
     ///
     /// Two seconds by default, which is frequent enough to keep each segment
-    /// small and far too slow to hear — the parameters glide across a roll and
+    /// small and far too slow to hear: the parameters glide across a roll and
     /// the phase offsets ease to their new values over about half a second.
     /// Set to `0.0` to keep a single stream for the whole session.
     ///
@@ -475,8 +475,8 @@ impl DeidConfig {
     /// Every value in here is reachable from a file: a WAV's `fmt ` chunk
     /// carries a **`u32`** sample rate, and `symphonia` passes whatever it
     /// finds straight through. That number then sizes the delay lines in
-    /// `effects.rs` — `Reverb`'s comb is `0.0297 × sample_rate` samples and the
-    /// chorus voices are similar — so a four-kilobyte file declaring
+    /// `effects.rs`, where `Reverb`'s comb is `0.0297 × sample_rate` samples and
+    /// the chorus voices are similar, so a four-kilobyte file declaring
     /// `u32::MAX` asks for roughly two gigabytes of buffers before a single
     /// sample is processed. A failed allocation in Rust aborts the process,
     /// which is the same shape as F-3: opening a hostile file kills the
@@ -499,7 +499,7 @@ impl DeidConfig {
     ///
     /// Every float is checked for finiteness, not merely for range. A `NaN`
     /// compares false against every bound, so a bare `self.sample_rate <
-    /// 8_000.0` test *passes* `NaN` — and an engine built at a `NaN` sample
+    /// 8_000.0` test *passes* `NaN`, and an engine built at a `NaN` sample
     /// rate produced `NaN` for every output sample, for the whole session,
     /// with nothing reported. That is F-5 arriving through a second door: F-5
     /// sanitised the samples, and nothing sanitised the configuration they were
@@ -559,7 +559,7 @@ impl DeidConfig {
             }
         }
         // The remaining floats are all clamped rather than refused, because
-        // every one of them has a meaningful nearest legal value — but a `NaN`
+        // every one of them has a meaningful nearest legal value. A `NaN`
         // does not clamp, it propagates, so it is refused by name.
         for (name, value) in [
             ("intensity", self.intensity),
@@ -1396,7 +1396,7 @@ mod tests {
         );
     }
 
-    /// Rolling must not cost determinism — reproducible builds and the whole
+    /// Rolling must not cost determinism, because reproducible builds and the whole
     /// test suite depend on `from_seed` being repeatable.
     #[test]
     fn rolling_stays_deterministic_for_a_given_seed() {

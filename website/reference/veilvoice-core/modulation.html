@@ -50,7 +50,7 @@
 <div>
 <section id="s-about">
 <p>Cryptographically-seeded modulation of the effect parameters.</p>
-<p>The pitch and formant ratios are never constant: a ChaCha20 CSPRNG picks a new random target every <code>frames_per_target</code> STFT frames, and a one-pole filter glides continuously toward it. Because the transform is therefore non-stationary and unpredictable, an attacker cannot &quot;undo&quot; it by assuming a single fixed shift &#8212; there is no single shift to undo, and the target sequence is unknowable without the seed (which never leaves the process and is zeroized on drop).</p>
+<p>The pitch and formant ratios are never constant: a ChaCha20 CSPRNG picks a new random target every <code>frames_per_target</code> STFT frames, and a one-pole filter glides continuously toward it. Because the transform is therefore non-stationary and unpredictable, an attacker cannot &quot;undo&quot; it by assuming a single fixed shift: there is no single shift to undo, and the target sequence is unknowable without the seed (which never leaves the process and is zeroized on drop).</p>
 <p>The seed does not stay put either. It is rolled forward every couple of seconds by default (see <code>Modulator::reseed</code>), so the stream driving any given stretch of audio is closed off permanently once that stretch is past.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>The amount by which the voice is altered is never held still. It drifts, constantly and unpredictably.</p>

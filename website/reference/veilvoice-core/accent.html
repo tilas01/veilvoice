@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/accent.svg" alt="accent.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/accent.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 696 lines &middot; <a href="accent.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 697 lines &middot; <a href="accent.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-an-accent-is-made-of-and-what-a-signal-level-transform-can-remove">What an accent is made of, and what a signal-level transform can remove</a>
@@ -56,12 +56,12 @@
 <h2 id="what-an-accent-is-made-of-and-what-a-signal-level-transform-can-remove">What an accent is made of, and what a signal-level transform can remove</h2>
 <p>Accent is carried by two very different kinds of cue, and they have opposite answers here:</p>
 <ul>
-<li><strong>Suprasegmental cues</strong> &#8212; intonation contour and pitch range, long-term voice quality and spectral tilt, and the fixed vocal-tract scale behind a speaker&#x27;s vowel space. These are <em>properties of the signal</em>, they are strongly speaker- and region-identifying, and this module removes them by mapping every speaker onto one canonical target.</li>
-<li><strong>Segmental cues</strong> &#8212; <em>which phonemes the speaker actually produced</em>: rhoticity, vowel mergers, dental-fricative substitution, aspiration patterns. These are not a colouration laid over the words; at this level they <strong>are</strong> the words. Removing them means deciding a different phoneme was said, which no filter can do &#8212; it requires recognising the speech and re-synthesising it (see the planned text-to-speech mode, which sidesteps this entirely by never carrying the original signal at all).</li>
+<li><strong>Suprasegmental cues</strong>, meaning intonation contour and pitch range, long-term voice quality and spectral tilt, and the fixed vocal-tract scale behind a speaker&#x27;s vowel space. These are <em>properties of the signal</em>, they are strongly speaker- and region-identifying, and this module removes them by mapping every speaker onto one canonical target.</li>
+<li><strong>Segmental cues</strong>, meaning <em>which phonemes the speaker actually produced</em>: rhoticity, vowel mergers, dental-fricative substitution, aspiration patterns. These are not a colouration laid over the words; at this level they <strong>are</strong> the words. Removing them means deciding a different phoneme was said, which no filter can do: it requires recognising the speech and re-synthesising it (see the planned text-to-speech mode, which sidesteps this entirely by never carrying the original signal at all).</li>
 </ul>
 <p>So this module makes every speaker land on the same pitch register, the same apparent vocal-tract length and the same long-term spectral tilt, which removes the accent&#x27;s melody and colour and a large part of its perceived origin. It does not, and cannot, re-articulate phonemes. <code>docs/WHITEPAPER.md</code> must state that limit plainly rather than claim accent removal is total.</p>
 <h2 id="why-this-also-strengthens-de-identification">Why this also strengthens de-identification</h2>
-<p>Every step here is <em>many-to-one</em>: a whole population of input f0 contours, spectral tilts and vocal-tract lengths is collapsed onto a single canonical value. That destroys information rather than displacing it, so it composes with the phase discard in <code>crate::spectral</code> &#8212; the two are independent one-way steps, and normalising the speaker&#x27;s <em>mean</em> pitch and vocal-tract length removes two of the strongest biometric features there are.</p>
+<p>Every step here is <em>many-to-one</em>: a whole population of input f0 contours, spectral tilts and vocal-tract lengths is collapsed onto a single canonical value. That destroys information rather than displacing it, so it composes with the phase discard in <code>crate::spectral</code>, because the two are independent one-way steps, and normalising the speaker&#x27;s <em>mean</em> pitch and vocal-tract length removes two of the strongest biometric features there are.</p>
 <h2 id="preserving-intelligibility">Preserving intelligibility</h2>
 <p>The critical design rule is that every correction is derived from a <strong>long-term</strong> average, never from the current frame. Per-frame spectral shape is what distinguishes /i/ from /u/; normalising it frame-by-frame would erase the vowels along with the accent. Vocal-tract and tilt corrections therefore use multi-second time constants, so they track the speaker and leave the phonemes moving freely underneath.</p>
 <h2 id="in-plain-words">In plain words</h2>
@@ -71,7 +71,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>696 lines defining <strong>13 functions</strong> (8 public), <strong>3 types</strong> and <strong>10 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>697 lines defining <strong>13 functions</strong> (8 public), <strong>3 types</strong> and <strong>10 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct AccentConfig</code> <span style="color:var(--muted)">line 95</span> &mdash; How aggressively accent and speaker traits are normalised.</li>
 <li><code>struct AccentStats</code> <span style="color:var(--muted)">line 143</span> &mdash; Live read-out of what the neutraliser is currently doing, for the UI.</li>
@@ -93,7 +93,7 @@
 </li>
 <li><code>AccentNeutralizer::vtln_ratio</code> <span style="color:var(--muted)">line 288</span> &mdash; Formant ratio to apply to the envelope this frame.
 </li>
-<li><code>AccentNeutralizer::shape</code> <span style="color:var(--muted)">line 308</span> &mdash; Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.
+<li><code>AccentNeutralizer::shape</code> <span style="color:var(--muted)">line 309</span> &mdash; Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>db_to_gain</code>, <code>gain_to_db</code>, <code>recompute_shape</code></span>
 </li>
 </ul>
@@ -160,28 +160,28 @@
 <a href="accent.src.html#fn-accentneutralizer-shape">
 <rect x="151.8" y="454.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="262.5" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::shape</text>
-<text x="262.5" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+<text x="262.5" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
 </a>
 <a href="accent.src.html#fn-accentneutralizer-recompute_shape">
 <rect x="29.3" y="554.0" width="181.1" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="119.8" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::</text>
 <text x="119.8" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">recompute_shape</text>
-<text x="119.8" y="610.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 351</text>
+<text x="119.8" y="610.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 352</text>
 </a>
 <a href="accent.src.html#fn-log_centroid">
 <rect x="236.4" y="562.5" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="298.8" y="585.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">log_centroid</text>
-<text x="298.8" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
+<text x="298.8" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
 </a>
 <a href="accent.src.html#fn-gain_to_db">
 <rect x="387.1" y="562.5" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="441.4" y="585.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">gain_to_db</text>
-<text x="441.4" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 422</text>
+<text x="441.4" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
 </a>
 <a href="accent.src.html#fn-db_to_gain">
 <rect x="208.2" y="671.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="262.5" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">db_to_gain</text>
-<text x="262.5" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 426</text>
+<text x="262.5" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
 </a>
 <rect x="20.0" y="755.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="764.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -206,11 +206,11 @@ flowchart TD
     n_prosody_ratio([&quot;AccentNeutralizer::&lt;br/&gt;prosody_ratio&lt;br/&gt;line 258&quot;])
     n_measure_envelope([&quot;AccentNeutralizer::&lt;br/&gt;measure_envelope&lt;br/&gt;line 269&quot;])
     n_vtln_ratio([&quot;AccentNeutralizer::vtln_ratio&lt;br/&gt;line 288&quot;])
-    n_shape([&quot;AccentNeutralizer::shape&lt;br/&gt;line 308&quot;])
-    n_recompute_shape[&quot;AccentNeutralizer::&lt;br/&gt;recompute_shape&lt;br/&gt;line 351&quot;]
-    n_log_centroid[&quot;log_centroid&lt;br/&gt;line 403&quot;]
-    n_gain_to_db[&quot;gain_to_db&lt;br/&gt;line 422&quot;]
-    n_db_to_gain[&quot;db_to_gain&lt;br/&gt;line 426&quot;]
+    n_shape([&quot;AccentNeutralizer::shape&lt;br/&gt;line 309&quot;])
+    n_recompute_shape[&quot;AccentNeutralizer::&lt;br/&gt;recompute_shape&lt;br/&gt;line 352&quot;]
+    n_log_centroid[&quot;log_centroid&lt;br/&gt;line 404&quot;]
+    n_gain_to_db[&quot;gain_to_db&lt;br/&gt;line 423&quot;]
+    n_db_to_gain[&quot;db_to_gain&lt;br/&gt;line 427&quot;]
     n_measure_envelope --&gt; n_log_centroid
     n_shape --&gt; n_db_to_gain
     n_shape --&gt; n_gain_to_db
@@ -223,11 +223,11 @@ flowchart TD
     click n_prosody_ratio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L258&quot; &quot;open the source&quot;
     click n_measure_envelope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269&quot; &quot;open the source&quot;
     click n_vtln_ratio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L288&quot; &quot;open the source&quot;
-    click n_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L308&quot; &quot;open the source&quot;
-    click n_recompute_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L351&quot; &quot;open the source&quot;
-    click n_log_centroid href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403&quot; &quot;open the source&quot;
-    click n_gain_to_db href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L422&quot; &quot;open the source&quot;
-    click n_db_to_gain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L426&quot; &quot;open the source&quot;
+    click n_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L309&quot; &quot;open the source&quot;
+    click n_recompute_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L352&quot; &quot;open the source&quot;
+    click n_log_centroid href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L404&quot; &quot;open the source&quot;
+    click n_gain_to_db href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L423&quot; &quot;open the source&quot;
+    click n_db_to_gain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L427&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -259,11 +259,11 @@ flowchart TD
 <tr><td><code>AccentNeutralizer::prosody_ratio</code> <sub>pub fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-prosody_ratio">258</a></td><td>Pitch ratio to apply to the excitation this frame.</td></tr>
 <tr><td><code>AccentNeutralizer::measure_envelope</code> <sub>pub fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-measure_envelope">269</a></td><td>Measure the speaker&#x27;s vocal-tract scale from the <em>unwarped</em> envelope and update the VTLN ratio.</td></tr>
 <tr><td><code>AccentNeutralizer::vtln_ratio</code> <sub>pub fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-vtln_ratio">288</a></td><td>Formant ratio to apply to the envelope this frame.</td></tr>
-<tr><td><code>AccentNeutralizer::shape</code> <sub>pub fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-shape">308</a></td><td>Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.</td></tr>
-<tr><td><code>AccentNeutralizer::recompute_shape</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-recompute_shape">351</a></td><td>Rebuild the correction curve from the current long-term average.</td></tr>
-<tr><td><code>log_centroid</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-log_centroid">403</a></td><td>Energy-weighted geometric-mean frequency of env over lo, hi bins.</td></tr>
-<tr><td><code>gain_to_db</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-gain_to_db">422</a></td><td></td></tr>
-<tr><td><code>db_to_gain</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-db_to_gain">426</a></td><td></td></tr>
+<tr><td><code>AccentNeutralizer::shape</code> <sub>pub fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-shape">309</a></td><td>Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.</td></tr>
+<tr><td><code>AccentNeutralizer::recompute_shape</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-recompute_shape">352</a></td><td>Rebuild the correction curve from the current long-term average.</td></tr>
+<tr><td><code>log_centroid</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-log_centroid">404</a></td><td>Energy-weighted geometric-mean frequency of env over lo, hi bins.</td></tr>
+<tr><td><code>gain_to_db</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-gain_to_db">423</a></td><td></td></tr>
+<tr><td><code>db_to_gain</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-db_to_gain">427</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

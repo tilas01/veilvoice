@@ -52,7 +52,7 @@
 <span class="ln" id="L9"><span class="tok-com">//! That matters more than it might sound, because the engine keeps *persistent*</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! state: the accent neutraliser&#x27;s long-term spectrum is an exponential moving</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! average, so a single non-finite sample folded into it never washes out. The</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! audit found exactly that &#8212; one NaN, and every output sample for the rest of</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! audit found exactly that: one NaN, and every output sample for the rest of</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! the session was NaN, silently.</span></span>
 <span class="ln" id="L14"><span class="tok-com">//!</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! # In plain words</span></span>
@@ -253,8 +253,8 @@
 <span class="ln" id="L194"><span class="tok-com">// second door onto the same failure, which the audit found still open: the</span></span>
 <span class="ln" id="L195"><span class="tok-com">// engine was built from a configuration nobody had validated, and a `NaN`</span></span>
 <span class="ln" id="L196"><span class="tok-com">// sample rate produced `NaN` output for every sample without a sample ever</span></span>
-<span class="ln" id="L197"><span class="tok-com">// having been bad. The value is reachable from a file &#8212; a WAV&#x27;s `fmt ` chunk</span></span>
-<span class="ln" id="L198"><span class="tok-com">// carries a `u32` sample rate that `symphonia` passes straight through &#8212; and</span></span>
+<span class="ln" id="L197"><span class="tok-com">// having been bad. The value is reachable from a file, because a WAV&#x27;s `fmt `</span></span>
+<span class="ln" id="L198"><span class="tok-com">// chunk carries a `u32` sample rate that `symphonia` passes straight through, and</span></span>
 <span class="ln" id="L199"><span class="tok-com">// from any project using these crates as libraries, which the README invites.</span></span>
 <span class="ln" id="L200"><span class="tok-com">// ---------------------------------------------------------------------------</span></span>
 <span class="ln" id="L201"></span>

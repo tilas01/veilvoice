@@ -53,7 +53,7 @@
 <div>
 <section id="s-about">
 <p>Light time-domain effects applied after resynthesis.</p>
-<p>These run on the continuous output stream (not per FFT frame) and exist to (a) further decorrelate the signal from the original, and (b) add a few detuned &quot;voices&quot; so the spectrogram is densely filled rather than showing a clean harmonic stack &#8212; without harming intelligibility, so every mix defaults low. None of them are invertible in a way that recovers the source voice.</p>
+<p>These run on the continuous output stream (not per FFT frame) and exist to (a) further decorrelate the signal from the original, and (b) add a few detuned &quot;voices&quot; so the spectrogram is densely filled rather than showing a clean harmonic stack, without harming intelligibility, so every mix defaults low. None of them are invertible in a way that recovers the source voice.</p>
 <h2 id="how-little-these-contribute-said-plainly">How little these contribute, said plainly</h2>
 <p>It would be easy to read a chorus and a reverb as part of the anonymity argument. They are not, and this crate should not let anybody think they are. <strong>The voiceprint is destroyed in <code>crate::spectral</code></strong> -- by discarding measured phase and by mapping every speaker onto one canonical pitch register and vocal-tract scale. That has already happened before a single sample reaches this file.</p>
 <p>What these three add is <em>decorrelation at the margins</em>: a denser spectrogram, a few detuned voices where there was a clean harmonic stack, and some odd harmonics smearing whatever residual cues survived. Useful, cheap, and nowhere near sufficient alone. Set all three mixes to zero and the output is exactly as unlinkable as before.</p>

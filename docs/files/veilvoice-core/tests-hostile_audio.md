@@ -30,7 +30,7 @@ friendly. A 32-bit-float WAV can legally contain NaN and infinity, and
 That matters more than it might sound, because the engine keeps *persistent*
 state: the accent neutraliser's long-term spectrum is an exponential moving
 average, so a single non-finite sample folded into it never washes out. The
-audit found exactly that — one NaN, and every output sample for the rest of
+audit found exactly that: one NaN, and every output sample for the rest of
 the session was NaN, silently.
 
 # In plain words

@@ -22,8 +22,8 @@ modulated voice de-identification** engine.
 
 ## What it guarantees (and what it deliberately does not)
 
-VeilVoice destroys the *biometric voiceprint* — fundamental pitch, formant
-structure, timbre, accent and micro-timing — so that neither software nor a
+VeilVoice destroys the *biometric voiceprint*, meaning fundamental pitch,
+formant structure, timbre, accent and micro-timing, so that neither software nor a
 human can re-identify the speaker or reconstruct the original waveform. It
 does **not** hide the words: intelligibility is preserved on purpose, because
 a scrambler you cannot understand or transcribe is useless. "Fill the whole
@@ -34,8 +34,8 @@ exclusive; see `docs/WHITEPAPER.md` for the full argument.
 
 `AccentConfig` additionally maps every speaker onto one canonical pitch
 register, vocal-tract scale and long-term spectrum, so the *melody and
-colour* of an accent — along with two of the strongest biometric features
-there are — do not survive. What no signal-level transform can remove is the
+colour* of an accent, along with two of the strongest biometric features
+there are, do not survive. What no signal-level transform can remove is the
 **segmental** side of an accent: which phonemes were actually produced. At
 that level the accent and the words are the same thing, and changing it means
 changing what was said. See `AccentConfig` for the full argument and the
@@ -44,8 +44,8 @@ limit, which the whitepaper must state rather than overclaim.
 ## Why it is one-way
 
 Every STFT frame has its **measured phase discarded** and resynthesised from
-scratch (see `spectral`). The original excitation phase — which encodes the
-precise waveform and a speaker's micro-timing — is never stored and never
+scratch (see `spectral`). The original excitation phase, which encodes the
+precise waveform and a speaker's micro-timing, is never stored and never
 reused, so no downstream process can recover it. On top of that, the pitch
 and formant shifts are driven every frame by a ChaCha20 CSPRNG
 (`modulation`) whose seed never leaves the process and is zeroized on drop,
@@ -93,14 +93,14 @@ identify you, this has not touched that.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>89 lines"])
-    n_accent["accent.rs<br/>696 lines"]
+    n_accent["accent.rs<br/>697 lines"]
     n_chain["chain.rs<br/>1621 lines"]
     n_effects["effects.rs<br/>226 lines"]
     n_modulation["modulation.rs<br/>313 lines"]
     n_pitch["pitch.rs<br/>286 lines"]
     n_spectral["spectral.rs<br/>442 lines"]
     n_stft["stft.rs<br/>259 lines"]
-    n_voices["voices.rs<br/>866 lines"]
+    n_voices["voices.rs<br/>867 lines"]
     n_window["window.rs<br/>101 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
@@ -131,7 +131,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`accent.rs`|File-veilvoice-core-accent]] | 696 | Accent and speaker-trait neutralisation. |
+| [[`accent.rs`|File-veilvoice-core-accent]] | 697 | Accent and speaker-trait neutralisation. |
 | [[`chain.rs`|File-veilvoice-core-chain]] | 1621 | The assembled de-identification chain and its live performance statistics. |
 | [[`effects.rs`|File-veilvoice-core-effects]] | 226 | Light time-domain effects applied after resynthesis. |
 | [[`lib.rs`|File-veilvoice-core-lib]] | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
@@ -139,7 +139,7 @@ flowchart TD
 | [[`pitch.rs`|File-veilvoice-core-pitch]] | 286 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [[`spectral.rs`|File-veilvoice-core-spectral]] | 442 | Frequency-domain de-identification transform. |
 | [[`stft.rs`|File-veilvoice-core-stft]] | 259 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [[`voices.rs`|File-veilvoice-core-voices]] | 866 | Destination voices: several canonical registers instead of one. |
+| [[`voices.rs`|File-veilvoice-core-voices]] | 867 | Destination voices: several canonical registers instead of one. |
 | [[`window.rs`|File-veilvoice-core-window]] | 101 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [[`spectrum_report.rs`|File-veilvoice-core-examples-spectrum_report]] | 107 | Where do the output partials actually land? |
 | [[`veil_a_buffer.rs`|File-veilvoice-core-examples-veil_a_buffer]] | 54 | _no module documentation yet_ |

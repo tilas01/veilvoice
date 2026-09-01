@@ -47,7 +47,7 @@
 <span class="ln" id="L4"><span class="tok-com">//! These run on the continuous output stream (not per FFT frame) and exist to</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! (a) further decorrelate the signal from the original, and (b) add a few</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! detuned &quot;voices&quot; so the spectrogram is densely filled rather than showing a</span></span>
-<span class="ln" id="L7"><span class="tok-com">//! clean harmonic stack &#8212; without harming intelligibility, so every mix defaults</span></span>
+<span class="ln" id="L7"><span class="tok-com">//! clean harmonic stack, without harming intelligibility, so every mix defaults</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! low. None of them are invertible in a way that recovers the source voice.</span></span>
 <span class="ln" id="L9"><span class="tok-com">//!</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! # How little these contribute, said plainly</span></span>
@@ -190,7 +190,7 @@
 <span class="ln" id="L133"><span class="tok-kw">impl</span> Chorus {</span>
 <span class="src-item" id="fn-chorus-new">
 <span class="ln" id="L134">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, mix: f32) -&gt; Self {</span>
-<span class="ln" id="L135">        <span class="tok-com">// Three voices at different rates/phases &#8212; cheap but effective spread.</span></span>
+<span class="ln" id="L135">        <span class="tok-com">// Three voices at different rates and phases: cheap but effective spread.</span></span>
 <span class="ln" id="L136">        <span class="tok-kw">let</span> voices = vec![</span>
 <span class="ln" id="L137">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">14.0</span>, <span class="tok-num">3.0</span>, <span class="tok-num">0.17</span>, <span class="tok-num">0.0</span>),</span>
 <span class="ln" id="L138">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">21.0</span>, <span class="tok-num">4.0</span>, <span class="tok-num">0.23</span>, <span class="tok-num">2.1</span>),</span>

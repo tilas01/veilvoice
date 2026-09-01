@@ -2,7 +2,7 @@
 //! Frequency-domain de-identification transform.
 //!
 //! For every STFT frame we:
-//!   1. take the magnitude spectrum and **discard the measured phase** — this is
+//!   1. take the magnitude spectrum and **discard the measured phase**. This is
 //!      the irreversible step, it permanently erases the speaker's waveform /
 //!      micro-timing;
 //!   2. estimate a smooth spectral **envelope** (the vocal-tract / formant
@@ -16,7 +16,7 @@
 //! ## Voiced frames: an explicit harmonic comb
 //!
 //! Step 4 has two modes. On **unvoiced** frames each bin accumulates its own
-//! centre frequency — the classic channel-vocoder phase, exactly right for
+//! centre frequency, which is the classic channel-vocoder phase, exactly right for
 //! fricatives and noise.
 //!
 //! On **voiced** frames that alone is not enough, and it is audible. Bin centres
@@ -28,7 +28,7 @@
 //! register [`crate::accent`] aims for unreachable.
 //!
 //! So when the frame is voiced and accent neutralisation is active, the
-//! excitation is not resampled at all — it is **replaced** by an ideal harmonic
+//! excitation is not resampled at all. It is **replaced** by an ideal harmonic
 //! comb at the canonical fundamental, quantised to the nearest whole bin. This
 //! is the textbook source-filter model of voiced speech (an impulse train
 //! through the vocal-tract filter), and because every comb line then sits
@@ -38,7 +38,7 @@
 //! formants, so the vowels are untouched.
 //!
 //! Snapping to the bin grid is what buys that coherence, and it costs pitch
-//! resolution — the grid step is coarse. That is not a problem for the default
+//! resolution, so the grid step is coarse. That is not a problem for the default
 //! configuration, which maps every speaker onto a *single constant* register
 //! that need only be snapped once; it does mean any residual intonation
 //! (`prosody_flatten` below 1.0) is quantised to the same grid. Lifting that
@@ -47,7 +47,7 @@
 //!
 //! None of this weakens irreversibility. The measured phase is still discarded
 //! in full, and pinning the output to one canonical fundamental destroys *more*
-//! pitch information than randomising it would — a constant carries nothing.
+//! pitch information than randomising it would, because a constant carries nothing.
 //!
 //! Between steps 2 and 4 the optional [`crate::accent`] neutraliser folds in its
 //! long-term corrections: it reads the unwarped envelope to measure the
@@ -55,7 +55,7 @@
 //! rotates the warped envelope toward a canonical spectral tilt.
 //!
 //! The measured phase is never reused, so no amount of downstream processing can
-//! reconstruct the original excitation phase — the transform is one-way.
+//! reconstruct the original excitation phase: the transform is one-way.
 //!
 //! # In plain words
 //!
@@ -136,7 +136,7 @@ impl SpectralState {
     /// Called when the modulation stream rolls onto a new seed. The offsets are
     /// **glided** to, never assigned: they are added directly to each bin's
     /// synthesis phase, so replacing them outright would step every partial's
-    /// phase at once — an audible click, every couple of seconds, forever.
+    /// phase at once, which is an audible click, every couple of seconds, forever.
     ///
     /// Gliding turns that step into a brief, tiny detune instead. The move is
     /// taken the short way around the circle, so the worst case is half a turn

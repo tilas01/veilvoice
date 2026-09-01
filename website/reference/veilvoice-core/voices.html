@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/voices.svg" alt="voices.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/voices.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 866 lines &middot; <a href="voices.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 867 lines &middot; <a href="voices.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -57,30 +57,30 @@
 <section id="s-about">
 <p>Destination voices: several canonical registers instead of one.</p>
 <h2 id="what-this-is-for">What this is for</h2>
-<p>By default every speaker VeilVoice processes comes out as <strong>the same voice</strong> &#8212; one pitch register, one vocal-tract scale, one long-term spectrum. That is the many-to-one mapping the whole project rests on, and for a single speaker it is exactly right.</p>
+<p>By default every speaker VeilVoice processes comes out as <strong>the same voice</strong>, with one pitch register, one vocal-tract scale and one long-term spectrum. That is the many-to-one mapping the whole project rests on, and for a single speaker it is exactly right.</p>
 <p>It is wrong for a conversation. Two people veiled into one indistinguishable voice produce a recording nobody can follow: the words survive and the turn-taking does not, so a listener cannot tell a question from its answer. This module hands out a small table of <strong>distinct destination voices</strong>, so a recording with three people in it comes out with three voices in it.</p>
 <h2 id="the-security-property-and-how-it-survives">The security property, and how it survives</h2>
-<p>The property that matters is that <strong>the output voice is a function of the slot, not of the speaker</strong>. Every input mapped onto slot 3 comes out as voice 3, whoever they were. The mapping is still many-to-one &#8212; there are still infinitely many inputs per output &#8212; so there is still no inverse to compute. What changes is the number of buckets, from one to at most ten.</p>
-<p>This is why a voice is <strong>never derived from the speaker</strong>. Choosing a destination by measuring the input &#8212; the obvious implementation, and the one that would sound most natural &#8212; would make the output voice a function of the input voice, which is precisely the linkage the project exists to destroy. Slots are assigned by turn order, and turn order is something the <em>user</em> supplies.</p>
+<p>The property that matters is that <strong>the output voice is a function of the slot, not of the speaker</strong>. Every input mapped onto slot 3 comes out as voice 3, whoever they were. The mapping is still many-to-one, with infinitely many inputs per output, so there is still no inverse to compute. What changes is the number of buckets, from one to at most ten.</p>
+<p>This is why a voice is <strong>never derived from the speaker</strong>. Choosing a destination by measuring the input is the obvious implementation, and the one that would sound most natural. It would make the output voice a function of the input voice, which is precisely the linkage the project exists to destroy. Slots are assigned by turn order, and turn order is something the <em>user</em> supplies.</p>
 <h2 id="what-a-conversation-leaks-that-a-monologue-does-not">What a conversation leaks that a monologue does not</h2>
 <p>Stated plainly, because it is a real cost and nobody should have to work it out for themselves:</p>
 <ul>
 <li><strong>How many people were talking.</strong> Ten voices in the output means ten speakers in the input.</li>
-<li><strong>Who spoke when, and for how long.</strong> Turn-taking structure is preserved on purpose &#8212; it is the thing that makes the result usable &#8212; and turn structure is information about a conversation. Overlaps, interruptions, the length of each answer and the rhythm of the exchange all survive.</li>
+<li><strong>Who spoke when, and for how long.</strong> Turn-taking structure is preserved on purpose, because it is the thing that makes the result usable, and turn structure is information about a conversation. Overlaps, interruptions, the length of each answer and the rhythm of the exchange all survive.</li>
 <li><strong>Nothing about who they were.</strong> The voiceprint of each speaker is destroyed exactly as thoroughly as in single-speaker mode: the same phase discard, the same many-to-one normalisation onto the slot&#x27;s canonical values.</li>
 </ul>
 <h2 id="a-register-has-to-land-on-a-bin-and-that-is-the-whole-constraint">A register has to land on a bin, and that is the whole constraint</h2>
 <p>The first version of this table picked five registers about 26 Hz apart on the reasoning that the just-noticeable difference for the fundamental of speech is around 8 Hz, so 26 Hz would be three times that. The reasoning was sound and the table was wrong, because it measured the wrong thing.</p>
-<p>When accent neutralisation is on, <code>crate::spectral</code> does not resample the excitation &#8212; it <strong>replaces</strong> it with a harmonic comb at the canonical fundamental, quantised to the nearest whole FFT bin so that every comb line sits on a bin centre and the frames overlap-add coherently. The rendered fundamental is therefore not the number in the table. It is</p>
+<p>When accent neutralisation is on, <code>crate::spectral</code> does not resample the excitation. It <strong>replaces</strong> it with a harmonic comb at the canonical fundamental, quantised to the nearest whole FFT bin so that every comb line sits on a bin centre and the frames overlap-add coherently. The rendered fundamental is therefore not the number in the table. It is</p>
 <pre><code>round(target_f0 / bin_hz) * bin_hz,   bin_hz = sample_rate / frame_size</code></pre>
-<p>At the default 1024-point frame and 48 kHz that spacing is <strong>46.875 Hz</strong>, so the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625, 140.625, 187.5 and 187.5 &#8212; three distinct pitches, not five. Two pairs of speakers would have shared a register with nothing in the interface saying so. It was found by measuring the fundamental of an actual rendered file, not by reading the code, and the tests below now measure the same thing the ear would.</p>
-<p>So the registers are <strong>bin-exact by construction</strong>: each is a whole number of bins at the default configuration. Inside the range where a resynthesised voice stays intelligible &#8212; roughly 90 to 240 Hz, below which the comb has too few harmonics under the vowels and above which it stops being a speaking register &#8212; there are exactly four:</p>
+<p>At the default 1024-point frame and 48 kHz that spacing is <strong>46.875 Hz</strong>, so the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625, 140.625, 187.5 and 187.5, which is three distinct pitches, not five. Two pairs of speakers would have shared a register with nothing in the interface saying so. It was found by measuring the fundamental of an actual rendered file, not by reading the code, and the tests below now measure the same thing the ear would.</p>
+<p>So the registers are <strong>bin-exact by construction</strong>: each is a whole number of bins at the default configuration. Inside the range where a resynthesised voice stays intelligible, roughly 90 to 240 Hz, below which the comb has too few harmonics under the vowels and above which it stops being a speaking register, there are exactly four:</p>
 <p>| bin | rendered | |---:|---:| | 2 | 93.75 Hz | | 3 | 140.625 Hz | | 4 | 187.5 Hz | | 5 | 234.375 Hz |</p>
 <h2 id="ten-voices-from-four-registers-and-three-vocal-tracts">Ten voices, from four registers and three vocal tracts</h2>
-<p>The second axis is the canonical vocal-tract scale, which is a continuous warp and is <strong>not</strong> quantised &#8212; so it is free to take values the ear can separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all inside the range where the vowels stay natural.</p>
-<p>Four registers times three tracts is twelve, and <code>MAX_VOICES</code> ships ten of them. Twenty, which was asked for, is not available: it would need either registers a single bin apart at a frame size four times longer &#8212; which quadruples the latency &#8212; or vocal tracts close enough to be heard as the same person on a different day.</p>
+<p>The second axis is the canonical vocal-tract scale, which is a continuous warp and is <strong>not</strong> quantised, so it is free to take values the ear can separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all inside the range where the vowels stay natural.</p>
+<p>Four registers times three tracts is twelve, and <code>MAX_VOICES</code> ships ten of them. Twenty, which was asked for, is not available: it would need either registers a single bin apart at a frame size four times longer, which quadruples the latency, or vocal tracts close enough to be heard as the same person on a different day.</p>
 <h2 id="if-you-change-the-frame-size-check-the-table-again">If you change the frame size, check the table again</h2>
-<p>The registers are exact at the <em>default</em> configuration. A caller who changes <code>crate::DeidConfig::frame_size</code> or the sample rate moves the bin grid underneath them, and two registers can collide again. <code>Voice::rendered_f0_hz</code> reports what a given configuration will actually produce, and <code>distinct_voices</code> counts how many of the ten survive it &#8212; so a front end can say &quot;this frame size gives you six distinguishable voices&quot; rather than handing out ten labels for six sounds.</p>
+<p>The registers are exact at the <em>default</em> configuration. A caller who changes <code>crate::DeidConfig::frame_size</code> or the sample rate moves the bin grid underneath them, and two registers can collide again. <code>Voice::rendered_f0_hz</code> reports what a given configuration will actually produce, and <code>distinct_voices</code> counts how many of the ten survive it, so a front end can say &quot;this frame size gives you six distinguishable voices&quot; rather than handing out ten labels for six sounds.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>The set of voices a recording can be turned into.</p>
 <p>By default everyone comes out as the same one. That is on purpose: if every speaker sounds identical, there is nothing in the result that distinguishes one from another, and nothing to trace back.</p>
@@ -88,27 +88,27 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>866 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>867 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Voice</code> <span style="color:var(--muted)">line 133</span> &mdash; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
+<li><code>struct Voice</code> <span style="color:var(--muted)">line 134</span> &mdash; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Voice::applied_to</code> <span style="color:var(--muted)">line 155</span> &mdash; Apply this voice to an AccentConfig.
+<li><code>Voice::applied_to</code> <span style="color:var(--muted)">line 156</span> &mdash; Apply this voice to an AccentConfig.
 </li>
-<li><code>Voice::checked</code> <span style="color:var(--muted)">line 182</span> &mdash; Whether this voice is inside the range the engine can render usefully.
+<li><code>Voice::checked</code> <span style="color:var(--muted)">line 183</span> &mdash; Whether this voice is inside the range the engine can render usefully.
 </li>
-<li><code>Voice::describe</code> <span style="color:var(--muted)">line 226</span> &mdash; A short label for an interface: &quot;low register, narrow tract&quot;.
+<li><code>Voice::describe</code> <span style="color:var(--muted)">line 227</span> &mdash; A short label for an interface: &quot;low register, narrow tract&quot;.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>rendered_f0_hz</code>, <code>bin_hz</code></span>
 </li>
-<li><code>voice</code> <span style="color:var(--muted)">line 325</span> &mdash; The destination voice for slot index.
+<li><code>voice</code> <span style="color:var(--muted)">line 326</span> &mdash; The destination voice for slot index.
 </li>
-<li><code>clear_voices</code> <span style="color:var(--muted)">line 406</span> &mdash; How many voices can be handed out before two of them are too alike.
+<li><code>clear_voices</code> <span style="color:var(--muted)">line 407</span> &mdash; How many voices can be handed out before two of them are too alike.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>closest_pair</code> <span style="color:var(--muted)">line 426</span> &mdash; The closest pair among the first count voices, as a ratio.
+<li><code>closest_pair</code> <span style="color:var(--muted)">line 427</span> &mdash; The closest pair among the first count voices, as a ratio.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>distinct_voices</code> <span style="color:var(--muted)">line 452</span> &mdash; How many of the ten are still distinguishable under config.
+<li><code>distinct_voices</code> <span style="color:var(--muted)">line 453</span> &mdash; How many of the ten are still distinguishable under config.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code></span>
 </li>
 </ul>
@@ -136,57 +136,57 @@
 <a href="voices.src.html#fn-voice-applied_to">
 <rect x="20.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::applied_to</text>
-<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
+<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
 </a>
 <a href="voices.src.html#fn-voice-rendered_f0_hz">
 <rect x="211.0" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="309.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::rendered_f0_hz</text>
-<text x="309.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
+<text x="309.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
 </a>
 <a href="voices.src.html#fn-voice-checked">
 <rect x="434.3" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="504.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::checked</text>
-<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 182</text>
+<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
 </a>
 <a href="voices.src.html#fn-voice-describe">
 <rect x="37.3" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="111.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::describe</text>
-<text x="111.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
+<text x="111.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
 </a>
 <a href="voices.src.html#fn-bin_hz">
 <rect x="251.3" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="297.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">bin_hz</text>
-<text x="297.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
+<text x="297.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
 </a>
 <a href="voices.src.html#fn-voice-2">
 <rect x="212.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="258.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">voice</text>
-<text x="258.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 325</text>
+<text x="258.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 326</text>
 </a>
 <a href="voices.src.html#fn-all">
 <rect x="330.7" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="376.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all</text>
-<text x="376.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
+<text x="376.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 337</text>
 </a>
 <a href="voices.src.html#fn-separation">
 <rect x="449.2" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="503.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">separation</text>
-<text x="503.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
+<text x="503.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 363</text>
 </a>
 <a href="voices.src.html#fn-clear_voices">
 <rect x="72.4" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="134.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clear_voices</text>
-<text x="134.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 406</text>
+<text x="134.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 407</text>
 </a>
 <a href="voices.src.html#fn-closest_pair">
 <rect x="223.1" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="285.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">closest_pair</text>
-<text x="285.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 426</text>
+<text x="285.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
 </a>
 <a href="voices.src.html#fn-distinct_voices">
 <rect x="373.8" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="448.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">distinct_voices</text>
-<text x="448.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 452</text>
+<text x="448.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 453</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -203,17 +203,17 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_applied_to([&quot;Voice::applied_to&lt;br/&gt;line 155&quot;])
-    n_rendered_f0_hz[&quot;Voice::rendered_f0_hz&lt;br/&gt;line 169&quot;]
-    n_checked([&quot;Voice::checked&lt;br/&gt;line 182&quot;])
-    n_describe([&quot;Voice::describe&lt;br/&gt;line 226&quot;])
-    n_bin_hz[&quot;bin_hz&lt;br/&gt;line 269&quot;]
-    n_voice([&quot;voice&lt;br/&gt;line 325&quot;])
-    n_all[&quot;all&lt;br/&gt;line 336&quot;]
-    n_separation[&quot;separation&lt;br/&gt;line 362&quot;]
-    n_clear_voices([&quot;clear_voices&lt;br/&gt;line 406&quot;])
-    n_closest_pair([&quot;closest_pair&lt;br/&gt;line 426&quot;])
-    n_distinct_voices([&quot;distinct_voices&lt;br/&gt;line 452&quot;])
+    n_applied_to([&quot;Voice::applied_to&lt;br/&gt;line 156&quot;])
+    n_rendered_f0_hz[&quot;Voice::rendered_f0_hz&lt;br/&gt;line 170&quot;]
+    n_checked([&quot;Voice::checked&lt;br/&gt;line 183&quot;])
+    n_describe([&quot;Voice::describe&lt;br/&gt;line 227&quot;])
+    n_bin_hz[&quot;bin_hz&lt;br/&gt;line 270&quot;]
+    n_voice([&quot;voice&lt;br/&gt;line 326&quot;])
+    n_all[&quot;all&lt;br/&gt;line 337&quot;]
+    n_separation[&quot;separation&lt;br/&gt;line 363&quot;]
+    n_clear_voices([&quot;clear_voices&lt;br/&gt;line 407&quot;])
+    n_closest_pair([&quot;closest_pair&lt;br/&gt;line 427&quot;])
+    n_distinct_voices([&quot;distinct_voices&lt;br/&gt;line 453&quot;])
     n_clear_voices --&gt; n_all
     n_clear_voices --&gt; n_separation
     n_closest_pair --&gt; n_all
@@ -221,17 +221,17 @@ flowchart TD
     n_describe --&gt; n_rendered_f0_hz
     n_distinct_voices --&gt; n_all
     n_rendered_f0_hz --&gt; n_bin_hz
-    click n_applied_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L155&quot; &quot;open the source&quot;
-    click n_rendered_f0_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169&quot; &quot;open the source&quot;
-    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L182&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L226&quot; &quot;open the source&quot;
-    click n_bin_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269&quot; &quot;open the source&quot;
-    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L325&quot; &quot;open the source&quot;
-    click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L336&quot; &quot;open the source&quot;
-    click n_separation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L362&quot; &quot;open the source&quot;
-    click n_clear_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L406&quot; &quot;open the source&quot;
-    click n_closest_pair href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L426&quot; &quot;open the source&quot;
-    click n_distinct_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L452&quot; &quot;open the source&quot;
+    click n_applied_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L156&quot; &quot;open the source&quot;
+    click n_rendered_f0_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L170&quot; &quot;open the source&quot;
+    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L183&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L227&quot; &quot;open the source&quot;
+    click n_bin_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L270&quot; &quot;open the source&quot;
+    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L326&quot; &quot;open the source&quot;
+    click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L337&quot; &quot;open the source&quot;
+    click n_separation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L363&quot; &quot;open the source&quot;
+    click n_clear_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L407&quot; &quot;open the source&quot;
+    click n_closest_pair href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L427&quot; &quot;open the source&quot;
+    click n_distinct_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L453&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_checked,n_describe,n_voice,n_clear_voices,n_closest_pair,n_distinct_voices entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -242,29 +242,29 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>MAX_VOICES</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-max_voices">128</a></td><td>How many distinct destination voices this engine hands out.</td></tr>
-<tr><td><code>Voice</code> <sub>pub struct</sub></td><td><a href="voices.src.html#fn-voice">133</a></td><td>One destination voice: the canonical values every speaker in this slot is mapped onto.</td></tr>
-<tr><td><code>Voice::applied_to</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-applied_to">155</a></td><td>Apply this voice to an AccentConfig.</td></tr>
-<tr><td><code>Voice::rendered_f0_hz</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-rendered_f0_hz">169</a></td><td>The fundamental this voice will actually be rendered at, under config.</td></tr>
-<tr><td><code>Voice::checked</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-checked">182</a></td><td>Whether this voice is inside the range the engine can render usefully.</td></tr>
-<tr><td><code>Voice::describe</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-describe">226</a></td><td>A short label for an interface: &quot;low register, narrow tract&quot;.</td></tr>
-<tr><td><code>F0_MIN_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-f0_min_hz">252</a></td><td>The lowest fundamental a resynthesised voice stays intelligible at.</td></tr>
-<tr><td><code>F0_MAX_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-f0_max_hz">254</a></td><td>The highest fundamental that still reads as a speaking register.</td></tr>
-<tr><td><code>CENTROID_MIN_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-centroid_min_hz">256</a></td><td>The narrowest canonical vocal tract offered.</td></tr>
-<tr><td><code>CENTROID_MAX_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-centroid_max_hz">258</a></td><td>The widest canonical vocal tract offered.</td></tr>
-<tr><td><code>TILT_MIN_DB_OCT</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-tilt_min_db_oct">260</a></td><td>The steepest permitted long-term slope, in dB per octave.</td></tr>
-<tr><td><code>TILT_MAX_DB_OCT</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-tilt_max_db_oct">262</a></td><td>The flattest permitted long-term slope, in dB per octave.</td></tr>
-<tr><td><code>bin_hz</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-bin_hz">269</a></td><td>The FFT bin spacing of a configuration, in hertz.</td></tr>
-<tr><td><code>REGISTERS_HZ</code> <sub>const</sub></td><td><a href="voices.src.html#fn-registers_hz">282</a></td><td>The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.</td></tr>
-<tr><td><code>TRACTS</code> <sub>const</sub></td><td><a href="voices.src.html#fn-tracts">286</a></td><td>The three vocal-tract scales, about 22 % apart.</td></tr>
-<tr><td><code>TABLE</code> <sub>const</sub></td><td><a href="voices.src.html#fn-table">304</a></td><td>The ten destination voices, in the order they are handed out.</td></tr>
-<tr><td><code>voice</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-2">325</a></td><td>The destination voice for slot index.</td></tr>
-<tr><td><code>all</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-all">336</a></td><td>Every destination voice, in the order they are handed out.</td></tr>
-<tr><td><code>separation</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-separation">362</a></td><td>How far apart two voices are, as the larger of their two separations.</td></tr>
-<tr><td><code>CLEAR_SEPARATION</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-clear_separation">394</a></td><td>The separation below which two voices should not be handed to two people.</td></tr>
-<tr><td><code>clear_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-clear_voices">406</a></td><td>How many voices can be handed out before two of them are too alike.</td></tr>
-<tr><td><code>closest_pair</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-closest_pair">426</a></td><td>The closest pair among the first count voices, as a ratio.</td></tr>
-<tr><td><code>distinct_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-distinct_voices">452</a></td><td>How many of the ten are still distinguishable under config.</td></tr>
+<tr><td><code>MAX_VOICES</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-max_voices">129</a></td><td>How many distinct destination voices this engine hands out.</td></tr>
+<tr><td><code>Voice</code> <sub>pub struct</sub></td><td><a href="voices.src.html#fn-voice">134</a></td><td>One destination voice: the canonical values every speaker in this slot is mapped onto.</td></tr>
+<tr><td><code>Voice::applied_to</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-applied_to">156</a></td><td>Apply this voice to an AccentConfig.</td></tr>
+<tr><td><code>Voice::rendered_f0_hz</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-rendered_f0_hz">170</a></td><td>The fundamental this voice will actually be rendered at, under config.</td></tr>
+<tr><td><code>Voice::checked</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-checked">183</a></td><td>Whether this voice is inside the range the engine can render usefully.</td></tr>
+<tr><td><code>Voice::describe</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-describe">227</a></td><td>A short label for an interface: &quot;low register, narrow tract&quot;.</td></tr>
+<tr><td><code>F0_MIN_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-f0_min_hz">253</a></td><td>The lowest fundamental a resynthesised voice stays intelligible at.</td></tr>
+<tr><td><code>F0_MAX_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-f0_max_hz">255</a></td><td>The highest fundamental that still reads as a speaking register.</td></tr>
+<tr><td><code>CENTROID_MIN_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-centroid_min_hz">257</a></td><td>The narrowest canonical vocal tract offered.</td></tr>
+<tr><td><code>CENTROID_MAX_HZ</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-centroid_max_hz">259</a></td><td>The widest canonical vocal tract offered.</td></tr>
+<tr><td><code>TILT_MIN_DB_OCT</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-tilt_min_db_oct">261</a></td><td>The steepest permitted long-term slope, in dB per octave.</td></tr>
+<tr><td><code>TILT_MAX_DB_OCT</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-tilt_max_db_oct">263</a></td><td>The flattest permitted long-term slope, in dB per octave.</td></tr>
+<tr><td><code>bin_hz</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-bin_hz">270</a></td><td>The FFT bin spacing of a configuration, in hertz.</td></tr>
+<tr><td><code>REGISTERS_HZ</code> <sub>const</sub></td><td><a href="voices.src.html#fn-registers_hz">283</a></td><td>The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.</td></tr>
+<tr><td><code>TRACTS</code> <sub>const</sub></td><td><a href="voices.src.html#fn-tracts">287</a></td><td>The three vocal-tract scales, about 22 % apart.</td></tr>
+<tr><td><code>TABLE</code> <sub>const</sub></td><td><a href="voices.src.html#fn-table">305</a></td><td>The ten destination voices, in the order they are handed out.</td></tr>
+<tr><td><code>voice</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-2">326</a></td><td>The destination voice for slot index.</td></tr>
+<tr><td><code>all</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-all">337</a></td><td>Every destination voice, in the order they are handed out.</td></tr>
+<tr><td><code>separation</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-separation">363</a></td><td>How far apart two voices are, as the larger of their two separations.</td></tr>
+<tr><td><code>CLEAR_SEPARATION</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-clear_separation">395</a></td><td>The separation below which two voices should not be handed to two people.</td></tr>
+<tr><td><code>clear_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-clear_voices">407</a></td><td>How many voices can be handed out before two of them are too alike.</td></tr>
+<tr><td><code>closest_pair</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-closest_pair">427</a></td><td>The closest pair among the first count voices, as a ratio.</td></tr>
+<tr><td><code>distinct_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-distinct_voices">453</a></td><td>How many of the ten are still distinguishable under config.</td></tr>
 </tbody></table>
 </section>
 </div></div>

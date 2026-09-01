@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-core/src/voices.rs</code></h1>
-<p style="color:var(--muted)"><a href="voices.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 866 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="voices.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 867 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -47,912 +47,913 @@
 <span class="ln" id="L4"><span class="tok-com">//! # What this is for</span></span>
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! By default every speaker VeilVoice processes comes out as **the same</span></span>
-<span class="ln" id="L7"><span class="tok-com">//! voice** &#8212; one pitch register, one vocal-tract scale, one long-term spectrum.</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! That is the many-to-one mapping the whole project rests on, and for a single</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! speaker it is exactly right.</span></span>
-<span class="ln" id="L10"><span class="tok-com">//!</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! It is wrong for a conversation. Two people veiled into one indistinguishable</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! voice produce a recording nobody can follow: the words survive and the</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! turn-taking does not, so a listener cannot tell a question from its answer.</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! This module hands out a small table of **distinct destination voices**, so a</span></span>
-<span class="ln" id="L15"><span class="tok-com">//! recording with three people in it comes out with three voices in it.</span></span>
-<span class="ln" id="L16"><span class="tok-com">//!</span></span>
-<span class="ln" id="L17"><span class="tok-com">//! # The security property, and how it survives</span></span>
-<span class="ln" id="L18"><span class="tok-com">//!</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! The property that matters is that **the output voice is a function of the</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! slot, not of the speaker**. Every input mapped onto slot 3 comes out as</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! voice 3, whoever they were. The mapping is still many-to-one &#8212; there are</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! still infinitely many inputs per output &#8212; so there is still no inverse to</span></span>
-<span class="ln" id="L23"><span class="tok-com">//! compute. What changes is the number of buckets, from one to at most ten.</span></span>
-<span class="ln" id="L24"><span class="tok-com">//!</span></span>
-<span class="ln" id="L25"><span class="tok-com">//! This is why a voice is **never derived from the speaker**. Choosing a</span></span>
-<span class="ln" id="L26"><span class="tok-com">//! destination by measuring the input &#8212; the obvious implementation, and the one</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! that would sound most natural &#8212; would make the output voice a function of the</span></span>
-<span class="ln" id="L28"><span class="tok-com">//! input voice, which is precisely the linkage the project exists to destroy.</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! Slots are assigned by turn order, and turn order is something the *user*</span></span>
-<span class="ln" id="L30"><span class="tok-com">//! supplies.</span></span>
-<span class="ln" id="L31"><span class="tok-com">//!</span></span>
-<span class="ln" id="L32"><span class="tok-com">//! # What a conversation leaks that a monologue does not</span></span>
-<span class="ln" id="L33"><span class="tok-com">//!</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! Stated plainly, because it is a real cost and nobody should have to work it</span></span>
-<span class="ln" id="L35"><span class="tok-com">//! out for themselves:</span></span>
-<span class="ln" id="L36"><span class="tok-com">//!</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! * **How many people were talking.** Ten voices in the output means ten</span></span>
-<span class="ln" id="L38"><span class="tok-com">//!   speakers in the input.</span></span>
-<span class="ln" id="L39"><span class="tok-com">//! * **Who spoke when, and for how long.** Turn-taking structure is preserved</span></span>
-<span class="ln" id="L40"><span class="tok-com">//!   on purpose &#8212; it is the thing that makes the result usable &#8212; and turn</span></span>
-<span class="ln" id="L41"><span class="tok-com">//!   structure is information about a conversation. Overlaps, interruptions,</span></span>
-<span class="ln" id="L42"><span class="tok-com">//!   the length of each answer and the rhythm of the exchange all survive.</span></span>
-<span class="ln" id="L43"><span class="tok-com">//! * **Nothing about who they were.** The voiceprint of each speaker is</span></span>
-<span class="ln" id="L44"><span class="tok-com">//!   destroyed exactly as thoroughly as in single-speaker mode: the same phase</span></span>
-<span class="ln" id="L45"><span class="tok-com">//!   discard, the same many-to-one normalisation onto the slot&#x27;s canonical</span></span>
-<span class="ln" id="L46"><span class="tok-com">//!   values.</span></span>
-<span class="ln" id="L47"><span class="tok-com">//!</span></span>
-<span class="ln" id="L48"><span class="tok-com">//! # A register has to land on a bin, and that is the whole constraint</span></span>
-<span class="ln" id="L49"><span class="tok-com">//!</span></span>
-<span class="ln" id="L50"><span class="tok-com">//! The first version of this table picked five registers about 26 Hz apart on</span></span>
-<span class="ln" id="L51"><span class="tok-com">//! the reasoning that the just-noticeable difference for the fundamental of</span></span>
-<span class="ln" id="L52"><span class="tok-com">//! speech is around 8 Hz, so 26 Hz would be three times that. The reasoning was</span></span>
-<span class="ln" id="L53"><span class="tok-com">//! sound and the table was wrong, because it measured the wrong thing.</span></span>
-<span class="ln" id="L54"><span class="tok-com">//!</span></span>
-<span class="ln" id="L55"><span class="tok-com">//! When accent neutralisation is on, [`crate::spectral`] does not resample the</span></span>
-<span class="ln" id="L56"><span class="tok-com">//! excitation &#8212; it **replaces** it with a harmonic comb at the canonical</span></span>
-<span class="ln" id="L57"><span class="tok-com">//! fundamental, quantised to the nearest whole FFT bin so that every comb line</span></span>
-<span class="ln" id="L58"><span class="tok-com">//! sits on a bin centre and the frames overlap-add coherently. The rendered</span></span>
-<span class="ln" id="L59"><span class="tok-com">//! fundamental is therefore not the number in the table. It is</span></span>
-<span class="ln" id="L60"><span class="tok-com">//!</span></span>
-<span class="ln" id="L61"><span class="tok-com">//! ```text</span></span>
-<span class="ln" id="L62"><span class="tok-com">//! round(target_f0 / bin_hz) * bin_hz,   bin_hz = sample_rate / frame_size</span></span>
-<span class="ln" id="L63"><span class="tok-com">//! ```</span></span>
-<span class="ln" id="L64"><span class="tok-com">//!</span></span>
-<span class="ln" id="L65"><span class="tok-com">//! At the default 1024-point frame and 48 kHz that spacing is **46.875 Hz**, so</span></span>
-<span class="ln" id="L66"><span class="tok-com">//! the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625,</span></span>
-<span class="ln" id="L67"><span class="tok-com">//! 140.625, 187.5 and 187.5 &#8212; three distinct pitches, not five. Two pairs of</span></span>
-<span class="ln" id="L68"><span class="tok-com">//! speakers would have shared a register with nothing in the interface saying</span></span>
-<span class="ln" id="L69"><span class="tok-com">//! so. It was found by measuring the fundamental of an actual rendered file,</span></span>
-<span class="ln" id="L70"><span class="tok-com">//! not by reading the code, and the tests below now measure the same thing the</span></span>
-<span class="ln" id="L71"><span class="tok-com">//! ear would.</span></span>
-<span class="ln" id="L72"><span class="tok-com">//!</span></span>
-<span class="ln" id="L73"><span class="tok-com">//! So the registers are **bin-exact by construction**: each is a whole number</span></span>
-<span class="ln" id="L74"><span class="tok-com">//! of bins at the default configuration. Inside the range where a resynthesised</span></span>
-<span class="ln" id="L75"><span class="tok-com">//! voice stays intelligible &#8212; roughly 90 to 240 Hz, below which the comb has too</span></span>
-<span class="ln" id="L76"><span class="tok-com">//! few harmonics under the vowels and above which it stops being a speaking</span></span>
-<span class="ln" id="L77"><span class="tok-com">//! register &#8212; there are exactly four:</span></span>
-<span class="ln" id="L78"><span class="tok-com">//!</span></span>
-<span class="ln" id="L79"><span class="tok-com">//! | bin | rendered |</span></span>
-<span class="ln" id="L80"><span class="tok-com">//! |---:|---:|</span></span>
-<span class="ln" id="L81"><span class="tok-com">//! | 2 | 93.75 Hz |</span></span>
-<span class="ln" id="L82"><span class="tok-com">//! | 3 | 140.625 Hz |</span></span>
-<span class="ln" id="L83"><span class="tok-com">//! | 4 | 187.5 Hz |</span></span>
-<span class="ln" id="L84"><span class="tok-com">//! | 5 | 234.375 Hz |</span></span>
-<span class="ln" id="L85"><span class="tok-com">//!</span></span>
-<span class="ln" id="L86"><span class="tok-com">//! # Ten voices, from four registers and three vocal tracts</span></span>
-<span class="ln" id="L87"><span class="tok-com">//!</span></span>
-<span class="ln" id="L88"><span class="tok-com">//! The second axis is the canonical vocal-tract scale, which is a continuous</span></span>
-<span class="ln" id="L89"><span class="tok-com">//! warp and is **not** quantised &#8212; so it is free to take values the ear can</span></span>
-<span class="ln" id="L90"><span class="tok-com">//! separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all</span></span>
-<span class="ln" id="L91"><span class="tok-com">//! inside the range where the vowels stay natural.</span></span>
-<span class="ln" id="L92"><span class="tok-com">//!</span></span>
-<span class="ln" id="L93"><span class="tok-com">//! Four registers times three tracts is twelve, and [`MAX_VOICES`] ships ten of</span></span>
-<span class="ln" id="L94"><span class="tok-com">//! them. Twenty, which was asked for, is not available: it would need either</span></span>
-<span class="ln" id="L95"><span class="tok-com">//! registers a single bin apart at a frame size four times longer &#8212; which</span></span>
-<span class="ln" id="L96"><span class="tok-com">//! quadruples the latency &#8212; or vocal tracts close enough to be heard as the</span></span>
-<span class="ln" id="L97"><span class="tok-com">//! same person on a different day.</span></span>
-<span class="ln" id="L98"><span class="tok-com">//!</span></span>
-<span class="ln" id="L99"><span class="tok-com">//! # If you change the frame size, check the table again</span></span>
-<span class="ln" id="L100"><span class="tok-com">//!</span></span>
-<span class="ln" id="L101"><span class="tok-com">//! The registers are exact at the *default* configuration. A caller who changes</span></span>
-<span class="ln" id="L102"><span class="tok-com">//! [`crate::DeidConfig::frame_size`] or the sample rate moves the bin grid</span></span>
-<span class="ln" id="L103"><span class="tok-com">//! underneath them, and two registers can collide again.</span></span>
-<span class="ln" id="L104"><span class="tok-com">//! [`Voice::rendered_f0_hz`] reports what a given configuration will actually</span></span>
-<span class="ln" id="L105"><span class="tok-com">//! produce, and [`distinct_voices`] counts how many of the ten survive it &#8212; so</span></span>
-<span class="ln" id="L106"><span class="tok-com">//! a front end can say &quot;this frame size gives you six distinguishable voices&quot;</span></span>
-<span class="ln" id="L107"><span class="tok-com">//! rather than handing out ten labels for six sounds.</span></span>
-<span class="ln" id="L108"><span class="tok-com">//!</span></span>
-<span class="ln" id="L109"><span class="tok-com">//! # In plain words</span></span>
-<span class="ln" id="L110"><span class="tok-com">//!</span></span>
-<span class="ln" id="L111"><span class="tok-com">//! The set of voices a recording can be turned into.</span></span>
-<span class="ln" id="L112"><span class="tok-com">//!</span></span>
-<span class="ln" id="L113"><span class="tok-com">//! By default everyone comes out as the same one. That is on purpose: if every</span></span>
-<span class="ln" id="L114"><span class="tok-com">//! speaker sounds identical, there is nothing in the result that distinguishes one</span></span>
-<span class="ln" id="L115"><span class="tok-com">//! from another, and nothing to trace back.</span></span>
-<span class="ln" id="L116"><span class="tok-com">//!</span></span>
-<span class="ln" id="L117"><span class="tok-com">//! When a recording has several people in it that becomes a problem, because a</span></span>
-<span class="ln" id="L118"><span class="tok-com">//! listener cannot follow who is who. So there is a small set of destination</span></span>
-<span class="ln" id="L119"><span class="tok-com">//! voices to hand out instead, chosen to be as far apart as the arithmetic allows,</span></span>
-<span class="ln" id="L120"><span class="tok-com">//! and a measured limit on how many of them can genuinely be told apart by ear.</span></span>
-<span class="ln" id="L121"></span>
-<span class="ln" id="L122"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::{AccentConfig, DeidConfig};</span>
-<span class="ln" id="L123"></span>
+<span class="ln" id="L7"><span class="tok-com">//! voice**, with one pitch register, one vocal-tract scale and one long-term</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! spectrum.</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! That is the many-to-one mapping the whole project rests on, and for a single</span></span>
+<span class="ln" id="L10"><span class="tok-com">//! speaker it is exactly right.</span></span>
+<span class="ln" id="L11"><span class="tok-com">//!</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! It is wrong for a conversation. Two people veiled into one indistinguishable</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! voice produce a recording nobody can follow: the words survive and the</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! turn-taking does not, so a listener cannot tell a question from its answer.</span></span>
+<span class="ln" id="L15"><span class="tok-com">//! This module hands out a small table of **distinct destination voices**, so a</span></span>
+<span class="ln" id="L16"><span class="tok-com">//! recording with three people in it comes out with three voices in it.</span></span>
+<span class="ln" id="L17"><span class="tok-com">//!</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! # The security property, and how it survives</span></span>
+<span class="ln" id="L19"><span class="tok-com">//!</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! The property that matters is that **the output voice is a function of the</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! slot, not of the speaker**. Every input mapped onto slot 3 comes out as</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! voice 3, whoever they were. The mapping is still many-to-one, with</span></span>
+<span class="ln" id="L23"><span class="tok-com">//! infinitely many inputs per output, so there is still no inverse to</span></span>
+<span class="ln" id="L24"><span class="tok-com">//! compute. What changes is the number of buckets, from one to at most ten.</span></span>
+<span class="ln" id="L25"><span class="tok-com">//!</span></span>
+<span class="ln" id="L26"><span class="tok-com">//! This is why a voice is **never derived from the speaker**. Choosing a</span></span>
+<span class="ln" id="L27"><span class="tok-com">//! destination by measuring the input is the obvious implementation, and the</span></span>
+<span class="ln" id="L28"><span class="tok-com">//! one that would sound most natural. It would make the output voice a function</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! of the input voice, which is precisely the linkage the project exists to destroy.</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! Slots are assigned by turn order, and turn order is something the *user*</span></span>
+<span class="ln" id="L31"><span class="tok-com">//! supplies.</span></span>
+<span class="ln" id="L32"><span class="tok-com">//!</span></span>
+<span class="ln" id="L33"><span class="tok-com">//! # What a conversation leaks that a monologue does not</span></span>
+<span class="ln" id="L34"><span class="tok-com">//!</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! Stated plainly, because it is a real cost and nobody should have to work it</span></span>
+<span class="ln" id="L36"><span class="tok-com">//! out for themselves:</span></span>
+<span class="ln" id="L37"><span class="tok-com">//!</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! * **How many people were talking.** Ten voices in the output means ten</span></span>
+<span class="ln" id="L39"><span class="tok-com">//!   speakers in the input.</span></span>
+<span class="ln" id="L40"><span class="tok-com">//! * **Who spoke when, and for how long.** Turn-taking structure is preserved</span></span>
+<span class="ln" id="L41"><span class="tok-com">//!   on purpose, because it is the thing that makes the result usable, and turn</span></span>
+<span class="ln" id="L42"><span class="tok-com">//!   structure is information about a conversation. Overlaps, interruptions,</span></span>
+<span class="ln" id="L43"><span class="tok-com">//!   the length of each answer and the rhythm of the exchange all survive.</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! * **Nothing about who they were.** The voiceprint of each speaker is</span></span>
+<span class="ln" id="L45"><span class="tok-com">//!   destroyed exactly as thoroughly as in single-speaker mode: the same phase</span></span>
+<span class="ln" id="L46"><span class="tok-com">//!   discard, the same many-to-one normalisation onto the slot&#x27;s canonical</span></span>
+<span class="ln" id="L47"><span class="tok-com">//!   values.</span></span>
+<span class="ln" id="L48"><span class="tok-com">//!</span></span>
+<span class="ln" id="L49"><span class="tok-com">//! # A register has to land on a bin, and that is the whole constraint</span></span>
+<span class="ln" id="L50"><span class="tok-com">//!</span></span>
+<span class="ln" id="L51"><span class="tok-com">//! The first version of this table picked five registers about 26 Hz apart on</span></span>
+<span class="ln" id="L52"><span class="tok-com">//! the reasoning that the just-noticeable difference for the fundamental of</span></span>
+<span class="ln" id="L53"><span class="tok-com">//! speech is around 8 Hz, so 26 Hz would be three times that. The reasoning was</span></span>
+<span class="ln" id="L54"><span class="tok-com">//! sound and the table was wrong, because it measured the wrong thing.</span></span>
+<span class="ln" id="L55"><span class="tok-com">//!</span></span>
+<span class="ln" id="L56"><span class="tok-com">//! When accent neutralisation is on, [`crate::spectral`] does not resample the</span></span>
+<span class="ln" id="L57"><span class="tok-com">//! excitation. It **replaces** it with a harmonic comb at the canonical</span></span>
+<span class="ln" id="L58"><span class="tok-com">//! fundamental, quantised to the nearest whole FFT bin so that every comb line</span></span>
+<span class="ln" id="L59"><span class="tok-com">//! sits on a bin centre and the frames overlap-add coherently. The rendered</span></span>
+<span class="ln" id="L60"><span class="tok-com">//! fundamental is therefore not the number in the table. It is</span></span>
+<span class="ln" id="L61"><span class="tok-com">//!</span></span>
+<span class="ln" id="L62"><span class="tok-com">//! ```text</span></span>
+<span class="ln" id="L63"><span class="tok-com">//! round(target_f0 / bin_hz) * bin_hz,   bin_hz = sample_rate / frame_size</span></span>
+<span class="ln" id="L64"><span class="tok-com">//! ```</span></span>
+<span class="ln" id="L65"><span class="tok-com">//!</span></span>
+<span class="ln" id="L66"><span class="tok-com">//! At the default 1024-point frame and 48 kHz that spacing is **46.875 Hz**, so</span></span>
+<span class="ln" id="L67"><span class="tok-com">//! the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625,</span></span>
+<span class="ln" id="L68"><span class="tok-com">//! 140.625, 187.5 and 187.5, which is three distinct pitches, not five. Two pairs of</span></span>
+<span class="ln" id="L69"><span class="tok-com">//! speakers would have shared a register with nothing in the interface saying</span></span>
+<span class="ln" id="L70"><span class="tok-com">//! so. It was found by measuring the fundamental of an actual rendered file,</span></span>
+<span class="ln" id="L71"><span class="tok-com">//! not by reading the code, and the tests below now measure the same thing the</span></span>
+<span class="ln" id="L72"><span class="tok-com">//! ear would.</span></span>
+<span class="ln" id="L73"><span class="tok-com">//!</span></span>
+<span class="ln" id="L74"><span class="tok-com">//! So the registers are **bin-exact by construction**: each is a whole number</span></span>
+<span class="ln" id="L75"><span class="tok-com">//! of bins at the default configuration. Inside the range where a resynthesised</span></span>
+<span class="ln" id="L76"><span class="tok-com">//! voice stays intelligible, roughly 90 to 240 Hz, below which the comb has too</span></span>
+<span class="ln" id="L77"><span class="tok-com">//! few harmonics under the vowels and above which it stops being a speaking</span></span>
+<span class="ln" id="L78"><span class="tok-com">//! register, there are exactly four:</span></span>
+<span class="ln" id="L79"><span class="tok-com">//!</span></span>
+<span class="ln" id="L80"><span class="tok-com">//! | bin | rendered |</span></span>
+<span class="ln" id="L81"><span class="tok-com">//! |---:|---:|</span></span>
+<span class="ln" id="L82"><span class="tok-com">//! | 2 | 93.75 Hz |</span></span>
+<span class="ln" id="L83"><span class="tok-com">//! | 3 | 140.625 Hz |</span></span>
+<span class="ln" id="L84"><span class="tok-com">//! | 4 | 187.5 Hz |</span></span>
+<span class="ln" id="L85"><span class="tok-com">//! | 5 | 234.375 Hz |</span></span>
+<span class="ln" id="L86"><span class="tok-com">//!</span></span>
+<span class="ln" id="L87"><span class="tok-com">//! # Ten voices, from four registers and three vocal tracts</span></span>
+<span class="ln" id="L88"><span class="tok-com">//!</span></span>
+<span class="ln" id="L89"><span class="tok-com">//! The second axis is the canonical vocal-tract scale, which is a continuous</span></span>
+<span class="ln" id="L90"><span class="tok-com">//! warp and is **not** quantised, so it is free to take values the ear can</span></span>
+<span class="ln" id="L91"><span class="tok-com">//! separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all</span></span>
+<span class="ln" id="L92"><span class="tok-com">//! inside the range where the vowels stay natural.</span></span>
+<span class="ln" id="L93"><span class="tok-com">//!</span></span>
+<span class="ln" id="L94"><span class="tok-com">//! Four registers times three tracts is twelve, and [`MAX_VOICES`] ships ten of</span></span>
+<span class="ln" id="L95"><span class="tok-com">//! them. Twenty, which was asked for, is not available: it would need either</span></span>
+<span class="ln" id="L96"><span class="tok-com">//! registers a single bin apart at a frame size four times longer, which</span></span>
+<span class="ln" id="L97"><span class="tok-com">//! quadruples the latency, or vocal tracts close enough to be heard as the</span></span>
+<span class="ln" id="L98"><span class="tok-com">//! same person on a different day.</span></span>
+<span class="ln" id="L99"><span class="tok-com">//!</span></span>
+<span class="ln" id="L100"><span class="tok-com">//! # If you change the frame size, check the table again</span></span>
+<span class="ln" id="L101"><span class="tok-com">//!</span></span>
+<span class="ln" id="L102"><span class="tok-com">//! The registers are exact at the *default* configuration. A caller who changes</span></span>
+<span class="ln" id="L103"><span class="tok-com">//! [`crate::DeidConfig::frame_size`] or the sample rate moves the bin grid</span></span>
+<span class="ln" id="L104"><span class="tok-com">//! underneath them, and two registers can collide again.</span></span>
+<span class="ln" id="L105"><span class="tok-com">//! [`Voice::rendered_f0_hz`] reports what a given configuration will actually</span></span>
+<span class="ln" id="L106"><span class="tok-com">//! produce, and [`distinct_voices`] counts how many of the ten survive it, so</span></span>
+<span class="ln" id="L107"><span class="tok-com">//! a front end can say &quot;this frame size gives you six distinguishable voices&quot;</span></span>
+<span class="ln" id="L108"><span class="tok-com">//! rather than handing out ten labels for six sounds.</span></span>
+<span class="ln" id="L109"><span class="tok-com">//!</span></span>
+<span class="ln" id="L110"><span class="tok-com">//! # In plain words</span></span>
+<span class="ln" id="L111"><span class="tok-com">//!</span></span>
+<span class="ln" id="L112"><span class="tok-com">//! The set of voices a recording can be turned into.</span></span>
+<span class="ln" id="L113"><span class="tok-com">//!</span></span>
+<span class="ln" id="L114"><span class="tok-com">//! By default everyone comes out as the same one. That is on purpose: if every</span></span>
+<span class="ln" id="L115"><span class="tok-com">//! speaker sounds identical, there is nothing in the result that distinguishes one</span></span>
+<span class="ln" id="L116"><span class="tok-com">//! from another, and nothing to trace back.</span></span>
+<span class="ln" id="L117"><span class="tok-com">//!</span></span>
+<span class="ln" id="L118"><span class="tok-com">//! When a recording has several people in it that becomes a problem, because a</span></span>
+<span class="ln" id="L119"><span class="tok-com">//! listener cannot follow who is who. So there is a small set of destination</span></span>
+<span class="ln" id="L120"><span class="tok-com">//! voices to hand out instead, chosen to be as far apart as the arithmetic allows,</span></span>
+<span class="ln" id="L121"><span class="tok-com">//! and a measured limit on how many of them can genuinely be told apart by ear.</span></span>
+<span class="ln" id="L122"></span>
+<span class="ln" id="L123"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::{AccentConfig, DeidConfig};</span>
+<span class="ln" id="L124"></span>
 <span class="src-item" id="fn-max_voices">
-<span class="ln" id="L124"><span class="tok-com">/// How many distinct destination voices this engine hands out.</span></span>
-<span class="ln" id="L125"><span class="tok-com">///</span></span>
-<span class="ln" id="L126"><span class="tok-com">/// Ten of the twelve the table can express. See the module documentation for</span></span>
-<span class="ln" id="L127"><span class="tok-com">/// why it is not twenty.</span></span>
-<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_VOICES: usize = <span class="tok-num">10</span>;</span>
+<span class="ln" id="L125"><span class="tok-com">/// How many distinct destination voices this engine hands out.</span></span>
+<span class="ln" id="L126"><span class="tok-com">///</span></span>
+<span class="ln" id="L127"><span class="tok-com">/// Ten of the twelve the table can express. See the module documentation for</span></span>
+<span class="ln" id="L128"><span class="tok-com">/// why it is not twenty.</span></span>
+<span class="ln" id="L129"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_VOICES: usize = <span class="tok-num">10</span>;</span>
 </span>
-<span class="ln" id="L129"></span>
+<span class="ln" id="L130"></span>
 <span class="src-item" id="fn-voice">
-<span class="ln" id="L130"><span class="tok-com">/// One destination voice: the canonical values every speaker in this slot is</span></span>
-<span class="ln" id="L131"><span class="tok-com">/// mapped onto.</span></span>
-<span class="ln" id="L132"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq)]</span>
-<span class="ln" id="L133"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Voice {</span>
-<span class="ln" id="L134">    <span class="tok-com">/// Pitch register, in hertz.</span></span>
-<span class="ln" id="L135">    <span class="tok-com">///</span></span>
-<span class="ln" id="L136">    <span class="tok-com">/// What is *asked for*. What is rendered is this quantised to the FFT bin</span></span>
-<span class="ln" id="L137">    <span class="tok-com">/// grid &#8212; see [`Voice::rendered_f0_hz`], and the module documentation for</span></span>
-<span class="ln" id="L138">    <span class="tok-com">/// why that distinction cost a wrong table once already.</span></span>
-<span class="ln" id="L139">    <span class="tok-kw">pub</span> target_f0_hz: f32,</span>
-<span class="ln" id="L140">    <span class="tok-com">/// Canonical long-term envelope centroid, in hertz &#8212; the vocal-tract scale.</span></span>
-<span class="ln" id="L141">    <span class="tok-com">///</span></span>
-<span class="ln" id="L142">    <span class="tok-com">/// A continuous warp, so this one is rendered as asked.</span></span>
-<span class="ln" id="L143">    <span class="tok-kw">pub</span> target_centroid_hz: f32,</span>
-<span class="ln" id="L144">    <span class="tok-com">/// Slope of the canonical long-term spectrum, in dB per octave.</span></span>
-<span class="ln" id="L145">    <span class="tok-kw">pub</span> target_tilt_db_oct: f32,</span>
-<span class="ln" id="L146">}</span>
+<span class="ln" id="L131"><span class="tok-com">/// One destination voice: the canonical values every speaker in this slot is</span></span>
+<span class="ln" id="L132"><span class="tok-com">/// mapped onto.</span></span>
+<span class="ln" id="L133"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq)]</span>
+<span class="ln" id="L134"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Voice {</span>
+<span class="ln" id="L135">    <span class="tok-com">/// Pitch register, in hertz.</span></span>
+<span class="ln" id="L136">    <span class="tok-com">///</span></span>
+<span class="ln" id="L137">    <span class="tok-com">/// What is *asked for*. What is rendered is this quantised to the FFT bin</span></span>
+<span class="ln" id="L138">    <span class="tok-com">/// grid. See [`Voice::rendered_f0_hz`], and the module documentation for</span></span>
+<span class="ln" id="L139">    <span class="tok-com">/// why that distinction cost a wrong table once already.</span></span>
+<span class="ln" id="L140">    <span class="tok-kw">pub</span> target_f0_hz: f32,</span>
+<span class="ln" id="L141">    <span class="tok-com">/// Canonical long-term envelope centroid, in hertz, which is the vocal-tract scale.</span></span>
+<span class="ln" id="L142">    <span class="tok-com">///</span></span>
+<span class="ln" id="L143">    <span class="tok-com">/// A continuous warp, so this one is rendered as asked.</span></span>
+<span class="ln" id="L144">    <span class="tok-kw">pub</span> target_centroid_hz: f32,</span>
+<span class="ln" id="L145">    <span class="tok-com">/// Slope of the canonical long-term spectrum, in dB per octave.</span></span>
+<span class="ln" id="L146">    <span class="tok-kw">pub</span> target_tilt_db_oct: f32,</span>
+<span class="ln" id="L147">}</span>
 </span>
-<span class="ln" id="L147"></span>
-<span class="ln" id="L148"><span class="tok-kw">impl</span> Voice {</span>
+<span class="ln" id="L148"></span>
+<span class="ln" id="L149"><span class="tok-kw">impl</span> Voice {</span>
 <span class="src-item" id="fn-voice-applied_to">
-<span class="ln" id="L149">    <span class="tok-com">/// Apply this voice to an [`AccentConfig`].</span></span>
-<span class="ln" id="L150">    <span class="tok-com">///</span></span>
-<span class="ln" id="L151">    <span class="tok-com">/// Only the three canonical targets are replaced. The *strengths* &#8212;</span></span>
-<span class="ln" id="L152">    <span class="tok-com">/// how hard the neutraliser pushes toward them &#8212; are left alone, because</span></span>
-<span class="ln" id="L153">    <span class="tok-com">/// they are the user&#x27;s setting and a slot is a destination, not a policy</span></span>
-<span class="ln" id="L154">    <span class="tok-com">/// about how firmly to arrive at it.</span></span>
-<span class="ln" id="L155">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">applied_to</span>(&amp;<span class="tok-kw">self</span>, <span class="tok-kw">mut</span> accent: AccentConfig) -&gt; AccentConfig {</span>
-<span class="ln" id="L156">        accent.target_f0_hz = <span class="tok-kw">self</span>.target_f0_hz;</span>
-<span class="ln" id="L157">        accent.target_centroid_hz = <span class="tok-kw">self</span>.target_centroid_hz;</span>
-<span class="ln" id="L158">        accent.target_tilt_db_oct = <span class="tok-kw">self</span>.target_tilt_db_oct;</span>
-<span class="ln" id="L159">        accent</span>
-<span class="ln" id="L160">    }</span>
+<span class="ln" id="L150">    <span class="tok-com">/// Apply this voice to an [`AccentConfig`].</span></span>
+<span class="ln" id="L151">    <span class="tok-com">///</span></span>
+<span class="ln" id="L152">    <span class="tok-com">/// Only the three canonical targets are replaced. The *strengths*, meaning</span></span>
+<span class="ln" id="L153">    <span class="tok-com">/// how hard the neutraliser pushes toward them, are left alone, because</span></span>
+<span class="ln" id="L154">    <span class="tok-com">/// they are the user&#x27;s setting and a slot is a destination, not a policy</span></span>
+<span class="ln" id="L155">    <span class="tok-com">/// about how firmly to arrive at it.</span></span>
+<span class="ln" id="L156">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">applied_to</span>(&amp;<span class="tok-kw">self</span>, <span class="tok-kw">mut</span> accent: AccentConfig) -&gt; AccentConfig {</span>
+<span class="ln" id="L157">        accent.target_f0_hz = <span class="tok-kw">self</span>.target_f0_hz;</span>
+<span class="ln" id="L158">        accent.target_centroid_hz = <span class="tok-kw">self</span>.target_centroid_hz;</span>
+<span class="ln" id="L159">        accent.target_tilt_db_oct = <span class="tok-kw">self</span>.target_tilt_db_oct;</span>
+<span class="ln" id="L160">        accent</span>
+<span class="ln" id="L161">    }</span>
 </span>
-<span class="ln" id="L161"></span>
+<span class="ln" id="L162"></span>
 <span class="src-item" id="fn-voice-rendered_f0_hz">
-<span class="ln" id="L162">    <span class="tok-com">/// The fundamental this voice will **actually** be rendered at, under</span></span>
-<span class="ln" id="L163">    <span class="tok-com">/// `config`.</span></span>
-<span class="ln" id="L164">    <span class="tok-com">///</span></span>
-<span class="ln" id="L165">    <span class="tok-com">/// The voiced excitation is a harmonic comb snapped to the FFT bin grid, so</span></span>
-<span class="ln" id="L166">    <span class="tok-com">/// the rendered fundamental is the requested one rounded to the nearest</span></span>
-<span class="ln" id="L167">    <span class="tok-com">/// whole bin. This is the number to compare two voices by, and the number</span></span>
-<span class="ln" id="L168">    <span class="tok-com">/// to show anybody who asks what a slot sounds like.</span></span>
-<span class="ln" id="L169">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">rendered_f0_hz</span>(&amp;<span class="tok-kw">self</span>, config: &amp;DeidConfig) -&gt; f32 {</span>
-<span class="ln" id="L170">        <span class="tok-kw">let</span> bin_hz = <span class="tok-fn">bin_hz</span>(config);</span>
-<span class="ln" id="L171">        <span class="tok-kw">if</span> bin_hz &lt;= <span class="tok-num">0.0</span> || !<span class="tok-kw">self</span>.target_f0_hz.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L172">            <span class="tok-kw">return</span> <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L173">        }</span>
-<span class="ln" id="L174">        (<span class="tok-kw">self</span>.target_f0_hz / bin_hz).<span class="tok-fn">round</span>().<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) * bin_hz</span>
-<span class="ln" id="L175">    }</span>
+<span class="ln" id="L163">    <span class="tok-com">/// The fundamental this voice will **actually** be rendered at, under</span></span>
+<span class="ln" id="L164">    <span class="tok-com">/// `config`.</span></span>
+<span class="ln" id="L165">    <span class="tok-com">///</span></span>
+<span class="ln" id="L166">    <span class="tok-com">/// The voiced excitation is a harmonic comb snapped to the FFT bin grid, so</span></span>
+<span class="ln" id="L167">    <span class="tok-com">/// the rendered fundamental is the requested one rounded to the nearest</span></span>
+<span class="ln" id="L168">    <span class="tok-com">/// whole bin. This is the number to compare two voices by, and the number</span></span>
+<span class="ln" id="L169">    <span class="tok-com">/// to show anybody who asks what a slot sounds like.</span></span>
+<span class="ln" id="L170">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">rendered_f0_hz</span>(&amp;<span class="tok-kw">self</span>, config: &amp;DeidConfig) -&gt; f32 {</span>
+<span class="ln" id="L171">        <span class="tok-kw">let</span> bin_hz = <span class="tok-fn">bin_hz</span>(config);</span>
+<span class="ln" id="L172">        <span class="tok-kw">if</span> bin_hz &lt;= <span class="tok-num">0.0</span> || !<span class="tok-kw">self</span>.target_f0_hz.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L173">            <span class="tok-kw">return</span> <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L174">        }</span>
+<span class="ln" id="L175">        (<span class="tok-kw">self</span>.target_f0_hz / bin_hz).<span class="tok-fn">round</span>().<span class="tok-fn">max</span>(<span class="tok-num">1.0</span>) * bin_hz</span>
+<span class="ln" id="L176">    }</span>
 </span>
-<span class="ln" id="L176"></span>
+<span class="ln" id="L177"></span>
 <span class="src-item" id="fn-voice-checked">
-<span class="ln" id="L177">    <span class="tok-com">/// Whether this voice is inside the range the engine can render usefully.</span></span>
-<span class="ln" id="L178">    <span class="tok-com">///</span></span>
-<span class="ln" id="L179">    <span class="tok-com">/// Checked rather than clamped: a caller who built a voice out of range</span></span>
-<span class="ln" id="L180">    <span class="tok-com">/// meant something, and silently moving it would give them a different</span></span>
-<span class="ln" id="L181">    <span class="tok-com">/// speaker from the one they asked for without saying so.</span></span>
-<span class="ln" id="L182">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">checked</span>(<span class="tok-kw">self</span>) -&gt; Result&lt;Self, String&gt; {</span>
-<span class="ln" id="L183">        <span class="tok-kw">for</span> (name, value) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L184">            (<span class="tok-str">&quot;target_f0_hz&quot;</span>, <span class="tok-kw">self</span>.target_f0_hz),</span>
-<span class="ln" id="L185">            (<span class="tok-str">&quot;target_centroid_hz&quot;</span>, <span class="tok-kw">self</span>.target_centroid_hz),</span>
-<span class="ln" id="L186">            (<span class="tok-str">&quot;target_tilt_db_oct&quot;</span>, <span class="tok-kw">self</span>.target_tilt_db_oct),</span>
-<span class="ln" id="L187">        ] {</span>
-<span class="ln" id="L188">            <span class="tok-kw">if</span> !value.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L189">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{name} must be a real number&quot;</span>));</span>
-<span class="ln" id="L190">            }</span>
-<span class="ln" id="L191">        }</span>
-<span class="ln" id="L192">        <span class="tok-kw">if</span> !(F0_MIN_HZ..=F0_MAX_HZ).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.target_f0_hz) {</span>
-<span class="ln" id="L193">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L194">                <span class="tok-str">&quot;target_f0_hz {} is outside {F0_MIN_HZ}-{F0_MAX_HZ} Hz, where a \</span></span>
-<span class="ln" id="L195"><span class="tok-str">                 resynthesised voice stays intelligible&quot;</span>,</span>
-<span class="ln" id="L196">                <span class="tok-kw">self</span>.target_f0_hz</span>
-<span class="ln" id="L197">            ));</span>
-<span class="ln" id="L198">        }</span>
-<span class="ln" id="L199">        <span class="tok-kw">if</span> !(CENTROID_MIN_HZ..=CENTROID_MAX_HZ).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.target_centroid_hz) {</span>
-<span class="ln" id="L200">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L201">                <span class="tok-str">&quot;target_centroid_hz {} is outside {CENTROID_MIN_HZ}-{CENTROID_MAX_HZ} Hz, \</span></span>
-<span class="ln" id="L202"><span class="tok-str">                 where the vowels stay natural&quot;</span>,</span>
-<span class="ln" id="L203">                <span class="tok-kw">self</span>.target_centroid_hz</span>
-<span class="ln" id="L204">            ));</span>
-<span class="ln" id="L205">        }</span>
-<span class="ln" id="L206">        <span class="tok-kw">if</span> !(TILT_MIN_DB_OCT..=TILT_MAX_DB_OCT).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.target_tilt_db_oct) {</span>
-<span class="ln" id="L207">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L208">                <span class="tok-str">&quot;target_tilt_db_oct {} is outside {TILT_MIN_DB_OCT} to \</span></span>
-<span class="ln" id="L209"><span class="tok-str">                 {TILT_MAX_DB_OCT} dB per octave&quot;</span>,</span>
-<span class="ln" id="L210">                <span class="tok-kw">self</span>.target_tilt_db_oct</span>
-<span class="ln" id="L211">            ));</span>
-<span class="ln" id="L212">        }</span>
-<span class="ln" id="L213">        <span class="tok-fn">Ok</span>(<span class="tok-kw">self</span>)</span>
-<span class="ln" id="L214">    }</span>
+<span class="ln" id="L178">    <span class="tok-com">/// Whether this voice is inside the range the engine can render usefully.</span></span>
+<span class="ln" id="L179">    <span class="tok-com">///</span></span>
+<span class="ln" id="L180">    <span class="tok-com">/// Checked rather than clamped: a caller who built a voice out of range</span></span>
+<span class="ln" id="L181">    <span class="tok-com">/// meant something, and silently moving it would give them a different</span></span>
+<span class="ln" id="L182">    <span class="tok-com">/// speaker from the one they asked for without saying so.</span></span>
+<span class="ln" id="L183">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">checked</span>(<span class="tok-kw">self</span>) -&gt; Result&lt;Self, String&gt; {</span>
+<span class="ln" id="L184">        <span class="tok-kw">for</span> (name, value) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L185">            (<span class="tok-str">&quot;target_f0_hz&quot;</span>, <span class="tok-kw">self</span>.target_f0_hz),</span>
+<span class="ln" id="L186">            (<span class="tok-str">&quot;target_centroid_hz&quot;</span>, <span class="tok-kw">self</span>.target_centroid_hz),</span>
+<span class="ln" id="L187">            (<span class="tok-str">&quot;target_tilt_db_oct&quot;</span>, <span class="tok-kw">self</span>.target_tilt_db_oct),</span>
+<span class="ln" id="L188">        ] {</span>
+<span class="ln" id="L189">            <span class="tok-kw">if</span> !value.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L190">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{name} must be a real number&quot;</span>));</span>
+<span class="ln" id="L191">            }</span>
+<span class="ln" id="L192">        }</span>
+<span class="ln" id="L193">        <span class="tok-kw">if</span> !(F0_MIN_HZ..=F0_MAX_HZ).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.target_f0_hz) {</span>
+<span class="ln" id="L194">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L195">                <span class="tok-str">&quot;target_f0_hz {} is outside {F0_MIN_HZ}-{F0_MAX_HZ} Hz, where a \</span></span>
+<span class="ln" id="L196"><span class="tok-str">                 resynthesised voice stays intelligible&quot;</span>,</span>
+<span class="ln" id="L197">                <span class="tok-kw">self</span>.target_f0_hz</span>
+<span class="ln" id="L198">            ));</span>
+<span class="ln" id="L199">        }</span>
+<span class="ln" id="L200">        <span class="tok-kw">if</span> !(CENTROID_MIN_HZ..=CENTROID_MAX_HZ).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.target_centroid_hz) {</span>
+<span class="ln" id="L201">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L202">                <span class="tok-str">&quot;target_centroid_hz {} is outside {CENTROID_MIN_HZ}-{CENTROID_MAX_HZ} Hz, \</span></span>
+<span class="ln" id="L203"><span class="tok-str">                 where the vowels stay natural&quot;</span>,</span>
+<span class="ln" id="L204">                <span class="tok-kw">self</span>.target_centroid_hz</span>
+<span class="ln" id="L205">            ));</span>
+<span class="ln" id="L206">        }</span>
+<span class="ln" id="L207">        <span class="tok-kw">if</span> !(TILT_MIN_DB_OCT..=TILT_MAX_DB_OCT).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.target_tilt_db_oct) {</span>
+<span class="ln" id="L208">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L209">                <span class="tok-str">&quot;target_tilt_db_oct {} is outside {TILT_MIN_DB_OCT} to \</span></span>
+<span class="ln" id="L210"><span class="tok-str">                 {TILT_MAX_DB_OCT} dB per octave&quot;</span>,</span>
+<span class="ln" id="L211">                <span class="tok-kw">self</span>.target_tilt_db_oct</span>
+<span class="ln" id="L212">            ));</span>
+<span class="ln" id="L213">        }</span>
+<span class="ln" id="L214">        <span class="tok-fn">Ok</span>(<span class="tok-kw">self</span>)</span>
+<span class="ln" id="L215">    }</span>
 </span>
-<span class="ln" id="L215"></span>
+<span class="ln" id="L216"></span>
 <span class="src-item" id="fn-voice-describe">
-<span class="ln" id="L216">    <span class="tok-com">/// A short label for an interface: &quot;low register, narrow tract&quot;.</span></span>
-<span class="ln" id="L217">    <span class="tok-com">///</span></span>
-<span class="ln" id="L218">    <span class="tok-com">/// Describes the *destination*, never the speaker. There is deliberately no</span></span>
-<span class="ln" id="L219">    <span class="tok-com">/// vocabulary here for who somebody was: &quot;man&quot;, &quot;woman&quot;, &quot;child&quot;, &quot;older&quot;</span></span>
-<span class="ln" id="L220">    <span class="tok-com">/// are all statements about an input this crate has just finished</span></span>
-<span class="ln" id="L221">    <span class="tok-com">/// destroying, and a label that reintroduced one would undo the point.</span></span>
-<span class="ln" id="L222">    <span class="tok-com">///</span></span>
-<span class="ln" id="L223">    <span class="tok-com">/// The hertz figure quoted is the one that will be **rendered** at the</span></span>
-<span class="ln" id="L224">    <span class="tok-com">/// default configuration, not the one requested, so the label and the ear</span></span>
-<span class="ln" id="L225">    <span class="tok-com">/// agree.</span></span>
-<span class="ln" id="L226">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L227">        <span class="tok-kw">let</span> rendered = <span class="tok-kw">self</span>.<span class="tok-fn">rendered_f0_hz</span>(&amp;DeidConfig::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> register = <span class="tok-kw">if</span> rendered &lt; <span class="tok-num">115.0</span> {</span>
-<span class="ln" id="L229">            <span class="tok-str">&quot;low&quot;</span></span>
-<span class="ln" id="L230">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> rendered &lt; <span class="tok-num">165.0</span> {</span>
-<span class="ln" id="L231">            <span class="tok-str">&quot;low-mid&quot;</span></span>
-<span class="ln" id="L232">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> rendered &lt; <span class="tok-num">210.0</span> {</span>
-<span class="ln" id="L233">            <span class="tok-str">&quot;mid-high&quot;</span></span>
-<span class="ln" id="L234">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L235">            <span class="tok-str">&quot;high&quot;</span></span>
-<span class="ln" id="L236">        };</span>
-<span class="ln" id="L237">        <span class="tok-kw">let</span> tract = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.target_centroid_hz &lt; <span class="tok-num">690.0</span> {</span>
-<span class="ln" id="L238">            <span class="tok-str">&quot;narrow&quot;</span></span>
-<span class="ln" id="L239">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-kw">self</span>.target_centroid_hz &lt; <span class="tok-num">830.0</span> {</span>
-<span class="ln" id="L240">            <span class="tok-str">&quot;medium&quot;</span></span>
-<span class="ln" id="L241">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L242">            <span class="tok-str">&quot;wide&quot;</span></span>
-<span class="ln" id="L243">        };</span>
-<span class="ln" id="L244">        format!(</span>
-<span class="ln" id="L245">            <span class="tok-str">&quot;{register} register, {tract} tract ({rendered:.0} Hz, {:.0} Hz)&quot;</span>,</span>
-<span class="ln" id="L246">            <span class="tok-kw">self</span>.target_centroid_hz</span>
-<span class="ln" id="L247">        )</span>
-<span class="ln" id="L248">    }</span>
+<span class="ln" id="L217">    <span class="tok-com">/// A short label for an interface: &quot;low register, narrow tract&quot;.</span></span>
+<span class="ln" id="L218">    <span class="tok-com">///</span></span>
+<span class="ln" id="L219">    <span class="tok-com">/// Describes the *destination*, never the speaker. There is deliberately no</span></span>
+<span class="ln" id="L220">    <span class="tok-com">/// vocabulary here for who somebody was: &quot;man&quot;, &quot;woman&quot;, &quot;child&quot;, &quot;older&quot;</span></span>
+<span class="ln" id="L221">    <span class="tok-com">/// are all statements about an input this crate has just finished</span></span>
+<span class="ln" id="L222">    <span class="tok-com">/// destroying, and a label that reintroduced one would undo the point.</span></span>
+<span class="ln" id="L223">    <span class="tok-com">///</span></span>
+<span class="ln" id="L224">    <span class="tok-com">/// The hertz figure quoted is the one that will be **rendered** at the</span></span>
+<span class="ln" id="L225">    <span class="tok-com">/// default configuration, not the one requested, so the label and the ear</span></span>
+<span class="ln" id="L226">    <span class="tok-com">/// agree.</span></span>
+<span class="ln" id="L227">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L228">        <span class="tok-kw">let</span> rendered = <span class="tok-kw">self</span>.<span class="tok-fn">rendered_f0_hz</span>(&amp;DeidConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L229">        <span class="tok-kw">let</span> register = <span class="tok-kw">if</span> rendered &lt; <span class="tok-num">115.0</span> {</span>
+<span class="ln" id="L230">            <span class="tok-str">&quot;low&quot;</span></span>
+<span class="ln" id="L231">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> rendered &lt; <span class="tok-num">165.0</span> {</span>
+<span class="ln" id="L232">            <span class="tok-str">&quot;low-mid&quot;</span></span>
+<span class="ln" id="L233">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> rendered &lt; <span class="tok-num">210.0</span> {</span>
+<span class="ln" id="L234">            <span class="tok-str">&quot;mid-high&quot;</span></span>
+<span class="ln" id="L235">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L236">            <span class="tok-str">&quot;high&quot;</span></span>
+<span class="ln" id="L237">        };</span>
+<span class="ln" id="L238">        <span class="tok-kw">let</span> tract = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.target_centroid_hz &lt; <span class="tok-num">690.0</span> {</span>
+<span class="ln" id="L239">            <span class="tok-str">&quot;narrow&quot;</span></span>
+<span class="ln" id="L240">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-kw">self</span>.target_centroid_hz &lt; <span class="tok-num">830.0</span> {</span>
+<span class="ln" id="L241">            <span class="tok-str">&quot;medium&quot;</span></span>
+<span class="ln" id="L242">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L243">            <span class="tok-str">&quot;wide&quot;</span></span>
+<span class="ln" id="L244">        };</span>
+<span class="ln" id="L245">        format!(</span>
+<span class="ln" id="L246">            <span class="tok-str">&quot;{register} register, {tract} tract ({rendered:.0} Hz, {:.0} Hz)&quot;</span>,</span>
+<span class="ln" id="L247">            <span class="tok-kw">self</span>.target_centroid_hz</span>
+<span class="ln" id="L248">        )</span>
+<span class="ln" id="L249">    }</span>
 </span>
-<span class="ln" id="L249">}</span>
-<span class="ln" id="L250"></span>
+<span class="ln" id="L250">}</span>
+<span class="ln" id="L251"></span>
 <span class="src-item" id="fn-f0_min_hz">
-<span class="ln" id="L251"><span class="tok-com">/// The lowest fundamental a resynthesised voice stays intelligible at.</span></span>
-<span class="ln" id="L252"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> F0_MIN_HZ: f32 = <span class="tok-num">90.0</span>;</span>
+<span class="ln" id="L252"><span class="tok-com">/// The lowest fundamental a resynthesised voice stays intelligible at.</span></span>
+<span class="ln" id="L253"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> F0_MIN_HZ: f32 = <span class="tok-num">90.0</span>;</span>
 </span>
 <span class="src-item" id="fn-f0_max_hz">
-<span class="ln" id="L253"><span class="tok-com">/// The highest fundamental that still reads as a speaking register.</span></span>
-<span class="ln" id="L254"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> F0_MAX_HZ: f32 = <span class="tok-num">240.0</span>;</span>
+<span class="ln" id="L254"><span class="tok-com">/// The highest fundamental that still reads as a speaking register.</span></span>
+<span class="ln" id="L255"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> F0_MAX_HZ: f32 = <span class="tok-num">240.0</span>;</span>
 </span>
 <span class="src-item" id="fn-centroid_min_hz">
-<span class="ln" id="L255"><span class="tok-com">/// The narrowest canonical vocal tract offered.</span></span>
-<span class="ln" id="L256"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CENTROID_MIN_HZ: f32 = <span class="tok-num">550.0</span>;</span>
+<span class="ln" id="L256"><span class="tok-com">/// The narrowest canonical vocal tract offered.</span></span>
+<span class="ln" id="L257"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CENTROID_MIN_HZ: f32 = <span class="tok-num">550.0</span>;</span>
 </span>
 <span class="src-item" id="fn-centroid_max_hz">
-<span class="ln" id="L257"><span class="tok-com">/// The widest canonical vocal tract offered.</span></span>
-<span class="ln" id="L258"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CENTROID_MAX_HZ: f32 = <span class="tok-num">1000.0</span>;</span>
+<span class="ln" id="L258"><span class="tok-com">/// The widest canonical vocal tract offered.</span></span>
+<span class="ln" id="L259"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CENTROID_MAX_HZ: f32 = <span class="tok-num">1000.0</span>;</span>
 </span>
 <span class="src-item" id="fn-tilt_min_db_oct">
-<span class="ln" id="L259"><span class="tok-com">/// The steepest permitted long-term slope, in dB per octave.</span></span>
-<span class="ln" id="L260"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> TILT_MIN_DB_OCT: f32 = -<span class="tok-num">12.0</span>;</span>
+<span class="ln" id="L260"><span class="tok-com">/// The steepest permitted long-term slope, in dB per octave.</span></span>
+<span class="ln" id="L261"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> TILT_MIN_DB_OCT: f32 = -<span class="tok-num">12.0</span>;</span>
 </span>
 <span class="src-item" id="fn-tilt_max_db_oct">
-<span class="ln" id="L261"><span class="tok-com">/// The flattest permitted long-term slope, in dB per octave.</span></span>
-<span class="ln" id="L262"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> TILT_MAX_DB_OCT: f32 = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L262"><span class="tok-com">/// The flattest permitted long-term slope, in dB per octave.</span></span>
+<span class="ln" id="L263"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> TILT_MAX_DB_OCT: f32 = <span class="tok-num">0.0</span>;</span>
 </span>
-<span class="ln" id="L263"></span>
+<span class="ln" id="L264"></span>
 <span class="src-item" id="fn-bin_hz">
-<span class="ln" id="L264"><span class="tok-com">/// The FFT bin spacing of a configuration, in hertz.</span></span>
-<span class="ln" id="L265"><span class="tok-com">///</span></span>
-<span class="ln" id="L266"><span class="tok-com">/// The grid every canonical register is snapped to. Public because a front end</span></span>
-<span class="ln" id="L267"><span class="tok-com">/// that lets somebody change the frame size needs to be able to explain what</span></span>
-<span class="ln" id="L268"><span class="tok-com">/// changed about the voices.</span></span>
-<span class="ln" id="L269"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">bin_hz</span>(config: &amp;DeidConfig) -&gt; f32 {</span>
-<span class="ln" id="L270">    <span class="tok-kw">if</span> config.frame_size == <span class="tok-num">0</span> || !config.sample_rate.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L271">        <span class="tok-kw">return</span> <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L272">    }</span>
-<span class="ln" id="L273">    config.sample_rate / config.frame_size <span class="tok-kw">as</span> f32</span>
-<span class="ln" id="L274">}</span>
+<span class="ln" id="L265"><span class="tok-com">/// The FFT bin spacing of a configuration, in hertz.</span></span>
+<span class="ln" id="L266"><span class="tok-com">///</span></span>
+<span class="ln" id="L267"><span class="tok-com">/// The grid every canonical register is snapped to. Public because a front end</span></span>
+<span class="ln" id="L268"><span class="tok-com">/// that lets somebody change the frame size needs to be able to explain what</span></span>
+<span class="ln" id="L269"><span class="tok-com">/// changed about the voices.</span></span>
+<span class="ln" id="L270"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">bin_hz</span>(config: &amp;DeidConfig) -&gt; f32 {</span>
+<span class="ln" id="L271">    <span class="tok-kw">if</span> config.frame_size == <span class="tok-num">0</span> || !config.sample_rate.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L272">        <span class="tok-kw">return</span> <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L273">    }</span>
+<span class="ln" id="L274">    config.sample_rate / config.frame_size <span class="tok-kw">as</span> f32</span>
+<span class="ln" id="L275">}</span>
 </span>
-<span class="ln" id="L275"></span>
+<span class="ln" id="L276"></span>
 <span class="src-item" id="fn-registers_hz">
-<span class="ln" id="L276"><span class="tok-com">/// The four registers, each a whole number of bins at the default</span></span>
-<span class="ln" id="L277"><span class="tok-com">/// configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.</span></span>
-<span class="ln" id="L278"><span class="tok-com">///</span></span>
-<span class="ln" id="L279"><span class="tok-com">/// Written out rather than computed from the default, so that changing the</span></span>
-<span class="ln" id="L280"><span class="tok-com">/// default frame size makes a **test** fail rather than silently moving every</span></span>
-<span class="ln" id="L281"><span class="tok-com">/// voice in every recording anybody has already made.</span></span>
-<span class="ln" id="L282"><span class="tok-kw">const</span> REGISTERS_HZ: [f32; <span class="tok-num">4</span>] = [<span class="tok-num">93.75</span>, <span class="tok-num">140.625</span>, <span class="tok-num">187.5</span>, <span class="tok-num">234.375</span>];</span>
+<span class="ln" id="L277"><span class="tok-com">/// The four registers, each a whole number of bins at the default</span></span>
+<span class="ln" id="L278"><span class="tok-com">/// configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.</span></span>
+<span class="ln" id="L279"><span class="tok-com">///</span></span>
+<span class="ln" id="L280"><span class="tok-com">/// Written out rather than computed from the default, so that changing the</span></span>
+<span class="ln" id="L281"><span class="tok-com">/// default frame size makes a **test** fail rather than silently moving every</span></span>
+<span class="ln" id="L282"><span class="tok-com">/// voice in every recording anybody has already made.</span></span>
+<span class="ln" id="L283"><span class="tok-kw">const</span> REGISTERS_HZ: [f32; <span class="tok-num">4</span>] = [<span class="tok-num">93.75</span>, <span class="tok-num">140.625</span>, <span class="tok-num">187.5</span>, <span class="tok-num">234.375</span>];</span>
 </span>
-<span class="ln" id="L283"></span>
+<span class="ln" id="L284"></span>
 <span class="src-item" id="fn-tracts">
-<span class="ln" id="L284"><span class="tok-com">/// The three vocal-tract scales, about 22 % apart. Not quantised &#8212; the warp is</span></span>
-<span class="ln" id="L285"><span class="tok-com">/// continuous &#8212; so these render as asked.</span></span>
-<span class="ln" id="L286"><span class="tok-kw">const</span> TRACTS: [(f32, f32); <span class="tok-num">3</span>] = [</span>
+<span class="ln" id="L285"><span class="tok-com">/// The three vocal-tract scales, about 22 % apart. Not quantised, because the</span></span>
+<span class="ln" id="L286"><span class="tok-com">/// warp is continuous, so these render as asked.</span></span>
+<span class="ln" id="L287"><span class="tok-kw">const</span> TRACTS: [(f32, f32); <span class="tok-num">3</span>] = [</span>
 </span>
-<span class="ln" id="L287">    <span class="tok-com">// (centroid Hz, tilt dB per octave)</span></span>
-<span class="ln" id="L288">    (<span class="tok-num">620.0</span>, -<span class="tok-num">5.0</span>),</span>
-<span class="ln" id="L289">    (<span class="tok-num">760.0</span>, -<span class="tok-num">6.0</span>),</span>
-<span class="ln" id="L290">    (<span class="tok-num">900.0</span>, -<span class="tok-num">7.0</span>),</span>
-<span class="ln" id="L291">];</span>
-<span class="ln" id="L292"></span>
+<span class="ln" id="L288">    <span class="tok-com">// (centroid Hz, tilt dB per octave)</span></span>
+<span class="ln" id="L289">    (<span class="tok-num">620.0</span>, -<span class="tok-num">5.0</span>),</span>
+<span class="ln" id="L290">    (<span class="tok-num">760.0</span>, -<span class="tok-num">6.0</span>),</span>
+<span class="ln" id="L291">    (<span class="tok-num">900.0</span>, -<span class="tok-num">7.0</span>),</span>
+<span class="ln" id="L292">];</span>
+<span class="ln" id="L293"></span>
 <span class="src-item" id="fn-table">
-<span class="ln" id="L293"><span class="tok-com">/// The ten destination voices, in the order they are handed out.</span></span>
-<span class="ln" id="L294"><span class="tok-com">///</span></span>
-<span class="ln" id="L295"><span class="tok-com">/// The order is chosen, not incidental. Slot 0 and slot 1 are the two furthest</span></span>
-<span class="ln" id="L296"><span class="tok-com">/// apart in both dimensions, because a **two-person conversation is the common</span></span>
-<span class="ln" id="L297"><span class="tok-com">/// case** and the two people in it should be the easiest pair in the table to</span></span>
-<span class="ln" id="L298"><span class="tok-com">/// tell apart. The table then works inward, so it degrades gracefully as more</span></span>
-<span class="ln" id="L299"><span class="tok-com">/// speakers are added rather than saving its clearest contrasts for a tenth</span></span>
-<span class="ln" id="L300"><span class="tok-com">/// speaker who is usually not there.</span></span>
-<span class="ln" id="L301"><span class="tok-com">///</span></span>
-<span class="ln" id="L302"><span class="tok-com">/// Two of the twelve combinations are unused, which is slack rather than a</span></span>
-<span class="ln" id="L303"><span class="tok-com">/// stretch: nothing here is reaching for a tenth voice it cannot really make.</span></span>
-<span class="ln" id="L304"><span class="tok-kw">const</span> TABLE: [(usize, usize); MAX_VOICES] = [</span>
+<span class="ln" id="L294"><span class="tok-com">/// The ten destination voices, in the order they are handed out.</span></span>
+<span class="ln" id="L295"><span class="tok-com">///</span></span>
+<span class="ln" id="L296"><span class="tok-com">/// The order is chosen, not incidental. Slot 0 and slot 1 are the two furthest</span></span>
+<span class="ln" id="L297"><span class="tok-com">/// apart in both dimensions, because a **two-person conversation is the common</span></span>
+<span class="ln" id="L298"><span class="tok-com">/// case** and the two people in it should be the easiest pair in the table to</span></span>
+<span class="ln" id="L299"><span class="tok-com">/// tell apart. The table then works inward, so it degrades gracefully as more</span></span>
+<span class="ln" id="L300"><span class="tok-com">/// speakers are added rather than saving its clearest contrasts for a tenth</span></span>
+<span class="ln" id="L301"><span class="tok-com">/// speaker who is usually not there.</span></span>
+<span class="ln" id="L302"><span class="tok-com">///</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// Two of the twelve combinations are unused, which is slack rather than a</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// stretch: nothing here is reaching for a tenth voice it cannot really make.</span></span>
+<span class="ln" id="L305"><span class="tok-kw">const</span> TABLE: [(usize, usize); MAX_VOICES] = [</span>
 </span>
-<span class="ln" id="L305">    <span class="tok-com">// (register index, tract index)</span></span>
-<span class="ln" id="L306">    (<span class="tok-num">0</span>, <span class="tok-num">0</span>), <span class="tok-com">// 0: lowest register, narrowest tract</span></span>
-<span class="ln" id="L307">    (<span class="tok-num">3</span>, <span class="tok-num">2</span>), <span class="tok-com">// 1: highest register, widest tract -- furthest from slot 0</span></span>
-<span class="ln" id="L308">    (<span class="tok-num">1</span>, <span class="tok-num">2</span>), <span class="tok-com">// 2</span></span>
-<span class="ln" id="L309">    (<span class="tok-num">2</span>, <span class="tok-num">0</span>), <span class="tok-com">// 3</span></span>
-<span class="ln" id="L310">    (<span class="tok-num">0</span>, <span class="tok-num">2</span>), <span class="tok-com">// 4</span></span>
-<span class="ln" id="L311">    (<span class="tok-num">3</span>, <span class="tok-num">0</span>), <span class="tok-com">// 5</span></span>
-<span class="ln" id="L312">    (<span class="tok-num">1</span>, <span class="tok-num">0</span>), <span class="tok-com">// 6</span></span>
-<span class="ln" id="L313">    (<span class="tok-num">2</span>, <span class="tok-num">2</span>), <span class="tok-com">// 7</span></span>
-<span class="ln" id="L314">    (<span class="tok-num">0</span>, <span class="tok-num">1</span>), <span class="tok-com">// 8</span></span>
-<span class="ln" id="L315">    (<span class="tok-num">3</span>, <span class="tok-num">1</span>), <span class="tok-com">// 9</span></span>
-<span class="ln" id="L316">];</span>
-<span class="ln" id="L317"></span>
+<span class="ln" id="L306">    <span class="tok-com">// (register index, tract index)</span></span>
+<span class="ln" id="L307">    (<span class="tok-num">0</span>, <span class="tok-num">0</span>), <span class="tok-com">// 0: lowest register, narrowest tract</span></span>
+<span class="ln" id="L308">    (<span class="tok-num">3</span>, <span class="tok-num">2</span>), <span class="tok-com">// 1: highest register, widest tract -- furthest from slot 0</span></span>
+<span class="ln" id="L309">    (<span class="tok-num">1</span>, <span class="tok-num">2</span>), <span class="tok-com">// 2</span></span>
+<span class="ln" id="L310">    (<span class="tok-num">2</span>, <span class="tok-num">0</span>), <span class="tok-com">// 3</span></span>
+<span class="ln" id="L311">    (<span class="tok-num">0</span>, <span class="tok-num">2</span>), <span class="tok-com">// 4</span></span>
+<span class="ln" id="L312">    (<span class="tok-num">3</span>, <span class="tok-num">0</span>), <span class="tok-com">// 5</span></span>
+<span class="ln" id="L313">    (<span class="tok-num">1</span>, <span class="tok-num">0</span>), <span class="tok-com">// 6</span></span>
+<span class="ln" id="L314">    (<span class="tok-num">2</span>, <span class="tok-num">2</span>), <span class="tok-com">// 7</span></span>
+<span class="ln" id="L315">    (<span class="tok-num">0</span>, <span class="tok-num">1</span>), <span class="tok-com">// 8</span></span>
+<span class="ln" id="L316">    (<span class="tok-num">3</span>, <span class="tok-num">1</span>), <span class="tok-com">// 9</span></span>
+<span class="ln" id="L317">];</span>
+<span class="ln" id="L318"></span>
 <span class="src-item" id="fn-voice-2">
-<span class="ln" id="L318"><span class="tok-com">/// The destination voice for slot `index`.</span></span>
-<span class="ln" id="L319"><span class="tok-com">///</span></span>
-<span class="ln" id="L320"><span class="tok-com">/// Wraps rather than failing past [`MAX_VOICES`]: an eleventh speaker gets the</span></span>
-<span class="ln" id="L321"><span class="tok-com">/// first voice again. That is a real collision &#8212; two people sharing one output</span></span>
-<span class="ln" id="L322"><span class="tok-com">/// voice &#8212; and it is why [`MAX_VOICES`] is stated and why a front end should</span></span>
-<span class="ln" id="L323"><span class="tok-com">/// refuse rather than rely on this. Wrapping is here so the function is total,</span></span>
-<span class="ln" id="L324"><span class="tok-com">/// not because reusing a voice is acceptable.</span></span>
-<span class="ln" id="L325"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">voice</span>(index: usize) -&gt; Voice {</span>
-<span class="ln" id="L326">    <span class="tok-kw">let</span> (register, tract) = TABLE[index % MAX_VOICES];</span>
-<span class="ln" id="L327">    <span class="tok-kw">let</span> (centroid, tilt) = TRACTS[tract];</span>
-<span class="ln" id="L328">    Voice {</span>
-<span class="ln" id="L329">        target_f0_hz: REGISTERS_HZ[register],</span>
-<span class="ln" id="L330">        target_centroid_hz: centroid,</span>
-<span class="ln" id="L331">        target_tilt_db_oct: tilt,</span>
-<span class="ln" id="L332">    }</span>
-<span class="ln" id="L333">}</span>
+<span class="ln" id="L319"><span class="tok-com">/// The destination voice for slot `index`.</span></span>
+<span class="ln" id="L320"><span class="tok-com">///</span></span>
+<span class="ln" id="L321"><span class="tok-com">/// Wraps rather than failing past [`MAX_VOICES`]: an eleventh speaker gets the</span></span>
+<span class="ln" id="L322"><span class="tok-com">/// first voice again. That is a real collision, with two people sharing one</span></span>
+<span class="ln" id="L323"><span class="tok-com">/// output voice, and it is why [`MAX_VOICES`] is stated and why a front end should</span></span>
+<span class="ln" id="L324"><span class="tok-com">/// refuse rather than rely on this. Wrapping is here so the function is total,</span></span>
+<span class="ln" id="L325"><span class="tok-com">/// not because reusing a voice is acceptable.</span></span>
+<span class="ln" id="L326"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">voice</span>(index: usize) -&gt; Voice {</span>
+<span class="ln" id="L327">    <span class="tok-kw">let</span> (register, tract) = TABLE[index % MAX_VOICES];</span>
+<span class="ln" id="L328">    <span class="tok-kw">let</span> (centroid, tilt) = TRACTS[tract];</span>
+<span class="ln" id="L329">    Voice {</span>
+<span class="ln" id="L330">        target_f0_hz: REGISTERS_HZ[register],</span>
+<span class="ln" id="L331">        target_centroid_hz: centroid,</span>
+<span class="ln" id="L332">        target_tilt_db_oct: tilt,</span>
+<span class="ln" id="L333">    }</span>
+<span class="ln" id="L334">}</span>
 </span>
-<span class="ln" id="L334"></span>
+<span class="ln" id="L335"></span>
 <span class="src-item" id="fn-all">
-<span class="ln" id="L335"><span class="tok-com">/// Every destination voice, in the order they are handed out.</span></span>
-<span class="ln" id="L336"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">all</span>() -&gt; Vec&lt;Voice&gt; {</span>
-<span class="ln" id="L337">    (<span class="tok-num">0</span>..MAX_VOICES).<span class="tok-fn">map</span>(voice).<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L338">}</span>
+<span class="ln" id="L336"><span class="tok-com">/// Every destination voice, in the order they are handed out.</span></span>
+<span class="ln" id="L337"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">all</span>() -&gt; Vec&lt;Voice&gt; {</span>
+<span class="ln" id="L338">    (<span class="tok-num">0</span>..MAX_VOICES).<span class="tok-fn">map</span>(voice).<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L339">}</span>
 </span>
-<span class="ln" id="L339"></span>
+<span class="ln" id="L340"></span>
 <span class="src-item" id="fn-separation">
-<span class="ln" id="L340"><span class="tok-com">/// How far apart two voices are, as the **larger** of their two separations.</span></span>
-<span class="ln" id="L341"><span class="tok-com">///</span></span>
-<span class="ln" id="L342"><span class="tok-com">/// Both axes are expressed as a ratio, because hearing is ratio-based on both:</span></span>
-<span class="ln" id="L343"><span class="tok-com">/// a 20 Hz pitch difference is enormous at 90 Hz and inaudible at 400, and the</span></span>
-<span class="ln" id="L344"><span class="tok-com">/// same is true of a vocal-tract scale.</span></span>
-<span class="ln" id="L345"><span class="tok-com">///</span></span>
-<span class="ln" id="L346"><span class="tok-com">/// # Why the larger and not the smaller</span></span>
-<span class="ln" id="L347"><span class="tok-com">///</span></span>
-<span class="ln" id="L348"><span class="tok-com">/// The first version of this took the *smaller*, reasoning that two voices are</span></span>
-<span class="ln" id="L349"><span class="tok-com">/// only as separable as their closest resemblance. Measuring it showed that to</span></span>
-<span class="ln" id="L350"><span class="tok-com">/// be backwards. Slots 0 and 4 have exactly the same rendered pitch and vocal</span></span>
-<span class="ln" id="L351"><span class="tok-com">/// tracts 45 % apart -- one sounds like a much larger person than the other,</span></span>
-<span class="ln" id="L352"><span class="tok-com">/// and nobody would confuse them -- and the minimum called them **identical**,</span></span>
-<span class="ln" id="L353"><span class="tok-com">/// because one axis matched. Taking the minimum reported that three voices were</span></span>
-<span class="ln" id="L354"><span class="tok-com">/// already indistinguishable, which is plainly false if you listen.</span></span>
-<span class="ln" id="L355"><span class="tok-com">///</span></span>
-<span class="ln" id="L356"><span class="tok-com">/// A listener separates two voices by whichever cue is strongest. Two voices</span></span>
-<span class="ln" id="L357"><span class="tok-com">/// are confusable only when they are close on *both* axes, which is what the</span></span>
-<span class="ln" id="L358"><span class="tok-com">/// maximum expresses.</span></span>
-<span class="ln" id="L359"><span class="tok-com">///</span></span>
-<span class="ln" id="L360"><span class="tok-com">/// `1.0` means identical on both axes. `1.19` means the stronger axis differs</span></span>
-<span class="ln" id="L361"><span class="tok-com">/// by 19 %, which is three semitones of pitch.</span></span>
-<span class="ln" id="L362"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">separation</span>(a: &amp;Voice, b: &amp;Voice, config: &amp;DeidConfig) -&gt; f32 {</span>
-<span class="ln" id="L363">    <span class="tok-kw">fn</span> <span class="tok-fn">ratio</span>(x: f32, y: f32) -&gt; f32 {</span>
-<span class="ln" id="L364">        <span class="tok-kw">if</span> x &lt;= <span class="tok-num">0.0</span> || y &lt;= <span class="tok-num">0.0</span> || !x.<span class="tok-fn">is_finite</span>() || !y.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L365">            <span class="tok-kw">return</span> <span class="tok-num">1.0</span>;</span>
-<span class="ln" id="L366">        }</span>
-<span class="ln" id="L367">        <span class="tok-kw">if</span> x &gt; y {</span>
-<span class="ln" id="L368">            x / y</span>
-<span class="ln" id="L369">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L370">            y / x</span>
-<span class="ln" id="L371">        }</span>
-<span class="ln" id="L372">    }</span>
-<span class="ln" id="L373">    <span class="tok-kw">let</span> pitch = <span class="tok-fn">ratio</span>(a.<span class="tok-fn">rendered_f0_hz</span>(config), b.<span class="tok-fn">rendered_f0_hz</span>(config));</span>
-<span class="ln" id="L374">    <span class="tok-kw">let</span> tract = <span class="tok-fn">ratio</span>(a.target_centroid_hz, b.target_centroid_hz);</span>
-<span class="ln" id="L375">    pitch.<span class="tok-fn">max</span>(tract)</span>
-<span class="ln" id="L376">}</span>
+<span class="ln" id="L341"><span class="tok-com">/// How far apart two voices are, as the **larger** of their two separations.</span></span>
+<span class="ln" id="L342"><span class="tok-com">///</span></span>
+<span class="ln" id="L343"><span class="tok-com">/// Both axes are expressed as a ratio, because hearing is ratio-based on both:</span></span>
+<span class="ln" id="L344"><span class="tok-com">/// a 20 Hz pitch difference is enormous at 90 Hz and inaudible at 400, and the</span></span>
+<span class="ln" id="L345"><span class="tok-com">/// same is true of a vocal-tract scale.</span></span>
+<span class="ln" id="L346"><span class="tok-com">///</span></span>
+<span class="ln" id="L347"><span class="tok-com">/// # Why the larger and not the smaller</span></span>
+<span class="ln" id="L348"><span class="tok-com">///</span></span>
+<span class="ln" id="L349"><span class="tok-com">/// The first version of this took the *smaller*, reasoning that two voices are</span></span>
+<span class="ln" id="L350"><span class="tok-com">/// only as separable as their closest resemblance. Measuring it showed that to</span></span>
+<span class="ln" id="L351"><span class="tok-com">/// be backwards. Slots 0 and 4 have exactly the same rendered pitch and vocal</span></span>
+<span class="ln" id="L352"><span class="tok-com">/// tracts 45 % apart -- one sounds like a much larger person than the other,</span></span>
+<span class="ln" id="L353"><span class="tok-com">/// and nobody would confuse them -- and the minimum called them **identical**,</span></span>
+<span class="ln" id="L354"><span class="tok-com">/// because one axis matched. Taking the minimum reported that three voices were</span></span>
+<span class="ln" id="L355"><span class="tok-com">/// already indistinguishable, which is plainly false if you listen.</span></span>
+<span class="ln" id="L356"><span class="tok-com">///</span></span>
+<span class="ln" id="L357"><span class="tok-com">/// A listener separates two voices by whichever cue is strongest. Two voices</span></span>
+<span class="ln" id="L358"><span class="tok-com">/// are confusable only when they are close on *both* axes, which is what the</span></span>
+<span class="ln" id="L359"><span class="tok-com">/// maximum expresses.</span></span>
+<span class="ln" id="L360"><span class="tok-com">///</span></span>
+<span class="ln" id="L361"><span class="tok-com">/// `1.0` means identical on both axes. `1.19` means the stronger axis differs</span></span>
+<span class="ln" id="L362"><span class="tok-com">/// by 19 %, which is three semitones of pitch.</span></span>
+<span class="ln" id="L363"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">separation</span>(a: &amp;Voice, b: &amp;Voice, config: &amp;DeidConfig) -&gt; f32 {</span>
+<span class="ln" id="L364">    <span class="tok-kw">fn</span> <span class="tok-fn">ratio</span>(x: f32, y: f32) -&gt; f32 {</span>
+<span class="ln" id="L365">        <span class="tok-kw">if</span> x &lt;= <span class="tok-num">0.0</span> || y &lt;= <span class="tok-num">0.0</span> || !x.<span class="tok-fn">is_finite</span>() || !y.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L366">            <span class="tok-kw">return</span> <span class="tok-num">1.0</span>;</span>
+<span class="ln" id="L367">        }</span>
+<span class="ln" id="L368">        <span class="tok-kw">if</span> x &gt; y {</span>
+<span class="ln" id="L369">            x / y</span>
+<span class="ln" id="L370">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L371">            y / x</span>
+<span class="ln" id="L372">        }</span>
+<span class="ln" id="L373">    }</span>
+<span class="ln" id="L374">    <span class="tok-kw">let</span> pitch = <span class="tok-fn">ratio</span>(a.<span class="tok-fn">rendered_f0_hz</span>(config), b.<span class="tok-fn">rendered_f0_hz</span>(config));</span>
+<span class="ln" id="L375">    <span class="tok-kw">let</span> tract = <span class="tok-fn">ratio</span>(a.target_centroid_hz, b.target_centroid_hz);</span>
+<span class="ln" id="L376">    pitch.<span class="tok-fn">max</span>(tract)</span>
+<span class="ln" id="L377">}</span>
 </span>
-<span class="ln" id="L377"></span>
+<span class="ln" id="L378"></span>
 <span class="src-item" id="fn-clear_separation">
-<span class="ln" id="L378"><span class="tok-com">/// The separation below which two voices should not be handed to two people.</span></span>
-<span class="ln" id="L379"><span class="tok-com">///</span></span>
-<span class="ln" id="L380"><span class="tok-com">/// **Three semitones &#8212; a ratio of 1.19.**</span></span>
-<span class="ln" id="L381"><span class="tok-com">///</span></span>
-<span class="ln" id="L382"><span class="tok-com">/// A semitone is about 6 % and is audible when two sounds are played back to</span></span>
-<span class="ln" id="L383"><span class="tok-com">/// back for comparison. That is not the task here. The task is following a</span></span>
-<span class="ln" id="L384"><span class="tok-com">/// conversation: hearing one voice, then a different one thirty seconds later,</span></span>
-<span class="ln" id="L385"><span class="tok-com">/// and knowing without being told that the speaker changed. That needs a</span></span>
-<span class="ln" id="L386"><span class="tok-com">/// margin, not a threshold, and three semitones is the smallest interval that</span></span>
-<span class="ln" id="L387"><span class="tok-com">/// is unmistakable rather than merely detectable.</span></span>
-<span class="ln" id="L388"><span class="tok-com">///</span></span>
-<span class="ln" id="L389"><span class="tok-com">/// Deliberately conservative, because being wrong in the other direction is</span></span>
-<span class="ln" id="L390"><span class="tok-com">/// worse. A group set up with two voices the listener cannot separate produces</span></span>
-<span class="ln" id="L391"><span class="tok-com">/// a recording in which two people sound like one &#8212; which is not a privacy</span></span>
-<span class="ln" id="L392"><span class="tok-com">/// failure but is a failure of the thing the feature is *for*, and it is only</span></span>
-<span class="ln" id="L393"><span class="tok-com">/// discovered after the recording exists.</span></span>
-<span class="ln" id="L394"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CLEAR_SEPARATION: f32 = <span class="tok-num">1.19</span>;</span>
+<span class="ln" id="L379"><span class="tok-com">/// The separation below which two voices should not be handed to two people.</span></span>
+<span class="ln" id="L380"><span class="tok-com">///</span></span>
+<span class="ln" id="L381"><span class="tok-com">/// **Three semitones, a ratio of 1.19.**</span></span>
+<span class="ln" id="L382"><span class="tok-com">///</span></span>
+<span class="ln" id="L383"><span class="tok-com">/// A semitone is about 6 % and is audible when two sounds are played back to</span></span>
+<span class="ln" id="L384"><span class="tok-com">/// back for comparison. That is not the task here. The task is following a</span></span>
+<span class="ln" id="L385"><span class="tok-com">/// conversation: hearing one voice, then a different one thirty seconds later,</span></span>
+<span class="ln" id="L386"><span class="tok-com">/// and knowing without being told that the speaker changed. That needs a</span></span>
+<span class="ln" id="L387"><span class="tok-com">/// margin, not a threshold, and three semitones is the smallest interval that</span></span>
+<span class="ln" id="L388"><span class="tok-com">/// is unmistakable rather than merely detectable.</span></span>
+<span class="ln" id="L389"><span class="tok-com">///</span></span>
+<span class="ln" id="L390"><span class="tok-com">/// Deliberately conservative, because being wrong in the other direction is</span></span>
+<span class="ln" id="L391"><span class="tok-com">/// worse. A group set up with two voices the listener cannot separate produces</span></span>
+<span class="ln" id="L392"><span class="tok-com">/// a recording in which two people sound like one, which is not a privacy</span></span>
+<span class="ln" id="L393"><span class="tok-com">/// failure but is a failure of the thing the feature is *for*, and it is only</span></span>
+<span class="ln" id="L394"><span class="tok-com">/// discovered after the recording exists.</span></span>
+<span class="ln" id="L395"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CLEAR_SEPARATION: f32 = <span class="tok-num">1.19</span>;</span>
 </span>
-<span class="ln" id="L395"></span>
+<span class="ln" id="L396"></span>
 <span class="src-item" id="fn-clear_voices">
-<span class="ln" id="L396"><span class="tok-com">/// How many voices can be handed out before two of them are too alike.</span></span>
-<span class="ln" id="L397"><span class="tok-com">///</span></span>
-<span class="ln" id="L398"><span class="tok-com">/// Slots are given out in table order, so this asks: taking them one at a time,</span></span>
-<span class="ln" id="L399"><span class="tok-com">/// at what point does a new voice come within [`CLEAR_SEPARATION`] of one</span></span>
-<span class="ln" id="L400"><span class="tok-com">/// already given out? Everything up to that point is safe to use.</span></span>
-<span class="ln" id="L401"><span class="tok-com">///</span></span>
-<span class="ln" id="L402"><span class="tok-com">/// This is a stricter question than [`distinct_voices`], which only asks</span></span>
-<span class="ln" id="L403"><span class="tok-com">/// whether two voices are *different*. Different is not the same as tellable</span></span>
-<span class="ln" id="L404"><span class="tok-com">/// apart, and a table of ten technically-different voices can still contain a</span></span>
-<span class="ln" id="L405"><span class="tok-com">/// pair nobody can separate by ear.</span></span>
-<span class="ln" id="L406"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">clear_voices</span>(config: &amp;DeidConfig) -&gt; usize {</span>
-<span class="ln" id="L407">    <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
-<span class="ln" id="L408">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> given: Vec&lt;Voice&gt; = Vec::<span class="tok-fn">with_capacity</span>(voices.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L409">    <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> voices {</span>
-<span class="ln" id="L410">        <span class="tok-kw">if</span> given</span>
-<span class="ln" id="L411">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L412">            .<span class="tok-fn">any</span>(|taken| <span class="tok-fn">separation</span>(taken, &amp;candidate, config) &lt; CLEAR_SEPARATION)</span>
-<span class="ln" id="L413">        {</span>
-<span class="ln" id="L414">            <span class="tok-kw">return</span> given.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L415">        }</span>
-<span class="ln" id="L416">        given.<span class="tok-fn">push</span>(candidate);</span>
-<span class="ln" id="L417">    }</span>
-<span class="ln" id="L418">    given.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L419">}</span>
+<span class="ln" id="L397"><span class="tok-com">/// How many voices can be handed out before two of them are too alike.</span></span>
+<span class="ln" id="L398"><span class="tok-com">///</span></span>
+<span class="ln" id="L399"><span class="tok-com">/// Slots are given out in table order, so this asks: taking them one at a time,</span></span>
+<span class="ln" id="L400"><span class="tok-com">/// at what point does a new voice come within [`CLEAR_SEPARATION`] of one</span></span>
+<span class="ln" id="L401"><span class="tok-com">/// already given out? Everything up to that point is safe to use.</span></span>
+<span class="ln" id="L402"><span class="tok-com">///</span></span>
+<span class="ln" id="L403"><span class="tok-com">/// This is a stricter question than [`distinct_voices`], which only asks</span></span>
+<span class="ln" id="L404"><span class="tok-com">/// whether two voices are *different*. Different is not the same as tellable</span></span>
+<span class="ln" id="L405"><span class="tok-com">/// apart, and a table of ten technically-different voices can still contain a</span></span>
+<span class="ln" id="L406"><span class="tok-com">/// pair nobody can separate by ear.</span></span>
+<span class="ln" id="L407"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">clear_voices</span>(config: &amp;DeidConfig) -&gt; usize {</span>
+<span class="ln" id="L408">    <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
+<span class="ln" id="L409">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> given: Vec&lt;Voice&gt; = Vec::<span class="tok-fn">with_capacity</span>(voices.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L410">    <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> voices {</span>
+<span class="ln" id="L411">        <span class="tok-kw">if</span> given</span>
+<span class="ln" id="L412">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L413">            .<span class="tok-fn">any</span>(|taken| <span class="tok-fn">separation</span>(taken, &amp;candidate, config) &lt; CLEAR_SEPARATION)</span>
+<span class="ln" id="L414">        {</span>
+<span class="ln" id="L415">            <span class="tok-kw">return</span> given.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L416">        }</span>
+<span class="ln" id="L417">        given.<span class="tok-fn">push</span>(candidate);</span>
+<span class="ln" id="L418">    }</span>
+<span class="ln" id="L419">    given.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L420">}</span>
 </span>
-<span class="ln" id="L420"></span>
+<span class="ln" id="L421"></span>
 <span class="src-item" id="fn-closest_pair">
-<span class="ln" id="L421"><span class="tok-com">/// The closest pair among the first `count` voices, as a ratio.</span></span>
-<span class="ln" id="L422"><span class="tok-com">///</span></span>
-<span class="ln" id="L423"><span class="tok-com">/// For a front end that wants to say *how* clear a given group size is rather</span></span>
-<span class="ln" id="L424"><span class="tok-com">/// than only whether it passed. `1.0` for fewer than two voices, since one</span></span>
-<span class="ln" id="L425"><span class="tok-com">/// voice has nothing to be confused with.</span></span>
-<span class="ln" id="L426"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">closest_pair</span>(count: usize, config: &amp;DeidConfig) -&gt; f32 {</span>
-<span class="ln" id="L427">    <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
-<span class="ln" id="L428">    <span class="tok-kw">let</span> taken = &amp;voices[..count.<span class="tok-fn">min</span>(voices.<span class="tok-fn">len</span>())];</span>
-<span class="ln" id="L429">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> closest = f32::INFINITY;</span>
-<span class="ln" id="L430">    <span class="tok-kw">for</span> (index, a) <span class="tok-kw">in</span> taken.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L431">        <span class="tok-kw">for</span> b <span class="tok-kw">in</span> taken.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(index + <span class="tok-num">1</span>) {</span>
-<span class="ln" id="L432">            closest = closest.<span class="tok-fn">min</span>(<span class="tok-fn">separation</span>(a, b, config));</span>
-<span class="ln" id="L433">        }</span>
-<span class="ln" id="L434">    }</span>
-<span class="ln" id="L435">    <span class="tok-kw">if</span> closest.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L436">        closest</span>
-<span class="ln" id="L437">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L438">        <span class="tok-num">1.0</span></span>
-<span class="ln" id="L439">    }</span>
-<span class="ln" id="L440">}</span>
+<span class="ln" id="L422"><span class="tok-com">/// The closest pair among the first `count` voices, as a ratio.</span></span>
+<span class="ln" id="L423"><span class="tok-com">///</span></span>
+<span class="ln" id="L424"><span class="tok-com">/// For a front end that wants to say *how* clear a given group size is rather</span></span>
+<span class="ln" id="L425"><span class="tok-com">/// than only whether it passed. `1.0` for fewer than two voices, since one</span></span>
+<span class="ln" id="L426"><span class="tok-com">/// voice has nothing to be confused with.</span></span>
+<span class="ln" id="L427"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">closest_pair</span>(count: usize, config: &amp;DeidConfig) -&gt; f32 {</span>
+<span class="ln" id="L428">    <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
+<span class="ln" id="L429">    <span class="tok-kw">let</span> taken = &amp;voices[..count.<span class="tok-fn">min</span>(voices.<span class="tok-fn">len</span>())];</span>
+<span class="ln" id="L430">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> closest = f32::INFINITY;</span>
+<span class="ln" id="L431">    <span class="tok-kw">for</span> (index, a) <span class="tok-kw">in</span> taken.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L432">        <span class="tok-kw">for</span> b <span class="tok-kw">in</span> taken.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(index + <span class="tok-num">1</span>) {</span>
+<span class="ln" id="L433">            closest = closest.<span class="tok-fn">min</span>(<span class="tok-fn">separation</span>(a, b, config));</span>
+<span class="ln" id="L434">        }</span>
+<span class="ln" id="L435">    }</span>
+<span class="ln" id="L436">    <span class="tok-kw">if</span> closest.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L437">        closest</span>
+<span class="ln" id="L438">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L439">        <span class="tok-num">1.0</span></span>
+<span class="ln" id="L440">    }</span>
+<span class="ln" id="L441">}</span>
 </span>
-<span class="ln" id="L441"></span>
+<span class="ln" id="L442"></span>
 <span class="src-item" id="fn-distinct_voices">
-<span class="ln" id="L442"><span class="tok-com">/// How many of the ten are still distinguishable under `config`.</span></span>
-<span class="ln" id="L443"><span class="tok-com">///</span></span>
-<span class="ln" id="L444"><span class="tok-com">/// Two voices count as the same when they would be **rendered** with the same</span></span>
-<span class="ln" id="L445"><span class="tok-com">/// fundamental and the same vocal tract. At the default configuration the</span></span>
-<span class="ln" id="L446"><span class="tok-com">/// answer is [`MAX_VOICES`]; at a shorter frame size it is fewer, because the</span></span>
-<span class="ln" id="L447"><span class="tok-com">/// bin grid coarsens and registers collapse onto each other.</span></span>
-<span class="ln" id="L448"><span class="tok-com">///</span></span>
-<span class="ln" id="L449"><span class="tok-com">/// A front end that lets somebody change the frame size should call this and</span></span>
-<span class="ln" id="L450"><span class="tok-com">/// say what it returns. Handing out ten labels for six sounds is the failure</span></span>
-<span class="ln" id="L451"><span class="tok-com">/// this function exists to make visible.</span></span>
-<span class="ln" id="L452"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">distinct_voices</span>(config: &amp;DeidConfig) -&gt; usize {</span>
-<span class="ln" id="L453">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;(i64, i64)&gt; = Vec::<span class="tok-fn">with_capacity</span>(MAX_VOICES);</span>
-<span class="ln" id="L454">    <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> <span class="tok-fn">all</span>() {</span>
-<span class="ln" id="L455">        <span class="tok-com">// Rounded to a hundredth of a hertz before comparing: these are</span></span>
-<span class="ln" id="L456">        <span class="tok-com">// computed floats, and two that differ in the last bit are the same</span></span>
-<span class="ln" id="L457">        <span class="tok-com">// sound.</span></span>
-<span class="ln" id="L458">        <span class="tok-kw">let</span> key = (</span>
-<span class="ln" id="L459">            (voice.<span class="tok-fn">rendered_f0_hz</span>(config) * <span class="tok-num">100.0</span>).<span class="tok-fn">round</span>() <span class="tok-kw">as</span> i64,</span>
-<span class="ln" id="L460">            (voice.target_centroid_hz * <span class="tok-num">100.0</span>).<span class="tok-fn">round</span>() <span class="tok-kw">as</span> i64,</span>
-<span class="ln" id="L461">        );</span>
-<span class="ln" id="L462">        <span class="tok-kw">if</span> !seen.<span class="tok-fn">contains</span>(&amp;key) {</span>
-<span class="ln" id="L463">            seen.<span class="tok-fn">push</span>(key);</span>
-<span class="ln" id="L464">        }</span>
-<span class="ln" id="L465">    }</span>
-<span class="ln" id="L466">    seen.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L467">}</span>
+<span class="ln" id="L443"><span class="tok-com">/// How many of the ten are still distinguishable under `config`.</span></span>
+<span class="ln" id="L444"><span class="tok-com">///</span></span>
+<span class="ln" id="L445"><span class="tok-com">/// Two voices count as the same when they would be **rendered** with the same</span></span>
+<span class="ln" id="L446"><span class="tok-com">/// fundamental and the same vocal tract. At the default configuration the</span></span>
+<span class="ln" id="L447"><span class="tok-com">/// answer is [`MAX_VOICES`]; at a shorter frame size it is fewer, because the</span></span>
+<span class="ln" id="L448"><span class="tok-com">/// bin grid coarsens and registers collapse onto each other.</span></span>
+<span class="ln" id="L449"><span class="tok-com">///</span></span>
+<span class="ln" id="L450"><span class="tok-com">/// A front end that lets somebody change the frame size should call this and</span></span>
+<span class="ln" id="L451"><span class="tok-com">/// say what it returns. Handing out ten labels for six sounds is the failure</span></span>
+<span class="ln" id="L452"><span class="tok-com">/// this function exists to make visible.</span></span>
+<span class="ln" id="L453"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">distinct_voices</span>(config: &amp;DeidConfig) -&gt; usize {</span>
+<span class="ln" id="L454">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;(i64, i64)&gt; = Vec::<span class="tok-fn">with_capacity</span>(MAX_VOICES);</span>
+<span class="ln" id="L455">    <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> <span class="tok-fn">all</span>() {</span>
+<span class="ln" id="L456">        <span class="tok-com">// Rounded to a hundredth of a hertz before comparing: these are</span></span>
+<span class="ln" id="L457">        <span class="tok-com">// computed floats, and two that differ in the last bit are the same</span></span>
+<span class="ln" id="L458">        <span class="tok-com">// sound.</span></span>
+<span class="ln" id="L459">        <span class="tok-kw">let</span> key = (</span>
+<span class="ln" id="L460">            (voice.<span class="tok-fn">rendered_f0_hz</span>(config) * <span class="tok-num">100.0</span>).<span class="tok-fn">round</span>() <span class="tok-kw">as</span> i64,</span>
+<span class="ln" id="L461">            (voice.target_centroid_hz * <span class="tok-num">100.0</span>).<span class="tok-fn">round</span>() <span class="tok-kw">as</span> i64,</span>
+<span class="ln" id="L462">        );</span>
+<span class="ln" id="L463">        <span class="tok-kw">if</span> !seen.<span class="tok-fn">contains</span>(&amp;key) {</span>
+<span class="ln" id="L464">            seen.<span class="tok-fn">push</span>(key);</span>
+<span class="ln" id="L465">        }</span>
+<span class="ln" id="L466">    }</span>
+<span class="ln" id="L467">    seen.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L468">}</span>
 </span>
-<span class="ln" id="L468"></span>
-<span class="ln" id="L469"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L470"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L471">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L472"></span>
-<span class="ln" id="L473">    <span class="tok-kw">fn</span> <span class="tok-fn">default_config</span>() -&gt; DeidConfig {</span>
-<span class="ln" id="L474">        DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L475">    }</span>
-<span class="ln" id="L476"></span>
-<span class="ln" id="L477">    <span class="tok-com">/// **Eight**, at the default configuration. Measured, not chosen.</span></span>
-<span class="ln" id="L478">    <span class="tok-com">///</span></span>
-<span class="ln" id="L479">    <span class="tok-com">/// The table holds ten and all ten are *different*; eight is how many are</span></span>
-<span class="ln" id="L480">    <span class="tok-com">/// far enough apart that a listener following a conversation can tell which</span></span>
-<span class="ln" id="L481">    <span class="tok-com">/// is which. Adding the ninth brings the closest pair to 1.1842 -- slots 4</span></span>
-<span class="ln" id="L482">    <span class="tok-com">/// and 8, which have exactly the same rendered pitch and vocal tracts only</span></span>
-<span class="ln" id="L483">    <span class="tok-com">/// 18 % apart -- and that is under the three-semitone floor.</span></span>
-<span class="ln" id="L484">    <span class="tok-com">///</span></span>
-<span class="ln" id="L485">    <span class="tok-com">/// This number is the one a front end should cap a group at. If it moves,</span></span>
-<span class="ln" id="L486">    <span class="tok-com">/// something about the table or the frame size moved with it, and the front</span></span>
-<span class="ln" id="L487">    <span class="tok-com">/// end&#x27;s limit has to move too.</span></span>
-<span class="ln" id="L488">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L489">    <span class="tok-kw">fn</span> <span class="tok-fn">eight_voices_are_clearly_separable_and_the_ninth_is_not</span>() {</span>
-<span class="ln" id="L490">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L491">        assert_eq!(<span class="tok-fn">clear_voices</span>(&amp;config), <span class="tok-num">8</span>, <span class="tok-str">&quot;the measured clear limit&quot;</span>);</span>
-<span class="ln" id="L492">        assert!(</span>
-<span class="ln" id="L493">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">8</span>, &amp;config) &gt;= CLEAR_SEPARATION,</span>
-<span class="ln" id="L494">            <span class="tok-str">&quot;eight: closest pair {:.4}&quot;</span>,</span>
-<span class="ln" id="L495">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">8</span>, &amp;config)</span>
-<span class="ln" id="L496">        );</span>
-<span class="ln" id="L497">        assert!(</span>
-<span class="ln" id="L498">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">9</span>, &amp;config) &lt; CLEAR_SEPARATION,</span>
-<span class="ln" id="L499">            <span class="tok-str">&quot;nine: closest pair {:.4} should be under the floor&quot;</span>,</span>
-<span class="ln" id="L500">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">9</span>, &amp;config)</span>
-<span class="ln" id="L501">        );</span>
-<span class="ln" id="L502">        <span class="tok-com">// The exact figures, so a change to the table is visible in the diff of</span></span>
-<span class="ln" id="L503">        <span class="tok-com">// this test rather than only in a number nobody looks at.</span></span>
-<span class="ln" id="L504">        assert!((<span class="tok-fn">closest_pair</span>(<span class="tok-num">8</span>, &amp;config) - <span class="tok-num">1.25</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.001</span>);</span>
-<span class="ln" id="L505">        assert!((<span class="tok-fn">closest_pair</span>(<span class="tok-num">9</span>, &amp;config) - <span class="tok-num">1.1842</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.001</span>);</span>
-<span class="ln" id="L506">    }</span>
-<span class="ln" id="L507"></span>
-<span class="ln" id="L508">    <span class="tok-com">/// Being *different* and being *tellable apart* are different questions,</span></span>
-<span class="ln" id="L509">    <span class="tok-com">/// and this is the gap between them: ten against eight.</span></span>
-<span class="ln" id="L510">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L511">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_is_a_weaker_test_than_clear</span>() {</span>
-<span class="ln" id="L512">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L513">        assert_eq!(<span class="tok-fn">distinct_voices</span>(&amp;config), MAX_VOICES);</span>
-<span class="ln" id="L514">        assert!(<span class="tok-fn">clear_voices</span>(&amp;config) &lt; <span class="tok-fn">distinct_voices</span>(&amp;config));</span>
-<span class="ln" id="L515">    }</span>
-<span class="ln" id="L516"></span>
-<span class="ln" id="L517">    <span class="tok-com">/// The separation of a voice with itself is 1.0, and the measure is</span></span>
-<span class="ln" id="L518">    <span class="tok-com">/// symmetric. Both are obvious and both would be silently wrong if the</span></span>
-<span class="ln" id="L519">    <span class="tok-com">/// ratio helper picked up a sign.</span></span>
-<span class="ln" id="L520">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L521">    <span class="tok-kw">fn</span> <span class="tok-fn">separation_is_symmetric_and_one_against_itself</span>() {</span>
-<span class="ln" id="L522">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L523">        <span class="tok-kw">for</span> (index, a) <span class="tok-kw">in</span> <span class="tok-fn">all</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L524">            assert!(</span>
-<span class="ln" id="L525">                (<span class="tok-fn">separation</span>(a, a, &amp;config) - <span class="tok-num">1.0</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>,</span>
-<span class="ln" id="L526">                <span class="tok-str">&quot;slot {index}&quot;</span></span>
-<span class="ln" id="L527">            );</span>
-<span class="ln" id="L528">            <span class="tok-kw">for</span> b <span class="tok-kw">in</span> <span class="tok-fn">all</span>().<span class="tok-fn">iter</span>() {</span>
-<span class="ln" id="L529">                assert!((<span class="tok-fn">separation</span>(a, b, &amp;config) - <span class="tok-fn">separation</span>(b, a, &amp;config)).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>);</span>
-<span class="ln" id="L530">            }</span>
-<span class="ln" id="L531">            assert!(<span class="tok-fn">separation</span>(a, a, &amp;config) &gt;= <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L532">        }</span>
-<span class="ln" id="L533">    }</span>
-<span class="ln" id="L534"></span>
-<span class="ln" id="L535">    <span class="tok-com">/// The first version of this took the smaller of the two axes, which</span></span>
-<span class="ln" id="L536">    <span class="tok-com">/// reported three voices as already indistinguishable. Slots 0 and 4 are</span></span>
-<span class="ln" id="L537">    <span class="tok-com">/// why that was wrong: identical pitch, vocal tracts 45 % apart -- one</span></span>
-<span class="ln" id="L538">    <span class="tok-com">/// sounds like a much larger person, and nobody would confuse them.</span></span>
-<span class="ln" id="L539">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L540">    <span class="tok-kw">fn</span> <span class="tok-fn">two_voices_differing_on_one_axis_only_are_still_separable</span>() {</span>
-<span class="ln" id="L541">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L542">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
-<span class="ln" id="L543">        <span class="tok-kw">let</span> (a, b) = (&amp;voices[<span class="tok-num">0</span>], &amp;voices[<span class="tok-num">4</span>]);</span>
-<span class="ln" id="L544">        assert!(</span>
-<span class="ln" id="L545">            (a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - b.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>,</span>
-<span class="ln" id="L546">            <span class="tok-str">&quot;slots 0 and 4 should share a pitch&quot;</span></span>
-<span class="ln" id="L547">        );</span>
-<span class="ln" id="L548">        assert!(</span>
-<span class="ln" id="L549">            <span class="tok-fn">separation</span>(a, b, &amp;config) &gt; CLEAR_SEPARATION,</span>
-<span class="ln" id="L550">            <span class="tok-str">&quot;same pitch, 45 % apart in tract, and separable on that alone&quot;</span></span>
-<span class="ln" id="L551">        );</span>
-<span class="ln" id="L552">    }</span>
-<span class="ln" id="L553"></span>
-<span class="ln" id="L554">    <span class="tok-com">/// One voice has nothing to be confused with, and no voices is not an</span></span>
-<span class="ln" id="L555">    <span class="tok-com">/// error. Both are reachable from a front end with an empty group.</span></span>
-<span class="ln" id="L556">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L557">    <span class="tok-kw">fn</span> <span class="tok-fn">a_group_too_small_to_confuse_reports_no_confusion</span>() {</span>
-<span class="ln" id="L558">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L559">        assert_eq!(<span class="tok-fn">closest_pair</span>(<span class="tok-num">0</span>, &amp;config), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L560">        assert_eq!(<span class="tok-fn">closest_pair</span>(<span class="tok-num">1</span>, &amp;config), <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L561">        <span class="tok-com">// And asking for more than the table holds does not index past it.</span></span>
-<span class="ln" id="L562">        assert_eq!(</span>
-<span class="ln" id="L563">            <span class="tok-fn">closest_pair</span>(MAX_VOICES + <span class="tok-num">5</span>, &amp;config),</span>
-<span class="ln" id="L564">            <span class="tok-fn">closest_pair</span>(MAX_VOICES, &amp;config)</span>
-<span class="ln" id="L565">        );</span>
-<span class="ln" id="L566">    }</span>
-<span class="ln" id="L567"></span>
-<span class="ln" id="L568">    <span class="tok-com">/// A coarser frame grid collapses registers onto each other, and the clear</span></span>
-<span class="ln" id="L569">    <span class="tok-com">/// count has to fall with it rather than keep promising eight.</span></span>
-<span class="ln" id="L570">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L571">    <span class="tok-kw">fn</span> <span class="tok-fn">a_coarser_frame_grid_reduces_the_clear_count</span>() {</span>
-<span class="ln" id="L572">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
-<span class="ln" id="L573">            frame_size: <span class="tok-num">128</span>,</span>
-<span class="ln" id="L574">            ..<span class="tok-fn">default_config</span>()</span>
-<span class="ln" id="L575">        };</span>
-<span class="ln" id="L576">        <span class="tok-kw">let</span> fine = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L577">        assert!(</span>
-<span class="ln" id="L578">            <span class="tok-fn">clear_voices</span>(&amp;coarse) &lt;= <span class="tok-fn">clear_voices</span>(&amp;fine),</span>
-<span class="ln" id="L579">            <span class="tok-str">&quot;coarse {} should not beat fine {}&quot;</span>,</span>
-<span class="ln" id="L580">            <span class="tok-fn">clear_voices</span>(&amp;coarse),</span>
-<span class="ln" id="L581">            <span class="tok-fn">clear_voices</span>(&amp;fine)</span>
-<span class="ln" id="L582">        );</span>
-<span class="ln" id="L583">    }</span>
-<span class="ln" id="L584"></span>
-<span class="ln" id="L585">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L586">    <span class="tok-kw">fn</span> <span class="tok-fn">there_are_exactly_ten_and_they_are_all_different_as_written</span>() {</span>
-<span class="ln" id="L587">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
-<span class="ln" id="L588">        assert_eq!(voices.<span class="tok-fn">len</span>(), MAX_VOICES);</span>
-<span class="ln" id="L589">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L590">            <span class="tok-kw">for</span> (j, b) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L591">                <span class="tok-kw">if</span> i != j {</span>
-<span class="ln" id="L592">                    assert_ne!(a, b, <span class="tok-str">&quot;slots {i} and {j} are the same voice&quot;</span>);</span>
-<span class="ln" id="L593">                }</span>
-<span class="ln" id="L594">            }</span>
-<span class="ln" id="L595">        }</span>
-<span class="ln" id="L596">    }</span>
-<span class="ln" id="L597"></span>
-<span class="ln" id="L598">    <span class="tok-com">/// **The test the first version of this table did not have.**</span></span>
-<span class="ln" id="L599">    <span class="tok-com">///</span></span>
-<span class="ln" id="L600">    <span class="tok-com">/// Being different as written is not enough: the voiced excitation is a</span></span>
-<span class="ln" id="L601">    <span class="tok-com">/// comb snapped to the FFT bin grid, so two registers a few hertz apart can</span></span>
-<span class="ln" id="L602">    <span class="tok-com">/// render as the same pitch. The first table had five registers that</span></span>
-<span class="ln" id="L603">    <span class="tok-com">/// rendered as three, and two pairs of speakers would have shared a voice</span></span>
-<span class="ln" id="L604">    <span class="tok-com">/// with nothing saying so. This compares what comes *out*.</span></span>
-<span class="ln" id="L605">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L606">    <span class="tok-kw">fn</span> <span class="tok-fn">all_ten_are_still_distinct_after_the_bin_grid_has_had_them</span>() {</span>
-<span class="ln" id="L607">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L608">        assert_eq!(</span>
-<span class="ln" id="L609">            <span class="tok-fn">distinct_voices</span>(&amp;config),</span>
-<span class="ln" id="L610">            MAX_VOICES,</span>
-<span class="ln" id="L611">            <span class="tok-str">&quot;the table collapses to {} distinguishable voices at the default \</span></span>
-<span class="ln" id="L612"><span class="tok-str">             configuration&quot;</span>,</span>
-<span class="ln" id="L613">            <span class="tok-fn">distinct_voices</span>(&amp;config)</span>
-<span class="ln" id="L614">        );</span>
-<span class="ln" id="L615"></span>
-<span class="ln" id="L616">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
-<span class="ln" id="L617">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L618">            <span class="tok-kw">for</span> (j, b) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>().<span class="tok-fn">skip</span>(i + <span class="tok-num">1</span>) {</span>
-<span class="ln" id="L619">                <span class="tok-kw">let</span> same_pitch =</span>
-<span class="ln" id="L620">                    (a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - b.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>;</span>
-<span class="ln" id="L621">                <span class="tok-kw">let</span> same_tract = (a.target_centroid_hz - b.target_centroid_hz).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>;</span>
-<span class="ln" id="L622">                assert!(</span>
-<span class="ln" id="L623">                    !(same_pitch &amp;&amp; same_tract),</span>
-<span class="ln" id="L624">                    <span class="tok-str">&quot;slots {i} and {j} both render at {:.3} Hz with a {:.0} Hz tract&quot;</span>,</span>
-<span class="ln" id="L625">                    a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config),</span>
-<span class="ln" id="L626">                    a.target_centroid_hz</span>
-<span class="ln" id="L627">                );</span>
-<span class="ln" id="L628">            }</span>
-<span class="ln" id="L629">        }</span>
-<span class="ln" id="L630">    }</span>
-<span class="ln" id="L631"></span>
-<span class="ln" id="L632">    <span class="tok-com">/// Each register must be a whole number of bins at the default</span></span>
-<span class="ln" id="L633">    <span class="tok-com">/// configuration, so what is asked for is what is rendered. If somebody</span></span>
-<span class="ln" id="L634">    <span class="tok-com">/// changes the default frame size, this is what tells them the voice table</span></span>
-<span class="ln" id="L635">    <span class="tok-com">/// needs choosing again.</span></span>
-<span class="ln" id="L636">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L637">    <span class="tok-kw">fn</span> <span class="tok-fn">every_register_is_bin_exact_at_the_default_configuration</span>() {</span>
-<span class="ln" id="L638">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L639">        <span class="tok-kw">let</span> spacing = <span class="tok-fn">bin_hz</span>(&amp;config);</span>
-<span class="ln" id="L640">        assert!(</span>
-<span class="ln" id="L641">            (spacing - <span class="tok-num">46.875</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>,</span>
-<span class="ln" id="L642">            <span class="tok-str">&quot;the bin spacing is {spacing} Hz, and the register table was chosen for \</span></span>
-<span class="ln" id="L643"><span class="tok-str">             46.875 Hz. Choose it again.&quot;</span></span>
-<span class="ln" id="L644">        );</span>
-<span class="ln" id="L645">        <span class="tok-kw">for</span> register <span class="tok-kw">in</span> REGISTERS_HZ {</span>
-<span class="ln" id="L646">            <span class="tok-kw">let</span> bins = register / spacing;</span>
-<span class="ln" id="L647">            assert!(</span>
-<span class="ln" id="L648">                (bins - bins.<span class="tok-fn">round</span>()).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>,</span>
-<span class="ln" id="L649">                <span class="tok-str">&quot;{register} Hz is {bins} bins, and a register must be a whole number&quot;</span></span>
-<span class="ln" id="L650">            );</span>
-<span class="ln" id="L651">            <span class="tok-kw">let</span> voice = Voice {</span>
-<span class="ln" id="L652">                target_f0_hz: register,</span>
-<span class="ln" id="L653">                ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L654">            };</span>
-<span class="ln" id="L655">            assert!(</span>
-<span class="ln" id="L656">                (voice.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - register).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">3</span>,</span>
-<span class="ln" id="L657">                <span class="tok-str">&quot;{register} Hz renders as {} Hz&quot;</span>,</span>
-<span class="ln" id="L658">                voice.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)</span>
-<span class="ln" id="L659">            );</span>
-<span class="ln" id="L660">        }</span>
-<span class="ln" id="L661">    }</span>
-<span class="ln" id="L662"></span>
-<span class="ln" id="L663">    <span class="tok-com">/// The measurement that found the bug, kept as a test. These are the</span></span>
-<span class="ln" id="L664">    <span class="tok-com">/// registers the first table shipped, and what they actually rendered as.</span></span>
-<span class="ln" id="L665">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L666">    <span class="tok-kw">fn</span> <span class="tok-fn">the_registers_that_were_wrong_are_still_wrong_for_the_same_reason</span>() {</span>
-<span class="ln" id="L667">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L668">        <span class="tok-kw">let</span> rendered = |hz: f32| {</span>
-<span class="ln" id="L669">            Voice {</span>
-<span class="ln" id="L670">                target_f0_hz: hz,</span>
-<span class="ln" id="L671">                ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L672">            }</span>
-<span class="ln" id="L673">            .<span class="tok-fn">rendered_f0_hz</span>(&amp;config)</span>
-<span class="ln" id="L674">        };</span>
-<span class="ln" id="L675">        assert!((<span class="tok-fn">rendered</span>(<span class="tok-num">131.0</span>) - <span class="tok-fn">rendered</span>(<span class="tok-num">157.0</span>)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L676">        assert!((<span class="tok-fn">rendered</span>(<span class="tok-num">183.0</span>) - <span class="tok-fn">rendered</span>(<span class="tok-num">209.0</span>)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L677">        assert!((<span class="tok-fn">rendered</span>(<span class="tok-num">105.0</span>) - <span class="tok-num">93.75</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L678">    }</span>
-<span class="ln" id="L679"></span>
-<span class="ln" id="L680">    <span class="tok-com">/// A coarser grid must be reported as fewer voices rather than silently</span></span>
-<span class="ln" id="L681">    <span class="tok-com">/// handing out ten labels for a smaller number of sounds.</span></span>
-<span class="ln" id="L682">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L683">    <span class="tok-kw">fn</span> <span class="tok-fn">a_shorter_frame_reports_fewer_distinguishable_voices</span>() {</span>
-<span class="ln" id="L684">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
-<span class="ln" id="L685">            frame_size: <span class="tok-num">256</span>,</span>
-<span class="ln" id="L686">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L687">        };</span>
-<span class="ln" id="L688">        <span class="tok-kw">let</span> fewer = <span class="tok-fn">distinct_voices</span>(&amp;coarse);</span>
-<span class="ln" id="L689">        assert!(</span>
-<span class="ln" id="L690">            fewer &lt; MAX_VOICES,</span>
-<span class="ln" id="L691">            <span class="tok-str">&quot;a 256-point frame is 187.5 Hz per bin and must collapse the table, got \</span></span>
-<span class="ln" id="L692"><span class="tok-str">             {fewer}&quot;</span></span>
-<span class="ln" id="L693">        );</span>
-<span class="ln" id="L694">        assert!(fewer &gt;= <span class="tok-num">1</span>);</span>
-<span class="ln" id="L695">    }</span>
-<span class="ln" id="L696"></span>
-<span class="ln" id="L697">    <span class="tok-com">/// The vocal tract is a continuous warp, not a quantised one, so its three</span></span>
-<span class="ln" id="L698">    <span class="tok-com">/// values must survive any frame size.</span></span>
-<span class="ln" id="L699">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L700">    <span class="tok-kw">fn</span> <span class="tok-fn">the_vocal_tracts_are_far_apart_and_are_not_quantised</span>() {</span>
-<span class="ln" id="L701">        <span class="tok-kw">for</span> pair <span class="tok-kw">in</span> TRACTS.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>) {</span>
-<span class="ln" id="L702">            <span class="tok-kw">let</span> ratio = pair[<span class="tok-num">1</span>].<span class="tok-num">0</span> / pair[<span class="tok-num">0</span>].<span class="tok-num">0</span>;</span>
-<span class="ln" id="L703">            assert!(</span>
-<span class="ln" id="L704">                ratio &gt; <span class="tok-num">1.18</span>,</span>
-<span class="ln" id="L705">                <span class="tok-str">&quot;{} Hz and {} Hz are only {:.0}% apart&quot;</span>,</span>
-<span class="ln" id="L706">                pair[<span class="tok-num">0</span>].<span class="tok-num">0</span>,</span>
-<span class="ln" id="L707">                pair[<span class="tok-num">1</span>].<span class="tok-num">0</span>,</span>
-<span class="ln" id="L708">                (ratio - <span class="tok-num">1.0</span>) * <span class="tok-num">100.0</span></span>
-<span class="ln" id="L709">            );</span>
-<span class="ln" id="L710">        }</span>
-<span class="ln" id="L711">    }</span>
-<span class="ln" id="L712"></span>
-<span class="ln" id="L713">    <span class="tok-com">/// A two-person conversation is the common case, so slots 0 and 1 must be</span></span>
-<span class="ln" id="L714">    <span class="tok-com">/// the furthest apart in the table.</span></span>
-<span class="ln" id="L715">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L716">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_two_slots_are_the_easiest_pair_to_tell_apart</span>() {</span>
-<span class="ln" id="L717">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L718">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
-<span class="ln" id="L719">        <span class="tok-kw">let</span> separation = |a: &amp;Voice, b: &amp;Voice| {</span>
-<span class="ln" id="L720">            (a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - b.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)).<span class="tok-fn">abs</span>() / <span class="tok-num">46.875</span></span>
-<span class="ln" id="L721">                + (a.target_centroid_hz - b.target_centroid_hz).<span class="tok-fn">abs</span>() / <span class="tok-num">140.0</span></span>
-<span class="ln" id="L722">        };</span>
-<span class="ln" id="L723">        <span class="tok-kw">let</span> first_pair = <span class="tok-fn">separation</span>(&amp;voices[<span class="tok-num">0</span>], &amp;voices[<span class="tok-num">1</span>]);</span>
-<span class="ln" id="L724">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L725">            <span class="tok-kw">for</span> b <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(i + <span class="tok-num">1</span>) {</span>
-<span class="ln" id="L726">                assert!(</span>
-<span class="ln" id="L727">                    <span class="tok-fn">separation</span>(a, b) &lt;= first_pair + 1e-<span class="tok-num">3</span>,</span>
-<span class="ln" id="L728">                    <span class="tok-str">&quot;a further-apart pair than slots 0 and 1 exists&quot;</span></span>
-<span class="ln" id="L729">                );</span>
-<span class="ln" id="L730">            }</span>
-<span class="ln" id="L731">        }</span>
-<span class="ln" id="L732">    }</span>
-<span class="ln" id="L733"></span>
-<span class="ln" id="L734">    <span class="tok-com">/// Every voice in the table must be one the engine will accept.</span></span>
-<span class="ln" id="L735">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L736">    <span class="tok-kw">fn</span> <span class="tok-fn">every_shipped_voice_is_within_range</span>() {</span>
-<span class="ln" id="L737">        <span class="tok-kw">for</span> (index, voice) <span class="tok-kw">in</span> <span class="tok-fn">all</span>().<span class="tok-fn">into_iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L738">            voice</span>
-<span class="ln" id="L739">                .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L740">                .<span class="tok-fn">unwrap_or_else</span>(|error| panic!(<span class="tok-str">&quot;slot {index}: {error}&quot;</span>));</span>
-<span class="ln" id="L741">        }</span>
-<span class="ln" id="L742">    }</span>
-<span class="ln" id="L743"></span>
-<span class="ln" id="L744">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L745">    <span class="tok-kw">fn</span> <span class="tok-fn">a_voice_out_of_range_is_refused_rather_than_moved</span>() {</span>
-<span class="ln" id="L746">        <span class="tok-kw">let</span> bad = Voice {</span>
-<span class="ln" id="L747">            target_f0_hz: <span class="tok-num">5.0</span>,</span>
-<span class="ln" id="L748">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L749">        };</span>
-<span class="ln" id="L750">        <span class="tok-kw">let</span> error = bad.<span class="tok-fn">checked</span>().<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;5 Hz is not a speaking register&quot;</span>);</span>
-<span class="ln" id="L751">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;target_f0_hz&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L752">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;intelligible&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L753"></span>
-<span class="ln" id="L754">        assert!(Voice {</span>
-<span class="ln" id="L755">            target_centroid_hz: <span class="tok-num">50.0</span>,</span>
-<span class="ln" id="L756">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L757">        }</span>
-<span class="ln" id="L758">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L759">        .<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L760">        assert!(Voice {</span>
-<span class="ln" id="L761">            target_tilt_db_oct: <span class="tok-num">40.0</span>,</span>
-<span class="ln" id="L762">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L763">        }</span>
-<span class="ln" id="L764">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L765">        .<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L766">        assert!(Voice {</span>
-<span class="ln" id="L767">            target_f0_hz: f32::NAN,</span>
-<span class="ln" id="L768">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L769">        }</span>
-<span class="ln" id="L770">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L771">        .<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L772">    }</span>
-<span class="ln" id="L773"></span>
-<span class="ln" id="L774">    <span class="tok-com">/// Applying a voice replaces the destination and nothing else. The</span></span>
-<span class="ln" id="L775">    <span class="tok-com">/// strengths are the user&#x27;s setting.</span></span>
-<span class="ln" id="L776">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L777">    <span class="tok-kw">fn</span> <span class="tok-fn">applying_a_voice_changes_only_the_destination</span>() {</span>
-<span class="ln" id="L778">        <span class="tok-kw">let</span> accent = AccentConfig {</span>
-<span class="ln" id="L779">            enabled: true,</span>
-<span class="ln" id="L780">            prosody_flatten: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L781">            vtln_strength: <span class="tok-num">0.4</span>,</span>
-<span class="ln" id="L782">            ltas_strength: <span class="tok-num">0.3</span>,</span>
-<span class="ln" id="L783">            ..AccentConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L784">        };</span>
-<span class="ln" id="L785">        <span class="tok-kw">let</span> applied = <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).<span class="tok-fn">applied_to</span>(accent);</span>
-<span class="ln" id="L786">        assert_eq!(applied.target_f0_hz, <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).target_f0_hz);</span>
-<span class="ln" id="L787">        assert_eq!(applied.target_centroid_hz, <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).target_centroid_hz);</span>
-<span class="ln" id="L788">        assert_eq!(applied.target_tilt_db_oct, <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).target_tilt_db_oct);</span>
-<span class="ln" id="L789">        assert_eq!(applied.prosody_flatten, <span class="tok-num">0.5</span>, <span class="tok-str">&quot;a strength must survive&quot;</span>);</span>
-<span class="ln" id="L790">        assert_eq!(applied.vtln_strength, <span class="tok-num">0.4</span>);</span>
-<span class="ln" id="L791">        assert_eq!(applied.ltas_strength, <span class="tok-num">0.3</span>);</span>
-<span class="ln" id="L792">        assert!(applied.enabled);</span>
-<span class="ln" id="L793">    }</span>
-<span class="ln" id="L794"></span>
-<span class="ln" id="L795">    <span class="tok-com">/// The slot is a function of the index and of nothing else. If this ever</span></span>
-<span class="ln" id="L796">    <span class="tok-com">/// takes anything derived from the input, the output voice becomes a</span></span>
-<span class="ln" id="L797">    <span class="tok-com">/// function of the input voice and the whole exercise is undone.</span></span>
-<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">a_slot_is_the_same_voice_every_time</span>() {</span>
-<span class="ln" id="L800">        <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES {</span>
-<span class="ln" id="L801">            assert_eq!(<span class="tok-fn">voice</span>(index), <span class="tok-fn">voice</span>(index));</span>
-<span class="ln" id="L802">        }</span>
-<span class="ln" id="L803">    }</span>
-<span class="ln" id="L804"></span>
-<span class="ln" id="L805">    <span class="tok-com">/// Past the table it wraps rather than panicking, and the collision is</span></span>
-<span class="ln" id="L806">    <span class="tok-com">/// real: slot 10 is slot 0 again.</span></span>
-<span class="ln" id="L807">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L808">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_past_the_table_wraps_onto_a_voice_already_in_use</span>() {</span>
-<span class="ln" id="L809">        assert_eq!(<span class="tok-fn">voice</span>(MAX_VOICES), <span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L810">        assert_eq!(<span class="tok-fn">voice</span>(MAX_VOICES * <span class="tok-num">3</span> + <span class="tok-num">4</span>), <span class="tok-fn">voice</span>(<span class="tok-num">4</span>));</span>
-<span class="ln" id="L811">        <span class="tok-kw">let</span> _ = <span class="tok-fn">voice</span>(usize::MAX);</span>
-<span class="ln" id="L812">    }</span>
-<span class="ln" id="L813"></span>
-<span class="ln" id="L814">    <span class="tok-com">/// A label describes where the voice arrived, never who was speaking.</span></span>
-<span class="ln" id="L815">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L816">    <span class="tok-kw">fn</span> <span class="tok-fn">no_label_says_anything_about_the_original_speaker</span>() {</span>
-<span class="ln" id="L817">        <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> <span class="tok-fn">all</span>() {</span>
-<span class="ln" id="L818">            <span class="tok-kw">let</span> label = voice.<span class="tok-fn">describe</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L819">            assert!(!label.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L820">            <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L821">                <span class="tok-str">&quot;man&quot;</span>, <span class="tok-str">&quot;woman&quot;</span>, <span class="tok-str">&quot;male&quot;</span>, <span class="tok-str">&quot;female&quot;</span>, <span class="tok-str">&quot;boy&quot;</span>, <span class="tok-str">&quot;girl&quot;</span>, <span class="tok-str">&quot;child&quot;</span>, <span class="tok-str">&quot;old&quot;</span>, <span class="tok-str">&quot;young&quot;</span>,</span>
-<span class="ln" id="L822">            ] {</span>
-<span class="ln" id="L823">                assert!(</span>
-<span class="ln" id="L824">                    !label</span>
-<span class="ln" id="L825">                        .<span class="tok-fn">split</span>(|c: char| !c.<span class="tok-fn">is_alphanumeric</span>())</span>
-<span class="ln" id="L826">                        .<span class="tok-fn">any</span>(|word| word == forbidden),</span>
-<span class="ln" id="L827">                    <span class="tok-str">&quot;{label} describes a person, not a destination&quot;</span></span>
-<span class="ln" id="L828">                );</span>
-<span class="ln" id="L829">            }</span>
-<span class="ln" id="L830">        }</span>
-<span class="ln" id="L831">    }</span>
-<span class="ln" id="L832"></span>
-<span class="ln" id="L833">    <span class="tok-com">/// A label must quote the fundamental that will be heard, not the one that</span></span>
-<span class="ln" id="L834">    <span class="tok-com">/// was asked for -- otherwise the interface and the ear disagree.</span></span>
-<span class="ln" id="L835">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L836">    <span class="tok-kw">fn</span> <span class="tok-fn">a_label_quotes_the_rendered_fundamental</span>() {</span>
-<span class="ln" id="L837">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
-<span class="ln" id="L838">        <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> <span class="tok-fn">all</span>() {</span>
-<span class="ln" id="L839">            <span class="tok-kw">let</span> label = voice.<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L840">            <span class="tok-kw">let</span> rendered = format!(<span class="tok-str">&quot;{:.0} Hz&quot;</span>, voice.<span class="tok-fn">rendered_f0_hz</span>(&amp;config));</span>
-<span class="ln" id="L841">            assert!(</span>
-<span class="ln" id="L842">                label.<span class="tok-fn">contains</span>(&amp;rendered),</span>
-<span class="ln" id="L843">                <span class="tok-str">&quot;{label} does not quote its rendered {rendered}&quot;</span></span>
-<span class="ln" id="L844">            );</span>
-<span class="ln" id="L845">        }</span>
-<span class="ln" id="L846">    }</span>
-<span class="ln" id="L847"></span>
-<span class="ln" id="L848">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L849">    <span class="tok-kw">fn</span> <span class="tok-fn">every_label_is_distinct</span>() {</span>
-<span class="ln" id="L850">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> labels: Vec&lt;String&gt; = <span class="tok-fn">all</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(Voice::describe).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L851">        labels.<span class="tok-fn">sort</span>();</span>
-<span class="ln" id="L852">        <span class="tok-kw">let</span> before = labels.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L853">        labels.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L854">        assert_eq!(before, labels.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;two slots describe themselves alike&quot;</span>);</span>
-<span class="ln" id="L855">    }</span>
-<span class="ln" id="L856"></span>
-<span class="ln" id="L857">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L858">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_configuration_reports_no_bin_spacing_rather_than_dividing_by_zero</span>() {</span>
-<span class="ln" id="L859">        <span class="tok-kw">let</span> broken = DeidConfig {</span>
-<span class="ln" id="L860">            frame_size: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L861">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L862">        };</span>
-<span class="ln" id="L863">        assert_eq!(<span class="tok-fn">bin_hz</span>(&amp;broken), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L864">        assert_eq!(<span class="tok-fn">voice</span>(<span class="tok-num">0</span>).<span class="tok-fn">rendered_f0_hz</span>(&amp;broken), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L865">    }</span>
-<span class="ln" id="L866">}</span>
+<span class="ln" id="L469"></span>
+<span class="ln" id="L470"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L471"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L472">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L473"></span>
+<span class="ln" id="L474">    <span class="tok-kw">fn</span> <span class="tok-fn">default_config</span>() -&gt; DeidConfig {</span>
+<span class="ln" id="L475">        DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L476">    }</span>
+<span class="ln" id="L477"></span>
+<span class="ln" id="L478">    <span class="tok-com">/// **Eight**, at the default configuration. Measured, not chosen.</span></span>
+<span class="ln" id="L479">    <span class="tok-com">///</span></span>
+<span class="ln" id="L480">    <span class="tok-com">/// The table holds ten and all ten are *different*; eight is how many are</span></span>
+<span class="ln" id="L481">    <span class="tok-com">/// far enough apart that a listener following a conversation can tell which</span></span>
+<span class="ln" id="L482">    <span class="tok-com">/// is which. Adding the ninth brings the closest pair to 1.1842 -- slots 4</span></span>
+<span class="ln" id="L483">    <span class="tok-com">/// and 8, which have exactly the same rendered pitch and vocal tracts only</span></span>
+<span class="ln" id="L484">    <span class="tok-com">/// 18 % apart -- and that is under the three-semitone floor.</span></span>
+<span class="ln" id="L485">    <span class="tok-com">///</span></span>
+<span class="ln" id="L486">    <span class="tok-com">/// This number is the one a front end should cap a group at. If it moves,</span></span>
+<span class="ln" id="L487">    <span class="tok-com">/// something about the table or the frame size moved with it, and the front</span></span>
+<span class="ln" id="L488">    <span class="tok-com">/// end&#x27;s limit has to move too.</span></span>
+<span class="ln" id="L489">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L490">    <span class="tok-kw">fn</span> <span class="tok-fn">eight_voices_are_clearly_separable_and_the_ninth_is_not</span>() {</span>
+<span class="ln" id="L491">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L492">        assert_eq!(<span class="tok-fn">clear_voices</span>(&amp;config), <span class="tok-num">8</span>, <span class="tok-str">&quot;the measured clear limit&quot;</span>);</span>
+<span class="ln" id="L493">        assert!(</span>
+<span class="ln" id="L494">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">8</span>, &amp;config) &gt;= CLEAR_SEPARATION,</span>
+<span class="ln" id="L495">            <span class="tok-str">&quot;eight: closest pair {:.4}&quot;</span>,</span>
+<span class="ln" id="L496">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">8</span>, &amp;config)</span>
+<span class="ln" id="L497">        );</span>
+<span class="ln" id="L498">        assert!(</span>
+<span class="ln" id="L499">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">9</span>, &amp;config) &lt; CLEAR_SEPARATION,</span>
+<span class="ln" id="L500">            <span class="tok-str">&quot;nine: closest pair {:.4} should be under the floor&quot;</span>,</span>
+<span class="ln" id="L501">            <span class="tok-fn">closest_pair</span>(<span class="tok-num">9</span>, &amp;config)</span>
+<span class="ln" id="L502">        );</span>
+<span class="ln" id="L503">        <span class="tok-com">// The exact figures, so a change to the table is visible in the diff of</span></span>
+<span class="ln" id="L504">        <span class="tok-com">// this test rather than only in a number nobody looks at.</span></span>
+<span class="ln" id="L505">        assert!((<span class="tok-fn">closest_pair</span>(<span class="tok-num">8</span>, &amp;config) - <span class="tok-num">1.25</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.001</span>);</span>
+<span class="ln" id="L506">        assert!((<span class="tok-fn">closest_pair</span>(<span class="tok-num">9</span>, &amp;config) - <span class="tok-num">1.1842</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.001</span>);</span>
+<span class="ln" id="L507">    }</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">    <span class="tok-com">/// Being *different* and being *tellable apart* are different questions,</span></span>
+<span class="ln" id="L510">    <span class="tok-com">/// and this is the gap between them: ten against eight.</span></span>
+<span class="ln" id="L511">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L512">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_is_a_weaker_test_than_clear</span>() {</span>
+<span class="ln" id="L513">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L514">        assert_eq!(<span class="tok-fn">distinct_voices</span>(&amp;config), MAX_VOICES);</span>
+<span class="ln" id="L515">        assert!(<span class="tok-fn">clear_voices</span>(&amp;config) &lt; <span class="tok-fn">distinct_voices</span>(&amp;config));</span>
+<span class="ln" id="L516">    }</span>
+<span class="ln" id="L517"></span>
+<span class="ln" id="L518">    <span class="tok-com">/// The separation of a voice with itself is 1.0, and the measure is</span></span>
+<span class="ln" id="L519">    <span class="tok-com">/// symmetric. Both are obvious and both would be silently wrong if the</span></span>
+<span class="ln" id="L520">    <span class="tok-com">/// ratio helper picked up a sign.</span></span>
+<span class="ln" id="L521">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L522">    <span class="tok-kw">fn</span> <span class="tok-fn">separation_is_symmetric_and_one_against_itself</span>() {</span>
+<span class="ln" id="L523">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L524">        <span class="tok-kw">for</span> (index, a) <span class="tok-kw">in</span> <span class="tok-fn">all</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L525">            assert!(</span>
+<span class="ln" id="L526">                (<span class="tok-fn">separation</span>(a, a, &amp;config) - <span class="tok-num">1.0</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>,</span>
+<span class="ln" id="L527">                <span class="tok-str">&quot;slot {index}&quot;</span></span>
+<span class="ln" id="L528">            );</span>
+<span class="ln" id="L529">            <span class="tok-kw">for</span> b <span class="tok-kw">in</span> <span class="tok-fn">all</span>().<span class="tok-fn">iter</span>() {</span>
+<span class="ln" id="L530">                assert!((<span class="tok-fn">separation</span>(a, b, &amp;config) - <span class="tok-fn">separation</span>(b, a, &amp;config)).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>);</span>
+<span class="ln" id="L531">            }</span>
+<span class="ln" id="L532">            assert!(<span class="tok-fn">separation</span>(a, a, &amp;config) &gt;= <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L533">        }</span>
+<span class="ln" id="L534">    }</span>
+<span class="ln" id="L535"></span>
+<span class="ln" id="L536">    <span class="tok-com">/// The first version of this took the smaller of the two axes, which</span></span>
+<span class="ln" id="L537">    <span class="tok-com">/// reported three voices as already indistinguishable. Slots 0 and 4 are</span></span>
+<span class="ln" id="L538">    <span class="tok-com">/// why that was wrong: identical pitch, vocal tracts 45 % apart -- one</span></span>
+<span class="ln" id="L539">    <span class="tok-com">/// sounds like a much larger person, and nobody would confuse them.</span></span>
+<span class="ln" id="L540">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L541">    <span class="tok-kw">fn</span> <span class="tok-fn">two_voices_differing_on_one_axis_only_are_still_separable</span>() {</span>
+<span class="ln" id="L542">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L543">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
+<span class="ln" id="L544">        <span class="tok-kw">let</span> (a, b) = (&amp;voices[<span class="tok-num">0</span>], &amp;voices[<span class="tok-num">4</span>]);</span>
+<span class="ln" id="L545">        assert!(</span>
+<span class="ln" id="L546">            (a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - b.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>,</span>
+<span class="ln" id="L547">            <span class="tok-str">&quot;slots 0 and 4 should share a pitch&quot;</span></span>
+<span class="ln" id="L548">        );</span>
+<span class="ln" id="L549">        assert!(</span>
+<span class="ln" id="L550">            <span class="tok-fn">separation</span>(a, b, &amp;config) &gt; CLEAR_SEPARATION,</span>
+<span class="ln" id="L551">            <span class="tok-str">&quot;same pitch, 45 % apart in tract, and separable on that alone&quot;</span></span>
+<span class="ln" id="L552">        );</span>
+<span class="ln" id="L553">    }</span>
+<span class="ln" id="L554"></span>
+<span class="ln" id="L555">    <span class="tok-com">/// One voice has nothing to be confused with, and no voices is not an</span></span>
+<span class="ln" id="L556">    <span class="tok-com">/// error. Both are reachable from a front end with an empty group.</span></span>
+<span class="ln" id="L557">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L558">    <span class="tok-kw">fn</span> <span class="tok-fn">a_group_too_small_to_confuse_reports_no_confusion</span>() {</span>
+<span class="ln" id="L559">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L560">        assert_eq!(<span class="tok-fn">closest_pair</span>(<span class="tok-num">0</span>, &amp;config), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L561">        assert_eq!(<span class="tok-fn">closest_pair</span>(<span class="tok-num">1</span>, &amp;config), <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L562">        <span class="tok-com">// And asking for more than the table holds does not index past it.</span></span>
+<span class="ln" id="L563">        assert_eq!(</span>
+<span class="ln" id="L564">            <span class="tok-fn">closest_pair</span>(MAX_VOICES + <span class="tok-num">5</span>, &amp;config),</span>
+<span class="ln" id="L565">            <span class="tok-fn">closest_pair</span>(MAX_VOICES, &amp;config)</span>
+<span class="ln" id="L566">        );</span>
+<span class="ln" id="L567">    }</span>
+<span class="ln" id="L568"></span>
+<span class="ln" id="L569">    <span class="tok-com">/// A coarser frame grid collapses registers onto each other, and the clear</span></span>
+<span class="ln" id="L570">    <span class="tok-com">/// count has to fall with it rather than keep promising eight.</span></span>
+<span class="ln" id="L571">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L572">    <span class="tok-kw">fn</span> <span class="tok-fn">a_coarser_frame_grid_reduces_the_clear_count</span>() {</span>
+<span class="ln" id="L573">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
+<span class="ln" id="L574">            frame_size: <span class="tok-num">128</span>,</span>
+<span class="ln" id="L575">            ..<span class="tok-fn">default_config</span>()</span>
+<span class="ln" id="L576">        };</span>
+<span class="ln" id="L577">        <span class="tok-kw">let</span> fine = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L578">        assert!(</span>
+<span class="ln" id="L579">            <span class="tok-fn">clear_voices</span>(&amp;coarse) &lt;= <span class="tok-fn">clear_voices</span>(&amp;fine),</span>
+<span class="ln" id="L580">            <span class="tok-str">&quot;coarse {} should not beat fine {}&quot;</span>,</span>
+<span class="ln" id="L581">            <span class="tok-fn">clear_voices</span>(&amp;coarse),</span>
+<span class="ln" id="L582">            <span class="tok-fn">clear_voices</span>(&amp;fine)</span>
+<span class="ln" id="L583">        );</span>
+<span class="ln" id="L584">    }</span>
+<span class="ln" id="L585"></span>
+<span class="ln" id="L586">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L587">    <span class="tok-kw">fn</span> <span class="tok-fn">there_are_exactly_ten_and_they_are_all_different_as_written</span>() {</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
+<span class="ln" id="L589">        assert_eq!(voices.<span class="tok-fn">len</span>(), MAX_VOICES);</span>
+<span class="ln" id="L590">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L591">            <span class="tok-kw">for</span> (j, b) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L592">                <span class="tok-kw">if</span> i != j {</span>
+<span class="ln" id="L593">                    assert_ne!(a, b, <span class="tok-str">&quot;slots {i} and {j} are the same voice&quot;</span>);</span>
+<span class="ln" id="L594">                }</span>
+<span class="ln" id="L595">            }</span>
+<span class="ln" id="L596">        }</span>
+<span class="ln" id="L597">    }</span>
+<span class="ln" id="L598"></span>
+<span class="ln" id="L599">    <span class="tok-com">/// **The test the first version of this table did not have.**</span></span>
+<span class="ln" id="L600">    <span class="tok-com">///</span></span>
+<span class="ln" id="L601">    <span class="tok-com">/// Being different as written is not enough: the voiced excitation is a</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// comb snapped to the FFT bin grid, so two registers a few hertz apart can</span></span>
+<span class="ln" id="L603">    <span class="tok-com">/// render as the same pitch. The first table had five registers that</span></span>
+<span class="ln" id="L604">    <span class="tok-com">/// rendered as three, and two pairs of speakers would have shared a voice</span></span>
+<span class="ln" id="L605">    <span class="tok-com">/// with nothing saying so. This compares what comes *out*.</span></span>
+<span class="ln" id="L606">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L607">    <span class="tok-kw">fn</span> <span class="tok-fn">all_ten_are_still_distinct_after_the_bin_grid_has_had_them</span>() {</span>
+<span class="ln" id="L608">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L609">        assert_eq!(</span>
+<span class="ln" id="L610">            <span class="tok-fn">distinct_voices</span>(&amp;config),</span>
+<span class="ln" id="L611">            MAX_VOICES,</span>
+<span class="ln" id="L612">            <span class="tok-str">&quot;the table collapses to {} distinguishable voices at the default \</span></span>
+<span class="ln" id="L613"><span class="tok-str">             configuration&quot;</span>,</span>
+<span class="ln" id="L614">            <span class="tok-fn">distinct_voices</span>(&amp;config)</span>
+<span class="ln" id="L615">        );</span>
+<span class="ln" id="L616"></span>
+<span class="ln" id="L617">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
+<span class="ln" id="L618">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L619">            <span class="tok-kw">for</span> (j, b) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>().<span class="tok-fn">skip</span>(i + <span class="tok-num">1</span>) {</span>
+<span class="ln" id="L620">                <span class="tok-kw">let</span> same_pitch =</span>
+<span class="ln" id="L621">                    (a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - b.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>;</span>
+<span class="ln" id="L622">                <span class="tok-kw">let</span> same_tract = (a.target_centroid_hz - b.target_centroid_hz).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>;</span>
+<span class="ln" id="L623">                assert!(</span>
+<span class="ln" id="L624">                    !(same_pitch &amp;&amp; same_tract),</span>
+<span class="ln" id="L625">                    <span class="tok-str">&quot;slots {i} and {j} both render at {:.3} Hz with a {:.0} Hz tract&quot;</span>,</span>
+<span class="ln" id="L626">                    a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config),</span>
+<span class="ln" id="L627">                    a.target_centroid_hz</span>
+<span class="ln" id="L628">                );</span>
+<span class="ln" id="L629">            }</span>
+<span class="ln" id="L630">        }</span>
+<span class="ln" id="L631">    }</span>
+<span class="ln" id="L632"></span>
+<span class="ln" id="L633">    <span class="tok-com">/// Each register must be a whole number of bins at the default</span></span>
+<span class="ln" id="L634">    <span class="tok-com">/// configuration, so what is asked for is what is rendered. If somebody</span></span>
+<span class="ln" id="L635">    <span class="tok-com">/// changes the default frame size, this is what tells them the voice table</span></span>
+<span class="ln" id="L636">    <span class="tok-com">/// needs choosing again.</span></span>
+<span class="ln" id="L637">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L638">    <span class="tok-kw">fn</span> <span class="tok-fn">every_register_is_bin_exact_at_the_default_configuration</span>() {</span>
+<span class="ln" id="L639">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L640">        <span class="tok-kw">let</span> spacing = <span class="tok-fn">bin_hz</span>(&amp;config);</span>
+<span class="ln" id="L641">        assert!(</span>
+<span class="ln" id="L642">            (spacing - <span class="tok-num">46.875</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>,</span>
+<span class="ln" id="L643">            <span class="tok-str">&quot;the bin spacing is {spacing} Hz, and the register table was chosen for \</span></span>
+<span class="ln" id="L644"><span class="tok-str">             46.875 Hz. Choose it again.&quot;</span></span>
+<span class="ln" id="L645">        );</span>
+<span class="ln" id="L646">        <span class="tok-kw">for</span> register <span class="tok-kw">in</span> REGISTERS_HZ {</span>
+<span class="ln" id="L647">            <span class="tok-kw">let</span> bins = register / spacing;</span>
+<span class="ln" id="L648">            assert!(</span>
+<span class="ln" id="L649">                (bins - bins.<span class="tok-fn">round</span>()).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>,</span>
+<span class="ln" id="L650">                <span class="tok-str">&quot;{register} Hz is {bins} bins, and a register must be a whole number&quot;</span></span>
+<span class="ln" id="L651">            );</span>
+<span class="ln" id="L652">            <span class="tok-kw">let</span> voice = Voice {</span>
+<span class="ln" id="L653">                target_f0_hz: register,</span>
+<span class="ln" id="L654">                ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L655">            };</span>
+<span class="ln" id="L656">            assert!(</span>
+<span class="ln" id="L657">                (voice.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - register).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">3</span>,</span>
+<span class="ln" id="L658">                <span class="tok-str">&quot;{register} Hz renders as {} Hz&quot;</span>,</span>
+<span class="ln" id="L659">                voice.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)</span>
+<span class="ln" id="L660">            );</span>
+<span class="ln" id="L661">        }</span>
+<span class="ln" id="L662">    }</span>
+<span class="ln" id="L663"></span>
+<span class="ln" id="L664">    <span class="tok-com">/// The measurement that found the bug, kept as a test. These are the</span></span>
+<span class="ln" id="L665">    <span class="tok-com">/// registers the first table shipped, and what they actually rendered as.</span></span>
+<span class="ln" id="L666">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L667">    <span class="tok-kw">fn</span> <span class="tok-fn">the_registers_that_were_wrong_are_still_wrong_for_the_same_reason</span>() {</span>
+<span class="ln" id="L668">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L669">        <span class="tok-kw">let</span> rendered = |hz: f32| {</span>
+<span class="ln" id="L670">            Voice {</span>
+<span class="ln" id="L671">                target_f0_hz: hz,</span>
+<span class="ln" id="L672">                ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L673">            }</span>
+<span class="ln" id="L674">            .<span class="tok-fn">rendered_f0_hz</span>(&amp;config)</span>
+<span class="ln" id="L675">        };</span>
+<span class="ln" id="L676">        assert!((<span class="tok-fn">rendered</span>(<span class="tok-num">131.0</span>) - <span class="tok-fn">rendered</span>(<span class="tok-num">157.0</span>)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L677">        assert!((<span class="tok-fn">rendered</span>(<span class="tok-num">183.0</span>) - <span class="tok-fn">rendered</span>(<span class="tok-num">209.0</span>)).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L678">        assert!((<span class="tok-fn">rendered</span>(<span class="tok-num">105.0</span>) - <span class="tok-num">93.75</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L679">    }</span>
+<span class="ln" id="L680"></span>
+<span class="ln" id="L681">    <span class="tok-com">/// A coarser grid must be reported as fewer voices rather than silently</span></span>
+<span class="ln" id="L682">    <span class="tok-com">/// handing out ten labels for a smaller number of sounds.</span></span>
+<span class="ln" id="L683">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L684">    <span class="tok-kw">fn</span> <span class="tok-fn">a_shorter_frame_reports_fewer_distinguishable_voices</span>() {</span>
+<span class="ln" id="L685">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
+<span class="ln" id="L686">            frame_size: <span class="tok-num">256</span>,</span>
+<span class="ln" id="L687">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L688">        };</span>
+<span class="ln" id="L689">        <span class="tok-kw">let</span> fewer = <span class="tok-fn">distinct_voices</span>(&amp;coarse);</span>
+<span class="ln" id="L690">        assert!(</span>
+<span class="ln" id="L691">            fewer &lt; MAX_VOICES,</span>
+<span class="ln" id="L692">            <span class="tok-str">&quot;a 256-point frame is 187.5 Hz per bin and must collapse the table, got \</span></span>
+<span class="ln" id="L693"><span class="tok-str">             {fewer}&quot;</span></span>
+<span class="ln" id="L694">        );</span>
+<span class="ln" id="L695">        assert!(fewer &gt;= <span class="tok-num">1</span>);</span>
+<span class="ln" id="L696">    }</span>
+<span class="ln" id="L697"></span>
+<span class="ln" id="L698">    <span class="tok-com">/// The vocal tract is a continuous warp, not a quantised one, so its three</span></span>
+<span class="ln" id="L699">    <span class="tok-com">/// values must survive any frame size.</span></span>
+<span class="ln" id="L700">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L701">    <span class="tok-kw">fn</span> <span class="tok-fn">the_vocal_tracts_are_far_apart_and_are_not_quantised</span>() {</span>
+<span class="ln" id="L702">        <span class="tok-kw">for</span> pair <span class="tok-kw">in</span> TRACTS.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>) {</span>
+<span class="ln" id="L703">            <span class="tok-kw">let</span> ratio = pair[<span class="tok-num">1</span>].<span class="tok-num">0</span> / pair[<span class="tok-num">0</span>].<span class="tok-num">0</span>;</span>
+<span class="ln" id="L704">            assert!(</span>
+<span class="ln" id="L705">                ratio &gt; <span class="tok-num">1.18</span>,</span>
+<span class="ln" id="L706">                <span class="tok-str">&quot;{} Hz and {} Hz are only {:.0}% apart&quot;</span>,</span>
+<span class="ln" id="L707">                pair[<span class="tok-num">0</span>].<span class="tok-num">0</span>,</span>
+<span class="ln" id="L708">                pair[<span class="tok-num">1</span>].<span class="tok-num">0</span>,</span>
+<span class="ln" id="L709">                (ratio - <span class="tok-num">1.0</span>) * <span class="tok-num">100.0</span></span>
+<span class="ln" id="L710">            );</span>
+<span class="ln" id="L711">        }</span>
+<span class="ln" id="L712">    }</span>
+<span class="ln" id="L713"></span>
+<span class="ln" id="L714">    <span class="tok-com">/// A two-person conversation is the common case, so slots 0 and 1 must be</span></span>
+<span class="ln" id="L715">    <span class="tok-com">/// the furthest apart in the table.</span></span>
+<span class="ln" id="L716">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L717">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_two_slots_are_the_easiest_pair_to_tell_apart</span>() {</span>
+<span class="ln" id="L718">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L719">        <span class="tok-kw">let</span> voices = <span class="tok-fn">all</span>();</span>
+<span class="ln" id="L720">        <span class="tok-kw">let</span> separation = |a: &amp;Voice, b: &amp;Voice| {</span>
+<span class="ln" id="L721">            (a.<span class="tok-fn">rendered_f0_hz</span>(&amp;config) - b.<span class="tok-fn">rendered_f0_hz</span>(&amp;config)).<span class="tok-fn">abs</span>() / <span class="tok-num">46.875</span></span>
+<span class="ln" id="L722">                + (a.target_centroid_hz - b.target_centroid_hz).<span class="tok-fn">abs</span>() / <span class="tok-num">140.0</span></span>
+<span class="ln" id="L723">        };</span>
+<span class="ln" id="L724">        <span class="tok-kw">let</span> first_pair = <span class="tok-fn">separation</span>(&amp;voices[<span class="tok-num">0</span>], &amp;voices[<span class="tok-num">1</span>]);</span>
+<span class="ln" id="L725">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L726">            <span class="tok-kw">for</span> b <span class="tok-kw">in</span> voices.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(i + <span class="tok-num">1</span>) {</span>
+<span class="ln" id="L727">                assert!(</span>
+<span class="ln" id="L728">                    <span class="tok-fn">separation</span>(a, b) &lt;= first_pair + 1e-<span class="tok-num">3</span>,</span>
+<span class="ln" id="L729">                    <span class="tok-str">&quot;a further-apart pair than slots 0 and 1 exists&quot;</span></span>
+<span class="ln" id="L730">                );</span>
+<span class="ln" id="L731">            }</span>
+<span class="ln" id="L732">        }</span>
+<span class="ln" id="L733">    }</span>
+<span class="ln" id="L734"></span>
+<span class="ln" id="L735">    <span class="tok-com">/// Every voice in the table must be one the engine will accept.</span></span>
+<span class="ln" id="L736">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L737">    <span class="tok-kw">fn</span> <span class="tok-fn">every_shipped_voice_is_within_range</span>() {</span>
+<span class="ln" id="L738">        <span class="tok-kw">for</span> (index, voice) <span class="tok-kw">in</span> <span class="tok-fn">all</span>().<span class="tok-fn">into_iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L739">            voice</span>
+<span class="ln" id="L740">                .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L741">                .<span class="tok-fn">unwrap_or_else</span>(|error| panic!(<span class="tok-str">&quot;slot {index}: {error}&quot;</span>));</span>
+<span class="ln" id="L742">        }</span>
+<span class="ln" id="L743">    }</span>
+<span class="ln" id="L744"></span>
+<span class="ln" id="L745">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L746">    <span class="tok-kw">fn</span> <span class="tok-fn">a_voice_out_of_range_is_refused_rather_than_moved</span>() {</span>
+<span class="ln" id="L747">        <span class="tok-kw">let</span> bad = Voice {</span>
+<span class="ln" id="L748">            target_f0_hz: <span class="tok-num">5.0</span>,</span>
+<span class="ln" id="L749">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L750">        };</span>
+<span class="ln" id="L751">        <span class="tok-kw">let</span> error = bad.<span class="tok-fn">checked</span>().<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;5 Hz is not a speaking register&quot;</span>);</span>
+<span class="ln" id="L752">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;target_f0_hz&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L753">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;intelligible&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L754"></span>
+<span class="ln" id="L755">        assert!(Voice {</span>
+<span class="ln" id="L756">            target_centroid_hz: <span class="tok-num">50.0</span>,</span>
+<span class="ln" id="L757">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L758">        }</span>
+<span class="ln" id="L759">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L760">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L761">        assert!(Voice {</span>
+<span class="ln" id="L762">            target_tilt_db_oct: <span class="tok-num">40.0</span>,</span>
+<span class="ln" id="L763">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L764">        }</span>
+<span class="ln" id="L765">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L766">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L767">        assert!(Voice {</span>
+<span class="ln" id="L768">            target_f0_hz: f32::NAN,</span>
+<span class="ln" id="L769">            ..<span class="tok-fn">voice</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L770">        }</span>
+<span class="ln" id="L771">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L772">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L773">    }</span>
+<span class="ln" id="L774"></span>
+<span class="ln" id="L775">    <span class="tok-com">/// Applying a voice replaces the destination and nothing else. The</span></span>
+<span class="ln" id="L776">    <span class="tok-com">/// strengths are the user&#x27;s setting.</span></span>
+<span class="ln" id="L777">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L778">    <span class="tok-kw">fn</span> <span class="tok-fn">applying_a_voice_changes_only_the_destination</span>() {</span>
+<span class="ln" id="L779">        <span class="tok-kw">let</span> accent = AccentConfig {</span>
+<span class="ln" id="L780">            enabled: true,</span>
+<span class="ln" id="L781">            prosody_flatten: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L782">            vtln_strength: <span class="tok-num">0.4</span>,</span>
+<span class="ln" id="L783">            ltas_strength: <span class="tok-num">0.3</span>,</span>
+<span class="ln" id="L784">            ..AccentConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L785">        };</span>
+<span class="ln" id="L786">        <span class="tok-kw">let</span> applied = <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).<span class="tok-fn">applied_to</span>(accent);</span>
+<span class="ln" id="L787">        assert_eq!(applied.target_f0_hz, <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).target_f0_hz);</span>
+<span class="ln" id="L788">        assert_eq!(applied.target_centroid_hz, <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).target_centroid_hz);</span>
+<span class="ln" id="L789">        assert_eq!(applied.target_tilt_db_oct, <span class="tok-fn">voice</span>(<span class="tok-num">3</span>).target_tilt_db_oct);</span>
+<span class="ln" id="L790">        assert_eq!(applied.prosody_flatten, <span class="tok-num">0.5</span>, <span class="tok-str">&quot;a strength must survive&quot;</span>);</span>
+<span class="ln" id="L791">        assert_eq!(applied.vtln_strength, <span class="tok-num">0.4</span>);</span>
+<span class="ln" id="L792">        assert_eq!(applied.ltas_strength, <span class="tok-num">0.3</span>);</span>
+<span class="ln" id="L793">        assert!(applied.enabled);</span>
+<span class="ln" id="L794">    }</span>
+<span class="ln" id="L795"></span>
+<span class="ln" id="L796">    <span class="tok-com">/// The slot is a function of the index and of nothing else. If this ever</span></span>
+<span class="ln" id="L797">    <span class="tok-com">/// takes anything derived from the input, the output voice becomes a</span></span>
+<span class="ln" id="L798">    <span class="tok-com">/// function of the input voice and the whole exercise is undone.</span></span>
+<span class="ln" id="L799">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L800">    <span class="tok-kw">fn</span> <span class="tok-fn">a_slot_is_the_same_voice_every_time</span>() {</span>
+<span class="ln" id="L801">        <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES {</span>
+<span class="ln" id="L802">            assert_eq!(<span class="tok-fn">voice</span>(index), <span class="tok-fn">voice</span>(index));</span>
+<span class="ln" id="L803">        }</span>
+<span class="ln" id="L804">    }</span>
+<span class="ln" id="L805"></span>
+<span class="ln" id="L806">    <span class="tok-com">/// Past the table it wraps rather than panicking, and the collision is</span></span>
+<span class="ln" id="L807">    <span class="tok-com">/// real: slot 10 is slot 0 again.</span></span>
+<span class="ln" id="L808">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L809">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_past_the_table_wraps_onto_a_voice_already_in_use</span>() {</span>
+<span class="ln" id="L810">        assert_eq!(<span class="tok-fn">voice</span>(MAX_VOICES), <span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L811">        assert_eq!(<span class="tok-fn">voice</span>(MAX_VOICES * <span class="tok-num">3</span> + <span class="tok-num">4</span>), <span class="tok-fn">voice</span>(<span class="tok-num">4</span>));</span>
+<span class="ln" id="L812">        <span class="tok-kw">let</span> _ = <span class="tok-fn">voice</span>(usize::MAX);</span>
+<span class="ln" id="L813">    }</span>
+<span class="ln" id="L814"></span>
+<span class="ln" id="L815">    <span class="tok-com">/// A label describes where the voice arrived, never who was speaking.</span></span>
+<span class="ln" id="L816">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L817">    <span class="tok-kw">fn</span> <span class="tok-fn">no_label_says_anything_about_the_original_speaker</span>() {</span>
+<span class="ln" id="L818">        <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> <span class="tok-fn">all</span>() {</span>
+<span class="ln" id="L819">            <span class="tok-kw">let</span> label = voice.<span class="tok-fn">describe</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L820">            assert!(!label.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L821">            <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L822">                <span class="tok-str">&quot;man&quot;</span>, <span class="tok-str">&quot;woman&quot;</span>, <span class="tok-str">&quot;male&quot;</span>, <span class="tok-str">&quot;female&quot;</span>, <span class="tok-str">&quot;boy&quot;</span>, <span class="tok-str">&quot;girl&quot;</span>, <span class="tok-str">&quot;child&quot;</span>, <span class="tok-str">&quot;old&quot;</span>, <span class="tok-str">&quot;young&quot;</span>,</span>
+<span class="ln" id="L823">            ] {</span>
+<span class="ln" id="L824">                assert!(</span>
+<span class="ln" id="L825">                    !label</span>
+<span class="ln" id="L826">                        .<span class="tok-fn">split</span>(|c: char| !c.<span class="tok-fn">is_alphanumeric</span>())</span>
+<span class="ln" id="L827">                        .<span class="tok-fn">any</span>(|word| word == forbidden),</span>
+<span class="ln" id="L828">                    <span class="tok-str">&quot;{label} describes a person, not a destination&quot;</span></span>
+<span class="ln" id="L829">                );</span>
+<span class="ln" id="L830">            }</span>
+<span class="ln" id="L831">        }</span>
+<span class="ln" id="L832">    }</span>
+<span class="ln" id="L833"></span>
+<span class="ln" id="L834">    <span class="tok-com">/// A label must quote the fundamental that will be heard, not the one that</span></span>
+<span class="ln" id="L835">    <span class="tok-com">/// was asked for -- otherwise the interface and the ear disagree.</span></span>
+<span class="ln" id="L836">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L837">    <span class="tok-kw">fn</span> <span class="tok-fn">a_label_quotes_the_rendered_fundamental</span>() {</span>
+<span class="ln" id="L838">        <span class="tok-kw">let</span> config = <span class="tok-fn">default_config</span>();</span>
+<span class="ln" id="L839">        <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> <span class="tok-fn">all</span>() {</span>
+<span class="ln" id="L840">            <span class="tok-kw">let</span> label = voice.<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L841">            <span class="tok-kw">let</span> rendered = format!(<span class="tok-str">&quot;{:.0} Hz&quot;</span>, voice.<span class="tok-fn">rendered_f0_hz</span>(&amp;config));</span>
+<span class="ln" id="L842">            assert!(</span>
+<span class="ln" id="L843">                label.<span class="tok-fn">contains</span>(&amp;rendered),</span>
+<span class="ln" id="L844">                <span class="tok-str">&quot;{label} does not quote its rendered {rendered}&quot;</span></span>
+<span class="ln" id="L845">            );</span>
+<span class="ln" id="L846">        }</span>
+<span class="ln" id="L847">    }</span>
+<span class="ln" id="L848"></span>
+<span class="ln" id="L849">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L850">    <span class="tok-kw">fn</span> <span class="tok-fn">every_label_is_distinct</span>() {</span>
+<span class="ln" id="L851">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> labels: Vec&lt;String&gt; = <span class="tok-fn">all</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(Voice::describe).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L852">        labels.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L853">        <span class="tok-kw">let</span> before = labels.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L854">        labels.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L855">        assert_eq!(before, labels.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;two slots describe themselves alike&quot;</span>);</span>
+<span class="ln" id="L856">    }</span>
+<span class="ln" id="L857"></span>
+<span class="ln" id="L858">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L859">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_configuration_reports_no_bin_spacing_rather_than_dividing_by_zero</span>() {</span>
+<span class="ln" id="L860">        <span class="tok-kw">let</span> broken = DeidConfig {</span>
+<span class="ln" id="L861">            frame_size: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L862">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L863">        };</span>
+<span class="ln" id="L864">        assert_eq!(<span class="tok-fn">bin_hz</span>(&amp;broken), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L865">        assert_eq!(<span class="tok-fn">voice</span>(<span class="tok-num">0</span>).<span class="tok-fn">rendered_f0_hz</span>(&amp;broken), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L866">    }</span>
+<span class="ln" id="L867">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

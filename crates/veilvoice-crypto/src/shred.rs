@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Secure erasure — the self-destruct.
+//! Secure erasure, the self-destruct.
 //!
 //! # Read this before relying on it
 //!
@@ -11,7 +11,7 @@
 //! **On a spinning disk**, overwriting is genuinely effective. The write goes to
 //! the same physical sectors, and the belief that a scanning-microscope recovery
 //! of overwritten magnetic media is practical does not survive contact with the
-//! literature — Gutmann's 1996 paper, whose 35-pass pattern is still cited, says
+//! literature. Gutmann's 1996 paper, whose 35-pass pattern is still cited, says
 //! so himself in its own epilogue about modern drives.
 //!
 //! **On an SSD, or any flash media**, it is not reliable and cannot be made so.
@@ -31,8 +31,8 @@
 //!
 //! Because passes stopped being the interesting variable decades ago. Against a
 //! drive that honours writes, one pass is enough; against one that does not, no
-//! number of passes reaches the retained cells. The default here is three —
-//! random, complement, random — which satisfies the common
+//! number of passes reaches the retained cells. The default here is three,
+//! random then complement then random, which satisfies the common
 //! three-pass expectation without pretending that thirty-five would be stronger.
 //! Time is better spent enabling disk encryption than on passes 4 through 35.
 //!
@@ -92,20 +92,20 @@ pub struct ShredReport {
     pub removed: bool,
     /// Whether the data was flushed to the device rather than left in cache.
     pub synced: bool,
-    /// Caveats that apply to this erasure, in plain words. Never empty — there
+    /// Caveats that apply to this erasure, in plain words. Never empty, because there
     /// is always something honest to say about the limits.
     pub caveats: Vec<String>,
 }
 
 /// Overwrite a file's contents, then delete it.
 ///
-/// The file is opened for writing in place — never truncated, never copied —
+/// The file is opened for writing in place, never truncated and never copied,
 /// so the bytes on disk are the ones being overwritten, as far as the operating
 /// system and the drive allow.
 pub fn shred_file(path: &Path, passes: Passes) -> Result<ShredReport, Error> {
     // `symlink_metadata` does *not* follow the link, which is the whole point.
-    // Overwriting through a symlink destroys whatever it points at — someone
-    // else's key, a config file, `~/.bashrc` — and then unlinks only the link,
+    // Overwriting through a symlink destroys whatever it points at, such as
+    // someone else's key, a config file or `~/.bashrc`, and then unlinks only the link,
     // so the report would say "removed" about a file that is still there while
     // an unrelated one has been filled with random bytes. A destructive
     // operation must refuse to be redirected.
@@ -130,7 +130,7 @@ pub fn shred_file(path: &Path, passes: Passes) -> Result<ShredReport, Error> {
     let count = passes.count();
 
     // Computed in `u64` and only then narrowed. `length as usize` truncates on
-    // a 32-bit target — and VeilVoice ships an ARMv7 build — so a file of
+    // a 32-bit target, and VeilVoice ships an ARMv7 build, so a file of
     // exactly 4 GiB gave a zero-length buffer, `take` was then always zero,
     // `remaining` never decreased and the loop **never terminated**: the erase
     // hung forever and the file was left intact. The same 32-bit-only shape as
@@ -357,7 +357,7 @@ mod tests {
     }
 
     /// The same on Windows, where a symlink needs either Developer Mode or
-    /// elevation to create — so the test skips rather than fails when it
+    /// elevation to create, so the test skips rather than fails when it
     /// cannot make one.
     #[cfg(windows)]
     #[test]

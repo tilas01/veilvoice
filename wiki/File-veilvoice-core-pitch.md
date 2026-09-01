@@ -22,13 +22,13 @@ Two constraints shape this implementation:
 1024-point FFT / 48 kHz the bin spacing is ~47 Hz, so a spectral peak-pick
 cannot tell 100 Hz from 140 Hz. This tracker therefore works in the time
 domain over its own rolling history, which may be longer than one STFT
-frame without adding any output latency — the window still *ends* at the
+frame without adding any output latency, because the window still *ends* at the
 current frame, so it stays causal.
 * **It must be cheap enough for an audio callback.** The signal is decimated
 to ~8 kHz first (pitch lives in the low harmonics), which cuts the
 difference-function cost by the square of the decimation factor. At the
-default settings it costs on the order of 8 M flops/s — well under 1 % of
-one core — and allocates nothing after construction.
+default settings it costs on the order of 8 M flops/s, well under 1 % of
+one core, and allocates nothing after construction.
 
 The algorithm is YIN's cumulative mean normalised difference function
 (de Cheveigné & Kawahara, 2002) with parabolic interpolation, minus the
@@ -100,7 +100,7 @@ flowchart TD
 | `F0_MIN_HZ` <sub>const</sub> | [38](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L38) | Lowest fundamental the tracker will report, in hertz. |
 | `F0_MAX_HZ` <sub>const</sub> | [40](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L40) | Highest fundamental the tracker will report, in hertz. |
 | `DECIMATED_HZ` <sub>const</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L42) | Target sample rate after decimation, in hertz. |
-| `WINDOW` <sub>const</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L45) | Analysis window length in decimated samples (~40 ms at 8 kHz — at least two periods of the lowest supported f0). |
+| `WINDOW` <sub>const</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L45) | Analysis window length in decimated samples (~40 ms at 8 kHz, at least two periods of the lowest supported f0). |
 | `YIN_THRESHOLD` <sub>const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L47) | d'(tau) below this counts as a confident voiced period. |
 | `SILENCE_RMS` <sub>const</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L49) | Frames quieter than this (RMS) are treated as unvoiced regardless. |
 | `PitchEstimate` <sub>pub struct</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L53) | One f0 measurement. |
