@@ -20,25 +20,29 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag to build (a dry run -- nothing is published)
-        required: true
+        description: Version to publish, e.g. v0.1.15 (leave empty for a dry run)
+        required: false
 
 permissions:
   contents: write
 
 env:
   CARGO_TERM_COLOR: always
-  # The tag being built.
+  # The version being published.
   #
   # This input existed and was **ignored**: every job named its artefacts after
-  # `github.ref_name`, which on a dispatch is the branch, so a dry run from
-  # `main` produced files called `veilvoice-main-...` and would have tried to
-  # publish a release named `main`. A declared input that changes nothing is
-  # worse than no input, because it reads like a supported way to do the thing.
+  # `github.ref_name`, which on a dispatch is the branch, so a run from `main`
+  # produced files called `veilvoice-main-...` and would have tried to publish a
+  # release named `main`. A declared input that changes nothing is worse than no
+  # input, because it reads like a supported way to do the thing.
   #
-  # `github.event.inputs.tag` is empty on a tag push, so this is the tag either
-  # way, and every job checks that ref out rather than whatever the dispatch
-  # happened to start from.
+  # It is read now, and it is how a release is cut when a tag cannot be pushed
+  # from where the work was done. Given `v0.1.15`, this builds the branch it was
+  # dispatched from, names everything `v0.1.15`, and publishes a release, which
+  # creates the tag at that commit. Given nothing, it is a dry run: everything
+  # is built, compared, hashed, signed and reported, and nothing is published.
+  #
+  # Empty on a tag push, so this is the version either way.
   VERSION_TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
 jobs:
@@ -108,8 +112,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
 
       # Only the GUI needs the windowing stack. A CLI-only target does not, and
       # on a cross target these packages would be for the wrong architecture.
@@ -336,8 +338,6 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
       - name: Build the CLI in a FreeBSD VM
         uses: vmactions/freebsd-vm@v1
         with:
@@ -390,8 +390,6 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
       - name: Build the CLI in a Openbsd VM
         uses: vmactions/openbsd-vm@v1
         with:
@@ -449,8 +447,6 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
       - name: Build the CLI in a Netbsd VM
         uses: vmactions/netbsd-vm@v1
         with:
@@ -512,8 +508,6 @@ jobs:
       HAS_SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
 
       - uses: actions/download-artifact@v4
         with:
@@ -675,12 +669,46 @@ jobs:
             echo "Built on: \`${{ runner.os }}\` runners, toolchain pinned by \`rust-toolchain.toml\`."
           } > NOTES.md
 
-      # A dry run builds, compares, hashes, signs and writes the notes, and
-      # stops here. That is what the input says it does, and publishing from a
-      # dispatch would mean a release could be cut from any branch by anybody
-      # who can press a button.
+      # **What decides whether this publishes, and the two things checked
+      # before it does.**
+      #
+      # A tag push publishes, as it always has. A manual run publishes only
+      # when it was given a version, and then only if that version survives
+      # both checks below; a manual run with no version is a dry run and
+      # reaches the summary at the end instead.
+      #
+      # The checks matter because a release cut from a branch has none of the
+      # protection a tag gives. A tag is a commit somebody chose; a branch moves.
+      # So the shape of the version is checked, because `softprops` would
+      # cheerfully create a tag called `main`, and the version is checked
+      # against the workspace, because publishing `v0.1.16` from a tree that
+      # says `0.1.15` produces a release whose own binaries disagree with its
+      # name.
+      - name: Is this a release, and is it a coherent one
+        id: gate
+        run: |
+          tag="${{ env.VERSION_TAG }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
+             && [ -z "${{ github.event.inputs.tag }}" ]; then
+            echo "no version given: this is a dry run and nothing will be published"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$tag" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "::error::'$tag' is not a version like v0.1.15"; exit 1 ;;
+          esac
+          want="${tag#v}"
+          have="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)"
+          if [ "$want" != "$have" ]; then
+            echo "::error::asked to publish $tag from a tree whose workspace version is $have"
+            exit 1
+          fi
+          echo "publishing $tag from a workspace at $have"
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+
       - uses: softprops/action-gh-release@v2
-        if: github.event_name != 'workflow_dispatch'
+        if: steps.gate.outputs.publish == 'true'
         with:
           tag_name: ${{ env.VERSION_TAG }}
           files: staging/*
@@ -689,7 +717,7 @@ jobs:
           prerelease: ${{ contains(env.VERSION_TAG, '-') }}
 
       - name: What a dry run produced
-        if: github.event_name == 'workflow_dispatch'
+        if: steps.gate.outputs.publish != 'true'
         run: |
           echo "Dry run for ${{ env.VERSION_TAG }}. Nothing was published."
           echo
