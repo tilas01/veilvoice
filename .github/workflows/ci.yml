@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Build, lint and test on every supported platform. Windows first — it is the
-# primary target — then macOS and Linux.
+# Build, lint and test on every supported platform. Windows first, because it
+# is the primary target, then macOS and Linux.
 
 name: ci
 
@@ -246,8 +246,8 @@ jobs:
 
   # The container header, the app-lock file and the RIFF chunk walker all parse
   # input an attacker chooses. The per-commit `cargo test` runs a short campaign
-  # against each; this runs a long one, because the bugs these found — an
-  # Argon2 parallelism overflow and an unbounded memory cost — were both
+  # against each; this runs a long one, because the bugs these found, an
+  # Argon2 parallelism overflow and an unbounded memory cost, were both
   # reachable from a file somebody sends you.
   fuzz:
     name: parser campaigns

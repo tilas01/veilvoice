@@ -9,7 +9,7 @@
 // The previous version of this file passed while the deployed page had three
 // permanently invisible paragraphs, one of which was the box explaining that
 // the app lock is not tamper-proof. It passed because its stub only ever
-// modelled the observer firing — and the real failure was the observer *not*
+// modelled the observer firing, and the real failure was the observer *not*
 // firing, when a viewport jump carries an element from below the fold to above
 // it between two frames without the intersection ratio ever leaving zero.
 //
@@ -71,7 +71,7 @@ function makePage({ count = 6, spacing = 400, viewportHeight = 800, reducedMotio
     // In a browser `window` *is* the global object, so `IntersectionObserver`
     // and `window.IntersectionObserver` are the same binding. The stub has to
     // model that, or code that feature-detects on `window` and then constructs
-    // from the global — which is ordinary, idiomatic browser code — fails here
+    // from the global, which is ordinary, idiomatic browser code, fails here
     // for a reason that could never happen in a browser.
     sandbox.IntersectionObserver = sandbox.window.IntersectionObserver;
   }
@@ -92,7 +92,7 @@ function makePage({ count = 6, spacing = 400, viewportHeight = 800, reducedMotio
     page.flush();
   };
   /**
-   * Move the viewport **without** the observer noticing — an anchor jump that
+   * Move the viewport **without** the observer noticing, such as an anchor jump that
    * carries elements from below the fold to above it in one step. This is the
    * case that shipped broken.
    */
@@ -180,7 +180,7 @@ function run() {
     const p = makePage({ count: 6, spacing: 4000, viewportHeight: 800 });
     // Run the frame the module queues at startup first. Discarding it instead
     // would leave the coalescing flag stuck on, and this test would then pass
-    // for the wrong reason — by observing no frames at all.
+    // for the wrong reason, by observing no frames at all.
     p.flush();
     p.frames.length = 0;
     p.scrollY = 10;

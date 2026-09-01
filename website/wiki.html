@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VeilVoice — wiki</title>
+<title>VeilVoice &middot; wiki</title>
 <meta name="description" content="How VeilVoice works, how to use it, how to verify a download, and what it deliberately does not do.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
@@ -67,7 +67,7 @@
   <a href="#cli">Command line</a>
   <a href="#live">Live scrambling</a>
   <a href="#cable">Virtual audio cables</a>
-  <a href="#record">Recording — use Audacity</a>
+  <a href="#record">Recording, use Audacity</a>
   <a href="#transcribe">Private transcription</a>
   <a href="#encrypt">Encryption</a>
   <a href="#applock">The app lock</a>
@@ -84,7 +84,7 @@
 
 <section id="start" style="border-top:0;padding-top:0">
   <h2>GETTING STARTED</h2>
-  <p>Download a build for your platform, or compile it — a fresh clone needs no secrets and no configuration.</p>
+  <p>Download a build for your platform, or compile it, since a fresh clone needs no secrets and no configuration.</p>
   <ol>
     <li>Get the archive from <a href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">the releases page</a>.</li>
     <li><a href="index.html#verify">Verify it</a>. This takes ten seconds and is the difference between running the software and running whatever arrived.</li>
@@ -103,22 +103,22 @@
     <thead><tr><th>Control</th><th>What it does</th></tr></thead>
     <tbody>
       <tr><td><b>intensity</b></td><td>How far pitch and formants are pushed from the original, 0.0–1.0. Default 1.0, which is full normalisation.</td></tr>
-      <tr><td><b>neutralise accent and intonation</b></td><td>On by default. Maps every speaker onto one canonical register and vocal tract. Turning it off is weaker de-identification — do it only if you know why.</td></tr>
+      <tr><td><b>neutralise accent and intonation</b></td><td>On by default. Maps every speaker onto one canonical register and vocal tract. Turning it off is weaker de-identification, so do it only if you know why.</td></tr>
       <tr><td><b>seed roll (s)</b></td><td>How often the modulation stream ratchets forward. Default 2 s; 0 keeps one stream for the whole session. Inaudible by construction.</td></tr>
       <tr><td><b>strip metadata from the result</b></td><td>On by default. Removes tags from the written file.</td></tr>
-      <tr><td><b>encrypt the result at rest</b></td><td>On by default — see below.</td></tr>
+      <tr><td><b>encrypt the result at rest</b></td><td>On by default. See below.</td></tr>
     </tbody>
   </table>
 
   <h4>At-rest encryption</h4>
   <p>The result is sealed as it is written, so a file you name <code>clean.wav</code> lands as <code>clean.wav.veil</code>. Two ways to seal it:</p>
   <ul>
-    <li><b>passphrase</b> — Argon2id at 256 MiB. Set it once and it is held for the session; the <b>change</b> button clears it. Locking the app clears it too.</li>
-    <li><b>public key</b> — X25519 + ML-KEM-768 hybrid, to a <code>.pub</code> file from <code>veilvoice keygen</code>. No passphrase to type and nothing to forget; only the matching private key opens it.</li>
+    <li><b>passphrase</b>: Argon2id at 256 MiB. Set it once and it is held for the session; the <b>change</b> button clears it. Locking the app clears it too.</li>
+    <li><b>public key</b>: X25519 + ML-KEM-768 hybrid, to a <code>.pub</code> file from <code>veilvoice keygen</code>. No passphrase to type and nothing to forget; only the matching private key opens it.</li>
   </ul>
   <p>The <b>anonymise</b> button stays disabled until there is something to encrypt with. That is deliberate: a tool that quietly wrote plaintext because you had not filled a field in yet would make the default worthless.</p>
   <div class="note">
-    <p>Unticking the box opens a dialogue that has to be answered before anything changes. The result is still a recording of every word that was said, and on flash storage deleting it afterwards is not a reliable fix — so the question is asked once, plainly, rather than hidden behind a preference.</p>
+    <p>Unticking the box opens a dialogue that has to be answered before anything changes. The result is still a recording of every word that was said, and on flash storage deleting it afterwards is not a reliable fix, so the question is asked once, plainly, rather than hidden behind a preference.</p>
   </div>
 
   <h3>live scramble</h3>
@@ -126,7 +126,7 @@
 
   <h3>monitor</h3>
   <p>Which applications are holding your microphone and camera, with a running log of starts and stops. The indicator rides the header on every tab, because a warning you have to go looking for is not doing its job.</p>
-  <p>On a platform that cannot see this — macOS exposes no public interface — the tab says so explicitly. An empty list from a blind monitor is a false reassurance, and is never presented as good news.</p>
+  <p>On a platform that cannot see this, because macOS exposes no public interface, the tab says so explicitly. An empty list from a blind monitor is a false reassurance, and is never presented as good news.</p>
 
   <h3>lock</h3>
   <p>Set, change or remove the app lock, and lock the app immediately. See <a href="#applock">the app lock</a> below for what it is worth. The header also carries a <b>lock</b> button, which locks and clears the session passphrase in one action.</p>
@@ -158,7 +158,7 @@ veilvoice info</code></pre>
     </tbody>
   </table>
   <div class="note">
-    <p><strong>Where did my WAV go?</strong> <code>anonymise</code> seals its result, so <code>-o clean.wav</code> produces <code>clean.wav.veil</code>. Open it with <code>veilvoice decrypt clean.wav.veil -o clean.wav</code>. The words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said — which is why this is the default rather than an option you have to find.</p>
+    <p><strong>Where did my WAV go?</strong> <code>anonymise</code> seals its result, so <code>-o clean.wav</code> produces <code>clean.wav.veil</code>. Open it with <code>veilvoice decrypt clean.wav.veil -o clean.wav</code>. The words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said, which is why this is the default rather than an option you have to find.</p>
   </div>
 </section>
 
@@ -175,13 +175,13 @@ veilvoice live             # picks a virtual cable automatically if one exists</
 
 <section id="cable">
   <h2>VIRTUAL AUDIO CABLES</h2>
-  <p>A virtual cable is a loopback device: what one program plays into it, another can record from. VeilVoice does not bundle one — they are separate projects with their own licences.</p>
+  <p>A virtual cable is a loopback device: what one program plays into it, another can record from. VeilVoice does not bundle one, because they are separate projects with their own licences.</p>
   <table>
     <thead><tr><th>Platform</th><th>Usual choice</th><th>Licence</th></tr></thead>
     <tbody>
       <tr><td>Windows</td><td>VB-CABLE, from vb-audio.com</td><td>Proprietary donationware</td></tr>
       <tr><td>macOS</td><td>BlackHole</td><td>GPL-3.0</td></tr>
-      <tr><td>Linux</td><td>PipeWire or a PulseAudio null sink — already installed</td><td>Free software</td></tr>
+      <tr><td>Linux</td><td>PipeWire or a PulseAudio null sink, already installed</td><td>Free software</td></tr>
     </tbody>
   </table>
   <p>On Linux nothing extra is needed:</p>
@@ -190,7 +190,7 @@ veilvoice live             # picks a virtual cable automatically if one exists</
 </section>
 
 <section id="record">
-  <h2>RECORDING — USE AUDACITY</h2>
+  <h2>RECORDING, USE AUDACITY</h2>
   <p>VeilVoice deliberately does not include a recording studio. Audacity already is one, it is free software, it is mature, and it is audited by far more people than this project will ever be. Writing a worse one would help nobody.</p>
   <p>The workflow:</p>
   <ol>
@@ -198,7 +198,7 @@ veilvoice live             # picks a virtual cable automatically if one exists</
     <li>Run it through VeilVoice: <code>veilvoice anonymise take.wav -o safe.wav</code>.</li>
     <li>Or record <em>through</em> VeilVoice live, by setting a virtual cable as Audacity's input.</li>
   </ol>
-  <p>The installer may offer to fetch the current Audacity for your platform. Like the cable, it is an opt-in tick box — VeilVoice will not install third-party software you did not ask for.</p>
+  <p>The installer may offer to fetch the current Audacity for your platform. Like the cable, it is an opt-in tick box. VeilVoice will not install third-party software you did not ask for.</p>
   <div class="note">
     <p><strong>A licensing note for contributors.</strong> Audacity is GPL-2.0-or-later, which is not compatible with this project's GPL-3.0-or-later in the direction of copying code <em>in</em>. Recommend it, integrate with it, do not lift source from it.</p>
   </div>
@@ -206,12 +206,12 @@ veilvoice live             # picks a virtual cable automatically if one exists</
 
 <section id="transcribe">
   <h2>PRIVATE TRANSCRIPTION</h2>
-  <p>Speech-to-text needs the words. It does not need your voiceprint — but every cloud transcription service receives one anyway, and a voiceprint is as durable an identifier as a fingerprint.</p>
+  <p>Speech-to-text needs the words. It does not need your voiceprint, but every cloud transcription service receives one anyway, and a voiceprint is as durable an identifier as a fingerprint.</p>
   <p>Anonymise first, then upload:</p>
   <pre><code>veilvoice anonymise dictation.wav -o safe-to-upload.wav</code></pre>
   <p>The service gets speech it can transcribe and a voice belonging to nobody.</p>
   <div class="note">
-    <p><strong>Two caveats.</strong> Accuracy drops somewhat, because recognisers are trained on natural speech and the output is synthetic. And <em>the words still go to the provider</em> — this protects your identity, not the content. If the content is sensitive, transcribe locally instead; <code>whisper.cpp</code> reads the WAV VeilVoice writes with no extra work.</p>
+    <p><strong>Two caveats.</strong> Accuracy drops somewhat, because recognisers are trained on natural speech and the output is synthetic. And <em>the words still go to the provider</em>. This protects your identity, not the content. If the content is sensitive, transcribe locally instead; <code>whisper.cpp</code> reads the WAV VeilVoice writes with no extra work.</p>
   </div>
 </section>
 
@@ -222,7 +222,7 @@ veilvoice live             # picks a virtual cable automatically if one exists</
 veilvoice keygen                       # hybrid post-quantum key pair
 veilvoice encrypt notes.wav --to recipient.pub
 veilvoice decrypt notes.wav.veil -o notes.wav --key veilvoice.key</code></pre>
-  <p>Private keys generated by <code>keygen</code> are themselves stored encrypted, under a passphrase, in the same container format — a stolen key file is worth nothing without it.</p>
+  <p>Private keys generated by <code>keygen</code> are themselves stored encrypted, under a passphrase, in the same container format, a stolen key file is worth nothing without it.</p>
   <p>Since <code>anonymise</code> now seals its own output, <code>encrypt</code> is for everything else: a file you already have, a note, a key you want to move.</p>
 </section>
 
@@ -234,10 +234,10 @@ veilvoice lock status     # is one set, and is it rate limited right now?
 veilvoice lock change
 veilvoice lock remove</code></pre>
   <p>The desktop app has the same controls under its <strong>lock</strong> tab, and a <strong>lock</strong> button in the header that locks it immediately and clears the session passphrase with it.</p>
-  <p><strong>Use a different password from the one you use for recordings.</strong> They are separate on purpose: opening the app should not be the same act as unsealing everything it has written. VeilVoice domain-separates the two derivations, so even typing the same string in both places does not produce two copies of one value — but it does mean one guess opens both, so do not.</p>
+  <p><strong>Use a different password from the one you use for recordings.</strong> They are separate on purpose: opening the app should not be the same act as unsealing everything it has written. VeilVoice domain-separates the two derivations, so even typing the same string in both places does not produce two copies of one value, but it does mean one guess opens both, so do not.</p>
   <div class="note bad">
     <p><strong>This is not tamper-proof, and cannot be.</strong> A local application has nowhere to hide a secret from the machine it runs on. Anyone who can write to your files can delete the lock file; anyone holding the disk can edit the attempt counter, move the clock to defeat the wait, or attack the stored password hash offline.</p>
-    <p>What it does buy is real: it stops <em>casual access</em>. Three attempts are free, then the wait doubles — 5 s, 10 s, 20 s, up to fifteen minutes — and the count is written to disk, so killing the app does not reset it. Argon2id at 256 MiB makes each offline guess expensive, which helps a good passphrase and does not save a bad one.</p>
+    <p>What it does buy is real: it stops <em>casual access</em>. Three attempts are free, then the wait doubles, 5 s, 10 s, 20 s, up to fifteen minutes, and the count is written to disk, so killing the app does not reset it. Argon2id at 256 MiB makes each offline guess expensive, which helps a good passphrase and does not save a bad one.</p>
     <p>If the threat is someone with your disk, the answers are full-volume encryption (LUKS, BitLocker, FileVault) and the at-rest encryption above. Not this.</p>
   </div>
 </section>
@@ -247,23 +247,23 @@ veilvoice lock remove</code></pre>
   <p>For recordings that must not survive: a secure-erase that overwrites the file's contents before unlinking it, rather than just removing the directory entry.</p>
   <div class="note bad">
     <p><strong>This is irreversible and there is no undo.</strong> It is opt-in and gated behind an explicit confirmation for that reason.</p>
-    <p>Be aware of the honest limit: on an SSD, wear levelling means the drive may keep a copy of the old blocks where no software can reach them. Overwriting is effective on spinning disks and is best-effort everywhere else. <strong>Full-disk encryption is the real answer</strong> — if the volume is encrypted, destroying the key destroys everything on it at once.</p>
+    <p>Be aware of the honest limit: on an SSD, wear levelling means the drive may keep a copy of the old blocks where no software can reach them. Overwriting is effective on spinning disks and is best-effort everywhere else. <strong>Full-disk encryption is the real answer.</strong> If the volume is encrypted, destroying the key destroys everything on it at once.</p>
   </div>
 </section>
 
 <section id="verify">
   <h2>VERIFYING A DOWNLOAD</h2>
   <p>Two independent checks ship with every release.</p>
-  <h3>1. The hash — is this the file that was published?</h3>
+  <h3>1. The hash: is this the file that was published?</h3>
   <pre><code>sha256sum -c SHA256SUMS --ignore-missing</code></pre>
   <p>Or use the <a href="index.html#verify">in-browser verifier</a>, which hashes locally and uploads nothing.</p>
-  <h3>2. The signature — was that list published by the maintainer?</h3>
+  <h3>2. The signature: was that list published by the maintainer?</h3>
   <pre><code>gpg --import veilvoice-signing-key.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS</code></pre>
   <p>Check the fingerprint is exactly:</p>
   <div class="hash fp">8101 FB3B B28D 02FB 239E&nbsp; 0CDF 9CC1 C7E7 A9B5 833A</div>
   <p>“Good signature” from an unexpected key means nothing. The fingerprint is the part that matters.</p>
-  <h3>3. The strongest check — rebuild it yourself</h3>
+  <h3>3. The strongest check: rebuild it yourself</h3>
   <p>Release binaries are reproducible: build the tagged commit and you get byte-identical output.</p>
   <pre><code>git checkout v0.1.1
 export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
@@ -275,10 +275,10 @@ sha256sum target/release/veilvoice</code></pre>
   <h2>HOW IT WORKS</h2>
   <p>Three mechanisms, each individually lossy. Undoing the output means defeating all three.</p>
   <h3>Phase is discarded, every frame</h3>
-  <p>Each analysis frame keeps only its magnitude spectrum; the measured phase — which encodes the exact waveform and the speaker's micro-timing — is thrown away and a synthetic one generated. This is deletion, not obfuscation: infinitely many waveforms share any magnitude spectrogram.</p>
+  <p>Each analysis frame keeps only its magnitude spectrum; the measured phase, which encodes the exact waveform and the speaker's micro-timing, is thrown away and a synthetic one generated. This is deletion, not obfuscation: infinitely many waveforms share any magnitude spectrogram.</p>
   <h3>Every speaker is collapsed onto one identity</h3>
   <p>Pitch register, vocal-tract length and long-term spectral tilt are each mapped to a single canonical value. These mappings are <em>many-to-one</em>: a whole population lands on the same output, so there is nothing to invert.</p>
-  <p>Every correction is drawn from a multi-second average, never the current frame — per-frame spectral shape is what distinguishes /i/ from /u/, and normalising that would erase the vowels along with the accent. The test suite asserts vowel contrast survives.</p>
+  <p>Every correction is drawn from a multi-second average, never the current frame, per-frame spectral shape is what distinguishes /i/ from /u/, and normalising that would erase the vowels along with the accent. The test suite asserts vowel contrast survives.</p>
   <h3>The remainder is CSPRNG-modulated</h3>
   <p>The residual transform changes every frame from a ChaCha20 stream whose seed comes from the OS CSPRNG, lives only in page-locked memory, and is zeroized on drop. There is no fixed transform to undo.</p>
   <p>Full argument, including the threat model: <a href="https://github.com/tilas01/veilvoice/blob/main/docs/WHITEPAPER.md" rel="noopener noreferrer">the whitepaper</a>.</p>
@@ -290,7 +290,7 @@ sha256sum target/release/veilvoice</code></pre>
   <ul>
     <li><strong>It does not hide what you said.</strong> The words are preserved on purpose and can be transcribed.</li>
     <li><strong>It does not fully remove a strong accent.</strong> The melody goes; which phonemes you produced cannot be changed by any filter.</li>
-    <li><strong>It does not sanitise the background</strong> — room acoustics, other voices, a passing siren.</li>
+    <li><strong>It does not sanitise the background.</strong> Room acoustics, other voices, a passing siren.</li>
     <li><strong>It does not hide your speaking rate</strong> or rhythm. A weak biometric, but a real one.</li>
     <li><strong>It does not help</strong> against an attacker already running code on your machine.</li>
     <li><strong>It does not clean the filename</strong>, the filesystem timestamps, or the channel you send it over.</li>
@@ -325,7 +325,7 @@ deid.process(&amp;block, &amp;mut out);</code></pre>
   <details><summary>Will it make me sound like a different specific person?</summary>
     <p>No, and that is deliberate. It maps you onto a canonical, deliberately synthetic voice that belongs to nobody. Impersonating a real person is a different tool with different ethics.</p></details>
   <details><summary>Why does it sound robotic?</summary>
-    <p>Because pitch is held constant by design — that steadiness is the sound of your pitch information being gone. Some of the metallic quality is the harmonic-comb resynthesis, and the whitepaper explains what would improve it.</p></details>
+    <p>Because pitch is held constant by design, that steadiness is the sound of your pitch information being gone. Some of the metallic quality is the harmonic-comb resynthesis, and the whitepaper explains what would improve it.</p></details>
   <details><summary>Can I get my original voice back?</summary>
     <p>No. That is the point. Keep your own copy of the original if you need one; nothing in the output can reconstruct it.</p></details>
   <details><summary>Does it work offline?</summary>
@@ -343,7 +343,7 @@ deid.process(&amp;block, &amp;mut out);</code></pre>
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice &middot; GPL-3.0-or-later ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="index.html">home</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">disclaimer</a> ·
