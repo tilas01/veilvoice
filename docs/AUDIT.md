@@ -87,6 +87,29 @@ rather than assumed to cover it: with the old keying and the clock rounded to
 microseconds, as macOS has, it fails with `"/tmp/vvg18d1393384078c00" was
 handed out twice`.
 
+**Where else this decision is made.** Every other place in the workspace that
+takes a scratch directory was read, because fixing the instance and moving on
+is this project's most reliable source of second defects. There are five, and
+all five are already correct, for two different reasons. `contents.rs` puts the
+thread id in the name, so two threads cannot collide whatever the clock says.
+`palettes.rs` and `crashlog.rs` use the process id and a per-test tag, and
+`verify.rs`'s two tests use different prefixes. `release_manifest.rs` takes a
+label and is called once.
+
+`palettes.rs` is worth quoting, because it had already written down the rule
+the GnuPG helper broke: "The process id keeps two `cargo test` runs from
+colliding, and the tag keeps the tests within one run apart." Two axes. The
+GnuPG helper had thought about the first, with a clock, and not about the
+second at all. The correct pattern was in the tree, in a comment, in a
+neighbouring crate.
+
+One thing those helpers rely on and nothing checks: the tags have to be unique,
+because each clears its directory before using it, so two tests sharing a tag
+would reproduce this defect exactly. All eleven tags currently differ. That is
+a convention rather than a guarantee, and it is recorded here rather than
+enforced, because a test that checks a list of string literals for duplicates
+is more machinery than the risk earns.
+
 **The lesson is about what "flaky" is allowed to mean.** A test that fails on
 one platform, on a commit that changed nothing it touches, is the most
 inviting possible candidate for a re-run, and a re-run would have passed. The
