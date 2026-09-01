@@ -40,8 +40,9 @@ longer offered as the explanation for anything.
 
 ## The twenty-first round: the verifier where a person actually stands, and 2.19 billion inputs
 
-Two defects (F-107 and F-108), both about which directory the verifier answers
-for, and a coverage-guided campaign at twice the length of any before it, which
+Three defects (F-107, F-108 and F-109), the first two about which directory
+the verifier answers for and the third about what the main binary says when
+there is nobody to ask, and a coverage-guided campaign at twice the length of any before it, which
 found nothing.
 
 ### F-107 -- the verifier could not find the release it was standing in
@@ -136,6 +137,46 @@ is the program looking somewhere else than the user pointed. Both are about
 whose question is being answered, both were found by running it rather than
 reading it, and the second was found only because the first prompted a walk
 through every other way somebody invokes this.
+
+### F-109 -- no terminal was reported as an errno
+
+`veilvoice-cli/src/atrest.rs`.
+
+Found by running the main binary the way the verifier had just been run, on
+the same principle: try it the way somebody actually invokes it.
+
+    $ veilvoice anonymise recording.wav < /dev/null
+      Choose a passphrase for this recording. It is separate from
+      the app lock, and there is no way to recover it.
+    ✗ No such device or address (os error 6)
+
+That is `ENXIO` from opening the console. It names nothing that was wanted,
+nothing about why, and none of the ways on. It is also a different string on
+Windows, so nobody could search for it and get the same answer twice.
+
+The situation is entirely ordinary: a script, a scheduled job, a CI step, or
+anything with its input redirected. VeilVoice encrypts at rest by default, so
+it wants a passphrase, and there is nowhere to ask.
+
+`confirm_plaintext`, thirty lines further up the same file, already got this
+right: it checks `stdin().is_terminal()` and carries on rather than blocking on
+a prompt nobody is there to answer. The two prompt functions beside it did not.
+The same defect, in the same file, through a different door, which is the shape
+this project has recorded more often than any other.
+
+Both prompts now check before asking, and refuse with what was wanted and the
+three ways on: `--encrypt-to` with a public key, which types nothing and is the
+one that works in a script; a terminal, if somebody is there; and
+`--encrypt false --yes`, described as what it is rather than as an option.
+Checking before rather than mapping the failure afterwards keeps the message
+the same on every platform.
+
+**The remedies were run rather than written down.** With stdin closed,
+`--encrypt false --yes` wrote a plain WAV, and `--encrypt-to me.pub` wrote a
+sealed one at 84x realtime; the key it used was made with `veilvoice keygen`
+under a pseudo-terminal, because `keygen` prompts too. That last part changed
+the wording: the message now says the key is made once, in a terminal, rather
+than implying `--encrypt-to` is available to somebody who has never had one.
 
 ### The campaign, at twenty minutes a target
 
@@ -2066,7 +2107,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1135 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1137 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3683,7 +3724,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eight defects found and fixed (F-1 to F-108), across twenty-one
+**One hundred and nine defects found and fixed (F-1 to F-109), across twenty-one
 rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
