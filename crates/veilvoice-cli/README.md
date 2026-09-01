@@ -113,7 +113,7 @@ flowchart TD
     n_main(["main.rs<br/>2554 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>286 lines"]
-    n_atrest["atrest.rs<br/>414 lines"]
+    n_atrest["atrest.rs<br/>456 lines"]
     n_capture["capture.rs<br/>330 lines"]
     n_conversation["conversation.rs<br/>797 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
@@ -184,7 +184,7 @@ flowchart TD
 |---|---:|---|
 | [`accel.rs`](../../docs/files/veilvoice-cli/accel.md) | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
 | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 286 | veilvoice appctl learns what normally runs, so it can notice what does not. |
-| [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 414 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
+| [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 456 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 330 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 797 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
