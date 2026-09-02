@@ -480,6 +480,7 @@ def build(root):
     index_html = read(os.path.join(root, "website", "index.html"))
     parts = split.shell(index_html)
     page = split.page(
+        root,
         parts,
         "roadmap",
         "Roadmap",
