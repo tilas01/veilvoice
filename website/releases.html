@@ -79,6 +79,18 @@ Every release, newest first. Open one to read what changed in it; its files are 
 </p>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>The demonstration is a recording now</strong></p>
+<ul>
+<li>The website&#x27;s demonstration replays transcripts of the real programs: the bytes they wrote on a terminal, with the passphrases typed at the real prompts. Five of them, covering all three binaries, and they are re-run and compared on every build.</li>
+<li>It sits with the screenshots, where somebody looking at pictures of the window will meet it, rather than four screens further down.</li>
+<li>The release verifier&#x27;s mode used to play a hand-written list of lines described as the program running, and four of its six output lines were text the program has never printed. On a page whose argument is that you should check things yourself, the part demonstrating the checking was invented. There is no hand-written program output anywhere on the site now.</li>
+</ul>
+<p><strong>Three defects the recordings found, F-128 to F-130</strong></p>
+<ul>
+<li><code>veilvoice anonymise -o veiled.veil</code> wrote <code>veiled.veil.veil</code> and reported that name back, so the file you asked for did not exist. The <code>.veil</code> extension is appended rather than substituted on purpose, and that rule was being applied to an output path somebody had already named.</li>
+<li>The verifier&#x27;s verdict said &quot;This file is byte-for-byte what was published&quot; without saying which file. <code>auto</code> finds the archive for you, so in the commonest way of running it the name had never been typed and was never printed. It names the file now.</li>
+<li>And the invented transcript above.</li>
+</ul>
 <p><strong>The roadmap</strong></p>
 <ul>
 <li>Every item on the roadmap page is linkable on its own now: item 98 is at <code>roadmap.html#m98</code>, and each heading has an anchor too, so one marker can be sent to somebody without sending the hundred around it.</li>

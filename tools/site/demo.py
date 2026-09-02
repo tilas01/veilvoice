@@ -82,6 +82,33 @@ COMMANDS = [
 ]
 
 
+# The recorded sessions, in the order somebody meeting this project would want
+# them: check the download first, then see what the program does, then see what
+# it refuses to do. `tools/shots/sessions.py` records them; this is what each
+# one is for, which that file knows and no page can read out of it.
+SESSIONS = [
+    ("verify", "veilvoice-verify",
+     "Checking a download",
+     "The published archive, its signed hash list, and the same question "
+     "asked again of your own GnuPG."),
+    ("anonymise", "veilvoice",
+     "Veiling one recording",
+     "A key made, then a three second recording veiled and sealed to it. "
+     "Nothing typed at the second step."),
+    ("info", "veilvoice",
+     "What this build can do",
+     "Every version, whether live audio works on this machine, and the "
+     "network answer."),
+    ("refusal", "veilvoice",
+     "In a script, with nobody to type a passphrase",
+     "It stops, explains, offers the two ways round it, and writes nothing."),
+    ("unencrypted", "veilvoice",
+     "Asking for it in the clear",
+     "The escape hatch exists, and says in full what you are giving up "
+     "before it uses it."),
+]
+
+
 def read(path):
     with io.open(path, encoding="utf-8") as handle:
         return handle.read()
@@ -129,6 +156,57 @@ def commands():
     return out
 
 
+def sessions():
+    """The transcripts of the programs actually running.
+
+    These are the answer to the demonstration's oldest problem. It showed ten
+    help screens, which are real and are the least interesting real thing
+    these programs produce: a help screen says what a flag is called and
+    nothing about what happens when you use one. Somebody deciding whether to
+    trust this wants to watch it work.
+
+    Each is a transcript of a real run, captured from a terminal by
+    `tools/shots/sessions.py`, including the prompts and the passphrase typed
+    at them. The command line is split from its output so the page can type
+    the one and print the other, which is what a terminal looks like.
+    """
+    out = []
+    for name, programme, title, note in SESSIONS:
+        path = os.path.join(ROOT, "assets", "screenshots", "session-%s.txt" % name)
+        if not os.path.exists(path):
+            raise SystemExit(
+                "%s is missing, so the demonstration would have to invent a\n"
+                "  session. Run: tools/shots/sessions.py --record"
+                % os.path.relpath(path, ROOT))
+        text = read(path).replace("\r\n", "\n").rstrip("\n")
+        steps = []
+        current = None
+        for line in text.split("\n"):
+            if line.startswith("$ "):
+                if current:
+                    steps.append(current)
+                current = {"typed": line[2:], "output": []}
+            elif current is not None:
+                current["output"].append(line)
+        if current:
+            steps.append(current)
+        if not steps:
+            raise SystemExit(
+                "%s has no `$ ` command line in it, so there is nothing to\n"
+                "  replay. The recorder writes one before each step."
+                % os.path.relpath(path, ROOT))
+        out.append({
+            "name": name,
+            "programme": programme,
+            "title": title,
+            "note": note,
+            "steps": [{"typed": step["typed"],
+                       "output": "\n".join(step["output"]).strip("\n")}
+                      for step in steps],
+        })
+    return out
+
+
 def version():
     manifest = read(os.path.join(ROOT, "Cargo.toml"))
     block = re.search(r"\[workspace\.package\]([\s\S]*?)(\n\[|$)", manifest)
@@ -141,6 +219,7 @@ def build():
         "version": version(),
         "tabs": tabs(),
         "commands": commands(),
+        "sessions": sessions(),
     }
     # Sorted keys and a fixed indent, so the file is a function of the facts
     # rather than of the order a dict happened to be built in.
@@ -184,8 +263,8 @@ def main():
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with io.open(path, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(text)
-    print("  wrote %s (%d tabs, %d commands)"
-          % (OUT, len(tabs()), len(commands())))
+    print("  wrote %s (%d tabs, %d commands, %d sessions)"
+          % (OUT, len(tabs()), len(commands()), len(sessions())))
     return 0
 
 

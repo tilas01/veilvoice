@@ -38,6 +38,104 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-fifth round: what recording the programs found
+
+Three defects (F-128 to F-130), all of them from one change: the website's
+demonstration stopped inventing what the programs print and started replaying
+recordings of them.
+
+Every one of the three was found by reading a transcript. Not by reasoning
+about the code, not by a test, and not by a review: by running the command,
+writing down what came out, and looking at it. That is the fourth round in a
+row where the finding that mattered came from running the thing, and it is the
+reason those recordings now run on every build.
+
+### F-128 -- `-o veiled.veil` wrote `veiled.veil.veil`
+
+`veilvoice-crypto/src/container.rs`.
+
+`veil_path` appends `.veil` rather than substituting it, so `recording.wav`
+becomes `recording.wav.veil` and the original name survives decryption without
+being guessed at. That rule is right and it is documented.
+
+It was applied to the output path the user chose. Asked for
+
+    veilvoice anonymise interview.wav -o veiled.veil --encrypt-to key.pub
+
+the program wrote `veiled.veil.veil`, reported that name back in its result
+block, and left the person with no file at the name they typed.
+
+Every test of that function passed a path that does not end in `.veil`, because
+that is the case the documented rule is about. The one case where the rule is
+wrong is the one nobody wrote a test for, and it is the case a person hits when
+they name the output themselves.
+
+Fixed where the rule lives rather than at the call site, so every caller is
+covered: a path already ending in `.veil` is returned unchanged, matched
+case-insensitively because Windows and macOS are.
+
+### F-129 -- the website showed output the verifier has never printed
+
+`website/js/demo.js`.
+
+The demonstration's release-verifier mode played a list of lines, one a second,
+presented as the program running. The list was written by hand, and four of its
+six output lines are text `veilvoice-verify` does not produce. It announced
+
+    ==> Checking the signing key's fingerprint
+      ok   fingerprint matches 8101FB...
+
+where the program writes
+
+      ok    embedded key fingerprint 8101FB...
+
+This is the worst thing on the site rather than a cosmetic one, and the reason
+is the subject. The page's argument is that you should not take this project's
+word for anything and should check the download yourself. The part of the page
+demonstrating the checking was fabricated. Somebody who ran the real verifier
+after watching that would see different output and have no way to tell which of
+the two was the lie.
+
+There is now no hand-written program output anywhere on the site.
+`tools/shots/sessions.py` records five real sessions, on a real pseudo-terminal
+with the passphrases typed at the real prompts, and `tools/verify.py` re-runs
+and compares them on every build. The demonstration replays those bytes. The
+only invented thing left is the pacing, and the overlay says so.
+
+### F-130 -- the verdict never said which file it was about
+
+`veilvoice-verify/src/main.rs`.
+
+On a pass the program printed:
+
+    INTACT. This file is byte-for-byte what was published, signed by
+    8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.
+
+"This file" is the archive it found. `veilvoice-verify auto` exists precisely
+so the person does not have to name it, so in the commonest way of running the
+program the name had never been typed and was never printed. The one line
+somebody quotes to somebody else, to say a download is genuine, named no
+download.
+
+Noticed by recording that session and reading it back with no idea what had
+been checked, which is the position a reader of that transcript is in and, it
+turns out, the position the person who ran it was in too.
+
+The verdict names the file. That also made the transcript checkable: the
+archive's name carries the version, so a stale recording of an older release
+now fails against the workspace version.
+
+### What was examined and found nothing
+
+**The other four recordings.** The refusal when there is no terminal, the
+warning before writing unencrypted, `info`, and the key generation all print
+what they are documented to print. The refusal in particular is worth a note
+for being right: asked to veil a recording in a script, the program stops,
+explains that there is nobody to type a passphrase, offers the two ways round
+it, and writes nothing. It is now one of the five things the website shows,
+because a program declining to do something unsafe is a better demonstration
+than one succeeding.
+
 ## The twenty-fourth round: the same symptom, and the cause this time
 
 Six defects (F-122 to F-127). The round exists because the previous one
@@ -2843,7 +2941,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1196 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1197 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4490,8 +4588,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and twenty-seven defects found and fixed (F-1 to F-127), across
-twenty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and thirty defects found and fixed (F-1 to F-130), across
+twenty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

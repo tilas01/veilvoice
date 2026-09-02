@@ -111,7 +111,7 @@ flowchart TD
     n_lib(["lib.rs<br/>200 lines"])
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
-    n_container["container.rs<br/>491 lines"]
+    n_container["container.rs<br/>535 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
     n_lock["lock.rs<br/>1437 lines"]
@@ -143,7 +143,7 @@ flowchart TD
 |---|---:|---|
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 178 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 327 | Amnesic secret storage: page-locked, zeroized, and never printed. |
-| [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 491 | The .veil encrypted container format. |
+| [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 535 | The .veil encrypted container format. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 200 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |

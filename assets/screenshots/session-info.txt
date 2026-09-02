@@ -1,0 +1,15 @@
+$ veilvoice info
+VeilVoice
+  Version                0.1.17
+  Engine                 0.1.17
+  Crypto                 0.1.17
+  Audio                  0.1.17
+  Metadata               0.1.17
+  Monitor                0.1.17
+  Licence                GPL-3.0-or-later
+  Network access         none, by construction
+  Live audio             available
+
+  VeilVoice destroys the voiceprint, not the words.
+  See docs/WHITEPAPER.md for what that does and does not
+  protect against.

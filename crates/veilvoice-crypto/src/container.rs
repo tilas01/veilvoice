@@ -161,7 +161,29 @@ impl Header {
 /// `.veil` is *appended* rather than substituted, so `recording.veiled.wav`
 /// becomes `recording.veiled.wav.veil` and the original name, including what
 /// kind of file it is, survives decryption without being guessed at.
+///
+/// # Except when it is already there
+///
+/// A path that already ends in `.veil` is returned unchanged. This is not
+/// tidiness: `-o` is a name the user chose, and
+///
+/// ```text
+/// veilvoice anonymise interview.wav -o veiled.veil --encrypt-to key.pub
+/// ```
+///
+/// wrote `veiled.veil.veil`, reported that name back, and left the person with
+/// a file that is not the one they asked for. Found by recording the command
+/// for the website's demonstration and reading what it printed, which is the
+/// only way this was ever going to be noticed: every test of this function
+/// passed a path that does not end in `.veil`, because that is the case the
+/// rule above describes.
 pub fn veil_path(path: &std::path::Path) -> std::path::PathBuf {
+    if path
+        .extension()
+        .is_some_and(|ext| ext.eq_ignore_ascii_case("veil"))
+    {
+        return path.to_path_buf();
+    }
     let mut name = path.as_os_str().to_os_string();
     name.push(".veil");
     std::path::PathBuf::from(name)
@@ -432,6 +454,28 @@ mod tests {
             veil_path(Path::new("a.b/c.wav")),
             Path::new("a.b/c.wav.veil")
         );
+    }
+
+    #[test]
+    fn a_path_that_is_already_sealed_is_left_alone() {
+        use std::path::Path;
+        // `-o veiled.veil` used to write `veiled.veil.veil` and report that
+        // name back, so the file the person asked for did not exist and the
+        // one that did had a name they never typed.
+        assert_eq!(
+            veil_path(Path::new("veiled.veil")),
+            Path::new("veiled.veil")
+        );
+        assert_eq!(
+            veil_path(Path::new("/tmp/out/clip.veil")),
+            Path::new("/tmp/out/clip.veil")
+        );
+        // Case-insensitively, because Windows and macOS are, and a path
+        // typed as `.VEIL` there names the same file.
+        assert_eq!(veil_path(Path::new("Clip.VEIL")), Path::new("Clip.VEIL"));
+        // And a name that merely contains the word is not a sealed file.
+        assert_eq!(veil_path(Path::new("veil.wav")), Path::new("veil.wav.veil"));
+        assert_eq!(veil_path(Path::new("myveil")), Path::new("myveil.veil"));
     }
 
     /// The cost ceiling for a caller with nobody watching. A hostile container
