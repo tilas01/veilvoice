@@ -398,20 +398,20 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.16: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1,141 tests across 27
-crates plus doctests, and 16 website suites, clippy clean, no `unsafe`), with
+destinations, CLI and GUI are implemented and tested (1,182 tests across 27
+crates plus doctests, and 17 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
-against the website's Markdown renderer. Release binaries are built for nine
-targets and verified bit-for-bit reproducible on eight of them; the FreeBSD
-build is made once in a VM and is reported as `not-verified` rather than
-claimed.
+against the website's Markdown renderer. Release binaries are built for eleven
+targets and verified bit-for-bit reproducible on the eight that build twice;
+the three BSD archives are made once in a VM and are reported as
+`not-verified` rather than claimed.
 
 **Audited by tilas01**, who wrote and reviewed it. Be clear about what that is
 worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Twenty-three audit rounds have found and fixed **119 defects**.
+Twenty-three audit rounds have found and fixed **121 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a

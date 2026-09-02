@@ -96,7 +96,7 @@
 <a href="veilvoice-check/reproduce.src.html">
 <rect x="289.2" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="351.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reproduce.rs</text>
-<text x="351.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">436 lines</text>
+<text x="351.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">536 lines</text>
 </a>
 <text x="20.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">Every arrow is a crate:: or super:: path one module</text>
 <text x="20.0" y="128.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">actually uses, read out of the source rather than drawn</text>
@@ -109,7 +109,7 @@
 flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;472 lines&quot;])
     n_contents[&quot;contents.rs&lt;br/&gt;623 lines&quot;]
-    n_reproduce[&quot;reproduce.rs&lt;br/&gt;436 lines&quot;]
+    n_reproduce[&quot;reproduce.rs&lt;br/&gt;536 lines&quot;]
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs&quot; &quot;open the source&quot;
     click n_contents href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs&quot; &quot;open the source&quot;
     click n_reproduce href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs&quot; &quot;open the source&quot;</code></pre>
@@ -121,7 +121,7 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-check/contents.html"><code>contents.rs</code></a></td><td>623</td><td>The signed list of what is inside each release archive.</td></tr>
 <tr><td><a href="veilvoice-check/lib.html"><code>lib.rs</code></a></td><td>472</td><td>Check a VeilVoice release: a file&#x27;s SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.</td></tr>
-<tr><td><a href="veilvoice-check/reproduce.html"><code>reproduce.rs</code></a></td><td>436</td><td>A script that rebuilds a release and compares it with what was published.</td></tr>
+<tr><td><a href="veilvoice-check/reproduce.html"><code>reproduce.rs</code></a></td><td>536</td><td>A script that rebuilds a release and compares it with what was published.</td></tr>
 </tbody></table>
 </section>
 </div></div>

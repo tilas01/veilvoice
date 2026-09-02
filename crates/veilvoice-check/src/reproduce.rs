@@ -109,6 +109,18 @@ impl System {
         }
     }
 
+    /// How this system checks a folder against a `SHA256SUMS`.
+    fn hash_check_command(self) -> &'static str {
+        match self {
+            System::Linux => "sha256sum -c SHA256SUMS --ignore-missing",
+            System::MacOs => "shasum -a 256 -c SHA256SUMS --ignore-missing",
+            // The BSDs' `sha256` has `-c`, and it does not take
+            // `--ignore-missing`; `-q` keeps the output to the verdict.
+            System::Bsd => "sha256 -c SHA256SUMS",
+            System::Windows => "certutil -hashfile",
+        }
+    }
+
     /// How this system spells "hash this file".
     fn hash_tool(self) -> &'static str {
         match self {
@@ -122,6 +134,11 @@ impl System {
             System::Windows => "certutil -hashfile",
         }
     }
+}
+
+/// The project's signing fingerprint, from the one place it is written.
+fn veilvoice_check_fingerprint() -> &'static str {
+    crate::FINGERPRINT
 }
 
 /// The script for this system.
@@ -190,6 +207,48 @@ command -v rustup >/dev/null 2>&1 \
     A different compiler produces a different binary, and a mismatch below
     would then say nothing about the release."
 
+# Where the release files are, if any are here. The build happens elsewhere
+# and this is where the comparison comes back to.
+here=$(pwd)
+
+# The project's signing key, from the same constant the programs compile in.
+FINGERPRINT={fingerprint}
+
+# The published side of the comparison, checked before anything is built.
+#
+# Before, deliberately. This used to run after the build, so an unsigned
+# hash list was reported ten minutes after the only thing it needed was a
+# signature check taking under a second. The cheap check that can fail
+# goes first.
+#
+# The script is useful without it -- it prints what this machine built, which
+# somebody can compare by eye -- but doing the comparison is the point, so it
+# is done whenever the files are present. All three come from the release:
+#
+#     SHA256SUMS, SHA256SUMS.asc, and the archive for this platform.
+#
+# The signature first, and refused if it is not by the project's key. A hash
+# list nobody signed is a hash list an attacker can write, and comparing a
+# rebuild against it would prove that the rebuild matches the attacker.
+published=""
+if [ -f SHA256SUMS ] && [ -f SHA256SUMS.asc ] && command -v gpg >/dev/null 2>&1; then
+    if [ -f veilvoice-signing-key.asc ]; then
+        gpg --quiet --import veilvoice-signing-key.asc 2>/dev/null || true
+    fi
+    if status=$(gpg --status-fd 1 --verify SHA256SUMS.asc SHA256SUMS 2>&1) \
+       && printf '%s\n' "$status" | awk -v want="$FINGERPRINT" '
+            /^\[GNUPG:\] VALIDSIG / {{ if ($3 == want || $NF == want) hit = 1 }}
+            END                     {{ exit !hit }}'
+    then
+        published=SHA256SUMS
+        say "hash list     signed by $FINGERPRINT"
+    else
+        die "SHA256SUMS is here and is not signed by $FINGERPRINT.
+    Nothing was compared against it: an unsigned hash list is one anybody
+    could have written, and a rebuild matching it would prove nothing."
+    fi
+fi
+
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 say "building in   $work"
@@ -216,28 +275,69 @@ cargo build --release --locked --quiet || die "the build did not succeed."
 say ""
 say "binary                          rebuilt here"
 mismatch=0
+built=0
 for binary in veilvoice veilvoice-gui veilvoice-verify; do
-    [ -f "target/release/$binary" ] || continue
-    mine=$({hash} "target/release/$binary"{take})
+    [ -f "$work/src/target/release/$binary" ] || continue
+    built=$((built + 1))
+    mine=$({hash} "$work/src/target/release/$binary"{take})
     say "$(printf '%-30s' "$binary") $mine"
+
+    # Against the copy that shipped, when the archive has been unpacked here.
+    theirs=""
+    for candidate in "./$binary" "./bin/$binary" veilvoice-*/"$binary"; do
+        [ -f "$candidate" ] || continue
+        theirs=$({hash} "$candidate"{take})
+        break
+    done
+    [ -n "$theirs" ] || continue
+    if [ "$mine" = "$theirs" ]; then
+        say "$(printf '%-30s' "") matches the published binary"
+    else
+        say "$(printf '%-30s' "") DIFFERS from the published binary"
+        say "$(printf '%-30s' "") published: $theirs"
+        mismatch=1
+    fi
 done
 
+[ "$built" -gt 0 ] || die "the build produced no binaries, which should not happen."
+
 say ""
-say "Compare those against SHA256SUMS in the release, which lists the archives"
-say "rather than the binaries: unpack the archive for this platform and hash"
-say "the binaries inside it the same way."
+if [ -n "$published" ]; then
+    # The archive itself, against the signed list. Separate from the rebuild:
+    # this says the download is what was published, and the rebuild says what
+    # was published is what the source compiles to. Both are worth knowing and
+    # they are not the same claim.
+    if {hash_check} >/dev/null 2>&1; then
+        say "archive       matches the signed hash list"
+    else
+        say "archive       does NOT match the signed hash list"
+        mismatch=1
+    fi
+fi
+
+if [ "$mismatch" -eq 0 ]; then
+    say ""
+    say "Everything that could be compared here agreed."
+else
+    say ""
+    say "Something did not match. That is worth reporting, and it is not by"
+    say "itself proof of anything: a different compiler version or a different"
+    say "set of build flags produces a different binary from identical source."
+fi
+
 say ""
-say "    {hash} <the unpacked binary>"
-say ""
-say "A match means the published binary is what this source compiles to. A"
-say "mismatch is worth reporting, and is not by itself proof of anything: a"
-say "different compiler version or a different set of build flags produces a"
-say "different binary from identical source."
+say "What this proves, and what it does not: a match means the published"
+say "binary is what this source compiles to. It does not make the source"
+say "correct, and it does not make it safe. It moves the question from"
+say "trusting the publisher to reading the code, which is a question you can"
+say "act on."
 exit $mismatch
 "##,
         file = system.file_name(),
         hash = hash,
         take = take_digest,
+        hash_check = system.hash_check_command(),
+        fingerprint = veilvoice_check_fingerprint(),
     )
 }
 
