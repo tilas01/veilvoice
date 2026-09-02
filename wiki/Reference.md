@@ -158,7 +158,9 @@ Which running programs can see your keyboard and mouse, reported as the heuristi
 
 Run the GnuPG already on this machine: import the VeilVoice signing key and check a detached signature, reading GnuPG's machine-readable status rather than its translated prose.
 
+- [[`backend.rs`|File-veilvoice-gnupg-backend]] &middot; Which program checks the signature, and who decides.
 - [[`lib.rs`|File-veilvoice-gnupg-lib]] &middot; Run the GnuPG that is already on this machine.
+- [[`script.rs`|File-veilvoice-gnupg-script]] &middot; A shell script that checks a release, for people who would rather read one.
 
 ## [[veilvoice-gui|Crate-veilvoice-gui]]
 

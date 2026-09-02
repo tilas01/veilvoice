@@ -112,7 +112,7 @@ impl WatchFeed {
     /// Does nothing on a platform that cannot answer: a thread that would only
     /// ever report "not supported" is a thread that need not exist, and
     /// [`WatchFeed::support`] is what a front end reads to say so.
-    pub fn start() -> Self {
+    pub fn start(ctx: egui::Context) -> Self {
         let mut feed = Self::idle();
         if !(feed.support.microphone || feed.support.camera) {
             return feed;
@@ -122,22 +122,58 @@ impl WatchFeed {
             .name("veilvoice-watch".into())
             .spawn(move || {
                 let mut monitor = Monitor::new();
+                let mut first = true;
+                let mut had_error = false;
                 loop {
-                    let update = match monitor.poll() {
-                        Ok(changes) => Update {
-                            active: monitor.current().to_vec(),
-                            alerts: changes.iter().map(veilvoice_watch::Change::alert).collect(),
-                            error: None,
-                        },
-                        Err(error) => Update {
-                            active: Vec::new(),
-                            alerts: Vec::new(),
-                            error: Some(error.to_string()),
-                        },
+                    let (update, worth_sending) = match monitor.poll() {
+                        Ok(changes) => {
+                            let worth = first || !changes.is_empty() || had_error;
+                            had_error = false;
+                            (
+                                Update {
+                                    active: monitor.current().to_vec(),
+                                    alerts: changes
+                                        .iter()
+                                        .map(veilvoice_watch::Change::alert)
+                                        .collect(),
+                                    error: None,
+                                },
+                                worth,
+                            )
+                        }
+                        Err(error) => {
+                            let worth = !had_error;
+                            had_error = true;
+                            (
+                                Update {
+                                    active: Vec::new(),
+                                    alerts: Vec::new(),
+                                    error: Some(error.to_string()),
+                                },
+                                worth,
+                            )
+                        }
                     };
-                    // The window has gone. Nothing else needs to happen.
-                    if sender.send(update).is_err() {
-                        return;
+                    first = false;
+
+                    // Only when there is something to say.
+                    //
+                    // This used to send on every poll, and the window used to
+                    // ask the channel every 500 ms whether anything had
+                    // arrived. Between them that meant a window sitting
+                    // untouched on any tab redrew itself twice a second for
+                    // ever: measured at 2.1 frames a second on all nine tabs,
+                    // with the animations turned off and nothing happening.
+                    //
+                    // A repaint is now asked for by the thread that has news,
+                    // which is the only thing that knows there is any. An idle
+                    // window draws nothing at all.
+                    if worth_sending {
+                        // The window has gone. Nothing else needs to happen.
+                        if sender.send(update).is_err() {
+                            return;
+                        }
+                        ctx.request_repaint();
                     }
                     std::thread::sleep(EVERY);
                 }
@@ -269,7 +305,7 @@ mod tests {
     /// nothing.
     #[test]
     fn draining_never_blocks_the_frame() {
-        let mut feed = WatchFeed::start();
+        let mut feed = WatchFeed::start(egui::Context::default());
         let mut worst = Duration::ZERO;
         for _ in 0..200 {
             let started = std::time::Instant::now();
@@ -370,7 +406,7 @@ mod tests {
     /// says it can do.
     #[test]
     fn starting_on_this_machine_agrees_with_what_it_supports() {
-        let feed = WatchFeed::start();
+        let feed = WatchFeed::start(egui::Context::default());
         let support = feed.support();
         if support.microphone || support.camera {
             assert!(feed.is_watching() || feed.error().is_some());

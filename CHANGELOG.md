@@ -20,7 +20,7 @@ audit's own arithmetic checked by a machine instead of by hand.
 
 ### The verify page can verify
 
-- **F-111** `website/verify.html` had the drop zone, the hash field, the
+- `website/verify.html` had the drop zone, the hash field, the
   progress bar and the verdict line, and did not load `js/verify.js`. Dropping
   a file on the page this project points people to for checking a download did
   nothing at all: the digest line sat at "no file hashed yet". The section
@@ -35,7 +35,7 @@ audit's own arithmetic checked by a machine instead of by hand.
   Chromium: a correct hash now gives MATCH on that page and a wrong one gives
   NO MATCH.
 
-- **F-112** Three sentences said "below" about something that is only on the
+- Three sentences said "below" about something that is only on the
   front page, and stayed that way when their section was given a page of its
   own: the repository panel twice and the in-browser verifier once. They now
   say what they mean without claiming a position. A link to another page
@@ -50,7 +50,7 @@ audit's own arithmetic checked by a machine instead of by hand.
 
 ### The verifier finds the release you are standing in
 
-- **F-107** Running `veilvoice-verify` with no arguments from inside an
+- Running `veilvoice-verify` with no arguments from inside an
   extracted release answered "no VeilVoice release was found to check". Every
   archive tool unpacks into a folder beside the archive, so the folder somebody
   opens holds the binaries and none of what they are checked against:
@@ -63,7 +63,7 @@ audit's own arithmetic checked by a machine instead of by hand.
   one that asks. Checked against the published v0.1.15 end to end, including
   341 of 341 extracted files and the machine's own GnuPG.
 
-- **F-108** `veilvoice-verify auto /no/such/place` checked a different
+- `veilvoice-verify auto /no/such/place` checked a different
   directory, printed INTACT and exited 0, without the path that was typed
   appearing anywhere in the output. The fallback through the current
   directory, Downloads and Desktop is right when nobody said where to look and
@@ -74,7 +74,7 @@ audit's own arithmetic checked by a machine instead of by hand.
   before anything is searched, and a refusal names the path and says nothing
   was checked.
 
-- **F-109** `veilvoice anonymise recording.wav` from a script, a scheduled job
+- `veilvoice anonymise recording.wav` from a script, a scheduled job
   or anything with its input redirected failed with `No such device or address
   (os error 6)`. That is the operating system's word for "there is no console",
   and it names nothing that was wanted and none of the ways on. VeilVoice
@@ -85,7 +85,7 @@ audit's own arithmetic checked by a machine instead of by hand.
   what it is. Checking first rather than reporting the failure afterwards keeps
   the message the same on Windows.
 
-- **F-110** The example plan printed in `docs/USER_GUIDE.md` did not parse.
+- The example plan printed in `docs/USER_GUIDE.md` did not parse.
   Copying it to write a first conversation plan gave `unknown keyword "turn
   19.000"`. The format separates fields with two spaces so a speaker's name and
   a subtitle can contain single ones, and the guide's example lines its columns
@@ -157,7 +157,8 @@ All seven fuzzing targets at twenty minutes each, twice the length of any
 previous run and the first to include `release_contents`. **2,127,796,269
 inputs, no crash, no hang, no out-of-memory.** The one new artefact was a slow
 unit declaring 569 MiB, ten passes and 127 lanes, legal on every axis against
-ceilings of 4 GiB, sixteen and 0x00ffffff, which is the class F-91 bounded.
+ceilings of 4 GiB, sixteen and 0x00ffffff, which is the class the app-lock
+memory ceiling bounded.
 
 Doubling the time found nothing new. That is evidence the targets are converged
 on the structure they can reach, and is not evidence the parsers are correct:
@@ -169,7 +170,7 @@ corpus, and none of it has run on Windows or macOS.
 v0.1.15 was downloaded, extracted and checked with the verifier that ships
 inside it. Not a fixture: the artefacts on the release page.
 
-- **F-104** The GnuPG half called a correctly signed release **unverified**, in
+- The GnuPG half called a correctly signed release **unverified**, in
   the strongest words the program has, for every reader with GnuPG installed.
   The release is signed by the signing subkey of the VeilVoice key, as most
   keys sign; GnuPG names the signing key first and the primary key last, and
@@ -210,20 +211,20 @@ pass on a splice, and the mechanical check found what reading had missed.
 
 ### The nineteenth and twentieth audit rounds
 
-- **F-105** The audit's verdict claimed one hundred and four defects and then
+- The audit's verdict claimed one hundred and four defects and then
   broke them down into sixty-five. The headline had been maintained every
   round; the breakdown under it had not been touched in eleven, so every
   conclusion in the document's most quotable paragraph was a seventh-round
   conclusion written in the present tense. The breakdown is gone rather than
   corrected, because a corrected one drifts again for the same reason.
-- **F-93 and F-94 were fixed in code and never written up.** Both were real,
+- **Two defects were fixed in code and never written up.** Both were real,
   both were described in full in the commit that fixed them, and neither had an
   entry, so the finding numbers ran to 104 with a hole at 94 and nothing said
   so. Writing them up forced an honest qualification of this project's
   "no confidentiality failure" claim, which had never mentioned the two
   encrypted-volume defects; the claim stands as defined, and the audit is now
   explicit about which side of the line they fall on.
-- **F-106** A test deleted another test's fixture. Two tests take a scratch
+- A test deleted another test's fixture. Two tests take a scratch
   GnuPG home and each removes it when it finishes, and the helper named that
   directory after the clock alone. Two threads reading the same tick get the
   same path, `create_dir_all` reports success because the directory is already
@@ -237,17 +238,17 @@ pass on a splice, and the mechanical check found what reading had missed.
 
 `docs/MEASURED.md` records how many findings the audit writes up and the
 highest number it hands out, read from the document's own headings. They agree
-exactly when no number has been skipped, so F-94's absence would have shown as
+exactly when no number has been skipped, so a missing write-up shows as
 103 against 104 rather than as nothing.
 
 A new site suite checks the README's count and range and the verdict's count
 and range against those measured numbers, never against each other: that is
-F-71, where a guard compared one hand-typed claim to another and passed while
+the earlier case where a guard compared one hand-typed claim to another and passed while
 both were wrong. Its four failure modes were tested by reintroducing them.
 
 ### The seventeenth audit round, run on the screenshots
 
-- **F-103** Nothing said when a committed screenshot had gone stale. The check
+- Nothing said when a committed screenshot had gone stale. The check
   compared each drawing against the text file beside it and compared that file
   against nothing: it is written by a separate `--capture` command that the
   verification run does not call, so a string could be rewritten and every
@@ -316,7 +317,7 @@ them makes the *invocation* independent.
 
 ### The sixteenth audit round, run on the manifest generator
 
-- **F-102** The generator normalised archive member paths with
+- The generator normalised archive member paths with
   `lstrip("./")`, which strips a set of characters rather than a prefix.
   Measured: `.hidden/file` came out as `hidden/file`, so a release containing a
   dotfile would publish it under a name no file on disk has and every verifier
@@ -340,7 +341,7 @@ closed, so the list stays readable at a glance; the detail is inside.
 
 ### The fifteenth audit round, run on that page
 
-- **F-101** The page listed five archives per release and the release workflow
+- The page listed five archives per release and the release workflow
   builds eleven. Two of the five names had never existed: it said
   `macos-aarch64` and `linux-aarch64` where every release has published
   `macos-arm64` and `linux-arm64`. So every entry carried two links that answer
@@ -357,25 +358,25 @@ New code in the one program whose entire job is not to be fooled is exactly the
 code an audit exists for. Three defects, all found by reading, and all three
 the same mistake: a check that could not see, answering as though it had.
 
-- **F-98** A folder the sweep could not open was reported as holding nothing
+- A folder the sweep could not open was reported as holding nothing
   extra. Measured: a tree deep enough to pass `PATH_MAX` stops the walk at
   about 1988 levels and a file below that read as absent rather than
   unreachable; a permission bit does it in one line. What could not be read is
   now named and withholds the pass, because unknown is not empty.
-- **F-99** A symbolic link standing where a program should be, pointing at a
+- A symbolic link standing where a program should be, pointing at a
   copy of the genuine bytes, was reported as matching the signed list. The
   release published a file, not a link, and a link is a name somebody else may
   repoint after this has looked. The sweep for extra files already refused to
   walk through links, so the two halves of one module disagreed about what a
   link is.
-- **F-100** A release signed by the project key *and* by somebody else's, in
+- A release signed by the project key *and* by somebody else's, in
   that order, would have been refused: only the first of GnuPG's signature
   reports was read. Safe direction, still a defect. A verifier people learn to
   work around protects nobody.
 
 ### The thirteenth audit round, run on what CI refused
 
-- **F-96** A program that has just been started is not yet wearing its own
+- A program that has just been started is not yet wearing its own
   name. The failsafe checks that a process id still belongs to the program it
   means to close, and its own tests start a `sleep` and act on it microseconds
   later. Measured, once in four thousand spawns: the kernel hands the parent
@@ -391,7 +392,7 @@ the same mistake: a check that could not see, answering as though it had.
 - `veilvoice-gui`'s help text is read only on the platforms that have a console
   to print it to, and was declared on all of them, so the Windows build failed
   on a constant nothing reads.
-- **F-97** Six committed drawings depended on which Python was installed.
+- Six committed drawings depended on which Python was installed.
   CPython 3.12 gave `sum` compensated summation over floats, so the same box
   widths added up a fraction differently, one box centred a tenth of a pixel
   further along, and files generated on one machine stopped matching the
@@ -406,8 +407,8 @@ the same mistake: a check that could not see, answering as though it had.
 
 ### The twelfth audit round, run before this release
 
-- **F-95** A VeraCrypt volume chosen and answered for, then locked, still
-  received the file. F-93 earlier in this cycle fixed the *panel*, which asked
+- A VeraCrypt volume chosen and answered for, then locked, still
+  received the file. The unmounted-vault fix earlier in this cycle fixed the *panel*, which asked
   whether the folder existed when the question is whether anything is mounted
   on it. The file is written somewhere else, and that path asked neither: it
   checked only whether the hidden-volume question had been answered. So a
@@ -501,15 +502,15 @@ now committed for the two targets that start cold, and what it buys was
 measured: on `lock_file`, a cold run starts at 25 code paths and reaches 460
 after 64,309 inputs, while a seeded run *starts* at 625.
 
-- **F-92** `Manifest::open_sealed` and `Policy::open_sealed` used the
+- `Manifest::open_sealed` and `Policy::open_sealed` used the
   four-gigabyte Argon2 ceiling meant for a container somebody was sent and
   chose to open. Neither is that. The manifest sits at a fixed path, and this
   cycle's own marker 75 made the desktop application read it at every unlock,
   so anybody able to write that directory could make every unlock allocate four
   gigabytes, which on a modest machine is an abort. Both now use the unattended
-  ceiling that F-91 gave the app lock. Found by decoding a slow unit the
+  ceiling the app lock was given. Found by decoding a slow unit the
   campaign reported rather than filing it as Argon2 being slow on purpose, and
-  the lesson is one already recorded twice: F-91 was written up as being about
+  the lesson is one already recorded twice: that ceiling was written up as being about
   the app-lock file when it was about any file the program opens without being
   asked.
 
@@ -578,26 +579,26 @@ written this cycle, every one found by reading the diff.
 Two of them were **worse than the thing they hardened**, which is the pattern
 worth naming.
 
-- **F-85** Any read of the vault index that was not a clean sixteen bytes drew
+- Any read of the vault index that was not a clean sixteen bytes drew
   a new index and wrote it, so one refused read, one sharing violation or one
   exhausted descriptor table would have orphaned the lock under a name nothing
   could ever compute again. The plain file this replaced could not be orphaned,
   because its name was a constant. Only a genuinely absent index is created now.
-- **F-86** The administrator-owned spare silently kept the previous password
+- The administrator-owned spare silently kept the previous password
   after a change made from an unelevated run, so deleting the copy anybody can
   delete reverted the lock to a password somebody may still know. `store` now
   reports whether the spare caught up, a change that did not reach it is not
   called finished, and two copies holding different passwords are reported.
-- **F-87** A spare that could never be written was reported as a deleted one,
+- A spare that could never be written was reported as a deleted one,
   at every launch, which is how an alarm stops being read.
-- **F-88** Dismissing an interference report ran Argon2id three times. A
+- Dismissing an interference report ran Argon2id three times. A
   control nobody will wait for is a control nobody uses.
-- **F-89** A power cut mid-write left a short file, which does not parse, which
+- A power cut mid-write left a short file, which does not parse, which
   reads as tampering. Both copies now go through a write-and-rename.
-- **F-90** Setting an app lock never upgraded an existing plain integrity
+- Setting an app lock never upgraded an existing plain integrity
   record to a sealed one, so somebody who did the thing that earns the sealed
   record kept the readable one.
-- **F-91** A lock file could declare four gigabytes of Argon2 memory, which on
+- A lock file could declare four gigabytes of Argon2 memory, which on
   a modest machine is an allocation failure rather than a wait, and this build
   aborts on one: the window would fail to start with no way in. The generous
   ceiling is right for a container somebody chose to open and wrong for the one
@@ -618,12 +619,12 @@ for five minutes each. **293 million inputs, nothing found.**
 
 One number in that changed for a reason worth recording. Last round `lock_file`
 managed 3,274 inputs in its five minutes; this round it managed 445,714, which
-is 136 times more. That is F-82's fix: with no ceiling on the number of Argon2
+is 136 times more. That is what the pass-count ceiling is for: with no ceiling on the number of Argon2
 passes, most of that target's time went into a handful of absurd derivations.
 Fixing a denial of service made the campaign that found it two orders of
 magnitude more productive.
 
-### F-84 - the preview said "nowhere else" before it knew where
+### The preview said "nowhere else" before it knew where
 
 `--preview` exists so somebody can hear their own veiled voice before an
 interview rather than during one, and it printed *"the veiled voice goes to
@@ -695,7 +696,7 @@ The colour key and explanation added to the diagrams needed a canvas tall
 enough for them, and the height was worked out in one function and drawn in
 another. They disagreed by one row, so the last line of every note was clipped
 by the bottom edge of the picture it was explaining. That is the third time
-this repository has cut its own text off, after F-37's banner and the terminal
+this repository has cut its own text off, after the banner and the terminal
 drawings' ellipsis, and the two earlier ones were both found by somebody
 looking at a picture. Looking does not scale to three hundred of them.
 
@@ -710,7 +711,7 @@ the first thing on a crate's page, in its README and in the wiki, and it was
 cutting its own sentence in half in all three. Nobody had noticed because
 nobody had read one to the end.
 
-That is F-37 again, in the same place, four rounds later. The lesson recorded
+That is the banner defect again, in the same place, four rounds later. The lesson recorded
 then was that a picture has to be looked at; the lesson now is that a
 measurement is what scales.
 
@@ -933,9 +934,9 @@ they got through 250 million inputs and found **two defects, both shipped, both
 in code three audit rounds had read.** The run counts and the limits of what
 five minutes proves are in `fuzz/README.md`.
 
-### F-82 - a header could ask for four billion Argon2 passes, and get them
+### A header could ask for four billion Argon2 passes, and get them
 
-The memory cost has had a ceiling since F-2, with a long note explaining that
+The memory cost has had a ceiling since the first round, with a long note explaining that
 it arrives from the file and that a header claiming `u32::MAX` asks for four
 terabytes. The **time** cost had a test for zero and nothing else.
 
@@ -959,7 +960,7 @@ header this build will accept is now a wait somebody can sit through.
 The exact bytes are a regression test in the deterministic campaign, where they
 run on every commit on every platform with no nightly toolchain.
 
-### F-83 - the tamper record refused to write what it was happy to read
+### The tamper record refused to write what it was happy to read
 
 `Manifest::of` refused to record a path containing a line break.
 `Manifest::parse` accepted one. So VeilVoice would not write a record it was
@@ -1023,12 +1024,12 @@ One machine, x86-64, Ubuntu 24.04, with a rustup toolchain rather than Debian's
 own `cargo` and `rustc` packages, which is why the build needed `-d` to get
 past `dpkg-checkbuilddeps`. `lintian` has not been run and nothing has been
 uploaded anywhere. All of that is written beside the yes in
-`docs/PACKAGING.md`, because "we built a .deb once" and "this is a Debian
+`docs/PACKAGING.md`, because "we built a.deb once" and "this is a Debian
 package" are different claims.
 
 Doing it found two defects.
 
-### F-80 - the documented way to build the Debian package could not run
+### The documented way to build the Debian package could not run
 
 Two things, either of which stops it before any compilation begins.
 
@@ -1046,7 +1047,7 @@ documentation said "not built", which is honest about the outcome and is not
 the same as knowing the route was broken. Both are fixed and both are checked,
 the mode through `git ls-files -s` rather than through the filesystem.
 
-### F-81 - every package definition was five releases behind
+### Every package definition was five releases behind
 
 Six files in `packaging/` name a version. All six said 0.1.9 while the
 workspace was at 0.1.14.
@@ -1059,8 +1060,8 @@ would have stamped a package 0.1.9. Two of the commands printed in
 `docs/PACKAGING.md` for a reader to copy carried the same number.
 
 Nobody noticed because nothing was looking. It is the shape this repository
-keeps finding: F-41 was generated output drifting from its generator, F-61 and
-F-63 were comments that had stopped being true, F-71 was two hand-typed numbers
+keeps finding: generated output drifting from its generator, comments that had
+stopped being true, two hand-typed numbers
 agreeing with each other. This is six files agreeing with a number that had
 moved on without them.
 
@@ -1074,7 +1075,7 @@ tests anything.
 
 `docs/AUDIT.md` has named this as the single highest-value change available to
 CI since the fifth round, and for a specific reason: **two shipped defects came
-out of its absence.** F-4 was an arithmetic overflow and F-11 was an erase loop
+out of its absence.** One was an arithmetic overflow and another an erase loop
 that never terminated and left the file it was destroying intact. Both were
 reachable only on a 32-bit target, both were found by reading, and neither was
 reachable by any campaign in a matrix where every entry is 64-bit.
@@ -1099,7 +1100,7 @@ A passing run is not a campaign, and the audit entry says so: this shows the
 existing tests hold where a pointer is narrow, not that anybody has gone
 hunting there.
 
-### F-79 - a security step that printed somebody else's error above its own "ok"
+### A security step that printed somebody else's error above its own "ok"
 
 The installer fetches the signing key from the website, and from the repository
 if the website does not answer. A failure of the first is not a failure at all,
@@ -1140,7 +1141,7 @@ matched against the signed list, both binaries installed, and the installed
 same machine, an unknown option and a version that is not published, and both
 exited 1.
 
-That run is what found F-79. macOS is still unrun, and its `sh` is not Linux's.
+That run is what found the packaging defect above. macOS is still unrun, and its `sh` is not Linux's.
 
 ### Every box in a flowchart now opens the source, here, in your colours
 
@@ -1181,7 +1182,7 @@ names another page has to resolve, every source page has to draw exactly as
 many lines as the file it claims to show, every box has to stay on this site,
 and the mark has to remain a CSS rule.
 
-### F-78 - four tests shared one global and could undo each other
+### Four tests shared one global and could undo each other
 
 The active theme in the desktop application is a process-global atomic, which
 is right: it is read on every repaint. Four tests read and write it, and cargo
@@ -1197,10 +1198,10 @@ Written up rather than quietly fixed because of what a flaky test costs: a
 suite that fails one run in forty teaches whoever runs it that red means run it
 again, which is the habit that lets a real failure through.
 
-### F-77 - a count on the front page was measured on one machine only
+### A count on the front page was measured on one machine only
 
 The front page states a number of tests, and that number is generated by
-running the suite rather than typed, which is what F-71 was about. It is still
+running the suite rather than typed, which is what the stale-claims guard was about. It is still
 a number about one computer: **the same commit measures 996 tests on Windows
 and 988 on Linux**, because nine tests are compiled only on Windows.
 
@@ -1211,9 +1212,9 @@ in its own header that the total differs by platform and by how much. Wording
 the front page so it is true wherever it is read is a change to that page's
 own voice, and it is listed as open rather than made here.
 
-### F-76 - a program that had died was reported as still running
+### A program that had died was reported as still running
 
-F-74 made Failsafe ask, before and after it closes something, whether a process
+The Failsafe fix made it ask, before and after it closes something, whether a process
 id still belongs to the program it means. On Unix it asked by name, and the
 name is the wrong question.
 
@@ -1225,7 +1226,7 @@ exits 0, and the only field that has changed is the run state, now `Z`.
 So the check said "still there" about a program that was already dead, and
 Failsafe waited out its whole retry loop, about two and three quarter seconds,
 before telling somebody to go and close by hand a program that had closed
-itself at the start of it. That is F-74's false report in the other direction:
+itself at the start of it. That is the same false report in the other direction:
 one said it had closed something it had not, this said it had failed to close
 something it had.
 
@@ -1237,7 +1238,7 @@ not the feature.
 **Found by running the suite on Linux**, where it failed two tests that pass on
 Windows, whose process table drops a terminated process at once.
 
-### F-74: Failsafe could close the wrong program, and said so either way
+### Failsafe could close the wrong program, and said so either way
 
 Two defects in one path, and the second is the worse of them.
 
@@ -1266,7 +1267,7 @@ question cannot be answered, the answer is **no**: not closing something is
 recoverable and closing the wrong thing is not. Afterwards the process is
 looked for again, and a kill that did not kill now reports so.
 
-### F-75: the application baseline was written world-readable
+### The application baseline was written world-readable
 
 `veilvoice appctl` records what normally runs on this machine, with
 `std::fs::write` and its default permissions.
@@ -1745,7 +1746,7 @@ what was asked for, the ratchet can only fire on a frame boundary, and
 showing the request would describe a spread that does not exist. Asking for
 `250,1800` reports `251-1803 ms`.
 
-### F-73: the randomised ratchet was written, documented, and never called
+### The randomised ratchet was written, documented, and never called
 
 **This one had shipped.** `reseed_range_ms` and `with_random_reseed_range` were
 implemented and tested, and the field's documentation said "the front ends call
@@ -1841,7 +1842,7 @@ It now answers the harder one: **is the published build the one this source
 produces**. A signature says who made a file. Only a build says what it is made
 of.
 
-**The eighth audit round found seven defects (F-66 to F-72), none of them
+**The eighth audit round found seven defects , none of them
 shipped.** Two were found by continuous integration rather than by anybody's
 judgement, and both had been watched to pass on the machine they failed on.
 Three more were found by running a command and reading what it printed. Not one
@@ -1853,7 +1854,7 @@ and the third time this project has had to learn it.
 
 ```
 veilvoice-verify deps
-veilvoice-verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc
+veilvoice-verify reproduce. --sums SHA256SUMS --sig SHA256SUMS.asc
 ```
 
 Markers 55 to 59. `veilvoice-verify file` answers *is this download the one
@@ -1896,7 +1897,7 @@ the hash list may be for another platform. A hash list naming nothing that was
 built would otherwise report success by vacuum, which is the failure mode this
 whole exercise is most exposed to.
 
-### F-72: three tests passed here and failed on the same platform
+### Three tests passed here and failed on the same platform
 
 Several tests read this project's own source with `include_str!` and find a
 function's end by searching for `"\n}\n"`. They passed locally and failed on
@@ -1924,7 +1925,7 @@ The failure mode is now a test of its own, a search for `"\n}\n"`
 is asserted to succeed against LF and to fail against CRLF, so it is
 on record as reachable rather than as a story about it.
 
-### F-71: the guard against stale claims compared one copy to another
+### The guard against stale claims compared one copy to another
 
 The front page said **354 tests** and "no unsafe code, in any of the **nine**
 crates". The tree holds 890 tests across 19 crates, and the website runs 11
@@ -1954,7 +1955,7 @@ Three things that would have let it happen again:
 The guard was checked by breaking it, then restoring it. A control nobody has
 watched fail is a control nobody has tested.
 
-### F-70: the reproducibility checker would have said no to everybody
+### The reproducibility checker would have said no to everybody
 
 The new `reproduce` command ran `cargo build --release` and nothing else: no
 `--remap-path-prefix`, no `SOURCE_DATE_EPOCH`, no per-linker determinism flag,
@@ -2005,7 +2006,7 @@ Measured on this machine, two builds in two separate target directories:
 A test compares the flags against `release.yml` itself, so changing one without
 the other fails the build.
 
-### F-69: the build succeeded, and then looked for it in the wrong place
+### The build succeeded, and then looked for it in the wrong place
 
 Found by running `build` on this machine. After a release build that took
 several minutes and worked, the tool hashed `root/target/release`, a path it
@@ -2015,7 +2016,7 @@ computed rather than asked for, and ended with:
   ok    the build finished
 
 FAILED: the build left nothing to hash
-  .\target\release is not there
+ .\target\release is not there
 ```
 
 `CARGO_TARGET_DIR`, `build.target-dir` in a `.cargo/config.toml`, and a target
@@ -2027,12 +2028,12 @@ the escapes are undone properly: the value is a Windows path, and text taken
 between the first two quotes gives `C:\\Users\\...`, which looks almost right
 and does not open.
 
-**Three of this round's four defects are the same mistake.** F-67 answered from
-a default configuration rather than the one in force, F-68 from a program that
-shared a name with the right one, F-69 from a path that is usually correct.
+**Three of this round's four defects are the same mistake.** One answered from
+a default configuration rather than the one in force, one from a program that
+shared a name with the right one, one from a path that is usually correct.
 None was a logic error, and none would have been found by reading the code.
 
-### F-68: the linker check found Git's hardlink tool and called it a linker
+### The linker check found Git's hardlink tool and called it a linker
 
 Found by running `deps` on this machine. The Windows probe looked for `link` on
 `PATH` and reported whatever came back, which was
@@ -2095,7 +2096,7 @@ error. A quiet mode is only as good as the last line nobody remembered to gate,
 and that omission is invisible: every other test still passes and the default
 output is still correct.
 
-### F-67: the group panel rendered with the default settings, not yours
+### The group panel rendered with the default settings, not yours
 
 The eighth audit round, over the voice limit, saved projects and profiles, and
 the table of communication programs. Two defects, neither shipped.
@@ -2121,7 +2122,7 @@ anything is painted. The regression test moves the frame size to something that
 genuinely lowers the count, and checks that the number shown *and* the number
 enforced both follow.
 
-### F-66: a saved project could come back different from how it went out
+### A saved project could come back different from how it went out
 
 A value that trimmed away to nothing was written as a key with an empty value:
 `Some("   ")` went out as `title  ` and came back as `Some("")`, which is neither what
@@ -2336,7 +2337,7 @@ for a crate that has not got one, with the crate named, the same rule
 heading. "We should document that" does not survive a busy week; a build that
 stops does.
 
-### F-65: two crates were invisible rather than uncovered
+### Two crates were invisible rather than uncovered
 
 `veilvoice-check` and `veilvoice-update` were added to the workspace this cycle
 and to neither of the documentation generator's crate lists. So they had no
@@ -2356,30 +2357,30 @@ Both crates are documented: 751 files for 19 crates, up from 721 for 17.
 
 ### Seventh audit round: four defects, and one encoder proved sound
 
-Four found and fixed, **F-61 to F-64**, all in code written this cycle. `main`
+Four found and fixed, all four, all in code written this cycle. `main`
 has not been released since v0.1.12, so "none had shipped" and "all were
 written this cycle" are the same sentence, and the round says so rather than
 claiming credit for it.
 
 **Three of the four are the same shape: a comment that had stopped being true.**
 
-* **F-61**: the verify tab's dropped file was read at the *end* of `update`,
+* The verify tab's dropped file was read at the *end* of `update`,
   after the panel that shows it had been painted, so a drop and the highlight
   under a hovering file were a frame late. The comment above the call said
   "before anything is drawn". A wrong thing that agrees with itself survives a
   reading, and this one had survived several.
-* **F-62**: nothing woke the window while a file hovered over it. An idle egui
+* Nothing woke the window while a file hovered over it. An idle egui
   window repaints only when asked, and the repaint condition listed every busy
   state and no hovering state, so the drop target lit nothing up and the file
   did not appear until the mouse moved for some other reason. The one moment
   where the user is waiting for the window and the window has decided nothing
   is happening.
-* **F-63**: the stylesheet comment beside the responsive-table rule said
+* The stylesheet comment beside the responsive-table rule said
   "nothing changes on a desktop". Measured: the tables render 820 px wide in an
   860 px column, so the row rules stop forty pixels short. `width: 100%` does
   not restore it, because the shrink happens on the anonymous table box inside
   the block. The trade is still right; the comment now says what it costs.
-* **F-64**: a malformed `SHA256SUMS` line carrying a digest and no name could
+* A malformed `SHA256SUMS` line carrying a digest and no name could
   answer a lookup for `""`, which is what `Path::file_name` gives for a
   directory or `..` once it has been through `unwrap_or_default`. Not reachable
   from either front end, so a hole rather than a live defect. Both halves
@@ -2732,7 +2733,7 @@ asking nothing, so a check at startup cannot be added without failing the build.
 dependencies at all. It runs the transfer tool your operating system already
 ships, as `veilvoice-verify` has fetched releases since it existed, found at
 an absolute path and never by bare name, because resolving a program by name on
-Windows searches the current directory first. That is finding F-13, and it does
+Windows searches the current directory first. That was an earlier finding, and it does
 not get to happen twice.
 
 **It downloads nothing and installs nothing.** It reports a version number and
@@ -2963,7 +2964,7 @@ follow from it being text rather than pixels: it follows the reader's palette
 instead of being baked in one of nine; its claims can be selected, searched and
 read aloud; and `prefers-reduced-motion` reaches it, which no rule in a
 stylesheet can do to a PNG. It is also legible on a phone, which the drawn
-banner never was, and finding F-37 was this project's own claims rendered
+banner never was, and the banner defect was this project's own claims rendered
 illegibly inside an image at phone width.
 
 The waveform is gone from it deliberately: the motif appears twice more on the
@@ -3565,7 +3566,7 @@ reproducibility because they are built once rather than twice.
 
 ### Fixes
 
-- **The website rendered the text in its own banner illegibly (F-37).** Every
+- **The website rendered the text in its own banner illegibly.** Every
   image carried `image-rendering: pixelated`, which is for pixel art being
   *enlarged*; every image here is *shrunk*. Nearest-neighbour sampling deletes
   the rows it discards rather than blending them, so on a phone the hero read
@@ -3573,11 +3574,11 @@ reproducibility because they are built once rather than twice.
   `BY ~I,FS01 CN GITHUB` instead of the claim, the licence and the authorship.
   It had been that way for as long as the banner existed, on every viewport,
   with every test passing. Found by rendering the page and reading it.
-- **The website's artwork had drifted from its generator (F-41).**
+- **The website's artwork had drifted from its generator.**
   `website/assets/` held hand-maintained copies that `--check` never looked at.
   The generator now writes both and checks both -- "generated from source" and
   "generated, plus a copy somebody maintains by hand" are different claims.
-- **A documentation link pointed at a file that does not exist (F-42).** Now
+- **A documentation link pointed at a file that does not exist.** Now
   mechanical: a site-test suite resolves every local link in every tracked
   document.
 - Seven further defects were found in code written during this round and fixed
@@ -3642,42 +3643,42 @@ write-ups, one per finding, are in [`docs/AUDIT.md`](docs/AUDIT.md).
 
 ### Security fixes -- the engine and the tools
 
-- **A four-kilobyte WAV killed the process (F-9).** A file declaring a sample
+- **A four-kilobyte WAV killed the process.** A file declaring a sample
   rate of zero made the decoder panic inside its own probe, before VeilVoice saw
   anything it could check -- and the release profile sets `panic = "abort"`, so
   that was the program ending rather than an error. `veilvoice anonymise` on a
   file somebody sent you was the whole of it. Now pre-flighted and refused with
   an explanation.
-- **A configuration value made every output sample silent (F-10).** `NaN`
+- **A configuration value made every output sample silent.** `NaN`
   passed validation, because `NaN` compares false against every bound. The
   engine built happily and produced `NaN` for the rest of the session with
   nothing reported. The same shape as the v0.1.6 finding about a single bad
   *sample*, reached through the configuration instead. An absurd sample rate --
   which a WAV header can carry, as a `u32` -- also asked for about two gigabytes
   of delay lines from a four-kilobyte file.
-- **Secure erase destroyed the wrong file (F-12).** It followed symbolic links,
+- **Secure erase destroyed the wrong file.** It followed symbolic links,
   so erasing a link filled its *target* with random data, unlinked only the
   link, and reported success. It now refuses a link and says why.
-- **Secure erase never finished on 32-bit builds (F-11).** A 4 GiB file
+- **Secure erase never finished on 32-bit builds.** A 4 GiB file
   truncated a length to zero and the overwrite loop ran for ever, leaving the
   file intact. Reachable only on the ARMv7 build; found by reading.
-- **A planted executable in the working directory was run (F-13).** On Windows
+- **A planted executable in the working directory was run.** On Windows
   the program-search order includes the current directory, so
   `Command::new("reg")` in the monitor and `wevtutil` in the tamper detector
   could execute a file that happened to be sitting beside you. Both now resolve
   to absolute paths under the system directory.
-- **Secrets were created world-readable and tightened afterwards (F-14, F-15).**
+- **Secrets were created world-readable and tightened afterwards.**
   The app-lock verifier -- rewritten after *every failed unlock attempt* -- plus
   `keygen`'s private key, `decrypt`'s plaintext output and an unencrypted
   recording. All now created owner-only in the first place, through a new
   `veilvoice_crypto::privatefile` module.
-- **The post-quantum shared secret was not zeroized (F-18).**
+- **The post-quantum shared secret was not zeroized.**
 - Plus: an unbounded decode that a compressed file could turn into an
-  out-of-memory abort (F-17); a corrupt WAV the metadata cleaner could hand back
-  as clean (F-19); app-lock cost parameters validated too late (F-20); a
-  manifest that reported every recorded file as new (F-21); and a Windows
+  out-of-memory abort; a corrupt WAV the metadata cleaner could hand back
+  as clean; app-lock cost parameters validated too late; a
+  manifest that reported every recorded file as new; and a Windows
   attribution query whose escaping was wrong, so it told the user the wrong
-  reason it could not see (F-16).
+  reason it could not see.
 
 ### Security fixes -- the website
 
@@ -3685,28 +3686,28 @@ write-ups, one per finding, are in [`docs/AUDIT.md`](docs/AUDIT.md).
   quadratics, measured rather than guessed: 128 000 characters on one line took
   **eight seconds**, and a second shape took **fourteen**. That is on the main
   thread, on text the page fetches over the network. Both are now linear
-  (F-22, F-23).
+.
 - **A deeply nested blockquote crashed the render** and the reader was told the
-  network had failed (F-24).
+  network had failed.
 - **Download links from the GitHub API were assigned with no scheme check**
-  (F-26) -- the item the previous audit listed as open. A refused asset is still
+  -- the item the previous audit listed as open. A refused asset is still
   named, just not clickable.
 - **The legal gate was an invisible modal** on any engine older than Chrome 111,
   Safari 16.2 or Firefox 113: `color-mix()` with no fallback left it with no
-  background while it still locked scrolling (F-30). And it **could not be
+  background while it still locked scrolling. And it **could not be
   dismissed at all on an iPhone**, because `88vh` put the continue button below
-  the visible area while the page behind was scroll-locked (F-33).
-- **No focus ring at all on Safari before 15.4** (F-31), **no header blur on
-  iOS 17 and earlier** (F-29), and **native controls drawn light on a dark
-  page** (F-32).
+  the visible area while the page behind was scroll-locked.
+- **No focus ring at all on Safari before 15.4**, **no header blur on
+  iOS 17 and earlier**, and **native controls drawn light on a dark
+  page**.
 - **The mobile header took a fifth of the screen** -- 165 px of an iPhone's
   812 px, at every scroll position -- and its links were below the minimum
-  touch-target size. Now 79 px with a single scrolling row (F-34).
-- A code fence could reach `Object.prototype` (F-25); a malformed API response
-  was reported as a network failure (F-27); repo-relative links resolved
-  somewhere other than where they pointed (F-28); the in-browser verifier gave
-  an unusable error on an insecure origin (F-35) and used twice the memory it
-  needed (F-36).
+  touch-target size. Now 79 px with a single scrolling row.
+- A code fence could reach `Object.prototype`; a malformed API response
+  was reported as a network failure; repo-relative links resolved
+  somewhere other than where they pointed; the in-browser verifier gave
+  an unusable error on an insecure origin and used twice the memory it
+  needed.
 
 ### Added
 
@@ -3812,30 +3813,30 @@ Found by finishing the audit scope that `docs/AUDIT.md` had listed as
 outstanding. Seven defects, four reachable from a file somebody sends you. None
 was a confidentiality failure.
 
-- **Argon2 parallelism overflow (F-2).** `argon2` 0.5.3 evaluates
+- **Argon2 parallelism overflow.** `argon2` 0.5.3 evaluates
   `m_cost < p_cost * 8` before checking `p_cost`'s ceiling, so a `p_cost` above
   `u32::MAX / 8` overflowed. That value is read verbatim from a `.veil` header
   and from the app-lock file, which is parsed before anyone has authenticated.
-- **Unbounded Argon2 memory cost (F-3).** `m_cost` was also read verbatim and
+- **Unbounded Argon2 memory cost.** `m_cost` was also read verbatim and
   allocated up front, so a header claiming `u32::MAX` asked for four terabytes;
   the allocation fails and a failed allocation aborts the process. Merely
   *trying to open* a hostile container killed the program, release builds
   included. Now capped at 4 GiB, above RFC 9106's largest recommended profile.
-- **32-bit overflow in the RIFF chunk walker (F-4).** Unreachable on 64-bit,
+- **32-bit overflow in the RIFF chunk walker.** Unreachable on 64-bit,
   live on the ARMv7 build. Found by reading, not by fuzzing.
-- **One NaN sample destroyed the engine (F-5).** The accent neutraliser's
+- **One NaN sample destroyed the engine.** The accent neutraliser's
   long-term spectrum is an exponential moving average, so a single non-finite
   input sample poisoned it permanently: every subsequent output sample was NaN
   for the rest of the session, silently. A 32-bit-float WAV can legally contain
   one. Input is now sanitised at the single gate every sample passes through.
-- **The site's Markdown renderer emitted unfiltered image URLs (F-6),** silently
-  deleted every string literal in every code block (F-7), and rejected ordinary
-  relative links (F-8).
+- **The site's Markdown renderer emitted unfiltered image URLs,** silently
+  deleted every string literal in every code block, and rejected ordinary
+  relative links.
 
 ### Website fixes
 
 - **Empty links.** A link whose label was inline code rendered as an empty
-  anchor, so "see [`docs/AUDIT.md`](docs/AUDIT.md)." was published as "see .".
+  anchor, so "see [`docs/AUDIT.md`](docs/AUDIT.md)." was published as "see.".
 - **Invisible paragraphs.** Three parts of the walkthrough never appeared,
   including the box stating the app lock is not tamper-proof. A viewport jump
   carried them past the observer without the intersection ratio ever changing.

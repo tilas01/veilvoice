@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 179 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 289 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -123,115 +123,229 @@
 <span class="ln" id="L75"><span class="tok-str">veilvoice-gui - the VeilVoice desktop application</span></span>
 <span class="ln" id="L76"></span>
 <span class="ln" id="L77"><span class="tok-str">Usage:</span></span>
-<span class="ln" id="L78"><span class="tok-str">  veilvoice-gui [--tab &lt;NAME&gt;]</span></span>
+<span class="ln" id="L78"><span class="tok-str">  veilvoice-gui [--tab &lt;NAME&gt;] [--size &lt;W&gt;x&lt;H&gt;]</span></span>
 <span class="ln" id="L79"></span>
 <span class="ln" id="L80"><span class="tok-str">Options:</span></span>
 <span class="ln" id="L81"><span class="tok-str">  --tab &lt;NAME&gt;  Open on a named tab rather than the last one used.</span></span>
 <span class="ln" id="L82"><span class="tok-str">                Names are the ones the tabs carry: file, live, group,</span></span>
 <span class="ln" id="L83"><span class="tok-str">                monitor, lock, verify, settings, install, about.</span></span>
-<span class="ln" id="L84"><span class="tok-str">  -h, --help    Print this message.</span></span>
-<span class="ln" id="L85"><span class="tok-str">  -V, --version Print the version.</span></span>
-<span class="ln" id="L86"></span>
-<span class="ln" id="L87"><span class="tok-str">The command line is `veilvoice`, and `veilvoice gui` opens this window too.</span></span>
-<span class="ln" id="L88"><span class="tok-str">Everything this window does, that command can do without one.</span></span>
-<span class="ln" id="L89"><span class="tok-str">&quot;</span>;</span>
+<span class="ln" id="L84"><span class="tok-str">  --size &lt;W&gt;x&lt;H&gt;  Open at this size in logical pixels rather than the</span></span>
+<span class="ln" id="L85"><span class="tok-str">                default 1100x720. Both are clamped to the window&#x27;s</span></span>
+<span class="ln" id="L86"><span class="tok-str">                minimum of 720x520.</span></span>
+<span class="ln" id="L87"><span class="tok-str">  -h, --help    Print this message.</span></span>
+<span class="ln" id="L88"><span class="tok-str">  -V, --version Print the version.</span></span>
+<span class="ln" id="L89"></span>
+<span class="ln" id="L90"><span class="tok-str">The command line is `veilvoice`, and `veilvoice gui` opens this window too.</span></span>
+<span class="ln" id="L91"><span class="tok-str">Everything this window does, that command can do without one.</span></span>
+<span class="ln" id="L92"><span class="tok-str">&quot;</span>;</span>
 </span>
-<span class="ln" id="L90"></span>
+<span class="ln" id="L93"></span>
 <span class="src-item" id="fn-answered_without_a_window">
-<span class="ln" id="L91"><span class="tok-com">/// Answer `--help` and `--version` before a window is opened.</span></span>
-<span class="ln" id="L92"><span class="tok-com">///</span></span>
-<span class="ln" id="L93"><span class="tok-com">/// Unix only, and the restriction is the honest part rather than an oversight.</span></span>
-<span class="ln" id="L94"><span class="tok-com">/// A release build on Windows declares `windows_subsystem = &quot;windows&quot;` and has</span></span>
-<span class="ln" id="L95"><span class="tok-com">/// no console attached, so `println!` there writes to nothing: the program</span></span>
-<span class="ln" id="L96"><span class="tok-com">/// would appear to do nothing at all, which is worse than the window it</span></span>
-<span class="ln" id="L97"><span class="tok-com">/// currently opens. Where a console is guaranteed, this answers; where it is</span></span>
-<span class="ln" id="L98"><span class="tok-com">/// not, behaviour is unchanged.</span></span>
-<span class="ln" id="L99"><span class="tok-com">///</span></span>
-<span class="ln" id="L100"><span class="tok-com">/// It exists because `veilvoice-gui --help` used to try to open a window and,</span></span>
-<span class="ln" id="L101"><span class="tok-com">/// on a machine with no display, failed with a winit error naming</span></span>
-<span class="ln" id="L102"><span class="tok-com">/// `WAYLAND_DISPLAY`. That is the reply to a reasonable question, and it is</span></span>
-<span class="ln" id="L103"><span class="tok-com">/// also what `lintian` was pointing at with `no-manual-page`: a binary with no</span></span>
-<span class="ln" id="L104"><span class="tok-com">/// help text has no page to derive.</span></span>
-<span class="ln" id="L105"><span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L106"><span class="tok-kw">fn</span> <span class="tok-fn">answered_without_a_window</span>() -&gt; bool {</span>
-<span class="ln" id="L107">    <span class="tok-kw">for</span> arg <span class="tok-kw">in</span> std::env::<span class="tok-fn">args</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>) {</span>
-<span class="ln" id="L108">        <span class="tok-kw">if</span> arg == <span class="tok-str">&quot;-h&quot;</span> || arg == <span class="tok-str">&quot;--help&quot;</span> {</span>
-<span class="ln" id="L109">            print!(<span class="tok-str">&quot;{USAGE}&quot;</span>);</span>
-<span class="ln" id="L110">            <span class="tok-kw">return</span> true;</span>
-<span class="ln" id="L111">        }</span>
-<span class="ln" id="L112">        <span class="tok-kw">if</span> arg == <span class="tok-str">&quot;-V&quot;</span> || arg == <span class="tok-str">&quot;--version&quot;</span> {</span>
-<span class="ln" id="L113">            println!(<span class="tok-str">&quot;veilvoice-gui {}&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>));</span>
-<span class="ln" id="L114">            <span class="tok-kw">return</span> true;</span>
-<span class="ln" id="L115">        }</span>
-<span class="ln" id="L116">    }</span>
-<span class="ln" id="L117">    false</span>
-<span class="ln" id="L118">}</span>
+<span class="ln" id="L94"><span class="tok-com">/// Answer `--help` and `--version` before a window is opened.</span></span>
+<span class="ln" id="L95"><span class="tok-com">///</span></span>
+<span class="ln" id="L96"><span class="tok-com">/// Unix only, and the restriction is the honest part rather than an oversight.</span></span>
+<span class="ln" id="L97"><span class="tok-com">/// A release build on Windows declares `windows_subsystem = &quot;windows&quot;` and has</span></span>
+<span class="ln" id="L98"><span class="tok-com">/// no console attached, so `println!` there writes to nothing: the program</span></span>
+<span class="ln" id="L99"><span class="tok-com">/// would appear to do nothing at all, which is worse than the window it</span></span>
+<span class="ln" id="L100"><span class="tok-com">/// currently opens. Where a console is guaranteed, this answers; where it is</span></span>
+<span class="ln" id="L101"><span class="tok-com">/// not, behaviour is unchanged.</span></span>
+<span class="ln" id="L102"><span class="tok-com">///</span></span>
+<span class="ln" id="L103"><span class="tok-com">/// It exists because `veilvoice-gui --help` used to try to open a window and,</span></span>
+<span class="ln" id="L104"><span class="tok-com">/// on a machine with no display, failed with a winit error naming</span></span>
+<span class="ln" id="L105"><span class="tok-com">/// `WAYLAND_DISPLAY`. That is the reply to a reasonable question, and it is</span></span>
+<span class="ln" id="L106"><span class="tok-com">/// also what `lintian` was pointing at with `no-manual-page`: a binary with no</span></span>
+<span class="ln" id="L107"><span class="tok-com">/// help text has no page to derive.</span></span>
+<span class="ln" id="L108"><span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L109"><span class="tok-kw">fn</span> <span class="tok-fn">answered_without_a_window</span>() -&gt; bool {</span>
+<span class="ln" id="L110">    <span class="tok-kw">for</span> arg <span class="tok-kw">in</span> std::env::<span class="tok-fn">args</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L111">        <span class="tok-kw">if</span> arg == <span class="tok-str">&quot;-h&quot;</span> || arg == <span class="tok-str">&quot;--help&quot;</span> {</span>
+<span class="ln" id="L112">            print!(<span class="tok-str">&quot;{USAGE}&quot;</span>);</span>
+<span class="ln" id="L113">            <span class="tok-kw">return</span> true;</span>
+<span class="ln" id="L114">        }</span>
+<span class="ln" id="L115">        <span class="tok-kw">if</span> arg == <span class="tok-str">&quot;-V&quot;</span> || arg == <span class="tok-str">&quot;--version&quot;</span> {</span>
+<span class="ln" id="L116">            println!(<span class="tok-str">&quot;veilvoice-gui {}&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>));</span>
+<span class="ln" id="L117">            <span class="tok-kw">return</span> true;</span>
+<span class="ln" id="L118">        }</span>
+<span class="ln" id="L119">    }</span>
+<span class="ln" id="L120">    false</span>
+<span class="ln" id="L121">}</span>
 </span>
-<span class="ln" id="L119"></span>
+<span class="ln" id="L122"></span>
 <span class="src-item" id="fn-answered_without_a_window-2">
-<span class="ln" id="L120"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(unix))]</span>
-<span class="ln" id="L121"><span class="tok-kw">fn</span> <span class="tok-fn">answered_without_a_window</span>() -&gt; bool {</span>
-<span class="ln" id="L122">    false</span>
-<span class="ln" id="L123">}</span>
+<span class="ln" id="L123"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(unix))]</span>
+<span class="ln" id="L124"><span class="tok-kw">fn</span> <span class="tok-fn">answered_without_a_window</span>() -&gt; bool {</span>
+<span class="ln" id="L125">    false</span>
+<span class="ln" id="L126">}</span>
 </span>
-<span class="ln" id="L124"></span>
+<span class="ln" id="L127"></span>
+<span class="src-item" id="fn-requested_size">
+<span class="ln" id="L128"><span class="tok-com">/// The size asked for by `--size &lt;W&gt;x&lt;H&gt;`, if one was and it parses.</span></span>
+<span class="ln" id="L129"><span class="tok-com">///</span></span>
+<span class="ln" id="L130"><span class="tok-com">/// A malformed value opens the default window rather than refusing to start.</span></span>
+<span class="ln" id="L131"><span class="tok-com">/// This is a convenience for somebody who wants a bigger window and for the</span></span>
+<span class="ln" id="L132"><span class="tok-com">/// screenshot harness; neither is worth a program that will not open, and a</span></span>
+<span class="ln" id="L133"><span class="tok-com">/// window that is the wrong size says so by being the wrong size.</span></span>
+<span class="ln" id="L134"><span class="tok-com">///</span></span>
+<span class="ln" id="L135"><span class="tok-com">/// Clamped to the minimum the window enforces anyway, so `--size 1x1` gives a</span></span>
+<span class="ln" id="L136"><span class="tok-com">/// usable window instead of one whose columns overlap.</span></span>
+<span class="ln" id="L137"><span class="tok-kw">fn</span> <span class="tok-fn">requested_size</span>() -&gt; Option&lt;[f32; <span class="tok-num">2</span>]&gt; {</span>
+<span class="ln" id="L138">    <span class="tok-fn">size_from</span>(std::env::<span class="tok-fn">args</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>))</span>
+<span class="ln" id="L139">}</span>
+</span>
+<span class="ln" id="L140"></span>
+<span class="src-item" id="fn-size_from">
+<span class="ln" id="L141"><span class="tok-com">/// The parsing half, separated from the environment so it can be tested.</span></span>
+<span class="ln" id="L142"><span class="tok-com">///</span></span>
+<span class="ln" id="L143"><span class="tok-com">/// `main` cannot be called from a test and `std::env::args` cannot be set by</span></span>
+<span class="ln" id="L144"><span class="tok-com">/// one, so a parser that reads the environment directly is a parser nothing</span></span>
+<span class="ln" id="L145"><span class="tok-com">/// checks. This takes the arguments instead.</span></span>
+<span class="ln" id="L146"><span class="tok-kw">fn</span> size_from&lt;I: Iterator&lt;Item = String&gt;&gt;(args: I) -&gt; Option&lt;[f32; <span class="tok-num">2</span>]&gt; {</span>
+<span class="ln" id="L147">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> args = args;</span>
+<span class="ln" id="L148">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(arg) = args.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L149">        <span class="tok-kw">let</span> value = <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rest) = arg.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;--size=&quot;</span>) {</span>
+<span class="ln" id="L150">            rest.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L151">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> arg == <span class="tok-str">&quot;--size&quot;</span> {</span>
+<span class="ln" id="L152">            args.<span class="tok-fn">next</span>()?</span>
+<span class="ln" id="L153">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L154">            continue;</span>
+<span class="ln" id="L155">        };</span>
+<span class="ln" id="L156">        <span class="tok-kw">let</span> (width, height) = value.<span class="tok-fn">split_once</span>([<span class="tok-str">&#x27;x&#x27;</span>, <span class="tok-str">&#x27;X&#x27;</span>])?;</span>
+<span class="ln" id="L157">        <span class="tok-kw">let</span> width: f32 = width.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L158">        <span class="tok-kw">let</span> height: f32 = height.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L159">        <span class="tok-kw">if</span> !width.<span class="tok-fn">is_finite</span>() || !height.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L160">            <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L161">        }</span>
+<span class="ln" id="L162">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>([width.<span class="tok-fn">max</span>(<span class="tok-num">720.0</span>), height.<span class="tok-fn">max</span>(<span class="tok-num">520.0</span>)]);</span>
+<span class="ln" id="L163">    }</span>
+<span class="ln" id="L164">    None</span>
+<span class="ln" id="L165">}</span>
+</span>
+<span class="ln" id="L166"></span>
 <span class="src-item" id="fn-main">
-<span class="ln" id="L125"><span class="tok-kw">fn</span> <span class="tok-fn">main</span>() -&gt; eframe::Result&lt;()&gt; {</span>
-<span class="ln" id="L126">    <span class="tok-kw">if</span> <span class="tok-fn">answered_without_a_window</span>() {</span>
-<span class="ln" id="L127">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L128">    }</span>
-<span class="ln" id="L129"></span>
-<span class="ln" id="L130">    <span class="tok-com">// First, before anything that can fail.</span></span>
-<span class="ln" id="L131">    <span class="tok-com">//</span></span>
-<span class="ln" id="L132">    <span class="tok-com">// This binary has no console (`windows_subsystem = &quot;windows&quot;`) and the</span></span>
-<span class="ln" id="L133">    <span class="tok-com">// workspace aborts on panic, so without this every failure produces</span></span>
-<span class="ln" id="L134">    <span class="tok-com">// literally nothing: no message, no dialog, no log, just a window that</span></span>
-<span class="ln" id="L135">    <span class="tok-com">// never appears. A user has nothing to report but &quot;it crashed&quot;, which is</span></span>
-<span class="ln" id="L136">    <span class="tok-com">// exactly the report that arrived against v0.1.10.</span></span>
-<span class="ln" id="L137">    veilvoice_gui::crashlog::<span class="tok-fn">install</span>();</span>
-<span class="ln" id="L138"></span>
-<span class="ln" id="L139">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> viewport = egui::ViewportBuilder::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L140">        <span class="tok-com">// Opens large enough to read without resizing, and still fits a</span></span>
-<span class="ln" id="L141">        <span class="tok-com">// 1366x768 laptop with its taskbar. Bigger than this and the window</span></span>
-<span class="ln" id="L142">        <span class="tok-com">// would open partly off the bottom of a common screen, which looks</span></span>
-<span class="ln" id="L143">        <span class="tok-com">// like a broken application rather than a generous one.</span></span>
-<span class="ln" id="L144">        .<span class="tok-fn">with_inner_size</span>([<span class="tok-num">1100.0</span>, <span class="tok-num">720.0</span>])</span>
-<span class="ln" id="L145">        <span class="tok-com">// The floor. Everything below it is reachable by scrolling -- every</span></span>
-<span class="ln" id="L146">        <span class="tok-com">// tab is inside one scroller now -- so the only thing this has to</span></span>
-<span class="ln" id="L147">        <span class="tok-com">// protect is the horizontal layout, which is monospace and</span></span>
-<span class="ln" id="L148">        <span class="tok-com">// column-based and starts overlapping rather than reflowing.</span></span>
-<span class="ln" id="L149">        .<span class="tok-fn">with_min_inner_size</span>([<span class="tok-num">720.0</span>, <span class="tok-num">520.0</span>])</span>
-<span class="ln" id="L150">        .<span class="tok-fn">with_title</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>);</span>
-<span class="ln" id="L151"></span>
-<span class="ln" id="L152">    <span class="tok-kw">if</span> ICON_RGBA.<span class="tok-fn">len</span>() == (ICON_SIZE * ICON_SIZE * <span class="tok-num">4</span>) <span class="tok-kw">as</span> usize {</span>
-<span class="ln" id="L153">        viewport = viewport.<span class="tok-fn">with_icon</span>(std::sync::Arc::<span class="tok-fn">new</span>(egui::IconData {</span>
-<span class="ln" id="L154">            rgba: ICON_RGBA.<span class="tok-fn">to_vec</span>(),</span>
-<span class="ln" id="L155">            width: ICON_SIZE,</span>
-<span class="ln" id="L156">            height: ICON_SIZE,</span>
-<span class="ln" id="L157">        }));</span>
-<span class="ln" id="L158">    }</span>
-<span class="ln" id="L159"></span>
-<span class="ln" id="L160">    <span class="tok-kw">let</span> result = eframe::<span class="tok-fn">run_native</span>(</span>
-<span class="ln" id="L161">        <span class="tok-str">&quot;VeilVoice&quot;</span>,</span>
-<span class="ln" id="L162">        eframe::NativeOptions {</span>
-<span class="ln" id="L163">            viewport,</span>
-<span class="ln" id="L164">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L165">        },</span>
-<span class="ln" id="L166">        Box::<span class="tok-fn">new</span>(|cc| <span class="tok-fn">Ok</span>(Box::<span class="tok-fn">new</span>(veilvoice_gui::VeilVoiceApp::<span class="tok-fn">new</span>(cc)))),</span>
-<span class="ln" id="L167">    );</span>
-<span class="ln" id="L168"></span>
-<span class="ln" id="L169">    <span class="tok-com">// `eframe` reports a failed start by returning, not by panicking, so the</span></span>
-<span class="ln" id="L170">    <span class="tok-com">// hook above never sees it -- and the `Err` a `main` returns is printed to</span></span>
-<span class="ln" id="L171">    <span class="tok-com">// a stderr that does not exist here. Creating the window is also the most</span></span>
-<span class="ln" id="L172">    <span class="tok-com">// likely thing to fail on somebody else&#x27;s machine: this renders through</span></span>
-<span class="ln" id="L173">    <span class="tok-com">// glow, which is OpenGL, and a virtual machine, a remote desktop session or</span></span>
-<span class="ln" id="L174">    <span class="tok-com">// hybrid graphics handing over the wrong adapter can all refuse a context.</span></span>
-<span class="ln" id="L175">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(error) = &amp;result {</span>
-<span class="ln" id="L176">        veilvoice_gui::crashlog::<span class="tok-fn">record_startup_failure</span>(&amp;format!(<span class="tok-str">&quot;{error}&quot;</span>));</span>
-<span class="ln" id="L177">    }</span>
-<span class="ln" id="L178">    result</span>
-<span class="ln" id="L179">}</span>
+<span class="ln" id="L167"><span class="tok-kw">fn</span> <span class="tok-fn">main</span>() -&gt; eframe::Result&lt;()&gt; {</span>
+<span class="ln" id="L168">    <span class="tok-kw">if</span> <span class="tok-fn">answered_without_a_window</span>() {</span>
+<span class="ln" id="L169">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L170">    }</span>
+<span class="ln" id="L171"></span>
+<span class="ln" id="L172">    <span class="tok-com">// First, before anything that can fail.</span></span>
+<span class="ln" id="L173">    <span class="tok-com">//</span></span>
+<span class="ln" id="L174">    <span class="tok-com">// This binary has no console (`windows_subsystem = &quot;windows&quot;`) and the</span></span>
+<span class="ln" id="L175">    <span class="tok-com">// workspace aborts on panic, so without this every failure produces</span></span>
+<span class="ln" id="L176">    <span class="tok-com">// literally nothing: no message, no dialog, no log, just a window that</span></span>
+<span class="ln" id="L177">    <span class="tok-com">// never appears. A user has nothing to report but &quot;it crashed&quot;, which is</span></span>
+<span class="ln" id="L178">    <span class="tok-com">// exactly the report that arrived against v0.1.10.</span></span>
+<span class="ln" id="L179">    veilvoice_gui::crashlog::<span class="tok-fn">install</span>();</span>
+<span class="ln" id="L180"></span>
+<span class="ln" id="L181">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> viewport = egui::ViewportBuilder::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L182">        <span class="tok-com">// Opens large enough to read without resizing, and still fits a</span></span>
+<span class="ln" id="L183">        <span class="tok-com">// 1366x768 laptop with its taskbar. Bigger than this and the window</span></span>
+<span class="ln" id="L184">        <span class="tok-com">// would open partly off the bottom of a common screen, which looks</span></span>
+<span class="ln" id="L185">        <span class="tok-com">// like a broken application rather than a generous one.</span></span>
+<span class="ln" id="L186">        <span class="tok-com">//</span></span>
+<span class="ln" id="L187">        <span class="tok-com">// `--size` overrides it. That exists because the screenshot harness</span></span>
+<span class="ln" id="L188">        <span class="tok-com">// needs a window bigger than the default -- at 1100x720 the longest</span></span>
+<span class="ln" id="L189">        <span class="tok-com">// tab does not fit and the picture shows a panel cut off partway --</span></span>
+<span class="ln" id="L190">        <span class="tok-com">// and the only way to get one used to be resizing the window after it</span></span>
+<span class="ln" id="L191">        <span class="tok-com">// opened, through `SetWindowPos`, which is Windows and nothing else.</span></span>
+<span class="ln" id="L192">        <span class="tok-com">// Asking for the size up front works on every platform, and it is a</span></span>
+<span class="ln" id="L193">        <span class="tok-com">// reasonable thing for a person with a large display to want too.</span></span>
+<span class="ln" id="L194">        .<span class="tok-fn">with_inner_size</span>(<span class="tok-fn">requested_size</span>().<span class="tok-fn">unwrap_or</span>([<span class="tok-num">1100.0</span>, <span class="tok-num">720.0</span>]))</span>
+<span class="ln" id="L195">        <span class="tok-com">// The floor. Everything below it is reachable by scrolling -- every</span></span>
+<span class="ln" id="L196">        <span class="tok-com">// tab is inside one scroller now -- so the only thing this has to</span></span>
+<span class="ln" id="L197">        <span class="tok-com">// protect is the horizontal layout, which is monospace and</span></span>
+<span class="ln" id="L198">        <span class="tok-com">// column-based and starts overlapping rather than reflowing.</span></span>
+<span class="ln" id="L199">        .<span class="tok-fn">with_min_inner_size</span>([<span class="tok-num">720.0</span>, <span class="tok-num">520.0</span>])</span>
+<span class="ln" id="L200">        .<span class="tok-fn">with_title</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>);</span>
+<span class="ln" id="L201"></span>
+<span class="ln" id="L202">    <span class="tok-kw">if</span> ICON_RGBA.<span class="tok-fn">len</span>() == (ICON_SIZE * ICON_SIZE * <span class="tok-num">4</span>) <span class="tok-kw">as</span> usize {</span>
+<span class="ln" id="L203">        viewport = viewport.<span class="tok-fn">with_icon</span>(std::sync::Arc::<span class="tok-fn">new</span>(egui::IconData {</span>
+<span class="ln" id="L204">            rgba: ICON_RGBA.<span class="tok-fn">to_vec</span>(),</span>
+<span class="ln" id="L205">            width: ICON_SIZE,</span>
+<span class="ln" id="L206">            height: ICON_SIZE,</span>
+<span class="ln" id="L207">        }));</span>
+<span class="ln" id="L208">    }</span>
+<span class="ln" id="L209"></span>
+<span class="ln" id="L210">    <span class="tok-kw">let</span> result = eframe::<span class="tok-fn">run_native</span>(</span>
+<span class="ln" id="L211">        <span class="tok-str">&quot;VeilVoice&quot;</span>,</span>
+<span class="ln" id="L212">        eframe::NativeOptions {</span>
+<span class="ln" id="L213">            viewport,</span>
+<span class="ln" id="L214">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L215">        },</span>
+<span class="ln" id="L216">        Box::<span class="tok-fn">new</span>(|cc| <span class="tok-fn">Ok</span>(Box::<span class="tok-fn">new</span>(veilvoice_gui::VeilVoiceApp::<span class="tok-fn">new</span>(cc)))),</span>
+<span class="ln" id="L217">    );</span>
+<span class="ln" id="L218"></span>
+<span class="ln" id="L219">    <span class="tok-com">// `eframe` reports a failed start by returning, not by panicking, so the</span></span>
+<span class="ln" id="L220">    <span class="tok-com">// hook above never sees it -- and the `Err` a `main` returns is printed to</span></span>
+<span class="ln" id="L221">    <span class="tok-com">// a stderr that does not exist here. Creating the window is also the most</span></span>
+<span class="ln" id="L222">    <span class="tok-com">// likely thing to fail on somebody else&#x27;s machine: this renders through</span></span>
+<span class="ln" id="L223">    <span class="tok-com">// glow, which is OpenGL, and a virtual machine, a remote desktop session or</span></span>
+<span class="ln" id="L224">    <span class="tok-com">// hybrid graphics handing over the wrong adapter can all refuse a context.</span></span>
+<span class="ln" id="L225">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(error) = &amp;result {</span>
+<span class="ln" id="L226">        veilvoice_gui::crashlog::<span class="tok-fn">record_startup_failure</span>(&amp;format!(<span class="tok-str">&quot;{error}&quot;</span>));</span>
+<span class="ln" id="L227">    }</span>
+<span class="ln" id="L228">    result</span>
+<span class="ln" id="L229">}</span>
 </span>
+<span class="ln" id="L230"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L231"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L232">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::size_from;</span>
+<span class="ln" id="L233"></span>
+<span class="ln" id="L234">    <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(args: &amp;[&amp;str]) -&gt; Option&lt;[f32; <span class="tok-num">2</span>]&gt; {</span>
+<span class="ln" id="L235">        <span class="tok-fn">size_from</span>(args.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|a| a.<span class="tok-fn">to_string</span>()))</span>
+<span class="ln" id="L236">    }</span>
+<span class="ln" id="L237"></span>
+<span class="ln" id="L238">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L239">    <span class="tok-kw">fn</span> <span class="tok-fn">a_size_is_read_in_either_spelling</span>() {</span>
+<span class="ln" id="L240">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--size&quot;</span>, <span class="tok-str">&quot;1400x1000&quot;</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">1000.0</span>]));</span>
+<span class="ln" id="L241">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--size=1400x1000&quot;</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">1000.0</span>]));</span>
+<span class="ln" id="L242">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--size&quot;</span>, <span class="tok-str">&quot;1400X1000&quot;</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">1000.0</span>]));</span>
+<span class="ln" id="L243">    }</span>
+<span class="ln" id="L244"></span>
+<span class="ln" id="L245">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L246">    <span class="tok-kw">fn</span> <span class="tok-fn">the_size_is_found_beside_other_arguments</span>() {</span>
+<span class="ln" id="L247">        assert_eq!(</span>
+<span class="ln" id="L248">            <span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--tab&quot;</span>, <span class="tok-str">&quot;verify&quot;</span>, <span class="tok-str">&quot;--size&quot;</span>, <span class="tok-str">&quot;1400x1000&quot;</span>]),</span>
+<span class="ln" id="L249">            <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">1000.0</span>])</span>
+<span class="ln" id="L250">        );</span>
+<span class="ln" id="L251">    }</span>
+<span class="ln" id="L252"></span>
+<span class="ln" id="L253">    <span class="tok-com">/// The window enforces a floor of 720x520, so a smaller request is raised</span></span>
+<span class="ln" id="L254">    <span class="tok-com">/// to it rather than producing a window whose columns overlap.</span></span>
+<span class="ln" id="L255">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L256">    <span class="tok-kw">fn</span> <span class="tok-fn">a_size_below_the_minimum_is_raised_to_it</span>() {</span>
+<span class="ln" id="L257">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--size&quot;</span>, <span class="tok-str">&quot;1x1&quot;</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">720.0</span>, <span class="tok-num">520.0</span>]));</span>
+<span class="ln" id="L258">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--size&quot;</span>, <span class="tok-str">&quot;1400x10&quot;</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">520.0</span>]));</span>
+<span class="ln" id="L259">    }</span>
+<span class="ln" id="L260"></span>
+<span class="ln" id="L261">    <span class="tok-com">/// A value that makes no sense opens the default window. The alternative</span></span>
+<span class="ln" id="L262">    <span class="tok-com">/// is a program that will not start over a convenience, and a window of</span></span>
+<span class="ln" id="L263">    <span class="tok-com">/// the wrong size reports itself by being the wrong size.</span></span>
+<span class="ln" id="L264">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L265">    <span class="tok-kw">fn</span> <span class="tok-fn">nonsense_falls_back_to_the_default</span>() {</span>
+<span class="ln" id="L266">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;1400&quot;</span>, <span class="tok-str">&quot;widexhigh&quot;</span>, <span class="tok-str">&quot;1400x&quot;</span>, <span class="tok-str">&quot;x1000&quot;</span>, <span class="tok-str">&quot;nanxnan&quot;</span>, <span class="tok-str">&quot;infxinf&quot;</span>] {</span>
+<span class="ln" id="L267">            assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--size&quot;</span>, bad]), None, <span class="tok-str">&quot;{bad:?} should not parse&quot;</span>);</span>
+<span class="ln" id="L268">        }</span>
+<span class="ln" id="L269">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[<span class="tok-str">&quot;--tab&quot;</span>, <span class="tok-str">&quot;file&quot;</span>]), None);</span>
+<span class="ln" id="L270">        assert_eq!(<span class="tok-fn">parse</span>(&amp;[]), None);</span>
+<span class="ln" id="L271">    }</span>
+<span class="ln" id="L272"></span>
+<span class="ln" id="L273">    <span class="tok-com">/// The help text has to name the option, because the manual page is</span></span>
+<span class="ln" id="L274">    <span class="tok-com">/// generated from that text: an option the program accepts and the help</span></span>
+<span class="ln" id="L275">    <span class="tok-com">/// does not mention is one nobody can find.</span></span>
+<span class="ln" id="L276">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L277">    <span class="tok-kw">fn</span> <span class="tok-fn">the_help_text_mentions_the_size_option</span>() {</span>
+<span class="ln" id="L278">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>);</span>
+<span class="ln" id="L279">        <span class="tok-kw">let</span> usage = source</span>
+<span class="ln" id="L280">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;const USAGE: &amp;str = \&quot;\\\n&quot;</span>)</span>
+<span class="ln" id="L281">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L282">            .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\&quot;;&quot;</span>).<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L283">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the usage text has to be findable&quot;</span>);</span>
+<span class="ln" id="L284">        assert!(</span>
+<span class="ln" id="L285">            usage.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--size&quot;</span>),</span>
+<span class="ln" id="L286">            <span class="tok-str">&quot;`--help` does not mention --size, which the program accepts&quot;</span></span>
+<span class="ln" id="L287">        );</span>
+<span class="ln" id="L288">    }</span>
+<span class="ln" id="L289">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
