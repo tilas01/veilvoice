@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/main.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 289 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 193 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
 
 ## Contents
 
@@ -67,7 +67,7 @@ failure to open leaves a message behind.
 
 ## What this file contains
 
-289 lines defining **5 functions** (0 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+193 lines defining **3 functions** (0 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -91,19 +91,13 @@ _Colour key: **helper** -- private to this file._
 flowchart TD
     n_answered_without_a_window["answered_without_a_window<br/>line 109"]
     n_answered_without_a_window["answered_without_a_window<br/>line 124"]
-    n_requested_size["requested_size<br/>line 137"]
-    n_size_from["size_from<br/>line 146"]
-    n_main["main<br/>line 167"]
+    n_main["main<br/>line 128"]
     n_main --> n_answered_without_a_window
-    n_main --> n_requested_size
-    n_requested_size --> n_size_from
     click n_answered_without_a_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L109" "open the source"
     click n_answered_without_a_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L124" "open the source"
-    click n_requested_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L137" "open the source"
-    click n_size_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L146" "open the source"
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L167" "open the source"
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L128" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_answered_without_a_window,n_answered_without_a_window,n_requested_size,n_size_from,n_main helper
+    class n_answered_without_a_window,n_answered_without_a_window,n_main helper
 ```
 
 </details>
@@ -117,9 +111,7 @@ flowchart TD
 | `USAGE` <sub>const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L74) | What --help prints, on the platforms where printing works. |
 | `answered_without_a_window` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L109) | Answer --help and --version before a window is opened. |
 | `answered_without_a_window` <sub>fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L124) |  |
-| `requested_size` <sub>fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L137) | The size asked for by --size <W>x<H>, if one was and it parses. |
-| `size_from` <sub>fn</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L146) | The parsing half, separated from the environment so it can be tested. |
-| `main` <sub>fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L167) |  |
+| `main` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L128) |  |
 
 ---
 

@@ -238,6 +238,39 @@ function run() {
 
   failures += changelogDates(fail, pass);
   failures += releaseDatesAgree(fail, pass);
+  // --- the site is published after a release ---------------------------------
+  //
+  // The site is not only documentation. The download page names the current
+  // version, the releases page is generated from CHANGELOG.md, and the verify
+  // page describes files a release publishes. Cutting a release changed all of
+  // that and deployed none of it: a tag push touches no path in the pages
+  // workflow's filter, so the site stayed on the previous release until
+  // somebody happened to edit a file under `website/`.
+  //
+  // Checked here rather than trusted, because the failure is silent and slow:
+  // the site is simply out of date, and looks fine.
+  const pages = "\.github/workflows/pages.yml";
+  const pagesPath = path.join(ROOT, ".github", "workflows", "pages.yml");
+  if (!fs.existsSync(pagesPath)) {
+    fail(`${pages} is missing, so nothing publishes the site`);
+    failures += 1;
+  } else {
+    const workflow = fs.readFileSync(pagesPath, "utf8");
+    if (!/workflow_run:/.test(workflow) || !/workflows:\s*\[?\s*release/.test(workflow)) {
+      fail(`${pages} does not run after the release workflow, so a release ` +
+           "publishes new archives and leaves the site describing the previous " +
+           "one until somebody edits a page by hand");
+      failures += 1;
+    } else if (!/conclusion\s*==\s*'success'/.test(workflow)) {
+      fail(`${pages} runs after the release workflow without checking that it ` +
+           "succeeded, so a release that failed halfway would still redeploy " +
+           "the site");
+      failures += 1;
+    } else {
+      pass("the site is published again after a release succeeds");
+    }
+  }
+
   return failures;
 }
 

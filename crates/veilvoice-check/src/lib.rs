@@ -54,6 +54,7 @@
 //! built the same thing and got the same answer.
 
 pub mod contents;
+pub mod reproduce;
 
 use std::fmt::Write as _;
 use std::path::Path;

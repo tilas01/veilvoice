@@ -91,7 +91,6 @@ pub fn size_from<I: Iterator<Item = String>>(args: I) -> Option<[f32; 2]> {
     None
 }
 
-
 /// The size to open at on this screen, given the monitor and what was asked
 /// for on the command line.
 ///
@@ -113,7 +112,6 @@ pub fn opening_size(monitor: Option<[f32; 2]>, asked_for: Option<[f32; 2]>) -> [
         PREFERRED[1].min(monitor[1] - CHROME[1]).max(MINIMUM[1]),
     ]
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -151,7 +149,15 @@ mod tests {
     /// the wrong size reports itself by being the wrong size.
     #[test]
     fn nonsense_falls_back_to_the_default() {
-        for bad in ["", "1400", "widexhigh", "1400x", "x1000", "nanxnan", "infxinf"] {
+        for bad in [
+            "",
+            "1400",
+            "widexhigh",
+            "1400x",
+            "x1000",
+            "nanxnan",
+            "infxinf",
+        ] {
             assert_eq!(parse(&["--size", bad]), None, "{bad:?} should not parse");
         }
         assert_eq!(parse(&["--tab", "file"]), None);

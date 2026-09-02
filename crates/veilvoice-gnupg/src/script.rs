@@ -53,7 +53,9 @@ impl Flavour {
     /// What to type if GnuPG is not installed.
     fn install_hint(self) -> &'static str {
         match self {
-            Flavour::Linux => "sudo apt-get install -y gnupg   (or your package manager's equivalent)",
+            Flavour::Linux => {
+                "sudo apt-get install -y gnupg   (or your package manager's equivalent)"
+            }
             Flavour::MacOs => "brew install gnupg",
         }
     }

@@ -95,8 +95,8 @@ part that is easiest to skip.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>863 lines"])
-    n_backend["backend.rs<br/>465 lines"]
-    n_script["script.rs<br/>281 lines"]
+    n_backend["backend.rs<br/>469 lines"]
+    n_script["script.rs<br/>283 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" "open the source"
     click n_backend href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" "open the source"
     click n_script href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" "open the source"
@@ -108,6 +108,6 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`backend.rs`|File-veilvoice-gnupg-backend]] | 465 | Which program checks the signature, and who decides. |
+| [[`backend.rs`|File-veilvoice-gnupg-backend]] | 469 | Which program checks the signature, and who decides. |
 | [[`lib.rs`|File-veilvoice-gnupg-lib]] | 863 | Run the GnuPG that is already on this machine. |
-| [[`script.rs`|File-veilvoice-gnupg-script]] | 281 | A shell script that checks a release, for people who would rather read one. |
+| [[`script.rs`|File-veilvoice-gnupg-script]] | 283 | A shell script that checks a release, for people who would rather read one. |

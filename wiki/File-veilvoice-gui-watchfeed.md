@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/watchfeed.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 381 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 417 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ is listening.
 
 ## What this file contains
 
-381 lines defining **11 functions** (10 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+417 lines defining **11 functions** (10 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -79,14 +79,14 @@ is listening.
 
 - `WatchFeed::start` (line 115) -- Start watching, on a thread of its own.
   - reaches: `idle`
-- `WatchFeed::unseen` (line 163) -- Alerts that have arrived and not yet been shown as a notification.
-- `WatchFeed::has_unseen` (line 168) -- Whether anything is waiting to be shown.
-- `WatchFeed::drain` (line 176) -- Take whatever has arrived.
-- `WatchFeed::active` (line 221) -- What is holding a device right now.
-- `WatchFeed::log` (line 226) -- What has started and stopped, oldest first.
-- `WatchFeed::error` (line 231) -- Why the monitor is not answering, if it is not.
-- `WatchFeed::support` (line 236) -- What this platform can detect at all.
-- `WatchFeed::is_watching` (line 241) -- Whether there is a worker running.
+- `WatchFeed::unseen` (line 199) -- Alerts that have arrived and not yet been shown as a notification.
+- `WatchFeed::has_unseen` (line 204) -- Whether anything is waiting to be shown.
+- `WatchFeed::drain` (line 212) -- Take whatever has arrived.
+- `WatchFeed::active` (line 257) -- What is holding a device right now.
+- `WatchFeed::log` (line 262) -- What has started and stopped, oldest first.
+- `WatchFeed::error` (line 267) -- Why the monitor is not answering, if it is not.
+- `WatchFeed::support` (line 272) -- What this platform can detect at all.
+- `WatchFeed::is_watching` (line 277) -- Whether there is a worker running.
 
 ## What calls what
 
@@ -105,27 +105,27 @@ flowchart TD
     n_default["WatchFeed::default<br/>line 91"]
     n_idle["WatchFeed::idle<br/>line 99"]
     n_start(["WatchFeed::start<br/>line 115"])
-    n_unseen(["WatchFeed::unseen<br/>line 163"])
-    n_has_unseen(["WatchFeed::has_unseen<br/>line 168"])
-    n_drain(["WatchFeed::drain<br/>line 176"])
-    n_active(["WatchFeed::active<br/>line 221"])
-    n_log(["WatchFeed::log<br/>line 226"])
-    n_error(["WatchFeed::error<br/>line 231"])
-    n_support(["WatchFeed::support<br/>line 236"])
-    n_is_watching(["WatchFeed::is_watching<br/>line 241"])
+    n_unseen(["WatchFeed::unseen<br/>line 199"])
+    n_has_unseen(["WatchFeed::has_unseen<br/>line 204"])
+    n_drain(["WatchFeed::drain<br/>line 212"])
+    n_active(["WatchFeed::active<br/>line 257"])
+    n_log(["WatchFeed::log<br/>line 262"])
+    n_error(["WatchFeed::error<br/>line 267"])
+    n_support(["WatchFeed::support<br/>line 272"])
+    n_is_watching(["WatchFeed::is_watching<br/>line 277"])
     n_default --> n_idle
     n_start --> n_idle
     click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L91" "open the source"
     click n_idle href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L99" "open the source"
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L115" "open the source"
-    click n_unseen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L163" "open the source"
-    click n_has_unseen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L168" "open the source"
-    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L176" "open the source"
-    click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L221" "open the source"
-    click n_log href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L226" "open the source"
-    click n_error href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L231" "open the source"
-    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L236" "open the source"
-    click n_is_watching href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L241" "open the source"
+    click n_unseen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L199" "open the source"
+    click n_has_unseen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L204" "open the source"
+    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L212" "open the source"
+    click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L257" "open the source"
+    click n_log href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L262" "open the source"
+    click n_error href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L267" "open the source"
+    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L272" "open the source"
+    click n_is_watching href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L277" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_unseen,n_has_unseen,n_drain,n_active,n_log,n_error,n_support,n_is_watching entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -147,11 +147,11 @@ flowchart TD
 | `WatchFeed::default` <sub>fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L91) |  |
 | `WatchFeed::idle` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L99) | A feed that watches nothing. |
 | `WatchFeed::start` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L115) | Start watching, on a thread of its own. |
-| `WatchFeed::unseen` <sub>pub fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L163) | Alerts that have arrived and not yet been shown as a notification. |
-| `WatchFeed::has_unseen` <sub>pub fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L168) | Whether anything is waiting to be shown. |
-| `WatchFeed::drain` <sub>pub fn</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L176) | Take whatever has arrived. |
-| `WatchFeed::active` <sub>pub fn</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L221) | What is holding a device right now. |
-| `WatchFeed::log` <sub>pub fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L226) | What has started and stopped, oldest first. |
-| `WatchFeed::error` <sub>pub fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L231) | Why the monitor is not answering, if it is not. |
-| `WatchFeed::support` <sub>pub fn</sub> | [236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L236) | What this platform can detect at all. |
-| `WatchFeed::is_watching` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L241) | Whether there is a worker running. |
+| `WatchFeed::unseen` <sub>pub fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L199) | Alerts that have arrived and not yet been shown as a notification. |
+| `WatchFeed::has_unseen` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L204) | Whether anything is waiting to be shown. |
+| `WatchFeed::drain` <sub>pub fn</sub> | [212](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L212) | Take whatever has arrived. |
+| `WatchFeed::active` <sub>pub fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L257) | What is holding a device right now. |
+| `WatchFeed::log` <sub>pub fn</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L262) | What has started and stopped, oldest first. |
+| `WatchFeed::error` <sub>pub fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L267) | Why the monitor is not answering, if it is not. |
+| `WatchFeed::support` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L272) | What this platform can detect at all. |
+| `WatchFeed::is_watching` <sub>pub fn</sub> | [277](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L277) | Whether there is a worker running. |

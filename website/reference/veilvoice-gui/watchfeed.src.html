@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/watchfeed.rs</code></h1>
-<p style="color:var(--muted)"><a href="watchfeed.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 381 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="watchfeed.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 417 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -168,7 +168,7 @@
 <span class="ln" id="L112">    <span class="tok-com">/// Does nothing on a platform that cannot answer: a thread that would only</span></span>
 <span class="ln" id="L113">    <span class="tok-com">/// ever report &quot;not supported&quot; is a thread that need not exist, and</span></span>
 <span class="ln" id="L114">    <span class="tok-com">/// [`WatchFeed::support`] is what a front end reads to say so.</span></span>
-<span class="ln" id="L115">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start</span>() -&gt; Self {</span>
+<span class="ln" id="L115">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(ctx: egui::Context) -&gt; Self {</span>
 <span class="ln" id="L116">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = Self::<span class="tok-fn">idle</span>();</span>
 <span class="ln" id="L117">        <span class="tok-kw">if</span> !(feed.support.microphone || feed.support.camera) {</span>
 <span class="ln" id="L118">            <span class="tok-kw">return</span> feed;</span>
@@ -178,280 +178,316 @@
 <span class="ln" id="L122">            .<span class="tok-fn">name</span>(<span class="tok-str">&quot;veilvoice-watch&quot;</span>.<span class="tok-fn">into</span>())</span>
 <span class="ln" id="L123">            .<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
 <span class="ln" id="L124">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> monitor = Monitor::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L125">                loop {</span>
-<span class="ln" id="L126">                    <span class="tok-kw">let</span> update = <span class="tok-kw">match</span> monitor.<span class="tok-fn">poll</span>() {</span>
-<span class="ln" id="L127">                        <span class="tok-fn">Ok</span>(changes) =&gt; Update {</span>
-<span class="ln" id="L128">                            active: monitor.<span class="tok-fn">current</span>().<span class="tok-fn">to_vec</span>(),</span>
-<span class="ln" id="L129">                            alerts: changes.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(veilvoice_watch::Change::alert).<span class="tok-fn">collect</span>(),</span>
-<span class="ln" id="L130">                            error: None,</span>
-<span class="ln" id="L131">                        },</span>
-<span class="ln" id="L132">                        <span class="tok-fn">Err</span>(error) =&gt; Update {</span>
-<span class="ln" id="L133">                            active: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L134">                            alerts: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L135">                            error: <span class="tok-fn">Some</span>(error.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L136">                        },</span>
-<span class="ln" id="L137">                    };</span>
-<span class="ln" id="L138">                    <span class="tok-com">// The window has gone. Nothing else needs to happen.</span></span>
-<span class="ln" id="L139">                    <span class="tok-kw">if</span> sender.<span class="tok-fn">send</span>(update).<span class="tok-fn">is_err</span>() {</span>
-<span class="ln" id="L140">                        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L141">                    }</span>
-<span class="ln" id="L142">                    std::thread::<span class="tok-fn">sleep</span>(EVERY);</span>
-<span class="ln" id="L143">                }</span>
-<span class="ln" id="L144">            })</span>
-<span class="ln" id="L145">            <span class="tok-com">// A machine that cannot spawn a thread has larger problems, and the</span></span>
-<span class="ln" id="L146">            <span class="tok-com">// interface should still open. The feed simply stays idle and the</span></span>
-<span class="ln" id="L147">            <span class="tok-com">// monitor tab says it is not running.</span></span>
-<span class="ln" id="L148">            .<span class="tok-fn">map</span>(|_| ())</span>
-<span class="ln" id="L149">            .<span class="tok-fn">unwrap_or_else</span>(|error| {</span>
-<span class="ln" id="L150">                feed.error = <span class="tok-fn">Some</span>(format!(<span class="tok-str">&quot;the monitor could not be started: {error}&quot;</span>));</span>
-<span class="ln" id="L151">            });</span>
-<span class="ln" id="L152">        feed.receiver = <span class="tok-fn">Some</span>(receiver);</span>
-<span class="ln" id="L153">        feed</span>
-<span class="ln" id="L154">    }</span>
+<span class="ln" id="L125">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> first = true;</span>
+<span class="ln" id="L126">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> had_error = false;</span>
+<span class="ln" id="L127">                loop {</span>
+<span class="ln" id="L128">                    <span class="tok-kw">let</span> (update, worth_sending) = <span class="tok-kw">match</span> monitor.<span class="tok-fn">poll</span>() {</span>
+<span class="ln" id="L129">                        <span class="tok-fn">Ok</span>(changes) =&gt; {</span>
+<span class="ln" id="L130">                            <span class="tok-kw">let</span> worth = first || !changes.<span class="tok-fn">is_empty</span>() || had_error;</span>
+<span class="ln" id="L131">                            had_error = false;</span>
+<span class="ln" id="L132">                            (</span>
+<span class="ln" id="L133">                                Update {</span>
+<span class="ln" id="L134">                                    active: monitor.<span class="tok-fn">current</span>().<span class="tok-fn">to_vec</span>(),</span>
+<span class="ln" id="L135">                                    alerts: changes</span>
+<span class="ln" id="L136">                                        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L137">                                        .<span class="tok-fn">map</span>(veilvoice_watch::Change::alert)</span>
+<span class="ln" id="L138">                                        .<span class="tok-fn">collect</span>(),</span>
+<span class="ln" id="L139">                                    error: None,</span>
+<span class="ln" id="L140">                                },</span>
+<span class="ln" id="L141">                                worth,</span>
+<span class="ln" id="L142">                            )</span>
+<span class="ln" id="L143">                        }</span>
+<span class="ln" id="L144">                        <span class="tok-fn">Err</span>(error) =&gt; {</span>
+<span class="ln" id="L145">                            <span class="tok-kw">let</span> worth = !had_error;</span>
+<span class="ln" id="L146">                            had_error = true;</span>
+<span class="ln" id="L147">                            (</span>
+<span class="ln" id="L148">                                Update {</span>
+<span class="ln" id="L149">                                    active: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L150">                                    alerts: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L151">                                    error: <span class="tok-fn">Some</span>(error.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L152">                                },</span>
+<span class="ln" id="L153">                                worth,</span>
+<span class="ln" id="L154">                            )</span>
+<span class="ln" id="L155">                        }</span>
+<span class="ln" id="L156">                    };</span>
+<span class="ln" id="L157">                    first = false;</span>
+<span class="ln" id="L158"></span>
+<span class="ln" id="L159">                    <span class="tok-com">// Only when there is something to say.</span></span>
+<span class="ln" id="L160">                    <span class="tok-com">//</span></span>
+<span class="ln" id="L161">                    <span class="tok-com">// This used to send on every poll, and the window used to</span></span>
+<span class="ln" id="L162">                    <span class="tok-com">// ask the channel every 500 ms whether anything had</span></span>
+<span class="ln" id="L163">                    <span class="tok-com">// arrived. Between them that meant a window sitting</span></span>
+<span class="ln" id="L164">                    <span class="tok-com">// untouched on any tab redrew itself twice a second for</span></span>
+<span class="ln" id="L165">                    <span class="tok-com">// ever: measured at 2.1 frames a second on all nine tabs,</span></span>
+<span class="ln" id="L166">                    <span class="tok-com">// with the animations turned off and nothing happening.</span></span>
+<span class="ln" id="L167">                    <span class="tok-com">//</span></span>
+<span class="ln" id="L168">                    <span class="tok-com">// A repaint is now asked for by the thread that has news,</span></span>
+<span class="ln" id="L169">                    <span class="tok-com">// which is the only thing that knows there is any. An idle</span></span>
+<span class="ln" id="L170">                    <span class="tok-com">// window draws nothing at all.</span></span>
+<span class="ln" id="L171">                    <span class="tok-kw">if</span> worth_sending {</span>
+<span class="ln" id="L172">                        <span class="tok-com">// The window has gone. Nothing else needs to happen.</span></span>
+<span class="ln" id="L173">                        <span class="tok-kw">if</span> sender.<span class="tok-fn">send</span>(update).<span class="tok-fn">is_err</span>() {</span>
+<span class="ln" id="L174">                            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L175">                        }</span>
+<span class="ln" id="L176">                        ctx.<span class="tok-fn">request_repaint</span>();</span>
+<span class="ln" id="L177">                    }</span>
+<span class="ln" id="L178">                    std::thread::<span class="tok-fn">sleep</span>(EVERY);</span>
+<span class="ln" id="L179">                }</span>
+<span class="ln" id="L180">            })</span>
+<span class="ln" id="L181">            <span class="tok-com">// A machine that cannot spawn a thread has larger problems, and the</span></span>
+<span class="ln" id="L182">            <span class="tok-com">// interface should still open. The feed simply stays idle and the</span></span>
+<span class="ln" id="L183">            <span class="tok-com">// monitor tab says it is not running.</span></span>
+<span class="ln" id="L184">            .<span class="tok-fn">map</span>(|_| ())</span>
+<span class="ln" id="L185">            .<span class="tok-fn">unwrap_or_else</span>(|error| {</span>
+<span class="ln" id="L186">                feed.error = <span class="tok-fn">Some</span>(format!(<span class="tok-str">&quot;the monitor could not be started: {error}&quot;</span>));</span>
+<span class="ln" id="L187">            });</span>
+<span class="ln" id="L188">        feed.receiver = <span class="tok-fn">Some</span>(receiver);</span>
+<span class="ln" id="L189">        feed</span>
+<span class="ln" id="L190">    }</span>
 </span>
-<span class="ln" id="L155"></span>
+<span class="ln" id="L191"></span>
 <span class="src-item" id="fn-watchfeed-unseen">
-<span class="ln" id="L156">    <span class="tok-com">/// Alerts that have arrived and not yet been shown as a notification.</span></span>
-<span class="ln" id="L157">    <span class="tok-com">///</span></span>
-<span class="ln" id="L158">    <span class="tok-com">/// Separate from [`WatchFeed::log`], which is the history and stays. This</span></span>
-<span class="ln" id="L159">    <span class="tok-com">/// is a queue of things still to say, and it is drained by whoever shows</span></span>
-<span class="ln" id="L160">    <span class="tok-com">/// them -- so an alert that arrives while the reader is on another tab is</span></span>
-<span class="ln" id="L161">    <span class="tok-com">/// still waiting when they come back, rather than having scrolled past in</span></span>
-<span class="ln" id="L162">    <span class="tok-com">/// a log they were not looking at.</span></span>
-<span class="ln" id="L163">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">unseen</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L164">        std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.unseen)</span>
-<span class="ln" id="L165">    }</span>
+<span class="ln" id="L192">    <span class="tok-com">/// Alerts that have arrived and not yet been shown as a notification.</span></span>
+<span class="ln" id="L193">    <span class="tok-com">///</span></span>
+<span class="ln" id="L194">    <span class="tok-com">/// Separate from [`WatchFeed::log`], which is the history and stays. This</span></span>
+<span class="ln" id="L195">    <span class="tok-com">/// is a queue of things still to say, and it is drained by whoever shows</span></span>
+<span class="ln" id="L196">    <span class="tok-com">/// them -- so an alert that arrives while the reader is on another tab is</span></span>
+<span class="ln" id="L197">    <span class="tok-com">/// still waiting when they come back, rather than having scrolled past in</span></span>
+<span class="ln" id="L198">    <span class="tok-com">/// a log they were not looking at.</span></span>
+<span class="ln" id="L199">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">unseen</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L200">        std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.unseen)</span>
+<span class="ln" id="L201">    }</span>
 </span>
-<span class="ln" id="L166"></span>
+<span class="ln" id="L202"></span>
 <span class="src-item" id="fn-watchfeed-has_unseen">
-<span class="ln" id="L167">    <span class="tok-com">/// Whether anything is waiting to be shown.</span></span>
-<span class="ln" id="L168">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">has_unseen</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L169">        !<span class="tok-kw">self</span>.unseen.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L170">    }</span>
+<span class="ln" id="L203">    <span class="tok-com">/// Whether anything is waiting to be shown.</span></span>
+<span class="ln" id="L204">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">has_unseen</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L205">        !<span class="tok-kw">self</span>.unseen.<span class="tok-fn">is_empty</span>()</span>
+<span class="ln" id="L206">    }</span>
 </span>
-<span class="ln" id="L171"></span>
+<span class="ln" id="L207"></span>
 <span class="src-item" id="fn-watchfeed-drain">
-<span class="ln" id="L172">    <span class="tok-com">/// Take whatever has arrived. Never waits.</span></span>
-<span class="ln" id="L173">    <span class="tok-com">///</span></span>
-<span class="ln" id="L174">    <span class="tok-com">/// Returns true when something new came in, so the caller can decide</span></span>
-<span class="ln" id="L175">    <span class="tok-com">/// whether the frame needs anything else done to it.</span></span>
-<span class="ln" id="L176">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">drain</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L177">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(receiver) = &amp;<span class="tok-kw">self</span>.receiver <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L178">            <span class="tok-kw">return</span> false;</span>
-<span class="ln" id="L179">        };</span>
-<span class="ln" id="L180">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fresh = false;</span>
-<span class="ln" id="L181">        loop {</span>
-<span class="ln" id="L182">            <span class="tok-kw">match</span> receiver.<span class="tok-fn">try_recv</span>() {</span>
-<span class="ln" id="L183">                <span class="tok-fn">Ok</span>(update) =&gt; {</span>
-<span class="ln" id="L184">                    fresh = true;</span>
-<span class="ln" id="L185">                    <span class="tok-kw">self</span>.error = update.error;</span>
-<span class="ln" id="L186">                    <span class="tok-kw">if</span> <span class="tok-kw">self</span>.error.<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L187">                        <span class="tok-kw">self</span>.active = update.active;</span>
-<span class="ln" id="L188">                    }</span>
-<span class="ln" id="L189">                    <span class="tok-com">// Queued for notification as well as kept in the log.</span></span>
-<span class="ln" id="L190">                    <span class="tok-com">// The cap is the same one the log uses: a machine that</span></span>
-<span class="ln" id="L191">                    <span class="tok-com">// produces alerts faster than they can be read should not</span></span>
-<span class="ln" id="L192">                    <span class="tok-com">// grow a queue without end, and the log is where the ones</span></span>
-<span class="ln" id="L193">                    <span class="tok-com">// that overflow can still be found.</span></span>
-<span class="ln" id="L194">                    <span class="tok-kw">self</span>.unseen.<span class="tok-fn">extend</span>(update.alerts.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>());</span>
-<span class="ln" id="L195">                    <span class="tok-kw">let</span> spare = <span class="tok-kw">self</span>.unseen.<span class="tok-fn">len</span>().<span class="tok-fn">saturating_sub</span>(MOST_ALERTS);</span>
-<span class="ln" id="L196">                    <span class="tok-kw">self</span>.unseen.<span class="tok-fn">drain</span>(..spare);</span>
-<span class="ln" id="L197">                    <span class="tok-kw">self</span>.log.<span class="tok-fn">extend</span>(update.alerts);</span>
-<span class="ln" id="L198">                    <span class="tok-kw">let</span> overflow = <span class="tok-kw">self</span>.log.<span class="tok-fn">len</span>().<span class="tok-fn">saturating_sub</span>(MOST_ALERTS);</span>
-<span class="ln" id="L199">                    <span class="tok-kw">self</span>.log.<span class="tok-fn">drain</span>(..overflow);</span>
-<span class="ln" id="L200">                }</span>
-<span class="ln" id="L201">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; break,</span>
-<span class="ln" id="L202">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
-<span class="ln" id="L203">                    <span class="tok-com">// The worker stopped. Said plainly rather than left as a</span></span>
-<span class="ln" id="L204">                    <span class="tok-com">// monitor that has quietly not updated for an hour, which</span></span>
-<span class="ln" id="L205">                    <span class="tok-com">// looks exactly like a machine where nothing is listening.</span></span>
-<span class="ln" id="L206">                    <span class="tok-kw">self</span>.receiver = None;</span>
-<span class="ln" id="L207">                    <span class="tok-kw">self</span>.error = <span class="tok-fn">Some</span>(</span>
-<span class="ln" id="L208">                        <span class="tok-str">&quot;the monitor thread stopped, so nothing here is being watched any \</span></span>
-<span class="ln" id="L209"><span class="tok-str">                         more. Close and reopen VeilVoice to start it again.&quot;</span></span>
-<span class="ln" id="L210">                            .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L211">                    );</span>
-<span class="ln" id="L212">                    <span class="tok-kw">self</span>.active.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L213">                    break;</span>
-<span class="ln" id="L214">                }</span>
-<span class="ln" id="L215">            }</span>
-<span class="ln" id="L216">        }</span>
-<span class="ln" id="L217">        fresh</span>
-<span class="ln" id="L218">    }</span>
+<span class="ln" id="L208">    <span class="tok-com">/// Take whatever has arrived. Never waits.</span></span>
+<span class="ln" id="L209">    <span class="tok-com">///</span></span>
+<span class="ln" id="L210">    <span class="tok-com">/// Returns true when something new came in, so the caller can decide</span></span>
+<span class="ln" id="L211">    <span class="tok-com">/// whether the frame needs anything else done to it.</span></span>
+<span class="ln" id="L212">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">drain</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L213">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(receiver) = &amp;<span class="tok-kw">self</span>.receiver <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L214">            <span class="tok-kw">return</span> false;</span>
+<span class="ln" id="L215">        };</span>
+<span class="ln" id="L216">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fresh = false;</span>
+<span class="ln" id="L217">        loop {</span>
+<span class="ln" id="L218">            <span class="tok-kw">match</span> receiver.<span class="tok-fn">try_recv</span>() {</span>
+<span class="ln" id="L219">                <span class="tok-fn">Ok</span>(update) =&gt; {</span>
+<span class="ln" id="L220">                    fresh = true;</span>
+<span class="ln" id="L221">                    <span class="tok-kw">self</span>.error = update.error;</span>
+<span class="ln" id="L222">                    <span class="tok-kw">if</span> <span class="tok-kw">self</span>.error.<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L223">                        <span class="tok-kw">self</span>.active = update.active;</span>
+<span class="ln" id="L224">                    }</span>
+<span class="ln" id="L225">                    <span class="tok-com">// Queued for notification as well as kept in the log.</span></span>
+<span class="ln" id="L226">                    <span class="tok-com">// The cap is the same one the log uses: a machine that</span></span>
+<span class="ln" id="L227">                    <span class="tok-com">// produces alerts faster than they can be read should not</span></span>
+<span class="ln" id="L228">                    <span class="tok-com">// grow a queue without end, and the log is where the ones</span></span>
+<span class="ln" id="L229">                    <span class="tok-com">// that overflow can still be found.</span></span>
+<span class="ln" id="L230">                    <span class="tok-kw">self</span>.unseen.<span class="tok-fn">extend</span>(update.alerts.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>());</span>
+<span class="ln" id="L231">                    <span class="tok-kw">let</span> spare = <span class="tok-kw">self</span>.unseen.<span class="tok-fn">len</span>().<span class="tok-fn">saturating_sub</span>(MOST_ALERTS);</span>
+<span class="ln" id="L232">                    <span class="tok-kw">self</span>.unseen.<span class="tok-fn">drain</span>(..spare);</span>
+<span class="ln" id="L233">                    <span class="tok-kw">self</span>.log.<span class="tok-fn">extend</span>(update.alerts);</span>
+<span class="ln" id="L234">                    <span class="tok-kw">let</span> overflow = <span class="tok-kw">self</span>.log.<span class="tok-fn">len</span>().<span class="tok-fn">saturating_sub</span>(MOST_ALERTS);</span>
+<span class="ln" id="L235">                    <span class="tok-kw">self</span>.log.<span class="tok-fn">drain</span>(..overflow);</span>
+<span class="ln" id="L236">                }</span>
+<span class="ln" id="L237">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; break,</span>
+<span class="ln" id="L238">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
+<span class="ln" id="L239">                    <span class="tok-com">// The worker stopped. Said plainly rather than left as a</span></span>
+<span class="ln" id="L240">                    <span class="tok-com">// monitor that has quietly not updated for an hour, which</span></span>
+<span class="ln" id="L241">                    <span class="tok-com">// looks exactly like a machine where nothing is listening.</span></span>
+<span class="ln" id="L242">                    <span class="tok-kw">self</span>.receiver = None;</span>
+<span class="ln" id="L243">                    <span class="tok-kw">self</span>.error = <span class="tok-fn">Some</span>(</span>
+<span class="ln" id="L244">                        <span class="tok-str">&quot;the monitor thread stopped, so nothing here is being watched any \</span></span>
+<span class="ln" id="L245"><span class="tok-str">                         more. Close and reopen VeilVoice to start it again.&quot;</span></span>
+<span class="ln" id="L246">                            .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L247">                    );</span>
+<span class="ln" id="L248">                    <span class="tok-kw">self</span>.active.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L249">                    break;</span>
+<span class="ln" id="L250">                }</span>
+<span class="ln" id="L251">            }</span>
+<span class="ln" id="L252">        }</span>
+<span class="ln" id="L253">        fresh</span>
+<span class="ln" id="L254">    }</span>
 </span>
-<span class="ln" id="L219"></span>
+<span class="ln" id="L255"></span>
 <span class="src-item" id="fn-watchfeed-active">
-<span class="ln" id="L220">    <span class="tok-com">/// What is holding a device right now.</span></span>
-<span class="ln" id="L221">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">active</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;[DeviceUse] {</span>
-<span class="ln" id="L222">        &amp;<span class="tok-kw">self</span>.active</span>
-<span class="ln" id="L223">    }</span>
+<span class="ln" id="L256">    <span class="tok-com">/// What is holding a device right now.</span></span>
+<span class="ln" id="L257">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">active</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;[DeviceUse] {</span>
+<span class="ln" id="L258">        &amp;<span class="tok-kw">self</span>.active</span>
+<span class="ln" id="L259">    }</span>
 </span>
-<span class="ln" id="L224"></span>
+<span class="ln" id="L260"></span>
 <span class="src-item" id="fn-watchfeed-log">
-<span class="ln" id="L225">    <span class="tok-com">/// What has started and stopped, oldest first.</span></span>
-<span class="ln" id="L226">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">log</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;[String] {</span>
-<span class="ln" id="L227">        &amp;<span class="tok-kw">self</span>.log</span>
-<span class="ln" id="L228">    }</span>
+<span class="ln" id="L261">    <span class="tok-com">/// What has started and stopped, oldest first.</span></span>
+<span class="ln" id="L262">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">log</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;[String] {</span>
+<span class="ln" id="L263">        &amp;<span class="tok-kw">self</span>.log</span>
+<span class="ln" id="L264">    }</span>
 </span>
-<span class="ln" id="L229"></span>
+<span class="ln" id="L265"></span>
 <span class="src-item" id="fn-watchfeed-error">
-<span class="ln" id="L230">    <span class="tok-com">/// Why the monitor is not answering, if it is not.</span></span>
-<span class="ln" id="L231">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">error</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;str&gt; {</span>
-<span class="ln" id="L232">        <span class="tok-kw">self</span>.error.<span class="tok-fn">as_deref</span>()</span>
-<span class="ln" id="L233">    }</span>
+<span class="ln" id="L266">    <span class="tok-com">/// Why the monitor is not answering, if it is not.</span></span>
+<span class="ln" id="L267">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">error</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;str&gt; {</span>
+<span class="ln" id="L268">        <span class="tok-kw">self</span>.error.<span class="tok-fn">as_deref</span>()</span>
+<span class="ln" id="L269">    }</span>
 </span>
-<span class="ln" id="L234"></span>
+<span class="ln" id="L270"></span>
 <span class="src-item" id="fn-watchfeed-support">
-<span class="ln" id="L235">    <span class="tok-com">/// What this platform can detect at all.</span></span>
-<span class="ln" id="L236">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">support</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;Support {</span>
-<span class="ln" id="L237">        &amp;<span class="tok-kw">self</span>.support</span>
-<span class="ln" id="L238">    }</span>
+<span class="ln" id="L271">    <span class="tok-com">/// What this platform can detect at all.</span></span>
+<span class="ln" id="L272">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">support</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;Support {</span>
+<span class="ln" id="L273">        &amp;<span class="tok-kw">self</span>.support</span>
+<span class="ln" id="L274">    }</span>
 </span>
-<span class="ln" id="L239"></span>
+<span class="ln" id="L275"></span>
 <span class="src-item" id="fn-watchfeed-is_watching">
-<span class="ln" id="L240">    <span class="tok-com">/// Whether there is a worker running.</span></span>
-<span class="ln" id="L241">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_watching</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L242">        <span class="tok-kw">self</span>.receiver.<span class="tok-fn">is_some</span>()</span>
-<span class="ln" id="L243">    }</span>
+<span class="ln" id="L276">    <span class="tok-com">/// Whether there is a worker running.</span></span>
+<span class="ln" id="L277">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_watching</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L278">        <span class="tok-kw">self</span>.receiver.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L279">    }</span>
 </span>
-<span class="ln" id="L244">}</span>
-<span class="ln" id="L245"></span>
-<span class="ln" id="L246"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L247"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L248">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L249"></span>
-<span class="ln" id="L250">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L251">    <span class="tok-kw">fn</span> <span class="tok-fn">an_idle_feed_starts_nothing_and_reports_nothing</span>() {</span>
-<span class="ln" id="L252">        <span class="tok-kw">let</span> feed = WatchFeed::<span class="tok-fn">idle</span>();</span>
-<span class="ln" id="L253">        assert!(!feed.<span class="tok-fn">is_watching</span>());</span>
-<span class="ln" id="L254">        assert!(feed.<span class="tok-fn">active</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L255">        assert!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L256">        assert!(feed.<span class="tok-fn">error</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L257">    }</span>
-<span class="ln" id="L258"></span>
-<span class="ln" id="L259">    <span class="tok-com">/// Draining an idle feed must be free and must not claim anything arrived.</span></span>
-<span class="ln" id="L260">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L261">    <span class="tok-kw">fn</span> <span class="tok-fn">draining_an_idle_feed_does_nothing</span>() {</span>
-<span class="ln" id="L262">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed::<span class="tok-fn">idle</span>();</span>
-<span class="ln" id="L263">        assert!(!feed.<span class="tok-fn">drain</span>());</span>
-<span class="ln" id="L264">        assert!(feed.<span class="tok-fn">active</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L265">    }</span>
-<span class="ln" id="L266"></span>
-<span class="ln" id="L267">    <span class="tok-com">/// The whole point: a drain must never wait for the machine. Measured as a</span></span>
-<span class="ln" id="L268">    <span class="tok-com">/// minimum over many runs, because one sample on a busy machine says</span></span>
-<span class="ln" id="L269">    <span class="tok-com">/// nothing.</span></span>
-<span class="ln" id="L270">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L271">    <span class="tok-kw">fn</span> <span class="tok-fn">draining_never_blocks_the_frame</span>() {</span>
-<span class="ln" id="L272">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed::<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L273">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> worst = Duration::ZERO;</span>
-<span class="ln" id="L274">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">200</span> {</span>
-<span class="ln" id="L275">            <span class="tok-kw">let</span> started = std::time::Instant::<span class="tok-fn">now</span>();</span>
-<span class="ln" id="L276">            feed.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L277">            worst = worst.<span class="tok-fn">max</span>(started.<span class="tok-fn">elapsed</span>());</span>
-<span class="ln" id="L278">        }</span>
-<span class="ln" id="L279">        assert!(</span>
-<span class="ln" id="L280">            worst &lt; Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">4</span>),</span>
-<span class="ln" id="L281">            <span class="tok-str">&quot;the worst drain took {worst:?}, which is a dropped frame&quot;</span></span>
-<span class="ln" id="L282">        );</span>
-<span class="ln" id="L283">    }</span>
-<span class="ln" id="L284"></span>
-<span class="ln" id="L285">    <span class="tok-com">/// A worker that has gone must be reported, not left looking like a quiet</span></span>
-<span class="ln" id="L286">    <span class="tok-com">/// machine -- which is the failure mode this project guards hardest</span></span>
-<span class="ln" id="L287">    <span class="tok-com">/// against.</span></span>
-<span class="ln" id="L288">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L289">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_stops_is_reported_rather_than_looking_quiet</span>() {</span>
-<span class="ln" id="L290">        <span class="tok-kw">let</span> (sender, receiver) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L291">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed {</span>
-<span class="ln" id="L292">            receiver: <span class="tok-fn">Some</span>(receiver),</span>
-<span class="ln" id="L293">            active: vec![],</span>
-<span class="ln" id="L294">            log: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L295">            unseen: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L296">            error: None,</span>
-<span class="ln" id="L297">            support: veilvoice_watch::<span class="tok-fn">support</span>(),</span>
-<span class="ln" id="L298">        };</span>
-<span class="ln" id="L299">        sender</span>
-<span class="ln" id="L300">            .<span class="tok-fn">send</span>(Update {</span>
-<span class="ln" id="L301">                active: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L302">                alerts: vec![<span class="tok-str">&quot;something started&quot;</span>.<span class="tok-fn">into</span>()],</span>
-<span class="ln" id="L303">                error: None,</span>
-<span class="ln" id="L304">            })</span>
-<span class="ln" id="L305">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L306">        assert!(feed.<span class="tok-fn">drain</span>());</span>
-<span class="ln" id="L307">        assert_eq!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L308"></span>
-<span class="ln" id="L309">        <span class="tok-fn">drop</span>(sender);</span>
-<span class="ln" id="L310">        feed.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L311">        assert!(!feed.<span class="tok-fn">is_watching</span>());</span>
-<span class="ln" id="L312">        <span class="tok-kw">let</span> error = feed.<span class="tok-fn">error</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a stopped worker must be reported&quot;</span>);</span>
-<span class="ln" id="L313">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L314">        assert!(feed.<span class="tok-fn">active</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L315">    }</span>
-<span class="ln" id="L316"></span>
-<span class="ln" id="L317">    <span class="tok-com">/// The log is capped, or a machine left open overnight grows one string at</span></span>
-<span class="ln" id="L318">    <span class="tok-com">/// a time until it is a problem.</span></span>
-<span class="ln" id="L319">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L320">    <span class="tok-kw">fn</span> <span class="tok-fn">the_log_is_capped</span>() {</span>
-<span class="ln" id="L321">        <span class="tok-kw">let</span> (sender, receiver) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed {</span>
-<span class="ln" id="L323">            receiver: <span class="tok-fn">Some</span>(receiver),</span>
-<span class="ln" id="L324">            active: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L325">            log: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L326">            unseen: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L327">            error: None,</span>
-<span class="ln" id="L328">            support: veilvoice_watch::<span class="tok-fn">support</span>(),</span>
-<span class="ln" id="L329">        };</span>
-<span class="ln" id="L330">        <span class="tok-kw">for</span> round <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">40</span> {</span>
-<span class="ln" id="L331">            sender</span>
-<span class="ln" id="L332">                .<span class="tok-fn">send</span>(Update {</span>
-<span class="ln" id="L333">                    active: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L334">                    alerts: (<span class="tok-num">0</span>..<span class="tok-num">10</span>).<span class="tok-fn">map</span>(|i| format!(<span class="tok-str">&quot;alert {round}-{i}&quot;</span>)).<span class="tok-fn">collect</span>(),</span>
-<span class="ln" id="L335">                    error: None,</span>
-<span class="ln" id="L336">                })</span>
-<span class="ln" id="L337">                .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L338">        }</span>
-<span class="ln" id="L339">        feed.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L340">        assert_eq!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">len</span>(), MOST_ALERTS);</span>
-<span class="ln" id="L341">        <span class="tok-com">// The newest are the ones kept.</span></span>
-<span class="ln" id="L342">        assert!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;alert 39-&quot;</span>));</span>
-<span class="ln" id="L343">    }</span>
+<span class="ln" id="L280">}</span>
+<span class="ln" id="L281"></span>
+<span class="ln" id="L282"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L283"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L284">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L285"></span>
+<span class="ln" id="L286">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L287">    <span class="tok-kw">fn</span> <span class="tok-fn">an_idle_feed_starts_nothing_and_reports_nothing</span>() {</span>
+<span class="ln" id="L288">        <span class="tok-kw">let</span> feed = WatchFeed::<span class="tok-fn">idle</span>();</span>
+<span class="ln" id="L289">        assert!(!feed.<span class="tok-fn">is_watching</span>());</span>
+<span class="ln" id="L290">        assert!(feed.<span class="tok-fn">active</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L291">        assert!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L292">        assert!(feed.<span class="tok-fn">error</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L293">    }</span>
+<span class="ln" id="L294"></span>
+<span class="ln" id="L295">    <span class="tok-com">/// Draining an idle feed must be free and must not claim anything arrived.</span></span>
+<span class="ln" id="L296">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L297">    <span class="tok-kw">fn</span> <span class="tok-fn">draining_an_idle_feed_does_nothing</span>() {</span>
+<span class="ln" id="L298">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed::<span class="tok-fn">idle</span>();</span>
+<span class="ln" id="L299">        assert!(!feed.<span class="tok-fn">drain</span>());</span>
+<span class="ln" id="L300">        assert!(feed.<span class="tok-fn">active</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L301">    }</span>
+<span class="ln" id="L302"></span>
+<span class="ln" id="L303">    <span class="tok-com">/// The whole point: a drain must never wait for the machine. Measured as a</span></span>
+<span class="ln" id="L304">    <span class="tok-com">/// minimum over many runs, because one sample on a busy machine says</span></span>
+<span class="ln" id="L305">    <span class="tok-com">/// nothing.</span></span>
+<span class="ln" id="L306">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L307">    <span class="tok-kw">fn</span> <span class="tok-fn">draining_never_blocks_the_frame</span>() {</span>
+<span class="ln" id="L308">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed::<span class="tok-fn">start</span>(egui::Context::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L309">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> worst = Duration::ZERO;</span>
+<span class="ln" id="L310">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">200</span> {</span>
+<span class="ln" id="L311">            <span class="tok-kw">let</span> started = std::time::Instant::<span class="tok-fn">now</span>();</span>
+<span class="ln" id="L312">            feed.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L313">            worst = worst.<span class="tok-fn">max</span>(started.<span class="tok-fn">elapsed</span>());</span>
+<span class="ln" id="L314">        }</span>
+<span class="ln" id="L315">        assert!(</span>
+<span class="ln" id="L316">            worst &lt; Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">4</span>),</span>
+<span class="ln" id="L317">            <span class="tok-str">&quot;the worst drain took {worst:?}, which is a dropped frame&quot;</span></span>
+<span class="ln" id="L318">        );</span>
+<span class="ln" id="L319">    }</span>
+<span class="ln" id="L320"></span>
+<span class="ln" id="L321">    <span class="tok-com">/// A worker that has gone must be reported, not left looking like a quiet</span></span>
+<span class="ln" id="L322">    <span class="tok-com">/// machine -- which is the failure mode this project guards hardest</span></span>
+<span class="ln" id="L323">    <span class="tok-com">/// against.</span></span>
+<span class="ln" id="L324">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L325">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_stops_is_reported_rather_than_looking_quiet</span>() {</span>
+<span class="ln" id="L326">        <span class="tok-kw">let</span> (sender, receiver) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L327">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed {</span>
+<span class="ln" id="L328">            receiver: <span class="tok-fn">Some</span>(receiver),</span>
+<span class="ln" id="L329">            active: vec![],</span>
+<span class="ln" id="L330">            log: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L331">            unseen: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L332">            error: None,</span>
+<span class="ln" id="L333">            support: veilvoice_watch::<span class="tok-fn">support</span>(),</span>
+<span class="ln" id="L334">        };</span>
+<span class="ln" id="L335">        sender</span>
+<span class="ln" id="L336">            .<span class="tok-fn">send</span>(Update {</span>
+<span class="ln" id="L337">                active: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L338">                alerts: vec![<span class="tok-str">&quot;something started&quot;</span>.<span class="tok-fn">into</span>()],</span>
+<span class="ln" id="L339">                error: None,</span>
+<span class="ln" id="L340">            })</span>
+<span class="ln" id="L341">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L342">        assert!(feed.<span class="tok-fn">drain</span>());</span>
+<span class="ln" id="L343">        assert_eq!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
 <span class="ln" id="L344"></span>
-<span class="ln" id="L345">    <span class="tok-com">/// A failed look must not wipe the last known state to nothing, which</span></span>
-<span class="ln" id="L346">    <span class="tok-com">/// would read as &quot;the microphone was released&quot;.</span></span>
-<span class="ln" id="L347">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L348">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_look_keeps_the_last_known_state</span>() {</span>
-<span class="ln" id="L349">        <span class="tok-kw">let</span> (sender, receiver) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L350">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed {</span>
-<span class="ln" id="L351">            receiver: <span class="tok-fn">Some</span>(receiver),</span>
-<span class="ln" id="L352">            active: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L353">            log: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L354">            unseen: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L355">            error: None,</span>
-<span class="ln" id="L356">            support: veilvoice_watch::<span class="tok-fn">support</span>(),</span>
-<span class="ln" id="L357">        };</span>
-<span class="ln" id="L358">        sender</span>
-<span class="ln" id="L359">            .<span class="tok-fn">send</span>(Update {</span>
-<span class="ln" id="L360">                active: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L361">                alerts: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L362">                error: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;the registry did not answer&quot;</span>.<span class="tok-fn">into</span>()),</span>
-<span class="ln" id="L363">            })</span>
-<span class="ln" id="L364">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L365">        feed.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L366">        assert_eq!(feed.<span class="tok-fn">error</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;the registry did not answer&quot;</span>));</span>
-<span class="ln" id="L367">    }</span>
-<span class="ln" id="L368"></span>
-<span class="ln" id="L369">    <span class="tok-com">/// Starting for real must not panic, and must agree with what the platform</span></span>
-<span class="ln" id="L370">    <span class="tok-com">/// says it can do.</span></span>
-<span class="ln" id="L371">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L372">    <span class="tok-kw">fn</span> <span class="tok-fn">starting_on_this_machine_agrees_with_what_it_supports</span>() {</span>
-<span class="ln" id="L373">        <span class="tok-kw">let</span> feed = WatchFeed::<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L374">        <span class="tok-kw">let</span> support = feed.<span class="tok-fn">support</span>();</span>
-<span class="ln" id="L375">        <span class="tok-kw">if</span> support.microphone || support.camera {</span>
-<span class="ln" id="L376">            assert!(feed.<span class="tok-fn">is_watching</span>() || feed.<span class="tok-fn">error</span>().<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L377">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L378">            assert!(!feed.<span class="tok-fn">is_watching</span>(), <span class="tok-str">&quot;a thread was started for nothing&quot;</span>);</span>
-<span class="ln" id="L379">        }</span>
-<span class="ln" id="L380">    }</span>
-<span class="ln" id="L381">}</span>
+<span class="ln" id="L345">        <span class="tok-fn">drop</span>(sender);</span>
+<span class="ln" id="L346">        feed.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L347">        assert!(!feed.<span class="tok-fn">is_watching</span>());</span>
+<span class="ln" id="L348">        <span class="tok-kw">let</span> error = feed.<span class="tok-fn">error</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a stopped worker must be reported&quot;</span>);</span>
+<span class="ln" id="L349">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L350">        assert!(feed.<span class="tok-fn">active</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L351">    }</span>
+<span class="ln" id="L352"></span>
+<span class="ln" id="L353">    <span class="tok-com">/// The log is capped, or a machine left open overnight grows one string at</span></span>
+<span class="ln" id="L354">    <span class="tok-com">/// a time until it is a problem.</span></span>
+<span class="ln" id="L355">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L356">    <span class="tok-kw">fn</span> <span class="tok-fn">the_log_is_capped</span>() {</span>
+<span class="ln" id="L357">        <span class="tok-kw">let</span> (sender, receiver) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L358">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed {</span>
+<span class="ln" id="L359">            receiver: <span class="tok-fn">Some</span>(receiver),</span>
+<span class="ln" id="L360">            active: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L361">            log: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L362">            unseen: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L363">            error: None,</span>
+<span class="ln" id="L364">            support: veilvoice_watch::<span class="tok-fn">support</span>(),</span>
+<span class="ln" id="L365">        };</span>
+<span class="ln" id="L366">        <span class="tok-kw">for</span> round <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">40</span> {</span>
+<span class="ln" id="L367">            sender</span>
+<span class="ln" id="L368">                .<span class="tok-fn">send</span>(Update {</span>
+<span class="ln" id="L369">                    active: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L370">                    alerts: (<span class="tok-num">0</span>..<span class="tok-num">10</span>).<span class="tok-fn">map</span>(|i| format!(<span class="tok-str">&quot;alert {round}-{i}&quot;</span>)).<span class="tok-fn">collect</span>(),</span>
+<span class="ln" id="L371">                    error: None,</span>
+<span class="ln" id="L372">                })</span>
+<span class="ln" id="L373">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L374">        }</span>
+<span class="ln" id="L375">        feed.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L376">        assert_eq!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">len</span>(), MOST_ALERTS);</span>
+<span class="ln" id="L377">        <span class="tok-com">// The newest are the ones kept.</span></span>
+<span class="ln" id="L378">        assert!(feed.<span class="tok-fn">log</span>().<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;alert 39-&quot;</span>));</span>
+<span class="ln" id="L379">    }</span>
+<span class="ln" id="L380"></span>
+<span class="ln" id="L381">    <span class="tok-com">/// A failed look must not wipe the last known state to nothing, which</span></span>
+<span class="ln" id="L382">    <span class="tok-com">/// would read as &quot;the microphone was released&quot;.</span></span>
+<span class="ln" id="L383">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L384">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_look_keeps_the_last_known_state</span>() {</span>
+<span class="ln" id="L385">        <span class="tok-kw">let</span> (sender, receiver) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L386">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> feed = WatchFeed {</span>
+<span class="ln" id="L387">            receiver: <span class="tok-fn">Some</span>(receiver),</span>
+<span class="ln" id="L388">            active: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L389">            log: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L390">            unseen: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L391">            error: None,</span>
+<span class="ln" id="L392">            support: veilvoice_watch::<span class="tok-fn">support</span>(),</span>
+<span class="ln" id="L393">        };</span>
+<span class="ln" id="L394">        sender</span>
+<span class="ln" id="L395">            .<span class="tok-fn">send</span>(Update {</span>
+<span class="ln" id="L396">                active: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L397">                alerts: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L398">                error: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;the registry did not answer&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L399">            })</span>
+<span class="ln" id="L400">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L401">        feed.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L402">        assert_eq!(feed.<span class="tok-fn">error</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;the registry did not answer&quot;</span>));</span>
+<span class="ln" id="L403">    }</span>
+<span class="ln" id="L404"></span>
+<span class="ln" id="L405">    <span class="tok-com">/// Starting for real must not panic, and must agree with what the platform</span></span>
+<span class="ln" id="L406">    <span class="tok-com">/// says it can do.</span></span>
+<span class="ln" id="L407">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L408">    <span class="tok-kw">fn</span> <span class="tok-fn">starting_on_this_machine_agrees_with_what_it_supports</span>() {</span>
+<span class="ln" id="L409">        <span class="tok-kw">let</span> feed = WatchFeed::<span class="tok-fn">start</span>(egui::Context::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L410">        <span class="tok-kw">let</span> support = feed.<span class="tok-fn">support</span>();</span>
+<span class="ln" id="L411">        <span class="tok-kw">if</span> support.microphone || support.camera {</span>
+<span class="ln" id="L412">            assert!(feed.<span class="tok-fn">is_watching</span>() || feed.<span class="tok-fn">error</span>().<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L413">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L414">            assert!(!feed.<span class="tok-fn">is_watching</span>(), <span class="tok-str">&quot;a thread was started for nothing&quot;</span>);</span>
+<span class="ln" id="L415">        }</span>
+<span class="ln" id="L416">    }</span>
+<span class="ln" id="L417">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

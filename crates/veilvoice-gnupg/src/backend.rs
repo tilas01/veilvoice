@@ -185,9 +185,11 @@ pub fn resolve(choice: Option<Choice>, survey: &Survey) -> Backend {
                 because: Because::ChosenIsMissing(Choice::Native),
             },
         },
-        Choice::Wsl => match survey.wsl.as_ref().and_then(|w| {
-            w.gpg.as_ref().map(|gpg| (w.program.clone(), gpg.clone()))
-        }) {
+        Choice::Wsl => match survey
+            .wsl
+            .as_ref()
+            .and_then(|w| w.gpg.as_ref().map(|gpg| (w.program.clone(), gpg.clone())))
+        {
             Some((program, gpg)) => Backend::Wsl { program, gpg },
             None => Backend::BuiltIn {
                 because: Because::ChosenIsMissing(Choice::Wsl),
@@ -430,8 +432,10 @@ mod tests {
     fn the_wsl_install_command_is_the_one_a_person_would_type() {
         let argv = install_in_wsl();
         assert_eq!(argv.first().map(String::as_str), Some("wsl"));
-        assert!(argv.iter().any(|part| part == "sudo"),
-                "installing inside the distribution needs root there");
+        assert!(
+            argv.iter().any(|part| part == "sudo"),
+            "installing inside the distribution needs root there"
+        );
         assert!(argv.iter().any(|part| part == "gnupg"));
     }
 

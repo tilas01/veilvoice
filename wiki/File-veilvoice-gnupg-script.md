@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gnupg/src/script.rs`
 
-[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 281 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs)
+[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 283 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs)
 
 ## Contents
 
@@ -44,7 +44,7 @@ fetched things would be a verification script with a network path in it.
 
 ## What this file contains
 
-281 lines defining **4 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+283 lines defining **4 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -52,8 +52,8 @@ fetched things would be a verification script with a network path in it.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Flavour::file_name` (line 62) -- The name a reader would give the file.
-- `shell` (line 71) -- The script, with the fingerprint compiled in from the one source of it.
+- `Flavour::file_name` (line 64) -- The name a reader would give the file.
+- `shell` (line 73) -- The script, with the fingerprint compiled in from the one source of it.
 
 ## What calls what
 
@@ -71,12 +71,12 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_hash_check["Flavour::hash_check<br/>line 46"]
     n_install_hint["Flavour::install_hint<br/>line 54"]
-    n_file_name(["Flavour::file_name<br/>line 62"])
-    n_shell(["shell<br/>line 71"])
+    n_file_name(["Flavour::file_name<br/>line 64"])
+    n_shell(["shell<br/>line 73"])
     click n_hash_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L46" "open the source"
     click n_install_hint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L54" "open the source"
-    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L62" "open the source"
-    click n_shell href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L71" "open the source"
+    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64" "open the source"
+    click n_shell href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L73" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_file_name,n_shell entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -92,5 +92,5 @@ flowchart TD
 | `Flavour` <sub>pub enum</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L37) | Which system the script is being written for. |
 | `Flavour::hash_check` <sub>fn</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L46) | The command that checks a file against SHA256SUMS. |
 | `Flavour::install_hint` <sub>fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L54) | What to type if GnuPG is not installed. |
-| `Flavour::file_name` <sub>pub fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L62) | The name a reader would give the file. |
-| `shell` <sub>pub fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L71) | The script, with the fingerprint compiled in from the one source of it. |
+| `Flavour::file_name` <sub>pub fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64) | The name a reader would give the file. |
+| `shell` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L73) | The script, with the fingerprint compiled in from the one source of it. |
