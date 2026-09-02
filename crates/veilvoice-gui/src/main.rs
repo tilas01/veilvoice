@@ -75,12 +75,15 @@ const USAGE: &str = "\
 veilvoice-gui - the VeilVoice desktop application
 
 Usage:
-  veilvoice-gui [--tab <NAME>]
+  veilvoice-gui [--tab <NAME>] [--size <W>x<H>]
 
 Options:
   --tab <NAME>  Open on a named tab rather than the last one used.
                 Names are the ones the tabs carry: file, live, group,
                 monitor, lock, verify, settings, install, about.
+  --size <W>x<H>  Open at this size in logical pixels rather than the
+                default 1100x720. Both are clamped to the window's
+                minimum of 720x520.
   -h, --help    Print this message.
   -V, --version Print the version.
 
@@ -122,6 +125,45 @@ fn answered_without_a_window() -> bool {
     false
 }
 
+/// The size asked for by `--size <W>x<H>`, if one was and it parses.
+///
+/// A malformed value opens the default window rather than refusing to start.
+/// This is a convenience for somebody who wants a bigger window and for the
+/// screenshot harness; neither is worth a program that will not open, and a
+/// window that is the wrong size says so by being the wrong size.
+///
+/// Clamped to the minimum the window enforces anyway, so `--size 1x1` gives a
+/// usable window instead of one whose columns overlap.
+fn requested_size() -> Option<[f32; 2]> {
+    size_from(std::env::args().skip(1))
+}
+
+/// The parsing half, separated from the environment so it can be tested.
+///
+/// `main` cannot be called from a test and `std::env::args` cannot be set by
+/// one, so a parser that reads the environment directly is a parser nothing
+/// checks. This takes the arguments instead.
+fn size_from<I: Iterator<Item = String>>(args: I) -> Option<[f32; 2]> {
+    let mut args = args;
+    while let Some(arg) = args.next() {
+        let value = if let Some(rest) = arg.strip_prefix("--size=") {
+            rest.to_string()
+        } else if arg == "--size" {
+            args.next()?
+        } else {
+            continue;
+        };
+        let (width, height) = value.split_once(['x', 'X'])?;
+        let width: f32 = width.trim().parse().ok()?;
+        let height: f32 = height.trim().parse().ok()?;
+        if !width.is_finite() || !height.is_finite() {
+            return None;
+        }
+        return Some([width.max(720.0), height.max(520.0)]);
+    }
+    None
+}
+
 fn main() -> eframe::Result<()> {
     if answered_without_a_window() {
         return Ok(());
@@ -141,7 +183,15 @@ fn main() -> eframe::Result<()> {
         // 1366x768 laptop with its taskbar. Bigger than this and the window
         // would open partly off the bottom of a common screen, which looks
         // like a broken application rather than a generous one.
-        .with_inner_size([1100.0, 720.0])
+        //
+        // `--size` overrides it. That exists because the screenshot harness
+        // needs a window bigger than the default -- at 1100x720 the longest
+        // tab does not fit and the picture shows a panel cut off partway --
+        // and the only way to get one used to be resizing the window after it
+        // opened, through `SetWindowPos`, which is Windows and nothing else.
+        // Asking for the size up front works on every platform, and it is a
+        // reasonable thing for a person with a large display to want too.
+        .with_inner_size(requested_size().unwrap_or([1100.0, 720.0]))
         // The floor. Everything below it is reachable by scrolling -- every
         // tab is inside one scroller now -- so the only thing this has to
         // protect is the horizontal layout, which is monospace and
@@ -176,4 +226,64 @@ fn main() -> eframe::Result<()> {
         veilvoice_gui::crashlog::record_startup_failure(&format!("{error}"));
     }
     result
+}
+#[cfg(test)]
+mod tests {
+    use super::size_from;
+
+    fn parse(args: &[&str]) -> Option<[f32; 2]> {
+        size_from(args.iter().map(|a| a.to_string()))
+    }
+
+    #[test]
+    fn a_size_is_read_in_either_spelling() {
+        assert_eq!(parse(&["--size", "1400x1000"]), Some([1400.0, 1000.0]));
+        assert_eq!(parse(&["--size=1400x1000"]), Some([1400.0, 1000.0]));
+        assert_eq!(parse(&["--size", "1400X1000"]), Some([1400.0, 1000.0]));
+    }
+
+    #[test]
+    fn the_size_is_found_beside_other_arguments() {
+        assert_eq!(
+            parse(&["--tab", "verify", "--size", "1400x1000"]),
+            Some([1400.0, 1000.0])
+        );
+    }
+
+    /// The window enforces a floor of 720x520, so a smaller request is raised
+    /// to it rather than producing a window whose columns overlap.
+    #[test]
+    fn a_size_below_the_minimum_is_raised_to_it() {
+        assert_eq!(parse(&["--size", "1x1"]), Some([720.0, 520.0]));
+        assert_eq!(parse(&["--size", "1400x10"]), Some([1400.0, 520.0]));
+    }
+
+    /// A value that makes no sense opens the default window. The alternative
+    /// is a program that will not start over a convenience, and a window of
+    /// the wrong size reports itself by being the wrong size.
+    #[test]
+    fn nonsense_falls_back_to_the_default() {
+        for bad in ["", "1400", "widexhigh", "1400x", "x1000", "nanxnan", "infxinf"] {
+            assert_eq!(parse(&["--size", bad]), None, "{bad:?} should not parse");
+        }
+        assert_eq!(parse(&["--tab", "file"]), None);
+        assert_eq!(parse(&[]), None);
+    }
+
+    /// The help text has to name the option, because the manual page is
+    /// generated from that text: an option the program accepts and the help
+    /// does not mention is one nobody can find.
+    #[test]
+    fn the_help_text_mentions_the_size_option() {
+        let source = include_str!("main.rs");
+        let usage = source
+            .split("const USAGE: &str = \"\\\n")
+            .nth(1)
+            .and_then(|rest| rest.split("\";").next())
+            .expect("the usage text has to be findable");
+        assert!(
+            usage.contains("--size"),
+            "`--help` does not mention --size, which the program accepts"
+        );
+    }
 }
