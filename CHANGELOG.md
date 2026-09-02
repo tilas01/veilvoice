@@ -8,6 +8,62 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**VeilVoice on a phone, checked rather than guessed**
+
+- The Android target was installed and the workspace compiled against it before
+  the estimate was written, which is the rule this project already follows for
+  anything that depends on somebody else's platform.
+- The engine, the crypto and the metadata cleaner build for
+  `aarch64-linux-android` unchanged. Live capture has a real backend through
+  `oboe` and failed here only for want of the Android NDK, which is a missing
+  tool rather than a missing backend.
+- The window is the actual work: `eframe` on Android needs an activity entry
+  point and a packaging step that do not exist in this tree, and the interface
+  is laid out for a mouse and a wide window. It stays planned, as work rather
+  than as a question. The findings are on the roadmap.
+
+**A first run that explains itself**
+
+- One card per tab, one sentence each, after the two settings questions. It
+  takes about twenty seconds and skips at any point. The window had nine tabs
+  and nothing said what any of them were, and two of them are not what their
+  names suggest: Monitor is not a level meter, and Lock is a passphrase on the
+  application rather than on a recording.
+- The last card says whether this copy is portable or installed, in those
+  words, because that is the question behind "where did my settings go".
+- After an upgrade it comes back only for tabs that did not exist last time. A
+  release that adds no tab shows nobody anything. What is stored is the list of
+  tabs already covered, rather than a flag or a version number: a flag cannot
+  answer which of these is new to you, and a version says only that something
+  changed rather than what.
+- A test ties the cards to the tab strip in both directions, so a tab cannot be
+  added without a sentence explaining it.
+- The tab strip is greyed out while the tour or the first-run choices are up.
+  Both draw instead of the tab and return, so clicking the strip moved the
+  highlight and changed nothing underneath it, which looks exactly like a
+  window that has stopped responding.
+
+**A crash report you are actually shown**
+
+- The report VeilVoice writes after a crash is offered on the next launch,
+  above whichever tab you land on, instead of as one line on the About tab.
+  About is where you go to read version numbers; it is not where you land after
+  a crash, so the report existed, was accurate, and was never read by anybody.
+- The whole of it is readable in place before you decide anything, with what it
+  contains listed beside it: the version, your operating system and processor,
+  and the error. No file names, no settings, no passphrase, nothing about any
+  audio.
+- Nothing is sent, and nothing there can send it. The panel offers a copy
+  button and a link to the issue tracker; what happens next is your decision.
+  The module has a test that fails if a network call ever appears in it.
+- Dismissing deletes the file, which is why the whole text is on screen first.
+- The About tab keeps a standing "something wrong?" link to the issue tracker,
+  directly under the version numbers a report needs.
+- Held back while the first-run panel is up. Both can be true at once, because
+  a crash before the answers were saved leaves the next launch as a first run
+  with a report waiting, and drawn together they were two unrelated decisions
+  on one screen.
+
 **The demonstration is a recording now**
 
 - The website's demonstration replays transcripts of the real programs: the

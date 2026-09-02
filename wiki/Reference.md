@@ -170,6 +170,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`app.rs`|File-veilvoice-gui-app]] &middot; The VeilVoice desktop application: seven tabs, one window, no menus.
 - [[`autolock.rs`|File-veilvoice-gui-autolock]] &middot; Locking the window again after a period of no use.
 - [[`crashlog.rs`|File-veilvoice-gui-crashlog]] &middot; Make a failure that produces no output produce some.
+- [[`crashreport.rs`|File-veilvoice-gui-crashreport]] &middot; Offering the report from the last crash, on the run after it.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &middot; Asking for a file without stopping the window.
 - [[`graphics.rs`|File-veilvoice-gui-graphics]] &middot; What the window is drawn with, asked for explicitly and then reported.
 - [[`group.rs`|File-veilvoice-gui-group]] &middot; Group mode: several people in one recording, each with a name and a colour.
@@ -189,6 +190,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`soundbar.rs`|File-veilvoice-gui-soundbar]] &middot; The animated mark: a row of bars that rise and fall.
 - [[`storage.rs`|File-veilvoice-gui-storage]] &middot; Where veiled recordings are written, and the encrypted volume that may hold them.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &middot; Colour schemes for the desktop app.
+- [[`tour.rs`|File-veilvoice-gui-tour]] &middot; The short tour on a first run, and after an upgrade.
 - [[`updates.rs`|File-veilvoice-gui-updates]] &middot; The manual update check, as the window shows it.
 - [[`verify.rs`|File-veilvoice-gui-verify]] &middot; The verify tab: drop a download on the window and be told what it is.
 - [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] &middot; The device monitor, moved off the thread that paints.

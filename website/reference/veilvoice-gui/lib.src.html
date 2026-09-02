@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 88 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 90 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -103,33 +103,35 @@
 <span class="ln" id="L60"><span class="tok-kw">mod</span> app;</span>
 <span class="ln" id="L61"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> autolock;</span>
 <span class="ln" id="L62"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> crashlog;</span>
-<span class="ln" id="L63"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> dialog;</span>
-<span class="ln" id="L64"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> graphics;</span>
-<span class="ln" id="L65"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> group;</span>
-<span class="ln" id="L66"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> integrity;</span>
-<span class="ln" id="L67"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> layout;</span>
-<span class="ln" id="L68"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> monitor;</span>
-<span class="ln" id="L69"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> notify;</span>
-<span class="ln" id="L70"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> palettes;</span>
-<span class="ln" id="L71"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> policy;</span>
-<span class="ln" id="L72"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> prefs;</span>
-<span class="ln" id="L73"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reduced_motion;</span>
-<span class="ln" id="L74"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> security;</span>
-<span class="ln" id="L75"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> settings;</span>
-<span class="ln" id="L76"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> setup;</span>
-<span class="ln" id="L77"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> soundbar;</span>
-<span class="ln" id="L78"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> storage;</span>
-<span class="ln" id="L79"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> theme;</span>
-<span class="ln" id="L80"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> updates;</span>
-<span class="ln" id="L81"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> verify;</span>
-<span class="ln" id="L82"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> watchfeed;</span>
-<span class="ln" id="L83"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> window;</span>
-<span class="ln" id="L84"></span>
-<span class="ln" id="L85"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> app::VeilVoiceApp;</span>
+<span class="ln" id="L63"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> crashreport;</span>
+<span class="ln" id="L64"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> dialog;</span>
+<span class="ln" id="L65"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> graphics;</span>
+<span class="ln" id="L66"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> group;</span>
+<span class="ln" id="L67"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> integrity;</span>
+<span class="ln" id="L68"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> layout;</span>
+<span class="ln" id="L69"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> monitor;</span>
+<span class="ln" id="L70"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> notify;</span>
+<span class="ln" id="L71"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> palettes;</span>
+<span class="ln" id="L72"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> policy;</span>
+<span class="ln" id="L73"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> prefs;</span>
+<span class="ln" id="L74"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reduced_motion;</span>
+<span class="ln" id="L75"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> security;</span>
+<span class="ln" id="L76"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> settings;</span>
+<span class="ln" id="L77"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> setup;</span>
+<span class="ln" id="L78"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> soundbar;</span>
+<span class="ln" id="L79"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> storage;</span>
+<span class="ln" id="L80"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> theme;</span>
+<span class="ln" id="L81"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> tour;</span>
+<span class="ln" id="L82"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> updates;</span>
+<span class="ln" id="L83"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> verify;</span>
+<span class="ln" id="L84"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> watchfeed;</span>
+<span class="ln" id="L85"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> window;</span>
 <span class="ln" id="L86"></span>
+<span class="ln" id="L87"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> app::VeilVoiceApp;</span>
+<span class="ln" id="L88"></span>
 <span class="src-item" id="fn-version">
-<span class="ln" id="L87"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
-<span class="ln" id="L88"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
+<span class="ln" id="L89"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
+<span class="ln" id="L90"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
 </span>
 </code></pre>
 </main>
