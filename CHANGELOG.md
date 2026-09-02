@@ -13,10 +13,40 @@ Nothing yet. The next release goes here.
 ## v0.1.16
 
 A verifier that finds the release you are standing in and no longer calls a
-genuine one unverified, buttons that line up with the buttons beside them,
-pictures that grow rather than cutting their words, no em dash left anywhere
-in the repository, and the audit's own arithmetic checked by a machine
-instead of by hand.
+genuine one unverified, a verify page that can now actually verify, buttons
+that line up with the buttons beside them, pictures that grow rather than
+cutting their words, no em dash left anywhere in the repository, and the
+audit's own arithmetic checked by a machine instead of by hand.
+
+### The verify page can verify
+
+- **F-111** `website/verify.html` had the drop zone, the hash field, the
+  progress bar and the verdict line, and did not load `js/verify.js`. Dropping
+  a file on the page this project points people to for checking a download did
+  nothing at all: the digest line sat at "no file hashed yet". The section
+  pages are generated from the front page, and the generator copied the head,
+  the header and the footer while collecting the scripts into a variable
+  nothing read. The six scripts loaded in the front page's head came along
+  inside the copied head, so every page looked normal; the three loaded at the
+  end of its body, `verify.js` among them, never arrived. Which scripts a page
+  needs is now read out of the scripts themselves, from the guard each one uses
+  to decide whether it has a job on the page, so a section that grows a feature
+  gets the code for it without a list being kept anywhere. Confirmed in a real
+  Chromium: a correct hash now gives MATCH on that page and a wrong one gives
+  NO MATCH.
+
+- **F-112** Three sentences said "below" about something that is only on the
+  front page, and stayed that way when their section was given a page of its
+  own: the repository panel twice and the in-browser verifier once. They now
+  say what they mean without claiming a position. A link to another page
+  described as being above or below on this one is a contradiction a machine
+  can see, and the new suite refuses it.
+
+- `tools/site-tests/scripts.test.js` checks every page against every module:
+  markup on the page means the code behind it is fetched. It reads the pages
+  that are committed rather than asking the generator, so a hand-edited page is
+  covered too, and it checks that the no-JavaScript pages load no scripts at
+  all. Seventeen website suites now.
 
 ### The verifier finds the release you are standing in
 
