@@ -209,13 +209,24 @@ function run() {
  * call a mouse pointer out of a scrollbar and fail a build for a picture that
  * is fine.
  *
- * There is an exact answer available instead. `tools/shots/gui.ps1` captures
- * with `PrintWindow`, which asks the window to draw itself into a bitmap. The
- * pointer is drawn by the compositor on top of the screen and is not part of
- * any window's own rendering, so a `PrintWindow` capture cannot contain one.
- * The property that guarantees no cursor is the capture method, so the capture
- * method is what is checked: a screen copy would include whatever is over the
- * window, a pointer among it.
+ * There is an exact answer available instead, and there is one for each of
+ * the two scripts that take these pictures.
+ *
+ * `tools/shots/gui.ps1` captures with `PrintWindow`, which asks the window to
+ * draw itself into a bitmap. The pointer is drawn by the compositor on top of
+ * the screen and is not part of any window's own rendering, so a
+ * `PrintWindow` capture cannot contain one. A screen copy would include
+ * whatever is over the window, a pointer among it.
+ *
+ * `tools/shots/gui.sh` captures the root window of an Xvfb display, which
+ * *would* include a pointer, so it starts that server with `-nocursor` and
+ * there is no pointer to include. Different mechanism, same kind of
+ * guarantee: a property of how the capture is taken, not a hope about where
+ * the mouse happened to be.
+ *
+ * Both are checked, and both have to exist. Two scripts producing one set of
+ * files is exactly the arrangement where one of them quietly stops being
+ * equivalent to the other, and the pictures do not say which took them.
  *
  * This is the same reasoning as F-103, which found that comparing a drawing
  * against a file written by the same command proves nothing. Check the thing
@@ -225,26 +236,58 @@ function windowCaptureChecks(fail, pass) {
   let failures = 0;
   const before = failures;
 
-  const script = "tools/shots/gui.ps1";
-  const full = path.join(ROOT, script);
-  if (!fs.existsSync(full)) {
-    fail(`${script} is missing, so nothing here can say how the window ` +
-         "captures are taken");
-    return 1;
-  }
-  const source = fs.readFileSync(full, "utf8");
-  const code = source
-    .split("\n")
-    .filter((line) => !line.trim().startsWith("#"))
-    .join("\n");
+  // Each capture script, and the thing in it that makes a mouse pointer
+  // impossible rather than unlikely.
+  const guarantees = [
+    {
+      script: "tools/shots/gui.ps1",
+      needs: /PrintWindow\s*\(/,
+      what: "calls PrintWindow",
+      why: "That call is the whole reason a mouse pointer cannot appear in " +
+           "a screenshot: it asks the window to draw itself, rather than " +
+           "copying whatever is on screen over it."
+    },
+    {
+      script: "tools/shots/gui.sh",
+      needs: /Xvfb\b[^\n]*-nocursor\b/,
+      what: "starts Xvfb with -nocursor",
+      why: "This script captures the root window, which would include a " +
+           "pointer if the server drew one, so it tells the server to draw " +
+           "none at all."
+    }
+  ];
 
-  if (!/PrintWindow\s*\(/.test(code)) {
-    fail(`${script} no longer calls PrintWindow. That call is the whole ` +
-         "reason a mouse pointer cannot appear in a screenshot: it asks the " +
-         "window to draw itself, rather than copying whatever is on screen " +
-         "over it.");
-  } else {
-    pass("window captures are taken with PrintWindow, so no pointer can be in them");
+  for (const { script, needs, what, why } of guarantees) {
+    const full = path.join(ROOT, script);
+    if (!fs.existsSync(full)) {
+      fail(`${script} is missing, so nothing here can say how the window ` +
+           "captures it takes are free of a mouse pointer. Both capture " +
+           "scripts have to exist: they produce the same nine files, and the " +
+           "files do not record which one took them.");
+      failures += 1;
+      continue;
+    }
+    const code = fs.readFileSync(full, "utf8")
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("#"))
+      .join("\n");
+    if (!needs.test(code)) {
+      fail(`${script} no longer ${what}. ${why}`);
+      failures += 1;
+    } else {
+      pass(`${script} ${what}, so no pointer can be in what it captures`);
+    }
+
+    // The other half of the same property: nothing that copies the screen
+    // instead of asking a window to draw itself.
+    for (const forbidden of ["CopyFromScreen", "BitBlt", "CAPTUREBLT"]) {
+      if (new RegExp(`${forbidden}\\s*\\(`).test(code)) {
+        fail(`${script} calls ${forbidden}, which copies the screen rather ` +
+             "than the window. Whatever is over the window at the time lands " +
+             "in the picture, and the mouse pointer usually is.");
+        failures += 1;
+      }
+    }
   }
 
   // The corners are in the alpha channel, so the stylesheet must not draw
@@ -270,14 +313,6 @@ function windowCaptureChecks(fail, pass) {
              "picture past its own corner, and a background shows through " +
              "the corners the file made transparent.");
       }
-    }
-  }
-
-  for (const forbidden of ["CopyFromScreen", "BitBlt", "CAPTUREBLT"]) {
-    if (new RegExp(`${forbidden}\\s*\\(`).test(code)) {
-      fail(`${script} calls ${forbidden}, which copies the screen rather than ` +
-           "the window. Whatever is over the window at the time lands in the " +
-           "picture, and the mouse pointer usually is.");
     }
   }
 

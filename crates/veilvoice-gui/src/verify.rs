@@ -66,6 +66,7 @@
 //! One press checks the zip, then every file you unzipped out of it, and then
 //! asks your own GnuPG the same question and shows you its answer.
 
+use crate::layout::column;
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
 use std::path::{Path, PathBuf};
@@ -176,6 +177,17 @@ pub struct Verify {
     /// whichever slot happened to be drawn when the dialog closed.
     choosing_for: Option<Slot>,
 }
+
+/// The width the slot labels are given, so the file names beside them start
+/// level. Wide enough for `SHA256SUMS.asc`, which is the longest.
+const SLOT_LABEL_WIDTH: f32 = 132.0;
+
+/// The width the file name is given, so the three `choose…` buttons land at
+/// one x whatever is in the slots. Wide enough for
+/// `the signature over that list`, the longest of the three placeholders; a
+/// name longer than this pushes its own button right, and a row where the
+/// name is the interesting part is the right place to spend the space.
+const SLOT_NAME_WIDTH: f32 = 226.0;
 
 impl Verify {
     /// Whether a check is running, so the app keeps repainting.
@@ -369,6 +381,8 @@ impl Verify {
             "the signature over that list",
         );
 
+        self.gnupg_section(ui);
+
         ui.add_space(12.0);
         let ready = self.download.is_some() && self.sums.is_some() && self.signature.is_some();
         ui.horizontal(|ui| {
@@ -440,13 +454,21 @@ impl Verify {
     }
 
     /// One file slot: what it is, what is in it, and a way to change it.
+    ///
+    /// The two labels are given fixed-width columns so that the three rows
+    /// line up and, with them, the three `choose…` buttons beside them.
+    ///
+    /// This used to pad the label with `{label:<16}` and hope. Trailing spaces
+    /// line nothing up in a proportional font, which is the same habit the
+    /// alignment work already took out of this application once: `the
+    /// download`, `SHA256SUMS` and `SHA256SUMS.asc` are three different widths
+    /// on screen whatever they are padded to, so the second column started in
+    /// three different places and every button sat somewhere else again.
     fn slot_row(&mut self, ui: &mut Ui, slot: Slot, label: &str, what: &str) {
         ui.horizontal(|ui| {
-            ui.label(
-                RichText::new(format!("{label:<16}"))
-                    .color(p::muted())
-                    .small(),
-            );
+            column(ui, SLOT_LABEL_WIDTH, |ui| {
+                ui.label(RichText::new(label).color(p::muted()).small());
+            });
             let current = match slot {
                 Slot::Download => &self.download,
                 Slot::Sums => &self.sums,
@@ -459,11 +481,13 @@ impl Verify {
                     .unwrap_or_else(|| path.display().to_string()),
                 None => what.to_string(),
             };
-            ui.label(RichText::new(text).color(if current.is_some() {
-                p::fg()
-            } else {
-                p::muted()
-            }));
+            column(ui, SLOT_NAME_WIDTH, |ui| {
+                ui.label(RichText::new(text).color(if current.is_some() {
+                    p::fg()
+                } else {
+                    p::muted()
+                }));
+            });
             if ui
                 .add_enabled(
                     !self.choosing.is_open(),
@@ -492,8 +516,6 @@ impl Verify {
             }
             self.report = None;
         }
-
-        self.gnupg_section(ui);
     }
 
     /// Marker 90. The same check, with a GnuPG this project did not write.
@@ -1082,6 +1104,76 @@ mod tests {
             Some(Err(Error::Io(why))) => assert!(why.contains("without answering"), "{why}"),
             other => panic!("expected a reported failure, got {other:?}"),
         }
+    }
+
+    /// The GnuPG section is drawn once, not once for each file slot.
+    ///
+    /// It used to be the last statement of `slot_row`, and `slot_row` is
+    /// called three times: for the download, the hash list and the signature.
+    /// So the verify tab carried three copies of the heading "The same check,
+    /// typed by you", three copies of the paragraph under it and three copies
+    /// of "choose a hash list and a signature above", interleaved with the
+    /// three file rows. It shipped in every screenshot of that tab.
+    ///
+    /// Nothing caught it because every piece of it was correct: the section
+    /// draws what it should, and `slot_row` draws what it should. Only the
+    /// place one is called from was wrong, and no test looked at that.
+    ///
+    /// This reads the call site rather than the drawing, because where it is
+    /// called from is exactly what was wrong.
+    #[test]
+    fn the_gnupg_section_is_drawn_once() {
+        // Only the code, not the tests: this file is read by this test, and
+        // the name written in the assertion below is itself a match. The
+        // first version counted two calls and one of them was its own.
+        let source = include_str!("verify.rs").replace("\r\n", "\n");
+        let source = source.split("\n#[cfg(test)]").next().unwrap();
+        let calls = source.matches("self.gnupg_section(ui)").count();
+        assert_eq!(
+            calls, 1,
+            "the GnuPG section is called {calls} times; it belongs once, in \
+             `body`, after the three slots rather than inside each of them"
+        );
+
+        let row = source
+            .split("fn slot_row(")
+            .nth(1)
+            .and_then(|rest| rest.split("\n    fn ").next())
+            .expect("slot_row exists");
+        assert!(
+            !row.contains("gnupg_section"),
+            "`slot_row` draws the GnuPG section, so it is drawn once per file \
+             slot and the tab carries three copies of it"
+        );
+    }
+
+    /// The slot labels are given a column rather than padded with spaces.
+    ///
+    /// `format!("{label:<16}")` lines nothing up in a proportional font, so
+    /// the three file names started in three different places and the three
+    /// `choose…` buttons beside them did too. The same habit was taken out of
+    /// `security.rs` once already, which is why the fix now lives in
+    /// `layout::column` and both call it.
+    #[test]
+    fn the_slot_rows_use_a_column_and_not_padding() {
+        let source = include_str!("verify.rs").replace("\r\n", "\n");
+        let source = source.split("\n#[cfg(test)]").next().unwrap();
+        let row = source
+            .split("fn slot_row(")
+            .nth(1)
+            .and_then(|rest| rest.split("\n    fn ").next())
+            .expect("slot_row exists");
+        assert!(
+            !row.contains(":<"),
+            "a slot label is padded to a width with spaces, which aligns \
+             nothing in a proportional font"
+        );
+        assert_eq!(
+            row.matches("column(ui,").count(),
+            2,
+            "both the label and the file name need a fixed column, or the \
+             `choose…` buttons do not line up with each other"
+        );
     }
 
     /// Marker 90. The window and the command line must print the same GnuPG
