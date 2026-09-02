@@ -74,6 +74,9 @@ PLACES: list[tuple[str, str, str]] = [
     ("README.md", r"^sh reproduce-veilvoice\.sh v([0-9]+\.[0-9]+\.[0-9]+)$", "the reproducible-build example"),
     ("README.md", r"^\*\*v([0-9]+\.[0-9]+\.[0-9]+): early but real\.\*\*", "the status section"),
     ("docs/USER_GUIDE.md", r"^sh reproduce-veilvoice\.sh v([0-9]+\.[0-9]+\.[0-9]+)$", "the reproducible-build example"),
+    # This one had gone three releases stale saying "v0.1.14 is released",
+    # which is what a roadmap is read for.
+    ("ROADMAP.md", r"\*\*v([0-9]+\.[0-9]+\.[0-9]+) is released\*\*", "the where-we-are-now line"),
     ("docs/PACKAGING.md", r"-d Version=([0-9]+\.[0-9]+\.[0-9]+) ", "the WiX example"),
     ("docs/PACKAGING.md", r"BinDir=dist/veilvoice-v([0-9]+\.[0-9]+\.[0-9]+)-windows", "the WiX example"),
     ("docs/PACKAGING.md", r"-o dist/VeilVoice-([0-9]+\.[0-9]+\.[0-9]+)-x64\.msi", "the WiX example"),
