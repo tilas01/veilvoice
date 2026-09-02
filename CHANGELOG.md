@@ -8,7 +8,32 @@ than a summary written afterwards.
 
 ## Unreleased
 
-Nothing yet. The next release goes here.
+**The roadmap**
+
+- Every item on the roadmap page is linkable on its own now: item 98 is at
+  `roadmap.html#m98`, and each heading has an anchor too, so one marker can be
+  sent to somebody without sending the hundred around it.
+- The finished list is grouped under the headings it is written under, with the
+  paragraphs each group opens with. The page used to keep the rows and drop the
+  sentences saying why the rows exist, which kept the score and lost the
+  argument.
+- Each item shows its name and its explanation as two things rather than one
+  run-on line, so a list of a hundred can be scanned.
+- The five blocked items are gone, at the maintainer's request. Each was
+  waiting on a decision rather than on effort, and a list where a fifth of the
+  open work cannot move reads as stalled when it is not. What each one was and
+  what it was waiting for is kept in the roadmap under what was dropped,
+  because that reasoning is the useful part.
+- Four new items for what was asked for while this release was being built: a
+  demonstration driven by real sessions, a crash report offered rather than
+  buried, a first run that explains itself, and VeilVoice on a phone.
+- The roadmap said "v0.1.14 is released" while three releases went out past it.
+  That line is now checked against `Cargo.toml` like every other copy of the
+  version.
+- One row, numbered `63b`, had never appeared on the website, in the picture,
+  or in any count, because the generator requires a plain integer and silently
+  skipped what it could not read. The generator now refuses such a row instead
+  of dropping it, which is the fix whether or not that row exists.
 
 ## v0.1.17
 
