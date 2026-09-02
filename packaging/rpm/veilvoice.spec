@@ -3,13 +3,13 @@
 # RPM spec for VeilVoice (Fedora, RHEL, openSUSE).
 #
 #   rpmbuild -ba packaging/rpm/veilvoice.spec \
-#            --define "_sourcedir $PWD/dist" --define "vv_version 0.1.16"
+#            --define "_sourcedir $PWD/dist" --define "vv_version 0.1.17"
 #
 # Builds from the published source tarball rather than repackaging a binary,
 # which is what a distribution package is supposed to do: the person installing
 # it gets something their own machine compiled from source they can read.
 
-%global vv_version %{?vv_version}%{!?vv_version:0.1.16}
+%global vv_version %{?vv_version}%{!?vv_version:0.1.17}
 
 Name:           veilvoice
 Version:        %{vv_version}
@@ -48,6 +48,11 @@ the build fails if an HTTP client enters the dependency graph.
 %package        gui
 Summary:        Desktop application for VeilVoice
 Requires:       %{name} = %{version}-%{release}
+# Named rather than left to the automatic dependency generator. The window
+# toolkit opens this one by name at startup instead of linking against it, so
+# nothing that reads a binary's linkage knows it is required: the package
+# installed cleanly and the application aborted before drawing anything.
+Requires:       libxkbcommon-x11
 
 %description    gui
 The VeilVoice desktop application.
@@ -98,6 +103,9 @@ cargo test --release --locked --workspace
 %{_datadir}/applications/veilvoice.desktop
 
 %changelog
+* Wed Sep 02 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.17-1
+- See CHANGELOG.md in the source for what changed in this release.
+
 * Tue Sep 01 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.16-1
 - See CHANGELOG.md in the source for what changed in this release.
 

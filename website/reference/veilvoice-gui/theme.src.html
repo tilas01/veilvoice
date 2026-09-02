@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/theme.rs</code></h1>
-<p style="color:var(--muted)"><a href="theme.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 783 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="theme.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 784 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -79,7 +79,7 @@
 <span class="ln" id="L36"><span class="tok-com">//! drift apart. Choosing one applies it straight away and it is remembered for</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! next time.</span></span>
 <span class="ln" id="L38"></span>
-<span class="ln" id="L39"><span class="tok-kw">use</span> egui::{Color32, FontFamily, FontId, Rounding, Stroke, TextStyle, Visuals};</span>
+<span class="ln" id="L39"><span class="tok-kw">use</span> egui::{Color32, CornerRadius, FontFamily, FontId, Stroke, TextStyle, Visuals};</span>
 <span class="ln" id="L40"><span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
 <span class="ln" id="L41"><span class="tok-kw">use</span> std::sync::OnceLock;</span>
 <span class="ln" id="L42"></span>
@@ -508,352 +508,353 @@
 <span class="ln" id="L438">            continue;</span>
 <span class="ln" id="L439">        };</span>
 <span class="ln" id="L440">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fonts = egui::FontDefinitions::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L441">        fonts</span>
-<span class="ln" id="L442">            .font_data</span>
-<span class="ln" id="L443">            .<span class="tok-fn">insert</span>(<span class="tok-str">&quot;jetbrains&quot;</span>.<span class="tok-fn">to_owned</span>(), egui::FontData::<span class="tok-fn">from_owned</span>(bytes));</span>
-<span class="ln" id="L444">        <span class="tok-kw">for</span> family <span class="tok-kw">in</span> [FontFamily::Monospace, FontFamily::Proportional] {</span>
-<span class="ln" id="L445">            fonts</span>
-<span class="ln" id="L446">                .families</span>
-<span class="ln" id="L447">                .<span class="tok-fn">entry</span>(family)</span>
-<span class="ln" id="L448">                .<span class="tok-fn">or_default</span>()</span>
-<span class="ln" id="L449">                .<span class="tok-fn">insert</span>(<span class="tok-num">0</span>, <span class="tok-str">&quot;jetbrains&quot;</span>.<span class="tok-fn">to_owned</span>());</span>
-<span class="ln" id="L450">        }</span>
-<span class="ln" id="L451">        ctx.<span class="tok-fn">set_fonts</span>(fonts);</span>
-<span class="ln" id="L452">        <span class="tok-kw">return</span> true;</span>
-<span class="ln" id="L453">    }</span>
-<span class="ln" id="L454">    false</span>
-<span class="ln" id="L455">}</span>
+<span class="ln" id="L441">        fonts.font_data.<span class="tok-fn">insert</span>(</span>
+<span class="ln" id="L442">            <span class="tok-str">&quot;jetbrains&quot;</span>.<span class="tok-fn">to_owned</span>(),</span>
+<span class="ln" id="L443">            std::sync::Arc::<span class="tok-fn">new</span>(egui::FontData::<span class="tok-fn">from_owned</span>(bytes)),</span>
+<span class="ln" id="L444">        );</span>
+<span class="ln" id="L445">        <span class="tok-kw">for</span> family <span class="tok-kw">in</span> [FontFamily::Monospace, FontFamily::Proportional] {</span>
+<span class="ln" id="L446">            fonts</span>
+<span class="ln" id="L447">                .families</span>
+<span class="ln" id="L448">                .<span class="tok-fn">entry</span>(family)</span>
+<span class="ln" id="L449">                .<span class="tok-fn">or_default</span>()</span>
+<span class="ln" id="L450">                .<span class="tok-fn">insert</span>(<span class="tok-num">0</span>, <span class="tok-str">&quot;jetbrains&quot;</span>.<span class="tok-fn">to_owned</span>());</span>
+<span class="ln" id="L451">        }</span>
+<span class="ln" id="L452">        ctx.<span class="tok-fn">set_fonts</span>(fonts);</span>
+<span class="ln" id="L453">        <span class="tok-kw">return</span> true;</span>
+<span class="ln" id="L454">    }</span>
+<span class="ln" id="L455">    false</span>
+<span class="ln" id="L456">}</span>
 </span>
-<span class="ln" id="L456"></span>
+<span class="ln" id="L457"></span>
 <span class="src-item" id="fn-install">
-<span class="ln" id="L457"><span class="tok-com">/// Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</span></span>
-<span class="ln" id="L458"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install</span>(ctx: &amp;egui::Context) {</span>
-<span class="ln" id="L459">    <span class="tok-kw">use</span> palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L460">    <span class="tok-kw">let</span> theme = <span class="tok-fn">active</span>();</span>
-<span class="ln" id="L461"></span>
-<span class="ln" id="L462">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> visuals = <span class="tok-kw">if</span> theme.light {</span>
-<span class="ln" id="L463">        Visuals::<span class="tok-fn">light</span>()</span>
-<span class="ln" id="L464">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L465">        Visuals::<span class="tok-fn">dark</span>()</span>
-<span class="ln" id="L466">    };</span>
-<span class="ln" id="L467"></span>
-<span class="ln" id="L468">    visuals.override_text_color = <span class="tok-fn">Some</span>(p::<span class="tok-fn">fg</span>());</span>
-<span class="ln" id="L469">    visuals.panel_fill = p::<span class="tok-fn">bg</span>();</span>
-<span class="ln" id="L470">    visuals.window_fill = p::<span class="tok-fn">bg</span>();</span>
-<span class="ln" id="L471">    visuals.extreme_bg_color = p::<span class="tok-fn">bg_dark</span>();</span>
-<span class="ln" id="L472">    visuals.faint_bg_color = p::<span class="tok-fn">bg_dark</span>();</span>
-<span class="ln" id="L473">    visuals.window_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>());</span>
-<span class="ln" id="L474">    visuals.selection.bg_fill = p::<span class="tok-fn">blue</span>().<span class="tok-fn">gamma_multiply</span>(<span class="tok-num">0.35</span>);</span>
-<span class="ln" id="L475">    visuals.selection.stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">blue</span>());</span>
-<span class="ln" id="L476">    visuals.hyperlink_color = p::<span class="tok-fn">cyan</span>();</span>
-<span class="ln" id="L477"></span>
-<span class="ln" id="L478">    <span class="tok-kw">let</span> rounding = Rounding::<span class="tok-fn">same</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L479">    <span class="tok-kw">for</span> (widget, fill) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L480">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.noninteractive, p::<span class="tok-fn">bg_dark</span>()),</span>
-<span class="ln" id="L481">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.inactive, p::<span class="tok-fn">surface</span>()),</span>
-<span class="ln" id="L482">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.hovered, p::<span class="tok-fn">surface_hi</span>()),</span>
-<span class="ln" id="L483">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.active, p::<span class="tok-fn">surface_hi</span>()),</span>
-<span class="ln" id="L484">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.open, p::<span class="tok-fn">surface</span>()),</span>
-<span class="ln" id="L485">    ] {</span>
-<span class="ln" id="L486">        widget.bg_fill = fill;</span>
-<span class="ln" id="L487">        widget.weak_bg_fill = fill;</span>
-<span class="ln" id="L488">        widget.rounding = rounding;</span>
-<span class="ln" id="L489">        widget.bg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>());</span>
-<span class="ln" id="L490">        widget.fg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">fg</span>());</span>
-<span class="ln" id="L491">    }</span>
-<span class="ln" id="L492">    visuals.widgets.hovered.bg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">blue</span>());</span>
-<span class="ln" id="L493">    visuals.widgets.active.bg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">blue</span>());</span>
-<span class="ln" id="L494">    visuals.widgets.noninteractive.fg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">muted</span>());</span>
-<span class="ln" id="L495"></span>
-<span class="ln" id="L496">    ctx.<span class="tok-fn">set_visuals</span>(visuals);</span>
-<span class="ln" id="L497"></span>
-<span class="ln" id="L498">    <span class="tok-com">// Monospace throughout: this is a tool for people who care what the numbers</span></span>
-<span class="ln" id="L499">    <span class="tok-com">// say, and a fixed advance keeps live readouts from jittering as they</span></span>
-<span class="ln" id="L500">    <span class="tok-com">// update.</span></span>
-<span class="ln" id="L501">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> style = (*ctx.<span class="tok-fn">style</span>()).<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L502">    style.text_styles = [</span>
-<span class="ln" id="L503">        (TextStyle::Heading, FontId::<span class="tok-fn">new</span>(<span class="tok-num">20.0</span>, FontFamily::Monospace)),</span>
-<span class="ln" id="L504">        (TextStyle::Body, FontId::<span class="tok-fn">new</span>(<span class="tok-num">13.0</span>, FontFamily::Monospace)),</span>
-<span class="ln" id="L505">        (</span>
-<span class="ln" id="L506">            TextStyle::Monospace,</span>
-<span class="ln" id="L507">            FontId::<span class="tok-fn">new</span>(<span class="tok-num">13.0</span>, FontFamily::Monospace),</span>
-<span class="ln" id="L508">        ),</span>
-<span class="ln" id="L509">        (TextStyle::Button, FontId::<span class="tok-fn">new</span>(<span class="tok-num">13.0</span>, FontFamily::Monospace)),</span>
-<span class="ln" id="L510">        (TextStyle::Small, FontId::<span class="tok-fn">new</span>(<span class="tok-num">11.0</span>, FontFamily::Monospace)),</span>
-<span class="ln" id="L511">    ]</span>
-<span class="ln" id="L512">    .<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L513">    style.spacing.item_spacing = egui::<span class="tok-fn">vec2</span>(<span class="tok-num">8.0</span>, <span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L514">    style.spacing.button_padding = egui::<span class="tok-fn">vec2</span>(<span class="tok-num">10.0</span>, <span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L515">    ctx.<span class="tok-fn">set_style</span>(style);</span>
-<span class="ln" id="L516">}</span>
+<span class="ln" id="L458"><span class="tok-com">/// Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</span></span>
+<span class="ln" id="L459"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install</span>(ctx: &amp;egui::Context) {</span>
+<span class="ln" id="L460">    <span class="tok-kw">use</span> palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L461">    <span class="tok-kw">let</span> theme = <span class="tok-fn">active</span>();</span>
+<span class="ln" id="L462"></span>
+<span class="ln" id="L463">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> visuals = <span class="tok-kw">if</span> theme.light {</span>
+<span class="ln" id="L464">        Visuals::<span class="tok-fn">light</span>()</span>
+<span class="ln" id="L465">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L466">        Visuals::<span class="tok-fn">dark</span>()</span>
+<span class="ln" id="L467">    };</span>
+<span class="ln" id="L468"></span>
+<span class="ln" id="L469">    visuals.override_text_color = <span class="tok-fn">Some</span>(p::<span class="tok-fn">fg</span>());</span>
+<span class="ln" id="L470">    visuals.panel_fill = p::<span class="tok-fn">bg</span>();</span>
+<span class="ln" id="L471">    visuals.window_fill = p::<span class="tok-fn">bg</span>();</span>
+<span class="ln" id="L472">    visuals.extreme_bg_color = p::<span class="tok-fn">bg_dark</span>();</span>
+<span class="ln" id="L473">    visuals.faint_bg_color = p::<span class="tok-fn">bg_dark</span>();</span>
+<span class="ln" id="L474">    visuals.window_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>());</span>
+<span class="ln" id="L475">    visuals.selection.bg_fill = p::<span class="tok-fn">blue</span>().<span class="tok-fn">gamma_multiply</span>(<span class="tok-num">0.35</span>);</span>
+<span class="ln" id="L476">    visuals.selection.stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">blue</span>());</span>
+<span class="ln" id="L477">    visuals.hyperlink_color = p::<span class="tok-fn">cyan</span>();</span>
+<span class="ln" id="L478"></span>
+<span class="ln" id="L479">    <span class="tok-kw">let</span> rounding = CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">4</span>);</span>
+<span class="ln" id="L480">    <span class="tok-kw">for</span> (widget, fill) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L481">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.noninteractive, p::<span class="tok-fn">bg_dark</span>()),</span>
+<span class="ln" id="L482">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.inactive, p::<span class="tok-fn">surface</span>()),</span>
+<span class="ln" id="L483">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.hovered, p::<span class="tok-fn">surface_hi</span>()),</span>
+<span class="ln" id="L484">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.active, p::<span class="tok-fn">surface_hi</span>()),</span>
+<span class="ln" id="L485">        (&amp;<span class="tok-kw">mut</span> visuals.widgets.open, p::<span class="tok-fn">surface</span>()),</span>
+<span class="ln" id="L486">    ] {</span>
+<span class="ln" id="L487">        widget.bg_fill = fill;</span>
+<span class="ln" id="L488">        widget.weak_bg_fill = fill;</span>
+<span class="ln" id="L489">        widget.corner_radius = rounding;</span>
+<span class="ln" id="L490">        widget.bg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>());</span>
+<span class="ln" id="L491">        widget.fg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">fg</span>());</span>
+<span class="ln" id="L492">    }</span>
+<span class="ln" id="L493">    visuals.widgets.hovered.bg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">blue</span>());</span>
+<span class="ln" id="L494">    visuals.widgets.active.bg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">blue</span>());</span>
+<span class="ln" id="L495">    visuals.widgets.noninteractive.fg_stroke = Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">muted</span>());</span>
+<span class="ln" id="L496"></span>
+<span class="ln" id="L497">    ctx.<span class="tok-fn">set_visuals</span>(visuals);</span>
+<span class="ln" id="L498"></span>
+<span class="ln" id="L499">    <span class="tok-com">// Monospace throughout: this is a tool for people who care what the numbers</span></span>
+<span class="ln" id="L500">    <span class="tok-com">// say, and a fixed advance keeps live readouts from jittering as they</span></span>
+<span class="ln" id="L501">    <span class="tok-com">// update.</span></span>
+<span class="ln" id="L502">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> style = (*ctx.<span class="tok-fn">style</span>()).<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L503">    style.text_styles = [</span>
+<span class="ln" id="L504">        (TextStyle::Heading, FontId::<span class="tok-fn">new</span>(<span class="tok-num">20.0</span>, FontFamily::Monospace)),</span>
+<span class="ln" id="L505">        (TextStyle::Body, FontId::<span class="tok-fn">new</span>(<span class="tok-num">13.0</span>, FontFamily::Monospace)),</span>
+<span class="ln" id="L506">        (</span>
+<span class="ln" id="L507">            TextStyle::Monospace,</span>
+<span class="ln" id="L508">            FontId::<span class="tok-fn">new</span>(<span class="tok-num">13.0</span>, FontFamily::Monospace),</span>
+<span class="ln" id="L509">        ),</span>
+<span class="ln" id="L510">        (TextStyle::Button, FontId::<span class="tok-fn">new</span>(<span class="tok-num">13.0</span>, FontFamily::Monospace)),</span>
+<span class="ln" id="L511">        (TextStyle::Small, FontId::<span class="tok-fn">new</span>(<span class="tok-num">11.0</span>, FontFamily::Monospace)),</span>
+<span class="ln" id="L512">    ]</span>
+<span class="ln" id="L513">    .<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L514">    style.spacing.item_spacing = egui::<span class="tok-fn">vec2</span>(<span class="tok-num">8.0</span>, <span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L515">    style.spacing.button_padding = egui::<span class="tok-fn">vec2</span>(<span class="tok-num">10.0</span>, <span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L516">    ctx.<span class="tok-fn">set_style</span>(style);</span>
+<span class="ln" id="L517">}</span>
 </span>
-<span class="ln" id="L517"></span>
-<span class="ln" id="L518"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L519"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L520">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L521">    <span class="tok-kw">use</span> std::sync::Mutex;</span>
-<span class="ln" id="L522"></span>
-<span class="ln" id="L523">    <span class="tok-com">/// **F-78.** Four tests here read and write the same process-global</span></span>
-<span class="ln" id="L524">    <span class="tok-com">/// `ACTIVE`, and `cargo test` runs them on parallel threads in one</span></span>
-<span class="ln" id="L525">    <span class="tok-com">/// process. Nothing kept them apart, so any two could interleave: one</span></span>
-<span class="ln" id="L526">    <span class="tok-com">/// switched the theme to `paper` and asked whether the palette had</span></span>
-<span class="ln" id="L527">    <span class="tok-com">/// changed, while another put the index back to zero in between and made</span></span>
-<span class="ln" id="L528">    <span class="tok-com">/// the answer no.</span></span>
-<span class="ln" id="L529">    <span class="tok-com">///</span></span>
-<span class="ln" id="L530">    <span class="tok-com">/// Measured: one failure in forty runs of this module alone, and it fired</span></span>
-<span class="ln" id="L531">    <span class="tok-com">/// for real during a full-workspace run, where there are more threads</span></span>
-<span class="ln" id="L532">    <span class="tok-com">/// competing. A test that fails one run in forty is worse than one that</span></span>
-<span class="ln" id="L533">    <span class="tok-com">/// fails every time, because the answer people learn is &quot;run it again&quot;.</span></span>
-<span class="ln" id="L534">    <span class="tok-com">///</span></span>
-<span class="ln" id="L535">    <span class="tok-com">/// So the tests that touch the global take this in turn. Poisoning is</span></span>
-<span class="ln" id="L536">    <span class="tok-com">/// stepped over rather than propagated: a panic in one test has already</span></span>
-<span class="ln" id="L537">    <span class="tok-com">/// failed that test, and turning it into a failure in every other one</span></span>
-<span class="ln" id="L538">    <span class="tok-com">/// hides which was the real fault.</span></span>
-<span class="ln" id="L539">    <span class="tok-kw">static</span> ACTIVE_THEME: Mutex&lt;()&gt; = Mutex::<span class="tok-fn">new</span>(());</span>
-<span class="ln" id="L540"></span>
-<span class="ln" id="L541">    <span class="tok-kw">fn</span> <span class="tok-fn">alone</span>() -&gt; std::sync::MutexGuard&lt;&#x27;<span class="tok-kw">static</span>, ()&gt; {</span>
-<span class="ln" id="L542">        ACTIVE_THEME</span>
-<span class="ln" id="L543">            .<span class="tok-fn">lock</span>()</span>
-<span class="ln" id="L544">            .<span class="tok-fn">unwrap_or_else</span>(|poisoned| poisoned.<span class="tok-fn">into_inner</span>())</span>
-<span class="ln" id="L545">    }</span>
-<span class="ln" id="L546"></span>
-<span class="ln" id="L547">    <span class="tok-kw">fn</span> <span class="tok-fn">reset</span>() {</span>
-<span class="ln" id="L548">        ACTIVE.<span class="tok-fn">store</span>(<span class="tok-num">0</span>, Ordering::Relaxed);</span>
-<span class="ln" id="L549">    }</span>
-<span class="ln" id="L550"></span>
-<span class="ln" id="L551">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L552">    <span class="tok-kw">fn</span> <span class="tok-fn">palette_matches_the_cli_escape_codes</span>() {</span>
-<span class="ln" id="L553">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
-<span class="ln" id="L554">        <span class="tok-fn">reset</span>();</span>
-<span class="ln" id="L555">        <span class="tok-com">// Both front-ends must be the same program to look at. These values are</span></span>
-<span class="ln" id="L556">        <span class="tok-com">// duplicated in veilvoice-cli&#x27;s `theme::colour`.</span></span>
-<span class="ln" id="L557">        assert_eq!(palette::<span class="tok-fn">blue</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">122</span>, <span class="tok-num">162</span>, <span class="tok-num">247</span>));</span>
-<span class="ln" id="L558">        assert_eq!(palette::<span class="tok-fn">green</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">158</span>, <span class="tok-num">206</span>, <span class="tok-num">106</span>));</span>
-<span class="ln" id="L559">        assert_eq!(palette::<span class="tok-fn">red</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">247</span>, <span class="tok-num">118</span>, <span class="tok-num">142</span>));</span>
-<span class="ln" id="L560">        assert_eq!(palette::<span class="tok-fn">muted</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">115</span>, <span class="tok-num">122</span>, <span class="tok-num">162</span>));</span>
-<span class="ln" id="L561">    }</span>
-<span class="ln" id="L562"></span>
-<span class="ln" id="L563">    <span class="tok-com">/// The website must not gain a theme the app has never heard of.</span></span>
-<span class="ln" id="L564">    <span class="tok-com">///</span></span>
-<span class="ln" id="L565">    <span class="tok-com">/// The test below walks `THEMES` and checks each against the stylesheet,</span></span>
-<span class="ln" id="L566">    <span class="tok-com">/// which catches a theme changed or removed on either side -- and misses a</span></span>
-<span class="ln" id="L567">    <span class="tok-com">/// theme **added to the website**, because nothing was walking the</span></span>
-<span class="ln" id="L568">    <span class="tok-com">/// stylesheet looking for entries this crate does not know.</span></span>
-<span class="ln" id="L569">    <span class="tok-com">///</span></span>
-<span class="ln" id="L570">    <span class="tok-com">/// That is the shape of the defect recorded against `html.test.js`: a check</span></span>
-<span class="ln" id="L571">    <span class="tok-com">/// enumerating from a hardcoded list is only ever as wide as the list, and</span></span>
-<span class="ln" id="L572">    <span class="tok-com">/// a page added later went unchecked for precisely that reason. So this</span></span>
-<span class="ln" id="L573">    <span class="tok-com">/// enumerates from the *stylesheet* instead, and the pair of tests closes</span></span>
-<span class="ln" id="L574">    <span class="tok-com">/// the loop in both directions.</span></span>
-<span class="ln" id="L575">    <span class="tok-com">///</span></span>
-<span class="ln" id="L576">    <span class="tok-com">/// A reader who picks a theme on the website and then opens the app should</span></span>
-<span class="ln" id="L577">    <span class="tok-com">/// find it there. Silently falling back to the default is a small thing</span></span>
-<span class="ln" id="L578">    <span class="tok-com">/// that reads as the application being broken.</span></span>
-<span class="ln" id="L579">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L580">    <span class="tok-kw">fn</span> <span class="tok-fn">the_website_has_no_theme_the_app_is_missing</span>() {</span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> css = std::fs::<span class="tok-fn">read_to_string</span>(</span>
-<span class="ln" id="L582">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/css/themes.css&quot;</span>),</span>
-<span class="ln" id="L583">        )</span>
-<span class="ln" id="L584">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;themes.css should be readable from the crate directory&quot;</span>);</span>
-<span class="ln" id="L585"></span>
-<span class="ln" id="L586">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L587">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rest = css.<span class="tok-fn">as_str</span>();</span>
-<span class="ln" id="L588">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = rest.<span class="tok-fn">find</span>(<span class="tok-str">&quot;[data-theme=\&quot;&quot;</span>) {</span>
-<span class="ln" id="L589">            <span class="tok-kw">let</span> after = &amp;rest[at + <span class="tok-str">&quot;[data-theme=\&quot;&quot;</span>.<span class="tok-fn">len</span>()..];</span>
-<span class="ln" id="L590">            <span class="tok-kw">let</span> end = after.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;unterminated data-theme selector&quot;</span>);</span>
-<span class="ln" id="L591">            found.<span class="tok-fn">push</span>(after[..end].<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L592">            rest = &amp;after[end..];</span>
-<span class="ln" id="L593">        }</span>
-<span class="ln" id="L594"></span>
-<span class="ln" id="L595">        assert!(</span>
-<span class="ln" id="L596">            !found.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L597">            <span class="tok-str">&quot;no [data-theme] selectors were found -- the parser, not the CSS, \</span></span>
-<span class="ln" id="L598"><span class="tok-str">             is what changed&quot;</span></span>
-<span class="ln" id="L599">        );</span>
-<span class="ln" id="L600"></span>
-<span class="ln" id="L601">        <span class="tok-kw">for</span> id <span class="tok-kw">in</span> &amp;found {</span>
-<span class="ln" id="L602">            assert!(</span>
-<span class="ln" id="L603">                THEMES.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|t| t.id == id),</span>
-<span class="ln" id="L604">                <span class="tok-str">&quot;the website defines the &#x27;{id}&#x27; theme and the app does not. \</span></span>
-<span class="ln" id="L605"><span class="tok-str">                 Add it to THEMES, or remove it from website/css/themes.css.&quot;</span></span>
-<span class="ln" id="L606">            );</span>
-<span class="ln" id="L607">        }</span>
-<span class="ln" id="L608">    }</span>
-<span class="ln" id="L609"></span>
-<span class="ln" id="L610">    <span class="tok-com">/// The app&#x27;s themes and the website&#x27;s are meant to be the same themes, not</span></span>
-<span class="ln" id="L611">    <span class="tok-com">/// two sets that happen to share names. Parsed straight out of the</span></span>
-<span class="ln" id="L612">    <span class="tok-com">/// stylesheet so a change to either side without the other fails here.</span></span>
-<span class="ln" id="L613">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L614">    <span class="tok-kw">fn</span> <span class="tok-fn">every_theme_matches_the_website_stylesheet</span>() {</span>
-<span class="ln" id="L615">        <span class="tok-kw">let</span> css = std::fs::<span class="tok-fn">read_to_string</span>(</span>
-<span class="ln" id="L616">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/css/themes.css&quot;</span>),</span>
-<span class="ln" id="L617">        )</span>
-<span class="ln" id="L618">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;themes.css should be readable from the crate directory&quot;</span>);</span>
-<span class="ln" id="L619"></span>
-<span class="ln" id="L620">        <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> THEMES {</span>
-<span class="ln" id="L621">            <span class="tok-kw">let</span> marker = format!(<span class="tok-str">&quot;[data-theme=\&quot;{}\&quot;]&quot;</span>, theme.id);</span>
-<span class="ln" id="L622">            <span class="tok-kw">let</span> start = css</span>
-<span class="ln" id="L623">                .<span class="tok-fn">find</span>(&amp;marker)</span>
-<span class="ln" id="L624">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{} is not in themes.css&quot;</span>, theme.id));</span>
-<span class="ln" id="L625">            <span class="tok-kw">let</span> block_end = css[start..].<span class="tok-fn">find</span>(<span class="tok-str">&#x27;}&#x27;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;unterminated block&quot;</span>) + start;</span>
-<span class="ln" id="L626">            <span class="tok-kw">let</span> block = &amp;css[start..block_end];</span>
-<span class="ln" id="L627"></span>
-<span class="ln" id="L628">            <span class="tok-kw">for</span> (token, expected) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L629">                (<span class="tok-str">&quot;--bg&quot;</span>, theme.bg),</span>
-<span class="ln" id="L630">                (<span class="tok-str">&quot;--bg-soft&quot;</span>, theme.bg_soft),</span>
-<span class="ln" id="L631">                (<span class="tok-str">&quot;--bg-inset&quot;</span>, theme.bg_inset),</span>
-<span class="ln" id="L632">                (<span class="tok-str">&quot;--border&quot;</span>, theme.border),</span>
-<span class="ln" id="L633">                (<span class="tok-str">&quot;--fg&quot;</span>, theme.fg),</span>
-<span class="ln" id="L634">                (<span class="tok-str">&quot;--muted&quot;</span>, theme.muted),</span>
-<span class="ln" id="L635">                (<span class="tok-str">&quot;--accent-2&quot;</span>, theme.accent_2),</span>
-<span class="ln" id="L636">                (<span class="tok-str">&quot;--cyan&quot;</span>, theme.cyan),</span>
-<span class="ln" id="L637">                (<span class="tok-str">&quot;--ok&quot;</span>, theme.ok),</span>
-<span class="ln" id="L638">                (<span class="tok-str">&quot;--warn&quot;</span>, theme.warn),</span>
-<span class="ln" id="L639">                (<span class="tok-str">&quot;--err&quot;</span>, theme.err),</span>
-<span class="ln" id="L640">            ] {</span>
-<span class="ln" id="L641">                <span class="tok-kw">let</span> needle = format!(<span class="tok-str">&quot;{token}:&quot;</span>);</span>
-<span class="ln" id="L642">                <span class="tok-kw">let</span> at = block</span>
-<span class="ln" id="L643">                    .<span class="tok-fn">find</span>(&amp;needle)</span>
-<span class="ln" id="L644">                    .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{} has no {token}&quot;</span>, theme.id));</span>
-<span class="ln" id="L645">                <span class="tok-kw">let</span> rest = &amp;block[at + needle.<span class="tok-fn">len</span>()..];</span>
-<span class="ln" id="L646">                <span class="tok-kw">let</span> hex: String = rest</span>
-<span class="ln" id="L647">                    .<span class="tok-fn">trim_start</span>()</span>
-<span class="ln" id="L648">                    .<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;#&#x27;</span>)</span>
-<span class="ln" id="L649">                    .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L650">                    .<span class="tok-fn">take</span>(<span class="tok-num">6</span>)</span>
-<span class="ln" id="L651">                    .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L652">                <span class="tok-kw">let</span> value = u32::<span class="tok-fn">from_str_radix</span>(&amp;hex, <span class="tok-num">16</span>)</span>
-<span class="ln" id="L653">                    .<span class="tok-fn">unwrap_or_else</span>(|_| panic!(<span class="tok-str">&quot;{} {token} is not a hex colour&quot;</span>, theme.id));</span>
-<span class="ln" id="L654">                assert_eq!(</span>
-<span class="ln" id="L655">                    <span class="tok-fn">rgb</span>(value),</span>
-<span class="ln" id="L656">                    expected,</span>
-<span class="ln" id="L657">                    <span class="tok-str">&quot;{} {token} differs between the app and the website&quot;</span>,</span>
-<span class="ln" id="L658">                    theme.id</span>
-<span class="ln" id="L659">                );</span>
-<span class="ln" id="L660">            }</span>
-<span class="ln" id="L661"></span>
-<span class="ln" id="L662">            <span class="tok-com">// `--accent` needs its own lookup: `--accent-2` contains it as a</span></span>
-<span class="ln" id="L663">            <span class="tok-com">// prefix, so a naive `find` would match the wrong line.</span></span>
-<span class="ln" id="L664">            <span class="tok-kw">let</span> at = block</span>
-<span class="ln" id="L665">                .<span class="tok-fn">match_indices</span>(<span class="tok-str">&quot;--accent:&quot;</span>)</span>
-<span class="ln" id="L666">                .<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L667">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{} has no --accent&quot;</span>, theme.id))</span>
-<span class="ln" id="L668">                .<span class="tok-num">0</span>;</span>
-<span class="ln" id="L669">            <span class="tok-kw">let</span> hex: String = block[at + <span class="tok-str">&quot;--accent:&quot;</span>.<span class="tok-fn">len</span>()..]</span>
-<span class="ln" id="L670">                .<span class="tok-fn">trim_start</span>()</span>
-<span class="ln" id="L671">                .<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;#&#x27;</span>)</span>
-<span class="ln" id="L672">                .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L673">                .<span class="tok-fn">take</span>(<span class="tok-num">6</span>)</span>
-<span class="ln" id="L674">                .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L675">            assert_eq!(</span>
-<span class="ln" id="L676">                <span class="tok-fn">rgb</span>(u32::<span class="tok-fn">from_str_radix</span>(&amp;hex, <span class="tok-num">16</span>).<span class="tok-fn">unwrap</span>()),</span>
-<span class="ln" id="L677">                theme.accent,</span>
-<span class="ln" id="L678">                <span class="tok-str">&quot;{} --accent differs between the app and the website&quot;</span>,</span>
-<span class="ln" id="L679">                theme.id</span>
-<span class="ln" id="L680">            );</span>
-<span class="ln" id="L681">        }</span>
-<span class="ln" id="L682">    }</span>
-<span class="ln" id="L683"></span>
-<span class="ln" id="L684">    <span class="tok-com">/// The website offers exactly these themes, in this order. A theme added to</span></span>
-<span class="ln" id="L685">    <span class="tok-com">/// one and not the other is the kind of drift nobody notices.</span></span>
-<span class="ln" id="L686">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L687">    <span class="tok-kw">fn</span> <span class="tok-fn">the_app_offers_the_same_themes_as_the_website</span>() {</span>
-<span class="ln" id="L688">        <span class="tok-kw">let</span> js = std::fs::<span class="tok-fn">read_to_string</span>(</span>
-<span class="ln" id="L689">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/js/theme.js&quot;</span>),</span>
-<span class="ln" id="L690">        )</span>
-<span class="ln" id="L691">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;theme.js should be readable&quot;</span>);</span>
-<span class="ln" id="L692">        <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> THEMES {</span>
-<span class="ln" id="L693">            assert!(</span>
-<span class="ln" id="L694">                js.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;\&quot;{}\&quot;&quot;</span>, theme.id)),</span>
-<span class="ln" id="L695">                <span class="tok-str">&quot;the website does not offer {}&quot;</span>,</span>
-<span class="ln" id="L696">                theme.id</span>
-<span class="ln" id="L697">            );</span>
-<span class="ln" id="L698">        }</span>
-<span class="ln" id="L699">    }</span>
-<span class="ln" id="L700"></span>
-<span class="ln" id="L701">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L702">    <span class="tok-kw">fn</span> <span class="tok-fn">switching_theme_changes_the_palette_and_the_visuals</span>() {</span>
-<span class="ln" id="L703">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
-<span class="ln" id="L704">        <span class="tok-fn">reset</span>();</span>
-<span class="ln" id="L705">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L706">        <span class="tok-fn">install</span>(&amp;ctx);</span>
-<span class="ln" id="L707">        <span class="tok-kw">let</span> tokyo = palette::<span class="tok-fn">bg</span>();</span>
-<span class="ln" id="L708"></span>
-<span class="ln" id="L709">        assert!(<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;paper&quot;</span>));</span>
-<span class="ln" id="L710">        assert_ne!(palette::<span class="tok-fn">bg</span>(), tokyo, <span class="tok-str">&quot;the palette did not change&quot;</span>);</span>
-<span class="ln" id="L711">        assert_eq!(ctx.<span class="tok-fn">style</span>().visuals.panel_fill, palette::<span class="tok-fn">bg</span>());</span>
-<span class="ln" id="L712">        assert!(<span class="tok-fn">active</span>().light, <span class="tok-str">&quot;paper is a light scheme&quot;</span>);</span>
-<span class="ln" id="L713"></span>
-<span class="ln" id="L714">        <span class="tok-com">// An unknown identifier must be ignored rather than fatal: a</span></span>
-<span class="ln" id="L715">        <span class="tok-com">// preferences file naming a theme this build does not have has to</span></span>
-<span class="ln" id="L716">        <span class="tok-com">// still start.</span></span>
-<span class="ln" id="L717">        assert!(!<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;no-such-theme&quot;</span>));</span>
-<span class="ln" id="L718">        assert_eq!(<span class="tok-fn">active</span>().id, <span class="tok-str">&quot;paper&quot;</span>, <span class="tok-str">&quot;an unknown id changed the theme&quot;</span>);</span>
-<span class="ln" id="L719">        <span class="tok-fn">reset</span>();</span>
-<span class="ln" id="L720">    }</span>
-<span class="ln" id="L721"></span>
-<span class="ln" id="L722">    <span class="tok-com">/// An out-of-range index must saturate rather than panic. This is read</span></span>
-<span class="ln" id="L723">    <span class="tok-com">/// inside the paint loop, which is the worst place for an index panic.</span></span>
-<span class="ln" id="L724">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L725">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_index_saturates_instead_of_panicking</span>() {</span>
-<span class="ln" id="L726">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
-<span class="ln" id="L727">        ACTIVE.<span class="tok-fn">store</span>(usize::MAX, Ordering::Relaxed);</span>
-<span class="ln" id="L728">        <span class="tok-kw">let</span> _ = <span class="tok-fn">active</span>();</span>
-<span class="ln" id="L729">        assert_eq!(<span class="tok-fn">active</span>().id, THEMES[THEMES.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>].id);</span>
-<span class="ln" id="L730">        <span class="tok-fn">reset</span>();</span>
-<span class="ln" id="L731">    }</span>
-<span class="ln" id="L732"></span>
-<span class="ln" id="L733">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L734">    <span class="tok-kw">fn</span> <span class="tok-fn">theme_identifiers_are_unique_and_stable</span>() {</span>
-<span class="ln" id="L735">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> ids: Vec&lt;&amp;str&gt; = THEMES.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|t| t.id).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L736">        ids.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L737">        <span class="tok-kw">let</span> count = ids.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L738">        ids.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L739">        assert_eq!(ids.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;duplicate theme id&quot;</span>);</span>
-<span class="ln" id="L740">        <span class="tok-com">// Written into the preferences file, so they must stay ASCII and plain.</span></span>
-<span class="ln" id="L741">        <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> THEMES {</span>
-<span class="ln" id="L742">            assert!(</span>
-<span class="ln" id="L743">                theme.id.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>),</span>
-<span class="ln" id="L744">                <span class="tok-str">&quot;{} is not a stable identifier&quot;</span>,</span>
-<span class="ln" id="L745">                theme.id</span>
-<span class="ln" id="L746">            );</span>
-<span class="ln" id="L747">            assert!(!theme.name.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L748">        }</span>
-<span class="ln" id="L749">    }</span>
-<span class="ln" id="L750"></span>
-<span class="ln" id="L751">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L752">    <span class="tok-kw">fn</span> <span class="tok-fn">font_search_covers_every_supported_platform</span>() {</span>
-<span class="ln" id="L753">        <span class="tok-kw">let</span> paths = <span class="tok-fn">user_font_paths</span>();</span>
-<span class="ln" id="L754">        assert!(paths</span>
-<span class="ln" id="L755">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L756">            .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Windows&quot;</span>)));</span>
-<span class="ln" id="L757">        assert!(paths</span>
-<span class="ln" id="L758">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L759">            .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;usr/share/fonts&quot;</span>)));</span>
-<span class="ln" id="L760">        assert!(paths</span>
-<span class="ln" id="L761">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L762">            .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Library/Fonts&quot;</span>)));</span>
-<span class="ln" id="L763">    }</span>
-<span class="ln" id="L764"></span>
-<span class="ln" id="L765">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L766">    <span class="tok-kw">fn</span> <span class="tok-fn">styling_applies_without_a_window</span>() {</span>
-<span class="ln" id="L767">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
-<span class="ln" id="L768">        <span class="tok-fn">reset</span>();</span>
-<span class="ln" id="L769">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L770">        <span class="tok-fn">install</span>(&amp;ctx);</span>
-<span class="ln" id="L771">        assert_eq!(ctx.<span class="tok-fn">style</span>().visuals.panel_fill, palette::<span class="tok-fn">bg</span>());</span>
-<span class="ln" id="L772">        assert!(ctx.<span class="tok-fn">style</span>().text_styles.<span class="tok-fn">contains_key</span>(&amp;TextStyle::Monospace));</span>
-<span class="ln" id="L773">    }</span>
-<span class="ln" id="L774"></span>
-<span class="ln" id="L775">    <span class="tok-com">/// Missing JetBrains Mono must degrade to the built-in face, never panic.</span></span>
-<span class="ln" id="L776">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L777">    <span class="tok-kw">fn</span> <span class="tok-fn">missing_font_is_not_fatal</span>() {</span>
-<span class="ln" id="L778">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
-<span class="ln" id="L779">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L780">        <span class="tok-kw">let</span> _found = <span class="tok-fn">install_fonts</span>(&amp;ctx);</span>
-<span class="ln" id="L781">        <span class="tok-fn">install</span>(&amp;ctx);</span>
-<span class="ln" id="L782">    }</span>
-<span class="ln" id="L783">}</span>
+<span class="ln" id="L518"></span>
+<span class="ln" id="L519"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L520"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L521">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L522">    <span class="tok-kw">use</span> std::sync::Mutex;</span>
+<span class="ln" id="L523"></span>
+<span class="ln" id="L524">    <span class="tok-com">/// **F-78.** Four tests here read and write the same process-global</span></span>
+<span class="ln" id="L525">    <span class="tok-com">/// `ACTIVE`, and `cargo test` runs them on parallel threads in one</span></span>
+<span class="ln" id="L526">    <span class="tok-com">/// process. Nothing kept them apart, so any two could interleave: one</span></span>
+<span class="ln" id="L527">    <span class="tok-com">/// switched the theme to `paper` and asked whether the palette had</span></span>
+<span class="ln" id="L528">    <span class="tok-com">/// changed, while another put the index back to zero in between and made</span></span>
+<span class="ln" id="L529">    <span class="tok-com">/// the answer no.</span></span>
+<span class="ln" id="L530">    <span class="tok-com">///</span></span>
+<span class="ln" id="L531">    <span class="tok-com">/// Measured: one failure in forty runs of this module alone, and it fired</span></span>
+<span class="ln" id="L532">    <span class="tok-com">/// for real during a full-workspace run, where there are more threads</span></span>
+<span class="ln" id="L533">    <span class="tok-com">/// competing. A test that fails one run in forty is worse than one that</span></span>
+<span class="ln" id="L534">    <span class="tok-com">/// fails every time, because the answer people learn is &quot;run it again&quot;.</span></span>
+<span class="ln" id="L535">    <span class="tok-com">///</span></span>
+<span class="ln" id="L536">    <span class="tok-com">/// So the tests that touch the global take this in turn. Poisoning is</span></span>
+<span class="ln" id="L537">    <span class="tok-com">/// stepped over rather than propagated: a panic in one test has already</span></span>
+<span class="ln" id="L538">    <span class="tok-com">/// failed that test, and turning it into a failure in every other one</span></span>
+<span class="ln" id="L539">    <span class="tok-com">/// hides which was the real fault.</span></span>
+<span class="ln" id="L540">    <span class="tok-kw">static</span> ACTIVE_THEME: Mutex&lt;()&gt; = Mutex::<span class="tok-fn">new</span>(());</span>
+<span class="ln" id="L541"></span>
+<span class="ln" id="L542">    <span class="tok-kw">fn</span> <span class="tok-fn">alone</span>() -&gt; std::sync::MutexGuard&lt;&#x27;<span class="tok-kw">static</span>, ()&gt; {</span>
+<span class="ln" id="L543">        ACTIVE_THEME</span>
+<span class="ln" id="L544">            .<span class="tok-fn">lock</span>()</span>
+<span class="ln" id="L545">            .<span class="tok-fn">unwrap_or_else</span>(|poisoned| poisoned.<span class="tok-fn">into_inner</span>())</span>
+<span class="ln" id="L546">    }</span>
+<span class="ln" id="L547"></span>
+<span class="ln" id="L548">    <span class="tok-kw">fn</span> <span class="tok-fn">reset</span>() {</span>
+<span class="ln" id="L549">        ACTIVE.<span class="tok-fn">store</span>(<span class="tok-num">0</span>, Ordering::Relaxed);</span>
+<span class="ln" id="L550">    }</span>
+<span class="ln" id="L551"></span>
+<span class="ln" id="L552">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L553">    <span class="tok-kw">fn</span> <span class="tok-fn">palette_matches_the_cli_escape_codes</span>() {</span>
+<span class="ln" id="L554">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
+<span class="ln" id="L555">        <span class="tok-fn">reset</span>();</span>
+<span class="ln" id="L556">        <span class="tok-com">// Both front-ends must be the same program to look at. These values are</span></span>
+<span class="ln" id="L557">        <span class="tok-com">// duplicated in veilvoice-cli&#x27;s `theme::colour`.</span></span>
+<span class="ln" id="L558">        assert_eq!(palette::<span class="tok-fn">blue</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">122</span>, <span class="tok-num">162</span>, <span class="tok-num">247</span>));</span>
+<span class="ln" id="L559">        assert_eq!(palette::<span class="tok-fn">green</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">158</span>, <span class="tok-num">206</span>, <span class="tok-num">106</span>));</span>
+<span class="ln" id="L560">        assert_eq!(palette::<span class="tok-fn">red</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">247</span>, <span class="tok-num">118</span>, <span class="tok-num">142</span>));</span>
+<span class="ln" id="L561">        assert_eq!(palette::<span class="tok-fn">muted</span>(), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">115</span>, <span class="tok-num">122</span>, <span class="tok-num">162</span>));</span>
+<span class="ln" id="L562">    }</span>
+<span class="ln" id="L563"></span>
+<span class="ln" id="L564">    <span class="tok-com">/// The website must not gain a theme the app has never heard of.</span></span>
+<span class="ln" id="L565">    <span class="tok-com">///</span></span>
+<span class="ln" id="L566">    <span class="tok-com">/// The test below walks `THEMES` and checks each against the stylesheet,</span></span>
+<span class="ln" id="L567">    <span class="tok-com">/// which catches a theme changed or removed on either side -- and misses a</span></span>
+<span class="ln" id="L568">    <span class="tok-com">/// theme **added to the website**, because nothing was walking the</span></span>
+<span class="ln" id="L569">    <span class="tok-com">/// stylesheet looking for entries this crate does not know.</span></span>
+<span class="ln" id="L570">    <span class="tok-com">///</span></span>
+<span class="ln" id="L571">    <span class="tok-com">/// That is the shape of the defect recorded against `html.test.js`: a check</span></span>
+<span class="ln" id="L572">    <span class="tok-com">/// enumerating from a hardcoded list is only ever as wide as the list, and</span></span>
+<span class="ln" id="L573">    <span class="tok-com">/// a page added later went unchecked for precisely that reason. So this</span></span>
+<span class="ln" id="L574">    <span class="tok-com">/// enumerates from the *stylesheet* instead, and the pair of tests closes</span></span>
+<span class="ln" id="L575">    <span class="tok-com">/// the loop in both directions.</span></span>
+<span class="ln" id="L576">    <span class="tok-com">///</span></span>
+<span class="ln" id="L577">    <span class="tok-com">/// A reader who picks a theme on the website and then opens the app should</span></span>
+<span class="ln" id="L578">    <span class="tok-com">/// find it there. Silently falling back to the default is a small thing</span></span>
+<span class="ln" id="L579">    <span class="tok-com">/// that reads as the application being broken.</span></span>
+<span class="ln" id="L580">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L581">    <span class="tok-kw">fn</span> <span class="tok-fn">the_website_has_no_theme_the_app_is_missing</span>() {</span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> css = std::fs::<span class="tok-fn">read_to_string</span>(</span>
+<span class="ln" id="L583">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/css/themes.css&quot;</span>),</span>
+<span class="ln" id="L584">        )</span>
+<span class="ln" id="L585">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;themes.css should be readable from the crate directory&quot;</span>);</span>
+<span class="ln" id="L586"></span>
+<span class="ln" id="L587">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rest = css.<span class="tok-fn">as_str</span>();</span>
+<span class="ln" id="L589">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = rest.<span class="tok-fn">find</span>(<span class="tok-str">&quot;[data-theme=\&quot;&quot;</span>) {</span>
+<span class="ln" id="L590">            <span class="tok-kw">let</span> after = &amp;rest[at + <span class="tok-str">&quot;[data-theme=\&quot;&quot;</span>.<span class="tok-fn">len</span>()..];</span>
+<span class="ln" id="L591">            <span class="tok-kw">let</span> end = after.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;unterminated data-theme selector&quot;</span>);</span>
+<span class="ln" id="L592">            found.<span class="tok-fn">push</span>(after[..end].<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L593">            rest = &amp;after[end..];</span>
+<span class="ln" id="L594">        }</span>
+<span class="ln" id="L595"></span>
+<span class="ln" id="L596">        assert!(</span>
+<span class="ln" id="L597">            !found.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L598">            <span class="tok-str">&quot;no [data-theme] selectors were found -- the parser, not the CSS, \</span></span>
+<span class="ln" id="L599"><span class="tok-str">             is what changed&quot;</span></span>
+<span class="ln" id="L600">        );</span>
+<span class="ln" id="L601"></span>
+<span class="ln" id="L602">        <span class="tok-kw">for</span> id <span class="tok-kw">in</span> &amp;found {</span>
+<span class="ln" id="L603">            assert!(</span>
+<span class="ln" id="L604">                THEMES.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|t| t.id == id),</span>
+<span class="ln" id="L605">                <span class="tok-str">&quot;the website defines the &#x27;{id}&#x27; theme and the app does not. \</span></span>
+<span class="ln" id="L606"><span class="tok-str">                 Add it to THEMES, or remove it from website/css/themes.css.&quot;</span></span>
+<span class="ln" id="L607">            );</span>
+<span class="ln" id="L608">        }</span>
+<span class="ln" id="L609">    }</span>
+<span class="ln" id="L610"></span>
+<span class="ln" id="L611">    <span class="tok-com">/// The app&#x27;s themes and the website&#x27;s are meant to be the same themes, not</span></span>
+<span class="ln" id="L612">    <span class="tok-com">/// two sets that happen to share names. Parsed straight out of the</span></span>
+<span class="ln" id="L613">    <span class="tok-com">/// stylesheet so a change to either side without the other fails here.</span></span>
+<span class="ln" id="L614">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L615">    <span class="tok-kw">fn</span> <span class="tok-fn">every_theme_matches_the_website_stylesheet</span>() {</span>
+<span class="ln" id="L616">        <span class="tok-kw">let</span> css = std::fs::<span class="tok-fn">read_to_string</span>(</span>
+<span class="ln" id="L617">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/css/themes.css&quot;</span>),</span>
+<span class="ln" id="L618">        )</span>
+<span class="ln" id="L619">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;themes.css should be readable from the crate directory&quot;</span>);</span>
+<span class="ln" id="L620"></span>
+<span class="ln" id="L621">        <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> THEMES {</span>
+<span class="ln" id="L622">            <span class="tok-kw">let</span> marker = format!(<span class="tok-str">&quot;[data-theme=\&quot;{}\&quot;]&quot;</span>, theme.id);</span>
+<span class="ln" id="L623">            <span class="tok-kw">let</span> start = css</span>
+<span class="ln" id="L624">                .<span class="tok-fn">find</span>(&amp;marker)</span>
+<span class="ln" id="L625">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{} is not in themes.css&quot;</span>, theme.id));</span>
+<span class="ln" id="L626">            <span class="tok-kw">let</span> block_end = css[start..].<span class="tok-fn">find</span>(<span class="tok-str">&#x27;}&#x27;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;unterminated block&quot;</span>) + start;</span>
+<span class="ln" id="L627">            <span class="tok-kw">let</span> block = &amp;css[start..block_end];</span>
+<span class="ln" id="L628"></span>
+<span class="ln" id="L629">            <span class="tok-kw">for</span> (token, expected) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L630">                (<span class="tok-str">&quot;--bg&quot;</span>, theme.bg),</span>
+<span class="ln" id="L631">                (<span class="tok-str">&quot;--bg-soft&quot;</span>, theme.bg_soft),</span>
+<span class="ln" id="L632">                (<span class="tok-str">&quot;--bg-inset&quot;</span>, theme.bg_inset),</span>
+<span class="ln" id="L633">                (<span class="tok-str">&quot;--border&quot;</span>, theme.border),</span>
+<span class="ln" id="L634">                (<span class="tok-str">&quot;--fg&quot;</span>, theme.fg),</span>
+<span class="ln" id="L635">                (<span class="tok-str">&quot;--muted&quot;</span>, theme.muted),</span>
+<span class="ln" id="L636">                (<span class="tok-str">&quot;--accent-2&quot;</span>, theme.accent_2),</span>
+<span class="ln" id="L637">                (<span class="tok-str">&quot;--cyan&quot;</span>, theme.cyan),</span>
+<span class="ln" id="L638">                (<span class="tok-str">&quot;--ok&quot;</span>, theme.ok),</span>
+<span class="ln" id="L639">                (<span class="tok-str">&quot;--warn&quot;</span>, theme.warn),</span>
+<span class="ln" id="L640">                (<span class="tok-str">&quot;--err&quot;</span>, theme.err),</span>
+<span class="ln" id="L641">            ] {</span>
+<span class="ln" id="L642">                <span class="tok-kw">let</span> needle = format!(<span class="tok-str">&quot;{token}:&quot;</span>);</span>
+<span class="ln" id="L643">                <span class="tok-kw">let</span> at = block</span>
+<span class="ln" id="L644">                    .<span class="tok-fn">find</span>(&amp;needle)</span>
+<span class="ln" id="L645">                    .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{} has no {token}&quot;</span>, theme.id));</span>
+<span class="ln" id="L646">                <span class="tok-kw">let</span> rest = &amp;block[at + needle.<span class="tok-fn">len</span>()..];</span>
+<span class="ln" id="L647">                <span class="tok-kw">let</span> hex: String = rest</span>
+<span class="ln" id="L648">                    .<span class="tok-fn">trim_start</span>()</span>
+<span class="ln" id="L649">                    .<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;#&#x27;</span>)</span>
+<span class="ln" id="L650">                    .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L651">                    .<span class="tok-fn">take</span>(<span class="tok-num">6</span>)</span>
+<span class="ln" id="L652">                    .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L653">                <span class="tok-kw">let</span> value = u32::<span class="tok-fn">from_str_radix</span>(&amp;hex, <span class="tok-num">16</span>)</span>
+<span class="ln" id="L654">                    .<span class="tok-fn">unwrap_or_else</span>(|_| panic!(<span class="tok-str">&quot;{} {token} is not a hex colour&quot;</span>, theme.id));</span>
+<span class="ln" id="L655">                assert_eq!(</span>
+<span class="ln" id="L656">                    <span class="tok-fn">rgb</span>(value),</span>
+<span class="ln" id="L657">                    expected,</span>
+<span class="ln" id="L658">                    <span class="tok-str">&quot;{} {token} differs between the app and the website&quot;</span>,</span>
+<span class="ln" id="L659">                    theme.id</span>
+<span class="ln" id="L660">                );</span>
+<span class="ln" id="L661">            }</span>
+<span class="ln" id="L662"></span>
+<span class="ln" id="L663">            <span class="tok-com">// `--accent` needs its own lookup: `--accent-2` contains it as a</span></span>
+<span class="ln" id="L664">            <span class="tok-com">// prefix, so a naive `find` would match the wrong line.</span></span>
+<span class="ln" id="L665">            <span class="tok-kw">let</span> at = block</span>
+<span class="ln" id="L666">                .<span class="tok-fn">match_indices</span>(<span class="tok-str">&quot;--accent:&quot;</span>)</span>
+<span class="ln" id="L667">                .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L668">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{} has no --accent&quot;</span>, theme.id))</span>
+<span class="ln" id="L669">                .<span class="tok-num">0</span>;</span>
+<span class="ln" id="L670">            <span class="tok-kw">let</span> hex: String = block[at + <span class="tok-str">&quot;--accent:&quot;</span>.<span class="tok-fn">len</span>()..]</span>
+<span class="ln" id="L671">                .<span class="tok-fn">trim_start</span>()</span>
+<span class="ln" id="L672">                .<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;#&#x27;</span>)</span>
+<span class="ln" id="L673">                .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L674">                .<span class="tok-fn">take</span>(<span class="tok-num">6</span>)</span>
+<span class="ln" id="L675">                .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L676">            assert_eq!(</span>
+<span class="ln" id="L677">                <span class="tok-fn">rgb</span>(u32::<span class="tok-fn">from_str_radix</span>(&amp;hex, <span class="tok-num">16</span>).<span class="tok-fn">unwrap</span>()),</span>
+<span class="ln" id="L678">                theme.accent,</span>
+<span class="ln" id="L679">                <span class="tok-str">&quot;{} --accent differs between the app and the website&quot;</span>,</span>
+<span class="ln" id="L680">                theme.id</span>
+<span class="ln" id="L681">            );</span>
+<span class="ln" id="L682">        }</span>
+<span class="ln" id="L683">    }</span>
+<span class="ln" id="L684"></span>
+<span class="ln" id="L685">    <span class="tok-com">/// The website offers exactly these themes, in this order. A theme added to</span></span>
+<span class="ln" id="L686">    <span class="tok-com">/// one and not the other is the kind of drift nobody notices.</span></span>
+<span class="ln" id="L687">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L688">    <span class="tok-kw">fn</span> <span class="tok-fn">the_app_offers_the_same_themes_as_the_website</span>() {</span>
+<span class="ln" id="L689">        <span class="tok-kw">let</span> js = std::fs::<span class="tok-fn">read_to_string</span>(</span>
+<span class="ln" id="L690">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/js/theme.js&quot;</span>),</span>
+<span class="ln" id="L691">        )</span>
+<span class="ln" id="L692">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;theme.js should be readable&quot;</span>);</span>
+<span class="ln" id="L693">        <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> THEMES {</span>
+<span class="ln" id="L694">            assert!(</span>
+<span class="ln" id="L695">                js.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;\&quot;{}\&quot;&quot;</span>, theme.id)),</span>
+<span class="ln" id="L696">                <span class="tok-str">&quot;the website does not offer {}&quot;</span>,</span>
+<span class="ln" id="L697">                theme.id</span>
+<span class="ln" id="L698">            );</span>
+<span class="ln" id="L699">        }</span>
+<span class="ln" id="L700">    }</span>
+<span class="ln" id="L701"></span>
+<span class="ln" id="L702">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L703">    <span class="tok-kw">fn</span> <span class="tok-fn">switching_theme_changes_the_palette_and_the_visuals</span>() {</span>
+<span class="ln" id="L704">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
+<span class="ln" id="L705">        <span class="tok-fn">reset</span>();</span>
+<span class="ln" id="L706">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L707">        <span class="tok-fn">install</span>(&amp;ctx);</span>
+<span class="ln" id="L708">        <span class="tok-kw">let</span> tokyo = palette::<span class="tok-fn">bg</span>();</span>
+<span class="ln" id="L709"></span>
+<span class="ln" id="L710">        assert!(<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;paper&quot;</span>));</span>
+<span class="ln" id="L711">        assert_ne!(palette::<span class="tok-fn">bg</span>(), tokyo, <span class="tok-str">&quot;the palette did not change&quot;</span>);</span>
+<span class="ln" id="L712">        assert_eq!(ctx.<span class="tok-fn">style</span>().visuals.panel_fill, palette::<span class="tok-fn">bg</span>());</span>
+<span class="ln" id="L713">        assert!(<span class="tok-fn">active</span>().light, <span class="tok-str">&quot;paper is a light scheme&quot;</span>);</span>
+<span class="ln" id="L714"></span>
+<span class="ln" id="L715">        <span class="tok-com">// An unknown identifier must be ignored rather than fatal: a</span></span>
+<span class="ln" id="L716">        <span class="tok-com">// preferences file naming a theme this build does not have has to</span></span>
+<span class="ln" id="L717">        <span class="tok-com">// still start.</span></span>
+<span class="ln" id="L718">        assert!(!<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;no-such-theme&quot;</span>));</span>
+<span class="ln" id="L719">        assert_eq!(<span class="tok-fn">active</span>().id, <span class="tok-str">&quot;paper&quot;</span>, <span class="tok-str">&quot;an unknown id changed the theme&quot;</span>);</span>
+<span class="ln" id="L720">        <span class="tok-fn">reset</span>();</span>
+<span class="ln" id="L721">    }</span>
+<span class="ln" id="L722"></span>
+<span class="ln" id="L723">    <span class="tok-com">/// An out-of-range index must saturate rather than panic. This is read</span></span>
+<span class="ln" id="L724">    <span class="tok-com">/// inside the paint loop, which is the worst place for an index panic.</span></span>
+<span class="ln" id="L725">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L726">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_index_saturates_instead_of_panicking</span>() {</span>
+<span class="ln" id="L727">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
+<span class="ln" id="L728">        ACTIVE.<span class="tok-fn">store</span>(usize::MAX, Ordering::Relaxed);</span>
+<span class="ln" id="L729">        <span class="tok-kw">let</span> _ = <span class="tok-fn">active</span>();</span>
+<span class="ln" id="L730">        assert_eq!(<span class="tok-fn">active</span>().id, THEMES[THEMES.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>].id);</span>
+<span class="ln" id="L731">        <span class="tok-fn">reset</span>();</span>
+<span class="ln" id="L732">    }</span>
+<span class="ln" id="L733"></span>
+<span class="ln" id="L734">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L735">    <span class="tok-kw">fn</span> <span class="tok-fn">theme_identifiers_are_unique_and_stable</span>() {</span>
+<span class="ln" id="L736">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> ids: Vec&lt;&amp;str&gt; = THEMES.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|t| t.id).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L737">        ids.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L738">        <span class="tok-kw">let</span> count = ids.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L739">        ids.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L740">        assert_eq!(ids.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;duplicate theme id&quot;</span>);</span>
+<span class="ln" id="L741">        <span class="tok-com">// Written into the preferences file, so they must stay ASCII and plain.</span></span>
+<span class="ln" id="L742">        <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> THEMES {</span>
+<span class="ln" id="L743">            assert!(</span>
+<span class="ln" id="L744">                theme.id.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>),</span>
+<span class="ln" id="L745">                <span class="tok-str">&quot;{} is not a stable identifier&quot;</span>,</span>
+<span class="ln" id="L746">                theme.id</span>
+<span class="ln" id="L747">            );</span>
+<span class="ln" id="L748">            assert!(!theme.name.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L749">        }</span>
+<span class="ln" id="L750">    }</span>
+<span class="ln" id="L751"></span>
+<span class="ln" id="L752">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L753">    <span class="tok-kw">fn</span> <span class="tok-fn">font_search_covers_every_supported_platform</span>() {</span>
+<span class="ln" id="L754">        <span class="tok-kw">let</span> paths = <span class="tok-fn">user_font_paths</span>();</span>
+<span class="ln" id="L755">        assert!(paths</span>
+<span class="ln" id="L756">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L757">            .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Windows&quot;</span>)));</span>
+<span class="ln" id="L758">        assert!(paths</span>
+<span class="ln" id="L759">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L760">            .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;usr/share/fonts&quot;</span>)));</span>
+<span class="ln" id="L761">        assert!(paths</span>
+<span class="ln" id="L762">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L763">            .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Library/Fonts&quot;</span>)));</span>
+<span class="ln" id="L764">    }</span>
+<span class="ln" id="L765"></span>
+<span class="ln" id="L766">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L767">    <span class="tok-kw">fn</span> <span class="tok-fn">styling_applies_without_a_window</span>() {</span>
+<span class="ln" id="L768">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
+<span class="ln" id="L769">        <span class="tok-fn">reset</span>();</span>
+<span class="ln" id="L770">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L771">        <span class="tok-fn">install</span>(&amp;ctx);</span>
+<span class="ln" id="L772">        assert_eq!(ctx.<span class="tok-fn">style</span>().visuals.panel_fill, palette::<span class="tok-fn">bg</span>());</span>
+<span class="ln" id="L773">        assert!(ctx.<span class="tok-fn">style</span>().text_styles.<span class="tok-fn">contains_key</span>(&amp;TextStyle::Monospace));</span>
+<span class="ln" id="L774">    }</span>
+<span class="ln" id="L775"></span>
+<span class="ln" id="L776">    <span class="tok-com">/// Missing JetBrains Mono must degrade to the built-in face, never panic.</span></span>
+<span class="ln" id="L777">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L778">    <span class="tok-kw">fn</span> <span class="tok-fn">missing_font_is_not_fatal</span>() {</span>
+<span class="ln" id="L779">        <span class="tok-kw">let</span> _alone = <span class="tok-fn">alone</span>();</span>
+<span class="ln" id="L780">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L781">        <span class="tok-kw">let</span> _found = <span class="tok-fn">install_fonts</span>(&amp;ctx);</span>
+<span class="ln" id="L782">        <span class="tok-fn">install</span>(&amp;ctx);</span>
+<span class="ln" id="L783">    }</span>
+<span class="ln" id="L784">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

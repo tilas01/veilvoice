@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/theme.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 783 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 784 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ next time.
 
 ## What this file contains
 
-783 lines defining **8 functions** (7 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+784 lines defining **8 functions** (7 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -102,7 +102,7 @@ flowchart TD
     n_set_by_id(["set_by_id<br/>line 315"])
     n_user_font_paths["user_font_paths<br/>line 420"]
     n_install_fonts(["install_fonts<br/>line 435"])
-    n_install["install<br/>line 458"]
+    n_install["install<br/>line 459"]
     n_active --> n_themes
     n_by_id --> n_themes
     n_install --> n_active
@@ -116,7 +116,7 @@ flowchart TD
     click n_set_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L315" "open the source"
     click n_user_font_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420" "open the source"
     click n_install_fonts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L458" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L459" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load_custom,n_set_by_id,n_install_fonts entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -145,7 +145,7 @@ flowchart TD
 | `JETBRAINS_MONO_PATHS` <sub>const</sub> | [408](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L408) | Places JetBrains Mono is normally installed. |
 | `user_font_paths` <sub>fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420) |  |
 | `install_fonts` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435) | Load JetBrains Mono if the system has it. |
-| `install` <sub>pub fn</sub> | [458](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L458) | Apply the active theme's visuals and a monospace-everywhere type scale. |
+| `install` <sub>pub fn</sub> | [459](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L459) | Apply the active theme's visuals and a monospace-everywhere type scale. |
 
 ---
 

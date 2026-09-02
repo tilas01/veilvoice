@@ -284,10 +284,10 @@ pub fn show(ui: &mut Ui, style: Style, notice: &Notice) -> bool {
 fn overlay(ui: &mut Ui, notice: &Notice) -> bool {
     let card = Card::for_level(notice.level, p::bg());
     let mut dismissed = false;
-    egui::Frame::none()
+    egui::Frame::new()
         .fill(card.fill)
-        .rounding(egui::Rounding::same(8.0))
-        .inner_margin(egui::Margin::symmetric(12.0, 9.0))
+        .corner_radius(egui::CornerRadius::same(8))
+        .inner_margin(egui::Margin::symmetric(12, 9))
         .show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.label(RichText::new(&notice.text).color(card.text));
@@ -306,10 +306,10 @@ fn overlay(ui: &mut Ui, notice: &Notice) -> bool {
 fn alert(ui: &mut Ui, notice: &Notice) -> bool {
     let card = Card::for_level(notice.level, p::bg());
     let mut dismissed = false;
-    egui::Frame::none()
+    egui::Frame::new()
         .fill(card.fill)
-        .rounding(egui::Rounding::same(4.0))
-        .inner_margin(egui::Margin::same(14.0))
+        .corner_radius(egui::CornerRadius::same(4))
+        .inner_margin(egui::Margin::same(14))
         .show(ui, |ui| {
             ui.label(RichText::new(&notice.text).color(card.text).strong());
             ui.add_space(8.0);

@@ -10,6 +10,114 @@ than a summary written afterwards.
 
 Nothing yet. The next release goes here.
 
+## v0.1.17
+
+**In short**
+
+- The window really does cost nothing when you are not using it now. It was
+  still redrawing sixty times a second, and the reason was the animated logo.
+- Dragging the window no longer competes with a redraw it did not need.
+- The window toolkit is a version newer, which is what made the first two
+  measurable.
+- The About tab says which graphics driver drew the window, read from the
+  driver rather than assumed.
+- A crash caused by a missing system library now names the library and the
+  package that carries it, instead of blaming your graphics card.
+- The version is kept in one place. Twelve files used to repeat it by hand.
+
+**In full**
+
+### The idle window, actually idle this time
+
+v0.1.16 removed a repaint timer and reported the window as costing nothing when
+untouched. It was still drawing about sixty frames a second on an untouched
+window, and the previous fix had removed a different, smaller cause of the same
+symptom.
+
+The cause is named rather than guessed at. `egui` can report why it was asked
+to draw, and asked over ten seconds of an untouched window on the file tab it
+answered `soundbar.rs:117` for 559 of 566 frames. That is the animated mark in
+the header, the row of bars that rises and falls, which asked for another frame
+every 33 milliseconds for as long as the program was open.
+
+Two of the costs of that are ones somebody notices rather than ones a profiler
+does. A laptop left on this screen never lets its processor idle. And a window
+being dragged is competing, every frame, with a full redraw of everything in it,
+which is what "it lags when I move it" is made of: `egui` has no partial
+repaint, so animating 46 by 22 pixels means redrawing 1400 by 1000.
+
+The mark now moves when somebody can see it moving and rests otherwise. Not
+while the window is unfocused. Not while it is being moved or resized, detected
+from the window's own rectangle changing between frames and resumed a quarter
+of a second after it stops. And at twenty frames a second rather than thirty,
+which over a 1.9 second eased cycle is not tellable apart.
+
+Resting is not resetting: a paused mark holds the shape it had rather than
+snapping flat, so clicking into another window and back does not make the logo
+jump. Measured after the change: no frames drawn at all on an untouched window,
+and 0.1 percent of one processor.
+
+### The window toolkit
+
+`eframe` and `egui` move from 0.29 to 0.32. Mostly mechanical, and the reason
+for doing it was that 0.32 can name its own repaint causes, which is what found
+the above.
+
+One thing it broke that nothing would have caught before a user hit it. The new
+version opens `libxkbcommon-x11` by name at startup rather than linking against
+it, so no packaging tool that derives dependencies from a binary's linkage
+knows it is needed. The application built, packaged and installed perfectly and
+then aborted before drawing anything on a machine without that library. It is
+now named explicitly in the `.deb` and the `.rpm`, installed in CI, and
+explained in the README and the guide.
+
+### Reports that describe the failure they are about
+
+Every crash report ended with the same paragraph about OpenGL contexts. That is
+the right guess for a window that never appeared and the wrong one for most of
+the ways this program can fail, and when the missing library above happened it
+sent the reader to look at their graphics driver while the real message, two
+lines above, named a keyboard library.
+
+The note is now chosen from the panic message. A message about a library that
+could not be opened names the library and the package that carries it on each
+family of Linux; anything else keeps the graphics note, which is still the best
+guess when there is nothing else to go on. Matched on the shape of the loader's
+message rather than on one library's name, so the next toolkit upgrade that
+adds one is covered without an edit.
+
+### What drew the window
+
+The About tab has a new line saying which OpenGL version and driver actually
+drew the window, read from the context rather than from what was requested. The
+two agree on most machines and disagree on exactly the ones where somebody is
+asking why the window is slow.
+
+The four choices that decide how a frame reaches the screen are also named in
+the source now instead of inherited from a default: OpenGL through glow, frames
+waiting for the display, no multisampling, and hardware acceleration
+*preferred* rather than required. Preferred is deliberate and the reasoning is
+written down beside it: required refuses to open at all in a virtual machine,
+over a remote desktop, or on a laptop whose hybrid graphics hand over the wrong
+adapter, and a privacy tool that will not run is not more private.
+
+### One version, in one place
+
+The workspace version was repeated by hand in twelve other files: the README's
+install blocks, the WiX recipe, the Homebrew formula, the Flatpak manifest, the
+RPM spec, the packaging documentation. Nothing derived any of them from
+`Cargo.toml` and nothing checked them.
+
+The cost of that is public and specific. The README's install block is the
+first thing anybody runs, and a release that forgets to bump it hands every new
+reader a command that downloads the *previous* version and then verifies it
+successfully, which is the worst kind of failure: it looks like it worked.
+
+`tools/release/version.py` reads `Cargo.toml` and moves or checks every copy,
+and the check runs with every other generator. The three files that keep a
+history are left alone except to have a new entry added, because rewriting a
+changelog is vandalism.
+
 ## v0.1.16
 
 **In short**

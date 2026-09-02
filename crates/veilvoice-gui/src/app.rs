@@ -204,6 +204,12 @@ enum JobDone {
 pub struct VeilVoiceApp {
     tab: Tab,
     jetbrains: bool,
+    /// The OpenGL context actually obtained, read once at startup.
+    ///
+    /// Read from the context rather than from the request: what was asked for
+    /// is in `graphics`, and the two differ on exactly the machines where the
+    /// answer matters.
+    drawing: String,
 
     /// Whether frames are being counted, from `VEILVOICE_FRAME_LOG`.
     frame_log: bool,
@@ -405,6 +411,7 @@ impl VeilVoiceApp {
             fitted: false,
             tab: Tab::File,
             jetbrains: false,
+            drawing: crate::graphics::describe(None),
             intensity: 1.0,
             neutralise_accent: true,
             reseed_secs: 2.0,
@@ -621,6 +628,7 @@ impl VeilVoiceApp {
         let group = crate::group::Group::start_from(preferences.prefs.always_group);
         let mut app = Self {
             jetbrains,
+            drawing: crate::graphics::describe(cc.gl.as_deref()),
             security: Security::load(),
             group,
             preferences,
@@ -853,19 +861,19 @@ impl eframe::App for VeilVoiceApp {
         // that, which is ours to make pleasant.
         egui::TopBottomPanel::top("header")
             .frame(
-                egui::Frame::none()
+                egui::Frame::new()
                     .fill(p::bg_dark())
                     .inner_margin(egui::Margin {
-                        left: 18.0,
-                        right: 18.0,
-                        top: 12.0,
-                        bottom: 10.0,
+                        left: 18,
+                        right: 18,
+                        top: 12,
+                        bottom: 10,
                     })
-                    .rounding(egui::Rounding {
-                        nw: 0.0,
-                        ne: 0.0,
-                        sw: 10.0,
-                        se: 10.0,
+                    .corner_radius(egui::CornerRadius {
+                        nw: 0,
+                        ne: 0,
+                        sw: 10,
+                        se: 10,
                     }),
             )
             .show(ctx, |ui| {
@@ -1919,6 +1927,10 @@ impl VeilVoiceApp {
                 "built-in monospace"
             },
         );
+        // What was actually obtained, not what was asked for. The two agree on
+        // most machines and disagree on exactly the ones where somebody is
+        // asking why the window is slow.
+        field(ui, "drawing", &self.drawing);
 
         ui.add_space(16.0);
         self.updates.section(ui, env!("CARGO_PKG_VERSION"));
@@ -2039,7 +2051,12 @@ fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
             );
         }
 
-        painter.rect_stroke(rect, 2.0, egui::Stroke::new(1.0, p::border()));
+        painter.rect_stroke(
+            rect,
+            2.0,
+            egui::Stroke::new(1.0, p::border()),
+            egui::StrokeKind::Inside,
+        );
 
         let text = if db <= meter::FLOOR_DB {
             "  -inf dBFS".to_string()

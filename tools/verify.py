@@ -131,6 +131,12 @@ GENERATORS = [
 ]
 
 CHECKS = [
+    # First, because a release whose README tells people to download the
+    # previous version is a failure nothing else here would notice: the
+    # command works, the verifier passes, and the reader gets the wrong
+    # program.
+    ("every copy of the version agrees with Cargo.toml",
+     [sys.executable, "tools/release/version.py", "--check"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     ("no screenshot has a capture border",
      [sys.executable, "tools/shots/crop.py", "--check"]),

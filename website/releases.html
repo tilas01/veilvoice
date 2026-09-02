@@ -77,7 +77,60 @@
 <p class="muted">
 Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
-<details class="release" id="v0.1.16" open>
+<details class="release" id="v0.1.17" open>
+<summary><strong>v0.1.17</strong> <span class="muted">In short</span></summary>
+<p><strong>In short</strong></p>
+<ul>
+<li>The window really does cost nothing when you are not using it now. It was still redrawing sixty times a second, and the reason was the animated logo.</li>
+<li>Dragging the window no longer competes with a redraw it did not need.</li>
+<li>The window toolkit is a version newer, which is what made the first two measurable.</li>
+<li>The About tab says which graphics driver drew the window, read from the driver rather than assumed.</li>
+<li>A crash caused by a missing system library now names the library and the package that carries it, instead of blaming your graphics card.</li>
+<li>The version is kept in one place. Twelve files used to repeat it by hand.</li>
+</ul>
+<p><strong>In full</strong></p>
+<h4 id="the-idle-window-actually-idle-this-time">The idle window, actually idle this time</h4>
+<p>v0.1.16 removed a repaint timer and reported the window as costing nothing when untouched. It was still drawing about sixty frames a second on an untouched window, and the previous fix had removed a different, smaller cause of the same symptom.</p>
+<p>The cause is named rather than guessed at. <code>egui</code> can report why it was asked to draw, and asked over ten seconds of an untouched window on the file tab it answered <code>soundbar.rs:117</code> for 559 of 566 frames. That is the animated mark in the header, the row of bars that rises and falls, which asked for another frame every 33 milliseconds for as long as the program was open.</p>
+<p>Two of the costs of that are ones somebody notices rather than ones a profiler does. A laptop left on this screen never lets its processor idle. And a window being dragged is competing, every frame, with a full redraw of everything in it, which is what &quot;it lags when I move it&quot; is made of: <code>egui</code> has no partial repaint, so animating 46 by 22 pixels means redrawing 1400 by 1000.</p>
+<p>The mark now moves when somebody can see it moving and rests otherwise. Not while the window is unfocused. Not while it is being moved or resized, detected from the window&#x27;s own rectangle changing between frames and resumed a quarter of a second after it stops. And at twenty frames a second rather than thirty, which over a 1.9 second eased cycle is not tellable apart.</p>
+<p>Resting is not resetting: a paused mark holds the shape it had rather than snapping flat, so clicking into another window and back does not make the logo jump. Measured after the change: no frames drawn at all on an untouched window, and 0.1 percent of one processor.</p>
+<h4 id="the-window-toolkit">The window toolkit</h4>
+<p><code>eframe</code> and <code>egui</code> move from 0.29 to 0.32. Mostly mechanical, and the reason for doing it was that 0.32 can name its own repaint causes, which is what found the above.</p>
+<p>One thing it broke that nothing would have caught before a user hit it. The new version opens <code>libxkbcommon-x11</code> by name at startup rather than linking against it, so no packaging tool that derives dependencies from a binary&#x27;s linkage knows it is needed. The application built, packaged and installed perfectly and then aborted before drawing anything on a machine without that library. It is now named explicitly in the <code>.deb</code> and the <code>.rpm</code>, installed in CI, and explained in the README and the guide.</p>
+<h4 id="reports-that-describe-the-failure-they-are-about">Reports that describe the failure they are about</h4>
+<p>Every crash report ended with the same paragraph about OpenGL contexts. That is the right guess for a window that never appeared and the wrong one for most of the ways this program can fail, and when the missing library above happened it sent the reader to look at their graphics driver while the real message, two lines above, named a keyboard library.</p>
+<p>The note is now chosen from the panic message. A message about a library that could not be opened names the library and the package that carries it on each family of Linux; anything else keeps the graphics note, which is still the best guess when there is nothing else to go on. Matched on the shape of the loader&#x27;s message rather than on one library&#x27;s name, so the next toolkit upgrade that adds one is covered without an edit.</p>
+<h4 id="what-drew-the-window">What drew the window</h4>
+<p>The About tab has a new line saying which OpenGL version and driver actually drew the window, read from the context rather than from what was requested. The two agree on most machines and disagree on exactly the ones where somebody is asking why the window is slow.</p>
+<p>The four choices that decide how a frame reaches the screen are also named in the source now instead of inherited from a default: OpenGL through glow, frames waiting for the display, no multisampling, and hardware acceleration <em>preferred</em> rather than required. Preferred is deliberate and the reasoning is written down beside it: required refuses to open at all in a virtual machine, over a remote desktop, or on a laptop whose hybrid graphics hand over the wrong adapter, and a privacy tool that will not run is not more private.</p>
+<h4 id="one-version-in-one-place">One version, in one place</h4>
+<p>The workspace version was repeated by hand in twelve other files: the README&#x27;s install blocks, the WiX recipe, the Homebrew formula, the Flatpak manifest, the RPM spec, the packaging documentation. Nothing derived any of them from <code>Cargo.toml</code> and nothing checked them.</p>
+<p>The cost of that is public and specific. The README&#x27;s install block is the first thing anybody runs, and a release that forgets to bump it hands every new reader a command that downloads the <em>previous</em> version and then verifies it successfully, which is the worst kind of failure: it looks like it worked.</p>
+<p><code>tools/release/version.py</code> reads <code>Cargo.toml</code> and moves or checks every copy, and the check runs with every other generator. The three files that keep a history are left alone except to have a new entry added, because rewriting a changelog is vandalism.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.17-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.17-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.17-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.17-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.17-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.17-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.17-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.17" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.16">
 <summary><strong>v0.1.16</strong> <span class="muted">In short</span></summary>
 <p><strong>In short</strong></p>
 <ul>

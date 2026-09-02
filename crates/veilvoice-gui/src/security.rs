@@ -655,11 +655,11 @@ impl Security {
             return;
         }
         let busy = self.busy();
-        egui::Frame::none()
+        egui::Frame::new()
             .fill(p::bg_dark())
             .stroke(egui::Stroke::new(1.0, p::red()))
-            .rounding(8.0)
-            .inner_margin(egui::Margin::symmetric(14.0, 12.0))
+            .corner_radius(8)
+            .inner_margin(egui::Margin::symmetric(14, 12))
             .show(ui, |ui| {
                 ui.label(
                     RichText::new("The app lock was interfered with")
