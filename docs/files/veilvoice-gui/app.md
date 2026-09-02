@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 2679 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 2760 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -144,7 +144,7 @@ started on another thread and the answer is collected later.
 
 ## What this file contains
 
-2679 lines defining **30 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+2760 lines defining **30 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -155,7 +155,7 @@ started on another thread and the answer is collected later.
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `Tab::key` (line 158) -- The name this tab answers to on the command line.
-- `VeilVoiceApp::new` (line 604) -- Build the application, ready for its first frame.
+- `VeilVoiceApp::new` (line 616) -- Build the application, ready for its first frame.
   - reaches: `tab_from_arguments`, `from_key`
 
 ## What calls what
@@ -182,27 +182,27 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_from_key["Tab::from_key<br/>line 186"]
-    n_preferred_output["preferred_output<br/>line 345"]
-    n_preferred_input["preferred_input<br/>line 354"]
-    n_count_frames["VeilVoiceApp::count_frames<br/>line 378"]
-    n_without_devices["VeilVoiceApp::without_devices<br/>line 406"]
-    n_default["VeilVoiceApp::default<br/>line 465"]
-    n_integrity_panel["VeilVoiceApp::integrity_panel<br/>line 504"]
-    n_tab_from_arguments["VeilVoiceApp::<br/>tab_from_arguments<br/>line 590"]
-    n_new(["VeilVoiceApp::new<br/>line 604"])
-    n_apply_policy["VeilVoiceApp::apply_policy<br/>line 676"]
-    n_posture["VeilVoiceApp::posture<br/>line 698"]
-    n_config["VeilVoiceApp::config<br/>line 708"]
-    n_fit_to_the_screen["VeilVoiceApp::<br/>fit_to_the_screen<br/>line 737"]
-    n_update["VeilVoiceApp::update<br/>line 763"]
-    n_poll_job["VeilVoiceApp::poll_job<br/>line 1143"]
-    n_settings["VeilVoiceApp::settings<br/>line 1177"]
-    n_file_tab["VeilVoiceApp::file_tab<br/>line 1288"]
-    n_start_job["VeilVoiceApp::start_job<br/>line 1397"]
-    n_live_tab["VeilVoiceApp::live_tab<br/>line 1476"]
-    n_start_live["VeilVoiceApp::start_live<br/>line 1605"]
-    n_start_live_preview["VeilVoiceApp::<br/>start_live_preview<br/>line 1625"]
-    n_check_failsafe["VeilVoiceApp::check_failsafe<br/>line 1673"]
+    n_preferred_output["preferred_output<br/>line 354"]
+    n_preferred_input["preferred_input<br/>line 363"]
+    n_count_frames["VeilVoiceApp::count_frames<br/>line 387"]
+    n_without_devices["VeilVoiceApp::without_devices<br/>line 415"]
+    n_default["VeilVoiceApp::default<br/>line 477"]
+    n_integrity_panel["VeilVoiceApp::integrity_panel<br/>line 516"]
+    n_tab_from_arguments["VeilVoiceApp::<br/>tab_from_arguments<br/>line 602"]
+    n_new(["VeilVoiceApp::new<br/>line 616"])
+    n_apply_policy["VeilVoiceApp::apply_policy<br/>line 688"]
+    n_posture["VeilVoiceApp::posture<br/>line 710"]
+    n_config["VeilVoiceApp::config<br/>line 720"]
+    n_fit_to_the_screen["VeilVoiceApp::<br/>fit_to_the_screen<br/>line 749"]
+    n_update["VeilVoiceApp::update<br/>line 775"]
+    n_poll_job["VeilVoiceApp::poll_job<br/>line 1202"]
+    n_settings["VeilVoiceApp::settings<br/>line 1236"]
+    n_file_tab["VeilVoiceApp::file_tab<br/>line 1347"]
+    n_start_job["VeilVoiceApp::start_job<br/>line 1456"]
+    n_live_tab["VeilVoiceApp::live_tab<br/>line 1535"]
+    n_start_live["VeilVoiceApp::start_live<br/>line 1664"]
+    n_start_live_preview["VeilVoiceApp::<br/>start_live_preview<br/>line 1684"]
+    n_check_failsafe["VeilVoiceApp::check_failsafe<br/>line 1732"]
     n_apply_policy --> n_posture
     n_config --> n_posture
     n_default --> n_preferred_input
@@ -229,27 +229,27 @@ flowchart TD
     n_update --> n_live_tab
     n_update --> n_poll_job
     click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L186" "open the source"
-    click n_preferred_output href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L345" "open the source"
-    click n_preferred_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L354" "open the source"
-    click n_count_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L378" "open the source"
-    click n_without_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L406" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L465" "open the source"
-    click n_integrity_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L504" "open the source"
-    click n_tab_from_arguments href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L590" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L604" "open the source"
-    click n_apply_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L676" "open the source"
-    click n_posture href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L698" "open the source"
-    click n_config href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L708" "open the source"
-    click n_fit_to_the_screen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L737" "open the source"
-    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L763" "open the source"
-    click n_poll_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1143" "open the source"
-    click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1177" "open the source"
-    click n_file_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1288" "open the source"
-    click n_start_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1397" "open the source"
-    click n_live_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1476" "open the source"
-    click n_start_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1605" "open the source"
-    click n_start_live_preview href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1625" "open the source"
-    click n_check_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1673" "open the source"
+    click n_preferred_output href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L354" "open the source"
+    click n_preferred_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L363" "open the source"
+    click n_count_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L387" "open the source"
+    click n_without_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L415" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L477" "open the source"
+    click n_integrity_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L516" "open the source"
+    click n_tab_from_arguments href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L602" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L616" "open the source"
+    click n_apply_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L688" "open the source"
+    click n_posture href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L710" "open the source"
+    click n_config href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L720" "open the source"
+    click n_fit_to_the_screen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L749" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L775" "open the source"
+    click n_poll_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1202" "open the source"
+    click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1236" "open the source"
+    click n_file_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1347" "open the source"
+    click n_start_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1456" "open the source"
+    click n_live_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1535" "open the source"
+    click n_start_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1664" "open the source"
+    click n_start_live_preview href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1684" "open the source"
+    click n_check_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1732" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -270,34 +270,34 @@ flowchart TD
 | `Tab::from_key` <sub>pub fn</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L186) | The tab with this name, if it is one. |
 | `JobDone` <sub>enum</sub> | [193](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L193) | Result of a background file job. |
 | `VeilVoiceApp` <sub>pub struct</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L204) | Application state. |
-| `preferred_output` <sub>fn</sub> | [345](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L345) | Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default. |
-| `preferred_input` <sub>fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L354) | Pick the input to start on: the system default, else whatever is first. |
-| `VeilVoiceApp::count_frames` <sub>fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L378) | Frames per second, to stderr, when VEILVOICE_FRAME_LOG is set. |
-| `VeilVoiceApp::without_devices` <sub>fn</sub> | [406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L406) | The application with no devices enumerated. |
-| `VeilVoiceApp::default` <sub>fn</sub> | [465](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L465) |  |
-| `VeilVoiceApp::integrity_panel` <sub>fn</sub> | [504](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L504) | Build the app, applying theme and fonts to ctx. |
-| `VeilVoiceApp::tab_from_arguments` <sub>fn</sub> | [590](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L590) |  |
-| `VeilVoiceApp::new` <sub>pub fn</sub> | [604](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L604) | Build the application, ready for its first frame. |
-| `VeilVoiceApp::apply_policy` <sub>fn</sub> | [676](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L676) | Bring the controls into line with the policy, once, at startup. |
-| `VeilVoiceApp::posture` <sub>fn</sub> | [698](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L698) | The settings as they will actually be used, after the policy. |
-| `VeilVoiceApp::config` <sub>fn</sub> | [708](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L708) |  |
-| `VeilVoiceApp::fit_to_the_screen` <sub>fn</sub> | [737](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L737) | Open at a size this screen can actually show, once, on the first frame. |
-| `VeilVoiceApp::update` <sub>fn</sub> | [763](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L763) |  |
-| `VeilVoiceApp::poll_job` <sub>fn</sub> | [1143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1143) |  |
-| `VeilVoiceApp::settings` <sub>fn</sub> | [1177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1177) |  |
-| `VeilVoiceApp::file_tab` <sub>fn</sub> | [1288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1288) |  |
-| `VeilVoiceApp::start_job` <sub>fn</sub> | [1397](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1397) |  |
-| `VeilVoiceApp::live_tab` <sub>fn</sub> | [1476](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1476) |  |
-| `VeilVoiceApp::start_live` <sub>fn</sub> | [1605](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1605) |  |
-| `VeilVoiceApp::start_live_preview` <sub>fn</sub> | [1625](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1625) | The same session, pointed at this machine's own output. |
-| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [1673](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1673) | Ask the safety catch what it makes of what is holding a microphone. |
-| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [1749](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1749) | Re-scan on a timer rather than every frame. |
-| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [1779](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1779) |  |
-| `VeilVoiceApp::previous_crash` <sub>fn</sub> | [1862](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1862) | Say so if the last run ended badly, and offer the file. |
-| `VeilVoiceApp::about_tab` <sub>fn</sub> | [1887](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1887) |  |
-| `device_picker` <sub>fn</sub> | [1976](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1976) |  |
-| `field` <sub>fn</sub> | [2001](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2001) |  |
-| `meter` <sub>fn</sub> | [2019](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2019) | One level meter: a bar on the decibel scale, and the number beside it. |
+| `preferred_output` <sub>fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L354) | Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default. |
+| `preferred_input` <sub>fn</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L363) | Pick the input to start on: the system default, else whatever is first. |
+| `VeilVoiceApp::count_frames` <sub>fn</sub> | [387](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L387) | Frames per second, to stderr, when VEILVOICE_FRAME_LOG is set. |
+| `VeilVoiceApp::without_devices` <sub>fn</sub> | [415](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L415) | The application with no devices enumerated. |
+| `VeilVoiceApp::default` <sub>fn</sub> | [477](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L477) |  |
+| `VeilVoiceApp::integrity_panel` <sub>fn</sub> | [516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L516) | Build the app, applying theme and fonts to ctx. |
+| `VeilVoiceApp::tab_from_arguments` <sub>fn</sub> | [602](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L602) |  |
+| `VeilVoiceApp::new` <sub>pub fn</sub> | [616](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L616) | Build the application, ready for its first frame. |
+| `VeilVoiceApp::apply_policy` <sub>fn</sub> | [688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L688) | Bring the controls into line with the policy, once, at startup. |
+| `VeilVoiceApp::posture` <sub>fn</sub> | [710](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L710) | The settings as they will actually be used, after the policy. |
+| `VeilVoiceApp::config` <sub>fn</sub> | [720](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L720) |  |
+| `VeilVoiceApp::fit_to_the_screen` <sub>fn</sub> | [749](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L749) | Open at a size this screen can actually show, once, on the first frame. |
+| `VeilVoiceApp::update` <sub>fn</sub> | [775](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L775) |  |
+| `VeilVoiceApp::poll_job` <sub>fn</sub> | [1202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1202) |  |
+| `VeilVoiceApp::settings` <sub>fn</sub> | [1236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1236) |  |
+| `VeilVoiceApp::file_tab` <sub>fn</sub> | [1347](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1347) |  |
+| `VeilVoiceApp::start_job` <sub>fn</sub> | [1456](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1456) |  |
+| `VeilVoiceApp::live_tab` <sub>fn</sub> | [1535](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1535) |  |
+| `VeilVoiceApp::start_live` <sub>fn</sub> | [1664](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1664) |  |
+| `VeilVoiceApp::start_live_preview` <sub>fn</sub> | [1684](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1684) | The same session, pointed at this machine's own output. |
+| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [1732](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1732) | Ask the safety catch what it makes of what is holding a microphone. |
+| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [1808](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1808) | Re-scan on a timer rather than every frame. |
+| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [1838](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1838) |  |
+| `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [1928](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1928) | Say so if the last run ended badly, and offer the file. |
+| `VeilVoiceApp::about_tab` <sub>fn</sub> | [1944](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1944) |  |
+| `device_picker` <sub>fn</sub> | [2033](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2033) |  |
+| `field` <sub>fn</sub> | [2058](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2058) |  |
+| `meter` <sub>fn</sub> | [2076](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2076) | One level meter: a bar on the decibel scale, and the number beside it. |
 
 ---
 

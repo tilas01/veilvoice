@@ -60,6 +60,7 @@
 mod app;
 pub mod autolock;
 pub mod crashlog;
+pub mod crashreport;
 pub mod dialog;
 pub mod graphics;
 pub mod group;
@@ -77,6 +78,7 @@ pub mod setup;
 pub mod soundbar;
 pub mod storage;
 pub mod theme;
+pub mod tour;
 pub mod updates;
 pub mod verify;
 pub mod watchfeed;
