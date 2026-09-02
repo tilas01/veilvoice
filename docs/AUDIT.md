@@ -40,9 +40,8 @@ longer offered as the explanation for anything.
 
 ## The twenty-first round: the verifier where a person actually stands, and 2.19 billion inputs
 
-Three defects (F-107, F-108 and F-109), the first two about which directory
-the verifier answers for and the third about what the main binary says when
-there is nobody to ask, and a coverage-guided campaign at twice the length of any before it, which
+Four defects (F-107 to F-110), every one of them found by using the programs
+rather than reading them, and a coverage-guided campaign at twice the length of any before it, which
 found nothing.
 
 ### F-107 -- the verifier could not find the release it was standing in
@@ -198,6 +197,65 @@ read. The first repair was a message that was right for `anonymise` and wrong
 for `encrypt`, for the same reason, inside the hour. It was caught the same way
 the original was, by running the other command rather than re-reading the
 patch.
+
+### F-110 -- the plan printed in the user guide did not parse
+
+`veilvoice-conversation/src/plan.rs`, and `docs/USER_GUIDE.md`.
+
+Found by following the user guide to use conversation mode, which is the way
+somebody uses it for the first time. Copying the example plan it prints and
+running `veilvoice conversation inspect` gave:
+
+    ✗ malformed plan: line 7: unknown keyword "turn 19.000"
+
+The plan format separates its fields with two spaces, deliberately, so that a
+speaker's name and a turn's subtitle can contain single spaces without needing
+quotes. The guide's example lines its columns up by eye:
+
+    turn  0.000   4.200  0  So, how did it go?
+    turn  4.100  19.050  1
+    turn 19.000  22.400  0  And after that?
+
+The third line has one space after `turn`, because `19.000` is a digit wider
+than `4.100`. The parser read `turn 19.000` as the keyword and refused it.
+
+**Neither half was wrong on its own, which is why it survived.** The example is
+what a person writes: columns lined up so the file can be read. The parser's
+two-space rule is a real requirement for the fields that can contain a space.
+It was applied to the fields that cannot: a keyword, a speaker index and a pair
+of timestamps have no spaces in them and never will. Nothing compared the guide
+to the parser, so both stayed as they were.
+
+The three numbers on a turn and the index on a speaker now end at any run of
+whitespace, one space, several, or a tab. Two spaces still separate a name from
+a picture path and the numbers from the subtitle, so every plan that parsed
+before parses identically, and the 69 existing tests pass unchanged.
+
+The regression test reads the example **out of `docs/USER_GUIDE.md`** rather
+than keeping a copy of it. A copy is the thing that drifts, which is the
+failure this is here to prevent: F-71 was two copies of a number and F-103 was
+a drawing compared against a file written by the same command. The test
+extracts every fenced block in the guide that begins `VEILCONV1` and parses it,
+so a guide edited into something the program refuses fails the build, and so
+does a parser tightened past what the guide shows.
+
+### Conversation mode, measured end to end
+
+Not a finding, and worth recording because it is the first time this path has
+been run outside its own unit tests. A twenty-second recording of two
+synthesised voices at 110 Hz and 175 Hz, with a four-turn plan:
+
+| | input | output |
+|---|---:|---:|
+| Me, first turn | 110.1 Hz | 93.8 Hz |
+| Sam, first turn | 175.2 Hz | 234.1 Hz |
+| Me, second turn | 110.1 Hz | 93.8 Hz |
+| Sam, second turn | 175.2 Hz | 234.1 Hz |
+
+Each speaker lands on their own canonical register, the same one in both of
+their turns, and the two are far apart. `--page` wrote the audio, a WebVTT
+track, an SRT file and the player page. That is markers 46 to 51 doing what
+they say, measured rather than asserted.
 
 ### The campaign, at twenty minutes a target
 
@@ -2128,7 +2186,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1137 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1140 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3745,7 +3803,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and nine defects found and fixed (F-1 to F-109), across twenty-one
+**One hundred and ten defects found and fixed (F-1 to F-110), across twenty-one
 rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
