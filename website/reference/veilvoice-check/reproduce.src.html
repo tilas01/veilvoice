@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-check/src/reproduce.rs</code></h1>
-<p style="color:var(--muted)"><a href="reproduce.html">what this file is for</a> &middot; <a href="../veilvoice-check.html">veilvoice-check</a> &middot; 436 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="reproduce.html">what this file is for</a> &middot; <a href="../veilvoice-check.html">veilvoice-check</a> &middot; 536 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -164,339 +164,443 @@
 <span class="ln" id="L110">    }</span>
 </span>
 <span class="ln" id="L111"></span>
-<span class="src-item" id="fn-system-hash_tool">
-<span class="ln" id="L112">    <span class="tok-com">/// How this system spells &quot;hash this file&quot;.</span></span>
-<span class="ln" id="L113">    <span class="tok-kw">fn</span> <span class="tok-fn">hash_tool</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="src-item" id="fn-system-hash_check_command">
+<span class="ln" id="L112">    <span class="tok-com">/// How this system checks a folder against a `SHA256SUMS`.</span></span>
+<span class="ln" id="L113">    <span class="tok-kw">fn</span> <span class="tok-fn">hash_check_command</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
 <span class="ln" id="L114">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L115">            <span class="tok-com">// Coreutils. Also what WSL has.</span></span>
-<span class="ln" id="L116">            System::Linux =&gt; <span class="tok-str">&quot;sha256sum&quot;</span>,</span>
-<span class="ln" id="L117">            <span class="tok-com">// macOS ships `shasum`, and `sha256sum` is not there.</span></span>
-<span class="ln" id="L118">            System::MacOs =&gt; <span class="tok-str">&quot;shasum -a 256&quot;</span>,</span>
-<span class="ln" id="L119">            <span class="tok-com">// FreeBSD, OpenBSD and NetBSD all ship `sha256`, whose `-q` prints</span></span>
-<span class="ln" id="L120">            <span class="tok-com">// the digest alone.</span></span>
-<span class="ln" id="L121">            System::Bsd =&gt; <span class="tok-str">&quot;sha256 -q&quot;</span>,</span>
-<span class="ln" id="L122">            System::Windows =&gt; <span class="tok-str">&quot;certutil -hashfile&quot;</span>,</span>
-<span class="ln" id="L123">        }</span>
-<span class="ln" id="L124">    }</span>
+<span class="ln" id="L115">            System::Linux =&gt; <span class="tok-str">&quot;sha256sum -c SHA256SUMS --ignore-missing&quot;</span>,</span>
+<span class="ln" id="L116">            System::MacOs =&gt; <span class="tok-str">&quot;shasum -a 256 -c SHA256SUMS --ignore-missing&quot;</span>,</span>
+<span class="ln" id="L117">            <span class="tok-com">// The BSDs&#x27; `sha256` has `-c`, and it does not take</span></span>
+<span class="ln" id="L118">            <span class="tok-com">// `--ignore-missing`; `-q` keeps the output to the verdict.</span></span>
+<span class="ln" id="L119">            System::Bsd =&gt; <span class="tok-str">&quot;sha256 -c SHA256SUMS&quot;</span>,</span>
+<span class="ln" id="L120">            System::Windows =&gt; <span class="tok-str">&quot;certutil -hashfile&quot;</span>,</span>
+<span class="ln" id="L121">        }</span>
+<span class="ln" id="L122">    }</span>
 </span>
-<span class="ln" id="L125">}</span>
-<span class="ln" id="L126"></span>
+<span class="ln" id="L123"></span>
+<span class="src-item" id="fn-system-hash_tool">
+<span class="ln" id="L124">    <span class="tok-com">/// How this system spells &quot;hash this file&quot;.</span></span>
+<span class="ln" id="L125">    <span class="tok-kw">fn</span> <span class="tok-fn">hash_tool</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L126">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L127">            <span class="tok-com">// Coreutils. Also what WSL has.</span></span>
+<span class="ln" id="L128">            System::Linux =&gt; <span class="tok-str">&quot;sha256sum&quot;</span>,</span>
+<span class="ln" id="L129">            <span class="tok-com">// macOS ships `shasum`, and `sha256sum` is not there.</span></span>
+<span class="ln" id="L130">            System::MacOs =&gt; <span class="tok-str">&quot;shasum -a 256&quot;</span>,</span>
+<span class="ln" id="L131">            <span class="tok-com">// FreeBSD, OpenBSD and NetBSD all ship `sha256`, whose `-q` prints</span></span>
+<span class="ln" id="L132">            <span class="tok-com">// the digest alone.</span></span>
+<span class="ln" id="L133">            System::Bsd =&gt; <span class="tok-str">&quot;sha256 -q&quot;</span>,</span>
+<span class="ln" id="L134">            System::Windows =&gt; <span class="tok-str">&quot;certutil -hashfile&quot;</span>,</span>
+<span class="ln" id="L135">        }</span>
+<span class="ln" id="L136">    }</span>
+</span>
+<span class="ln" id="L137">}</span>
+<span class="ln" id="L138"></span>
+<span class="src-item" id="fn-veilvoice_check_fingerprint">
+<span class="ln" id="L139"><span class="tok-com">/// The project&#x27;s signing fingerprint, from the one place it is written.</span></span>
+<span class="ln" id="L140"><span class="tok-kw">fn</span> <span class="tok-fn">veilvoice_check_fingerprint</span>() -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L141">    <span class="tok-kw">crate</span>::FINGERPRINT</span>
+<span class="ln" id="L142">}</span>
+</span>
+<span class="ln" id="L143"></span>
 <span class="src-item" id="fn-script">
-<span class="ln" id="L127"><span class="tok-com">/// The script for this system.</span></span>
-<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">script</span>(system: System) -&gt; String {</span>
-<span class="ln" id="L129">    <span class="tok-kw">match</span> system {</span>
-<span class="ln" id="L130">        System::Windows =&gt; <span class="tok-fn">windows</span>(),</span>
-<span class="ln" id="L131">        other =&gt; <span class="tok-fn">posix</span>(other),</span>
-<span class="ln" id="L132">    }</span>
-<span class="ln" id="L133">}</span>
+<span class="ln" id="L144"><span class="tok-com">/// The script for this system.</span></span>
+<span class="ln" id="L145"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">script</span>(system: System) -&gt; String {</span>
+<span class="ln" id="L146">    <span class="tok-kw">match</span> system {</span>
+<span class="ln" id="L147">        System::Windows =&gt; <span class="tok-fn">windows</span>(),</span>
+<span class="ln" id="L148">        other =&gt; <span class="tok-fn">posix</span>(other),</span>
+<span class="ln" id="L149">    }</span>
+<span class="ln" id="L150">}</span>
 </span>
-<span class="ln" id="L134"></span>
+<span class="ln" id="L151"></span>
 <span class="src-item" id="fn-posix">
-<span class="ln" id="L135"><span class="tok-com">/// The POSIX script, which covers Linux, macOS and the BSDs.</span></span>
-<span class="ln" id="L136"><span class="tok-com">///</span></span>
-<span class="ln" id="L137"><span class="tok-com">/// One script rather than three, because they differ in exactly one place:</span></span>
-<span class="ln" id="L138"><span class="tok-com">/// the name of the program that computes a SHA-256. Writing three would mean</span></span>
-<span class="ln" id="L139"><span class="tok-com">/// three places for the *logic* to drift, which is the part that matters.</span></span>
-<span class="ln" id="L140"><span class="tok-kw">fn</span> <span class="tok-fn">posix</span>(system: System) -&gt; String {</span>
-<span class="ln" id="L141">    <span class="tok-kw">let</span> hash = system.<span class="tok-fn">hash_tool</span>();</span>
-<span class="ln" id="L142">    <span class="tok-com">// `sha256sum` and `shasum` print &quot;digest  name&quot;; BSD `sha256 -q` prints</span></span>
-<span class="ln" id="L143">    <span class="tok-com">// the digest alone.</span></span>
-<span class="ln" id="L144">    <span class="tok-kw">let</span> take_digest = <span class="tok-kw">match</span> system {</span>
-<span class="ln" id="L145">        System::Bsd =&gt; <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L146">        _ =&gt; <span class="tok-str">&quot; | cut -d&#x27; &#x27; -f1&quot;</span>,</span>
-<span class="ln" id="L147">    };</span>
-<span class="ln" id="L148">    format!(</span>
-<span class="ln" id="L149">        <span class="tok-str">r##&quot;#!/bin/sh</span></span>
-<span class="ln" id="L150"><span class="tok-str"># Rebuild a VeilVoice release and compare it with the published binary.</span></span>
-<span class="ln" id="L151"><span class="tok-str">#</span></span>
-<span class="ln" id="L152"><span class="tok-str">#     sh {file} &lt;version&gt;          e.g.  sh {file} v0.1.15</span></span>
-<span class="ln" id="L153"><span class="tok-str">#</span></span>
-<span class="ln" id="L154"><span class="tok-str"># What this proves, and what checking a hash does not</span></span>
-<span class="ln" id="L155"><span class="tok-str">#</span></span>
-<span class="ln" id="L156"><span class="tok-str"># Checking a download against SHA256SUMS proves the file is the one whose hash</span></span>
-<span class="ln" id="L157"><span class="tok-str"># was signed. It says nothing about what is inside it: the same person signed</span></span>
-<span class="ln" id="L158"><span class="tok-str"># both. This rebuilds the release from source and compares the result, so a</span></span>
-<span class="ln" id="L159"><span class="tok-str"># match means the published binary is what this source compiles to.</span></span>
-<span class="ln" id="L160"><span class="tok-str">#</span></span>
-<span class="ln" id="L161"><span class="tok-str"># That moves the question from &quot;do I trust the publisher&quot; to &quot;do I trust the</span></span>
-<span class="ln" id="L162"><span class="tok-str"># source&quot;, and the source is here to read.</span></span>
-<span class="ln" id="L163"><span class="tok-str">#</span></span>
-<span class="ln" id="L164"><span class="tok-str"># What this needs, and what it will not do for you</span></span>
-<span class="ln" id="L165"><span class="tok-str">#</span></span>
-<span class="ln" id="L166"><span class="tok-str">#   git, and a rustup-managed Rust toolchain.</span></span>
-<span class="ln" id="L167"><span class="tok-str">#</span></span>
-<span class="ln" id="L168"><span class="tok-str"># It will not install either. Being asked to let an unfamiliar program put a</span></span>
-<span class="ln" id="L169"><span class="tok-str"># compiler on your machine, as part of deciding whether to trust that program,</span></span>
-<span class="ln" id="L170"><span class="tok-str"># is not a reasonable thing to be asked.</span></span>
-<span class="ln" id="L171"><span class="tok-str">#</span></span>
-<span class="ln" id="L172"><span class="tok-str"># The compiler version is deliberately not written down here. It is pinned in</span></span>
-<span class="ln" id="L173"><span class="tok-str"># rust-toolchain.toml in the checkout, and rustup reads that by itself. A</span></span>
-<span class="ln" id="L174"><span class="tok-str"># version typed into this script would be wrong the first time the pin moved,</span></span>
-<span class="ln" id="L175"><span class="tok-str"># and would report a genuine release as tampered with.</span></span>
-<span class="ln" id="L176"></span>
-<span class="ln" id="L177"><span class="tok-str">set -eu</span></span>
-<span class="ln" id="L178"></span>
-<span class="ln" id="L179"><span class="tok-str">VERSION=${{1:-}}</span></span>
-<span class="ln" id="L180"><span class="tok-str">[ -n &quot;$VERSION&quot; ] || {{ echo &quot;usage: sh $0 &lt;version&gt;   e.g. $0 v0.1.15&quot; &gt;&amp;2; exit 2; }}</span></span>
-<span class="ln" id="L181"></span>
-<span class="ln" id="L182"><span class="tok-str">say() {{ printf &#x27;%s\n&#x27; &quot;$*&quot;; }}</span></span>
-<span class="ln" id="L183"><span class="tok-str">die() {{ say &quot;FAILED: $*&quot;; exit 1; }}</span></span>
-<span class="ln" id="L184"></span>
-<span class="ln" id="L185"><span class="tok-str">for tool in git cargo; do</span></span>
-<span class="ln" id="L186"><span class="tok-str">    command -v &quot;$tool&quot; &gt;/dev/null 2&gt;&amp;1 || die &quot;$tool is not installed.&quot;</span></span>
-<span class="ln" id="L187"><span class="tok-str">done</span></span>
-<span class="ln" id="L188"><span class="tok-str">command -v rustup &gt;/dev/null 2&gt;&amp;1 \</span></span>
-<span class="ln" id="L189"><span class="tok-str">    || say &quot;note: rustup was not found, so the pinned compiler is not guaranteed.</span></span>
-<span class="ln" id="L190"><span class="tok-str">    A different compiler produces a different binary, and a mismatch below</span></span>
-<span class="ln" id="L191"><span class="tok-str">    would then say nothing about the release.&quot;</span></span>
-<span class="ln" id="L192"></span>
-<span class="ln" id="L193"><span class="tok-str">work=$(mktemp -d)</span></span>
-<span class="ln" id="L194"><span class="tok-str">trap &#x27;rm -rf &quot;$work&quot;&#x27; EXIT</span></span>
-<span class="ln" id="L195"><span class="tok-str">say &quot;building in   $work&quot;</span></span>
-<span class="ln" id="L196"></span>
-<span class="ln" id="L197"><span class="tok-str">git clone --quiet --depth 1 --branch &quot;$VERSION&quot; \</span></span>
-<span class="ln" id="L198"><span class="tok-str">    https://github.com/tilas01/veilvoice &quot;$work/src&quot; \</span></span>
-<span class="ln" id="L199"><span class="tok-str">    || die &quot;no such version: $VERSION&quot;</span></span>
-<span class="ln" id="L200"><span class="tok-str">cd &quot;$work/src&quot;</span></span>
+<span class="ln" id="L152"><span class="tok-com">/// The POSIX script, which covers Linux, macOS and the BSDs.</span></span>
+<span class="ln" id="L153"><span class="tok-com">///</span></span>
+<span class="ln" id="L154"><span class="tok-com">/// One script rather than three, because they differ in exactly one place:</span></span>
+<span class="ln" id="L155"><span class="tok-com">/// the name of the program that computes a SHA-256. Writing three would mean</span></span>
+<span class="ln" id="L156"><span class="tok-com">/// three places for the *logic* to drift, which is the part that matters.</span></span>
+<span class="ln" id="L157"><span class="tok-kw">fn</span> <span class="tok-fn">posix</span>(system: System) -&gt; String {</span>
+<span class="ln" id="L158">    <span class="tok-kw">let</span> hash = system.<span class="tok-fn">hash_tool</span>();</span>
+<span class="ln" id="L159">    <span class="tok-com">// `sha256sum` and `shasum` print &quot;digest  name&quot;; BSD `sha256 -q` prints</span></span>
+<span class="ln" id="L160">    <span class="tok-com">// the digest alone.</span></span>
+<span class="ln" id="L161">    <span class="tok-kw">let</span> take_digest = <span class="tok-kw">match</span> system {</span>
+<span class="ln" id="L162">        System::Bsd =&gt; <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L163">        _ =&gt; <span class="tok-str">&quot; | cut -d&#x27; &#x27; -f1&quot;</span>,</span>
+<span class="ln" id="L164">    };</span>
+<span class="ln" id="L165">    format!(</span>
+<span class="ln" id="L166">        <span class="tok-str">r##&quot;#!/bin/sh</span></span>
+<span class="ln" id="L167"><span class="tok-str"># Rebuild a VeilVoice release and compare it with the published binary.</span></span>
+<span class="ln" id="L168"><span class="tok-str">#</span></span>
+<span class="ln" id="L169"><span class="tok-str">#     sh {file} &lt;version&gt;          e.g.  sh {file} v0.1.15</span></span>
+<span class="ln" id="L170"><span class="tok-str">#</span></span>
+<span class="ln" id="L171"><span class="tok-str"># What this proves, and what checking a hash does not</span></span>
+<span class="ln" id="L172"><span class="tok-str">#</span></span>
+<span class="ln" id="L173"><span class="tok-str"># Checking a download against SHA256SUMS proves the file is the one whose hash</span></span>
+<span class="ln" id="L174"><span class="tok-str"># was signed. It says nothing about what is inside it: the same person signed</span></span>
+<span class="ln" id="L175"><span class="tok-str"># both. This rebuilds the release from source and compares the result, so a</span></span>
+<span class="ln" id="L176"><span class="tok-str"># match means the published binary is what this source compiles to.</span></span>
+<span class="ln" id="L177"><span class="tok-str">#</span></span>
+<span class="ln" id="L178"><span class="tok-str"># That moves the question from &quot;do I trust the publisher&quot; to &quot;do I trust the</span></span>
+<span class="ln" id="L179"><span class="tok-str"># source&quot;, and the source is here to read.</span></span>
+<span class="ln" id="L180"><span class="tok-str">#</span></span>
+<span class="ln" id="L181"><span class="tok-str"># What this needs, and what it will not do for you</span></span>
+<span class="ln" id="L182"><span class="tok-str">#</span></span>
+<span class="ln" id="L183"><span class="tok-str">#   git, and a rustup-managed Rust toolchain.</span></span>
+<span class="ln" id="L184"><span class="tok-str">#</span></span>
+<span class="ln" id="L185"><span class="tok-str"># It will not install either. Being asked to let an unfamiliar program put a</span></span>
+<span class="ln" id="L186"><span class="tok-str"># compiler on your machine, as part of deciding whether to trust that program,</span></span>
+<span class="ln" id="L187"><span class="tok-str"># is not a reasonable thing to be asked.</span></span>
+<span class="ln" id="L188"><span class="tok-str">#</span></span>
+<span class="ln" id="L189"><span class="tok-str"># The compiler version is deliberately not written down here. It is pinned in</span></span>
+<span class="ln" id="L190"><span class="tok-str"># rust-toolchain.toml in the checkout, and rustup reads that by itself. A</span></span>
+<span class="ln" id="L191"><span class="tok-str"># version typed into this script would be wrong the first time the pin moved,</span></span>
+<span class="ln" id="L192"><span class="tok-str"># and would report a genuine release as tampered with.</span></span>
+<span class="ln" id="L193"></span>
+<span class="ln" id="L194"><span class="tok-str">set -eu</span></span>
+<span class="ln" id="L195"></span>
+<span class="ln" id="L196"><span class="tok-str">VERSION=${{1:-}}</span></span>
+<span class="ln" id="L197"><span class="tok-str">[ -n &quot;$VERSION&quot; ] || {{ echo &quot;usage: sh $0 &lt;version&gt;   e.g. $0 v0.1.15&quot; &gt;&amp;2; exit 2; }}</span></span>
+<span class="ln" id="L198"></span>
+<span class="ln" id="L199"><span class="tok-str">say() {{ printf &#x27;%s\n&#x27; &quot;$*&quot;; }}</span></span>
+<span class="ln" id="L200"><span class="tok-str">die() {{ say &quot;FAILED: $*&quot;; exit 1; }}</span></span>
 <span class="ln" id="L201"></span>
-<span class="ln" id="L202"><span class="tok-str"># The commit date, which is what the release build used. Without this the</span></span>
-<span class="ln" id="L203"><span class="tok-str"># binary carries the time of this build and can never match.</span></span>
-<span class="ln" id="L204"><span class="tok-str">SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)</span></span>
-<span class="ln" id="L205"><span class="tok-str">export SOURCE_DATE_EPOCH</span></span>
-<span class="ln" id="L206"></span>
-<span class="ln" id="L207"><span class="tok-str"># The same remapping the release build applies, so paths inside the binary do</span></span>
-<span class="ln" id="L208"><span class="tok-str"># not depend on where it was built. Hardcoding one person&#x27;s directory would</span></span>
-<span class="ln" id="L209"><span class="tok-str"># make the build reproducible only for them.</span></span>
-<span class="ln" id="L210"><span class="tok-str">RUSTFLAGS=&quot;--remap-path-prefix=$work/src=/veilvoice --remap-path-prefix=$HOME=/home&quot;</span></span>
-<span class="ln" id="L211"><span class="tok-str">export RUSTFLAGS</span></span>
-<span class="ln" id="L212"></span>
-<span class="ln" id="L213"><span class="tok-str">say &quot;compiling     this takes a while, and it is meant to&quot;</span></span>
-<span class="ln" id="L214"><span class="tok-str">cargo build --release --locked --quiet || die &quot;the build did not succeed.&quot;</span></span>
-<span class="ln" id="L215"></span>
-<span class="ln" id="L216"><span class="tok-str">say &quot;&quot;</span></span>
-<span class="ln" id="L217"><span class="tok-str">say &quot;binary                          rebuilt here&quot;</span></span>
-<span class="ln" id="L218"><span class="tok-str">mismatch=0</span></span>
-<span class="ln" id="L219"><span class="tok-str">for binary in veilvoice veilvoice-gui veilvoice-verify; do</span></span>
-<span class="ln" id="L220"><span class="tok-str">    [ -f &quot;target/release/$binary&quot; ] || continue</span></span>
-<span class="ln" id="L221"><span class="tok-str">    mine=$({hash} &quot;target/release/$binary&quot;{take})</span></span>
-<span class="ln" id="L222"><span class="tok-str">    say &quot;$(printf &#x27;%-30s&#x27; &quot;$binary&quot;) $mine&quot;</span></span>
-<span class="ln" id="L223"><span class="tok-str">done</span></span>
-<span class="ln" id="L224"></span>
-<span class="ln" id="L225"><span class="tok-str">say &quot;&quot;</span></span>
-<span class="ln" id="L226"><span class="tok-str">say &quot;Compare those against SHA256SUMS in the release, which lists the archives&quot;</span></span>
-<span class="ln" id="L227"><span class="tok-str">say &quot;rather than the binaries: unpack the archive for this platform and hash&quot;</span></span>
-<span class="ln" id="L228"><span class="tok-str">say &quot;the binaries inside it the same way.&quot;</span></span>
-<span class="ln" id="L229"><span class="tok-str">say &quot;&quot;</span></span>
-<span class="ln" id="L230"><span class="tok-str">say &quot;    {hash} &lt;the unpacked binary&gt;&quot;</span></span>
-<span class="ln" id="L231"><span class="tok-str">say &quot;&quot;</span></span>
-<span class="ln" id="L232"><span class="tok-str">say &quot;A match means the published binary is what this source compiles to. A&quot;</span></span>
-<span class="ln" id="L233"><span class="tok-str">say &quot;mismatch is worth reporting, and is not by itself proof of anything: a&quot;</span></span>
-<span class="ln" id="L234"><span class="tok-str">say &quot;different compiler version or a different set of build flags produces a&quot;</span></span>
-<span class="ln" id="L235"><span class="tok-str">say &quot;different binary from identical source.&quot;</span></span>
-<span class="ln" id="L236"><span class="tok-str">exit $mismatch</span></span>
-<span class="ln" id="L237"><span class="tok-str">&quot;##</span>,</span>
-<span class="ln" id="L238">        file = system.<span class="tok-fn">file_name</span>(),</span>
-<span class="ln" id="L239">        hash = hash,</span>
-<span class="ln" id="L240">        take = take_digest,</span>
-<span class="ln" id="L241">    )</span>
-<span class="ln" id="L242">}</span>
-</span>
-<span class="ln" id="L243"></span>
-<span class="src-item" id="fn-windows">
-<span class="ln" id="L244"><span class="tok-com">/// The Windows script, for `cmd.exe`.</span></span>
-<span class="ln" id="L245"><span class="tok-com">///</span></span>
-<span class="ln" id="L246"><span class="tok-com">/// A `.cmd` rather than PowerShell on purpose: PowerShell&#x27;s execution policy</span></span>
-<span class="ln" id="L247"><span class="tok-com">/// refuses unsigned scripts by default, so a script somebody downloads to</span></span>
-<span class="ln" id="L248"><span class="tok-com">/// check a download is the exact case it blocks.</span></span>
-<span class="ln" id="L249"><span class="tok-kw">fn</span> <span class="tok-fn">windows</span>() -&gt; String {</span>
-<span class="ln" id="L250">    <span class="tok-str">r##&quot;@echo off</span></span>
-<span class="ln" id="L251"><span class="tok-str">rem Rebuild a VeilVoice release and compare it with the published binary.</span></span>
-<span class="ln" id="L252"><span class="tok-str">rem</span></span>
-<span class="ln" id="L253"><span class="tok-str">rem     reproduce-veilvoice.cmd &lt;version&gt;      e.g.  reproduce-veilvoice.cmd v0.1.15</span></span>
-<span class="ln" id="L254"><span class="tok-str">rem</span></span>
-<span class="ln" id="L255"><span class="tok-str">rem Checking a download against SHA256SUMS proves the file is the one whose</span></span>
-<span class="ln" id="L256"><span class="tok-str">rem hash was signed, and says nothing about what is inside it: the same person</span></span>
-<span class="ln" id="L257"><span class="tok-str">rem signed both. This rebuilds the release from source, so a match means the</span></span>
-<span class="ln" id="L258"><span class="tok-str">rem published binary is what this source compiles to.</span></span>
-<span class="ln" id="L259"><span class="tok-str">rem</span></span>
-<span class="ln" id="L260"><span class="tok-str">rem Needs git and a rustup-managed Rust toolchain. It installs neither. Being</span></span>
-<span class="ln" id="L261"><span class="tok-str">rem asked to let an unfamiliar program put a compiler on your machine, as part</span></span>
-<span class="ln" id="L262"><span class="tok-str">rem of deciding whether to trust that program, is not a reasonable thing to be</span></span>
-<span class="ln" id="L263"><span class="tok-str">rem asked.</span></span>
-<span class="ln" id="L264"><span class="tok-str">rem</span></span>
-<span class="ln" id="L265"><span class="tok-str">rem The compiler version is not written down here on purpose: rust-toolchain.toml</span></span>
-<span class="ln" id="L266"><span class="tok-str">rem in the checkout pins it and rustup reads that by itself. A version typed</span></span>
-<span class="ln" id="L267"><span class="tok-str">rem into this file would be wrong the first time the pin moved, and would</span></span>
-<span class="ln" id="L268"><span class="tok-str">rem report a genuine release as tampered with.</span></span>
-<span class="ln" id="L269"></span>
-<span class="ln" id="L270"><span class="tok-str">setlocal enabledelayedexpansion</span></span>
+<span class="ln" id="L202"><span class="tok-str">for tool in git cargo; do</span></span>
+<span class="ln" id="L203"><span class="tok-str">    command -v &quot;$tool&quot; &gt;/dev/null 2&gt;&amp;1 || die &quot;$tool is not installed.&quot;</span></span>
+<span class="ln" id="L204"><span class="tok-str">done</span></span>
+<span class="ln" id="L205"><span class="tok-str">command -v rustup &gt;/dev/null 2&gt;&amp;1 \</span></span>
+<span class="ln" id="L206"><span class="tok-str">    || say &quot;note: rustup was not found, so the pinned compiler is not guaranteed.</span></span>
+<span class="ln" id="L207"><span class="tok-str">    A different compiler produces a different binary, and a mismatch below</span></span>
+<span class="ln" id="L208"><span class="tok-str">    would then say nothing about the release.&quot;</span></span>
+<span class="ln" id="L209"></span>
+<span class="ln" id="L210"><span class="tok-str"># Where the release files are, if any are here. The build happens elsewhere</span></span>
+<span class="ln" id="L211"><span class="tok-str"># and this is where the comparison comes back to.</span></span>
+<span class="ln" id="L212"><span class="tok-str">here=$(pwd)</span></span>
+<span class="ln" id="L213"></span>
+<span class="ln" id="L214"><span class="tok-str"># The project&#x27;s signing key, from the same constant the programs compile in.</span></span>
+<span class="ln" id="L215"><span class="tok-str">FINGERPRINT={fingerprint}</span></span>
+<span class="ln" id="L216"></span>
+<span class="ln" id="L217"><span class="tok-str"># The published side of the comparison, checked before anything is built.</span></span>
+<span class="ln" id="L218"><span class="tok-str">#</span></span>
+<span class="ln" id="L219"><span class="tok-str"># Before, deliberately. This used to run after the build, so an unsigned</span></span>
+<span class="ln" id="L220"><span class="tok-str"># hash list was reported ten minutes after the only thing it needed was a</span></span>
+<span class="ln" id="L221"><span class="tok-str"># signature check taking under a second. The cheap check that can fail</span></span>
+<span class="ln" id="L222"><span class="tok-str"># goes first.</span></span>
+<span class="ln" id="L223"><span class="tok-str">#</span></span>
+<span class="ln" id="L224"><span class="tok-str"># The script is useful without it -- it prints what this machine built, which</span></span>
+<span class="ln" id="L225"><span class="tok-str"># somebody can compare by eye -- but doing the comparison is the point, so it</span></span>
+<span class="ln" id="L226"><span class="tok-str"># is done whenever the files are present. All three come from the release:</span></span>
+<span class="ln" id="L227"><span class="tok-str">#</span></span>
+<span class="ln" id="L228"><span class="tok-str">#     SHA256SUMS, SHA256SUMS.asc, and the archive for this platform.</span></span>
+<span class="ln" id="L229"><span class="tok-str">#</span></span>
+<span class="ln" id="L230"><span class="tok-str"># The signature first, and refused if it is not by the project&#x27;s key. A hash</span></span>
+<span class="ln" id="L231"><span class="tok-str"># list nobody signed is a hash list an attacker can write, and comparing a</span></span>
+<span class="ln" id="L232"><span class="tok-str"># rebuild against it would prove that the rebuild matches the attacker.</span></span>
+<span class="ln" id="L233"><span class="tok-str">published=&quot;&quot;</span></span>
+<span class="ln" id="L234"><span class="tok-str">if [ -f SHA256SUMS ] &amp;&amp; [ -f SHA256SUMS.asc ] &amp;&amp; command -v gpg &gt;/dev/null 2&gt;&amp;1; then</span></span>
+<span class="ln" id="L235"><span class="tok-str">    if [ -f veilvoice-signing-key.asc ]; then</span></span>
+<span class="ln" id="L236"><span class="tok-str">        gpg --quiet --import veilvoice-signing-key.asc 2&gt;/dev/null || true</span></span>
+<span class="ln" id="L237"><span class="tok-str">    fi</span></span>
+<span class="ln" id="L238"><span class="tok-str">    if status=$(gpg --status-fd 1 --verify SHA256SUMS.asc SHA256SUMS 2&gt;&amp;1) \</span></span>
+<span class="ln" id="L239"><span class="tok-str">       &amp;&amp; printf &#x27;%s\n&#x27; &quot;$status&quot; | awk -v want=&quot;$FINGERPRINT&quot; &#x27;</span></span>
+<span class="ln" id="L240"><span class="tok-str">            /^\[GNUPG:\] VALIDSIG / {{ if ($3 == want || $NF == want) hit = 1 }}</span></span>
+<span class="ln" id="L241"><span class="tok-str">            END                     {{ exit !hit }}&#x27;</span></span>
+<span class="ln" id="L242"><span class="tok-str">    then</span></span>
+<span class="ln" id="L243"><span class="tok-str">        published=SHA256SUMS</span></span>
+<span class="ln" id="L244"><span class="tok-str">        say &quot;hash list     signed by $FINGERPRINT&quot;</span></span>
+<span class="ln" id="L245"><span class="tok-str">    else</span></span>
+<span class="ln" id="L246"><span class="tok-str">        die &quot;SHA256SUMS is here and is not signed by $FINGERPRINT.</span></span>
+<span class="ln" id="L247"><span class="tok-str">    Nothing was compared against it: an unsigned hash list is one anybody</span></span>
+<span class="ln" id="L248"><span class="tok-str">    could have written, and a rebuild matching it would prove nothing.&quot;</span></span>
+<span class="ln" id="L249"><span class="tok-str">    fi</span></span>
+<span class="ln" id="L250"><span class="tok-str">fi</span></span>
+<span class="ln" id="L251"></span>
+<span class="ln" id="L252"><span class="tok-str">work=$(mktemp -d)</span></span>
+<span class="ln" id="L253"><span class="tok-str">trap &#x27;rm -rf &quot;$work&quot;&#x27; EXIT</span></span>
+<span class="ln" id="L254"><span class="tok-str">say &quot;building in   $work&quot;</span></span>
+<span class="ln" id="L255"></span>
+<span class="ln" id="L256"><span class="tok-str">git clone --quiet --depth 1 --branch &quot;$VERSION&quot; \</span></span>
+<span class="ln" id="L257"><span class="tok-str">    https://github.com/tilas01/veilvoice &quot;$work/src&quot; \</span></span>
+<span class="ln" id="L258"><span class="tok-str">    || die &quot;no such version: $VERSION&quot;</span></span>
+<span class="ln" id="L259"><span class="tok-str">cd &quot;$work/src&quot;</span></span>
+<span class="ln" id="L260"></span>
+<span class="ln" id="L261"><span class="tok-str"># The commit date, which is what the release build used. Without this the</span></span>
+<span class="ln" id="L262"><span class="tok-str"># binary carries the time of this build and can never match.</span></span>
+<span class="ln" id="L263"><span class="tok-str">SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)</span></span>
+<span class="ln" id="L264"><span class="tok-str">export SOURCE_DATE_EPOCH</span></span>
+<span class="ln" id="L265"></span>
+<span class="ln" id="L266"><span class="tok-str"># The same remapping the release build applies, so paths inside the binary do</span></span>
+<span class="ln" id="L267"><span class="tok-str"># not depend on where it was built. Hardcoding one person&#x27;s directory would</span></span>
+<span class="ln" id="L268"><span class="tok-str"># make the build reproducible only for them.</span></span>
+<span class="ln" id="L269"><span class="tok-str">RUSTFLAGS=&quot;--remap-path-prefix=$work/src=/veilvoice --remap-path-prefix=$HOME=/home&quot;</span></span>
+<span class="ln" id="L270"><span class="tok-str">export RUSTFLAGS</span></span>
 <span class="ln" id="L271"></span>
-<span class="ln" id="L272"><span class="tok-str">if &quot;%~1&quot;==&quot;&quot; (</span></span>
-<span class="ln" id="L273"><span class="tok-str">  echo usage: %~n0 ^&lt;version^&gt;    e.g. %~n0 v0.1.15</span></span>
-<span class="ln" id="L274"><span class="tok-str">  exit /b 2</span></span>
-<span class="ln" id="L275"><span class="tok-str">)</span></span>
-<span class="ln" id="L276"><span class="tok-str">set VERSION=%~1</span></span>
-<span class="ln" id="L277"></span>
-<span class="ln" id="L278"><span class="tok-str">where git &gt;nul 2&gt;&amp;1 || (echo FAILED: git is not installed. &amp; exit /b 1)</span></span>
-<span class="ln" id="L279"><span class="tok-str">where cargo &gt;nul 2&gt;&amp;1 || (echo FAILED: cargo is not installed. &amp; exit /b 1)</span></span>
-<span class="ln" id="L280"><span class="tok-str">where rustup &gt;nul 2&gt;&amp;1 || echo note: rustup was not found, so the pinned compiler is not guaranteed.</span></span>
-<span class="ln" id="L281"></span>
-<span class="ln" id="L282"><span class="tok-str">set WORK=%TEMP%\veilvoice-reproduce-%RANDOM%</span></span>
-<span class="ln" id="L283"><span class="tok-str">mkdir &quot;%WORK%&quot; || (echo FAILED: could not make a working directory. &amp; exit /b 1)</span></span>
-<span class="ln" id="L284"><span class="tok-str">echo building in   %WORK%</span></span>
-<span class="ln" id="L285"></span>
-<span class="ln" id="L286"><span class="tok-str">git clone --quiet --depth 1 --branch %VERSION% https://github.com/tilas01/veilvoice &quot;%WORK%\src&quot;</span></span>
-<span class="ln" id="L287"><span class="tok-str">if errorlevel 1 (echo FAILED: no such version: %VERSION% &amp; rmdir /s /q &quot;%WORK%&quot; &amp; exit /b 1)</span></span>
-<span class="ln" id="L288"><span class="tok-str">cd /d &quot;%WORK%\src&quot;</span></span>
-<span class="ln" id="L289"></span>
-<span class="ln" id="L290"><span class="tok-str">rem The commit date, which is what the release build used. Without it the</span></span>
-<span class="ln" id="L291"><span class="tok-str">rem binary carries the time of this build and can never match.</span></span>
-<span class="ln" id="L292"><span class="tok-str">for /f %%d in (&#x27;git log -1 --pretty=%%ct&#x27;) do set SOURCE_DATE_EPOCH=%%d</span></span>
-<span class="ln" id="L293"></span>
-<span class="ln" id="L294"><span class="tok-str">set RUSTFLAGS=--remap-path-prefix=%WORK%\src=/veilvoice</span></span>
-<span class="ln" id="L295"></span>
-<span class="ln" id="L296"><span class="tok-str">echo compiling     this takes a while, and it is meant to</span></span>
-<span class="ln" id="L297"><span class="tok-str">cargo build --release --locked --quiet</span></span>
-<span class="ln" id="L298"><span class="tok-str">if errorlevel 1 (echo FAILED: the build did not succeed. &amp; cd /d %TEMP% &amp; rmdir /s /q &quot;%WORK%&quot; &amp; exit /b 1)</span></span>
-<span class="ln" id="L299"></span>
-<span class="ln" id="L300"><span class="tok-str">echo.</span></span>
-<span class="ln" id="L301"><span class="tok-str">echo binary                          rebuilt here</span></span>
-<span class="ln" id="L302"><span class="tok-str">for %%b in (veilvoice.exe veilvoice-gui.exe veilvoice-verify.exe) do (</span></span>
-<span class="ln" id="L303"><span class="tok-str">  if exist &quot;target\release\%%b&quot; (</span></span>
-<span class="ln" id="L304"><span class="tok-str">    for /f &quot;skip=1 tokens=*&quot; %%h in (&#x27;certutil -hashfile &quot;target\release\%%b&quot; SHA256&#x27;) do (</span></span>
-<span class="ln" id="L305"><span class="tok-str">      if not defined DONE_%%b (</span></span>
-<span class="ln" id="L306"><span class="tok-str">        echo %%b   %%h</span></span>
-<span class="ln" id="L307"><span class="tok-str">        set DONE_%%b=1</span></span>
-<span class="ln" id="L308"><span class="tok-str">      )</span></span>
-<span class="ln" id="L309"><span class="tok-str">    )</span></span>
-<span class="ln" id="L310"><span class="tok-str">  )</span></span>
-<span class="ln" id="L311"><span class="tok-str">)</span></span>
-<span class="ln" id="L312"></span>
-<span class="ln" id="L313"><span class="tok-str">echo.</span></span>
-<span class="ln" id="L314"><span class="tok-str">echo Compare those against SHA256SUMS in the release, which lists the archives</span></span>
-<span class="ln" id="L315"><span class="tok-str">echo rather than the binaries: unpack the archive for this platform and hash</span></span>
-<span class="ln" id="L316"><span class="tok-str">echo the binaries inside it with:</span></span>
-<span class="ln" id="L317"><span class="tok-str">echo.</span></span>
-<span class="ln" id="L318"><span class="tok-str">echo     certutil -hashfile ^&lt;the unpacked binary^&gt; SHA256</span></span>
-<span class="ln" id="L319"><span class="tok-str">echo.</span></span>
-<span class="ln" id="L320"><span class="tok-str">echo A match means the published binary is what this source compiles to. A</span></span>
-<span class="ln" id="L321"><span class="tok-str">echo mismatch is worth reporting, and is not by itself proof of anything: a</span></span>
-<span class="ln" id="L322"><span class="tok-str">echo different compiler version or different build flags produce a different</span></span>
-<span class="ln" id="L323"><span class="tok-str">echo binary from identical source.</span></span>
-<span class="ln" id="L324"></span>
-<span class="ln" id="L325"><span class="tok-str">cd /d %TEMP%</span></span>
-<span class="ln" id="L326"><span class="tok-str">rmdir /s /q &quot;%WORK%&quot;</span></span>
-<span class="ln" id="L327"><span class="tok-str">endlocal</span></span>
-<span class="ln" id="L328"><span class="tok-str">&quot;##</span></span>
-<span class="ln" id="L329">    .<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L330">}</span>
+<span class="ln" id="L272"><span class="tok-str">say &quot;compiling     this takes a while, and it is meant to&quot;</span></span>
+<span class="ln" id="L273"><span class="tok-str">cargo build --release --locked --quiet || die &quot;the build did not succeed.&quot;</span></span>
+<span class="ln" id="L274"></span>
+<span class="ln" id="L275"><span class="tok-str">say &quot;&quot;</span></span>
+<span class="ln" id="L276"><span class="tok-str">say &quot;binary                          rebuilt here&quot;</span></span>
+<span class="ln" id="L277"><span class="tok-str">mismatch=0</span></span>
+<span class="ln" id="L278"><span class="tok-str">built=0</span></span>
+<span class="ln" id="L279"><span class="tok-str">for binary in veilvoice veilvoice-gui veilvoice-verify; do</span></span>
+<span class="ln" id="L280"><span class="tok-str">    [ -f &quot;$work/src/target/release/$binary&quot; ] || continue</span></span>
+<span class="ln" id="L281"><span class="tok-str">    built=$((built + 1))</span></span>
+<span class="ln" id="L282"><span class="tok-str">    mine=$({hash} &quot;$work/src/target/release/$binary&quot;{take})</span></span>
+<span class="ln" id="L283"><span class="tok-str">    say &quot;$(printf &#x27;%-30s&#x27; &quot;$binary&quot;) $mine&quot;</span></span>
+<span class="ln" id="L284"></span>
+<span class="ln" id="L285"><span class="tok-str">    # Against the copy that shipped, when the archive has been unpacked here.</span></span>
+<span class="ln" id="L286"><span class="tok-str">    theirs=&quot;&quot;</span></span>
+<span class="ln" id="L287"><span class="tok-str">    for candidate in &quot;./$binary&quot; &quot;./bin/$binary&quot; veilvoice-*/&quot;$binary&quot;; do</span></span>
+<span class="ln" id="L288"><span class="tok-str">        [ -f &quot;$candidate&quot; ] || continue</span></span>
+<span class="ln" id="L289"><span class="tok-str">        theirs=$({hash} &quot;$candidate&quot;{take})</span></span>
+<span class="ln" id="L290"><span class="tok-str">        break</span></span>
+<span class="ln" id="L291"><span class="tok-str">    done</span></span>
+<span class="ln" id="L292"><span class="tok-str">    [ -n &quot;$theirs&quot; ] || continue</span></span>
+<span class="ln" id="L293"><span class="tok-str">    if [ &quot;$mine&quot; = &quot;$theirs&quot; ]; then</span></span>
+<span class="ln" id="L294"><span class="tok-str">        say &quot;$(printf &#x27;%-30s&#x27; &quot;&quot;) matches the published binary&quot;</span></span>
+<span class="ln" id="L295"><span class="tok-str">    else</span></span>
+<span class="ln" id="L296"><span class="tok-str">        say &quot;$(printf &#x27;%-30s&#x27; &quot;&quot;) DIFFERS from the published binary&quot;</span></span>
+<span class="ln" id="L297"><span class="tok-str">        say &quot;$(printf &#x27;%-30s&#x27; &quot;&quot;) published: $theirs&quot;</span></span>
+<span class="ln" id="L298"><span class="tok-str">        mismatch=1</span></span>
+<span class="ln" id="L299"><span class="tok-str">    fi</span></span>
+<span class="ln" id="L300"><span class="tok-str">done</span></span>
+<span class="ln" id="L301"></span>
+<span class="ln" id="L302"><span class="tok-str">[ &quot;$built&quot; -gt 0 ] || die &quot;the build produced no binaries, which should not happen.&quot;</span></span>
+<span class="ln" id="L303"></span>
+<span class="ln" id="L304"><span class="tok-str">say &quot;&quot;</span></span>
+<span class="ln" id="L305"><span class="tok-str">if [ -n &quot;$published&quot; ]; then</span></span>
+<span class="ln" id="L306"><span class="tok-str">    # The archive itself, against the signed list. Separate from the rebuild:</span></span>
+<span class="ln" id="L307"><span class="tok-str">    # this says the download is what was published, and the rebuild says what</span></span>
+<span class="ln" id="L308"><span class="tok-str">    # was published is what the source compiles to. Both are worth knowing and</span></span>
+<span class="ln" id="L309"><span class="tok-str">    # they are not the same claim.</span></span>
+<span class="ln" id="L310"><span class="tok-str">    if {hash_check} &gt;/dev/null 2&gt;&amp;1; then</span></span>
+<span class="ln" id="L311"><span class="tok-str">        say &quot;archive       matches the signed hash list&quot;</span></span>
+<span class="ln" id="L312"><span class="tok-str">    else</span></span>
+<span class="ln" id="L313"><span class="tok-str">        say &quot;archive       does NOT match the signed hash list&quot;</span></span>
+<span class="ln" id="L314"><span class="tok-str">        mismatch=1</span></span>
+<span class="ln" id="L315"><span class="tok-str">    fi</span></span>
+<span class="ln" id="L316"><span class="tok-str">fi</span></span>
+<span class="ln" id="L317"></span>
+<span class="ln" id="L318"><span class="tok-str">if [ &quot;$mismatch&quot; -eq 0 ]; then</span></span>
+<span class="ln" id="L319"><span class="tok-str">    say &quot;&quot;</span></span>
+<span class="ln" id="L320"><span class="tok-str">    say &quot;Everything that could be compared here agreed.&quot;</span></span>
+<span class="ln" id="L321"><span class="tok-str">else</span></span>
+<span class="ln" id="L322"><span class="tok-str">    say &quot;&quot;</span></span>
+<span class="ln" id="L323"><span class="tok-str">    say &quot;Something did not match. That is worth reporting, and it is not by&quot;</span></span>
+<span class="ln" id="L324"><span class="tok-str">    say &quot;itself proof of anything: a different compiler version or a different&quot;</span></span>
+<span class="ln" id="L325"><span class="tok-str">    say &quot;set of build flags produces a different binary from identical source.&quot;</span></span>
+<span class="ln" id="L326"><span class="tok-str">fi</span></span>
+<span class="ln" id="L327"></span>
+<span class="ln" id="L328"><span class="tok-str">say &quot;&quot;</span></span>
+<span class="ln" id="L329"><span class="tok-str">say &quot;What this proves, and what it does not: a match means the published&quot;</span></span>
+<span class="ln" id="L330"><span class="tok-str">say &quot;binary is what this source compiles to. It does not make the source&quot;</span></span>
+<span class="ln" id="L331"><span class="tok-str">say &quot;correct, and it does not make it safe. It moves the question from&quot;</span></span>
+<span class="ln" id="L332"><span class="tok-str">say &quot;trusting the publisher to reading the code, which is a question you can&quot;</span></span>
+<span class="ln" id="L333"><span class="tok-str">say &quot;act on.&quot;</span></span>
+<span class="ln" id="L334"><span class="tok-str">exit $mismatch</span></span>
+<span class="ln" id="L335"><span class="tok-str">&quot;##</span>,</span>
+<span class="ln" id="L336">        file = system.<span class="tok-fn">file_name</span>(),</span>
+<span class="ln" id="L337">        hash = hash,</span>
+<span class="ln" id="L338">        take = take_digest,</span>
+<span class="ln" id="L339">        hash_check = system.<span class="tok-fn">hash_check_command</span>(),</span>
+<span class="ln" id="L340">        fingerprint = <span class="tok-fn">veilvoice_check_fingerprint</span>(),</span>
+<span class="ln" id="L341">    )</span>
+<span class="ln" id="L342">}</span>
 </span>
-<span class="ln" id="L331"></span>
-<span class="ln" id="L332"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L333"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L334">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L335"></span>
-<span class="ln" id="L336">    <span class="tok-com">/// The version pinned in `rust-toolchain.toml` must not appear in any</span></span>
-<span class="ln" id="L337">    <span class="tok-com">/// script.</span></span>
-<span class="ln" id="L338">    <span class="tok-com">///</span></span>
-<span class="ln" id="L339">    <span class="tok-com">/// This is the one thing that would turn a helpful script into a harmful</span></span>
-<span class="ln" id="L340">    <span class="tok-com">/// one. A script carrying its own copy of the compiler version keeps</span></span>
-<span class="ln" id="L341">    <span class="tok-com">/// working until the pin moves, and then reports a *genuine* release as</span></span>
-<span class="ln" id="L342">    <span class="tok-com">/// not matching, which is the most alarming thing this project could tell</span></span>
-<span class="ln" id="L343">    <span class="tok-com">/// somebody and would be false.</span></span>
-<span class="ln" id="L344">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L345">    <span class="tok-kw">fn</span> <span class="tok-fn">no_script_carries_its_own_copy_of_the_toolchain_version</span>() {</span>
-<span class="ln" id="L346">        <span class="tok-kw">let</span> pinned = include_str!(concat!(</span>
-<span class="ln" id="L347">            env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>),</span>
-<span class="ln" id="L348">            <span class="tok-str">&quot;/../../rust-toolchain.toml&quot;</span></span>
-<span class="ln" id="L349">        ));</span>
-<span class="ln" id="L350">        <span class="tok-kw">let</span> channel = pinned</span>
-<span class="ln" id="L351">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L352">            .<span class="tok-fn">find_map</span>(|line| line.<span class="tok-fn">trim</span>().<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;channel = &quot;</span>))</span>
-<span class="ln" id="L353">            .<span class="tok-fn">map</span>(|value| value.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L354">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the toolchain file pins a channel&quot;</span>);</span>
-<span class="ln" id="L355">        assert!(!channel.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L356">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
-<span class="ln" id="L357">            assert!(</span>
-<span class="ln" id="L358">                !<span class="tok-fn">script</span>(*system).<span class="tok-fn">contains</span>(&amp;channel),</span>
-<span class="ln" id="L359">                <span class="tok-str">&quot;the {} script names the pinned compiler version ({channel}). \</span></span>
-<span class="ln" id="L360"><span class="tok-str">                 When the pin moves, that script reports a genuine release as \</span></span>
-<span class="ln" id="L361"><span class="tok-str">                 a mismatch.&quot;</span>,</span>
-<span class="ln" id="L362">                system.<span class="tok-fn">key</span>()</span>
-<span class="ln" id="L363">            );</span>
-<span class="ln" id="L364">        }</span>
-<span class="ln" id="L365">    }</span>
-<span class="ln" id="L366"></span>
-<span class="ln" id="L367">    <span class="tok-com">/// Each system gets the hash tool it actually has. `sha256sum` is not on</span></span>
-<span class="ln" id="L368">    <span class="tok-com">/// macOS and is not on the BSDs, and a script that calls one there fails</span></span>
-<span class="ln" id="L369">    <span class="tok-com">/// at the last step, after appearing to work for several minutes.</span></span>
-<span class="ln" id="L370">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L371">    <span class="tok-kw">fn</span> <span class="tok-fn">each_system_uses_a_hash_tool_it_has</span>() {</span>
-<span class="ln" id="L372">        assert!(<span class="tok-fn">script</span>(System::Linux).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum &quot;</span>));</span>
-<span class="ln" id="L373">        assert!(<span class="tok-fn">script</span>(System::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;shasum -a 256&quot;</span>));</span>
-<span class="ln" id="L374">        assert!(!<span class="tok-fn">script</span>(System::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum &quot;</span>));</span>
-<span class="ln" id="L375">        assert!(<span class="tok-fn">script</span>(System::Bsd).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256 -q&quot;</span>));</span>
-<span class="ln" id="L376">        assert!(!<span class="tok-fn">script</span>(System::Bsd).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum &quot;</span>));</span>
-<span class="ln" id="L377">        assert!(<span class="tok-fn">script</span>(System::Windows).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;certutil -hashfile&quot;</span>));</span>
-<span class="ln" id="L378">    }</span>
-<span class="ln" id="L379"></span>
-<span class="ln" id="L380">    <span class="tok-com">/// The commit date has to be exported, or the binary carries the time of</span></span>
-<span class="ln" id="L381">    <span class="tok-com">/// this build and can never match anything.</span></span>
-<span class="ln" id="L382">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L383">    <span class="tok-kw">fn</span> <span class="tok-fn">every_script_pins_the_build_date_to_the_commit</span>() {</span>
-<span class="ln" id="L384">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
-<span class="ln" id="L385">            assert!(</span>
-<span class="ln" id="L386">                <span class="tok-fn">script</span>(*system).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;SOURCE_DATE_EPOCH&quot;</span>),</span>
-<span class="ln" id="L387">                <span class="tok-str">&quot;the {} script does not pin the build date, so its output can \</span></span>
-<span class="ln" id="L388"><span class="tok-str">                 never match a published binary&quot;</span>,</span>
-<span class="ln" id="L389">                system.<span class="tok-fn">key</span>()</span>
-<span class="ln" id="L390">            );</span>
-<span class="ln" id="L391">        }</span>
-<span class="ln" id="L392">    }</span>
+<span class="ln" id="L343"></span>
+<span class="src-item" id="fn-windows">
+<span class="ln" id="L344"><span class="tok-com">/// The Windows script, for `cmd.exe`.</span></span>
+<span class="ln" id="L345"><span class="tok-com">///</span></span>
+<span class="ln" id="L346"><span class="tok-com">/// A `.cmd` rather than PowerShell on purpose: PowerShell&#x27;s execution policy</span></span>
+<span class="ln" id="L347"><span class="tok-com">/// refuses unsigned scripts by default, so a script somebody downloads to</span></span>
+<span class="ln" id="L348"><span class="tok-com">/// check a download is the exact case it blocks.</span></span>
+<span class="ln" id="L349"><span class="tok-kw">fn</span> <span class="tok-fn">windows</span>() -&gt; String {</span>
+<span class="ln" id="L350">    <span class="tok-str">r##&quot;@echo off</span></span>
+<span class="ln" id="L351"><span class="tok-str">rem Rebuild a VeilVoice release and compare it with the published binary.</span></span>
+<span class="ln" id="L352"><span class="tok-str">rem</span></span>
+<span class="ln" id="L353"><span class="tok-str">rem     reproduce-veilvoice.cmd &lt;version&gt;      e.g.  reproduce-veilvoice.cmd v0.1.15</span></span>
+<span class="ln" id="L354"><span class="tok-str">rem</span></span>
+<span class="ln" id="L355"><span class="tok-str">rem Checking a download against SHA256SUMS proves the file is the one whose</span></span>
+<span class="ln" id="L356"><span class="tok-str">rem hash was signed, and says nothing about what is inside it: the same person</span></span>
+<span class="ln" id="L357"><span class="tok-str">rem signed both. This rebuilds the release from source, so a match means the</span></span>
+<span class="ln" id="L358"><span class="tok-str">rem published binary is what this source compiles to.</span></span>
+<span class="ln" id="L359"><span class="tok-str">rem</span></span>
+<span class="ln" id="L360"><span class="tok-str">rem Needs git and a rustup-managed Rust toolchain. It installs neither. Being</span></span>
+<span class="ln" id="L361"><span class="tok-str">rem asked to let an unfamiliar program put a compiler on your machine, as part</span></span>
+<span class="ln" id="L362"><span class="tok-str">rem of deciding whether to trust that program, is not a reasonable thing to be</span></span>
+<span class="ln" id="L363"><span class="tok-str">rem asked.</span></span>
+<span class="ln" id="L364"><span class="tok-str">rem</span></span>
+<span class="ln" id="L365"><span class="tok-str">rem The compiler version is not written down here on purpose: rust-toolchain.toml</span></span>
+<span class="ln" id="L366"><span class="tok-str">rem in the checkout pins it and rustup reads that by itself. A version typed</span></span>
+<span class="ln" id="L367"><span class="tok-str">rem into this file would be wrong the first time the pin moved, and would</span></span>
+<span class="ln" id="L368"><span class="tok-str">rem report a genuine release as tampered with.</span></span>
+<span class="ln" id="L369"></span>
+<span class="ln" id="L370"><span class="tok-str">setlocal enabledelayedexpansion</span></span>
+<span class="ln" id="L371"></span>
+<span class="ln" id="L372"><span class="tok-str">if &quot;%~1&quot;==&quot;&quot; (</span></span>
+<span class="ln" id="L373"><span class="tok-str">  echo usage: %~n0 ^&lt;version^&gt;    e.g. %~n0 v0.1.15</span></span>
+<span class="ln" id="L374"><span class="tok-str">  exit /b 2</span></span>
+<span class="ln" id="L375"><span class="tok-str">)</span></span>
+<span class="ln" id="L376"><span class="tok-str">set VERSION=%~1</span></span>
+<span class="ln" id="L377"></span>
+<span class="ln" id="L378"><span class="tok-str">where git &gt;nul 2&gt;&amp;1 || (echo FAILED: git is not installed. &amp; exit /b 1)</span></span>
+<span class="ln" id="L379"><span class="tok-str">where cargo &gt;nul 2&gt;&amp;1 || (echo FAILED: cargo is not installed. &amp; exit /b 1)</span></span>
+<span class="ln" id="L380"><span class="tok-str">where rustup &gt;nul 2&gt;&amp;1 || echo note: rustup was not found, so the pinned compiler is not guaranteed.</span></span>
+<span class="ln" id="L381"></span>
+<span class="ln" id="L382"><span class="tok-str">set WORK=%TEMP%\veilvoice-reproduce-%RANDOM%</span></span>
+<span class="ln" id="L383"><span class="tok-str">mkdir &quot;%WORK%&quot; || (echo FAILED: could not make a working directory. &amp; exit /b 1)</span></span>
+<span class="ln" id="L384"><span class="tok-str">echo building in   %WORK%</span></span>
+<span class="ln" id="L385"></span>
+<span class="ln" id="L386"><span class="tok-str">git clone --quiet --depth 1 --branch %VERSION% https://github.com/tilas01/veilvoice &quot;%WORK%\src&quot;</span></span>
+<span class="ln" id="L387"><span class="tok-str">if errorlevel 1 (echo FAILED: no such version: %VERSION% &amp; rmdir /s /q &quot;%WORK%&quot; &amp; exit /b 1)</span></span>
+<span class="ln" id="L388"><span class="tok-str">cd /d &quot;%WORK%\src&quot;</span></span>
+<span class="ln" id="L389"></span>
+<span class="ln" id="L390"><span class="tok-str">rem The commit date, which is what the release build used. Without it the</span></span>
+<span class="ln" id="L391"><span class="tok-str">rem binary carries the time of this build and can never match.</span></span>
+<span class="ln" id="L392"><span class="tok-str">for /f %%d in (&#x27;git log -1 --pretty=%%ct&#x27;) do set SOURCE_DATE_EPOCH=%%d</span></span>
 <span class="ln" id="L393"></span>
-<span class="ln" id="L394">    <span class="tok-com">/// It builds; it does not install a compiler.</span></span>
-<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">no_script_installs_a_toolchain</span>() {</span>
-<span class="ln" id="L397">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
-<span class="ln" id="L398">            <span class="tok-kw">let</span> text = <span class="tok-fn">script</span>(*system);</span>
-<span class="ln" id="L399">            <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;rustup install&quot;</span>, <span class="tok-str">&quot;rustup toolchain install&quot;</span>, <span class="tok-str">&quot;rustup-init&quot;</span>] {</span>
-<span class="ln" id="L400">                assert!(</span>
-<span class="ln" id="L401">                    !text.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L402">                    <span class="tok-str">&quot;the {} script runs {forbidden:?}&quot;</span>,</span>
-<span class="ln" id="L403">                    system.<span class="tok-fn">key</span>()</span>
-<span class="ln" id="L404">                );</span>
-<span class="ln" id="L405">            }</span>
-<span class="ln" id="L406">        }</span>
-<span class="ln" id="L407">    }</span>
-<span class="ln" id="L408"></span>
-<span class="ln" id="L409">    <span class="tok-com">/// A locked build, or the dependency versions are whatever resolved today</span></span>
-<span class="ln" id="L410">    <span class="tok-com">/// and the result cannot match.</span></span>
-<span class="ln" id="L411">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L412">    <span class="tok-kw">fn</span> <span class="tok-fn">every_script_builds_from_the_committed_lockfile</span>() {</span>
-<span class="ln" id="L413">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
-<span class="ln" id="L414">            assert!(</span>
-<span class="ln" id="L415">                <span class="tok-fn">script</span>(*system).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--locked&quot;</span>),</span>
-<span class="ln" id="L416">                <span class="tok-str">&quot;the {} script does not build with --locked&quot;</span>,</span>
-<span class="ln" id="L417">                system.<span class="tok-fn">key</span>()</span>
-<span class="ln" id="L418">            );</span>
-<span class="ln" id="L419">        }</span>
-<span class="ln" id="L420">    }</span>
-<span class="ln" id="L421"></span>
-<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">every_system_survives_being_written_down_and_read_back</span>() {</span>
-<span class="ln" id="L424">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
-<span class="ln" id="L425">            assert_eq!(System::<span class="tok-fn">from_key</span>(system.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*system));</span>
-<span class="ln" id="L426">        }</span>
-<span class="ln" id="L427">        assert_eq!(System::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nonsense&quot;</span>), None);</span>
-<span class="ln" id="L428">        assert_eq!(System::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;wsl&quot;</span>), <span class="tok-fn">Some</span>(System::Linux));</span>
-<span class="ln" id="L429">    }</span>
-<span class="ln" id="L430"></span>
-<span class="ln" id="L431">    <span class="tok-com">/// The system this is running on is one of the four, whatever it is.</span></span>
-<span class="ln" id="L432">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L433">    <span class="tok-kw">fn</span> <span class="tok-fn">this_machine_is_one_of_the_systems</span>() {</span>
-<span class="ln" id="L434">        assert!(System::ALL.<span class="tok-fn">contains</span>(&amp;System::<span class="tok-fn">here</span>()));</span>
-<span class="ln" id="L435">    }</span>
-<span class="ln" id="L436">}</span>
+<span class="ln" id="L394"><span class="tok-str">set RUSTFLAGS=--remap-path-prefix=%WORK%\src=/veilvoice</span></span>
+<span class="ln" id="L395"></span>
+<span class="ln" id="L396"><span class="tok-str">echo compiling     this takes a while, and it is meant to</span></span>
+<span class="ln" id="L397"><span class="tok-str">cargo build --release --locked --quiet</span></span>
+<span class="ln" id="L398"><span class="tok-str">if errorlevel 1 (echo FAILED: the build did not succeed. &amp; cd /d %TEMP% &amp; rmdir /s /q &quot;%WORK%&quot; &amp; exit /b 1)</span></span>
+<span class="ln" id="L399"></span>
+<span class="ln" id="L400"><span class="tok-str">echo.</span></span>
+<span class="ln" id="L401"><span class="tok-str">echo binary                          rebuilt here</span></span>
+<span class="ln" id="L402"><span class="tok-str">for %%b in (veilvoice.exe veilvoice-gui.exe veilvoice-verify.exe) do (</span></span>
+<span class="ln" id="L403"><span class="tok-str">  if exist &quot;target\release\%%b&quot; (</span></span>
+<span class="ln" id="L404"><span class="tok-str">    for /f &quot;skip=1 tokens=*&quot; %%h in (&#x27;certutil -hashfile &quot;target\release\%%b&quot; SHA256&#x27;) do (</span></span>
+<span class="ln" id="L405"><span class="tok-str">      if not defined DONE_%%b (</span></span>
+<span class="ln" id="L406"><span class="tok-str">        echo %%b   %%h</span></span>
+<span class="ln" id="L407"><span class="tok-str">        set DONE_%%b=1</span></span>
+<span class="ln" id="L408"><span class="tok-str">      )</span></span>
+<span class="ln" id="L409"><span class="tok-str">    )</span></span>
+<span class="ln" id="L410"><span class="tok-str">  )</span></span>
+<span class="ln" id="L411"><span class="tok-str">)</span></span>
+<span class="ln" id="L412"></span>
+<span class="ln" id="L413"><span class="tok-str">echo.</span></span>
+<span class="ln" id="L414"><span class="tok-str">echo Compare those against SHA256SUMS in the release, which lists the archives</span></span>
+<span class="ln" id="L415"><span class="tok-str">echo rather than the binaries: unpack the archive for this platform and hash</span></span>
+<span class="ln" id="L416"><span class="tok-str">echo the binaries inside it with:</span></span>
+<span class="ln" id="L417"><span class="tok-str">echo.</span></span>
+<span class="ln" id="L418"><span class="tok-str">echo     certutil -hashfile ^&lt;the unpacked binary^&gt; SHA256</span></span>
+<span class="ln" id="L419"><span class="tok-str">echo.</span></span>
+<span class="ln" id="L420"><span class="tok-str">echo A match means the published binary is what this source compiles to. A</span></span>
+<span class="ln" id="L421"><span class="tok-str">echo mismatch is worth reporting, and is not by itself proof of anything: a</span></span>
+<span class="ln" id="L422"><span class="tok-str">echo different compiler version or different build flags produce a different</span></span>
+<span class="ln" id="L423"><span class="tok-str">echo binary from identical source.</span></span>
+<span class="ln" id="L424"></span>
+<span class="ln" id="L425"><span class="tok-str">cd /d %TEMP%</span></span>
+<span class="ln" id="L426"><span class="tok-str">rmdir /s /q &quot;%WORK%&quot;</span></span>
+<span class="ln" id="L427"><span class="tok-str">endlocal</span></span>
+<span class="ln" id="L428"><span class="tok-str">&quot;##</span></span>
+<span class="ln" id="L429">    .<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L430">}</span>
+</span>
+<span class="ln" id="L431"></span>
+<span class="ln" id="L432"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L433"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L434">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L435"></span>
+<span class="ln" id="L436">    <span class="tok-com">/// The version pinned in `rust-toolchain.toml` must not appear in any</span></span>
+<span class="ln" id="L437">    <span class="tok-com">/// script.</span></span>
+<span class="ln" id="L438">    <span class="tok-com">///</span></span>
+<span class="ln" id="L439">    <span class="tok-com">/// This is the one thing that would turn a helpful script into a harmful</span></span>
+<span class="ln" id="L440">    <span class="tok-com">/// one. A script carrying its own copy of the compiler version keeps</span></span>
+<span class="ln" id="L441">    <span class="tok-com">/// working until the pin moves, and then reports a *genuine* release as</span></span>
+<span class="ln" id="L442">    <span class="tok-com">/// not matching, which is the most alarming thing this project could tell</span></span>
+<span class="ln" id="L443">    <span class="tok-com">/// somebody and would be false.</span></span>
+<span class="ln" id="L444">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L445">    <span class="tok-kw">fn</span> <span class="tok-fn">no_script_carries_its_own_copy_of_the_toolchain_version</span>() {</span>
+<span class="ln" id="L446">        <span class="tok-kw">let</span> pinned = include_str!(concat!(</span>
+<span class="ln" id="L447">            env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>),</span>
+<span class="ln" id="L448">            <span class="tok-str">&quot;/../../rust-toolchain.toml&quot;</span></span>
+<span class="ln" id="L449">        ));</span>
+<span class="ln" id="L450">        <span class="tok-kw">let</span> channel = pinned</span>
+<span class="ln" id="L451">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L452">            .<span class="tok-fn">find_map</span>(|line| line.<span class="tok-fn">trim</span>().<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;channel = &quot;</span>))</span>
+<span class="ln" id="L453">            .<span class="tok-fn">map</span>(|value| value.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L454">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the toolchain file pins a channel&quot;</span>);</span>
+<span class="ln" id="L455">        assert!(!channel.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L456">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
+<span class="ln" id="L457">            assert!(</span>
+<span class="ln" id="L458">                !<span class="tok-fn">script</span>(*system).<span class="tok-fn">contains</span>(&amp;channel),</span>
+<span class="ln" id="L459">                <span class="tok-str">&quot;the {} script names the pinned compiler version ({channel}). \</span></span>
+<span class="ln" id="L460"><span class="tok-str">                 When the pin moves, that script reports a genuine release as \</span></span>
+<span class="ln" id="L461"><span class="tok-str">                 a mismatch.&quot;</span>,</span>
+<span class="ln" id="L462">                system.<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L463">            );</span>
+<span class="ln" id="L464">        }</span>
+<span class="ln" id="L465">    }</span>
+<span class="ln" id="L466"></span>
+<span class="ln" id="L467">    <span class="tok-com">/// Each system gets the hash tool it actually has. `sha256sum` is not on</span></span>
+<span class="ln" id="L468">    <span class="tok-com">/// macOS and is not on the BSDs, and a script that calls one there fails</span></span>
+<span class="ln" id="L469">    <span class="tok-com">/// at the last step, after appearing to work for several minutes.</span></span>
+<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">each_system_uses_a_hash_tool_it_has</span>() {</span>
+<span class="ln" id="L472">        assert!(<span class="tok-fn">script</span>(System::Linux).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum &quot;</span>));</span>
+<span class="ln" id="L473">        assert!(<span class="tok-fn">script</span>(System::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;shasum -a 256&quot;</span>));</span>
+<span class="ln" id="L474">        assert!(!<span class="tok-fn">script</span>(System::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum &quot;</span>));</span>
+<span class="ln" id="L475">        assert!(<span class="tok-fn">script</span>(System::Bsd).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256 -q&quot;</span>));</span>
+<span class="ln" id="L476">        assert!(!<span class="tok-fn">script</span>(System::Bsd).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum &quot;</span>));</span>
+<span class="ln" id="L477">        assert!(<span class="tok-fn">script</span>(System::Windows).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;certutil -hashfile&quot;</span>));</span>
+<span class="ln" id="L478">    }</span>
+<span class="ln" id="L479"></span>
+<span class="ln" id="L480">    <span class="tok-com">/// The commit date has to be exported, or the binary carries the time of</span></span>
+<span class="ln" id="L481">    <span class="tok-com">/// this build and can never match anything.</span></span>
+<span class="ln" id="L482">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L483">    <span class="tok-kw">fn</span> <span class="tok-fn">every_script_pins_the_build_date_to_the_commit</span>() {</span>
+<span class="ln" id="L484">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
+<span class="ln" id="L485">            assert!(</span>
+<span class="ln" id="L486">                <span class="tok-fn">script</span>(*system).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;SOURCE_DATE_EPOCH&quot;</span>),</span>
+<span class="ln" id="L487">                <span class="tok-str">&quot;the {} script does not pin the build date, so its output can \</span></span>
+<span class="ln" id="L488"><span class="tok-str">                 never match a published binary&quot;</span>,</span>
+<span class="ln" id="L489">                system.<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L490">            );</span>
+<span class="ln" id="L491">        }</span>
+<span class="ln" id="L492">    }</span>
+<span class="ln" id="L493"></span>
+<span class="ln" id="L494">    <span class="tok-com">/// It builds; it does not install a compiler.</span></span>
+<span class="ln" id="L495">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L496">    <span class="tok-kw">fn</span> <span class="tok-fn">no_script_installs_a_toolchain</span>() {</span>
+<span class="ln" id="L497">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
+<span class="ln" id="L498">            <span class="tok-kw">let</span> text = <span class="tok-fn">script</span>(*system);</span>
+<span class="ln" id="L499">            <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;rustup install&quot;</span>, <span class="tok-str">&quot;rustup toolchain install&quot;</span>, <span class="tok-str">&quot;rustup-init&quot;</span>] {</span>
+<span class="ln" id="L500">                assert!(</span>
+<span class="ln" id="L501">                    !text.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L502">                    <span class="tok-str">&quot;the {} script runs {forbidden:?}&quot;</span>,</span>
+<span class="ln" id="L503">                    system.<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L504">                );</span>
+<span class="ln" id="L505">            }</span>
+<span class="ln" id="L506">        }</span>
+<span class="ln" id="L507">    }</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">    <span class="tok-com">/// A locked build, or the dependency versions are whatever resolved today</span></span>
+<span class="ln" id="L510">    <span class="tok-com">/// and the result cannot match.</span></span>
+<span class="ln" id="L511">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L512">    <span class="tok-kw">fn</span> <span class="tok-fn">every_script_builds_from_the_committed_lockfile</span>() {</span>
+<span class="ln" id="L513">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
+<span class="ln" id="L514">            assert!(</span>
+<span class="ln" id="L515">                <span class="tok-fn">script</span>(*system).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--locked&quot;</span>),</span>
+<span class="ln" id="L516">                <span class="tok-str">&quot;the {} script does not build with --locked&quot;</span>,</span>
+<span class="ln" id="L517">                system.<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L518">            );</span>
+<span class="ln" id="L519">        }</span>
+<span class="ln" id="L520">    }</span>
+<span class="ln" id="L521"></span>
+<span class="ln" id="L522">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L523">    <span class="tok-kw">fn</span> <span class="tok-fn">every_system_survives_being_written_down_and_read_back</span>() {</span>
+<span class="ln" id="L524">        <span class="tok-kw">for</span> system <span class="tok-kw">in</span> System::ALL {</span>
+<span class="ln" id="L525">            assert_eq!(System::<span class="tok-fn">from_key</span>(system.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*system));</span>
+<span class="ln" id="L526">        }</span>
+<span class="ln" id="L527">        assert_eq!(System::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nonsense&quot;</span>), None);</span>
+<span class="ln" id="L528">        assert_eq!(System::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;wsl&quot;</span>), <span class="tok-fn">Some</span>(System::Linux));</span>
+<span class="ln" id="L529">    }</span>
+<span class="ln" id="L530"></span>
+<span class="ln" id="L531">    <span class="tok-com">/// The system this is running on is one of the four, whatever it is.</span></span>
+<span class="ln" id="L532">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L533">    <span class="tok-kw">fn</span> <span class="tok-fn">this_machine_is_one_of_the_systems</span>() {</span>
+<span class="ln" id="L534">        assert!(System::ALL.<span class="tok-fn">contains</span>(&amp;System::<span class="tok-fn">here</span>()));</span>
+<span class="ln" id="L535">    }</span>
+<span class="ln" id="L536">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

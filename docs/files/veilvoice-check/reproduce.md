@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-check/src/reproduce.rs`
 
-[`veilvoice-check`](../../../crates/veilvoice-check/README.md) &middot; 436 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs)
+[`veilvoice-check`](../../../crates/veilvoice-check/README.md) &middot; 536 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs)
 
 ## Contents
 
@@ -63,7 +63,7 @@ deciding whether to trust that program.
 
 ## What this file contains
 
-436 lines defining **8 functions** (5 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+536 lines defining **10 functions** (5 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -75,8 +75,8 @@ deciding whether to trust that program.
 - `System::key` (line 71) -- The name this is called on the command line.
 - `System::from_key` (line 81) -- The system with this name, if it is one.
 - `System::here` (line 96) -- The one this program is running on, when it is one of these.
-- `script` (line 128) -- The script for this system.
-  - reaches: `posix`, `windows`
+- `script` (line 145) -- The script for this system.
+  - reaches: `posix`, `windows`, `veilvoice_check_fingerprint`
 
 ## What calls what
 
@@ -102,24 +102,29 @@ flowchart TD
     n_key(["System::key<br/>line 71"])
     n_from_key(["System::from_key<br/>line 81"])
     n_here(["System::here<br/>line 96"])
-    n_hash_tool["System::hash_tool<br/>line 113"]
-    n_script(["script<br/>line 128"])
-    n_posix["posix<br/>line 140"]
-    n_windows["windows<br/>line 249"]
+    n_hash_check_command["System::hash_check_command<br/>line 113"]
+    n_hash_tool["System::hash_tool<br/>line 125"]
+    n_veilvoice_check_fingerprint["veilvoice_check_fingerprint<br/>line 140"]
+    n_script(["script<br/>line 145"])
+    n_posix["posix<br/>line 157"]
+    n_windows["windows<br/>line 349"]
+    n_posix --> n_veilvoice_check_fingerprint
     n_script --> n_posix
     n_script --> n_windows
     click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L61" "open the source"
     click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L71" "open the source"
     click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L81" "open the source"
     click n_here href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L96" "open the source"
-    click n_hash_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L113" "open the source"
-    click n_script href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L128" "open the source"
-    click n_posix href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L140" "open the source"
-    click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L249" "open the source"
+    click n_hash_check_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L113" "open the source"
+    click n_hash_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L125" "open the source"
+    click n_veilvoice_check_fingerprint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L140" "open the source"
+    click n_script href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L145" "open the source"
+    click n_posix href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L157" "open the source"
+    click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L349" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_file_name,n_key,n_from_key,n_here,n_script entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_hash_tool,n_posix,n_windows helper
+    class n_hash_check_command,n_hash_tool,n_veilvoice_check_fingerprint,n_posix,n_windows helper
 ```
 
 </details>
@@ -134,10 +139,12 @@ flowchart TD
 | `System::from_key` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L81) | The system with this name, if it is one. |
 | `System::ALL` <sub>pub const</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L92) | Every system, in the order a front end should offer them. |
 | `System::here` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L96) | The one this program is running on, when it is one of these. |
-| `System::hash_tool` <sub>fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L113) | How this system spells "hash this file". |
-| `script` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L128) | The script for this system. |
-| `posix` <sub>fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L140) | The POSIX script, which covers Linux, macOS and the BSDs. |
-| `windows` <sub>fn</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L249) | The Windows script, for cmd.exe. |
+| `System::hash_check_command` <sub>fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L113) | How this system checks a folder against a SHA256SUMS. |
+| `System::hash_tool` <sub>fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L125) | How this system spells "hash this file". |
+| `veilvoice_check_fingerprint` <sub>fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L140) | The project's signing fingerprint, from the one place it is written. |
+| `script` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L145) | The script for this system. |
+| `posix` <sub>fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L157) | The POSIX script, which covers Linux, macOS and the BSDs. |
+| `windows` <sub>fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs#L349) | The Windows script, for cmd.exe. |
 
 ---
 

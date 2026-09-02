@@ -12,12 +12,23 @@ Nothing yet. The next release goes here.
 
 ## v0.1.16
 
-A window that costs nothing when you are not using it, opens big enough to
-read, and no longer says everything three times on its verify tab. A shell
-script that checks a release without trusting VeilVoice to check it. A
-verifier that finds the release you are standing in and no longer calls a
-genuine one unverified. Screenshots that can be taken on any machine. And a
-guide that describes the application that actually ships.
+**In short**
+
+- The window costs nothing when you are not using it. It was quietly redrawing
+  itself twice a second on every tab, for ever.
+- It opens at a size you can read, instead of cutting its longest panel off.
+- The verify tab no longer says everything three times, and its buttons line up.
+- You can check a release without trusting VeilVoice to check it: a short shell
+  script that uses GnuPG and nothing of ours, and a longer one that rebuilds
+  the release from source and compares the result.
+- The desktop app tells you which program is doing the checking, and lets you
+  pick a different one.
+- Screenshots can be taken on any machine now, not one particular Windows one.
+- The website is published again after a release, instead of going stale.
+- The guide describes the application that actually ships, including where it
+  runs and how anything reaches the network.
+
+**In full**
 
 ### An idle window costs nothing now
 
@@ -117,6 +128,21 @@ guide that describes the application that actually ships.
 - A new section says what the three programs are for, which parts are inside
   them, and how anything reaches the network at all given that none of them
   contains a network client.
+
+### Two things this release's own documentation got wrong
+
+- The new section explaining how the update check reaches the network credited
+  PowerShell. It has never used PowerShell: it looks for `curl` by absolute
+  path, and on Windows that is `System32\curl.exe`. The absolute path is the
+  part that matters, because Windows searches the current directory before
+  `PATH`, so a `curl.exe` left beside VeilVoice would otherwise be what ran.
+  A test now reads every path the program looks in and requires the guide to
+  mention each; it caught a second omission, a `wget` fallback, within a minute.
+
+- The README said a release is built for nine targets. It is eleven, and has
+  been for at least two releases. A number typed beside a list is a copy of
+  that list's length, and this one had nothing comparing it to the workflow
+  that does the building. It is counted from that workflow now.
 
 ### The verify page can verify
 

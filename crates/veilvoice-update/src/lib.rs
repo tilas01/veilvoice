@@ -382,6 +382,53 @@ with veilvoice-verify before running it.";
 
 #[cfg(test)]
 mod tests {
+    /// The guide describes the tool this actually looks for.
+    ///
+    /// Written after the guide said "PowerShell's web request on Windows",
+    /// which this has never used: it looks for `System32\\curl.exe` by
+    /// absolute path. That was a sentence about the program, written beside
+    /// the program, wrong on the day it was written -- which is the shape of
+    /// finding after finding in this repository, and is why the two are
+    /// compared here rather than trusted to agree.
+    #[test]
+    fn the_guide_names_the_tool_this_looks_for() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        let source = include_str!("lib.rs");
+        let looking = source
+            .split("fn find_tool()")
+            .nth(1)
+            .and_then(|rest| rest.split("\n}").next())
+            .expect("find_tool exists");
+
+        // Every absolute path the program will actually try.
+        let mut paths: Vec<&str> = looking
+            .match_indices('"')
+            .map(|(at, _)| &looking[at + 1..])
+            .filter_map(|rest| rest.split('"').next())
+            .filter(|candidate| candidate.contains('/') || candidate.contains('\\'))
+            .collect();
+        paths.sort();
+        paths.dedup();
+        assert!(!paths.is_empty(), "find_tool names no paths");
+
+        for path in paths {
+            // The guide writes Windows paths with the environment variable
+            // spelled out, so compare on the part that identifies the tool.
+            let needle = path.rsplit(['/', '\\']).next().unwrap_or(path);
+            assert!(
+                guide.contains(needle),
+                "the update check looks for {path:?} and docs/USER_GUIDE.md \
+                 never mentions {needle:?}"
+            );
+        }
+
+        assert!(
+            !guide.contains("PowerShell's web request"),
+            "the guide credits PowerShell for the update check; this has never \
+             used it"
+        );
+    }
+
     use super::*;
 
     #[test]

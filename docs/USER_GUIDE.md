@@ -84,7 +84,7 @@ else's installer.
 
 ### What runs where
 
-Ten platforms get a signed archive with every release, and the table says what
+Eleven platforms get a signed archive with every release, and the table says what
 is in each one. It is not the same everywhere, and where it is not, that is a
 limit of what the platform offers rather than something waiting to be written.
 
@@ -127,10 +127,20 @@ nothing in the workspace links one. Two features nonetheless involve the
 network, and the way they do it is the point.
 
 **Check for updates**, in the desktop application only, asks the operating
-system's own HTTPS tool to fetch one small file: `curl` on macOS and most
-Linux systems, PowerShell's web request on Windows. VeilVoice starts that
-program, reads what it printed, and parses a version number. It is a button;
-it is never automatic; and the command line has no such feature at all.
+system's own transfer tool to fetch one small file, and reads a version number
+out of what it printed. It is a button, it is never automatic, and the command
+line has no such feature at all.
+
+The tool is found by **absolute path**, never through `PATH`. On Windows that
+is `%SystemRoot%\System32\curl.exe`, which has shipped with Windows since
+2018. Elsewhere it is `curl` at `/usr/bin`, `/bin` or `/usr/local/bin`, and
+`wget` at the same three places if there is no `curl`.
+
+That distinction is not fussiness. Windows searches the current directory
+before `PATH`, so a file called `curl.exe` sitting beside VeilVoice would
+otherwise be the program that ran, and a privacy tool reaching for the network
+is the last place to accept a stranger's binary. If none of those paths holds a
+tool, the button says so and nothing is run.
 
 **Installing a companion** does not fetch anything either. It runs the package
 manager already on the machine, which is the thing your system already trusts
