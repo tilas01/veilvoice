@@ -3795,6 +3795,19 @@ the top of this document now says.
    fixed, both would have been bounced by a distribution's review, and neither
    was visible until the package was built and linted rather than parsed.
 
+   **The wrong date was in the Debian changelog too**, as `Sun, 31 Aug 2026`.
+   One mistake, copied into two packaging files, sitting in both for as long as
+   they had existed. Debian's tooling treats it as a defect as squarely as
+   RPM's does: lintian carries `debian-changelog-has-wrong-day-of-week`. It was
+   found only because the RPM was built, and it would not have been found by
+   building the RPM alone.
+
+   So the weekday of every changelog date in both files is now checked by
+   `tools/site-tests/packaging.test.js`, which runs on every commit rather than
+   when somebody happens to build a package. It does not replace building them;
+   it catches the one class of defect that a build found and that nothing else
+   was looking for. Both spellings were tested by putting the wrong day back.
+
    The other eighteen reports are `rpmlint`'s default configuration disagreeing
    with how RPM packages are written now: it wants a `Group:` tag that Fedora
    dropped, a `BuildRoot:` unnecessary since RPM 4.6, a `Packager:` that

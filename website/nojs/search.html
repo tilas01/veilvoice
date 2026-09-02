@@ -43,7 +43,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice, 304 files and 12981 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice, 304 files and 12993 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -899,7 +899,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>docs/AUDIT.md</code> <span class="meta">&middot; docs, 4004 lines, 400 sections</span></summary>
+<summary><code>docs/AUDIT.md</code> <span class="meta">&middot; docs, 4017 lines, 400 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/docs/AUDIT.md">open AUDIT.md</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">&lt;!-- SPDX-License-Identifier: GPL-3.0-or-later --&gt;</span></li>
@@ -12332,7 +12332,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>tools/site-tests/packaging.test.js</code> <span class="meta">&middot; tools, 243 lines, 45 sections</span></summary>
+<summary><code>tools/site-tests/packaging.test.js</code> <span class="meta">&middot; tools, 325 lines, 57 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/site-tests/packaging.test.js">open packaging.test.js</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">// SPDX-License-Identifier: GPL-3.0-or-later // // The package definitions, against the version the workspace is actually at. // // # The defect this exists to stop coming back // // F-81. Every definition in `packaging/` named v0.1.9</span></li>
@@ -12378,8 +12378,20 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 201</span> <span class="meta">line 201</span><br><span class="x">{ cwd: ROOT, encoding: &quot;utf8&quot;, maxBuffer: 16 * 1024 * 1024 }); const modes = new Map( index.split(&quot;\n&quot;).filter(Boolean).map((line) =&gt; { const parts = line.split(&quot;\t&quot;); return [parts[1], parts[0].split(&quot; &quot;)[0]]; }) ); if</span></li>
 <li><span class="sec">line 201</span> <span class="meta">line 201</span><br><span class="x">(!modes.has(&quot;packaging/debian/changelog&quot;)) { fail(&quot;packaging/debian/changelog is not tracked, and dpkg-buildpackage &quot; + &quot;refuses to start without it&quot;); } else { pass(&quot;packaging/debian/changelog is there, so dpkg-buildpackage can start&quot;); }</span></li>
 <li><span class="sec">line 201</span> <span class="meta">line 201</span><br><span class="x">const rules = modes.get(&quot;packaging/debian/rules&quot;); if (rules !== &quot;100755&quot;) { fail(`packaging/debian/rules is mode ${rules || &quot;absent&quot;} in the index; ` + &quot;dpkg-buildpackage runs it directly, so it has to be 100755&quot;); } else {</span></li>
-<li><span class="sec">line 201</span> <span class="meta">line 201</span><br><span class="x">pass(&quot;packaging/debian/rules is executable in the index&quot;); } return failures; }</span></li>
-<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">module.exports = { run, name: &quot;package definitions, against the workspace version&quot; };</span></li>
+<li><span class="sec">line 201</span> <span class="meta">line 201</span><br><span class="x">pass(&quot;packaging/debian/rules is executable in the index&quot;); } failures += changelogDates(fail, pass); return failures;</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">} /** * Every changelog entry&#x27;s weekday matches its date. * * # The defect this exists to stop coming back * * `Sun, 31 Aug 2026` in the Debian changelog and `Sun Aug 31 2026` in the RPM * spec. 31 August 2026 was a Monday. One wrong</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">weekday, copied into two * packaging files, sitting in both for as long as they had existed. * * Neither is cosmetic. `rpmbuild` prints `bogus date in %changelog` and * lintian carries `debian-changelog-has-wrong-day-of-week`, so both</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">would be * bounced by a distribution&#x27;s review. Nothing here noticed, because nothing * here built the packages: `docs/PACKAGING.md` said these formats &quot;parse&quot;, and * a date with the wrong weekday parses perfectly. * * # Why this check and</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">not the build * * Building both packages takes a full release compile and two toolchains, and * it already happens by hand and is written up. This is the part that can run * on every commit, on any machine, in milliseconds. It does not</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">replace the * build; it catches the one class of defect that a build found and that * nothing else was looking for. */ function changelogDates(fail, pass) { let failures = 0; const DAYS = [&quot;Sun&quot;, &quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;];</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 }; const sources = [ { file: &quot;packaging/debian/changelog&quot;, // ` -- Name &lt;mail&gt; Tue, 01 Sep 2026 00:00:00 +0000` pattern: /^</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">-- .*?&gt;\s+(\w{3}), (\d{2}) (\w{3}) (\d{4})/gm, order: (m) =&gt; [m[1], m[2], m[3], m[4]] },</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">{ file: &quot;packaging/rpm/veilvoice.spec&quot;, // `* Tue Sep 01 2026 Name &lt;mail&gt; - 0.1.16-1` pattern: /^\* (\w{3}) (\w{3}) (\d{2}) (\d{4})/gm, order: (m) =&gt; [m[1], m[3], m[2], m[4]] } ]; let checked = 0; for (const { file, pattern, order } of</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">sources) { const text = read(file); let m; pattern.lastIndex = 0; while ((m = pattern.exec(text)) !== null) { const [dow, day, mon, year] = order(m); if (!(mon in MONTHS)) { failures += 1; fail(`${file}: &quot;${mon}&quot; is not a month name`);</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">continue; } checked += 1; const date = new Date(Date.UTC(Number(year), MONTHS[mon], Number(day))); const actual = DAYS[date.getUTCDay()]; if (actual !== dow) { failures += 1; fail(`${file}: &quot;${dow}, ${day} ${mon} ${year}&quot; is wrong; that</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">date is ` + `a ${actual}. rpmbuild calls this a bogus date and lintian has ` + &quot;debian-changelog-has-wrong-day-of-week, so a distribution&#x27;s &quot; + &quot;review would bounce it.&quot;); } } } if (checked &lt; 2) { failures += 1; fail(&quot;no changelog dates</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">were found in either packaging file, so this &quot; + &quot;check is reading nothing&quot;); } else if (failures === 0) { pass(`${checked} packaging changelog dates have the right weekday`); }</span></li>
+<li><span class="sec">line 321</span> <span class="meta">line 321</span><br><span class="x">return failures; } module.exports = { run, name: &quot;package definitions, against the workspace version&quot; };</span></li>
 </ul>
 </details>
 <details open>
@@ -14663,7 +14675,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">veilvoice (0.1.16-1) unstable; urgency=medium * See CHANGELOG.md in the source for what changed in this release. This file exists because dpkg-buildpackage requires it and takes the package&#x27;s version from it, so it is the one place in</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">packaging/ that decides what version is built. tools/site-tests/packaging.test.js compares it against the workspace version and fails the build if the two disagree. -- tilas01 &lt;tilas01@users.noreply.github.com&gt; Tue, 01 Sep 2026 00:00:00</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">+0000 veilvoice (0.1.15-1) unstable; urgency=medium * See CHANGELOG.md in the source for what changed in this release. This file exists because dpkg-buildpackage requires it and takes the package&#x27;s version from it, so it is the one place</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">in packaging/ that decides what version is built. tools/site-tests/packaging.test.js compares it against the workspace version and fails the build if the two disagree. -- tilas01 &lt;tilas01@users.noreply.github.com&gt; Sun, 31 Aug 2026 00:00:00</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">in packaging/ that decides what version is built. tools/site-tests/packaging.test.js compares it against the workspace version and fails the build if the two disagree. -- tilas01 &lt;tilas01@users.noreply.github.com&gt; Mon, 31 Aug 2026 00:00:00</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">+0000</span></li>
 </ul>
 </details>
