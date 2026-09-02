@@ -1167,6 +1167,20 @@ html.demo-locked, html.demo-locked body { overflow: hidden; }
 
 /* The output scrolls in its own box. A help screen is forty lines and the card
  * must not grow to whatever the longest one happens to be. */
+/* The one-line description of the recording being played, between the picker
+   and the terminal, so somebody who clicked a title knows what they are about
+   to watch before it starts. */
+/* The replay is a different kind of action from the five titles beside it, so
+   it is pushed to the far end rather than sitting in the list as a sixth
+   thing to choose between. */
+.demo-btn-strong.demo-btn-replay { margin-left: auto; }
+
+.demo-term-note {
+  margin: 6px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .demo-term-out {
   margin: 0;
   padding: 12px 14px;

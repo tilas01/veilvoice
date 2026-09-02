@@ -551,7 +551,13 @@ fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> 
 
     good(&format!("sha256 matches ({actual})"));
     out!();
-    verdict!("  INTACT. This file is byte-for-byte what was published, signed by");
+    // Named, not "this file". `auto` finds the archive itself, so the person
+    // running it never typed the name, and a verdict that says "this file is
+    // byte-for-byte what was published" without saying which file is a verdict
+    // about nothing. It is also the one line somebody quotes when they tell
+    // somebody else the download is genuine. Found by recording this session
+    // for the website and reading it back with no idea what had been checked.
+    verdict!("  INTACT. {name} is byte-for-byte what was published, signed by");
     verdict!("  {FINGERPRINT}.");
     out!();
     out!("  That is not the same as knowing it was built from the published");

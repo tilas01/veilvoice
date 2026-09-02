@@ -1,0 +1,34 @@
+$ veilvoice-verify auto .
+Checking what is in .
+
+  ok    embedded key fingerprint 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+  ok    signature over the hash list is good
+  ok    sha256 matches (d7814c9d7b40035f06d25eba5012bf4a62a4cee310e9b6eb3405baf2ef9c43b8)
+
+  INTACT. veilvoice-v0.1.17-linux-x86_64.tar.gz is byte-for-byte what was published, signed by
+  8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.
+
+  That is not the same as knowing it was built from the published
+  source -- the same person produced the binary and the list. For
+  that, compare against a hash somebody else produced from their own
+  build:  veilvoice-verify --explain
+
+Checking it again with your own GnuPG
+  found at /usr/bin/gpg
+  Your GnuPG keyring already had the VeilVoice signing key 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.
+  It is a public key: it lets you check signatures and can sign
+  nothing and decrypt nothing. It carries no e-mail address.
+  To remove it:  gpg --delete-keys 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+
+  ok    your GnuPG agrees: signed by the VeilVoice key
+
+  And the same thing, typed by you, which is the part this program
+  cannot do for itself:
+
+    gpg --import ./veilvoice-signing-key.asc
+    gpg --verify ./SHA256SUMS.asc ./SHA256SUMS
+    sha256sum -c SHA256SUMS --ignore-missing
+
+  Worth doing. This program checked the signature with a key built into
+  itself, and it came out of the same download you are checking. The
+  fingerprint on the website is the independent answer.

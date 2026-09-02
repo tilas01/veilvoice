@@ -1,0 +1,32 @@
+$ veilvoice anonymise interview.wav -o veiled.wav --encrypt false --yes
+Input
+  File                   interview.wav
+  Duration               3.00 s
+  Sample rate            16000 Hz
+
+✗ WRITING THIS RECORDING UNENCRYPTED
+  The de-identified recording will be written to disk unencrypted.
+
+  VeilVoice destroys the voiceprint, not the words. Anyone who can read
+  this file can still hear everything that was said: another user, a
+  backup, a sync client, anyone who later gets the disk.
+
+  Deleting it afterwards is not a fix: on an SSD, SD card or USB stick
+  the original blocks can survive every overwrite. That is why at-rest
+  encryption is the default rather than an option you have to find.
+
+  The file will be created readable only by your account. That is a file
+  permission and nothing more. It does not survive a copy, a backup, or
+  anyone who has the disk.
+
+Result
+  Written                veiled.wav
+  Speed                  123.0x realtime
+  Accent                 neutralised
+  Seed rolls             1280-1840 ms, drawn fresh before every roll -- no period to observe
+  At rest                UNENCRYPTED
+
+✓ done, and the voiceprint in this file is not recoverable
+  The words are still there; that is deliberate. To hide the
+  message as well, encrypt it: veilvoice encrypt
+! continuing without at-rest encryption, as asked

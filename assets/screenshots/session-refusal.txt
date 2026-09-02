@@ -1,0 +1,28 @@
+$ veilvoice anonymise interview.wav -o veiled.wav
+Input
+  File                   interview.wav
+  Duration               3.00 s
+  Sample rate            16000 Hz
+
+  Choose a passphrase for this recording. It is separate from
+  the app lock, and there is no way to recover it.
+✗ there is no terminal here to ask for a passphrase.
+
+  This is what happens in a script, a scheduled job, or anything with
+  its input redirected.
+
+  Run it in a terminal, if somebody is there to type.
+
+  Or, for the two commands that write a recording, seal it to a public
+  key instead, which types nothing and is what works in a script:
+
+    veilvoice anonymise <FILE> --encrypt-to <PUBKEY>
+    veilvoice encrypt   <FILE> --to <PUBKEY>
+
+  Make the key once, in a terminal, with veilvoice keygen.
+
+  veilvoice anonymise can also write a recording with no encryption at
+  all, using --encrypt false --yes. That leaves every word that was
+  said readable by anyone who gets the file.
+
+  Nothing was written.

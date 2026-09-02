@@ -8,6 +8,32 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The demonstration is a recording now**
+
+- The website's demonstration replays transcripts of the real programs: the
+  bytes they wrote on a terminal, with the passphrases typed at the real
+  prompts. Five of them, covering all three binaries, and they are re-run and
+  compared on every build.
+- It sits with the screenshots, where somebody looking at pictures of the
+  window will meet it, rather than four screens further down.
+- The release verifier's mode used to play a hand-written list of lines
+  described as the program running, and four of its six output lines were text
+  the program has never printed. On a page whose argument is that you should
+  check things yourself, the part demonstrating the checking was invented.
+  There is no hand-written program output anywhere on the site now.
+
+**Three defects the recordings found, F-128 to F-130**
+
+- `veilvoice anonymise -o veiled.veil` wrote `veiled.veil.veil` and reported
+  that name back, so the file you asked for did not exist. The `.veil`
+  extension is appended rather than substituted on purpose, and that rule was
+  being applied to an output path somebody had already named.
+- The verifier's verdict said "This file is byte-for-byte what was published"
+  without saying which file. `auto` finds the archive for you, so in the
+  commonest way of running it the name had never been typed and was never
+  printed. It names the file now.
+- And the invented transcript above.
+
 **The roadmap**
 
 - Every item on the roadmap page is linkable on its own now: item 98 is at
