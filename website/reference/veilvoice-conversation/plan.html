@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/plan.svg" alt="plan.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/plan.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 947 lines &middot; <a href="plan.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 1084 lines &middot; <a href="plan.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#veilvoice-does-not-work-out-who-is-talking-and-will-not-guess">VeilVoice does not work out who is talking, and will not guess</a>
@@ -76,7 +76,7 @@ turn  4.100  9.050  1</code></pre>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>947 lines defining <strong>21 functions</strong> (21 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1084 lines defining <strong>22 functions</strong> (21 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Speaker</code> <span style="color:var(--muted)">line 71</span> &middot; One person in the recording.</li>
 <li><code>struct Turn</code> <span style="color:var(--muted)">line 97</span> &middot; A span of the recording belonging to one speaker.</li>
@@ -85,47 +85,47 @@ turn  4.100  9.050  1</code></pre>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Turn::duration</code> <span style="color:var(--muted)">line 114</span> &middot; How long this turn lasts, in seconds.
 </li>
-<li><code>Conversation::add_speaker</code> <span style="color:var(--muted)">line 147</span> &middot; Add a speaker, and return the index they were given.
+<li><code>Conversation::add_speaker</code> <span style="color:var(--muted)">line 157</span> &middot; Add a speaker, and return the index they were given.
 </li>
-<li><code>Conversation::add_turn</code> <span style="color:var(--muted)">line 169</span> &middot; Add a turn.
+<li><code>Conversation::add_turn</code> <span style="color:var(--muted)">line 179</span> &middot; Add a turn.
 </li>
-<li><code>Conversation::rename_speakers</code> <span style="color:var(--muted)">line 235</span> &middot; Rename everybody, in slot order, keeping every turn where it is.
+<li><code>Conversation::rename_speakers</code> <span style="color:var(--muted)">line 245</span> &middot; Rename everybody, in slot order, keeping every turn where it is.
 </li>
-<li><code>Conversation::speakers</code> <span style="color:var(--muted)">line 265</span> &middot; The speakers, in the order they were added.
+<li><code>Conversation::speakers</code> <span style="color:var(--muted)">line 275</span> &middot; The speakers, in the order they were added.
 </li>
-<li><code>Conversation::turns</code> <span style="color:var(--muted)">line 270</span> &middot; The turns, in time order.
+<li><code>Conversation::turns</code> <span style="color:var(--muted)">line 280</span> &middot; The turns, in time order.
 </li>
-<li><code>Conversation::len</code> <span style="color:var(--muted)">line 275</span> &middot; How many speakers there are.
+<li><code>Conversation::len</code> <span style="color:var(--muted)">line 285</span> &middot; How many speakers there are.
 </li>
-<li><code>Conversation::is_empty</code> <span style="color:var(--muted)">line 280</span> &middot; Whether there is nobody in the plan.
+<li><code>Conversation::is_empty</code> <span style="color:var(--muted)">line 290</span> &middot; Whether there is nobody in the plan.
 </li>
-<li><code>Conversation::voice</code> <span style="color:var(--muted)">line 285</span> &middot; The destination voice for a speaker.
+<li><code>Conversation::voice</code> <span style="color:var(--muted)">line 295</span> &middot; The destination voice for a speaker.
 </li>
-<li><code>Conversation::mode</code> <span style="color:var(--muted)">line 296</span> &middot; Whether every speaker gets their own voice, or one between them.
+<li><code>Conversation::mode</code> <span style="color:var(--muted)">line 306</span> &middot; Whether every speaker gets their own voice, or one between them.
 </li>
-<li><code>Conversation::set_mode</code> <span style="color:var(--muted)">line 305</span> &middot; Render every speaker as the same voice, or as their own.
+<li><code>Conversation::set_mode</code> <span style="color:var(--muted)">line 315</span> &middot; Render every speaker as the same voice, or as their own.
 </li>
-<li><code>Conversation::duration</code> <span style="color:var(--muted)">line 316</span> &middot; When the last turn ends, in seconds.
+<li><code>Conversation::duration</code> <span style="color:var(--muted)">line 326</span> &middot; When the last turn ends, in seconds.
 </li>
-<li><code>Conversation::overlaps</code> <span style="color:var(--muted)">line 325</span> &middot; Turns where two people are speaking at once.
+<li><code>Conversation::overlaps</code> <span style="color:var(--muted)">line 335</span> &middot; Turns where two people are speaking at once.
 </li>
-<li><code>Conversation::self_overlaps</code> <span style="color:var(--muted)">line 346</span> &middot; Spans where a speaker&#x27;s turns overlap their own other turns.
+<li><code>Conversation::self_overlaps</code> <span style="color:var(--muted)">line 356</span> &middot; Spans where a speaker&#x27;s turns overlap their own other turns.
 </li>
-<li><code>Conversation::from_channels</code> <span style="color:var(--muted)">line 368</span> &middot; A plan for a recording with one microphone per person.
+<li><code>Conversation::from_channels</code> <span style="color:var(--muted)">line 378</span> &middot; A plan for a recording with one microphone per person.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>named</code>, <code>new</code></span>
 </li>
-<li><code>Conversation::save</code> <span style="color:var(--muted)">line 525</span> &middot; Write the plan to path.
+<li><code>Conversation::save</code> <span style="color:var(--muted)">line 562</span> &middot; Write the plan to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Conversation::load</code> <span style="color:var(--muted)">line 536</span> &middot; Read a plan written by Conversation::save.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code></span>
+<li><code>Conversation::load</code> <span style="color:var(--muted)">line 573</span> &middot; Read a plan written by Conversation::save.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code>, <code>split_word</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 619 1115" width="619" height="1115" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 635 1131" width="635" height="1131" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -134,126 +134,134 @@ turn  4.100  9.050  1</code></pre>
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="619" height="1115" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M568.2 747.0 C 590.2 747.0, 590.2 47.0, 171.8 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M568.2 747.0 C 613.2 747.0, 613.2 47.0, 594.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M495.7 947.0 C 533.8 947.0, 533.8 847.0, 514.8 847.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M511.8 847.0 C 613.2 847.0, 613.2 47.0, 594.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M296.6 947.0 C 326.7 947.0, 326.7 847.0, 307.7 847.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<rect x="0" y="0" width="635" height="1131" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M328.8 847.0 C 350.8 847.0, 350.8 47.0, 208.1 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M328.8 847.0 C 350.8 847.0, 350.8 147.0, 275.4 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M607.3 947.0 C 629.3 947.0, 629.3 947.0, 212.1 947.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M209.1 947.0 C 294.4 947.0, 294.4 147.0, 275.4 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M209.1 947.0 C 593.0 947.0, 593.0 47.0, 574.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M408.2 947.0 C 574.1 947.0, 574.1 847.0, 555.1 847.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="plan.src.html#fn-speaker-named">
-<rect x="28.0" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="98.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Speaker::named</text>
-<text x="98.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+<rect x="64.3" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="134.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Speaker::named</text>
+<text x="134.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
 </a>
 <a href="plan.src.html#fn-turn-duration">
-<rect x="91.3" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="193.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Turn::duration</text>
-<text x="193.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
+<rect x="330.7" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="433.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Turn::duration</text>
+<text x="433.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
+</a>
+<a href="plan.src.html#fn-split_word">
+<rect x="462.4" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="516.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">split_word</text>
+<text x="516.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
 </a>
 <a href="plan.src.html#fn-conversation-new">
-<rect x="426.2" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="508.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::new</text>
-<text x="508.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
+<rect x="107.4" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="189.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::new</text>
+<text x="189.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="plan.src.html#fn-conversation-add_speaker">
-<rect x="79.2" y="120.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="193.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_speaker</text>
-<text x="193.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+<rect x="298.4" y="120.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="413.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_speaker</text>
+<text x="413.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
 </a>
 <a href="plan.src.html#fn-conversation-add_turn">
-<rect x="334.7" y="120.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="437.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_turn</text>
-<text x="437.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
+<rect x="71.1" y="220.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="173.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_turn</text>
+<text x="173.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
 <a href="plan.src.html#fn-conversation-rename_speakers">
-<rect x="63.1" y="220.0" width="261.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="193.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::rename_speakers</text>
-<text x="193.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
+<rect x="302.4" y="220.0" width="261.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="433.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::rename_speakers</text>
+<text x="433.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
 </a>
 <a href="plan.src.html#fn-conversation-speakers">
-<rect x="350.8" y="220.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="453.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::speakers</text>
-<text x="453.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 265</text>
+<rect x="111.4" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="214.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::speakers</text>
+<text x="214.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
 </a>
 <a href="plan.src.html#fn-conversation-turns">
-<rect x="123.5" y="320.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="214.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::turns</text>
-<text x="214.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
+<rect x="342.7" y="320.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="433.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::turns</text>
+<text x="433.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
 </a>
 <a href="plan.src.html#fn-conversation-len">
-<rect x="330.7" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="413.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::len</text>
-<text x="413.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
+<rect x="119.5" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="202.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::len</text>
+<text x="202.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
 </a>
 <a href="plan.src.html#fn-conversation-is_empty">
-<rect x="103.4" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="206.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::is_empty</text>
-<text x="206.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
+<rect x="310.5" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="413.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::is_empty</text>
+<text x="413.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 290</text>
 </a>
 <a href="plan.src.html#fn-conversation-voice">
-<rect x="334.7" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="425.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::voice</text>
-<text x="425.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
+<rect x="127.5" y="520.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="218.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::voice</text>
+<text x="218.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 295</text>
 </a>
 <a href="plan.src.html#fn-conversation-mode">
-<rect x="107.4" y="520.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="193.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::mode</text>
-<text x="193.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 296</text>
+<rect x="334.7" y="520.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="421.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::mode</text>
+<text x="421.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 306</text>
 </a>
 <a href="plan.src.html#fn-conversation-set_mode">
-<rect x="306.5" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="409.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::set_mode</text>
-<text x="409.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 305</text>
+<rect x="99.3" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="202.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::set_mode</text>
+<text x="202.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
 </a>
 <a href="plan.src.html#fn-conversation-duration">
-<rect x="91.3" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="193.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::duration</text>
-<text x="193.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
+<rect x="330.7" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="433.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::duration</text>
+<text x="433.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 326</text>
 </a>
 <a href="plan.src.html#fn-conversation-overlaps">
-<rect x="322.6" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="425.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::overlaps</text>
-<text x="425.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 325</text>
+<rect x="79.2" y="720.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="181.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::overlaps</text>
+<text x="181.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 335</text>
 </a>
 <a href="plan.src.html#fn-conversation-self_overlaps">
-<rect x="51.0" y="720.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="173.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::self_overlaps</text>
-<text x="173.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 346</text>
+<rect x="310.5" y="720.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="433.3" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::self_overlaps</text>
+<text x="433.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 356</text>
 </a>
 <a href="plan.src.html#fn-conversation-from_channels">
-<rect x="322.6" y="720.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="445.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::from_channels</text>
-<text x="445.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 368</text>
+<rect x="83.2" y="820.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="206.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::from_channels</text>
+<text x="206.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 378</text>
 </a>
 <a href="plan.src.html#fn-conversation-to_text">
-<rect x="107.4" y="820.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="206.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::to_text</text>
-<text x="206.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 393</text>
+<rect x="354.8" y="820.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="453.5" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::to_text</text>
+<text x="453.5" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
 </a>
 <a href="plan.src.html#fn-conversation-parse">
-<rect x="330.7" y="820.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="421.2" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::parse</text>
-<text x="421.2" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 430</text>
+<rect x="28.0" y="920.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="118.6" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::parse</text>
+<text x="118.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 440</text>
 </a>
 <a href="plan.src.html#fn-conversation-save">
-<rect x="123.5" y="920.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="210.1" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::save</text>
-<text x="210.1" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 525</text>
+<rect x="235.1" y="920.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="321.7" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::save</text>
+<text x="321.7" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 562</text>
 </a>
 <a href="plan.src.html#fn-conversation-load">
-<rect x="322.6" y="920.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="409.1" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::load</text>
-<text x="409.1" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 536</text>
+<rect x="434.2" y="920.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="520.8" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::load</text>
+<text x="520.8" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 573</text>
 </a>
 <rect x="20.0" y="1004.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
 <rect x="20.0" y="1020.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
 <text x="35.0" y="1029.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<path d="M20.0 1040.5 L29.0 1040.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="1045.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="1067.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="1082.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="1097.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<rect x="20.0" y="1036.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="1045.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 1056.5 L29.0 1056.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="1061.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="1083.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
+<text x="20.0" y="1098.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="1113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
@@ -262,55 +270,60 @@ turn  4.100  9.050  1</code></pre>
 flowchart TD
     n_named[&quot;Speaker::named&lt;br/&gt;line 87&quot;]
     n_duration([&quot;Turn::duration&lt;br/&gt;line 114&quot;])
-    n_new[&quot;Conversation::new&lt;br/&gt;line 137&quot;]
-    n_add_speaker([&quot;Conversation::add_speaker&lt;br/&gt;line 147&quot;])
-    n_add_turn([&quot;Conversation::add_turn&lt;br/&gt;line 169&quot;])
-    n_rename_speakers([&quot;Conversation::rename_speakers&lt;br/&gt;line 235&quot;])
-    n_speakers([&quot;Conversation::speakers&lt;br/&gt;line 265&quot;])
-    n_turns([&quot;Conversation::turns&lt;br/&gt;line 270&quot;])
-    n_len([&quot;Conversation::len&lt;br/&gt;line 275&quot;])
-    n_is_empty([&quot;Conversation::is_empty&lt;br/&gt;line 280&quot;])
-    n_voice([&quot;Conversation::voice&lt;br/&gt;line 285&quot;])
-    n_mode([&quot;Conversation::mode&lt;br/&gt;line 296&quot;])
-    n_set_mode([&quot;Conversation::set_mode&lt;br/&gt;line 305&quot;])
-    n_duration([&quot;Conversation::duration&lt;br/&gt;line 316&quot;])
-    n_overlaps([&quot;Conversation::overlaps&lt;br/&gt;line 325&quot;])
-    n_self_overlaps([&quot;Conversation::self_overlaps&lt;br/&gt;line 346&quot;])
-    n_from_channels([&quot;Conversation::from_channels&lt;br/&gt;line 368&quot;])
-    n_to_text[&quot;Conversation::to_text&lt;br/&gt;line 393&quot;]
-    n_parse[&quot;Conversation::parse&lt;br/&gt;line 430&quot;]
-    n_save([&quot;Conversation::save&lt;br/&gt;line 525&quot;])
-    n_load([&quot;Conversation::load&lt;br/&gt;line 536&quot;])
+    n_split_word[&quot;split_word&lt;br/&gt;line 139&quot;]
+    n_new[&quot;Conversation::new&lt;br/&gt;line 147&quot;]
+    n_add_speaker([&quot;Conversation::add_speaker&lt;br/&gt;line 157&quot;])
+    n_add_turn([&quot;Conversation::add_turn&lt;br/&gt;line 179&quot;])
+    n_rename_speakers([&quot;Conversation::rename_speakers&lt;br/&gt;line 245&quot;])
+    n_speakers([&quot;Conversation::speakers&lt;br/&gt;line 275&quot;])
+    n_turns([&quot;Conversation::turns&lt;br/&gt;line 280&quot;])
+    n_len([&quot;Conversation::len&lt;br/&gt;line 285&quot;])
+    n_is_empty([&quot;Conversation::is_empty&lt;br/&gt;line 290&quot;])
+    n_voice([&quot;Conversation::voice&lt;br/&gt;line 295&quot;])
+    n_mode([&quot;Conversation::mode&lt;br/&gt;line 306&quot;])
+    n_set_mode([&quot;Conversation::set_mode&lt;br/&gt;line 315&quot;])
+    n_duration([&quot;Conversation::duration&lt;br/&gt;line 326&quot;])
+    n_overlaps([&quot;Conversation::overlaps&lt;br/&gt;line 335&quot;])
+    n_self_overlaps([&quot;Conversation::self_overlaps&lt;br/&gt;line 356&quot;])
+    n_from_channels([&quot;Conversation::from_channels&lt;br/&gt;line 378&quot;])
+    n_to_text[&quot;Conversation::to_text&lt;br/&gt;line 403&quot;]
+    n_parse[&quot;Conversation::parse&lt;br/&gt;line 440&quot;]
+    n_save([&quot;Conversation::save&lt;br/&gt;line 562&quot;])
+    n_load([&quot;Conversation::load&lt;br/&gt;line 573&quot;])
     n_from_channels --&gt; n_named
     n_from_channels --&gt; n_new
     n_load --&gt; n_parse
     n_parse --&gt; n_new
+    n_parse --&gt; n_split_word
     n_save --&gt; n_to_text
     click n_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L87&quot; &quot;open the source&quot;
     click n_duration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L114&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L137&quot; &quot;open the source&quot;
-    click n_add_speaker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L147&quot; &quot;open the source&quot;
-    click n_add_turn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L169&quot; &quot;open the source&quot;
-    click n_rename_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L235&quot; &quot;open the source&quot;
-    click n_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L265&quot; &quot;open the source&quot;
-    click n_turns href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L270&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L275&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L280&quot; &quot;open the source&quot;
-    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L285&quot; &quot;open the source&quot;
-    click n_mode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L296&quot; &quot;open the source&quot;
-    click n_set_mode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L305&quot; &quot;open the source&quot;
-    click n_duration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L316&quot; &quot;open the source&quot;
-    click n_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L325&quot; &quot;open the source&quot;
-    click n_self_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L346&quot; &quot;open the source&quot;
-    click n_from_channels href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L368&quot; &quot;open the source&quot;
-    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L393&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L430&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L525&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L536&quot; &quot;open the source&quot;
+    click n_split_word href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L139&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L147&quot; &quot;open the source&quot;
+    click n_add_speaker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L157&quot; &quot;open the source&quot;
+    click n_add_turn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L179&quot; &quot;open the source&quot;
+    click n_rename_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L245&quot; &quot;open the source&quot;
+    click n_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L275&quot; &quot;open the source&quot;
+    click n_turns href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L280&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L285&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L290&quot; &quot;open the source&quot;
+    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L295&quot; &quot;open the source&quot;
+    click n_mode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L306&quot; &quot;open the source&quot;
+    click n_set_mode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L315&quot; &quot;open the source&quot;
+    click n_duration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L326&quot; &quot;open the source&quot;
+    click n_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L335&quot; &quot;open the source&quot;
+    click n_self_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L356&quot; &quot;open the source&quot;
+    click n_from_channels href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L378&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L403&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L440&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L562&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L573&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration,n_add_speaker,n_add_turn,n_rename_speakers,n_speakers,n_turns,n_len,n_is_empty,n_voice,n_mode,n_set_mode,n_duration,n_overlaps,n_self_overlaps,n_from_channels,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_named,n_new,n_to_text,n_parse api</code></pre>
+    class n_named,n_new,n_to_text,n_parse api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_split_word helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -323,25 +336,27 @@ flowchart TD
 <tr><td><code>Turn</code> <sub>pub struct</sub></td><td><a href="plan.src.html#fn-turn">97</a></td><td>A span of the recording belonging to one speaker.</td></tr>
 <tr><td><code>Turn::duration</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-turn-duration">114</a></td><td>How long this turn lasts, in seconds.</td></tr>
 <tr><td><code>Conversation</code> <sub>pub struct</sub></td><td><a href="plan.src.html#fn-conversation">121</a></td><td>The whole plan: who is in the recording, and when each of them speaks.</td></tr>
-<tr><td><code>Conversation::new</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-new">137</a></td><td>An empty plan.</td></tr>
-<tr><td><code>Conversation::add_speaker</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-add_speaker">147</a></td><td>Add a speaker, and return the index they were given.</td></tr>
-<tr><td><code>Conversation::add_turn</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-add_turn">169</a></td><td>Add a turn.</td></tr>
-<tr><td><code>Conversation::rename_speakers</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-rename_speakers">235</a></td><td>Rename everybody, in slot order, keeping every turn where it is.</td></tr>
-<tr><td><code>Conversation::speakers</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-speakers">265</a></td><td>The speakers, in the order they were added.</td></tr>
-<tr><td><code>Conversation::turns</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-turns">270</a></td><td>The turns, in time order.</td></tr>
-<tr><td><code>Conversation::len</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-len">275</a></td><td>How many speakers there are.</td></tr>
-<tr><td><code>Conversation::is_empty</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-is_empty">280</a></td><td>Whether there is nobody in the plan.</td></tr>
-<tr><td><code>Conversation::voice</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-voice">285</a></td><td>The destination voice for a speaker.</td></tr>
-<tr><td><code>Conversation::mode</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-mode">296</a></td><td>Whether every speaker gets their own voice, or one between them.</td></tr>
-<tr><td><code>Conversation::set_mode</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-set_mode">305</a></td><td>Render every speaker as the same voice, or as their own.</td></tr>
-<tr><td><code>Conversation::duration</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-duration">316</a></td><td>When the last turn ends, in seconds.</td></tr>
-<tr><td><code>Conversation::overlaps</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-overlaps">325</a></td><td>Turns where two people are speaking at once.</td></tr>
-<tr><td><code>Conversation::self_overlaps</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-self_overlaps">346</a></td><td>Spans where a speaker&#x27;s turns overlap their own other turns.</td></tr>
-<tr><td><code>Conversation::from_channels</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-from_channels">368</a></td><td>A plan for a recording with one microphone per person.</td></tr>
-<tr><td><code>Conversation::to_text</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-to_text">393</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
-<tr><td><code>Conversation::parse</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-parse">430</a></td><td>Parse the text format.</td></tr>
-<tr><td><code>Conversation::save</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-save">525</a></td><td>Write the plan to path.</td></tr>
-<tr><td><code>Conversation::load</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-load">536</a></td><td>Read a plan written by Conversation::save.</td></tr>
+<tr><td><code>split_word</code> <sub>fn</sub></td><td><a href="plan.src.html#fn-split_word">139</a></td><td>The first whitespace-separated word, and everything after it.</td></tr>
+<tr><td><code>Conversation::new</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-new">147</a></td><td>An empty plan.</td></tr>
+<tr><td><code>Conversation::add_speaker</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-add_speaker">157</a></td><td>Add a speaker, and return the index they were given.</td></tr>
+<tr><td><code>Conversation::add_turn</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-add_turn">179</a></td><td>Add a turn.</td></tr>
+<tr><td><code>Conversation::rename_speakers</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-rename_speakers">245</a></td><td>Rename everybody, in slot order, keeping every turn where it is.</td></tr>
+<tr><td><code>Conversation::speakers</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-speakers">275</a></td><td>The speakers, in the order they were added.</td></tr>
+<tr><td><code>Conversation::turns</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-turns">280</a></td><td>The turns, in time order.</td></tr>
+<tr><td><code>Conversation::len</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-len">285</a></td><td>How many speakers there are.</td></tr>
+<tr><td><code>Conversation::is_empty</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-is_empty">290</a></td><td>Whether there is nobody in the plan.</td></tr>
+<tr><td><code>Conversation::voice</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-voice">295</a></td><td>The destination voice for a speaker.</td></tr>
+<tr><td><code>Conversation::mode</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-mode">306</a></td><td>Whether every speaker gets their own voice, or one between them.</td></tr>
+<tr><td><code>Conversation::set_mode</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-set_mode">315</a></td><td>Render every speaker as the same voice, or as their own.</td></tr>
+<tr><td><code>Conversation::duration</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-duration">326</a></td><td>When the last turn ends, in seconds.</td></tr>
+<tr><td><code>Conversation::overlaps</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-overlaps">335</a></td><td>Turns where two people are speaking at once.</td></tr>
+<tr><td><code>Conversation::self_overlaps</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-self_overlaps">356</a></td><td>Spans where a speaker&#x27;s turns overlap their own other turns.</td></tr>
+<tr><td><code>Conversation::from_channels</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-from_channels">378</a></td><td>A plan for a recording with one microphone per person.</td></tr>
+<tr><td><code>Conversation::to_text</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-to_text">403</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
+<tr><td><code>Conversation::parse</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-parse">440</a></td><td>Parse the text format.</td></tr>
+<tr><td><code>Conversation::save</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-save">562</a></td><td>Write the plan to path.</td></tr>
+<tr><td><code>Conversation::load</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-load">573</a></td><td>Read a plan written by Conversation::save.</td></tr>
+<tr><td><code>guide_tests</code> <sub>mod</sub></td><td><a href="plan.src.html#fn-guide_tests">987</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
