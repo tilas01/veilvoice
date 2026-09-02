@@ -38,13 +38,14 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
-## The twenty-fifth round: what recording the programs found
+## The twenty-fifth round: what running the programs found
 
-Three defects (F-128 to F-130), all of them from one change: the website's
+Five defects (F-128 to F-132), three of them from one change: the website's
 demonstration stopped inventing what the programs print and started replaying
 recordings of them.
 
-Every one of the three was found by reading a transcript. Not by reasoning
+Three of the five were found by reading a transcript, and the other two by
+running the window and looking at it. Not by reasoning
 about the code, not by a test, and not by a review: by running the command,
 writing down what came out, and looking at it. That is the fourth round in a
 row where the finding that mattered came from running the thing, and it is the
@@ -124,6 +125,58 @@ turns out, the position the person who ran it was in too.
 The verdict names the file. That also made the transcript checkable: the
 archive's name carries the version, so a stale recording of an older release
 now fails against the workspace version.
+
+### F-131 -- the crash report was only ever shown on the About tab
+
+`veilvoice-gui/src/app.rs`.
+
+A report of a crash has been written to disk since v0.1.10, and the interface
+mentioned it: one line on the About tab saying the previous run ended
+unexpectedly and naming the file.
+
+About is where somebody goes to read version numbers. It is not where they land
+after a crash: they restart the application to get back to what they were
+doing, arrive on the tab they were using, and see nothing. So the report
+existed, was accurate, was written for a person to read, and there was no path
+by which a person would read it.
+
+This is a feature that was finished and unreachable, which is a different
+failure from one that is broken, and harder to see, because every test of it
+passed and every screenshot of the About tab showed it working.
+
+It is now offered above whichever tab you land on, using the panel the
+application already has for anything it needs somebody to see whatever they are
+looking at. With the whole report readable in place before any decision, a
+button to copy it, a link to the issue tracker, and one to dismiss and delete.
+Nothing is sent, and nothing there can send it: the module has a test that
+fails if a request appears in it.
+
+Running it turned up a second thing worth recording, though not a separate
+finding. The crash panel and the first-run panel can be up together, and it is
+not a rare combination: the application crashed before it saved the first-run
+answers, so the next launch is both. Drawn together they were two unrelated
+demands for a decision on one screen, with the welcome underneath the
+wreckage. The two choices come first now, and the report is there when they are
+made.
+
+### F-132 -- the tab strip looked clickable and did nothing
+
+`veilvoice-gui/src/app.rs`.
+
+Two panels take over the whole tab body and return before it: the first-run
+choices, and now the tour. The tab strip above them stayed live throughout.
+
+Clicking a tab moved the highlight and changed nothing underneath it. That is
+the exact appearance of a window that has stopped responding, offered to
+somebody in their first thirty seconds with the program, and it had been true
+of the first-run panel since it was written.
+
+Found by running the tour and clicking a tab out of habit. Not by a test:
+every test of the first-run panel renders it and checks what it contains, and
+what it contains was right.
+
+The strip is now disabled while either panel is up, which is the honest
+rendering of a state that already existed.
 
 ### What was examined and found nothing
 
@@ -2941,7 +2994,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1197 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1208 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4588,7 +4641,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and thirty defects found and fixed (F-1 to F-130), across
+**One hundred and thirty-two defects found and fixed (F-1 to F-132), across
 twenty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

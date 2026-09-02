@@ -275,9 +275,38 @@ installing it, and finding their way around it without reading a manual.
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
 | 104 | **A demonstration that is the program**: the website's demo driven by real recorded sessions of all three binaries rather than by invented text, in the reader's chosen theme, and sitting with the screenshots rather than away from them | **next** | 3 |
-| 105 | **A crash report offered rather than buried**: the report already written to disk surfaced by a notice on the next launch, with what it contains shown before anything is sent and the filing left to the person | **planned** | 2 |
-| 106 | **A first run that explains itself**: a short tour that can be skipped and comes back on a new version, and an offer to install with portable and installed said plainly, overwriting an older install and saying to restart the terminal | **planned** | 3 |
+| 105 | **A crash report offered rather than buried**: the report already written to disk surfaced above whatever tab you land on, with what it contains listed and readable in full before anything leaves your machine, and the filing left to the person | **done** | - |
+| 106 | **A first run that explains itself**: one card per tab saying what it is for, skippable, and after an upgrade only the tabs that are new, with portable and installed said plainly on the last card | **done** | - |
 | 107 | **VeilVoice on a phone**: an Android package a person can install without developer tools, and iOS if it can be built and signed under a pseudonym, which is the part that decides it | **planned** | 10 |
+
+**What was checked before estimating that, rather than after.** The same rule
+that turned the speaker-detection question from planned into a measurement was
+applied here: the Android target was installed and the workspace was compiled
+against it.
+
+* **The engine, the crypto and the metadata cleaner build for
+  `aarch64-linux-android` as they are.** No conditional compilation, no
+  substitutions, nothing to port. That is the part of VeilVoice that does the
+  actual work, and it is already portable.
+* **Live capture has a real path.** `cpal` reaches Android through `oboe`, and
+  the dependency resolves. It failed here only for want of the NDK, which is a
+  missing tool on this machine rather than a missing backend, and that is a
+  materially different answer from the BSDs, where the backend does not exist.
+* **The window is the work.** `eframe` on Android needs `android-activity` with
+  one of `game-activity` or `native-activity` chosen, an activity entry point
+  in place of `main`, and a `cargo-apk` or `cargo-ndk` packaging step. None of
+  that exists in this tree today, and none of it is a decision anybody is
+  waiting on.
+* **The interface is laid out for a mouse and a wide window.** Nine tabs in a
+  strip, hover text carrying real explanation, and file dialogues. A phone
+  build is not a recompilation of the desktop one.
+
+So the estimate stands as work rather than as a question, which is why this is
+**planned** and not blocked. iOS is the half that may not be possible: it needs
+macOS to build and an Apple Developer ID to sign, and this project is published
+under a pseudonym on purpose, which is the same wall already documented for
+kernel drivers. That will be answered before anything is promised.
+
 
 ---
 

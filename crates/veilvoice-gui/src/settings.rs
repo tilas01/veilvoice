@@ -492,6 +492,23 @@ impl Settings {
         }
     }
 
+    /// The tabs the tour has already covered.
+    pub fn toured_tabs(&self) -> Vec<String> {
+        self.prefs
+            .toured_tabs
+            .split(',')
+            .map(str::trim)
+            .filter(|part| !part.is_empty())
+            .map(str::to_string)
+            .collect()
+    }
+
+    /// Record that the tour has covered these tabs, and save.
+    pub fn mark_toured(&mut self, keys: &[String]) {
+        self.prefs.toured_tabs = keys.join(",");
+        self.persist();
+    }
+
     /// The first-run panel: offered once, with animation already on.
     ///
     /// Shown as a page rather than a modal because it is not urgent and does
@@ -1192,6 +1209,7 @@ mod tests {
                 animations: false,
                 animated_icon: false,
                 configured: true,
+                toured_tabs: String::new(),
                 notify_style: "overlay".into(),
                 failsafe: "close".into(),
                 live_monitor: "toolbar".into(),
