@@ -94,33 +94,35 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>87 lines"])
-    n_main(["main.rs<br/>193 lines"])
-    n_app["app.rs<br/>2662 lines"]
+    n_lib(["lib.rs<br/>88 lines"])
+    n_main(["main.rs<br/>190 lines"])
+    n_app["app.rs<br/>2679 lines"]
     n_autolock["autolock.rs<br/>326 lines"]
-    n_crashlog["crashlog.rs<br/>266 lines"]
+    n_crashlog["crashlog.rs<br/>365 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
-    n_group["group.rs<br/>1668 lines"]
+    n_graphics["graphics.rs<br/>158 lines"]
+    n_group["group.rs<br/>1673 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
     n_layout["layout.rs<br/>280 lines"]
-    n_monitor["monitor.rs<br/>414 lines"]
+    n_monitor["monitor.rs<br/>419 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>601 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
     n_security["security.rs<br/>1717 lines"]
-    n_settings["settings.rs<br/>1245 lines"]
-    n_setup["setup.rs<br/>753 lines"]
-    n_soundbar["soundbar.rs<br/>360 lines"]
+    n_settings["settings.rs<br/>1246 lines"]
+    n_setup["setup.rs<br/>758 lines"]
+    n_soundbar["soundbar.rs<br/>722 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_theme["theme.rs<br/>783 lines"]
+    n_theme["theme.rs<br/>784 lines"]
     n_updates["updates.rs<br/>246 lines"]
-    n_verify["verify.rs<br/>1588 lines"]
+    n_verify["verify.rs<br/>1592 lines"]
     n_watchfeed["watchfeed.rs<br/>417 lines"]
     n_window["window.rs<br/>244 lines"]
     n_app --> n_crashlog
     n_app --> n_dialog
+    n_app --> n_graphics
     n_app --> n_group
     n_app --> n_integrity
     n_app --> n_monitor
@@ -182,6 +184,7 @@ flowchart TD
     click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" "open the source"
     click n_crashlog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" "open the source"
     click n_dialog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" "open the source"
+    click n_graphics href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" "open the source"
     click n_group href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" "open the source"
     click n_integrity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs" "open the source"
     click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" "open the source"
@@ -209,29 +212,30 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2662 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2679 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 326 | Locking the window again after a period of no use. |
-| [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 266 | Make a failure that produces no output produce some. |
+| [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 365 | Make a failure that produces no output produce some. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
-| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1668 | Group mode: several people in one recording, each with a name and a colour. |
+| [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 158 | What the window is drawn with, asked for explicitly and then reported. |
+| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1673 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 87 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
-| [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 193 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
-| [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 414 | The live monitor: what is going in, and what is coming out, wherever you are. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 88 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 190 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
+| [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 419 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 601 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1717 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1245 | The settings panel: a menu of pages, each a titled group of choices. |
-| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 753 | The setup tab: install this copy, undo that, and the optional companions. |
-| [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 360 | The animated mark: a row of bars that rise and fall. |
+| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1246 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 758 | The setup tab: install this copy, undo that, and the optional companions. |
+| [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 722 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 783 | Colour schemes for the desktop app. |
+| [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 784 | Colour schemes for the desktop app. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
-| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1588 | The verify tab: drop a download on the window and be told what it is. |
+| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1592 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
@@ -254,6 +258,11 @@ flowchart TD
 | `fn clear` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | Forget a previous report. |
 | `enum Ask` | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | What is being asked for. |
 | `struct Pending` | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | A file dialog that is open, or has just been answered. |
+| `const BACKEND` | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | The rendering backend. |
+| `const VSYNC` | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | Whether frames wait for the display. |
+| `const MULTISAMPLING` | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | Multisampling, off. |
+| `fn describe` | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | One line for the About tab, and for a bug report. |
+| `fn options` | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | The options the window is created with. |
 | `struct Person` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | One person, as the panel holds them. |
 | `struct Outputs` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | What comes out of a group render. |
 | `struct Group` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | The group-mode panel's state. |
@@ -298,6 +307,7 @@ flowchart TD
 | `enum Page` | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | Which page of the settings menu is showing. |
 | `struct Settings` | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | The settings tab's own state. |
 | `struct Setup` | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | The setup tab's state. |
+| `const FRAMES_PER_SECOND` | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | How often the mark is redrawn while it is moving. |
 | `fn draw` | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | Draw the mark at size, returning the response so it can carry a tooltip. |
 | `struct Destination` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | The chosen place for veiled output, if there is one. |
 | `struct Storage` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | Everything the window shows about encrypted storage. |

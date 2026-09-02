@@ -96,6 +96,15 @@ requirements: the plain archive is a folder of binaries that needs no package
 manager, and the statically linked build needs no system libraries at all,
 which is the one to reach for on a distribution nothing else fits.
 
+**One library the desktop app needs, and why it is worth a paragraph.** The
+window toolkit opens `libxkbcommon-x11` by name when it starts, rather than
+linking against it. Nothing that works out dependencies by reading a binary can
+see that, so a minimal or server install can be missing it and the application
+will exit at once instead of drawing a window. If that happens, the crash report
+VeilVoice writes names the library and the package that carries it; the short
+version is `libxkbcommon-x11-0` on Debian and Ubuntu and `libxkbcommon-x11`
+elsewhere. The command line needs none of it.
+
 **The BSDs get the command line only, and the reason is specific.** The audio
 library VeilVoice uses has no backend for them, so live capture cannot work
 there and the desktop application is built around a window that would have

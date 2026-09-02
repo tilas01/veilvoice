@@ -61,6 +61,7 @@ mod app;
 pub mod autolock;
 pub mod crashlog;
 pub mod dialog;
+pub mod graphics;
 pub mod group;
 pub mod integrity;
 pub mod layout;

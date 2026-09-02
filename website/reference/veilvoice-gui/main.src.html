@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 193 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 190 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -227,24 +227,21 @@
 <span class="ln" id="L173"></span>
 <span class="ln" id="L174">    <span class="tok-kw">let</span> result = eframe::<span class="tok-fn">run_native</span>(</span>
 <span class="ln" id="L175">        <span class="tok-str">&quot;VeilVoice&quot;</span>,</span>
-<span class="ln" id="L176">        eframe::NativeOptions {</span>
-<span class="ln" id="L177">            viewport,</span>
-<span class="ln" id="L178">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L179">        },</span>
-<span class="ln" id="L180">        Box::<span class="tok-fn">new</span>(|cc| <span class="tok-fn">Ok</span>(Box::<span class="tok-fn">new</span>(veilvoice_gui::VeilVoiceApp::<span class="tok-fn">new</span>(cc)))),</span>
-<span class="ln" id="L181">    );</span>
-<span class="ln" id="L182"></span>
-<span class="ln" id="L183">    <span class="tok-com">// `eframe` reports a failed start by returning, not by panicking, so the</span></span>
-<span class="ln" id="L184">    <span class="tok-com">// hook above never sees it -- and the `Err` a `main` returns is printed to</span></span>
-<span class="ln" id="L185">    <span class="tok-com">// a stderr that does not exist here. Creating the window is also the most</span></span>
-<span class="ln" id="L186">    <span class="tok-com">// likely thing to fail on somebody else&#x27;s machine: this renders through</span></span>
-<span class="ln" id="L187">    <span class="tok-com">// glow, which is OpenGL, and a virtual machine, a remote desktop session or</span></span>
-<span class="ln" id="L188">    <span class="tok-com">// hybrid graphics handing over the wrong adapter can all refuse a context.</span></span>
-<span class="ln" id="L189">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(error) = &amp;result {</span>
-<span class="ln" id="L190">        veilvoice_gui::crashlog::<span class="tok-fn">record_startup_failure</span>(&amp;format!(<span class="tok-str">&quot;{error}&quot;</span>));</span>
-<span class="ln" id="L191">    }</span>
-<span class="ln" id="L192">    result</span>
-<span class="ln" id="L193">}</span>
+<span class="ln" id="L176">        veilvoice_gui::graphics::<span class="tok-fn">options</span>(viewport),</span>
+<span class="ln" id="L177">        Box::<span class="tok-fn">new</span>(|cc| <span class="tok-fn">Ok</span>(Box::<span class="tok-fn">new</span>(veilvoice_gui::VeilVoiceApp::<span class="tok-fn">new</span>(cc)))),</span>
+<span class="ln" id="L178">    );</span>
+<span class="ln" id="L179"></span>
+<span class="ln" id="L180">    <span class="tok-com">// `eframe` reports a failed start by returning, not by panicking, so the</span></span>
+<span class="ln" id="L181">    <span class="tok-com">// hook above never sees it -- and the `Err` a `main` returns is printed to</span></span>
+<span class="ln" id="L182">    <span class="tok-com">// a stderr that does not exist here. Creating the window is also the most</span></span>
+<span class="ln" id="L183">    <span class="tok-com">// likely thing to fail on somebody else&#x27;s machine: this renders through</span></span>
+<span class="ln" id="L184">    <span class="tok-com">// glow, which is OpenGL, and a virtual machine, a remote desktop session or</span></span>
+<span class="ln" id="L185">    <span class="tok-com">// hybrid graphics handing over the wrong adapter can all refuse a context.</span></span>
+<span class="ln" id="L186">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(error) = &amp;result {</span>
+<span class="ln" id="L187">        veilvoice_gui::crashlog::<span class="tok-fn">record_startup_failure</span>(&amp;format!(<span class="tok-str">&quot;{error}&quot;</span>));</span>
+<span class="ln" id="L188">    }</span>
+<span class="ln" id="L189">    result</span>
+<span class="ln" id="L190">}</span>
 </span>
 </code></pre>
 </main>

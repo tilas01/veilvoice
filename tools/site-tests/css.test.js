@@ -395,18 +395,31 @@ function run() {
     }
   }
 
-  // Anchored on the verdict line rather than on "F-1 to F-": section 2.1's
-  // heading is also "(F-1 to F-8)", and matching that would compare the page
-  // against the count from three rounds ago.
-  const auditFindings = /audit rounds \(F-1 to F-(\d+)\)/.exec(audit);
-  const pageFindings = /(\d+) defects found and fixed across (\w+) audit rounds/.exec(indexHtml);
-  if (!auditFindings || !pageFindings) {
+  // Anchored on the **bold** verdict, which is the audit's own current claim.
+  //
+  // It used to match `audit rounds (F-1 to F-N)` in plain text, and that is a
+  // sentence the audit contains twice: once as its verdict and once *quoted*,
+  // inside F-105's write-up, which exists precisely because that verdict had
+  // gone stale. The quotation comes first in the file, so this compared the
+  // front page against a number F-105 was written to condemn, and reported it
+  // as agreement. The page said 104 for six rounds with this check passing.
+  //
+  // The bold markers are what makes the new pattern safe: a quotation of a
+  // sentence is not bold, and the verdict always is.
+  const verdict = /\*\*[A-Za-z- ]+ defects found and fixed \(F-1 to F-(\d+)\), across\s+([a-z-]+) rounds\.\*\*/.exec(audit);
+  const pageFindings = /(\d+) defects found and fixed across ([a-z-]+) audit rounds/.exec(indexHtml);
+  if (!verdict || !pageFindings) {
     fail("the defect-count claim could not be found in the audit or on the page");
-  } else if (auditFindings[1] !== pageFindings[1]) {
+  } else if (verdict[1] !== pageFindings[1]) {
     fail(`the front page claims ${pageFindings[1]} defects, ` +
-         `docs/AUDIT.md's findings run to F-${auditFindings[1]}`);
+         `docs/AUDIT.md's verdict says F-1 to F-${verdict[1]}`);
+  } else if (verdict[2] !== pageFindings[2]) {
+    // The round count drifted separately from the defect count once already.
+    fail(`the front page says ${pageFindings[2]} audit rounds, ` +
+         `docs/AUDIT.md's verdict says ${verdict[2]}`);
   } else {
-    pass(`the front page's defect count (${pageFindings[1]}) matches the audit`);
+    pass(`the front page's defect count (${pageFindings[1]}) and round count ` +
+         `(${pageFindings[2]}) match the audit's verdict`);
   }
 
   // --- 10. tooltips --------------------------------------------------------

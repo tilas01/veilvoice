@@ -406,7 +406,12 @@ impl Setup {
         );
         let painter = ui.painter();
         painter.rect_filled(rect, 3.0, p::bg_dark());
-        painter.rect_stroke(rect, 3.0, egui::Stroke::new(1.0, p::border()));
+        painter.rect_stroke(
+            rect,
+            3.0,
+            egui::Stroke::new(1.0, p::border()),
+            egui::StrokeKind::Inside,
+        );
 
         if motion.enabled {
             // A quarter-width highlight travelling left to right, so the

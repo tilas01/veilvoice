@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/crashlog.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 266 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 365 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs)
 
 ## Contents
 
@@ -82,15 +82,15 @@ application opens. It stays on your machine and is never sent anywhere.
 
 ## What this file contains
 
-266 lines defining **7 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+365 lines defining **9 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `install` (line 136) -- Install the panic hook.
-  - reaches: `default_path`, `previous`, `write`, `stamp`
-- `record_startup_failure` (line 159) -- Record a startup failure that eframe returned rather than panicked.
-  - reaches: `default_path`, `write`, `stamp`
-- `clear` (line 173) -- Forget a previous report.
+- `install` (line 191) -- Install the panic hook.
+  - reaches: `default_path`, `previous`, `write`, `advice`, `stamp`, `missing_library`
+- `record_startup_failure` (line 214) -- Record a startup failure that eframe returned rather than panicked.
+  - reaches: `default_path`, `write`, `advice`, `stamp`, `missing_library`
+- `clear` (line 228) -- Forget a previous report.
   - reaches: `default_path`
 
 ## What calls what
@@ -116,10 +116,13 @@ flowchart TD
     n_default_path["default_path<br/>line 64"]
     n_stamp["stamp<br/>line 74"]
     n_write["write<br/>line 87"]
-    n_install(["install<br/>line 136"])
-    n_record_startup_failure(["record_startup_failure<br/>line 159"])
-    n_previous["previous<br/>line 166"]
-    n_clear(["clear<br/>line 173"])
+    n_advice["advice<br/>line 149"]
+    n_missing_library["missing_library<br/>line 175"]
+    n_install(["install<br/>line 191"])
+    n_record_startup_failure(["record_startup_failure<br/>line 214"])
+    n_previous["previous<br/>line 221"]
+    n_clear(["clear<br/>line 228"])
+    n_advice --> n_missing_library
     n_clear --> n_default_path
     n_install --> n_default_path
     n_install --> n_previous
@@ -127,20 +130,23 @@ flowchart TD
     n_previous --> n_default_path
     n_record_startup_failure --> n_default_path
     n_record_startup_failure --> n_write
+    n_write --> n_advice
     n_write --> n_stamp
     click n_default_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L64" "open the source"
     click n_stamp href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L74" "open the source"
     click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L87" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L136" "open the source"
-    click n_record_startup_failure href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L159" "open the source"
-    click n_previous href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L166" "open the source"
-    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L173" "open the source"
+    click n_advice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L149" "open the source"
+    click n_missing_library href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L175" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L191" "open the source"
+    click n_record_startup_failure href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L214" "open the source"
+    click n_previous href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L221" "open the source"
+    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L228" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_install,n_record_startup_failure,n_clear entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_default_path,n_write,n_previous api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_stamp helper
+    class n_stamp,n_advice,n_missing_library helper
 ```
 
 </details>
@@ -152,10 +158,12 @@ flowchart TD
 | `default_path` <sub>pub fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L64) | The file a failure is written to, beside the preferences. |
 | `stamp` <sub>fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L74) | Seconds since the Unix epoch, or 0 if the clock is unreadable. |
 | `write` <sub>pub fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L87) | Write one failure report. |
-| `install` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L136) | Install the panic hook. |
-| `record_startup_failure` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L159) | Record a startup failure that eframe returned rather than panicked. |
-| `previous` <sub>pub fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L166) | Read a previous report, if one is there, so the interface can mention it. |
-| `clear` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L173) | Forget a previous report. |
+| `advice` <sub>fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L149) | The paragraph that tries to be useful about *this* failure. |
+| `missing_library` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L175) | The name of the shared library a panic message says could not be loaded. |
+| `install` <sub>pub fn</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L191) | Install the panic hook. |
+| `record_startup_failure` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L214) | Record a startup failure that eframe returned rather than panicked. |
+| `previous` <sub>pub fn</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L221) | Read a previous report, if one is there, so the interface can mention it. |
+| `clear` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L228) | Forget a previous report. |
 
 ---
 

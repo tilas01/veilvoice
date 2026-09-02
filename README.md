@@ -188,7 +188,7 @@ on faith.
 
 ```bash
 # 1. Download the archive, the hash list and the signature.
-V=v0.1.16
+V=v0.1.17
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
 curl -fsSLO $B/SHA256SUMS
@@ -210,8 +210,18 @@ cd veilvoice-$V-linux-x86_64
 **Restart your terminal afterwards**, or the new `PATH` will not be in the one
 you are using.
 
-On a distribution nothing else fits, take the `musl-static` archive: it needs
-no system libraries at all.
+If the desktop application exits immediately saying a library could not be
+loaded, install it and try again. The window toolkit opens it by name at
+startup, so a minimal or server install often does not have it:
+
+```bash
+sudo apt install libxkbcommon-x11-0     # Debian, Ubuntu
+sudo dnf install libxkbcommon-x11       # Fedora, RHEL
+sudo pacman -S libxkbcommon-x11         # Arch
+```
+
+The command line needs none of this. On a distribution nothing else fits, take
+the `musl-static` archive: it needs no system libraries at all.
 
 </details>
 
@@ -219,7 +229,7 @@ no system libraries at all.
 <summary><b>macOS</b> (Intel and Apple Silicon)</summary>
 
 ```bash
-V=v0.1.16
+V=v0.1.17
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 # arm64 for Apple Silicon, x86_64 for Intel.
 curl -fsSLO $B/veilvoice-$V-macos-arm64.tar.gz
@@ -242,7 +252,7 @@ and choose Open, rather than turning Gatekeeper off.
 <summary><b>Windows</b> (10 and 11)</summary>
 
 ```powershell
-$V = "v0.1.16"
+$V = "v0.1.17"
 $B = "https://github.com/tilas01/veilvoice/releases/download/$V"
 curl.exe -fsSLO "$B/veilvoice-$V-windows-x86_64.zip"
 curl.exe -fsSLO "$B/SHA256SUMS"
@@ -280,7 +290,7 @@ cannot work and the window is not shipped. Everything that operates on a file
 runs exactly as it does elsewhere.
 
 ```sh
-V=v0.1.16
+V=v0.1.17
 fetch https://github.com/tilas01/veilvoice/releases/download/$V/veilvoice-$V-freebsd-x86_64.tar.gz
 tar xzf veilvoice-$V-freebsd-x86_64.tar.gz
 cd veilvoice-$V-freebsd-x86_64
@@ -303,7 +313,7 @@ To prove your build is the published one, byte for byte:
 
 ```bash
 veilvoice verify --build-script > reproduce-veilvoice.sh
-sh reproduce-veilvoice.sh v0.1.16
+sh reproduce-veilvoice.sh v0.1.17
 ```
 
 That clones the tag, builds it with the committed lockfile and the commit's own
@@ -540,9 +550,9 @@ Artwork is **generated, not committed as opaque blobs**:
 
 ## Status
 
-**v0.1.16: early but real.** The engine, cryptography, audio path, metadata
+**v0.1.17: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1,182 tests across 27
+destinations, CLI and GUI are implemented and tested (1,196 tests across 27
 crates plus doctests, and 17 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
@@ -555,7 +565,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Twenty-three audit rounds have found and fixed **121 defects**.
+Twenty-four audit rounds have found and fixed **127 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a

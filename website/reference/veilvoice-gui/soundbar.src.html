@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/soundbar.rs</code></h1>
-<p style="color:var(--muted)"><a href="soundbar.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 360 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="soundbar.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 722 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -72,349 +72,719 @@
 <span class="ln" id="L29"><span class="tok-com">//! the battery cost behind. The caller decides by passing a [`Motion`], and the</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! only way to animate is to ask for it.</span></span>
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
-<span class="ln" id="L32"><span class="tok-com">//! # In plain words</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! # Cost when it is switched on, which is the interesting one</span></span>
 <span class="ln" id="L33"><span class="tok-com">//!</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! The little row of bars in the corner that rises and falls.</span></span>
-<span class="ln" id="L35"><span class="tok-com">//!</span></span>
-<span class="ln" id="L36"><span class="tok-com">//! It is the same mark the website uses, drawn rather than loaded as a picture, so</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! it takes the colours of whichever scheme you have chosen.</span></span>
-<span class="ln" id="L38"><span class="tok-com">//!</span></span>
-<span class="ln" id="L39"><span class="tok-com">//! It stops moving if your system is set to reduce motion. That setting is a</span></span>
-<span class="ln" id="L40"><span class="tok-com">//! request from somebody who has a reason for making it, and animation that</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! ignores it is animation that makes an application unusable for them.</span></span>
-<span class="ln" id="L42"></span>
-<span class="ln" id="L43"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::prefs::Motion;</span>
-<span class="ln" id="L44"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L45"><span class="tok-kw">use</span> egui::{Color32, Rect, Rounding, Sense, Ui, Vec2};</span>
-<span class="ln" id="L46"></span>
+<span class="ln" id="L34"><span class="tok-com">//! Motion is on by default, and this is the only thing in the application that</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! moves without being asked to. Everything else draws when something happens.</span></span>
+<span class="ln" id="L36"><span class="tok-com">//! So with the default settings, on the file tab, doing nothing, the window was</span></span>
+<span class="ln" id="L37"><span class="tok-com">//! redrawing about sixty times a second for ever, and it was this: measured</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! with `Context::repaint_causes`, which named line 117 of this file as the</span></span>
+<span class="ln" id="L39"><span class="tok-com">//! reason for 559 of 566 frames.</span></span>
+<span class="ln" id="L40"><span class="tok-com">//!</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! An animated logo is not worth a permanently busy window, and two of the</span></span>
+<span class="ln" id="L42"><span class="tok-com">//! costs are ones a user actually notices rather than ones a profiler does.</span></span>
+<span class="ln" id="L43"><span class="tok-com">//! A laptop lid left open at this screen never lets the processor idle. And a</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! window being dragged is competing, every frame, with a full redraw it did</span></span>
+<span class="ln" id="L45"><span class="tok-com">//! not need, which is what &quot;it lags when I move it&quot; is made of.</span></span>
+<span class="ln" id="L46"><span class="tok-com">//!</span></span>
+<span class="ln" id="L47"><span class="tok-com">//! So the mark now moves in the three circumstances where somebody can see it</span></span>
+<span class="ln" id="L48"><span class="tok-com">//! moving, and rests otherwise:</span></span>
+<span class="ln" id="L49"><span class="tok-com">//!</span></span>
+<span class="ln" id="L50"><span class="tok-com">//! - **Not while the window is unfocused.** A background window is still.</span></span>
+<span class="ln" id="L51"><span class="tok-com">//! - **Not while the window is being moved or resized.** Detected from the</span></span>
+<span class="ln" id="L52"><span class="tok-com">//!   window&#x27;s own rectangle changing between frames, and resumed a quarter of</span></span>
+<span class="ln" id="L53"><span class="tok-com">//!   a second after it stops. This is the drag case specifically.</span></span>
+<span class="ln" id="L54"><span class="tok-com">//! - **Not faster than [`FRAMES_PER_SECOND`].** The cycle is 1.9 seconds long</span></span>
+<span class="ln" id="L55"><span class="tok-com">//!   and eased; twenty frames a second is indistinguishable from thirty here,</span></span>
+<span class="ln" id="L56"><span class="tok-com">//!   and costs two thirds as much.</span></span>
+<span class="ln" id="L57"><span class="tok-com">//!</span></span>
+<span class="ln" id="L58"><span class="tok-com">//! Resting is not the same as resetting. Freezing at the midpoint would make</span></span>
+<span class="ln" id="L59"><span class="tok-com">//! every click into another window snap the row flat, so a paused mark holds</span></span>
+<span class="ln" id="L60"><span class="tok-com">//! the shape it had when it paused and picks the cycle up from there.</span></span>
+<span class="ln" id="L61"><span class="tok-com">//!</span></span>
+<span class="ln" id="L62"><span class="tok-com">//! # In plain words</span></span>
+<span class="ln" id="L63"><span class="tok-com">//!</span></span>
+<span class="ln" id="L64"><span class="tok-com">//! The little row of bars in the corner that rises and falls.</span></span>
+<span class="ln" id="L65"><span class="tok-com">//!</span></span>
+<span class="ln" id="L66"><span class="tok-com">//! It is the same mark the website uses, drawn rather than loaded as a picture, so</span></span>
+<span class="ln" id="L67"><span class="tok-com">//! it takes the colours of whichever scheme you have chosen.</span></span>
+<span class="ln" id="L68"><span class="tok-com">//!</span></span>
+<span class="ln" id="L69"><span class="tok-com">//! It stops moving if your system is set to reduce motion. That setting is a</span></span>
+<span class="ln" id="L70"><span class="tok-com">//! request from somebody who has a reason for making it, and animation that</span></span>
+<span class="ln" id="L71"><span class="tok-com">//! ignores it is animation that makes an application unusable for them.</span></span>
+<span class="ln" id="L72"></span>
+<span class="ln" id="L73"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::prefs::Motion;</span>
+<span class="ln" id="L74"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L75"><span class="tok-kw">use</span> egui::{Color32, CornerRadius, Rect, Sense, Ui, Vec2};</span>
+<span class="ln" id="L76"></span>
 <span class="src-item" id="fn-period">
-<span class="ln" id="L47"><span class="tok-com">/// Seconds for one full rise and fall. Matches the website&#x27;s `1.9s`.</span></span>
-<span class="ln" id="L48"><span class="tok-kw">const</span> PERIOD: f32 = <span class="tok-num">1.9</span>;</span>
+<span class="ln" id="L77"><span class="tok-com">/// Seconds for one full rise and fall. Matches the website&#x27;s `1.9s`.</span></span>
+<span class="ln" id="L78"><span class="tok-kw">const</span> PERIOD: f32 = <span class="tok-num">1.9</span>;</span>
 </span>
-<span class="ln" id="L49"></span>
+<span class="ln" id="L79"></span>
+<span class="src-item" id="fn-frames_per_second">
+<span class="ln" id="L80"><span class="tok-com">/// How often the mark is redrawn while it is moving.</span></span>
+<span class="ln" id="L81"><span class="tok-com">///</span></span>
+<span class="ln" id="L82"><span class="tok-com">/// Twenty rather than the thirty it used to ask for. Over a 1.9 second eased</span></span>
+<span class="ln" id="L83"><span class="tok-com">/// cycle the two are not tellable apart, and every one of these frames is a</span></span>
+<span class="ln" id="L84"><span class="tok-com">/// redraw of the whole window, not of the 46 by 22 pixels that changed: egui</span></span>
+<span class="ln" id="L85"><span class="tok-com">/// has no partial repaint, so the cheapest frame is the one not drawn.</span></span>
+<span class="ln" id="L86"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FRAMES_PER_SECOND: u64 = <span class="tok-num">20</span>;</span>
+</span>
+<span class="ln" id="L87"></span>
+<span class="src-item" id="fn-settle">
+<span class="ln" id="L88"><span class="tok-com">/// How long the window must hold still before the mark starts moving again.</span></span>
+<span class="ln" id="L89"><span class="tok-com">///</span></span>
+<span class="ln" id="L90"><span class="tok-com">/// A drag delivers a new window rectangle every few milliseconds, so anything</span></span>
+<span class="ln" id="L91"><span class="tok-com">/// shorter than this restarts the animation between two frames of the same</span></span>
+<span class="ln" id="L92"><span class="tok-com">/// drag and achieves nothing. A quarter of a second is below the point where</span></span>
+<span class="ln" id="L93"><span class="tok-com">/// somebody notices the mark was waiting.</span></span>
+<span class="ln" id="L94"><span class="tok-kw">const</span> SETTLE: f64 = <span class="tok-num">0.25</span>;</span>
+</span>
+<span class="ln" id="L95"></span>
 <span class="src-item" id="fn-delays">
-<span class="ln" id="L50"><span class="tok-com">/// Per-bar phase offsets in seconds, matching the `animation-delay` values in</span></span>
-<span class="ln" id="L51"><span class="tok-com">/// `website/index.html`. Twelve bars, deliberately not in order, so the row</span></span>
-<span class="ln" id="L52"><span class="tok-com">/// ripples instead of sweeping.</span></span>
-<span class="ln" id="L53"><span class="tok-kw">const</span> DELAYS: [f32; <span class="tok-num">12</span>] = [</span>
+<span class="ln" id="L96"><span class="tok-com">/// Per-bar phase offsets in seconds, matching the `animation-delay` values in</span></span>
+<span class="ln" id="L97"><span class="tok-com">/// `website/index.html`. Twelve bars, deliberately not in order, so the row</span></span>
+<span class="ln" id="L98"><span class="tok-com">/// ripples instead of sweeping.</span></span>
+<span class="ln" id="L99"><span class="tok-kw">const</span> DELAYS: [f32; <span class="tok-num">12</span>] = [</span>
 </span>
-<span class="ln" id="L54">    <span class="tok-num">0.000</span>, <span class="tok-num">0.120</span>, <span class="tok-num">0.240</span>, <span class="tok-num">0.080</span>, <span class="tok-num">0.300</span>, <span class="tok-num">0.180</span>, <span class="tok-num">0.060</span>, <span class="tok-num">0.420</span>, <span class="tok-num">0.220</span>, <span class="tok-num">0.500</span>, <span class="tok-num">0.140</span>, <span class="tok-num">0.360</span>,</span>
-<span class="ln" id="L55">];</span>
-<span class="ln" id="L56"></span>
+<span class="ln" id="L100">    <span class="tok-num">0.000</span>, <span class="tok-num">0.120</span>, <span class="tok-num">0.240</span>, <span class="tok-num">0.080</span>, <span class="tok-num">0.300</span>, <span class="tok-num">0.180</span>, <span class="tok-num">0.060</span>, <span class="tok-num">0.420</span>, <span class="tok-num">0.220</span>, <span class="tok-num">0.500</span>, <span class="tok-num">0.140</span>, <span class="tok-num">0.360</span>,</span>
+<span class="ln" id="L101">];</span>
+<span class="ln" id="L102"></span>
 <span class="src-item" id="fn-min_fraction">
-<span class="ln" id="L57"><span class="tok-com">/// Height as a fraction of the available box, matching `16%` and `82%`.</span></span>
-<span class="ln" id="L58"><span class="tok-kw">const</span> MIN_FRACTION: f32 = <span class="tok-num">0.16</span>;</span>
+<span class="ln" id="L103"><span class="tok-com">/// Height as a fraction of the available box, matching `16%` and `82%`.</span></span>
+<span class="ln" id="L104"><span class="tok-kw">const</span> MIN_FRACTION: f32 = <span class="tok-num">0.16</span>;</span>
 </span>
 <span class="src-item" id="fn-max_fraction">
-<span class="ln" id="L59"><span class="tok-kw">const</span> MAX_FRACTION: f32 = <span class="tok-num">0.82</span>;</span>
+<span class="ln" id="L105"><span class="tok-kw">const</span> MAX_FRACTION: f32 = <span class="tok-num">0.82</span>;</span>
 </span>
-<span class="ln" id="L60"></span>
+<span class="ln" id="L106"></span>
 <span class="src-item" id="fn-height_fraction">
-<span class="ln" id="L61"><span class="tok-com">/// How far along its cycle a bar is, in 0..=1, eased the way CSS</span></span>
-<span class="ln" id="L62"><span class="tok-com">/// `ease-in-out` eases.</span></span>
-<span class="ln" id="L63"><span class="tok-kw">fn</span> <span class="tok-fn">height_fraction</span>(time: f32, delay: f32) -&gt; f32 {</span>
-<span class="ln" id="L64">    <span class="tok-com">// `rem_euclid` so a negative time -- which `Context::input().time` will not</span></span>
-<span class="ln" id="L65">    <span class="tok-com">// produce, but a test can -- still lands inside the period rather than</span></span>
-<span class="ln" id="L66">    <span class="tok-com">// producing a negative phase.</span></span>
-<span class="ln" id="L67">    <span class="tok-kw">let</span> phase = (time + delay).<span class="tok-fn">rem_euclid</span>(PERIOD) / PERIOD;</span>
-<span class="ln" id="L68">    <span class="tok-com">// A triangle wave, then smoothstep, which is close enough to</span></span>
-<span class="ln" id="L69">    <span class="tok-com">// `ease-in-out` that no one could pick them apart side by side.</span></span>
-<span class="ln" id="L70">    <span class="tok-kw">let</span> triangle = <span class="tok-num">1.0</span> - (phase * <span class="tok-num">2.0</span> - <span class="tok-num">1.0</span>).<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L71">    <span class="tok-kw">let</span> eased = triangle * triangle * (<span class="tok-num">3.0</span> - <span class="tok-num">2.0</span> * triangle);</span>
-<span class="ln" id="L72">    MIN_FRACTION + (MAX_FRACTION - MIN_FRACTION) * eased</span>
-<span class="ln" id="L73">}</span>
+<span class="ln" id="L107"><span class="tok-com">/// How far along its cycle a bar is, in 0..=1, eased the way CSS</span></span>
+<span class="ln" id="L108"><span class="tok-com">/// `ease-in-out` eases.</span></span>
+<span class="ln" id="L109"><span class="tok-kw">fn</span> <span class="tok-fn">height_fraction</span>(time: f32, delay: f32) -&gt; f32 {</span>
+<span class="ln" id="L110">    <span class="tok-com">// `rem_euclid` so a negative time -- which `Context::input().time` will not</span></span>
+<span class="ln" id="L111">    <span class="tok-com">// produce, but a test can -- still lands inside the period rather than</span></span>
+<span class="ln" id="L112">    <span class="tok-com">// producing a negative phase.</span></span>
+<span class="ln" id="L113">    <span class="tok-kw">let</span> phase = (time + delay).<span class="tok-fn">rem_euclid</span>(PERIOD) / PERIOD;</span>
+<span class="ln" id="L114">    <span class="tok-com">// A triangle wave, then smoothstep, which is close enough to</span></span>
+<span class="ln" id="L115">    <span class="tok-com">// `ease-in-out` that no one could pick them apart side by side.</span></span>
+<span class="ln" id="L116">    <span class="tok-kw">let</span> triangle = <span class="tok-num">1.0</span> - (phase * <span class="tok-num">2.0</span> - <span class="tok-num">1.0</span>).<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L117">    <span class="tok-kw">let</span> eased = triangle * triangle * (<span class="tok-num">3.0</span> - <span class="tok-num">2.0</span> * triangle);</span>
+<span class="ln" id="L118">    MIN_FRACTION + (MAX_FRACTION - MIN_FRACTION) * eased</span>
+<span class="ln" id="L119">}</span>
 </span>
-<span class="ln" id="L74"></span>
+<span class="ln" id="L120"></span>
+<span class="src-item" id="fn-window_is_settled">
+<span class="ln" id="L121"><span class="tok-com">/// Whether the window is holding still enough for the mark to move.</span></span>
+<span class="ln" id="L122"><span class="tok-com">///</span></span>
+<span class="ln" id="L123"><span class="tok-com">/// Two questions, both asked of the window rather than of the application:</span></span>
+<span class="ln" id="L124"><span class="tok-com">/// does it have focus, and has its rectangle stopped changing.</span></span>
+<span class="ln" id="L125"><span class="tok-com">///</span></span>
+<span class="ln" id="L126"><span class="tok-com">/// The focus answer defaults to *yes* when the platform does not report one.</span></span>
+<span class="ln" id="L127"><span class="tok-com">/// A mark frozen for ever on a system that never says &quot;focused&quot; is a worse</span></span>
+<span class="ln" id="L128"><span class="tok-com">/// failure than one that animates when it did not have to, and there are</span></span>
+<span class="ln" id="L129"><span class="tok-com">/// window managers that do not send focus events at all.</span></span>
+<span class="ln" id="L130"><span class="tok-com">///</span></span>
+<span class="ln" id="L131"><span class="tok-com">/// The rectangle answer is how a drag is detected. There is no &quot;the user is</span></span>
+<span class="ln" id="L132"><span class="tok-com">/// dragging me&quot; signal in `egui` or `winit` to ask for; there is the window&#x27;s</span></span>
+<span class="ln" id="L133"><span class="tok-com">/// own position and size, which changes on every frame of a drag and on no</span></span>
+<span class="ln" id="L134"><span class="tok-com">/// frame of anything else. Stored in `egui`&#x27;s temporary memory, so it lives</span></span>
+<span class="ln" id="L135"><span class="tok-com">/// exactly as long as the context and costs no field on any struct.</span></span>
+<span class="ln" id="L136"><span class="tok-kw">fn</span> <span class="tok-fn">window_is_settled</span>(ctx: &amp;egui::Context) -&gt; bool {</span>
+<span class="ln" id="L137">    <span class="tok-kw">let</span> focused = ctx.<span class="tok-fn">input</span>(|i| i.<span class="tok-fn">viewport</span>().focused).<span class="tok-fn">unwrap_or</span>(true);</span>
+<span class="ln" id="L138">    <span class="tok-kw">if</span> !focused {</span>
+<span class="ln" id="L139">        <span class="tok-kw">return</span> false;</span>
+<span class="ln" id="L140">    }</span>
+<span class="ln" id="L141"></span>
+<span class="ln" id="L142">    <span class="tok-kw">let</span> id = egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-soundbar-window-rect&quot;</span>);</span>
+<span class="ln" id="L143">    <span class="tok-kw">let</span> (rect, now) = ctx.<span class="tok-fn">input</span>(|i| (i.<span class="tok-fn">viewport</span>().outer_rect, i.time));</span>
+<span class="ln" id="L144">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rect) = rect <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L145">        <span class="tok-com">// A platform that does not report the window rectangle cannot be</span></span>
+<span class="ln" id="L146">        <span class="tok-com">// asked whether it is moving. Treat it as still rather than never</span></span>
+<span class="ln" id="L147">        <span class="tok-com">// animating there.</span></span>
+<span class="ln" id="L148">        <span class="tok-kw">return</span> true;</span>
+<span class="ln" id="L149">    };</span>
+<span class="ln" id="L150"></span>
+<span class="ln" id="L151">    <span class="tok-kw">let</span> last: Option&lt;(egui::Rect, f64)&gt; = ctx.<span class="tok-fn">memory</span>(|m| m.data.<span class="tok-fn">get_temp</span>(id));</span>
+<span class="ln" id="L152">    <span class="tok-kw">let</span> moved_at = <span class="tok-kw">match</span> last {</span>
+<span class="ln" id="L153">        <span class="tok-fn">Some</span>((was, when)) <span class="tok-kw">if</span> was == rect =&gt; when,</span>
+<span class="ln" id="L154">        _ =&gt; now,</span>
+<span class="ln" id="L155">    };</span>
+<span class="ln" id="L156">    ctx.<span class="tok-fn">memory_mut</span>(|m| m.data.<span class="tok-fn">insert_temp</span>(id, (rect, moved_at)));</span>
+<span class="ln" id="L157"></span>
+<span class="ln" id="L158">    <span class="tok-kw">let</span> settled = now - moved_at &gt;= SETTLE;</span>
+<span class="ln" id="L159">    <span class="tok-kw">if</span> !settled {</span>
+<span class="ln" id="L160">        <span class="tok-com">// Come back and look again once it could have settled, or the mark</span></span>
+<span class="ln" id="L161">        <span class="tok-com">// stays frozen after the drag ends until something else moves.</span></span>
+<span class="ln" id="L162">        ctx.<span class="tok-fn">request_repaint_after</span>(std::time::Duration::<span class="tok-fn">from_secs_f64</span>(SETTLE));</span>
+<span class="ln" id="L163">    }</span>
+<span class="ln" id="L164">    settled</span>
+<span class="ln" id="L165">}</span>
+</span>
+<span class="ln" id="L166"></span>
+<span class="src-item" id="fn-animation_clock">
+<span class="ln" id="L167"><span class="tok-com">/// The clock the bars are drawn against, which is not always the real one.</span></span>
+<span class="ln" id="L168"><span class="tok-com">///</span></span>
+<span class="ln" id="L169"><span class="tok-com">/// While the mark is moving this is the application clock. While it is resting</span></span>
+<span class="ln" id="L170"><span class="tok-com">/// it is the moment it stopped, held in temporary memory, so the row keeps the</span></span>
+<span class="ln" id="L171"><span class="tok-com">/// shape it had rather than snapping to the midpoint the instant the window</span></span>
+<span class="ln" id="L172"><span class="tok-com">/// loses focus. Clicking away from the window and back should not make the</span></span>
+<span class="ln" id="L173"><span class="tok-com">/// logo jump.</span></span>
+<span class="ln" id="L174"><span class="tok-kw">fn</span> <span class="tok-fn">animation_clock</span>(ctx: &amp;egui::Context, moving: bool, time: f32) -&gt; f32 {</span>
+<span class="ln" id="L175">    <span class="tok-kw">let</span> id = egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-soundbar-clock&quot;</span>);</span>
+<span class="ln" id="L176">    <span class="tok-kw">if</span> moving {</span>
+<span class="ln" id="L177">        ctx.<span class="tok-fn">memory_mut</span>(|m| m.data.<span class="tok-fn">insert_temp</span>(id, time));</span>
+<span class="ln" id="L178">        time</span>
+<span class="ln" id="L179">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L180">        ctx.<span class="tok-fn">memory</span>(|m| m.data.<span class="tok-fn">get_temp</span>(id)).<span class="tok-fn">unwrap_or</span>(time)</span>
+<span class="ln" id="L181">    }</span>
+<span class="ln" id="L182">}</span>
+</span>
+<span class="ln" id="L183"></span>
 <span class="src-item" id="fn-draw">
-<span class="ln" id="L75"><span class="tok-com">/// Draw the mark at `size`, returning the response so it can carry a tooltip.</span></span>
-<span class="ln" id="L76"><span class="tok-com">///</span></span>
-<span class="ln" id="L77"><span class="tok-com">/// `time` is the application clock in seconds. When `motion` disallows</span></span>
-<span class="ln" id="L78"><span class="tok-com">/// movement every bar is drawn at its resting height and nothing is scheduled.</span></span>
-<span class="ln" id="L79"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">draw</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, size: Vec2, motion: Motion, time: f32) -&gt; egui::Response {</span>
-<span class="ln" id="L80">    <span class="tok-kw">let</span> (rect, response) = ui.<span class="tok-fn">allocate_exact_size</span>(size, Sense::<span class="tok-fn">hover</span>());</span>
-<span class="ln" id="L81">    <span class="tok-kw">if</span> !ui.<span class="tok-fn">is_rect_visible</span>(rect) {</span>
-<span class="ln" id="L82">        <span class="tok-kw">return</span> response;</span>
-<span class="ln" id="L83">    }</span>
-<span class="ln" id="L84"></span>
-<span class="ln" id="L85">    <span class="tok-kw">let</span> bars = DELAYS.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L86">    <span class="tok-com">// A gap of a quarter of a bar&#x27;s width, as on the website (5 px bar, 3 px</span></span>
-<span class="ln" id="L87">    <span class="tok-com">// gap is close to a third, but a quarter reads better at icon sizes).</span></span>
-<span class="ln" id="L88">    <span class="tok-kw">let</span> unit = rect.<span class="tok-fn">width</span>() / (bars <span class="tok-kw">as</span> f32 * <span class="tok-num">1.25</span>);</span>
-<span class="ln" id="L89">    <span class="tok-kw">let</span> bar_width = unit;</span>
-<span class="ln" id="L90">    <span class="tok-kw">let</span> gap = unit * <span class="tok-num">0.25</span>;</span>
-<span class="ln" id="L91">    <span class="tok-kw">let</span> total = bars <span class="tok-kw">as</span> f32 * bar_width + (bars <span class="tok-kw">as</span> f32 - <span class="tok-num">1.0</span>) * gap;</span>
-<span class="ln" id="L92">    <span class="tok-kw">let</span> left = rect.<span class="tok-fn">center</span>().x - total / <span class="tok-num">2.0</span>;</span>
-<span class="ln" id="L93"></span>
-<span class="ln" id="L94">    <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
-<span class="ln" id="L95">    <span class="tok-kw">let</span> rounding = Rounding::<span class="tok-fn">same</span>((bar_width * <span class="tok-num">0.4</span>).<span class="tok-fn">min</span>(<span class="tok-num">2.0</span>));</span>
-<span class="ln" id="L96"></span>
-<span class="ln" id="L97">    <span class="tok-kw">for</span> (index, delay) <span class="tok-kw">in</span> DELAYS.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L98">        <span class="tok-com">// At rest every bar sits at the midpoint, so a still mark reads as a</span></span>
-<span class="ln" id="L99">        <span class="tok-com">// deliberate shape rather than as an animation caught mid-frame.</span></span>
-<span class="ln" id="L100">        <span class="tok-kw">let</span> fraction = <span class="tok-kw">if</span> motion.icon {</span>
-<span class="ln" id="L101">            <span class="tok-fn">height_fraction</span>(time, *delay)</span>
-<span class="ln" id="L102">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L103">            (MIN_FRACTION + MAX_FRACTION) / <span class="tok-num">2.0</span></span>
-<span class="ln" id="L104">        };</span>
-<span class="ln" id="L105">        <span class="tok-kw">let</span> height = rect.<span class="tok-fn">height</span>() * fraction;</span>
-<span class="ln" id="L106">        <span class="tok-kw">let</span> x = left + index <span class="tok-kw">as</span> f32 * (bar_width + gap);</span>
-<span class="ln" id="L107">        <span class="tok-kw">let</span> bar = Rect::<span class="tok-fn">from_min_size</span>(</span>
-<span class="ln" id="L108">            egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">center</span>().y - height / <span class="tok-num">2.0</span>),</span>
-<span class="ln" id="L109">            egui::<span class="tok-fn">vec2</span>(bar_width, height),</span>
-<span class="ln" id="L110">        );</span>
-<span class="ln" id="L111">        painter.<span class="tok-fn">rect_filled</span>(bar, rounding, <span class="tok-fn">colour_for</span>(index, bars));</span>
-<span class="ln" id="L112">    }</span>
-<span class="ln" id="L113"></span>
-<span class="ln" id="L114">    <span class="tok-com">// Only ask for another frame if something will actually differ in it.</span></span>
-<span class="ln" id="L115">    <span class="tok-kw">if</span> motion.icon {</span>
-<span class="ln" id="L116">        ui.<span class="tok-fn">ctx</span>()</span>
-<span class="ln" id="L117">            .<span class="tok-fn">request_repaint_after</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">33</span>));</span>
-<span class="ln" id="L118">    }</span>
-<span class="ln" id="L119"></span>
-<span class="ln" id="L120">    response</span>
-<span class="ln" id="L121">}</span>
-</span>
-<span class="ln" id="L122"></span>
-<span class="src-item" id="fn-colour_for">
-<span class="ln" id="L123"><span class="tok-com">/// The left half in the accent colour, the right in the veiled secondary --</span></span>
-<span class="ln" id="L124"><span class="tok-com">/// the same split the website and the icon use.</span></span>
-<span class="ln" id="L125"><span class="tok-kw">fn</span> <span class="tok-fn">colour_for</span>(index: usize, bars: usize) -&gt; Color32 {</span>
-<span class="ln" id="L126">    <span class="tok-kw">if</span> index * <span class="tok-num">2</span> &lt; bars {</span>
-<span class="ln" id="L127">        p::<span class="tok-fn">blue</span>()</span>
-<span class="ln" id="L128">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L129">        <span class="tok-com">// `0.85` matches the website&#x27;s `opacity: 0.85` on the veiled half,</span></span>
-<span class="ln" id="L130">        <span class="tok-com">// applied as a blend towards the background so it does not depend on</span></span>
-<span class="ln" id="L131">        <span class="tok-com">// what is painted behind it.</span></span>
-<span class="ln" id="L132">        p::<span class="tok-fn">blend</span>(p::<span class="tok-fn">bg</span>(), p::<span class="tok-fn">purple</span>(), <span class="tok-num">0.85</span>)</span>
-<span class="ln" id="L133">    }</span>
-<span class="ln" id="L134">}</span>
-</span>
-<span class="ln" id="L135"></span>
-<span class="ln" id="L136"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L137"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L138">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L139">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::prefs::Prefs;</span>
-<span class="ln" id="L140"></span>
-<span class="ln" id="L141">    <span class="tok-kw">fn</span> <span class="tok-fn">moving</span>() -&gt; Motion {</span>
-<span class="ln" id="L142">        Motion::<span class="tok-fn">resolve</span>(</span>
-<span class="ln" id="L143">            &amp;Prefs {</span>
-<span class="ln" id="L144">                animations: true,</span>
-<span class="ln" id="L145">                animated_icon: true,</span>
-<span class="ln" id="L146">                ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L147">            },</span>
-<span class="ln" id="L148">            false,</span>
-<span class="ln" id="L149">        )</span>
-<span class="ln" id="L150">    }</span>
-<span class="ln" id="L151"></span>
-<span class="ln" id="L152">    <span class="tok-kw">fn</span> <span class="tok-fn">still</span>() -&gt; Motion {</span>
-<span class="ln" id="L153">        Motion::<span class="tok-fn">resolve</span>(</span>
-<span class="ln" id="L154">            &amp;Prefs {</span>
-<span class="ln" id="L155">                animations: true,</span>
-<span class="ln" id="L156">                animated_icon: false,</span>
-<span class="ln" id="L157">                ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L158">            },</span>
-<span class="ln" id="L159">            false,</span>
-<span class="ln" id="L160">        )</span>
-<span class="ln" id="L161">    }</span>
-<span class="ln" id="L162"></span>
-<span class="ln" id="L163">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L164">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bar_stays_inside_the_documented_height_range</span>() {</span>
-<span class="ln" id="L165">        <span class="tok-com">// Walk several periods at a fine step: nothing may leave 16%..82%,</span></span>
-<span class="ln" id="L166">        <span class="tok-com">// because a bar taller than its box is a bar drawn over the text</span></span>
-<span class="ln" id="L167">        <span class="tok-com">// beside it.</span></span>
-<span class="ln" id="L168">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lowest = f32::MAX;</span>
-<span class="ln" id="L169">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> highest = f32::MIN;</span>
-<span class="ln" id="L170">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2000</span> {</span>
-<span class="ln" id="L171">            <span class="tok-kw">let</span> time = step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.01</span>;</span>
-<span class="ln" id="L172">            <span class="tok-kw">for</span> delay <span class="tok-kw">in</span> DELAYS {</span>
-<span class="ln" id="L173">                <span class="tok-kw">let</span> f = <span class="tok-fn">height_fraction</span>(time, delay);</span>
-<span class="ln" id="L174">                assert!(f.<span class="tok-fn">is_finite</span>(), <span class="tok-str">&quot;non-finite height at t={time}&quot;</span>);</span>
-<span class="ln" id="L175">                lowest = lowest.<span class="tok-fn">min</span>(f);</span>
-<span class="ln" id="L176">                highest = highest.<span class="tok-fn">max</span>(f);</span>
-<span class="ln" id="L177">            }</span>
-<span class="ln" id="L178">        }</span>
-<span class="ln" id="L179">        assert!(</span>
-<span class="ln" id="L180">            lowest &gt;= MIN_FRACTION - 1e-<span class="tok-num">4</span>,</span>
-<span class="ln" id="L181">            <span class="tok-str">&quot;went below the floor: {lowest}&quot;</span></span>
-<span class="ln" id="L182">        );</span>
-<span class="ln" id="L183">        assert!(</span>
-<span class="ln" id="L184">            highest &lt;= MAX_FRACTION + 1e-<span class="tok-num">4</span>,</span>
-<span class="ln" id="L185">            <span class="tok-str">&quot;went above the ceiling: {highest}&quot;</span></span>
-<span class="ln" id="L186">        );</span>
-<span class="ln" id="L187">        <span class="tok-com">// And it must actually use the range, or the animation is invisible.</span></span>
-<span class="ln" id="L188">        assert!(lowest &lt; MIN_FRACTION + <span class="tok-num">0.02</span>, <span class="tok-str">&quot;never reached the floor&quot;</span>);</span>
-<span class="ln" id="L189">        assert!(highest &gt; MAX_FRACTION - <span class="tok-num">0.02</span>, <span class="tok-str">&quot;never reached the ceiling&quot;</span>);</span>
-<span class="ln" id="L190">    }</span>
-<span class="ln" id="L191"></span>
-<span class="ln" id="L192">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L193">    <span class="tok-kw">fn</span> <span class="tok-fn">the_cycle_repeats_exactly_once_per_period</span>() {</span>
-<span class="ln" id="L194">        <span class="tok-kw">for</span> delay <span class="tok-kw">in</span> DELAYS {</span>
-<span class="ln" id="L195">            <span class="tok-kw">for</span> t <span class="tok-kw">in</span> [<span class="tok-num">0</span>.0f32, <span class="tok-num">0.3</span>, <span class="tok-num">1.1</span>, <span class="tok-num">7.7</span>] {</span>
-<span class="ln" id="L196">                <span class="tok-kw">let</span> a = <span class="tok-fn">height_fraction</span>(t, delay);</span>
-<span class="ln" id="L197">                <span class="tok-kw">let</span> b = <span class="tok-fn">height_fraction</span>(t + PERIOD, delay);</span>
-<span class="ln" id="L198">                assert!((a - b).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>, <span class="tok-str">&quot;not periodic at t={t}&quot;</span>);</span>
-<span class="ln" id="L199">            }</span>
-<span class="ln" id="L200">        }</span>
-<span class="ln" id="L201">    }</span>
-<span class="ln" id="L202"></span>
-<span class="ln" id="L203">    <span class="tok-com">/// The bars must not all be at the same height, or the row pumps as one</span></span>
-<span class="ln" id="L204">    <span class="tok-com">/// block instead of rippling.</span></span>
-<span class="ln" id="L205">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L206">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bars_are_out_of_phase_with_each_other</span>() {</span>
-<span class="ln" id="L207">        <span class="tok-kw">let</span> heights: Vec&lt;f32&gt; = DELAYS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|d| <span class="tok-fn">height_fraction</span>(<span class="tok-num">0.0</span>, *d)).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L208">        <span class="tok-kw">let</span> spread = heights.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>().<span class="tok-fn">fold</span>(f32::MIN, f32::max)</span>
-<span class="ln" id="L209">            - heights.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>().<span class="tok-fn">fold</span>(f32::MAX, f32::min);</span>
-<span class="ln" id="L210">        assert!(spread &gt; <span class="tok-num">0.1</span>, <span class="tok-str">&quot;the bars move together: spread {spread}&quot;</span>);</span>
-<span class="ln" id="L211">    }</span>
+<span class="ln" id="L184"><span class="tok-com">/// Draw the mark at `size`, returning the response so it can carry a tooltip.</span></span>
+<span class="ln" id="L185"><span class="tok-com">///</span></span>
+<span class="ln" id="L186"><span class="tok-com">/// `time` is the application clock in seconds. When `motion` disallows</span></span>
+<span class="ln" id="L187"><span class="tok-com">/// movement every bar is drawn at its resting height and nothing is scheduled.</span></span>
+<span class="ln" id="L188"><span class="tok-com">/// When motion is allowed but the window is unfocused or being dragged, the</span></span>
+<span class="ln" id="L189"><span class="tok-com">/// bars hold their last shape and nothing is scheduled either.</span></span>
+<span class="ln" id="L190"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">draw</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, size: Vec2, motion: Motion, time: f32) -&gt; egui::Response {</span>
+<span class="ln" id="L191">    <span class="tok-kw">let</span> (rect, response) = ui.<span class="tok-fn">allocate_exact_size</span>(size, Sense::<span class="tok-fn">hover</span>());</span>
+<span class="ln" id="L192">    <span class="tok-kw">if</span> !ui.<span class="tok-fn">is_rect_visible</span>(rect) {</span>
+<span class="ln" id="L193">        <span class="tok-kw">return</span> response;</span>
+<span class="ln" id="L194">    }</span>
+<span class="ln" id="L195"></span>
+<span class="ln" id="L196">    <span class="tok-com">// Asked once per draw, before any bar is positioned, so every bar in the</span></span>
+<span class="ln" id="L197">    <span class="tok-com">// row agrees about which frame this is.</span></span>
+<span class="ln" id="L198">    <span class="tok-kw">let</span> moving = motion.icon &amp;&amp; <span class="tok-fn">window_is_settled</span>(ui.<span class="tok-fn">ctx</span>());</span>
+<span class="ln" id="L199">    <span class="tok-kw">let</span> time = <span class="tok-fn">animation_clock</span>(ui.<span class="tok-fn">ctx</span>(), moving, time);</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201">    <span class="tok-kw">let</span> bars = DELAYS.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L202">    <span class="tok-com">// A gap of a quarter of a bar&#x27;s width, as on the website (5 px bar, 3 px</span></span>
+<span class="ln" id="L203">    <span class="tok-com">// gap is close to a third, but a quarter reads better at icon sizes).</span></span>
+<span class="ln" id="L204">    <span class="tok-kw">let</span> unit = rect.<span class="tok-fn">width</span>() / (bars <span class="tok-kw">as</span> f32 * <span class="tok-num">1.25</span>);</span>
+<span class="ln" id="L205">    <span class="tok-kw">let</span> bar_width = unit;</span>
+<span class="ln" id="L206">    <span class="tok-kw">let</span> gap = unit * <span class="tok-num">0.25</span>;</span>
+<span class="ln" id="L207">    <span class="tok-kw">let</span> total = bars <span class="tok-kw">as</span> f32 * bar_width + (bars <span class="tok-kw">as</span> f32 - <span class="tok-num">1.0</span>) * gap;</span>
+<span class="ln" id="L208">    <span class="tok-kw">let</span> left = rect.<span class="tok-fn">center</span>().x - total / <span class="tok-num">2.0</span>;</span>
+<span class="ln" id="L209"></span>
+<span class="ln" id="L210">    <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
+<span class="ln" id="L211">    <span class="tok-kw">let</span> rounding = CornerRadius::<span class="tok-fn">same</span>((bar_width * <span class="tok-num">0.4</span>).<span class="tok-fn">min</span>(<span class="tok-num">2.0</span>) <span class="tok-kw">as</span> u8);</span>
 <span class="ln" id="L212"></span>
-<span class="ln" id="L213">    <span class="tok-com">/// A negative clock must not produce a negative phase.</span></span>
-<span class="ln" id="L214">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L215">    <span class="tok-kw">fn</span> <span class="tok-fn">a_negative_time_is_handled</span>() {</span>
-<span class="ln" id="L216">        <span class="tok-kw">for</span> t <span class="tok-kw">in</span> [-<span class="tok-num">0</span>.5f32, -<span class="tok-num">100.0</span>] {</span>
-<span class="ln" id="L217">            <span class="tok-kw">let</span> f = <span class="tok-fn">height_fraction</span>(t, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L218">            assert!((MIN_FRACTION..=MAX_FRACTION).<span class="tok-fn">contains</span>(&amp;f), <span class="tok-str">&quot;t={t} gave {f}&quot;</span>);</span>
-<span class="ln" id="L219">        }</span>
-<span class="ln" id="L220">    }</span>
-<span class="ln" id="L221"></span>
-<span class="ln" id="L222">    <span class="tok-com">/// The point of the toggle: still means still, and identical at every</span></span>
-<span class="ln" id="L223">    <span class="tok-com">/// moment. A &quot;still&quot; mark that still differed frame to frame would mean</span></span>
-<span class="ln" id="L224">    <span class="tok-com">/// the switch had not actually turned anything off.</span></span>
-<span class="ln" id="L225">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L226">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stilled_mark_is_the_same_at_every_moment</span>() {</span>
-<span class="ln" id="L227">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> a = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">still</span>(), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L229">        <span class="tok-kw">let</span> b = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">still</span>(), <span class="tok-num">12.34</span>);</span>
-<span class="ln" id="L230">        assert_eq!(a, b, <span class="tok-str">&quot;the stilled mark changed between frames&quot;</span>);</span>
-<span class="ln" id="L231"></span>
-<span class="ln" id="L232">        <span class="tok-kw">let</span> c = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">moving</span>(), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L233">        <span class="tok-kw">let</span> d = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">moving</span>(), <span class="tok-num">0.6</span>);</span>
-<span class="ln" id="L234">        assert_ne!(c, d, <span class="tok-str">&quot;the moving mark did not move&quot;</span>);</span>
-<span class="ln" id="L235">    }</span>
-<span class="ln" id="L236"></span>
-<span class="ln" id="L237">    <span class="tok-com">/// And it must not keep the CPU awake once it is off.</span></span>
-<span class="ln" id="L238">    <span class="tok-com">///</span></span>
-<span class="ln" id="L239">    <span class="tok-com">/// An &quot;off&quot; switch that still schedules a frame every 33 ms has turned the</span></span>
-<span class="ln" id="L240">    <span class="tok-com">/// animation off visually and left the battery cost behind, which on a</span></span>
-<span class="ln" id="L241">    <span class="tok-com">/// laptop is most of the reason somebody turned it off. Compared against</span></span>
-<span class="ln" id="L242">    <span class="tok-com">/// the moving case rather than against an absolute sentinel, because what</span></span>
-<span class="ln" id="L243">    <span class="tok-com">/// egui uses to mean &quot;nothing pending&quot; is its business and not a contract.</span></span>
-<span class="ln" id="L244">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L245">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stilled_mark_requests_no_repaint</span>() {</span>
-<span class="ln" id="L246">        <span class="tok-com">// Measured from a *settled* context. egui asks for an immediate</span></span>
-<span class="ln" id="L247">        <span class="tok-com">// repaint on the first frames whatever is drawn, because layout needs</span></span>
-<span class="ln" id="L248">        <span class="tok-com">// a second pass to converge -- so a single `run` reports zero for the</span></span>
-<span class="ln" id="L249">        <span class="tok-com">// still case too, and the test would pass or fail for a reason that</span></span>
-<span class="ln" id="L250">        <span class="tok-com">// has nothing to do with the mark.</span></span>
-<span class="ln" id="L251">        <span class="tok-kw">let</span> soonest = |motion: Motion| {</span>
-<span class="ln" id="L252">            <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L253">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> delay = std::time::Duration::MAX;</span>
-<span class="ln" id="L254">            <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
-<span class="ln" id="L255">                <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L256">                    egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L257">                        <span class="tok-fn">draw</span>(ui, egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">32.0</span>), motion, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L258">                    });</span>
-<span class="ln" id="L259">                });</span>
-<span class="ln" id="L260">                delay = output</span>
-<span class="ln" id="L261">                    .viewport_output</span>
-<span class="ln" id="L262">                    .<span class="tok-fn">values</span>()</span>
-<span class="ln" id="L263">                    .<span class="tok-fn">map</span>(|v| v.repaint_delay)</span>
-<span class="ln" id="L264">                    .<span class="tok-fn">min</span>()</span>
-<span class="ln" id="L265">                    .<span class="tok-fn">unwrap_or</span>(std::time::Duration::MAX);</span>
-<span class="ln" id="L266">            }</span>
-<span class="ln" id="L267">            delay</span>
-<span class="ln" id="L268">        };</span>
-<span class="ln" id="L269"></span>
-<span class="ln" id="L270">        <span class="tok-kw">let</span> moving_delay = <span class="tok-fn">soonest</span>(<span class="tok-fn">moving</span>());</span>
-<span class="ln" id="L271">        <span class="tok-kw">let</span> still_delay = <span class="tok-fn">soonest</span>(<span class="tok-fn">still</span>());</span>
-<span class="ln" id="L272"></span>
-<span class="ln" id="L273">        assert!(</span>
-<span class="ln" id="L274">            moving_delay &lt;= std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">100</span>),</span>
-<span class="ln" id="L275">            <span class="tok-str">&quot;a moving mark did not ask to be repainted promptly: {moving_delay:?}&quot;</span></span>
-<span class="ln" id="L276">        );</span>
-<span class="ln" id="L277">        assert!(</span>
-<span class="ln" id="L278">            still_delay &gt; moving_delay,</span>
-<span class="ln" id="L279">            <span class="tok-str">&quot;a stilled mark asked to be repainted as eagerly as a moving one \</span></span>
-<span class="ln" id="L280"><span class="tok-str">             ({still_delay:?} vs {moving_delay:?})&quot;</span></span>
-<span class="ln" id="L281">        );</span>
-<span class="ln" id="L282">        assert!(</span>
-<span class="ln" id="L283">            still_delay &gt;= std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">1</span>),</span>
-<span class="ln" id="L284">            <span class="tok-str">&quot;a stilled mark is still driving the frame rate: {still_delay:?}&quot;</span></span>
-<span class="ln" id="L285">        );</span>
-<span class="ln" id="L286">    }</span>
-<span class="ln" id="L287"></span>
-<span class="ln" id="L288">    <span class="tok-com">/// Drawing must not panic at any size, including degenerate ones a layout</span></span>
-<span class="ln" id="L289">    <span class="tok-com">/// can genuinely produce while a window is being resized.</span></span>
-<span class="ln" id="L290">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L291">    <span class="tok-kw">fn</span> <span class="tok-fn">any_size_can_be_drawn</span>() {</span>
-<span class="ln" id="L292">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L293">        <span class="tok-kw">for</span> size <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L294">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L295">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>),</span>
-<span class="ln" id="L296">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">32.0</span>),</span>
-<span class="ln" id="L297">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">4000.0</span>, <span class="tok-num">2.0</span>),</span>
-<span class="ln" id="L298">        ] {</span>
-<span class="ln" id="L299">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L300">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L301">                    <span class="tok-fn">draw</span>(ui, size, <span class="tok-fn">moving</span>(), <span class="tok-num">3.0</span>);</span>
-<span class="ln" id="L302">                });</span>
-<span class="ln" id="L303">            });</span>
-<span class="ln" id="L304">        }</span>
+<span class="ln" id="L213">    <span class="tok-kw">for</span> (index, delay) <span class="tok-kw">in</span> DELAYS.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L214">        <span class="tok-com">// At rest every bar sits at the midpoint, so a still mark reads as a</span></span>
+<span class="ln" id="L215">        <span class="tok-com">// deliberate shape rather than as an animation caught mid-frame.</span></span>
+<span class="ln" id="L216">        <span class="tok-kw">let</span> fraction = <span class="tok-kw">if</span> motion.icon {</span>
+<span class="ln" id="L217">            <span class="tok-fn">height_fraction</span>(time, *delay)</span>
+<span class="ln" id="L218">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L219">            (MIN_FRACTION + MAX_FRACTION) / <span class="tok-num">2.0</span></span>
+<span class="ln" id="L220">        };</span>
+<span class="ln" id="L221">        <span class="tok-kw">let</span> height = rect.<span class="tok-fn">height</span>() * fraction;</span>
+<span class="ln" id="L222">        <span class="tok-kw">let</span> x = left + index <span class="tok-kw">as</span> f32 * (bar_width + gap);</span>
+<span class="ln" id="L223">        <span class="tok-kw">let</span> bar = Rect::<span class="tok-fn">from_min_size</span>(</span>
+<span class="ln" id="L224">            egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">center</span>().y - height / <span class="tok-num">2.0</span>),</span>
+<span class="ln" id="L225">            egui::<span class="tok-fn">vec2</span>(bar_width, height),</span>
+<span class="ln" id="L226">        );</span>
+<span class="ln" id="L227">        painter.<span class="tok-fn">rect_filled</span>(bar, rounding, <span class="tok-fn">colour_for</span>(index, bars));</span>
+<span class="ln" id="L228">    }</span>
+<span class="ln" id="L229"></span>
+<span class="ln" id="L230">    <span class="tok-com">// Only ask for another frame if something will actually differ in it.</span></span>
+<span class="ln" id="L231">    <span class="tok-com">// `moving`, not `motion.icon`: an unfocused or dragging window is not</span></span>
+<span class="ln" id="L232">    <span class="tok-com">// going to look different next frame, and asking anyway is how a window</span></span>
+<span class="ln" id="L233">    <span class="tok-com">// that appears to be doing nothing keeps a processor busy.</span></span>
+<span class="ln" id="L234">    <span class="tok-kw">if</span> moving {</span>
+<span class="ln" id="L235">        ui.<span class="tok-fn">ctx</span>()</span>
+<span class="ln" id="L236">            .<span class="tok-fn">request_repaint_after</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">1000</span> / FRAMES_PER_SECOND));</span>
+<span class="ln" id="L237">    }</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">    response</span>
+<span class="ln" id="L240">}</span>
+</span>
+<span class="ln" id="L241"></span>
+<span class="src-item" id="fn-colour_for">
+<span class="ln" id="L242"><span class="tok-com">/// The left half in the accent colour, the right in the veiled secondary --</span></span>
+<span class="ln" id="L243"><span class="tok-com">/// the same split the website and the icon use.</span></span>
+<span class="ln" id="L244"><span class="tok-kw">fn</span> <span class="tok-fn">colour_for</span>(index: usize, bars: usize) -&gt; Color32 {</span>
+<span class="ln" id="L245">    <span class="tok-kw">if</span> index * <span class="tok-num">2</span> &lt; bars {</span>
+<span class="ln" id="L246">        p::<span class="tok-fn">blue</span>()</span>
+<span class="ln" id="L247">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L248">        <span class="tok-com">// `0.85` matches the website&#x27;s `opacity: 0.85` on the veiled half,</span></span>
+<span class="ln" id="L249">        <span class="tok-com">// applied as a blend towards the background so it does not depend on</span></span>
+<span class="ln" id="L250">        <span class="tok-com">// what is painted behind it.</span></span>
+<span class="ln" id="L251">        p::<span class="tok-fn">blend</span>(p::<span class="tok-fn">bg</span>(), p::<span class="tok-fn">purple</span>(), <span class="tok-num">0.85</span>)</span>
+<span class="ln" id="L252">    }</span>
+<span class="ln" id="L253">}</span>
+</span>
+<span class="ln" id="L254"></span>
+<span class="ln" id="L255"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L256"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L257">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L258">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::prefs::Prefs;</span>
+<span class="ln" id="L259"></span>
+<span class="ln" id="L260">    <span class="tok-kw">fn</span> <span class="tok-fn">moving</span>() -&gt; Motion {</span>
+<span class="ln" id="L261">        Motion::<span class="tok-fn">resolve</span>(</span>
+<span class="ln" id="L262">            &amp;Prefs {</span>
+<span class="ln" id="L263">                animations: true,</span>
+<span class="ln" id="L264">                animated_icon: true,</span>
+<span class="ln" id="L265">                ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L266">            },</span>
+<span class="ln" id="L267">            false,</span>
+<span class="ln" id="L268">        )</span>
+<span class="ln" id="L269">    }</span>
+<span class="ln" id="L270"></span>
+<span class="ln" id="L271">    <span class="tok-com">/// A frame of input describing a window: is it focused, where is it, and</span></span>
+<span class="ln" id="L272">    <span class="tok-com">/// what time is it. `None` for the rectangle stands for a platform that</span></span>
+<span class="ln" id="L273">    <span class="tok-com">/// does not report one.</span></span>
+<span class="ln" id="L274">    <span class="tok-kw">fn</span> <span class="tok-fn">frame</span>(focused: Option&lt;bool&gt;, rect: Option&lt;egui::Rect&gt;, time: f64) -&gt; egui::RawInput {</span>
+<span class="ln" id="L275">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> input = egui::RawInput {</span>
+<span class="ln" id="L276">            time: <span class="tok-fn">Some</span>(time),</span>
+<span class="ln" id="L277">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L278">        };</span>
+<span class="ln" id="L279">        <span class="tok-kw">let</span> id = egui::ViewportId::ROOT;</span>
+<span class="ln" id="L280">        <span class="tok-kw">let</span> viewport = input.viewports.<span class="tok-fn">entry</span>(id).<span class="tok-fn">or_default</span>();</span>
+<span class="ln" id="L281">        viewport.focused = focused;</span>
+<span class="ln" id="L282">        viewport.outer_rect = rect;</span>
+<span class="ln" id="L283">        input</span>
+<span class="ln" id="L284">    }</span>
+<span class="ln" id="L285"></span>
+<span class="ln" id="L286">    <span class="tok-com">/// The bar heights drawn for one frame of that input.</span></span>
+<span class="ln" id="L287">    <span class="tok-kw">fn</span> <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L288">        ctx: &amp;egui::Context,</span>
+<span class="ln" id="L289">        input: egui::RawInput,</span>
+<span class="ln" id="L290">        motion: Motion,</span>
+<span class="ln" id="L291">        time: f32,</span>
+<span class="ln" id="L292">    ) -&gt; Vec&lt;u32&gt; {</span>
+<span class="ln" id="L293">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
+<span class="ln" id="L294">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L295">                <span class="tok-fn">draw</span>(ui, egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">40.0</span>), motion, time);</span>
+<span class="ln" id="L296">            });</span>
+<span class="ln" id="L297">        });</span>
+<span class="ln" id="L298">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> heights = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L299">        <span class="tok-kw">for</span> clipped <span class="tok-kw">in</span> output.shapes {</span>
+<span class="ln" id="L300">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::Shape::<span class="tok-fn">Rect</span>(r) = &amp;clipped.shape {</span>
+<span class="ln" id="L301">                heights.<span class="tok-fn">push</span>((r.rect.<span class="tok-fn">height</span>() * <span class="tok-num">100.0</span>) <span class="tok-kw">as</span> u32);</span>
+<span class="ln" id="L302">            }</span>
+<span class="ln" id="L303">        }</span>
+<span class="ln" id="L304">        heights</span>
 <span class="ln" id="L305">    }</span>
 <span class="ln" id="L306"></span>
-<span class="ln" id="L307">    <span class="tok-com">/// The delays are copied from the website&#x27;s markup; if that list changes</span></span>
-<span class="ln" id="L308">    <span class="tok-com">/// and this one does not, the two marks stop matching.</span></span>
-<span class="ln" id="L309">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L310">    <span class="tok-kw">fn</span> <span class="tok-fn">the_delays_match_the_website_markup</span>() {</span>
-<span class="ln" id="L311">        <span class="tok-kw">let</span> html = std::fs::<span class="tok-fn">read_to_string</span>(</span>
-<span class="ln" id="L312">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/index.html&quot;</span>),</span>
-<span class="ln" id="L313">        )</span>
-<span class="ln" id="L314">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;index.html should be readable&quot;</span>);</span>
-<span class="ln" id="L315">        <span class="tok-kw">let</span> start = html</span>
-<span class="ln" id="L316">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;class=\&quot;veil\&quot;&quot;</span>)</span>
-<span class="ln" id="L317">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;no veil mark on the page&quot;</span>);</span>
-<span class="ln" id="L318">        <span class="tok-kw">let</span> end = html[start..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;&lt;/div&gt;&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;unterminated veil&quot;</span>) + start;</span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> block = &amp;html[start..end];</span>
-<span class="ln" id="L320"></span>
-<span class="ln" id="L321">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found: Vec&lt;f32&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L322">        <span class="tok-kw">for</span> piece <span class="tok-kw">in</span> block.<span class="tok-fn">split</span>(<span class="tok-str">&quot;animation-delay:&quot;</span>).<span class="tok-fn">skip</span>(<span class="tok-num">1</span>) {</span>
-<span class="ln" id="L323">            <span class="tok-kw">let</span> ms: String = piece.<span class="tok-fn">chars</span>().<span class="tok-fn">take_while</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L324">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(v) = ms.parse::&lt;f32&gt;() {</span>
-<span class="ln" id="L325">                found.<span class="tok-fn">push</span>(v / <span class="tok-num">1000.0</span>);</span>
-<span class="ln" id="L326">            }</span>
-<span class="ln" id="L327">        }</span>
-<span class="ln" id="L328">        assert_eq!(</span>
-<span class="ln" id="L329">            found.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L330">            DELAYS.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L331">            <span class="tok-str">&quot;the website has {} bars, the app has {}&quot;</span>,</span>
-<span class="ln" id="L332">            found.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L333">            DELAYS.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L334">        );</span>
-<span class="ln" id="L335">        <span class="tok-kw">for</span> (i, (site, app)) <span class="tok-kw">in</span> found.<span class="tok-fn">iter</span>().<span class="tok-fn">zip</span>(DELAYS.<span class="tok-fn">iter</span>()).<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L336">            assert!(</span>
-<span class="ln" id="L337">                (site - app).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>,</span>
-<span class="ln" id="L338">                <span class="tok-str">&quot;bar {i}: website {site}s, app {app}s&quot;</span></span>
-<span class="ln" id="L339">            );</span>
-<span class="ln" id="L340">        }</span>
-<span class="ln" id="L341">    }</span>
-<span class="ln" id="L342"></span>
-<span class="ln" id="L343">    <span class="tok-com">/// Render once and read the bar heights back out of the paint list.</span></span>
-<span class="ln" id="L344">    <span class="tok-kw">fn</span> <span class="tok-fn">render_heights</span>(ctx: &amp;egui::Context, motion: Motion, time: f32) -&gt; Vec&lt;u32&gt; {</span>
-<span class="ln" id="L345">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L346">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L347">                <span class="tok-fn">draw</span>(ui, egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">40.0</span>), motion, time);</span>
-<span class="ln" id="L348">            });</span>
-<span class="ln" id="L349">        });</span>
-<span class="ln" id="L350">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> heights = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L351">        <span class="tok-kw">for</span> clipped <span class="tok-kw">in</span> output.shapes {</span>
-<span class="ln" id="L352">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::Shape::<span class="tok-fn">Rect</span>(r) = &amp;clipped.shape {</span>
-<span class="ln" id="L353">                <span class="tok-com">// Quantised, so floating-point noise does not make two</span></span>
-<span class="ln" id="L354">                <span class="tok-com">// identical frames look different.</span></span>
-<span class="ln" id="L355">                heights.<span class="tok-fn">push</span>((r.rect.<span class="tok-fn">height</span>() * <span class="tok-num">100.0</span>) <span class="tok-kw">as</span> u32);</span>
-<span class="ln" id="L356">            }</span>
-<span class="ln" id="L357">        }</span>
-<span class="ln" id="L358">        heights</span>
-<span class="ln" id="L359">    }</span>
-<span class="ln" id="L360">}</span>
+<span class="ln" id="L307">    <span class="tok-com">/// The soonest repaint the context asked for after that frame.</span></span>
+<span class="ln" id="L308">    <span class="tok-kw">fn</span> <span class="tok-fn">soonest_after</span>(</span>
+<span class="ln" id="L309">        ctx: &amp;egui::Context,</span>
+<span class="ln" id="L310">        input: egui::RawInput,</span>
+<span class="ln" id="L311">        motion: Motion,</span>
+<span class="ln" id="L312">        time: f32,</span>
+<span class="ln" id="L313">    ) -&gt; std::time::Duration {</span>
+<span class="ln" id="L314">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
+<span class="ln" id="L315">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L316">                <span class="tok-fn">draw</span>(ui, egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">40.0</span>), motion, time);</span>
+<span class="ln" id="L317">            });</span>
+<span class="ln" id="L318">        });</span>
+<span class="ln" id="L319">        output</span>
+<span class="ln" id="L320">            .viewport_output</span>
+<span class="ln" id="L321">            .<span class="tok-fn">values</span>()</span>
+<span class="ln" id="L322">            .<span class="tok-fn">map</span>(|v| v.repaint_delay)</span>
+<span class="ln" id="L323">            .<span class="tok-fn">min</span>()</span>
+<span class="ln" id="L324">            .<span class="tok-fn">unwrap_or</span>(std::time::Duration::MAX)</span>
+<span class="ln" id="L325">    }</span>
+<span class="ln" id="L326"></span>
+<span class="ln" id="L327">    <span class="tok-kw">const</span> SOMEWHERE: <span class="tok-kw">fn</span>() -&gt; egui::Rect =</span>
+<span class="ln" id="L328">        || egui::Rect::<span class="tok-fn">from_min_size</span>(egui::<span class="tok-fn">pos2</span>(<span class="tok-num">100.0</span>, <span class="tok-num">100.0</span>), egui::<span class="tok-fn">vec2</span>(<span class="tok-num">800.0</span>, <span class="tok-num">600.0</span>));</span>
+<span class="ln" id="L329"></span>
+<span class="ln" id="L330">    <span class="tok-kw">fn</span> <span class="tok-fn">still</span>() -&gt; Motion {</span>
+<span class="ln" id="L331">        Motion::<span class="tok-fn">resolve</span>(</span>
+<span class="ln" id="L332">            &amp;Prefs {</span>
+<span class="ln" id="L333">                animations: true,</span>
+<span class="ln" id="L334">                animated_icon: false,</span>
+<span class="ln" id="L335">                ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L336">            },</span>
+<span class="ln" id="L337">            false,</span>
+<span class="ln" id="L338">        )</span>
+<span class="ln" id="L339">    }</span>
+<span class="ln" id="L340"></span>
+<span class="ln" id="L341">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L342">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bar_stays_inside_the_documented_height_range</span>() {</span>
+<span class="ln" id="L343">        <span class="tok-com">// Walk several periods at a fine step: nothing may leave 16%..82%,</span></span>
+<span class="ln" id="L344">        <span class="tok-com">// because a bar taller than its box is a bar drawn over the text</span></span>
+<span class="ln" id="L345">        <span class="tok-com">// beside it.</span></span>
+<span class="ln" id="L346">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lowest = f32::MAX;</span>
+<span class="ln" id="L347">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> highest = f32::MIN;</span>
+<span class="ln" id="L348">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2000</span> {</span>
+<span class="ln" id="L349">            <span class="tok-kw">let</span> time = step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.01</span>;</span>
+<span class="ln" id="L350">            <span class="tok-kw">for</span> delay <span class="tok-kw">in</span> DELAYS {</span>
+<span class="ln" id="L351">                <span class="tok-kw">let</span> f = <span class="tok-fn">height_fraction</span>(time, delay);</span>
+<span class="ln" id="L352">                assert!(f.<span class="tok-fn">is_finite</span>(), <span class="tok-str">&quot;non-finite height at t={time}&quot;</span>);</span>
+<span class="ln" id="L353">                lowest = lowest.<span class="tok-fn">min</span>(f);</span>
+<span class="ln" id="L354">                highest = highest.<span class="tok-fn">max</span>(f);</span>
+<span class="ln" id="L355">            }</span>
+<span class="ln" id="L356">        }</span>
+<span class="ln" id="L357">        assert!(</span>
+<span class="ln" id="L358">            lowest &gt;= MIN_FRACTION - 1e-<span class="tok-num">4</span>,</span>
+<span class="ln" id="L359">            <span class="tok-str">&quot;went below the floor: {lowest}&quot;</span></span>
+<span class="ln" id="L360">        );</span>
+<span class="ln" id="L361">        assert!(</span>
+<span class="ln" id="L362">            highest &lt;= MAX_FRACTION + 1e-<span class="tok-num">4</span>,</span>
+<span class="ln" id="L363">            <span class="tok-str">&quot;went above the ceiling: {highest}&quot;</span></span>
+<span class="ln" id="L364">        );</span>
+<span class="ln" id="L365">        <span class="tok-com">// And it must actually use the range, or the animation is invisible.</span></span>
+<span class="ln" id="L366">        assert!(lowest &lt; MIN_FRACTION + <span class="tok-num">0.02</span>, <span class="tok-str">&quot;never reached the floor&quot;</span>);</span>
+<span class="ln" id="L367">        assert!(highest &gt; MAX_FRACTION - <span class="tok-num">0.02</span>, <span class="tok-str">&quot;never reached the ceiling&quot;</span>);</span>
+<span class="ln" id="L368">    }</span>
+<span class="ln" id="L369"></span>
+<span class="ln" id="L370">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L371">    <span class="tok-kw">fn</span> <span class="tok-fn">the_cycle_repeats_exactly_once_per_period</span>() {</span>
+<span class="ln" id="L372">        <span class="tok-kw">for</span> delay <span class="tok-kw">in</span> DELAYS {</span>
+<span class="ln" id="L373">            <span class="tok-kw">for</span> t <span class="tok-kw">in</span> [<span class="tok-num">0</span>.0f32, <span class="tok-num">0.3</span>, <span class="tok-num">1.1</span>, <span class="tok-num">7.7</span>] {</span>
+<span class="ln" id="L374">                <span class="tok-kw">let</span> a = <span class="tok-fn">height_fraction</span>(t, delay);</span>
+<span class="ln" id="L375">                <span class="tok-kw">let</span> b = <span class="tok-fn">height_fraction</span>(t + PERIOD, delay);</span>
+<span class="ln" id="L376">                assert!((a - b).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>, <span class="tok-str">&quot;not periodic at t={t}&quot;</span>);</span>
+<span class="ln" id="L377">            }</span>
+<span class="ln" id="L378">        }</span>
+<span class="ln" id="L379">    }</span>
+<span class="ln" id="L380"></span>
+<span class="ln" id="L381">    <span class="tok-com">/// The bars must not all be at the same height, or the row pumps as one</span></span>
+<span class="ln" id="L382">    <span class="tok-com">/// block instead of rippling.</span></span>
+<span class="ln" id="L383">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L384">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bars_are_out_of_phase_with_each_other</span>() {</span>
+<span class="ln" id="L385">        <span class="tok-kw">let</span> heights: Vec&lt;f32&gt; = DELAYS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|d| <span class="tok-fn">height_fraction</span>(<span class="tok-num">0.0</span>, *d)).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L386">        <span class="tok-kw">let</span> spread = heights.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>().<span class="tok-fn">fold</span>(f32::MIN, f32::max)</span>
+<span class="ln" id="L387">            - heights.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>().<span class="tok-fn">fold</span>(f32::MAX, f32::min);</span>
+<span class="ln" id="L388">        assert!(spread &gt; <span class="tok-num">0.1</span>, <span class="tok-str">&quot;the bars move together: spread {spread}&quot;</span>);</span>
+<span class="ln" id="L389">    }</span>
+<span class="ln" id="L390"></span>
+<span class="ln" id="L391">    <span class="tok-com">/// A negative clock must not produce a negative phase.</span></span>
+<span class="ln" id="L392">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L393">    <span class="tok-kw">fn</span> <span class="tok-fn">a_negative_time_is_handled</span>() {</span>
+<span class="ln" id="L394">        <span class="tok-kw">for</span> t <span class="tok-kw">in</span> [-<span class="tok-num">0</span>.5f32, -<span class="tok-num">100.0</span>] {</span>
+<span class="ln" id="L395">            <span class="tok-kw">let</span> f = <span class="tok-fn">height_fraction</span>(t, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L396">            assert!((MIN_FRACTION..=MAX_FRACTION).<span class="tok-fn">contains</span>(&amp;f), <span class="tok-str">&quot;t={t} gave {f}&quot;</span>);</span>
+<span class="ln" id="L397">        }</span>
+<span class="ln" id="L398">    }</span>
+<span class="ln" id="L399"></span>
+<span class="ln" id="L400">    <span class="tok-com">/// The point of the toggle: still means still, and identical at every</span></span>
+<span class="ln" id="L401">    <span class="tok-com">/// moment. A &quot;still&quot; mark that still differed frame to frame would mean</span></span>
+<span class="ln" id="L402">    <span class="tok-com">/// the switch had not actually turned anything off.</span></span>
+<span class="ln" id="L403">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L404">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stilled_mark_is_the_same_at_every_moment</span>() {</span>
+<span class="ln" id="L405">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L406">        <span class="tok-kw">let</span> a = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">still</span>(), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L407">        <span class="tok-kw">let</span> b = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">still</span>(), <span class="tok-num">12.34</span>);</span>
+<span class="ln" id="L408">        assert_eq!(a, b, <span class="tok-str">&quot;the stilled mark changed between frames&quot;</span>);</span>
+<span class="ln" id="L409"></span>
+<span class="ln" id="L410">        <span class="tok-kw">let</span> c = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">moving</span>(), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L411">        <span class="tok-kw">let</span> d = <span class="tok-fn">render_heights</span>(&amp;ctx, <span class="tok-fn">moving</span>(), <span class="tok-num">0.6</span>);</span>
+<span class="ln" id="L412">        assert_ne!(c, d, <span class="tok-str">&quot;the moving mark did not move&quot;</span>);</span>
+<span class="ln" id="L413">    }</span>
+<span class="ln" id="L414"></span>
+<span class="ln" id="L415">    <span class="tok-com">/// And it must not keep the CPU awake once it is off.</span></span>
+<span class="ln" id="L416">    <span class="tok-com">///</span></span>
+<span class="ln" id="L417">    <span class="tok-com">/// An &quot;off&quot; switch that still schedules a frame every 33 ms has turned the</span></span>
+<span class="ln" id="L418">    <span class="tok-com">/// animation off visually and left the battery cost behind, which on a</span></span>
+<span class="ln" id="L419">    <span class="tok-com">/// laptop is most of the reason somebody turned it off. Compared against</span></span>
+<span class="ln" id="L420">    <span class="tok-com">/// the moving case rather than against an absolute sentinel, because what</span></span>
+<span class="ln" id="L421">    <span class="tok-com">/// egui uses to mean &quot;nothing pending&quot; is its business and not a contract.</span></span>
+<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stilled_mark_requests_no_repaint</span>() {</span>
+<span class="ln" id="L424">        <span class="tok-com">// Measured from a *settled* context. egui asks for an immediate</span></span>
+<span class="ln" id="L425">        <span class="tok-com">// repaint on the first frames whatever is drawn, because layout needs</span></span>
+<span class="ln" id="L426">        <span class="tok-com">// a second pass to converge -- so a single `run` reports zero for the</span></span>
+<span class="ln" id="L427">        <span class="tok-com">// still case too, and the test would pass or fail for a reason that</span></span>
+<span class="ln" id="L428">        <span class="tok-com">// has nothing to do with the mark.</span></span>
+<span class="ln" id="L429">        <span class="tok-kw">let</span> soonest = |motion: Motion| {</span>
+<span class="ln" id="L430">            <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L431">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> delay = std::time::Duration::MAX;</span>
+<span class="ln" id="L432">            <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L433">                <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L434">                    egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L435">                        <span class="tok-fn">draw</span>(ui, egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">32.0</span>), motion, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L436">                    });</span>
+<span class="ln" id="L437">                });</span>
+<span class="ln" id="L438">                delay = output</span>
+<span class="ln" id="L439">                    .viewport_output</span>
+<span class="ln" id="L440">                    .<span class="tok-fn">values</span>()</span>
+<span class="ln" id="L441">                    .<span class="tok-fn">map</span>(|v| v.repaint_delay)</span>
+<span class="ln" id="L442">                    .<span class="tok-fn">min</span>()</span>
+<span class="ln" id="L443">                    .<span class="tok-fn">unwrap_or</span>(std::time::Duration::MAX);</span>
+<span class="ln" id="L444">            }</span>
+<span class="ln" id="L445">            delay</span>
+<span class="ln" id="L446">        };</span>
+<span class="ln" id="L447"></span>
+<span class="ln" id="L448">        <span class="tok-kw">let</span> moving_delay = <span class="tok-fn">soonest</span>(<span class="tok-fn">moving</span>());</span>
+<span class="ln" id="L449">        <span class="tok-kw">let</span> still_delay = <span class="tok-fn">soonest</span>(<span class="tok-fn">still</span>());</span>
+<span class="ln" id="L450"></span>
+<span class="ln" id="L451">        assert!(</span>
+<span class="ln" id="L452">            moving_delay &lt;= std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">100</span>),</span>
+<span class="ln" id="L453">            <span class="tok-str">&quot;a moving mark did not ask to be repainted promptly: {moving_delay:?}&quot;</span></span>
+<span class="ln" id="L454">        );</span>
+<span class="ln" id="L455">        assert!(</span>
+<span class="ln" id="L456">            still_delay &gt; moving_delay,</span>
+<span class="ln" id="L457">            <span class="tok-str">&quot;a stilled mark asked to be repainted as eagerly as a moving one \</span></span>
+<span class="ln" id="L458"><span class="tok-str">             ({still_delay:?} vs {moving_delay:?})&quot;</span></span>
+<span class="ln" id="L459">        );</span>
+<span class="ln" id="L460">        assert!(</span>
+<span class="ln" id="L461">            still_delay &gt;= std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">1</span>),</span>
+<span class="ln" id="L462">            <span class="tok-str">&quot;a stilled mark is still driving the frame rate: {still_delay:?}&quot;</span></span>
+<span class="ln" id="L463">        );</span>
+<span class="ln" id="L464">    }</span>
+<span class="ln" id="L465"></span>
+<span class="ln" id="L466">    <span class="tok-com">/// Drawing must not panic at any size, including degenerate ones a layout</span></span>
+<span class="ln" id="L467">    <span class="tok-com">/// can genuinely produce while a window is being resized.</span></span>
+<span class="ln" id="L468">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L469">    <span class="tok-kw">fn</span> <span class="tok-fn">any_size_can_be_drawn</span>() {</span>
+<span class="ln" id="L470">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L471">        <span class="tok-kw">for</span> size <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L472">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L473">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>),</span>
+<span class="ln" id="L474">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">32.0</span>),</span>
+<span class="ln" id="L475">            egui::<span class="tok-fn">vec2</span>(<span class="tok-num">4000.0</span>, <span class="tok-num">2.0</span>),</span>
+<span class="ln" id="L476">        ] {</span>
+<span class="ln" id="L477">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L478">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L479">                    <span class="tok-fn">draw</span>(ui, size, <span class="tok-fn">moving</span>(), <span class="tok-num">3.0</span>);</span>
+<span class="ln" id="L480">                });</span>
+<span class="ln" id="L481">            });</span>
+<span class="ln" id="L482">        }</span>
+<span class="ln" id="L483">    }</span>
+<span class="ln" id="L484"></span>
+<span class="ln" id="L485">    <span class="tok-com">/// The delays are copied from the website&#x27;s markup; if that list changes</span></span>
+<span class="ln" id="L486">    <span class="tok-com">/// and this one does not, the two marks stop matching.</span></span>
+<span class="ln" id="L487"></span>
+<span class="ln" id="L488">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L489">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unfocused_window_does_not_animate</span>() {</span>
+<span class="ln" id="L490">        <span class="tok-com">// The case that makes a laptop warm: the application is open behind</span></span>
+<span class="ln" id="L491">        <span class="tok-com">// something else and nobody can see the mark at all.</span></span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L493">        <span class="tok-kw">let</span> rect = <span class="tok-fn">SOMEWHERE</span>();</span>
+<span class="ln" id="L494">        <span class="tok-com">// Settle it first, focused, so the &quot;unmoved for a quarter second&quot;</span></span>
+<span class="ln" id="L495">        <span class="tok-com">// condition is satisfied and focus is the only thing being tested.</span></span>
+<span class="ln" id="L496">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L497">            <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L498">                &amp;ctx,</span>
+<span class="ln" id="L499">                <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(rect), step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.2</span>),</span>
+<span class="ln" id="L500">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L501">                step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.2</span>,</span>
+<span class="ln" id="L502">            );</span>
+<span class="ln" id="L503">        }</span>
+<span class="ln" id="L504"></span>
+<span class="ln" id="L505">        <span class="tok-kw">let</span> first = <span class="tok-fn">heights_for</span>(&amp;ctx, <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(false), <span class="tok-fn">Some</span>(rect), <span class="tok-num">2.0</span>), <span class="tok-fn">moving</span>(), <span class="tok-num">2.0</span>);</span>
+<span class="ln" id="L506">        <span class="tok-kw">let</span> later = <span class="tok-fn">heights_for</span>(&amp;ctx, <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(false), <span class="tok-fn">Some</span>(rect), <span class="tok-num">2.9</span>), <span class="tok-fn">moving</span>(), <span class="tok-num">2.9</span>);</span>
+<span class="ln" id="L507">        assert_eq!(</span>
+<span class="ln" id="L508">            first, later,</span>
+<span class="ln" id="L509">            <span class="tok-str">&quot;the mark moved with the window unfocused, half a period apart&quot;</span></span>
+<span class="ln" id="L510">        );</span>
+<span class="ln" id="L511"></span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> delay = <span class="tok-fn">soonest_after</span>(&amp;ctx, <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(false), <span class="tok-fn">Some</span>(rect), <span class="tok-num">3.5</span>), <span class="tok-fn">moving</span>(), <span class="tok-num">3.5</span>);</span>
+<span class="ln" id="L513">        assert!(</span>
+<span class="ln" id="L514">            delay &gt;= std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">1</span>),</span>
+<span class="ln" id="L515">            <span class="tok-str">&quot;an unfocused window is still driving the frame rate: {delay:?}&quot;</span></span>
+<span class="ln" id="L516">        );</span>
+<span class="ln" id="L517">    }</span>
+<span class="ln" id="L518"></span>
+<span class="ln" id="L519">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L520">    <span class="tok-kw">fn</span> <span class="tok-fn">a_window_being_dragged_does_not_animate</span>() {</span>
+<span class="ln" id="L521">        <span class="tok-com">// The reported symptom: dragging the window is jerky. Every frame of</span></span>
+<span class="ln" id="L522">        <span class="tok-com">// a drag delivers a new rectangle, and each one used to come with a</span></span>
+<span class="ln" id="L523">        <span class="tok-com">// full redraw this animation had asked for.</span></span>
+<span class="ln" id="L524">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L525">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L526">            <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L527">                &amp;ctx,</span>
+<span class="ln" id="L528">                <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(<span class="tok-fn">SOMEWHERE</span>()), step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.2</span>),</span>
+<span class="ln" id="L529">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L530">                step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.2</span>,</span>
+<span class="ln" id="L531">            );</span>
+<span class="ln" id="L532">        }</span>
+<span class="ln" id="L533">        <span class="tok-kw">let</span> settled = <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L534">            &amp;ctx,</span>
+<span class="ln" id="L535">            <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(<span class="tok-fn">SOMEWHERE</span>()), <span class="tok-num">1.0</span>),</span>
+<span class="ln" id="L536">            <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L537">            <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L538">        );</span>
+<span class="ln" id="L539"></span>
+<span class="ln" id="L540">        <span class="tok-com">// Now move it, one frame at a time, as a drag does.</span></span>
+<span class="ln" id="L541">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> dragged = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L542">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">6</span> {</span>
+<span class="ln" id="L543">            <span class="tok-kw">let</span> moved = <span class="tok-fn">SOMEWHERE</span>().<span class="tok-fn">translate</span>(egui::<span class="tok-fn">vec2</span>(step <span class="tok-kw">as</span> f32 * <span class="tok-num">7.0</span>, <span class="tok-num">0.0</span>));</span>
+<span class="ln" id="L544">            <span class="tok-kw">let</span> time = <span class="tok-num">1.0</span> + step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.05</span>;</span>
+<span class="ln" id="L545">            dragged.<span class="tok-fn">push</span>(<span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L546">                &amp;ctx,</span>
+<span class="ln" id="L547">                <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(moved), time),</span>
+<span class="ln" id="L548">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L549">                time <span class="tok-kw">as</span> f32,</span>
+<span class="ln" id="L550">            ));</span>
+<span class="ln" id="L551">        }</span>
+<span class="ln" id="L552">        <span class="tok-kw">for</span> (index, shape) <span class="tok-kw">in</span> dragged.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L553">            assert_eq!(</span>
+<span class="ln" id="L554">                shape, &amp;settled,</span>
+<span class="ln" id="L555">                <span class="tok-str">&quot;the mark advanced on drag frame {index}, which is the redraw \</span></span>
+<span class="ln" id="L556"><span class="tok-str">                 that competes with the window move&quot;</span></span>
+<span class="ln" id="L557">            );</span>
+<span class="ln" id="L558">        }</span>
+<span class="ln" id="L559">    }</span>
+<span class="ln" id="L560"></span>
+<span class="ln" id="L561">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L562">    <span class="tok-kw">fn</span> <span class="tok-fn">the_mark_starts_again_once_the_window_stops</span>() {</span>
+<span class="ln" id="L563">        <span class="tok-com">// Pausing during a drag is only correct if it resumes afterwards. A</span></span>
+<span class="ln" id="L564">        <span class="tok-com">// permanently frozen logo is a different bug, not a fix.</span></span>
+<span class="ln" id="L565">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> rect = <span class="tok-fn">SOMEWHERE</span>();</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> paused = <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L568">            &amp;ctx,</span>
+<span class="ln" id="L569">            <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(rect.<span class="tok-fn">translate</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">9.0</span>, <span class="tok-num">0.0</span>))), <span class="tok-num">1.0</span>),</span>
+<span class="ln" id="L570">            <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L571">            <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L572">        );</span>
+<span class="ln" id="L573"></span>
+<span class="ln" id="L574">        <span class="tok-com">// Hold still for longer than SETTLE, then look again half a period on.</span></span>
+<span class="ln" id="L575">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> latest = paused.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L576">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">1</span>..<span class="tok-num">8</span> {</span>
+<span class="ln" id="L577">            <span class="tok-kw">let</span> time = <span class="tok-num">1.0</span> + step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.2</span>;</span>
+<span class="ln" id="L578">            latest = <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L579">                &amp;ctx,</span>
+<span class="ln" id="L580">                <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(rect), time),</span>
+<span class="ln" id="L581">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L582">                time <span class="tok-kw">as</span> f32,</span>
+<span class="ln" id="L583">            );</span>
+<span class="ln" id="L584">        }</span>
+<span class="ln" id="L585">        assert_ne!(</span>
+<span class="ln" id="L586">            latest, paused,</span>
+<span class="ln" id="L587">            <span class="tok-str">&quot;the mark never resumed after the window stopped moving&quot;</span></span>
+<span class="ln" id="L588">        );</span>
+<span class="ln" id="L589">    }</span>
+<span class="ln" id="L590"></span>
+<span class="ln" id="L591">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L592">    <span class="tok-kw">fn</span> <span class="tok-fn">a_paused_mark_keeps_the_shape_it_had</span>() {</span>
+<span class="ln" id="L593">        <span class="tok-com">// Freezing at the resting midpoint would make every click into another</span></span>
+<span class="ln" id="L594">        <span class="tok-com">// window snap the row flat, which is a new visible glitch traded for</span></span>
+<span class="ln" id="L595">        <span class="tok-com">// the old invisible one.</span></span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L597">        <span class="tok-kw">let</span> rect = <span class="tok-fn">SOMEWHERE</span>();</span>
+<span class="ln" id="L598">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> running = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L599">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">6</span> {</span>
+<span class="ln" id="L600">            <span class="tok-kw">let</span> time = step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.2</span>;</span>
+<span class="ln" id="L601">            running = <span class="tok-fn">heights_for</span>(</span>
+<span class="ln" id="L602">                &amp;ctx,</span>
+<span class="ln" id="L603">                <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(rect), time),</span>
+<span class="ln" id="L604">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L605">                time <span class="tok-kw">as</span> f32,</span>
+<span class="ln" id="L606">            );</span>
+<span class="ln" id="L607">        }</span>
+<span class="ln" id="L608">        <span class="tok-kw">let</span> frozen = <span class="tok-fn">heights_for</span>(&amp;ctx, <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(false), <span class="tok-fn">Some</span>(rect), <span class="tok-num">1.4</span>), <span class="tok-fn">moving</span>(), <span class="tok-num">1.4</span>);</span>
+<span class="ln" id="L609">        assert_eq!(</span>
+<span class="ln" id="L610">            frozen, running,</span>
+<span class="ln" id="L611">            <span class="tok-str">&quot;losing focus changed the shape of the mark rather than holding it&quot;</span></span>
+<span class="ln" id="L612">        );</span>
+<span class="ln" id="L613">    }</span>
+<span class="ln" id="L614"></span>
+<span class="ln" id="L615">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L616">    <span class="tok-kw">fn</span> <span class="tok-fn">a_platform_that_reports_nothing_still_animates</span>() {</span>
+<span class="ln" id="L617">        <span class="tok-com">// No focus and no window rectangle: a mark frozen for ever there would</span></span>
+<span class="ln" id="L618">        <span class="tok-com">// be a worse failure than one that animates when it need not.</span></span>
+<span class="ln" id="L619">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L620">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> delay = std::time::Duration::MAX;</span>
+<span class="ln" id="L621">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L622">            delay = <span class="tok-fn">soonest_after</span>(</span>
+<span class="ln" id="L623">                &amp;ctx,</span>
+<span class="ln" id="L624">                <span class="tok-fn">frame</span>(None, None, step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.1</span>),</span>
+<span class="ln" id="L625">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L626">                step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.1</span>,</span>
+<span class="ln" id="L627">            );</span>
+<span class="ln" id="L628">        }</span>
+<span class="ln" id="L629">        assert!(</span>
+<span class="ln" id="L630">            delay &lt;= std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">1000</span> / FRAMES_PER_SECOND + <span class="tok-num">10</span>),</span>
+<span class="ln" id="L631">            <span class="tok-str">&quot;a platform reporting neither focus nor geometry stopped the mark: {delay:?}&quot;</span></span>
+<span class="ln" id="L632">        );</span>
+<span class="ln" id="L633">    }</span>
+<span class="ln" id="L634"></span>
+<span class="ln" id="L635">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L636">    <span class="tok-kw">fn</span> <span class="tok-fn">the_frame_rate_is_the_documented_one</span>() {</span>
+<span class="ln" id="L637">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L638">        <span class="tok-kw">let</span> rect = <span class="tok-fn">SOMEWHERE</span>();</span>
+<span class="ln" id="L639">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> delay = std::time::Duration::MAX;</span>
+<span class="ln" id="L640">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">6</span> {</span>
+<span class="ln" id="L641">            delay = <span class="tok-fn">soonest_after</span>(</span>
+<span class="ln" id="L642">                &amp;ctx,</span>
+<span class="ln" id="L643">                <span class="tok-fn">frame</span>(<span class="tok-fn">Some</span>(true), <span class="tok-fn">Some</span>(rect), step <span class="tok-kw">as</span> f64 * <span class="tok-num">0.2</span>),</span>
+<span class="ln" id="L644">                <span class="tok-fn">moving</span>(),</span>
+<span class="ln" id="L645">                step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.2</span>,</span>
+<span class="ln" id="L646">            );</span>
+<span class="ln" id="L647">        }</span>
+<span class="ln" id="L648">        <span class="tok-com">// What comes back is not what was asked for, and the difference is</span></span>
+<span class="ln" id="L649">        <span class="tok-com">// deliberate on egui&#x27;s side: it subtracts one predicted frame from</span></span>
+<span class="ln" id="L650">        <span class="tok-com">// every delay so a repaint does not land late. So the reported figure</span></span>
+<span class="ln" id="L651">        <span class="tok-com">// is up to one frame short of the request, and a test comparing them</span></span>
+<span class="ln" id="L652">        <span class="tok-com">// for equality is asserting the frame rate of the machine it runs on.</span></span>
+<span class="ln" id="L653">        <span class="tok-kw">let</span> requested = std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">1000</span> / FRAMES_PER_SECOND);</span>
+<span class="ln" id="L654">        <span class="tok-kw">let</span> one_frame = std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">17</span>);</span>
+<span class="ln" id="L655">        assert!(</span>
+<span class="ln" id="L656">            delay &lt;= requested,</span>
+<span class="ln" id="L657">            <span class="tok-str">&quot;asked to be repainted later than the rate this module documents: \</span></span>
+<span class="ln" id="L658"><span class="tok-str">             {delay:?} against {requested:?}&quot;</span></span>
+<span class="ln" id="L659">        );</span>
+<span class="ln" id="L660">        assert!(</span>
+<span class="ln" id="L661">            delay + one_frame &gt;= requested,</span>
+<span class="ln" id="L662">            <span class="tok-str">&quot;asked to be repainted far sooner than this module documents: \</span></span>
+<span class="ln" id="L663"><span class="tok-str">             {delay:?} against {requested:?}&quot;</span></span>
+<span class="ln" id="L664">        );</span>
+<span class="ln" id="L665">        <span class="tok-com">// A constant, so the compiler settles it: the whole point of this</span></span>
+<span class="ln" id="L666">        <span class="tok-com">// change was to ask for fewer whole-window redraws than the thirty a</span></span>
+<span class="ln" id="L667">        <span class="tok-com">// second it used to.</span></span>
+<span class="ln" id="L668">        <span class="tok-kw">const</span> { assert!(FRAMES_PER_SECOND &lt; <span class="tok-num">30</span>) };</span>
+<span class="ln" id="L669">    }</span>
+<span class="ln" id="L670"></span>
+<span class="ln" id="L671">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L672">    <span class="tok-kw">fn</span> <span class="tok-fn">the_delays_match_the_website_markup</span>() {</span>
+<span class="ln" id="L673">        <span class="tok-kw">let</span> html = std::fs::<span class="tok-fn">read_to_string</span>(</span>
+<span class="ln" id="L674">            std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../website/index.html&quot;</span>),</span>
+<span class="ln" id="L675">        )</span>
+<span class="ln" id="L676">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;index.html should be readable&quot;</span>);</span>
+<span class="ln" id="L677">        <span class="tok-kw">let</span> start = html</span>
+<span class="ln" id="L678">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;class=\&quot;veil\&quot;&quot;</span>)</span>
+<span class="ln" id="L679">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;no veil mark on the page&quot;</span>);</span>
+<span class="ln" id="L680">        <span class="tok-kw">let</span> end = html[start..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;&lt;/div&gt;&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;unterminated veil&quot;</span>) + start;</span>
+<span class="ln" id="L681">        <span class="tok-kw">let</span> block = &amp;html[start..end];</span>
+<span class="ln" id="L682"></span>
+<span class="ln" id="L683">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found: Vec&lt;f32&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L684">        <span class="tok-kw">for</span> piece <span class="tok-kw">in</span> block.<span class="tok-fn">split</span>(<span class="tok-str">&quot;animation-delay:&quot;</span>).<span class="tok-fn">skip</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L685">            <span class="tok-kw">let</span> ms: String = piece.<span class="tok-fn">chars</span>().<span class="tok-fn">take_while</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L686">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(v) = ms.parse::&lt;f32&gt;() {</span>
+<span class="ln" id="L687">                found.<span class="tok-fn">push</span>(v / <span class="tok-num">1000.0</span>);</span>
+<span class="ln" id="L688">            }</span>
+<span class="ln" id="L689">        }</span>
+<span class="ln" id="L690">        assert_eq!(</span>
+<span class="ln" id="L691">            found.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L692">            DELAYS.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L693">            <span class="tok-str">&quot;the website has {} bars, the app has {}&quot;</span>,</span>
+<span class="ln" id="L694">            found.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L695">            DELAYS.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L696">        );</span>
+<span class="ln" id="L697">        <span class="tok-kw">for</span> (i, (site, app)) <span class="tok-kw">in</span> found.<span class="tok-fn">iter</span>().<span class="tok-fn">zip</span>(DELAYS.<span class="tok-fn">iter</span>()).<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L698">            assert!(</span>
+<span class="ln" id="L699">                (site - app).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">4</span>,</span>
+<span class="ln" id="L700">                <span class="tok-str">&quot;bar {i}: website {site}s, app {app}s&quot;</span></span>
+<span class="ln" id="L701">            );</span>
+<span class="ln" id="L702">        }</span>
+<span class="ln" id="L703">    }</span>
+<span class="ln" id="L704"></span>
+<span class="ln" id="L705">    <span class="tok-com">/// Render once and read the bar heights back out of the paint list.</span></span>
+<span class="ln" id="L706">    <span class="tok-kw">fn</span> <span class="tok-fn">render_heights</span>(ctx: &amp;egui::Context, motion: Motion, time: f32) -&gt; Vec&lt;u32&gt; {</span>
+<span class="ln" id="L707">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L708">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L709">                <span class="tok-fn">draw</span>(ui, egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">40.0</span>), motion, time);</span>
+<span class="ln" id="L710">            });</span>
+<span class="ln" id="L711">        });</span>
+<span class="ln" id="L712">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> heights = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L713">        <span class="tok-kw">for</span> clipped <span class="tok-kw">in</span> output.shapes {</span>
+<span class="ln" id="L714">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::Shape::<span class="tok-fn">Rect</span>(r) = &amp;clipped.shape {</span>
+<span class="ln" id="L715">                <span class="tok-com">// Quantised, so floating-point noise does not make two</span></span>
+<span class="ln" id="L716">                <span class="tok-com">// identical frames look different.</span></span>
+<span class="ln" id="L717">                heights.<span class="tok-fn">push</span>((r.rect.<span class="tok-fn">height</span>() * <span class="tok-num">100.0</span>) <span class="tok-kw">as</span> u32);</span>
+<span class="ln" id="L718">            }</span>
+<span class="ln" id="L719">        }</span>
+<span class="ln" id="L720">        heights</span>
+<span class="ln" id="L721">    }</span>
+<span class="ln" id="L722">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

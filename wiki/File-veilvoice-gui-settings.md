@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/settings.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1245 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1246 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
 
 ## Contents
 
@@ -52,7 +52,7 @@ choice applies as you make it and is remembered.
 
 ## What this file contains
 
-1245 lines defining **34 functions** (24 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1246 lines defining **34 functions** (24 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

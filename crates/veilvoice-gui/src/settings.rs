@@ -1003,11 +1003,12 @@ fn swatches(ui: &mut Ui) {
                 ui.allocate_exact_size(egui::vec2(26.0, 18.0), egui::Sense::hover());
             if ui.is_rect_visible(rect) {
                 ui.painter()
-                    .rect_filled(rect, egui::Rounding::same(3.0), colour);
+                    .rect_filled(rect, egui::CornerRadius::same(3), colour);
                 ui.painter().rect_stroke(
                     rect,
-                    egui::Rounding::same(3.0),
+                    egui::CornerRadius::same(3),
                     egui::Stroke::new(1.0, p::border()),
+                    egui::StrokeKind::Inside,
                 );
             }
             response.on_hover_text(name);

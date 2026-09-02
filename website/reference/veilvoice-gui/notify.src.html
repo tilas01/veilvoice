@@ -362,10 +362,10 @@
 <span class="ln" id="L284"><span class="tok-kw">fn</span> <span class="tok-fn">overlay</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, notice: &amp;Notice) -&gt; bool {</span>
 <span class="ln" id="L285">    <span class="tok-kw">let</span> card = Card::<span class="tok-fn">for_level</span>(notice.level, p::<span class="tok-fn">bg</span>());</span>
 <span class="ln" id="L286">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> dismissed = false;</span>
-<span class="ln" id="L287">    egui::Frame::<span class="tok-fn">none</span>()</span>
+<span class="ln" id="L287">    egui::Frame::<span class="tok-fn">new</span>()</span>
 <span class="ln" id="L288">        .<span class="tok-fn">fill</span>(card.fill)</span>
-<span class="ln" id="L289">        .<span class="tok-fn">rounding</span>(egui::Rounding::<span class="tok-fn">same</span>(<span class="tok-num">8.0</span>))</span>
-<span class="ln" id="L290">        .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">symmetric</span>(<span class="tok-num">12.0</span>, <span class="tok-num">9.0</span>))</span>
+<span class="ln" id="L289">        .<span class="tok-fn">corner_radius</span>(egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">8</span>))</span>
+<span class="ln" id="L290">        .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">symmetric</span>(<span class="tok-num">12</span>, <span class="tok-num">9</span>))</span>
 <span class="ln" id="L291">        .<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L292">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
 <span class="ln" id="L293">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(&amp;notice.text).<span class="tok-fn">color</span>(card.text));</span>
@@ -386,10 +386,10 @@
 <span class="ln" id="L306"><span class="tok-kw">fn</span> <span class="tok-fn">alert</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, notice: &amp;Notice) -&gt; bool {</span>
 <span class="ln" id="L307">    <span class="tok-kw">let</span> card = Card::<span class="tok-fn">for_level</span>(notice.level, p::<span class="tok-fn">bg</span>());</span>
 <span class="ln" id="L308">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> dismissed = false;</span>
-<span class="ln" id="L309">    egui::Frame::<span class="tok-fn">none</span>()</span>
+<span class="ln" id="L309">    egui::Frame::<span class="tok-fn">new</span>()</span>
 <span class="ln" id="L310">        .<span class="tok-fn">fill</span>(card.fill)</span>
-<span class="ln" id="L311">        .<span class="tok-fn">rounding</span>(egui::Rounding::<span class="tok-fn">same</span>(<span class="tok-num">4.0</span>))</span>
-<span class="ln" id="L312">        .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">same</span>(<span class="tok-num">14.0</span>))</span>
+<span class="ln" id="L311">        .<span class="tok-fn">corner_radius</span>(egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">4</span>))</span>
+<span class="ln" id="L312">        .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">same</span>(<span class="tok-num">14</span>))</span>
 <span class="ln" id="L313">        .<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L314">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(&amp;notice.text).<span class="tok-fn">color</span>(card.text).<span class="tok-fn">strong</span>());</span>
 <span class="ln" id="L315">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
