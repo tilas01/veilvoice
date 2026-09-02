@@ -252,6 +252,15 @@ pub struct VeilVoiceApp {
     /// One at a time. A stack of cards covering the window is how somebody
     /// dismisses six warnings without reading any of them.
     notice: Option<crate::notify::Notice>,
+    /// The short tour, on a first run and after an upgrade that adds a tab.
+    tour: crate::tour::Tour,
+    /// Set once the tour has been considered for this launch, so the decision
+    /// is taken from the saved version once rather than on every frame.
+    tour_considered: bool,
+    /// The report from a previous crash, offered above whatever tab is open.
+    /// It used to be one line on the About tab, which is the tab somebody who
+    /// has just had a crash is least likely to open.
+    crash: crate::crashreport::Offer,
 
     // File mode.
     input: Option<PathBuf>,
@@ -420,6 +429,9 @@ impl VeilVoiceApp {
                 .with_random_reseed_range()
                 .reseed_range_ms,
             notice: None,
+            crash: crate::crashreport::Offer::default(),
+            tour: crate::tour::Tour::default(),
+            tour_considered: false,
             choosing_input: crate::dialog::Pending::new(),
             failsafe: veilvoice_failsafe::Guard::new(),
             failsafe_finding: None,
@@ -939,42 +951,51 @@ impl eframe::App for VeilVoiceApp {
                 if !offer_install && self.tab == Tab::Setup {
                     self.tab = Tab::File;
                 }
-                ui.horizontal(|ui| {
-                    for (tab, label) in [
-                        (Tab::File, "Anonymise file"),
-                        (Tab::Live, "Live scramble"),
-                        (Tab::Group, "Group"),
-                        (Tab::Watch, "Monitor"),
-                        (Tab::Security, "Lock"),
-                        (Tab::Verify, "Verify"),
-                        (Tab::Preferences, "Settings"),
-                        (Tab::Setup, "Install"),
-                        (Tab::About, "About"),
-                    ] {
-                        if tab == Tab::Setup && !offer_install {
-                            continue;
+                // Greyed out while a panel that takes over the whole body is
+                // up: the first-run choices, or the tour. Both of those draw
+                // instead of the tab and return, so a click on the strip moved
+                // the highlight and changed nothing underneath it, which looks
+                // exactly like a window that has stopped responding. Disabled
+                // is the honest version of what was already true.
+                let taken_over = self.preferences.needs_first_run() || self.tour.running();
+                ui.add_enabled_ui(!taken_over, |ui| {
+                    ui.horizontal(|ui| {
+                        for (tab, label) in [
+                            (Tab::File, "Anonymise file"),
+                            (Tab::Live, "Live scramble"),
+                            (Tab::Group, "Group"),
+                            (Tab::Watch, "Monitor"),
+                            (Tab::Security, "Lock"),
+                            (Tab::Verify, "Verify"),
+                            (Tab::Preferences, "Settings"),
+                            (Tab::Setup, "Install"),
+                            (Tab::About, "About"),
+                        ] {
+                            if tab == Tab::Setup && !offer_install {
+                                continue;
+                            }
+                            let selected = self.tab == tab;
+                            let text = RichText::new(label).color(if selected {
+                                p::blue()
+                            } else {
+                                p::muted()
+                            });
+                            if ui.selectable_label(selected, text).clicked() {
+                                self.tab = tab;
+                            }
+                            // A real gap between tabs, not just the default padding.
+                            //
+                            // It reads better, and it is load-bearing for
+                            // `tools/shots/gui.ps1`, which finds the tabs by scanning
+                            // the strip for lit columns separated by gaps. Capitalising
+                            // the labels widened them enough to close the space between
+                            // the first two, and the scanner read "Anonymise file Live
+                            // scramble" as one label and refused to continue -- which
+                            // is the failure working as intended, and the fix is to
+                            // give it something unambiguous to see.
+                            ui.add_space(6.0);
                         }
-                        let selected = self.tab == tab;
-                        let text = RichText::new(label).color(if selected {
-                            p::blue()
-                        } else {
-                            p::muted()
-                        });
-                        if ui.selectable_label(selected, text).clicked() {
-                            self.tab = tab;
-                        }
-                        // A real gap between tabs, not just the default padding.
-                        //
-                        // It reads better, and it is load-bearing for
-                        // `tools/shots/gui.ps1`, which finds the tabs by scanning
-                        // the strip for lit columns separated by gaps. Capitalising
-                        // the labels widened them enough to close the space between
-                        // the first two, and the scanner read "Anonymise file Live
-                        // scramble" as one label and refused to continue -- which
-                        // is the failure working as intended, and the fix is to
-                        // give it something unambiguous to see.
-                        ui.add_space(6.0);
-                    }
+                    });
                 });
             });
 
@@ -1031,6 +1052,25 @@ impl eframe::App for VeilVoiceApp {
             });
         }
 
+        // The report from a crash, on the first run after one, above whichever
+        // tab the person landed on. Looked for once rather than every frame.
+        //
+        // Held back while the first-run panel is up. Both can be true at once,
+        // and it happens for a specific reason: the application crashed before
+        // it saved the answers, so the next launch is still a first run and
+        // also has a report waiting. Drawn together they were two unrelated
+        // things demanding a decision on the same screen, with the welcome
+        // underneath the wreckage. The two choices come first, and the report
+        // is there when they are made.
+        self.crash.look();
+        if self.crash.waiting() && !self.preferences.needs_first_run() {
+            egui::TopBottomPanel::top("crash").show(ctx, |ui| {
+                ui.add_space(8.0);
+                self.crash.panel(ui);
+                ui.add_space(8.0);
+            });
+        }
+
         egui::CentralPanel::default().show(ctx, |ui| {
             // While the "unencrypted?" question is open, clicks must not land
             // on the window behind it.
@@ -1039,6 +1079,25 @@ impl eframe::App for VeilVoiceApp {
                 // defaults, so it is a courtesy rather than a gate.
                 if self.preferences.needs_first_run() {
                     self.preferences.first_run_panel(ui);
+                    return;
+                }
+                // The tour, once the two choices are made. Considered once per
+                // launch: a first run sees every card, an upgrade sees only
+                // the tabs that did not exist when it last ran, and a version
+                // that has already toured sees nothing.
+                if !self.tour_considered {
+                    self.tour_considered = true;
+                    let seen = self.preferences.toured_tabs();
+                    if seen.is_empty() {
+                        self.tour.start();
+                    } else {
+                        self.tour.start_new_only(&seen);
+                    }
+                }
+                if self.tour.running() && self.tour.panel(ui, self.setup.running_installed()) {
+                    self.preferences.mark_toured(&crate::tour::all_keys());
+                }
+                if self.tour.running() {
                     return;
                 }
                 // Every tab, inside one scroller.
@@ -1859,34 +1918,31 @@ impl VeilVoiceApp {
     /// Shown in the about tab rather than as a modal on launch: the previous
     /// run failing is worth knowing and is not worth a dialog in front of
     /// somebody who has just successfully opened the application.
-    fn previous_crash(&mut self, ui: &mut egui::Ui) {
-        let Some((path, _)) = crate::crashlog::previous() else {
-            return;
-        };
+    /// A way to report a fault, whether or not anything has crashed.
+    ///
+    /// What was here was the crash notice itself, and it was only here. The
+    /// panel above every tab has taken that over, because About is where
+    /// somebody goes to read version numbers rather than where they land after
+    /// a crash. What stays is the standing offer: the version numbers a report
+    /// needs are directly above this line, and now so is somewhere to send it.
+    fn report_a_fault(&mut self, ui: &mut egui::Ui) {
+        ui.add_space(10.0);
         ui.horizontal_wrapped(|ui| {
+            ui.label(RichText::new("Something wrong?").color(p::fg()).size(12.0));
+            ui.hyperlink_to("open an issue", crate::crashreport::ISSUES);
             ui.label(
-                RichText::new("The previous run ended unexpectedly.")
-                    .color(p::yellow())
-                    .strong(),
+                RichText::new(
+                    "The versions above are what a report needs. Nothing is sent \
+                     from here: the link opens your browser.",
+                )
+                .color(p::muted())
+                .size(12.0),
             );
         });
-        ui.label(
-            RichText::new(format!(
-                "A report was written to {}. It was written on this machine and sent \n                 nowhere. VeilVoice has no network code at all.",
-                path.display()
-            ))
-            .color(p::muted())
-            .size(12.0),
-        );
-        if ui.button("dismiss this notice").clicked() {
-            crate::crashlog::clear();
-        }
-        ui.add_space(10.0);
     }
 
     fn about_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
-        self.previous_crash(ui);
         field(ui, "app", env!("CARGO_PKG_VERSION"));
         field(ui, "engine", veilvoice_core::VERSION);
         field(ui, "audio", veilvoice_audio::VERSION);
@@ -1970,6 +2026,7 @@ impl VeilVoiceApp {
 
         ui.add_space(16.0);
         self.policy.panel(ui);
+        self.report_a_fault(ui);
     }
 }
 
@@ -2375,6 +2432,30 @@ mod tests {
         }
         assert_eq!(Tab::from_key("nothing-like-this"), None);
         assert_eq!(Tab::from_key(""), None);
+    }
+
+    /// Every tab is introduced, and the tour introduces nothing that is gone.
+    ///
+    /// The tour reads as a list of tabs, and a list of tabs written by hand
+    /// beside a list of tabs written by hand is two lists that drift. This is
+    /// what stops a tab being added with no sentence to explain it, which is
+    /// the failure that matters: an unexplained tab looks the same as an
+    /// explained one until somebody opens it.
+    #[test]
+    fn every_tab_has_a_tour_card_and_every_card_has_a_tab() {
+        let tabs: Vec<&str> = Tab::ALL.iter().map(|tab| tab.key()).collect();
+        for tab in &tabs {
+            assert!(
+                crate::tour::CARDS.iter().any(|(key, _, _)| key == tab),
+                "the {tab} tab has no tour card, so nothing tells anybody what it is"
+            );
+        }
+        for (key, _, _) in crate::tour::CARDS {
+            assert!(
+                tabs.contains(key),
+                "the tour introduces a {key} tab that does not exist"
+            );
+        }
     }
 
     /// Device selection is tested against synthetic lists, never the machine.

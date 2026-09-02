@@ -59,6 +59,13 @@ pub struct Prefs {
     pub animated_icon: bool,
     /// Whether the first-run panel has been answered.
     pub configured: bool,
+    /// The tabs the tour has already covered, comma separated.
+    ///
+    /// The tab list rather than a "seen" flag or a version number. A flag
+    /// cannot answer the question an upgrade asks, and a version answers it
+    /// only indirectly: it says that something changed, where this says what.
+    /// Empty means the tour has never run.
+    pub toured_tabs: String,
     /// Whether the install tab is hidden even on a portable copy.
     ///
     /// The tab already disappears once VeilVoice is installed -- an installed
@@ -144,6 +151,7 @@ impl Default for Prefs {
             animations: true,
             animated_icon: true,
             configured: false,
+            toured_tabs: String::new(),
             hide_install_tab: false,
             always_group: false,
             seal_with_app_lock: false,
@@ -230,6 +238,10 @@ impl Prefs {
                         prefs.animated_icon = on;
                         understood += 1;
                     }
+                }
+                "toured_tabs" => {
+                    prefs.toured_tabs = value.to_string();
+                    understood += 1;
                 }
                 "configured" => {
                     if let Some(on) = parse_bool(value) {
@@ -329,6 +341,7 @@ impl Prefs {
         out.push_str(&format!("animations = {}\n", self.animations));
         out.push_str(&format!("animated_icon = {}\n", self.animated_icon));
         out.push_str(&format!("configured = {}\n", self.configured));
+        out.push_str(&format!("toured_tabs = {}\n", self.toured_tabs));
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
         out.push_str(&format!(
@@ -443,6 +456,7 @@ mod tests {
             animations: false,
             animated_icon: false,
             configured: true,
+            toured_tabs: String::new(),
             hide_install_tab: true,
             always_group: true,
             seal_with_app_lock: false,
@@ -538,6 +552,7 @@ mod tests {
             animations: false,
             animated_icon: true,
             configured: true,
+            toured_tabs: String::new(),
             notify_style: "overlay".into(),
             failsafe: "close".into(),
             live_monitor: "toolbar".into(),

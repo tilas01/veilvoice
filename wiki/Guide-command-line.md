@@ -105,6 +105,47 @@ VeilVoice writes names the library and the package that carries it; the short
 version is `libxkbcommon-x11-0` on Debian and Ubuntu and `libxkbcommon-x11`
 elsewhere. The command line needs none of it.
 
+**The first time you open it.** After the two settings questions, VeilVoice
+shows one card per tab saying what that tab is for, which takes about twenty
+seconds and can be skipped at any point. Two of the nine are worth the card on
+their own: Monitor is not a level meter, it watches for another program picking
+up a real microphone while you are being veiled; and Lock is a passphrase on
+the application rather than on a recording.
+
+The last card says whether this copy is **portable** or **installed**, in those
+words. Portable means it runs from wherever you put it and installs nothing:
+move the folder and VeilVoice moves with it, delete the folder and it is gone.
+Installed means it is on this machine for good, on your menu or path, with its
+settings in your account. Both are fine, and the Install tab is where the
+decision is made rather than in the tour.
+
+After an upgrade the tour comes back only for tabs that did not exist last
+time, and a release that adds no tab shows nothing. What is stored is the list
+of tabs you have been shown, which is what "which of these is new to you" is
+actually asking.
+
+**When something goes wrong.** VeilVoice writes a report of a crash to a file
+beside its settings, and on the next launch it offers it to you above whatever
+tab you land on: what happened, where the file is, and a button to read the
+whole of it before you decide anything.
+
+Nothing is sent. Nothing here *can* send it, and that is not a policy but a
+property of the build: this project contains no network client and the build
+fails if one enters the dependency graph. The ordinary shape of this feature is
+a reporter that uploads, and that is the wrong shape for a program people use
+to protect themselves, because a report from a privacy tool is a report about
+somebody who was being careful.
+
+So the panel offers two things instead: copy the report, and open the issue
+tracker. What happens next is your decision and your clipboard. If you would
+rather it went away, "dismiss and delete it" removes the file.
+
+The report holds the version, your operating system and processor, and the
+error with its source location. It holds no file names, no settings, no
+passphrase and nothing about any audio. That list is in the panel too, because
+"would you like to send this" is only a real question if you can see what
+"this" is.
+
 **The BSDs get the command line only, and the reason is specific.** The audio
 library VeilVoice uses has no backend for them, so live capture cannot work
 there and the desktop application is built around a window that would have
