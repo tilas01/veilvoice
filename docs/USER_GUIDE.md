@@ -45,7 +45,9 @@ folder and it is gone.
 
 ## 3. The desktop app
 
-`veilvoice-gui`. Five tabs.
+`veilvoice-gui`. One tab for each thing it does, in the strip across the
+top. Every one of them has a section below, and `veilvoice-gui --tab <name>`
+opens the window on one directly.
 
 ### anonymise file
 
@@ -128,6 +130,86 @@ interview are:
 4. **Afterwards**, if the recording has several people in it and you want each
    one given a different voice, that is the **Group** tab and it works on the
    file.
+
+### group
+
+Several people in one recording, each given a **different** destination voice,
+so a listener can still follow the conversation by ear. Every voiceprint is
+destroyed as thoroughly as one speaker's would be; what is kept is that the
+speakers are distinguishable, not who they are.
+
+It works on a recording that already exists, not on a live microphone.
+
+| Control | What it is |
+|---|---|
+| **How you are working** | One person, a group with a voice each, or a group with one voice for everybody. The last is the honest choice when there are more people than there are voices far enough apart to tell apart. |
+| **open / save project** | A project holds where your files are, who is in the recording and what you called them. No audio and no passwords, so it is safe to keep beside the recording. It does hold the names you typed. |
+| **group mode** | On for this run. Closing the window turns it off again, so a recording of one person is never rendered against a plan describing several. |
+| **always start in group mode** | Remembered, for people who are always working this way. |
+| **the people** | A name and a colour each. **Names are not veiled by anything**: you type them and they go into the subtitles as typed. |
+| **the recording, and the plan** | The plan says when each person speaks. Without one there is nothing to render against, and audio no turn claims is silenced rather than passed through, so a missing plan gives a silent file rather than an unveiled one. `veilvoice conversation inspect` describes a plan you already have. |
+| **what a render writes** | Audio, subtitles and a player page. All three by default. |
+
+VeilVoice does not guess who is speaking. Turns come from a plan file or from
+one microphone per person, and that is a deliberate limit: guessing wrongly
+would put one person's words under another person's name.
+
+### verify
+
+Check that a download is the one that was published, without leaving the
+window. This is the same check `veilvoice-verify` does, and §7 walks through
+it in full.
+
+Drop the archive on the window and the hash list and signature beside it are
+picked up automatically. One press then checks the signature over the hash
+list, the archive against that list, every file you extracted out of it, and
+all of it again through your own GnuPG if you have one.
+
+The commands are also printed for you to run yourself. That is not decoration:
+a program telling you that a download is genuine came out of that download.
+Running the commands yourself is the part no program can do for you.
+
+**What a pass proves** is written on the tab, and it is worth reading. A good
+signature and a matching hash prove the file is the one the holder of that key
+published. They do not prove it is safe, that the source compiles to it, or
+that the key belongs to anybody in particular.
+
+### settings
+
+Where every choice the window remembers is made, and where they are kept.
+
+| Page | What is on it |
+|---|---|
+| **Interface** | The colour scheme, which is every palette the website has. Whether the mark in the header animates, and whether the window icon does. Whether the **install** tab is shown at all. |
+| **Locking** | The app lock and the idle timer that turns it on. See §5 and §5.5. |
+| **At rest** | Whether a result is sealed with the app-lock password as well, and where a vault lives if you keep one. See §5.7. |
+| **Notifications** | How the window tells you a job has finished. |
+
+The file itself is plain text, one `key = value` a line, at
+`%APPDATA%\veilvoice\settings.conf` on Windows,
+`~/Library/Application Support/veilvoice/settings.conf` on macOS and
+`${XDG_CONFIG_HOME:-~/.config}/veilvoice/settings.conf` on Linux. Nothing in it
+is secret and none of it is a password.
+
+### install
+
+Only there when you are running a portable copy, and it removes itself once
+VeilVoice is installed: a program offering to install itself when it already is
+tells you something untrue about what you are running. There is a tick under
+settings to hide it on a portable copy too.
+
+The install it offers is deliberately small. It copies the VeilVoice programs
+beside this one into your own program directory and adds that directory to your
+PATH, so that typing `veilvoice` in a terminal works. No administrator rights
+are asked for, no service is created, and nothing is written outside your own
+account.
+
+**Companion software** is listed on the same tab, and none of it is part of
+VeilVoice or required by it. Each entry names one program, says who makes it
+and under what licence, says whether it was found, and gives the one command
+that would install it. VeilVoice never runs somebody else's installer, and
+anything needing root prints the command for you to run in a terminal where you
+can see what you are approving.
 
 ### monitor
 

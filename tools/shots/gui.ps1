@@ -104,14 +104,19 @@ $tabs = @("file", "live", "group", "monitor", "lock", "verify", "settings", "ins
 $settings = Join-Path $env:APPDATA "veilvoice\settings.conf"
 $saved = $null
 if (Test-Path $settings) { $saved = Get-Content -Raw $settings }
-$forced = if ($saved) {
-  if ($saved -match "always_group\s*=") {
-    $saved -replace "always_group\s*=.*", "always_group = true"
+#
+# `animations` is stilled for the same kind of reason: the mark in the header
+# animates, so it is a different shape in every photograph and two captures of
+# one tab differ for no reason anybody wants. It is a setting the application
+# already has.
+$wanted = @{ "always_group" = "true"; "animations" = "false"; "animated_icon" = "false" }
+$forced = if ($saved) { $saved } else { "configured = true`n" }
+foreach ($key in $wanted.Keys) {
+  if ($forced -match "$key\s*=") {
+    $forced = $forced -replace "$key\s*=.*", "$key = $($wanted[$key])"
   } else {
-    $saved.TrimEnd() + "`nalways_group = true`n"
+    $forced = $forced.TrimEnd() + "`n$key = $($wanted[$key])`n"
   }
-} else {
-  "configured = true`nalways_group = true`n"
 }
 New-Item -ItemType Directory -Force (Split-Path $settings) | Out-Null
 Set-Content -Path $settings -Value $forced -Encoding utf8
@@ -144,12 +149,14 @@ foreach ($tab in $tabs) {
   #
   # Maximising on a 4K display gave 3840x2088 captures whose text was
   # unreadable at any size a page shows them, with wide empty margins down
-  # either side where the layout had nothing to put. This is the size the
-  # window opens at, widened so all nine tab labels fit and made taller so that
-  # every control on the longest tab is visible without scrolling. The picture
-  # should show somebody the whole of a panel, which is the only reason to take
-  # one.
-  [void][Shot]::SetWindowPos($h, [IntPtr]::Zero, 40, 40, 1400, 1000, 0x0004)
+  # either side where the layout had nothing to put.
+  #
+  # Tall rather than square, and taller than any tab needs: `tools/shots/
+  # fit.py` trims each picture back to what it actually contains, so a window
+  # bigger than the longest panel costs nothing and a window smaller than it
+  # cuts a sentence in half. 1000 was that smaller window: the group panel is
+  # 1288 pixels of content and was published with its bottom third missing.
+  [void][Shot]::SetWindowPos($h, [IntPtr]::Zero, 40, 40, 1400, 1900, 0x0004)
   # Long enough for the layout to settle and the first frames to be drawn.
   Start-Sleep -Milliseconds 2500
 
