@@ -148,6 +148,11 @@ CHECKS = [
      [sys.executable, "tools/shots/attrs.py", "--check"]),
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
+    # The recorded sessions, re-run and compared. This is the check that would
+    # have caught the demonstration inventing the verifier's output, and it is
+    # the only one here that runs the programs rather than reading about them.
+    ("recorded sessions match the programs",
+     [sys.executable, "tools/shots/sessions.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
     ("per-program guides match the user guide",
      [sys.executable, "tools/docs/guides.py", "--check"]),

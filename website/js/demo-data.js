@@ -77,6 +77,72 @@ window.VEILVOICE_DEMO = {
       "typed": "veilvoice clean --help"
     }
   ],
+  "sessions": [
+    {
+      "name": "verify",
+      "note": "The published archive, its signed hash list, and the same question asked again of your own GnuPG.",
+      "programme": "veilvoice-verify",
+      "steps": [
+        {
+          "output": "Checking what is in .\n\n  ok    embedded key fingerprint 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n  ok    signature over the hash list is good\n  ok    sha256 matches (d7814c9d7b40035f06d25eba5012bf4a62a4cee310e9b6eb3405baf2ef9c43b8)\n\n  INTACT. veilvoice-v0.1.17-linux-x86_64.tar.gz is byte-for-byte what was published, signed by\n  8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.\n\n  That is not the same as knowing it was built from the published\n  source -- the same person produced the binary and the list. For\n  that, compare against a hash somebody else produced from their own\n  build:  veilvoice-verify --explain\n\nChecking it again with your own GnuPG\n  found at /usr/bin/gpg\n  Your GnuPG keyring already had the VeilVoice signing key 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.\n  It is a public key: it lets you check signatures and can sign\n  nothing and decrypt nothing. It carries no e-mail address.\n  To remove it:  gpg --delete-keys 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n\n  ok    your GnuPG agrees: signed by the VeilVoice key\n\n  And the same thing, typed by you, which is the part this program\n  cannot do for itself:\n\n    gpg --import ./veilvoice-signing-key.asc\n    gpg --verify ./SHA256SUMS.asc ./SHA256SUMS\n    sha256sum -c SHA256SUMS --ignore-missing\n\n  Worth doing. This program checked the signature with a key built into\n  itself, and it came out of the same download you are checking. The\n  fingerprint on the website is the independent answer.",
+          "typed": "veilvoice-verify auto ."
+        }
+      ],
+      "title": "Checking a download"
+    },
+    {
+      "name": "anonymise",
+      "note": "A key made, then a three second recording veiled and sealed to it. Nothing typed at the second step.",
+      "programme": "veilvoice",
+      "steps": [
+        {
+          "output": "  Choose a passphrase to protect the private key.\nPassphrase:\nRepeat:\n  Deriving key (Argon2id, deliberately slow)...\n\u2713 public key  veilvoice.pub\n\u2713 private key veilvoice.key (encrypted)\n\n  Algorithm              X25519 + ML-KEM-768 hybrid\n  Share the public key freely. Anyone holding it can\n  encrypt to you; only the private key can open it.",
+          "typed": "veilvoice keygen"
+        },
+        {
+          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\nResult\n  Written                veiled.veil\n  Speed                  126.7x realtime\n  Accent                 neutralised\n  Seed rolls             507-1680 ms, drawn fresh before every roll -- no period to observe\n  At rest                sealed to a public key (X25519 + ML-KEM-768)\n\n\u2713 done, and the voiceprint in this file is not recoverable\n  Open it again with: veilvoice decrypt <file> -o out.wav",
+          "typed": "veilvoice anonymise interview.wav -o veiled.veil --encrypt-to veilvoice.pub"
+        }
+      ],
+      "title": "Veiling one recording"
+    },
+    {
+      "name": "info",
+      "note": "Every version, whether live audio works on this machine, and the network answer.",
+      "programme": "veilvoice",
+      "steps": [
+        {
+          "output": "VeilVoice\n  Version                0.1.17\n  Engine                 0.1.17\n  Crypto                 0.1.17\n  Audio                  0.1.17\n  Metadata               0.1.17\n  Monitor                0.1.17\n  Licence                GPL-3.0-or-later\n  Network access         none, by construction\n  Live audio             available\n\n  VeilVoice destroys the voiceprint, not the words.\n  See docs/WHITEPAPER.md for what that does and does not\n  protect against.",
+          "typed": "veilvoice info"
+        }
+      ],
+      "title": "What this build can do"
+    },
+    {
+      "name": "refusal",
+      "note": "It stops, explains, offers the two ways round it, and writes nothing.",
+      "programme": "veilvoice",
+      "steps": [
+        {
+          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\n  Choose a passphrase for this recording. It is separate from\n  the app lock, and there is no way to recover it.\n\u2717 there is no terminal here to ask for a passphrase.\n\n  This is what happens in a script, a scheduled job, or anything with\n  its input redirected.\n\n  Run it in a terminal, if somebody is there to type.\n\n  Or, for the two commands that write a recording, seal it to a public\n  key instead, which types nothing and is what works in a script:\n\n    veilvoice anonymise <FILE> --encrypt-to <PUBKEY>\n    veilvoice encrypt   <FILE> --to <PUBKEY>\n\n  Make the key once, in a terminal, with veilvoice keygen.\n\n  veilvoice anonymise can also write a recording with no encryption at\n  all, using --encrypt false --yes. That leaves every word that was\n  said readable by anyone who gets the file.\n\n  Nothing was written.",
+          "typed": "veilvoice anonymise interview.wav -o veiled.wav"
+        }
+      ],
+      "title": "In a script, with nobody to type a passphrase"
+    },
+    {
+      "name": "unencrypted",
+      "note": "The escape hatch exists, and says in full what you are giving up before it uses it.",
+      "programme": "veilvoice",
+      "steps": [
+        {
+          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\n\u2717 WRITING THIS RECORDING UNENCRYPTED\n  The de-identified recording will be written to disk unencrypted.\n\n  VeilVoice destroys the voiceprint, not the words. Anyone who can read\n  this file can still hear everything that was said: another user, a\n  backup, a sync client, anyone who later gets the disk.\n\n  Deleting it afterwards is not a fix: on an SSD, SD card or USB stick\n  the original blocks can survive every overwrite. That is why at-rest\n  encryption is the default rather than an option you have to find.\n\n  The file will be created readable only by your account. That is a file\n  permission and nothing more. It does not survive a copy, a backup, or\n  anyone who has the disk.\n\nResult\n  Written                veiled.wav\n  Speed                  123.0x realtime\n  Accent                 neutralised\n  Seed rolls             1280-1840 ms, drawn fresh before every roll -- no period to observe\n  At rest                UNENCRYPTED\n\n\u2713 done, and the voiceprint in this file is not recoverable\n  The words are still there; that is deliberate. To hide the\n  message as well, encrypt it: veilvoice encrypt\n! continuing without at-rest encryption, as asked",
+          "typed": "veilvoice anonymise interview.wav -o veiled.wav --encrypt false --yes"
+        }
+      ],
+      "title": "Asking for it in the clear"
+    }
+  ],
   "tabs": [
     {
       "key": "file",

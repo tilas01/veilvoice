@@ -18,12 +18,26 @@
 //
 // # The label, which is not optional
 //
-// **This is a drawing, not the program.** The panels are written by hand, the
-// device names and levels in them are illustrations, and nothing here veils
-// any audio. That sentence is printed at the top of the overlay where a reader
-// meets it, not buried in a comment, because a demonstration that lets
-// somebody believe they have used the software is a demonstration that has
-// misled them.
+// **Watch it run is a recording. The rest is a drawing.**
+//
+// The first mode replays transcripts of the real programs: the bytes they
+// wrote on a real terminal, with the passphrases typed at the real prompts,
+// recorded by `tools/shots/sessions.py` and checked against the programs on
+// every build. Nothing in them is rewritten and the only invented thing is the
+// pacing, because a wall of text arriving at once is a paste rather than a
+// session.
+//
+// The other modes are a drawing. The panels are written by hand, the device
+// names and levels in them are illustrations, and nothing there veils any
+// audio. Both halves of that are printed at the top of the overlay where a
+// reader meets them, not buried in a comment, because a demonstration that
+// lets somebody believe they have used the software is a demonstration that
+// has misled them.
+//
+// What was here before this was worse than a drawing. The release verifier's
+// mode played a hand-written list of lines described as the program running,
+// and four of its six output lines were text the program has never printed.
+// That is the reason the recordings exist.
 //
 // What is *not* invented is checked: the tabs come from the application's own
 // source and the terminal replays exactly what each command printed, both
@@ -58,10 +72,10 @@
 (function () {
   "use strict";
 
-  var data = window.VEILVOICE_DEMO || { version: "", tabs: [], commands: [] };
+  var data = window.VEILVOICE_DEMO || { version: "", tabs: [], commands: [], sessions: [] };
   var overlay = null;
   var lastFocus = null;
-  var mode = "app";
+  var mode = "session";  // what it does, before what it looks like
   var tab = data.tabs.length ? data.tabs[0].key : "file";
 
   function el(name, className, text) {
@@ -425,62 +439,122 @@
     return frame;
   }
 
-  // --- the release verifier ------------------------------------------------
+  // --- recorded sessions ---------------------------------------------------
 
-  function verifyModel() {
+  // What used to be here was a hand-written list of lines, played back one a
+  // second, described as the release verifier running. It was not. Four of its
+  // six output lines are text the program has never printed: it announced
+  // "==> Checking the signing key's fingerprint" and "ok   fingerprint
+  // matches", where the real program writes "ok    embedded key fingerprint".
+  //
+  // A demonstration that invents its own output is worse than no demonstration
+  // on a page whose subject is whether you can trust what this project tells
+  // you. So the transcripts now come from `demo-data.js`, which is generated
+  // from `assets/screenshots/session-*.txt`, which are recordings of the real
+  // programs on a real terminal, prompts and all. Nothing on this page is
+  // written by hand any more except the sentence saying so.
+
+  function sessionModel() {
     var frame = el("div", "demo-term");
     var bar = el("div", "demo-term-bar");
-    bar.appendChild(el("span", "demo-term-name", "veilvoice-verify"));
+    ["#f7768e", "#e0af68", "#9ece6a"].forEach(function (colour) {
+      var dot = el("i", "demo-term-dot");
+      dot.style.background = colour;
+      bar.appendChild(dot);
+    });
+    var name = el("span", "demo-term-name", "veilvoice");
+    bar.appendChild(name);
     frame.appendChild(bar);
 
-    var out = el("pre", "demo-term-out");
-    var step = 0;
-    var lines = [
-      "$ veilvoice-verify auto",
-      "",
-      "==> Checking the signing key's fingerprint",
-      "  ok   fingerprint matches 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A",
-      "==> Verifying the signature over SHA256SUMS",
-      "  ok   signature is good",
-      "==> Verifying the archive against SHA256SUMS",
-      "  ok   sha256 matches",
-      "",
-      "Every check passed, in that order: the key, then the signature over the",
-      "list, then the file against the list. A hash checked against a list",
-      "nobody verified is not a check."
-    ];
-    var run = el("button", "demo-btn demo-btn-strong", "run it");
-    var timer = null;
-    function play() {
-      if (timer) { window.clearInterval(timer); }
-      step = 0;
-      out.textContent = "";
-      timer = window.setInterval(function () {
-        if (step >= lines.length) {
-          window.clearInterval(timer);
-          timer = null;
-          return;
-        }
-        out.textContent += (step ? "\n" : "") + lines[step];
-        step += 1;
-      }, 260);
-    }
-    run.addEventListener("click", play);
     var picks = el("div", "demo-term-picks");
-    picks.appendChild(run);
+    var note = el("p", "demo-term-note", "");
+    var out = el("pre", "demo-term-out");
+    var replay = el("button", "demo-btn demo-btn-strong demo-btn-replay", "play it again");
+
+    var timer = null;
+    var current = null;
+
+    function stop() {
+      if (timer) { window.clearTimeout(timer); timer = null; }
+    }
+
+    // Typed a character at a time, then the output a line at a time. The
+    // pacing is the only invented thing here and it is invented on purpose:
+    // a wall of text appearing at once is not a session, it is a paste.
+    function play(entry) {
+      stop();
+      current = entry;
+      name.textContent = entry.programme;
+      note.textContent = entry.note;
+      out.textContent = "";
+      Array.prototype.forEach.call(picks.children, function (button) {
+        if (button.dataset.name) {
+          button.className = "demo-btn" + (button.dataset.name === entry.name ? " demo-btn-on" : "");
+        }
+      });
+
+      // Anybody who has asked for less movement gets the whole thing at once,
+      // which is the same information without the animation.
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (still) {
+        out.textContent = entry.steps.map(function (step) {
+          return "$ " + step.typed + "\n" + step.output;
+        }).join("\n\n");
+        return;
+      }
+
+      var queue = [];
+      entry.steps.forEach(function (step, index) {
+        if (index) { queue.push({ kind: "line", text: "" }); }
+        queue.push({ kind: "prompt" });
+        step.typed.split("").forEach(function (character) {
+          queue.push({ kind: "type", text: character });
+        });
+        queue.push({ kind: "line", text: "" });
+        step.output.split("\n").forEach(function (line) {
+          queue.push({ kind: "line", text: line });
+        });
+      });
+
+      var at = 0;
+      function tick() {
+        if (at >= queue.length) { timer = null; return; }
+        var item = queue[at];
+        at += 1;
+        var wait = 14;
+        if (item.kind === "prompt") { out.textContent += "$ "; wait = 220; }
+        else if (item.kind === "type") { out.textContent += item.text; wait = 22; }
+        else { out.textContent += "\n" + item.text; wait = item.text ? 32 : 90; }
+        out.scrollTop = out.scrollHeight;
+        timer = window.setTimeout(tick, wait);
+      }
+      tick();
+    }
+
+    (data.sessions || []).forEach(function (entry) {
+      var button = el("button", "demo-btn", entry.title);
+      button.dataset.name = entry.name;
+      button.title = entry.note;
+      button.addEventListener("click", function () { play(entry); });
+      picks.appendChild(button);
+    });
+    replay.addEventListener("click", function () { if (current) { play(current); } });
+    picks.appendChild(replay);
+
     frame.appendChild(picks);
+    frame.appendChild(note);
     frame.appendChild(out);
-    out.textContent = lines.join("\n");
+    if (data.sessions && data.sessions.length) { play(data.sessions[0]); }
     return frame;
   }
 
   // --- the overlay ---------------------------------------------------------
 
   var MODES = [
+    ["session", "Watch it run"],
     ["app", "The application"],
     ["cli", "The command line"],
-    ["both", "Both"],
-    ["verify", "The release verifier"]
+    ["both", "Both"]
   ];
 
   function stage(root) {
@@ -488,7 +562,7 @@
     area.textContent = "";
     if (mode === "app") { area.appendChild(appModel(root)); }
     else if (mode === "cli") { area.appendChild(cliModel()); }
-    else if (mode === "verify") { area.appendChild(verifyModel()); }
+    else if (mode === "session") { area.appendChild(sessionModel()); }
     else {
       area.className = "demo-stage demo-stage-split";
       area.appendChild(appModel(root));
@@ -529,10 +603,13 @@
     card.appendChild(head);
 
     card.appendChild(el("p", "demo-warn demo-disclaimer",
-      "This is a drawing of VeilVoice, not VeilVoice. Nothing here touches any " +
-      "audio and the levels and device names are illustrations. What is real: " +
-      "the tabs come from the application's source and the terminal replays " +
-      "exactly what each command printed."));
+      "Watch it run replays recordings of the real programs, typed out at " +
+      "reading speed: the bytes they wrote on a terminal, prompts and all, " +
+      "nothing rewritten. The application and the command line beside it are " +
+      "a drawing, not VeilVoice: nothing there touches any audio and the " +
+      "levels and device names are illustrations, though the tabs come from " +
+      "the application's source and the terminal replays exactly what each " +
+      "command printed."));
 
     card.appendChild(el("div", "demo-stage"));
     card.appendChild(el("p", "demo-help",
