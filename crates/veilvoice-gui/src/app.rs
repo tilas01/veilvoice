@@ -2032,6 +2032,68 @@ mod tests {
         );
     }
 
+    /// The user guide describes the application that exists.
+    ///
+    /// It said "Five tabs" and documented five, and there are nine. The four
+    /// it left out were **group**, **verify**, **settings** and **install** --
+    /// among them the verify tab, which is the one this project tells people
+    /// to use before running a download it has just told them not to trust.
+    ///
+    /// This is the fourth finding of one shape in this repository: a document
+    /// describing the program, with nothing comparing the two. F-71 was two
+    /// hand-typed copies of a number, F-101 a page linking files that were
+    /// never published, F-110 an example the parser refused. The remedy is
+    /// always the same one, and this is it for the guide.
+    ///
+    /// Each tab gets a heading of its own, named for the key the tab answers
+    /// to, so `veilvoice-gui --tab verify` and the section explaining that tab
+    /// cannot come apart. A tab added without a section fails the build here.
+    #[test]
+    fn the_user_guide_documents_every_tab() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        let headings: Vec<&str> = guide
+            .lines()
+            .filter(|line| line.starts_with("### "))
+            .map(|line| line.trim_start_matches("### ").trim())
+            .collect();
+        let missing: Vec<&str> = Tab::ALL
+            .iter()
+            .map(|tab| tab.key())
+            .filter(|key| {
+                !headings
+                    .iter()
+                    .any(|heading| heading.to_ascii_lowercase().contains(*key))
+            })
+            .collect();
+        assert!(
+            missing.is_empty(),
+            "docs/USER_GUIDE.md has no section for these tabs: {}. Every tab \
+             the window shows needs one, named for the key it answers to, or \
+             the guide describes a different application from the one that \
+             ships.",
+            missing.join(", ")
+        );
+    }
+
+    /// A count of the tabs, written out in the guide, is a second copy of a
+    /// fact and drifts from the first. It already did: "Five tabs", nine tabs.
+    #[test]
+    fn the_user_guide_does_not_count_the_tabs_by_hand() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        for wrong in [
+            "Three tabs", "Four tabs", "Five tabs", "Six tabs", "Seven tabs",
+            "Eight tabs", "Ten tabs",
+        ] {
+            assert!(
+                !guide.contains(wrong),
+                "docs/USER_GUIDE.md says {wrong:?} and the window shows {}. A \
+                 number typed beside a list is a copy of the list's length, \
+                 and it goes stale the first time a tab is added.",
+                Tab::ALL.len()
+            );
+        }
+    }
+
     /// The tab names `veilvoice-gui --help` lists have to be the tab names
     /// that exist.
     ///

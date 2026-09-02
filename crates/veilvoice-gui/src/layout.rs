@@ -114,6 +114,39 @@ pub fn centred_row<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> InnerRespo
     InnerResponse::new(inner.expect("the row body runs exactly once"), response)
 }
 
+/// A fixed-width column inside a row, so what follows it starts at one x.
+///
+/// # Why this is not `ui.label(format!("{label:<16}"))`
+///
+/// Padding a label with trailing spaces is the obvious way to make a column
+/// and it aligns nothing outside a terminal. The interface font is
+/// proportional, so a space is not the width of a letter and eight letters
+/// plus two spaces is not the width of ten; and egui gives trailing
+/// whitespace no reliable width at all. Rows padded that way sat at slightly
+/// different places on different screens, and everything lined up beneath
+/// them inherited the drift.
+///
+/// This has now been the cause of two findings in two different files, which
+/// is why it is here rather than written out a third time.
+///
+/// # Why `set_min_width` is not optional
+///
+/// [`egui::Ui::allocate_ui_with_layout`] asks for a width and then gives back
+/// only what the contents actually used, so a short label would take a short
+/// column and the next widget would move left again, which is the whole
+/// problem. `set_min_width` is what turns the request into a column.
+pub fn column<R>(ui: &mut Ui, width: f32, add: impl FnOnce(&mut Ui) -> R) -> R {
+    ui.allocate_ui_with_layout(
+        egui::vec2(width, ui.spacing().interact_size.y),
+        egui::Layout::left_to_right(egui::Align::Center),
+        |ui| {
+            ui.set_min_width(width);
+            add(ui)
+        },
+    )
+    .inner
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
