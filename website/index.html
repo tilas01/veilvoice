@@ -149,7 +149,7 @@
     <span class="fact" style="--f:0;--c:var(--ok)">No network code in the dependency graph</span>
     <span class="fact" style="--f:1;--c:var(--cyan)">CI fails the build if an HTTP client appears</span>
     <span class="fact" style="--f:2;--c:var(--ok)">No unsafe code, in any of the 27 crates</span>
-    <span class="fact" style="--f:3;--c:var(--accent)">1141 tests, and 16 more suites for the website</span>
+    <span class="fact" style="--f:3;--c:var(--accent)">1141 tests, and 17 more suites for the website</span>
     <span class="fact" style="--f:4;--c:var(--cyan)">Reproducible builds: each target built twice, and compared</span>
     <span class="fact" style="--f:5;--c:var(--accent-2)">Releases signed; the fingerprint is published everywhere</span>
     <span class="fact" style="--f:6;--c:var(--accent)">Measured phase is discarded every frame, and never stored</span>
@@ -362,7 +362,7 @@
 
     <h3>Files in the latest release</h3>
     <ul id="asset-list">
-      <li class="lede">Load the live panel below, or open
+      <li class="lede">The current list of files is on
         <a href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">the releases page</a>.</li>
     </ul>
 
@@ -370,8 +370,8 @@
       <p><strong>Always verify before you run it.</strong> A download can be
       corrupted in transit or replaced entirely. Two independent checks are
       published with every release: a SHA-256 for each file, and an OpenPGP
-      signature over that hash list. The <a href="#verify">verifier below</a>
-      does the first one in your browser.</p>
+      signature over that hash list. The <a href="#verify">in-browser
+      verifier</a> does the first one for you.</p>
     </div>
   </div>
 </section>
@@ -867,7 +867,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       <li><strong>Offline by construction.</strong> No telemetry and no accounts, and CI fails the build if an HTTP client so much as enters the dependency graph. One thing reaches the network and only when you press it: the desktop app's <em>check for updates</em> button, which runs then and at no other time, sends nothing about you, and downloads nothing. It borrows your system's own transfer tool, exactly as the release verifier does.</li>
       <li><strong>Reproducible.</strong> Pinned toolchain, committed lockfile, path-remapped builds. Rebuild a release and confirm it matches, byte for byte.</li>
       <li><strong>Artwork generated from source.</strong> Every icon and the banner come out of a readable script, not a committed binary blob.</li>
-      <li><strong>This website too.</strong> No CDN, no web fonts, no analytics, no cookies. The only third-party request is the optional repository panel below, and it is a button you press.</li>
+      <li><strong>This website too.</strong> No CDN, no web fonts, no analytics, no cookies. The only third-party request is the optional repository panel, and it is a button you press.</li>
     </ul>
 
     <div class="note bad">

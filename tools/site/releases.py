@@ -432,6 +432,7 @@ def build():
     index_html = read(os.path.join(ROOT, "website", "index.html"))
     parts = split.shell(index_html)
     page = split.page(
+        ROOT,
         parts,
         "releases",
         "Releases",

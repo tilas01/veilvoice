@@ -38,6 +38,117 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-second round: the verify page that had no verifier
+
+Two defects (F-111 and F-112), both found by driving the website in a real
+browser rather than reading it, and both on pages a generator writes.
+
+### F-111 -- the page for checking a download could not check a download
+
+`tools/site/split.py`, and the five section pages it writes.
+
+`website/verify.html` is where this project sends people when it tells them not
+to run a download until they have checked it. It has the drop zone, the field
+for the published hash, the progress bar and the verdict line. It did not load
+`js/verify.js`.
+
+Dropping a file on it did nothing. The digest line sat at `no file hashed yet`,
+for ever, on the page whose whole subject is proving a download is genuine.
+
+Found by driving Chromium over the DevTools protocol and using the page: a file
+was put in the picker, a hash typed in the field, and the `change` event
+dispatched. The front page answered
+
+    8bd6a58c7b2348ec0dac088c9a33ebf2a89ab64b0cfe3f89443c8b32760f24ab
+    MATCH -- this file is byte-for-byte what the hash describes.
+
+and `verify.html`, with identical markup, answered nothing at all. The page's
+own listener had never been attached, because the code that attaches it was
+never fetched.
+
+**The cause is a variable nobody read.** The section pages are generated from
+`index.html`, and `shell()` collected the parts to reuse: the head, the header,
+the footer, and `scripts` -- a list of all nine `<script src>` tags on the
+front page. `page()` used the first three. Nothing ever used `scripts`. The six
+scripts `index.html` loads in its `<head>` arrived anyway, inside the copied
+head, so every generated page had theme, reveal, legal and the rest and looked
+entirely normal. The three loaded at the end of its body did not arrive, and
+`js/verify.js` is one of them.
+
+That is why it survived: the pages worked. They were themed, they revealed on
+scroll, the legal notice appeared. One feature on one page was furniture, and
+furniture does not raise an error.
+
+**Which scripts a page needs is now read out of the scripts.** A table here
+saying "verify.html needs verify.js" would be a second copy of a fact, which is
+the shape of a third of the findings in this document. Instead every module is
+read for the ids it will not start without, every page for the ids it has, and
+the two compared.
+
+The distinction between the ids a module *touches* and the ids it *needs* is
+the whole of the difficulty, and getting it wrong in either direction is a real
+mistake. `repo.js` touches `#asset-list`, and `download.html` has an
+`#asset-list`; loading `repo.js` there on that evidence would put a third-party
+request on a page that cannot use it, on a site whose only third-party request
+is announced and opt-in. But `repo.js` returns immediately unless `#load-repo`
+is present, and that button is on the front page only. `verify.js` returns
+unless `#drop` and `#file` are both present, and `verify.html` has both.
+
+Every module here is written that way: a `DOMContentLoaded` handler looks its
+elements up and returns early if the ones it cannot work without are missing.
+The generator now reads that guard. Where there is no guard to read it demands
+the module wherever any of its markup appears, which is the cautious answer
+rather than the precise one, and is the right way round.
+
+`tools/site-tests/scripts.test.js` makes the same comparison against the
+committed pages, independently of the generator that wrote them, so a page
+edited by hand is covered as well as a page generated. Removing the script tag
+again fails it with the page and the ids named. It also checks that the
+`website/nojs` pages load no scripts at all, which is the one thing they exist
+not to do.
+
+**Both halves were then run in the browser rather than assumed.** A correct
+hash gives `MATCH -- this file is byte-for-byte what the hash describes.`, a
+wrong one gives `NO MATCH -- do not run this file.` with the failure class on
+the verdict, on `verify.html`, from a real Chromium.
+
+The limit: this settles that the code a page's markup needs is fetched. It does
+not settle that the code works, and could not. That is what using the page is
+for, and using the page is what found this.
+
+### F-112 -- "below" survived being moved to another page
+
+`website/index.html`, in three sentences.
+
+Splitting a section onto its own page changes what the words in it mean. The
+download section said
+
+> The <a href="#verify">verifier below</a> does the first one in your browser.
+
+which is true on the front page, where the verifier is below. On
+`download.html` the generator rewrites that link to `index.html#verify`, as it
+must, and the sentence now describes a link to a different page as being lower
+down this one.
+
+Three sentences had gone false this way, all of them naming something that
+lives on the front page only: the live repository panel "below" on the download
+page and again on the security page, and the verifier "below" on the download
+page. All three now say what they mean without claiming a position, so they
+read correctly wherever the generator puts them.
+
+The other three occurrences of "above" and "below" on the generated pages were
+checked and are correct: two refer to headings that are genuinely on the same
+page, and one is inside an HTML comment.
+
+**Only part of this is guarded, and it is worth saying which part.** A link to
+another page described as "above" or "below" is a contradiction that can be
+read mechanically, and `scripts.test.js` now refuses it -- that is the check
+that found the verifier sentence, after the other two had been found by reading.
+Whether "the repository panel below" refers to anything is not mechanically
+decidable, and a check that guessed at it would produce false alarms on the
+sentences that are fine. So the crisp half is enforced and the rest is not, and
+this paragraph is here rather than a test that pretends otherwise.
+
 ## The twenty-first round: the verifier where a person actually stands, and 2.19 billion inputs
 
 Four defects (F-107 to F-110), every one of them found by using the programs
@@ -2259,7 +2370,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1141 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1141 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3906,8 +4017,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ten defects found and fixed (F-1 to F-110), across twenty-one
-rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and twelve defects found and fixed (F-1 to F-112), across
+twenty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven
