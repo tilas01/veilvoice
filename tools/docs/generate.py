@@ -3134,7 +3134,10 @@ def check(root, files):
     # The wiki is one flat namespace, so the exclusion there is a *prefix* on a
     # file name rather than a directory. That is the price of the wiki's shape,
     # and it is why those pages are named `Source-` and nothing else is.
-    not_ours = ("website/reference/source/", "wiki/Source-")
+    # `wiki/Guide-` is `tools/docs/guides.py`: per-program views of the user
+    # guide, which this tool cannot produce because it reads Rust doc
+    # comments and those are Markdown. That tool has its own `--check`.
+    not_ours = ("website/reference/source/", "wiki/Source-", "wiki/Guide-")
     for base in ("docs/files", "website/reference", "assets/banners",
                  "website/assets/banners", "wiki"):
         directory = os.path.join(root, base.replace("/", os.sep))
