@@ -78,8 +78,19 @@
 Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
 <details class="release" id="v0.1.16" open>
-<summary><strong>v0.1.16</strong> <span class="muted">A window that costs nothing when you are not using it, opens big enough...</span></summary>
-<p>A window that costs nothing when you are not using it, opens big enough to read, and no longer says everything three times on its verify tab. A shell script that checks a release without trusting VeilVoice to check it. A verifier that finds the release you are standing in and no longer calls a genuine one unverified. Screenshots that can be taken on any machine. And a guide that describes the application that actually ships.</p>
+<summary><strong>v0.1.16</strong> <span class="muted">In short</span></summary>
+<p><strong>In short</strong></p>
+<ul>
+<li>The window costs nothing when you are not using it. It was quietly redrawing itself twice a second on every tab, for ever.</li>
+<li>It opens at a size you can read, instead of cutting its longest panel off.</li>
+<li>The verify tab no longer says everything three times, and its buttons line up.</li>
+<li>You can check a release without trusting VeilVoice to check it: a short shell script that uses GnuPG and nothing of ours, and a longer one that rebuilds the release from source and compares the result.</li>
+<li>The desktop app tells you which program is doing the checking, and lets you pick a different one.</li>
+<li>Screenshots can be taken on any machine now, not one particular Windows one.</li>
+<li>The website is published again after a release, instead of going stale.</li>
+<li>The guide describes the application that actually ships, including where it runs and how anything reaches the network.</li>
+</ul>
+<p><strong>In full</strong></p>
 <h4 id="an-idle-window-costs-nothing-now">An idle window costs nothing now</h4>
 <ul>
 <li>The window drew 2.1 frames a second on every tab, for ever, with the animations off and nobody touching it, and spent 7 to 9 per cent of a processor core doing it. It now draws none and spends 0.2. The microphone monitor sent an update on every poll whether or not anything had changed, and the window woke twice a second to ask whether one had arrived. The thread with the news asks for the redraw now, and only when there is news.</li>
@@ -135,6 +146,13 @@ Every release, newest first. Open one to read what changed in it; its files are 
 </ul>
 <ul>
 <li>A new section says what the three programs are for, which parts are inside them, and how anything reaches the network at all given that none of them contains a network client.</li>
+</ul>
+<h4 id="two-things-this-releases-own-documentation-got-wrong">Two things this release&#x27;s own documentation got wrong</h4>
+<ul>
+<li>The new section explaining how the update check reaches the network credited PowerShell. It has never used PowerShell: it looks for <code>curl</code> by absolute path, and on Windows that is <code>System32\curl.exe</code>. The absolute path is the part that matters, because Windows searches the current directory before <code>PATH</code>, so a <code>curl.exe</code> left beside VeilVoice would otherwise be what ran. A test now reads every path the program looks in and requires the guide to mention each; it caught a second omission, a <code>wget</code> fallback, within a minute.</li>
+</ul>
+<ul>
+<li>The README said a release is built for nine targets. It is eleven, and has been for at least two releases. A number typed beside a list is a copy of that list&#x27;s length, and this one had nothing comparing it to the workflow that does the building. It is counted from that workflow now.</li>
 </ul>
 <h4 id="the-verify-page-can-verify">The verify page can verify</h4>
 <ul>

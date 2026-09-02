@@ -271,6 +271,53 @@ function run() {
     }
   }
 
+  // --- what the README claims the release builds ----------------------------
+  //
+  // It said "nine targets" and the release publishes eleven. A number typed
+  // into prose beside a list is a copy of that list's length, and this one had
+  // been wrong across at least two releases without anything noticing, because
+  // nothing compared the sentence to the workflow that does the building.
+  //
+  // Counted from the workflow rather than from a list here, so the only way to
+  // change the number is to change what is actually built.
+  const releaseYml = path.join(ROOT, ".github", "workflows", "release.yml");
+  if (!fs.existsSync(releaseYml)) {
+    fail(".github/workflows/release.yml is missing, so nothing builds a release");
+    failures += 1;
+  } else {
+    const workflow = fs.readFileSync(releaseYml, "utf8");
+    // One archive per `label:` in the build matrix, plus the BSD jobs, which
+    // are separate entries in the file because they run inside a VM rather
+    // than on a runner.
+    const matrix = new Set(
+      [...workflow.matchAll(/^\s*label:\s*([a-z0-9][a-z0-9.\-_]*)\s*$/gm)]
+        .map((m) => m[1]));
+    for (const os of ["freebsd", "openbsd", "netbsd"]) {
+      if (new RegExp(`^  ${os}:`, "m").test(workflow)) { matrix.add(os); }
+    }
+    const targets = matrix.size;
+
+    const words = { 9: "nine", 10: "ten", 11: "eleven", 12: "twelve", 13: "thirteen" };
+    const readme = read("README.md");
+    const claimed = /built for (\w+)\s*\n?targets/.exec(readme.replace(/\s+/g, " ")) ||
+                    /built for (\w+) targets/.exec(readme.replace(/\s+/g, " "));
+    if (targets < 5) {
+      fail(`only ${targets} release target(s) were found in release.yml, which ` +
+           "is not credible: this check is reading the workflow wrongly");
+      failures += 1;
+    } else if (!claimed) {
+      fail("README.md no longer says how many targets a release builds for, " +
+           "so nothing here can check it against the workflow");
+      failures += 1;
+    } else if (claimed[1] !== words[targets]) {
+      fail(`README.md says a release is built for "${claimed[1]}" targets; ` +
+           `release.yml builds ${targets} (${words[targets] || targets})`);
+      failures += 1;
+    } else {
+      pass(`README.md's "${claimed[1]} targets" matches the ${targets} in release.yml`);
+    }
+  }
+
   return failures;
 }
 
