@@ -89,8 +89,22 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <li>Screenshots can be taken on any machine now, not one particular Windows one.</li>
 <li>The website is published again after a release, instead of going stale.</li>
 <li>The guide describes the application that actually ships, including where it runs and how anything reaches the network.</li>
+<li>There is a guide for each program now, and installing is a dropdown per system in the README.</li>
 </ul>
 <p><strong>In full</strong></p>
+<h4 id="guides-one-per-program">Guides, one per program</h4>
+<ul>
+<li>A guide for each of the three programs, so somebody holding one of them does not have to read about the other two to find their part: checking a download, the command line, the desktop application. They are in <code>docs/</code>, in the wiki, and in every release archive.</li>
+</ul>
+<ul>
+<li>They are assembled from the user guide rather than written beside it. Three hand-maintained descriptions of one application is how documentation goes stale in one place and not the others, so there is one source and a check that fails the build when a guide and that source disagree.</li>
+</ul>
+<ul>
+<li>The verifier finally has a section of its own. It is the program you are meant to run <em>first</em>, and it was the only one with no guide.</li>
+</ul>
+<ul>
+<li>Installing is now a dropdown per system in the README: Linux, macOS, Windows, WSL, the BSDs, and building it yourself. Each is one command to get running and ends by checking the download, and the build-it-yourself route says what to check on your own machine before reporting a mismatch.</li>
+</ul>
 <h4 id="an-idle-window-costs-nothing-now">An idle window costs nothing now</h4>
 <ul>
 <li>The window drew 2.1 frames a second on every tab, for ever, with the animations off and nobody touching it, and spent 7 to 9 per cent of a processor core doing it. It now draws none and spends 0.2. The microphone monitor sent an update on every poll whether or not anything had changed, and the window woke twice a second to ask whether one had arrived. The thread with the news asks for the redraw now, and only when there is news.</li>

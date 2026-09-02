@@ -801,6 +801,102 @@ hurt.
 
 ---
 
+## 6.5 The verifier, `veilvoice-verify`
+
+A separate program, in the same archive, for one job: deciding whether the
+download you just made is the one that was published. It is separate so that it
+is usable *before* you trust the other two.
+
+### Just run it
+
+```bash
+veilvoice-verify
+```
+
+With no arguments it looks for a release around it: the folder you are in, the
+folder above, the one the program itself is in, and Downloads and Desktop. If
+it finds an archive with a `SHA256SUMS` and a signature beside it, it checks
+everything without being told anything.
+
+That is the intended way to use it. Unpack the archive, run the program inside
+the folder, read the verdict.
+
+### What one press actually checks
+
+Four things, in the order that makes each one worth checking:
+
+1. **The signature over the hash list.** Before the hashes, always. Whoever
+   could replace your download could replace `SHA256SUMS` beside it, and the
+   two would agree perfectly. The signature is what makes the list worth
+   comparing against, and the fingerprint is what makes the signature worth
+   checking.
+2. **The archive against that list.**
+3. **Every file you extracted out of it**, against a signed contents list
+   published with the release. An archive can be genuine and a file inside your
+   extracted copy still be wrong.
+4. **All of it again through your own GnuPG**, if you have one. See below.
+
+### Pointing it at something specific
+
+```bash
+veilvoice-verify auto ~/Downloads          # look here, not wherever I am
+veilvoice-verify file veilvoice.tar.gz     # this file, against SHA256SUMS
+```
+
+A folder you name that does not exist is an error, not an invitation to go and
+check somewhere else. That distinction cost a finding: the fallback through
+Downloads and Desktop is right when nobody said where to look, and wrong the
+moment somebody does.
+
+### The second opinion, and why you want one
+
+VeilVoice checks the signature itself, in Rust, with the signing key compiled
+in. That check needs nothing installed and works on every platform.
+
+It also came out of the download it is checking. **A tampered release ships a
+tampered verifier.** That is not a bug to be fixed; no program can vouch for
+itself.
+
+So the commands are printed for you to run yourself, and the desktop
+application will run your GnuPG if you ask it to:
+
+```bash
+veilvoice verify                # what to check, and where the files come from
+veilvoice verify --script       # a shell script that uses gpg and nothing of ours
+```
+
+The script is about sixty lines. Read it before running it: the entire reason
+to use it rather than `veilvoice-verify` is that it is not this project's code.
+
+### The strongest check, which no program here can do for you
+
+Rebuild the release from source and compare:
+
+```bash
+veilvoice verify --build-script > reproduce-veilvoice.sh
+sh reproduce-veilvoice.sh v0.1.16
+```
+
+A hash proves the file is the one whose hash was signed, and says nothing about
+what is inside it, because the same person signed both. Rebuilding moves the
+question from "do I trust the publisher" to "do I trust the source", and the
+source is here to read.
+
+### What a pass proves, and what it does not
+
+A good signature and a matching hash prove the file is the one the holder of
+that key published. They do **not** prove it is safe, that the source compiles
+to it, or that the key belongs to anybody in particular. Compare the
+fingerprint against the website and this README, from somewhere other than the
+download you are checking:
+
+```
+8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+```
+
+
+---
+
 ## 7. Getting help, and checking for yourself
 
 Nothing here asks for trust. The properties above are asserted by the test

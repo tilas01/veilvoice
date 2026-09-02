@@ -175,23 +175,167 @@ Everything the window does, and some things it does not.
 
 ## Install
 
-Grab a build from [Releases](https://github.com/tilas01/veilvoice/releases),
-or verify one first with the
-[in-browser verifier](https://tilas01.github.io/veilvoice/#verify), or build it
-yourself, since a fresh clone needs **no secrets**:
+Pick your system. Each one is a single command to get running, and a second
+path if you would rather build it and check the result against what was
+published.
+
+**Check the download before you run it.** Every route below ends with that,
+because a privacy tool you have not verified is a privacy tool you are taking
+on faith.
+
+<details>
+<summary><b>Linux</b> (any distribution)</summary>
+
+```bash
+# 1. Download the archive, the hash list and the signature.
+V=v0.1.16
+B=https://github.com/tilas01/veilvoice/releases/download/$V
+curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
+curl -fsSLO $B/SHA256SUMS
+curl -fsSLO $B/SHA256SUMS.asc
+curl -fsSLO $B/veilvoice-signing-key.asc
+
+# 2. Unpack and check it, from inside the folder.
+tar xzf veilvoice-$V-linux-x86_64.tar.gz
+cd veilvoice-$V-linux-x86_64
+./veilvoice-verify
+
+# 3. Run it, or install it so `veilvoice` works in any terminal.
+./veilvoice-gui
+./veilvoice install
+```
+
+`install` copies the programs into your own program directory and adds it to
+`PATH`. No administrator rights, no service, nothing outside your account.
+**Restart your terminal afterwards**, or the new `PATH` will not be in the one
+you are using.
+
+On a distribution nothing else fits, take the `musl-static` archive: it needs
+no system libraries at all.
+
+</details>
+
+<details>
+<summary><b>macOS</b> (Intel and Apple Silicon)</summary>
+
+```bash
+V=v0.1.16
+B=https://github.com/tilas01/veilvoice/releases/download/$V
+# arm64 for Apple Silicon, x86_64 for Intel.
+curl -fsSLO $B/veilvoice-$V-macos-arm64.tar.gz
+curl -fsSLO $B/SHA256SUMS
+curl -fsSLO $B/SHA256SUMS.asc
+curl -fsSLO $B/veilvoice-signing-key.asc
+
+tar xzf veilvoice-$V-macos-arm64.tar.gz
+cd veilvoice-$V-macos-arm64
+./veilvoice-verify
+./veilvoice-gui
+```
+
+macOS will refuse an unsigned download the first time. Right-click the program
+and choose Open, rather than turning Gatekeeper off.
+
+</details>
+
+<details>
+<summary><b>Windows</b> (10 and 11)</summary>
+
+```powershell
+$V = "v0.1.16"
+$B = "https://github.com/tilas01/veilvoice/releases/download/$V"
+curl.exe -fsSLO "$B/veilvoice-$V-windows-x86_64.zip"
+curl.exe -fsSLO "$B/SHA256SUMS"
+curl.exe -fsSLO "$B/SHA256SUMS.asc"
+curl.exe -fsSLO "$B/veilvoice-signing-key.asc"
+
+Expand-Archive "veilvoice-$V-windows-x86_64.zip" -DestinationPath .
+cd "veilvoice-$V-windows-x86_64"
+.\veilvoice-verify.exe
+.\veilvoice-gui.exe
+```
+
+`.\veilvoice.exe install` puts it on your `PATH`. **Open a new terminal
+afterwards**: an existing one keeps the `PATH` it started with.
+
+</details>
+
+<details>
+<summary><b>WSL</b></summary>
+
+WSL is Linux, so the Linux instructions apply unchanged and `veilvoice` works
+exactly as it does there. Two differences worth knowing:
+
+- The window needs **WSLg**, which recent Windows has by default.
+- A microphone belongs to Windows, not to the distribution, so **live mode is
+  the Windows build's job**. Use the Windows download for that.
+
+</details>
+
+<details>
+<summary><b>FreeBSD, OpenBSD, NetBSD</b></summary>
+
+The command line only. The audio library has no BSD backend, so live capture
+cannot work and the window is not shipped. Everything that operates on a file
+runs exactly as it does elsewhere.
+
+```sh
+V=v0.1.16
+fetch https://github.com/tilas01/veilvoice/releases/download/$V/veilvoice-$V-freebsd-x86_64.tar.gz
+tar xzf veilvoice-$V-freebsd-x86_64.tar.gz
+cd veilvoice-$V-freebsd-x86_64
+./veilvoice-verify
+```
+
+</details>
+
+<details>
+<summary><b>Build it yourself, and prove it matches</b></summary>
+
+A fresh clone needs **no secrets**:
 
 ```bash
 git clone https://github.com/tilas01/veilvoice && cd veilvoice
 cargo build --release
 ```
 
-Release binaries are built twice in different directories and verified
-byte-identical. Install with a script that refuses rather than continues
-([`docs/INSTALL.md`](docs/INSTALL.md)), check a download without GnuPG
-installed (`veilvoice-verify`), or package it yourself
-([`docs/PACKAGING.md`](docs/PACKAGING.md)).
-See [`docs/REPRODUCIBLE_BUILDS.md`](docs/REPRODUCIBLE_BUILDS.md)
-to check a download against the source yourself.
+To prove your build is the published one, byte for byte:
+
+```bash
+veilvoice verify --build-script > reproduce-veilvoice.sh
+sh reproduce-veilvoice.sh v0.1.16
+```
+
+That clones the tag, builds it with the committed lockfile and the commit's own
+date, and compares the result with the release. **If it does not match**, the
+script says which file differed. Before reporting it, check the three things
+that cause a mismatch on an otherwise honest machine:
+
+1. **A different compiler.** The version is pinned in `rust-toolchain.toml`
+   and `rustup` honours it automatically. Without `rustup`, you may be building
+   with something else.
+2. **`RUSTFLAGS` set in your environment**, which changes codegen.
+3. **A dirty checkout.** The script clones fresh for exactly this reason; if
+   you built by hand, `git status` should be clean.
+
+If all three are ruled out, that is worth reporting, and
+[`docs/REPRODUCIBLE_BUILDS.md`](docs/REPRODUCIBLE_BUILDS.md) explains what is
+pinned and why.
+
+</details>
+
+### Guides
+
+| If you have | Read |
+|---|---|
+| an archive you just downloaded | [Checking a download](docs/GUIDE_VERIFY.md) |
+| a terminal | [The command line](docs/GUIDE_CLI.md) |
+| a window | [The desktop application](docs/GUIDE_GUI.md) |
+| all of it | [The full user guide](docs/USER_GUIDE.md) |
+
+Also: [installing in detail](docs/INSTALL.md),
+[packaging it yourself](docs/PACKAGING.md),
+[reproducible builds](docs/REPRODUCIBLE_BUILDS.md).
 
 ---
 
