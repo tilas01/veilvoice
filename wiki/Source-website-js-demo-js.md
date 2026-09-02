@@ -3,7 +3,7 @@
 
 # `website/js/demo.js`
 
-[[The website's source|Source-index]] &middot; 612 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/demo.js)
+[[The website's source|Source-index]] &middot; 689 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/demo.js)
 
 ## What it does
 
@@ -17,7 +17,13 @@ So there is a model. Four of them, chosen from a strip at the top: the desktop a
 
 # The label, which is not optional
 
-**This is a drawing, not the program.** The panels are written by hand, the device names and levels in them are illustrations, and nothing here veils any audio. That sentence is printed at the top of the overlay where a reader meets it, not buried in a comment, because a demonstration that lets somebody believe they have used the software is a demonstration that has misled them.
+**Watch it run is a recording. The rest is a drawing.**
+
+The first mode replays transcripts of the real programs: the bytes they wrote on a real terminal, with the passphrases typed at the real prompts, recorded by `tools/shots/sessions.py` and checked against the programs on every build. Nothing in them is rewritten and the only invented thing is the pacing, because a wall of text arriving at once is a paste rather than a session.
+
+The other modes are a drawing. The panels are written by hand, the device names and levels in them are illustrations, and nothing there veils any audio. Both halves of that are printed at the top of the overlay where a reader meets them, not buried in a comment, because a demonstration that lets somebody believe they have used the software is a demonstration that has misled them.
+
+What was here before this was worse than a drawing. The release verifier's mode played a hand-written list of lines described as the program running, and four of its six output lines were text the program has never printed. That is the reason the recordings exist.
 
 What is *not* invented is checked: the tabs come from the application's own source and the terminal replays exactly what each command printed, both through `demo-data.js`, which `tools/site/demo.py` generates and CI verifies. A model that drifts from the program is a claim rather than an omission.
 
@@ -45,28 +51,29 @@ resolved one.
 
 | Function | Line |
 |---|---:|
-| `el` | 67 |
-| `helper` | 81 |
-| `explainable` | 86 |
-| `show` | 87 |
-| `file` | 104 |
-| `live` | 137 |
-| `stop` | 169 |
-| `run` | 177 |
-| `group` | 212 |
-| `monitor` | 234 |
-| `lock` | 250 |
-| `verify` | 268 |
-| `settings` | 290 |
-| `install` | 315 |
-| `about` | 328 |
-| `appModel` | 340 |
-| `draw` | 355 |
-| `cliModel` | 392 |
-| `verifyModel` | 430 |
-| `play` | 454 |
-| `stage` | 486 |
-| `build` | 501 |
-| `onKey` | 550 |
-| `hide` | 572 |
-| `fromFragment` | 594 |
+| `el` | 81 |
+| `helper` | 95 |
+| `explainable` | 100 |
+| `show` | 101 |
+| `file` | 118 |
+| `live` | 151 |
+| `stop` | 183 |
+| `run` | 191 |
+| `group` | 226 |
+| `monitor` | 248 |
+| `lock` | 264 |
+| `verify` | 282 |
+| `settings` | 304 |
+| `install` | 329 |
+| `about` | 342 |
+| `appModel` | 354 |
+| `draw` | 369 |
+| `cliModel` | 406 |
+| `sessionModel` | 457 |
+| `play` | 484 |
+| `tick` | 520 |
+| `stage` | 560 |
+| `build` | 575 |
+| `onKey` | 627 |
+| `hide` | 649 |
+| `fromFragment` | 671 |

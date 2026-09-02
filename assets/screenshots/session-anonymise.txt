@@ -1,0 +1,27 @@
+$ veilvoice keygen
+  Choose a passphrase to protect the private key.
+Passphrase:
+Repeat:
+  Deriving key (Argon2id, deliberately slow)...
+✓ public key  veilvoice.pub
+✓ private key veilvoice.key (encrypted)
+
+  Algorithm              X25519 + ML-KEM-768 hybrid
+  Share the public key freely. Anyone holding it can
+  encrypt to you; only the private key can open it.
+
+$ veilvoice anonymise interview.wav -o veiled.veil --encrypt-to veilvoice.pub
+Input
+  File                   interview.wav
+  Duration               3.00 s
+  Sample rate            16000 Hz
+
+Result
+  Written                veiled.veil
+  Speed                  126.7x realtime
+  Accent                 neutralised
+  Seed rolls             507-1680 ms, drawn fresh before every roll -- no period to observe
+  At rest                sealed to a public key (X25519 + ML-KEM-768)
+
+✓ done, and the voiceprint in this file is not recoverable
+  Open it again with: veilvoice decrypt <file> -o out.wav

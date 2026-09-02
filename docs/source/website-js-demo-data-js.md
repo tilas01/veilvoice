@@ -11,7 +11,7 @@
 
 # `website/js/demo-data.js`
 
-[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/demo-data.js) &middot; 120 lines
+[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/demo-data.js) &middot; 186 lines
 
 ## What it does
 
