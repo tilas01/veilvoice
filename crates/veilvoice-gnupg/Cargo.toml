@@ -12,3 +12,6 @@ description = "Run the GnuPG already on this machine: import the VeilVoice signi
 # everything it needs is in the standard library, and the portable verifier that
 # links it is the one binary in this project whose size is a feature.
 [dependencies]
+# For the signing fingerprint, so the generated script cannot carry a
+# different one from the programs.
+veilvoice-check = { path = "../veilvoice-check" }

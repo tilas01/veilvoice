@@ -90,6 +90,9 @@ impl std::fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+pub mod backend;
+pub mod script;
+
 /// Where GnuPG is, if it is on `PATH`.
 ///
 /// A lookup and nothing else: it never runs the program to find out.

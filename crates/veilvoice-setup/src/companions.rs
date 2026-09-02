@@ -172,6 +172,7 @@ impl Companion {
             "blackhole" => detect_blackhole(),
             "pipewire" => detect_pipewire(),
             "audacity" => detect_audacity(),
+            "gnupg" => detect_gnupg(),
             other => Presence::Unknown(format!("no probe is written for {other}")),
         }
     }
@@ -208,6 +209,7 @@ impl Companion {
                 }
             }
             "audacity" => audacity_offer(),
+            "gnupg" => gnupg_offer(),
             other => Offer::NoKnownRoute(format!("no route is written for {other}")),
         }
     }
@@ -253,6 +255,19 @@ pub const ALL: &[Companion] = &[
         why: "Its null sink is the virtual cable on Linux, so live mode needs no extra \
               software at all on a machine that already runs it.",
         page: "https://pipewire.org/",
+    },
+    Companion {
+        key: "gnupg",
+        name: "GnuPG",
+        vendor: "the GnuPG project",
+        licence: "GPL-3.0-or-later",
+        what: "The standard OpenPGP implementation: the `gpg` command that checks \
+               signatures.",
+        why: "VeilVoice checks a release signature itself, with code in this binary. \
+              That is the check telling you a download is genuine, made by a program \
+              that came out of that download. GnuPG is a second opinion from software \
+              this project did not write, and it is the one worth having.",
+        page: "https://gnupg.org/",
     },
     Companion {
         key: "audacity",
@@ -508,6 +523,75 @@ fn brew(arguments: &[&str]) -> Offer {
 /// the same order, so the two agree about what this machine is. The ones that
 /// need `sudo` are marked as needing it rather than being run: this program is
 /// not going to prompt for a root password.
+/// GnuPG, which is on `PATH` or is not.
+///
+/// No hunt through program directories, unlike the audio companions. A `gpg`
+/// that is installed but not on `PATH` is one the commands printed beside the
+/// verifier would not find either, so reporting it as present would be
+/// reporting something the reader cannot use.
+fn detect_gnupg() -> Presence {
+    for name in ["gpg", "gpg2"] {
+        if let Some(found) = on_path(name) {
+            return Presence::Present(found.display().to_string());
+        }
+    }
+    Presence::NotDetected
+}
+
+/// How GnuPG would be installed here.
+///
+/// On Windows this is Gpg4win through winget, which is the packaging almost
+/// everybody means by "GnuPG on Windows". The other route on Windows is a
+/// `gpg` inside WSL, which is not an install of anything on Windows itself
+/// and is offered separately by `veilvoice-gnupg`.
+fn gnupg_offer() -> Offer {
+    if cfg!(windows) {
+        return if on_path("winget").is_some() {
+            Offer::Command {
+                argv: vec![
+                    "winget".to_string(),
+                    "install".to_string(),
+                    "--id".to_string(),
+                    "GnuPG.Gpg4win".to_string(),
+                    "-e".to_string(),
+                    "--accept-package-agreements".to_string(),
+                    "--accept-source-agreements".to_string(),
+                ],
+                via: "winget",
+                needs_privilege: false,
+            }
+        } else {
+            Offer::NoKnownRoute(
+                "winget is not on this system. Gpg4win can be downloaded from \
+                 gpg4win.org, or a `gpg` inside WSL can be used instead."
+                    .to_string(),
+            )
+        };
+    }
+    if cfg!(target_os = "macos") {
+        return brew(&["install", "gnupg"]);
+    }
+    for (manager, install) in UNIX_PACKAGE_MANAGERS {
+        if on_path(manager).is_none() {
+            continue;
+        }
+        let mut argv = vec!["sudo".to_string(), (*manager).to_string()];
+        argv.extend(install.iter().map(|part| (*part).to_string()));
+        // Debian and Ubuntu call it `gnupg`; so do Fedora and Arch.
+        argv.push("gnupg".to_string());
+        return Offer::Command {
+            argv,
+            via: manager,
+            needs_privilege: true,
+        };
+    }
+    Offer::NoKnownRoute(
+        "no package manager this program recognises is on PATH. Install GnuPG the \
+         way you install anything else on this system."
+            .to_string(),
+    )
+}
+
 fn audacity_offer() -> Offer {
     if cfg!(windows) {
         return if on_path("winget").is_some() {

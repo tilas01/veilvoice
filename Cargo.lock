@@ -4864,11 +4864,13 @@ dependencies = [
  "veilvoice-appctl",
  "veilvoice-audio",
  "veilvoice-capture",
+ "veilvoice-check",
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-decoy",
  "veilvoice-failsafe",
+ "veilvoice-gnupg",
  "veilvoice-guard",
  "veilvoice-input",
  "veilvoice-meta",
@@ -4942,6 +4944,9 @@ version = "0.1.16"
 [[package]]
 name = "veilvoice-gnupg"
 version = "0.1.16"
+dependencies = [
+ "veilvoice-check",
+]
 
 [[package]]
 name = "veilvoice-guard"

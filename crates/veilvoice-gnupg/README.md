@@ -107,8 +107,12 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>860 lines"])
+    n_lib(["lib.rs<br/>863 lines"])
+    n_backend["backend.rs<br/>465 lines"]
+    n_script["script.rs<br/>281 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" "open the source"
+    click n_backend href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" "open the source"
+    click n_script href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" "open the source"
 ```
 
 </details>
@@ -117,12 +121,23 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | 860 | Run the GnuPG that is already on this machine. |
+| [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | 465 | Which program checks the signature, and who decides. |
+| [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | 863 | Run the GnuPG that is already on this machine. |
+| [`script.rs`](../../docs/files/veilvoice-gnupg/script.md) | 281 | A shell script that checks a release, for people who would rather read one. |
 
 ## Public items
 
 | Item | Where | What |
 |---|---|---|
+| `enum Choice` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | What the person using VeilVoice chose. |
+| `struct Wsl` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | A gpg reached through WSL. |
+| `struct Survey` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | What is on this machine. |
+| `enum Backend` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | Which checker will actually run, and why. |
+| `enum Because` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | Why the built-in check is the one running. |
+| `fn resolve` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | The checker to use, from what was chosen and what is here. |
+| `fn look` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | What is here, without running anything. |
+| `fn look_in_wsl` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | Ask the WSL distribution where its gpg is. |
+| `fn install_in_wsl` | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | The command that installs GnuPG inside the WSL distribution. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | Something that stopped GnuPG being asked at all. |
 | `fn on_path` | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | Where GnuPG is, if it is on PATH. |
 | `enum Outcome` | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | What GnuPG made of a signature. |
@@ -131,6 +146,8 @@ flowchart TD
 | `struct Import` | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | The key, in the keyring. |
 | `struct Gnupg` | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | A GnuPG to run, and the keyring to run it against. |
 | `fn commands` | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | The commands a reader can type to get this answer without VeilVoice. |
+| `enum Flavour` | [`script.rs`](../../docs/files/veilvoice-gnupg/script.md) | Which system the script is being written for. |
+| `fn shell` | [`script.rs`](../../docs/files/veilvoice-gnupg/script.md) | The script, with the fingerprint compiled in from the one source of it. |
 
 ## Reading it elsewhere
 
