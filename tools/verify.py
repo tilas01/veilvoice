@@ -95,9 +95,18 @@ GENERATORS = [
     # and record their sizes: a crop after that copy would leave the two out of
     # step, and the size check in `terminal.py --check` is what would notice.
     ("screenshot borders", [sys.executable, "tools/shots/crop.py"]),
-    # After the crop, never before it: rounding the corners of a picture that
-    # still has a capture border rounds the border.
+    # After the border comes off and before the corners go on. A capture is
+    # taken taller than any tab needs, so that the longest one is not cut in
+    # half, and this trims each picture back to what it actually contains.
+    # Rounding first would round the corners of a picture that is about to
+    # lose its bottom half.
+    ("screenshot height", [sys.executable, "tools/shots/fit.py"]),
+    # After the crop and the fit, never before them: rounding the corners of a
+    # picture that still has a capture border rounds the border.
     ("screenshot corners", [sys.executable, "tools/shots/round.py"]),
+    # After everything that can change a picture's size, because it copies
+    # those sizes into the pages that show them.
+    ("screenshot sizes on the pages", [sys.executable, "tools/shots/attrs.py"]),
     ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
     # The website's own source, which `generate.py` does not cover: it reads
@@ -122,8 +131,12 @@ CHECKS = [
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     ("no screenshot has a capture border",
      [sys.executable, "tools/shots/crop.py", "--check"]),
+    ("no screenshot has empty space below its content",
+     [sys.executable, "tools/shots/fit.py", "--check"]),
     ("screenshots have rounded corners",
      [sys.executable, "tools/shots/round.py", "--check"]),
+    ("every screenshot tag matches its file",
+     [sys.executable, "tools/shots/attrs.py", "--check"]),
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),

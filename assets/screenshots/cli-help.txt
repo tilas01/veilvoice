@@ -29,6 +29,7 @@ Commands:
   input         What running programs can see your keyboard and mouse
   sentry        Canaries, and how fast a folder is changing
   companions    Optional third-party software VeilVoice works with, and whether this machine already has it
+  verify        Check a download, and what does the checking
   video         Turn a veiled recording into a video with a black picture
   import        Take the sound out of a recording made somewhere else
   volumes       Encrypted volumes this machine has: Cryptomator and VeraCrypt

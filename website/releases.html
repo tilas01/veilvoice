@@ -78,8 +78,64 @@
 Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
 <details class="release" id="v0.1.16" open>
-<summary><strong>v0.1.16</strong> <span class="muted">A verifier that finds the release you are standing in and no longer...</span></summary>
-<p>A verifier that finds the release you are standing in and no longer calls a genuine one unverified, a verify page that can now actually verify, buttons that line up with the buttons beside them, pictures that grow rather than cutting their words, no em dash left anywhere in the repository, and the audit&#x27;s own arithmetic checked by a machine instead of by hand.</p>
+<summary><strong>v0.1.16</strong> <span class="muted">A window that costs nothing when you are not using it, opens big enough...</span></summary>
+<p>A window that costs nothing when you are not using it, opens big enough to read, and no longer says everything three times on its verify tab. A shell script that checks a release without trusting VeilVoice to check it. A verifier that finds the release you are standing in and no longer calls a genuine one unverified. Screenshots that can be taken on any machine. And a guide that describes the application that actually ships.</p>
+<h4 id="an-idle-window-costs-nothing-now">An idle window costs nothing now</h4>
+<ul>
+<li>The window drew 2.1 frames a second on every tab, for ever, with the animations off and nobody touching it, and spent 7 to 9 per cent of a processor core doing it. It now draws none and spends 0.2. The microphone monitor sent an update on every poll whether or not anything had changed, and the window woke twice a second to ask whether one had arrived. The thread with the news asks for the redraw now, and only when there is news.</li>
+</ul>
+<ul>
+<li>Measured, not guessed. The desktop application can be run on a machine with no screen for the first time, so this is a number: twenty seconds a tab, all nine tabs, frames counted by the program and processor time read from the system. <code>VEILVOICE_FRAME_LOG=1</code> prints frames per second for anybody diagnosing a slow machine.</li>
+</ul>
+<ul>
+<li>The window opens at a size that fits its own panels. It opened at 1100 by 720 always, and the longest panel is 1288 pixels tall, so it opened with its bottom third missing. It now opens at 1400 by 1000, reduced on the first frame to whatever the monitor can actually show, leaving room for a title bar and a task bar. Dragging it smaller still works exactly as before.</li>
+</ul>
+<h4 id="the-verify-tab">The verify tab</h4>
+<ul>
+<li>It drew its GnuPG section once for each of the three file rows, so the tab carried three copies of the same heading, paragraph and hint. One now.</li>
+</ul>
+<ul>
+<li>The three <code>choose&#8230;</code> buttons sat at three different places, because the labels beside them were padded with spaces to fake a column. That aligns nothing in a proportional font. It is the second time this habit has been taken out of the application, so the fix now lives in one place that both callers use.</li>
+</ul>
+<ul>
+<li>It says which program is doing the checking, and lets you choose: this binary&#x27;s own code, a GnuPG on the machine, or a GnuPG inside WSL on Windows. Nothing external runs until you pick it, even if it was installed long before VeilVoice was. Where one is missing, the command that installs it is shown, with a copy button that says it copied.</li>
+</ul>
+<ul>
+<li>It says where <code>SHA256SUMS</code>, its signature and the signing key come from, and links to the releases page and to the key in this repository. It had been asking for three files without ever saying where anybody gets them.</li>
+</ul>
+<h4 id="checking-a-release-without-trusting-veilvoice-to-do-it">Checking a release without trusting VeilVoice to do it</h4>
+<ul>
+<li><code>veilvoice verify</code> explains how a release is checked, which parts are built into the binary and which are not, and what GnuPG adds that this project cannot add for itself.</li>
+</ul>
+<ul>
+<li><code>veilvoice verify --script</code> writes a short shell script that does the whole check with <code>gpg</code> and the system hash tool and nothing from this project. That is the point of it: the program telling you a download is genuine came out of that download.</li>
+</ul>
+<ul>
+<li>The script refuses a good signature by the wrong key. GnuPG calls a signature good when any key in your keyring made it, and a substituted release is exactly that. Checked by signing a hash list with a second key and confirming the script says no while <code>gpg --verify</code> says &quot;Good signature&quot;. Run against the published v0.1.15: a genuine release passes, a tampered hash, a tampered signature and a wrong key are each refused by name, and a folder with none of the release in it says there was nothing to check rather than reporting a mismatch.</li>
+</ul>
+<ul>
+<li>GnuPG is in the companion list, so <code>veilvoice companions --install gnupg</code> prints the command for this machine. VeilVoice still never runs an installer.</li>
+</ul>
+<h4 id="screenshots-taken-on-any-machine">Screenshots, taken on any machine</h4>
+<ul>
+<li>The nine window captures no longer need one particular Windows computer. <code>tools/shots/gui.sh</code> takes them on Linux with no display attached, and the pictures come out the same size by construction rather than by cropping afterwards.</li>
+</ul>
+<ul>
+<li>Each picture is trimmed to what it contains. There is no one window size that suits all nine tabs: 1000 tall cuts the group panel in half, and 1320 shows the monitor tab as a strip of content above nine hundred pixels of nothing. Eight come out identical and the ninth is taller because its panel genuinely is.</li>
+</ul>
+<ul>
+<li>The width and height on each <code>&lt;img&gt;</code> are read from the file now instead of being typed once. They said 1371 by 988 and the pictures are not that size, which makes a page jump as it loads rather than reserving the right room.</li>
+</ul>
+<ul>
+<li>The captures are taken under a configuration made moments earlier and thrown away after, so no setting or policy belonging to the person running the script applies, and the animated mark is stilled so two photographs of the same tab do not differ.</li>
+</ul>
+<h4 id="the-guide-describes-the-application-that-exists">The guide describes the application that exists</h4>
+<ul>
+<li>It said &quot;Five tabs&quot; and documented five. There are nine, and the four missing were group, verify, settings and install, including the tab this project points people to before running a download. All four are written up, and a test fails the build for any tab without a section.</li>
+</ul>
+<ul>
+<li>A new section says what the three programs are for, which parts are inside them, and how anything reaches the network at all given that none of them contains a network client.</li>
+</ul>
 <h4 id="the-verify-page-can-verify">The verify page can verify</h4>
 <ul>
 <li><code>website/verify.html</code> had the drop zone, the hash field, the progress bar and the verdict line, and did not load <code>js/verify.js</code>. Dropping a file on the page this project points people to for checking a download did nothing at all: the digest line sat at &quot;no file hashed yet&quot;. The section pages are generated from the front page, and the generator copied the head, the header and the footer while collecting the scripts into a variable nothing read. The six scripts loaded in the front page&#x27;s head came along inside the copied head, so every page looked normal; the three loaded at the end of its body, <code>verify.js</code> among them, never arrived. Which scripts a page needs is now read out of the scripts themselves, from the guard each one uses to decide whether it has a job on the page, so a section that grows a feature gets the code for it without a list being kept anywhere. Confirmed in a real Chromium: a correct hash now gives MATCH on that page and a wrong one gives NO MATCH.</li>

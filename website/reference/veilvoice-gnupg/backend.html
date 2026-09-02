@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gnupg/backend.svg" alt="backend.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gnupg/src/backend.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 465 lines &middot; <a href="backend.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 469 lines &middot; <a href="backend.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-the-built-in-check-is-not-enough-on-its-own-and-why-it-is-the-default">Why the built-in check is not enough on its own, and why it is the default</a>
@@ -63,7 +63,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>465 lines defining <strong>12 functions</strong> (11 public), <strong>5 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>469 lines defining <strong>12 functions</strong> (11 public), <strong>5 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Choice</code> <span style="color:var(--muted)">line 51</span> &middot; What the person using VeilVoice chose.</li>
 <li><code>struct Wsl</code> <span style="color:var(--muted)">line 86</span> &middot; A gpg reached through WSL.</li>
@@ -82,18 +82,18 @@
 </li>
 <li><code>resolve</code> <span style="color:var(--muted)">line 172</span> &middot; The checker to use, from what was chosen and what is here.
 </li>
-<li><code>Backend::is_second_opinion</code> <span style="color:var(--muted)">line 204</span> &middot; Whether an OpenPGP implementation other than this one is doing the work.
+<li><code>Backend::is_second_opinion</code> <span style="color:var(--muted)">line 206</span> &middot; Whether an OpenPGP implementation other than this one is doing the work.
 </li>
-<li><code>Backend::plainly</code> <span style="color:var(--muted)">line 209</span> &middot; A one-line description for a reader.
+<li><code>Backend::plainly</code> <span style="color:var(--muted)">line 211</span> &middot; A one-line description for a reader.
 </li>
-<li><code>Backend::spell</code> <span style="color:var(--muted)">line 223</span> &middot; How a command written for gpg is spelled for this backend.
+<li><code>Backend::spell</code> <span style="color:var(--muted)">line 225</span> &middot; How a command written for gpg is spelled for this backend.
 </li>
-<li><code>look</code> <span style="color:var(--muted)">line 245</span> &middot; What is here, without running anything.
+<li><code>look</code> <span style="color:var(--muted)">line 247</span> &middot; What is here, without running anything.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>wsl_program</code></span>
 </li>
-<li><code>look_in_wsl</code> <span style="color:var(--muted)">line 273</span> &middot; Ask the WSL distribution where its gpg is.
+<li><code>look_in_wsl</code> <span style="color:var(--muted)">line 275</span> &middot; Ask the WSL distribution where its gpg is.
 </li>
-<li><code>install_in_wsl</code> <span style="color:var(--muted)">line 291</span> &middot; The command that installs GnuPG inside the WSL distribution.
+<li><code>install_in_wsl</code> <span style="color:var(--muted)">line 293</span> &middot; The command that installs GnuPG inside the WSL distribution.
 </li>
 </ul>
 </section>
@@ -139,37 +139,37 @@
 <a href="backend.src.html#fn-backend-is_second_opinion">
 <rect x="344.4" y="120.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="463.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Backend::is_second_opinion</text>
-<text x="463.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
+<text x="463.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 206</text>
 </a>
 <a href="backend.src.html#fn-backend-plainly">
 <rect x="20.0" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="98.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Backend::plainly</text>
-<text x="98.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
+<text x="98.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
 </a>
 <a href="backend.src.html#fn-backend-spell">
 <rect x="203.0" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="273.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Backend::spell</text>
-<text x="273.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+<text x="273.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 225</text>
 </a>
 <a href="backend.src.html#fn-look">
 <rect x="369.8" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look</text>
-<text x="416.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+<text x="416.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 247</text>
 </a>
 <a href="backend.src.html#fn-wsl_program">
 <rect x="254.1" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wsl_program</text>
-<text x="312.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
+<text x="312.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 255</text>
 </a>
 <a href="backend.src.html#fn-look_in_wsl">
 <rect x="488.3" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="546.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in_wsl</text>
-<text x="546.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
+<text x="546.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
 </a>
 <a href="backend.src.html#fn-install_in_wsl">
 <rect x="242.1" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="312.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_in_wsl</text>
-<text x="312.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
+<text x="312.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 293</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -191,26 +191,26 @@ flowchart TD
     n_supports([&quot;Survey::supports&lt;br/&gt;line 105&quot;])
     n_plainly([&quot;Because::plainly&lt;br/&gt;line 146&quot;])
     n_resolve([&quot;resolve&lt;br/&gt;line 172&quot;])
-    n_is_second_opinion([&quot;Backend::is_second_opinion&lt;br/&gt;line 204&quot;])
-    n_plainly([&quot;Backend::plainly&lt;br/&gt;line 209&quot;])
-    n_spell([&quot;Backend::spell&lt;br/&gt;line 223&quot;])
-    n_look([&quot;look&lt;br/&gt;line 245&quot;])
-    n_wsl_program[&quot;wsl_program&lt;br/&gt;line 253&quot;]
-    n_look_in_wsl([&quot;look_in_wsl&lt;br/&gt;line 273&quot;])
-    n_install_in_wsl([&quot;install_in_wsl&lt;br/&gt;line 291&quot;])
+    n_is_second_opinion([&quot;Backend::is_second_opinion&lt;br/&gt;line 206&quot;])
+    n_plainly([&quot;Backend::plainly&lt;br/&gt;line 211&quot;])
+    n_spell([&quot;Backend::spell&lt;br/&gt;line 225&quot;])
+    n_look([&quot;look&lt;br/&gt;line 247&quot;])
+    n_wsl_program[&quot;wsl_program&lt;br/&gt;line 255&quot;]
+    n_look_in_wsl([&quot;look_in_wsl&lt;br/&gt;line 275&quot;])
+    n_install_in_wsl([&quot;install_in_wsl&lt;br/&gt;line 293&quot;])
     n_look --&gt; n_wsl_program
     click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L62&quot; &quot;open the source&quot;
     click n_from_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L71&quot; &quot;open the source&quot;
     click n_supports href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L105&quot; &quot;open the source&quot;
     click n_plainly href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L146&quot; &quot;open the source&quot;
     click n_resolve href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L172&quot; &quot;open the source&quot;
-    click n_is_second_opinion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L204&quot; &quot;open the source&quot;
-    click n_plainly href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L209&quot; &quot;open the source&quot;
-    click n_spell href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L223&quot; &quot;open the source&quot;
-    click n_look href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L245&quot; &quot;open the source&quot;
-    click n_wsl_program href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L253&quot; &quot;open the source&quot;
-    click n_look_in_wsl href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L273&quot; &quot;open the source&quot;
-    click n_install_in_wsl href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L291&quot; &quot;open the source&quot;
+    click n_is_second_opinion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L206&quot; &quot;open the source&quot;
+    click n_plainly href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L211&quot; &quot;open the source&quot;
+    click n_spell href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L225&quot; &quot;open the source&quot;
+    click n_look href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L247&quot; &quot;open the source&quot;
+    click n_wsl_program href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L255&quot; &quot;open the source&quot;
+    click n_look_in_wsl href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L275&quot; &quot;open the source&quot;
+    click n_install_in_wsl href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L293&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_from_key,n_supports,n_plainly,n_resolve,n_is_second_opinion,n_plainly,n_spell,n_look,n_look_in_wsl,n_install_in_wsl entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -232,13 +232,13 @@ flowchart TD
 <tr><td><code>Because</code> <sub>pub enum</sub></td><td><a href="backend.src.html#fn-because">135</a></td><td>Why the built-in check is the one running.</td></tr>
 <tr><td><code>Because::plainly</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-because-plainly">146</a></td><td>What to tell the reader.</td></tr>
 <tr><td><code>resolve</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-resolve">172</a></td><td>The checker to use, from what was chosen and what is here.</td></tr>
-<tr><td><code>Backend::is_second_opinion</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-backend-is_second_opinion">204</a></td><td>Whether an OpenPGP implementation other than this one is doing the work.</td></tr>
-<tr><td><code>Backend::plainly</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-backend-plainly">209</a></td><td>A one-line description for a reader.</td></tr>
-<tr><td><code>Backend::spell</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-backend-spell">223</a></td><td>How a command written for gpg is spelled for this backend.</td></tr>
-<tr><td><code>look</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-look">245</a></td><td>What is here, without running anything.</td></tr>
-<tr><td><code>wsl_program</code> <sub>fn</sub></td><td><a href="backend.src.html#fn-wsl_program">253</a></td><td>wsl.exe, if this is Windows and it is installed.</td></tr>
-<tr><td><code>look_in_wsl</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-look_in_wsl">273</a></td><td>Ask the WSL distribution where its gpg is.</td></tr>
-<tr><td><code>install_in_wsl</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-install_in_wsl">291</a></td><td>The command that installs GnuPG inside the WSL distribution.</td></tr>
+<tr><td><code>Backend::is_second_opinion</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-backend-is_second_opinion">206</a></td><td>Whether an OpenPGP implementation other than this one is doing the work.</td></tr>
+<tr><td><code>Backend::plainly</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-backend-plainly">211</a></td><td>A one-line description for a reader.</td></tr>
+<tr><td><code>Backend::spell</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-backend-spell">225</a></td><td>How a command written for gpg is spelled for this backend.</td></tr>
+<tr><td><code>look</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-look">247</a></td><td>What is here, without running anything.</td></tr>
+<tr><td><code>wsl_program</code> <sub>fn</sub></td><td><a href="backend.src.html#fn-wsl_program">255</a></td><td>wsl.exe, if this is Windows and it is installed.</td></tr>
+<tr><td><code>look_in_wsl</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-look_in_wsl">275</a></td><td>Ask the WSL distribution where its gpg is.</td></tr>
+<tr><td><code>install_in_wsl</code> <sub>pub fn</sub></td><td><a href="backend.src.html#fn-install_in_wsl">293</a></td><td>The command that installs GnuPG inside the WSL distribution.</td></tr>
 </tbody></table>
 </section>
 </div></div>

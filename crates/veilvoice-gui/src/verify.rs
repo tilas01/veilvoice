@@ -67,12 +67,12 @@
 //! asks your own GnuPG the same question and shows you its answer.
 
 use crate::layout::column;
-use veilvoice_gnupg::backend::{self, Choice as Checker, Survey};
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use veilvoice_check::{Checked, Error};
+use veilvoice_gnupg::backend::{self, Choice as Checker, Survey};
 
 /// Which of the three files a dropped path is.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -414,6 +414,12 @@ impl Verify {
         );
 
         self.gnupg_section(ui);
+        // Outside `gnupg_section`, which returns early when the hash list and
+        // the signature have not been chosen yet. Which program does the
+        // checking is a decision somebody makes *before* they check anything,
+        // so putting the chooser behind that return showed it only once it no
+        // longer mattered.
+        self.checker_section(ui);
 
         ui.add_space(12.0);
         let ready = self.download.is_some() && self.sums.is_some() && self.signature.is_some();
@@ -637,9 +643,16 @@ impl Verify {
         let commands = veilvoice_gnupg::commands(&sums, &signature, key.as_deref());
 
         ui.add_space(4.0);
-        let backend = backend::resolve(self.checker, self.survey.as_ref().unwrap_or(&Survey::default()));
+        let backend = backend::resolve(
+            self.checker,
+            self.survey.as_ref().unwrap_or(&Survey::default()),
+        );
         for line in &commands {
-            ui.label(RichText::new(backend.spell(line)).color(p::fg()).monospace());
+            ui.label(
+                RichText::new(backend.spell(line))
+                    .color(p::fg())
+                    .monospace(),
+            );
         }
         ui.add_space(4.0);
 
@@ -647,13 +660,10 @@ impl Verify {
         // pressed leaves somebody pressing it again to find out whether it
         // worked, and a clipboard is not somewhere they can easily look.
         let now = ui.input(|i| i.time);
-        let just_copied = self
-            .copied
-            .is_some_and(|at| now - at < COPIED_FOR);
+        let just_copied = self.copied.is_some_and(|at| now - at < COPIED_FOR);
         ui.horizontal(|ui| {
             if ui.button("copy these commands").clicked() {
-                let script: Vec<String> =
-                    commands.iter().map(|line| backend.spell(line)).collect();
+                let script: Vec<String> = commands.iter().map(|line| backend.spell(line)).collect();
                 ui.ctx().copy_text(script.join("\n"));
                 self.copied = Some(now);
             }
@@ -671,7 +681,8 @@ impl Verify {
         if just_copied {
             // Keep drawing until the message has had its time, or it would sit
             // there until something else caused a repaint.
-            ui.ctx().request_repaint_after(std::time::Duration::from_millis(250));
+            ui.ctx()
+                .request_repaint_after(std::time::Duration::from_millis(250));
         }
 
         ui.label(
@@ -684,8 +695,6 @@ impl Verify {
             .color(p::muted())
             .small(),
         );
-
-        self.checker_section(ui);
     }
 
     /// Which implementation checks the signature, and the choice behind it.
@@ -755,8 +764,9 @@ impl Verify {
 
         // What to do when the one they want is not here.
         if !survey.supports(Checker::Native) {
-            if let Some(companion) =
-                veilvoice_setup::companions::ALL.iter().find(|c| c.key == "gnupg")
+            if let Some(companion) = veilvoice_setup::companions::ALL
+                .iter()
+                .find(|c| c.key == "gnupg")
             {
                 match companion.offer() {
                     veilvoice_setup::companions::Offer::Command { argv, via, .. } => {
@@ -793,11 +803,9 @@ impl Verify {
         if let Some(wsl) = survey.wsl.as_ref() {
             if wsl.gpg.is_none() {
                 ui.label(
-                    RichText::new(
-                        "WSL is here and GnuPG inside it is not. To install it there:",
-                    )
-                    .color(p::muted())
-                    .small(),
+                    RichText::new("WSL is here and GnuPG inside it is not. To install it there:")
+                        .color(p::muted())
+                        .small(),
                 );
                 self.copyable_command(ui, &backend::install_in_wsl().join(" "));
                 ui.label(

@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gnupg/src/backend.rs</code></h1>
-<p style="color:var(--muted)"><a href="backend.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 465 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="backend.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 469 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -249,299 +249,303 @@
 <span class="ln" id="L185">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Native),</span>
 <span class="ln" id="L186">            },</span>
 <span class="ln" id="L187">        },</span>
-<span class="ln" id="L188">        Choice::Wsl =&gt; <span class="tok-kw">match</span> survey.wsl.<span class="tok-fn">as_ref</span>().<span class="tok-fn">and_then</span>(|w| {</span>
-<span class="ln" id="L189">            w.gpg.<span class="tok-fn">as_ref</span>().<span class="tok-fn">map</span>(|gpg| (w.program.<span class="tok-fn">clone</span>(), gpg.<span class="tok-fn">clone</span>()))</span>
-<span class="ln" id="L190">        }) {</span>
-<span class="ln" id="L191">            <span class="tok-fn">Some</span>((program, gpg)) =&gt; Backend::Wsl { program, gpg },</span>
-<span class="ln" id="L192">            None =&gt; Backend::BuiltIn {</span>
-<span class="ln" id="L193">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Wsl),</span>
-<span class="ln" id="L194">            },</span>
-<span class="ln" id="L195">        },</span>
-<span class="ln" id="L196">    }</span>
-<span class="ln" id="L197">}</span>
+<span class="ln" id="L188">        Choice::Wsl =&gt; <span class="tok-kw">match</span> survey</span>
+<span class="ln" id="L189">            .wsl</span>
+<span class="ln" id="L190">            .<span class="tok-fn">as_ref</span>()</span>
+<span class="ln" id="L191">            .<span class="tok-fn">and_then</span>(|w| w.gpg.<span class="tok-fn">as_ref</span>().<span class="tok-fn">map</span>(|gpg| (w.program.<span class="tok-fn">clone</span>(), gpg.<span class="tok-fn">clone</span>())))</span>
+<span class="ln" id="L192">        {</span>
+<span class="ln" id="L193">            <span class="tok-fn">Some</span>((program, gpg)) =&gt; Backend::Wsl { program, gpg },</span>
+<span class="ln" id="L194">            None =&gt; Backend::BuiltIn {</span>
+<span class="ln" id="L195">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Wsl),</span>
+<span class="ln" id="L196">            },</span>
+<span class="ln" id="L197">        },</span>
+<span class="ln" id="L198">    }</span>
+<span class="ln" id="L199">}</span>
 </span>
-<span class="ln" id="L198"></span>
-<span class="ln" id="L199"><span class="tok-kw">impl</span> Backend {</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201"><span class="tok-kw">impl</span> Backend {</span>
 <span class="src-item" id="fn-backend-is_second_opinion">
-<span class="ln" id="L200">    <span class="tok-com">/// Whether an OpenPGP implementation other than this one is doing the work.</span></span>
-<span class="ln" id="L201">    <span class="tok-com">///</span></span>
-<span class="ln" id="L202">    <span class="tok-com">/// The whole value of choosing one is that it is not this program, so this</span></span>
-<span class="ln" id="L203">    <span class="tok-com">/// is the question the tab actually asks.</span></span>
-<span class="ln" id="L204">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_second_opinion</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L205">        !matches!(<span class="tok-kw">self</span>, Backend::BuiltIn { .. })</span>
-<span class="ln" id="L206">    }</span>
+<span class="ln" id="L202">    <span class="tok-com">/// Whether an OpenPGP implementation other than this one is doing the work.</span></span>
+<span class="ln" id="L203">    <span class="tok-com">///</span></span>
+<span class="ln" id="L204">    <span class="tok-com">/// The whole value of choosing one is that it is not this program, so this</span></span>
+<span class="ln" id="L205">    <span class="tok-com">/// is the question the tab actually asks.</span></span>
+<span class="ln" id="L206">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_second_opinion</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L207">        !matches!(<span class="tok-kw">self</span>, Backend::BuiltIn { .. })</span>
+<span class="ln" id="L208">    }</span>
 </span>
-<span class="ln" id="L207"></span>
+<span class="ln" id="L209"></span>
 <span class="src-item" id="fn-backend-plainly">
-<span class="ln" id="L208">    <span class="tok-com">/// A one-line description for a reader.</span></span>
-<span class="ln" id="L209">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">plainly</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L210">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L211">            Backend::BuiltIn { because } =&gt; because.<span class="tok-fn">plainly</span>(),</span>
-<span class="ln" id="L212">            Backend::<span class="tok-fn">Native</span>(path) =&gt; format!(<span class="tok-str">&quot;GnuPG at {}&quot;</span>, path.<span class="tok-fn">display</span>()),</span>
-<span class="ln" id="L213">            Backend::Wsl { gpg, .. } =&gt; format!(<span class="tok-str">&quot;GnuPG inside WSL, at {gpg}&quot;</span>),</span>
-<span class="ln" id="L214">        }</span>
-<span class="ln" id="L215">    }</span>
+<span class="ln" id="L210">    <span class="tok-com">/// A one-line description for a reader.</span></span>
+<span class="ln" id="L211">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">plainly</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L212">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L213">            Backend::BuiltIn { because } =&gt; because.<span class="tok-fn">plainly</span>(),</span>
+<span class="ln" id="L214">            Backend::<span class="tok-fn">Native</span>(path) =&gt; format!(<span class="tok-str">&quot;GnuPG at {}&quot;</span>, path.<span class="tok-fn">display</span>()),</span>
+<span class="ln" id="L215">            Backend::Wsl { gpg, .. } =&gt; format!(<span class="tok-str">&quot;GnuPG inside WSL, at {gpg}&quot;</span>),</span>
+<span class="ln" id="L216">        }</span>
+<span class="ln" id="L217">    }</span>
 </span>
-<span class="ln" id="L216"></span>
+<span class="ln" id="L218"></span>
 <span class="src-item" id="fn-backend-spell">
-<span class="ln" id="L217">    <span class="tok-com">/// How a command written for `gpg` is spelled for this backend.</span></span>
-<span class="ln" id="L218">    <span class="tok-com">///</span></span>
-<span class="ln" id="L219">    <span class="tok-com">/// A WSL command is the same command with `wsl` in front of it, which is</span></span>
-<span class="ln" id="L220">    <span class="tok-com">/// worth showing rather than hiding: it is what the reader would type, and</span></span>
-<span class="ln" id="L221">    <span class="tok-com">/// it makes plain that the check is happening in the Linux distribution</span></span>
-<span class="ln" id="L222">    <span class="tok-com">/// rather than on Windows.</span></span>
-<span class="ln" id="L223">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">spell</span>(&amp;<span class="tok-kw">self</span>, command: &amp;str) -&gt; String {</span>
-<span class="ln" id="L224">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L225">            Backend::Wsl { .. } =&gt; format!(<span class="tok-str">&quot;wsl {command}&quot;</span>),</span>
-<span class="ln" id="L226">            _ =&gt; command.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L227">        }</span>
-<span class="ln" id="L228">    }</span>
+<span class="ln" id="L219">    <span class="tok-com">/// How a command written for `gpg` is spelled for this backend.</span></span>
+<span class="ln" id="L220">    <span class="tok-com">///</span></span>
+<span class="ln" id="L221">    <span class="tok-com">/// A WSL command is the same command with `wsl` in front of it, which is</span></span>
+<span class="ln" id="L222">    <span class="tok-com">/// worth showing rather than hiding: it is what the reader would type, and</span></span>
+<span class="ln" id="L223">    <span class="tok-com">/// it makes plain that the check is happening in the Linux distribution</span></span>
+<span class="ln" id="L224">    <span class="tok-com">/// rather than on Windows.</span></span>
+<span class="ln" id="L225">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">spell</span>(&amp;<span class="tok-kw">self</span>, command: &amp;str) -&gt; String {</span>
+<span class="ln" id="L226">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L227">            Backend::Wsl { .. } =&gt; format!(<span class="tok-str">&quot;wsl {command}&quot;</span>),</span>
+<span class="ln" id="L228">            _ =&gt; command.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L229">        }</span>
+<span class="ln" id="L230">    }</span>
 </span>
-<span class="ln" id="L229">}</span>
-<span class="ln" id="L230"></span>
-<span class="ln" id="L231"><span class="tok-com">// --- The part that actually looks ------------------------------------------</span></span>
-<span class="ln" id="L232"><span class="tok-com">//</span></span>
-<span class="ln" id="L233"><span class="tok-com">// Everything above decides things from a `Survey`. This fills one in, and it</span></span>
-<span class="ln" id="L234"><span class="tok-com">// is kept apart deliberately: the rules are what matter and they are testable</span></span>
-<span class="ln" id="L235"><span class="tok-com">// without a `gpg`, a WSL or a Windows machine, which is why none of the tests</span></span>
-<span class="ln" id="L236"><span class="tok-com">// below call any of this.</span></span>
-<span class="ln" id="L237"></span>
+<span class="ln" id="L231">}</span>
+<span class="ln" id="L232"></span>
+<span class="ln" id="L233"><span class="tok-com">// --- The part that actually looks ------------------------------------------</span></span>
+<span class="ln" id="L234"><span class="tok-com">//</span></span>
+<span class="ln" id="L235"><span class="tok-com">// Everything above decides things from a `Survey`. This fills one in, and it</span></span>
+<span class="ln" id="L236"><span class="tok-com">// is kept apart deliberately: the rules are what matter and they are testable</span></span>
+<span class="ln" id="L237"><span class="tok-com">// without a `gpg`, a WSL or a Windows machine, which is why none of the tests</span></span>
+<span class="ln" id="L238"><span class="tok-com">// below call any of this.</span></span>
+<span class="ln" id="L239"></span>
 <span class="src-item" id="fn-look">
-<span class="ln" id="L238"><span class="tok-com">/// What is here, without running anything.</span></span>
-<span class="ln" id="L239"><span class="tok-com">///</span></span>
-<span class="ln" id="L240"><span class="tok-com">/// `PATH` is read and files are looked at. No program is started, including</span></span>
-<span class="ln" id="L241"><span class="tok-com">/// `wsl.exe`: starting WSL boots a Linux distribution, and that is not</span></span>
-<span class="ln" id="L242"><span class="tok-com">/// something to do because a window opened. So `wsl` is reported as present</span></span>
-<span class="ln" id="L243"><span class="tok-com">/// or absent, and whether GnuPG is *inside* it stays unknown until</span></span>
-<span class="ln" id="L244"><span class="tok-com">/// [`look_in_wsl`] is called, which is a thing the reader asks for.</span></span>
-<span class="ln" id="L245"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look</span>() -&gt; Survey {</span>
-<span class="ln" id="L246">    Survey {</span>
-<span class="ln" id="L247">        native: <span class="tok-kw">crate</span>::<span class="tok-fn">on_path</span>(),</span>
-<span class="ln" id="L248">        wsl: <span class="tok-fn">wsl_program</span>().<span class="tok-fn">map</span>(|program| Wsl { program, gpg: None }),</span>
-<span class="ln" id="L249">    }</span>
-<span class="ln" id="L250">}</span>
+<span class="ln" id="L240"><span class="tok-com">/// What is here, without running anything.</span></span>
+<span class="ln" id="L241"><span class="tok-com">///</span></span>
+<span class="ln" id="L242"><span class="tok-com">/// `PATH` is read and files are looked at. No program is started, including</span></span>
+<span class="ln" id="L243"><span class="tok-com">/// `wsl.exe`: starting WSL boots a Linux distribution, and that is not</span></span>
+<span class="ln" id="L244"><span class="tok-com">/// something to do because a window opened. So `wsl` is reported as present</span></span>
+<span class="ln" id="L245"><span class="tok-com">/// or absent, and whether GnuPG is *inside* it stays unknown until</span></span>
+<span class="ln" id="L246"><span class="tok-com">/// [`look_in_wsl`] is called, which is a thing the reader asks for.</span></span>
+<span class="ln" id="L247"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look</span>() -&gt; Survey {</span>
+<span class="ln" id="L248">    Survey {</span>
+<span class="ln" id="L249">        native: <span class="tok-kw">crate</span>::<span class="tok-fn">on_path</span>(),</span>
+<span class="ln" id="L250">        wsl: <span class="tok-fn">wsl_program</span>().<span class="tok-fn">map</span>(|program| Wsl { program, gpg: None }),</span>
+<span class="ln" id="L251">    }</span>
+<span class="ln" id="L252">}</span>
 </span>
-<span class="ln" id="L251"></span>
+<span class="ln" id="L253"></span>
 <span class="src-item" id="fn-wsl_program">
-<span class="ln" id="L252"><span class="tok-com">/// `wsl.exe`, if this is Windows and it is installed.</span></span>
-<span class="ln" id="L253"><span class="tok-kw">fn</span> <span class="tok-fn">wsl_program</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L254">    <span class="tok-kw">if</span> !cfg!(windows) {</span>
-<span class="ln" id="L255">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L256">    }</span>
-<span class="ln" id="L257">    <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?;</span>
-<span class="ln" id="L258">    <span class="tok-kw">for</span> dir <span class="tok-kw">in</span> std::env::<span class="tok-fn">split_paths</span>(&amp;path) {</span>
-<span class="ln" id="L259">        <span class="tok-kw">let</span> candidate = dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;wsl.exe&quot;</span>);</span>
-<span class="ln" id="L260">        <span class="tok-kw">if</span> candidate.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L261">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(candidate);</span>
-<span class="ln" id="L262">        }</span>
-<span class="ln" id="L263">    }</span>
-<span class="ln" id="L264">    None</span>
-<span class="ln" id="L265">}</span>
+<span class="ln" id="L254"><span class="tok-com">/// `wsl.exe`, if this is Windows and it is installed.</span></span>
+<span class="ln" id="L255"><span class="tok-kw">fn</span> <span class="tok-fn">wsl_program</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L256">    <span class="tok-kw">if</span> !cfg!(windows) {</span>
+<span class="ln" id="L257">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L258">    }</span>
+<span class="ln" id="L259">    <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?;</span>
+<span class="ln" id="L260">    <span class="tok-kw">for</span> dir <span class="tok-kw">in</span> std::env::<span class="tok-fn">split_paths</span>(&amp;path) {</span>
+<span class="ln" id="L261">        <span class="tok-kw">let</span> candidate = dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;wsl.exe&quot;</span>);</span>
+<span class="ln" id="L262">        <span class="tok-kw">if</span> candidate.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L263">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(candidate);</span>
+<span class="ln" id="L264">        }</span>
+<span class="ln" id="L265">    }</span>
+<span class="ln" id="L266">    None</span>
+<span class="ln" id="L267">}</span>
 </span>
-<span class="ln" id="L266"></span>
+<span class="ln" id="L268"></span>
 <span class="src-item" id="fn-look_in_wsl">
-<span class="ln" id="L267"><span class="tok-com">/// Ask the WSL distribution where its `gpg` is.</span></span>
-<span class="ln" id="L268"><span class="tok-com">///</span></span>
-<span class="ln" id="L269"><span class="tok-com">/// **This starts WSL**, which starts a Linux distribution, which is why it is</span></span>
-<span class="ln" id="L270"><span class="tok-com">/// a separate call and not part of [`look`]. `command -v` is the shell</span></span>
-<span class="ln" id="L271"><span class="tok-com">/// builtin, so this needs nothing installed to answer that nothing is</span></span>
-<span class="ln" id="L272"><span class="tok-com">/// installed.</span></span>
-<span class="ln" id="L273"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look_in_wsl</span>(program: &amp;std::path::Path) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L274">    <span class="tok-kw">let</span> output = std::process::Command::<span class="tok-fn">new</span>(program)</span>
-<span class="ln" id="L275">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;--&quot;</span>, <span class="tok-str">&quot;sh&quot;</span>, <span class="tok-str">&quot;-lc&quot;</span>, <span class="tok-str">&quot;command -v gpg&quot;</span>])</span>
-<span class="ln" id="L276">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L277">        .<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L278">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L279">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L280">    }</span>
-<span class="ln" id="L281">    <span class="tok-kw">let</span> found = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L282">    (!found.<span class="tok-fn">is_empty</span>()).<span class="tok-fn">then_some</span>(found)</span>
-<span class="ln" id="L283">}</span>
+<span class="ln" id="L269"><span class="tok-com">/// Ask the WSL distribution where its `gpg` is.</span></span>
+<span class="ln" id="L270"><span class="tok-com">///</span></span>
+<span class="ln" id="L271"><span class="tok-com">/// **This starts WSL**, which starts a Linux distribution, which is why it is</span></span>
+<span class="ln" id="L272"><span class="tok-com">/// a separate call and not part of [`look`]. `command -v` is the shell</span></span>
+<span class="ln" id="L273"><span class="tok-com">/// builtin, so this needs nothing installed to answer that nothing is</span></span>
+<span class="ln" id="L274"><span class="tok-com">/// installed.</span></span>
+<span class="ln" id="L275"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look_in_wsl</span>(program: &amp;std::path::Path) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L276">    <span class="tok-kw">let</span> output = std::process::Command::<span class="tok-fn">new</span>(program)</span>
+<span class="ln" id="L277">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;--&quot;</span>, <span class="tok-str">&quot;sh&quot;</span>, <span class="tok-str">&quot;-lc&quot;</span>, <span class="tok-str">&quot;command -v gpg&quot;</span>])</span>
+<span class="ln" id="L278">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L279">        .<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L280">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L281">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L282">    }</span>
+<span class="ln" id="L283">    <span class="tok-kw">let</span> found = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L284">    (!found.<span class="tok-fn">is_empty</span>()).<span class="tok-fn">then_some</span>(found)</span>
+<span class="ln" id="L285">}</span>
 </span>
-<span class="ln" id="L284"></span>
+<span class="ln" id="L286"></span>
 <span class="src-item" id="fn-install_in_wsl">
-<span class="ln" id="L285"><span class="tok-com">/// The command that installs GnuPG inside the WSL distribution.</span></span>
-<span class="ln" id="L286"><span class="tok-com">///</span></span>
-<span class="ln" id="L287"><span class="tok-com">/// Shown rather than run. It needs root inside that distribution, and a</span></span>
-<span class="ln" id="L288"><span class="tok-com">/// program that asks for somebody&#x27;s password to install something is a</span></span>
-<span class="ln" id="L289"><span class="tok-com">/// program to be suspicious of; run in a terminal, the reader can see what</span></span>
-<span class="ln" id="L290"><span class="tok-com">/// they are approving. This is the same rule the companion list follows.</span></span>
-<span class="ln" id="L291"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install_in_wsl</span>() -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L292">    vec![</span>
-<span class="ln" id="L293">        <span class="tok-str">&quot;wsl&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L294">        <span class="tok-str">&quot;--&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L295">        <span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L296">        <span class="tok-str">&quot;apt-get&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L297">        <span class="tok-str">&quot;install&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L298">        <span class="tok-str">&quot;-y&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L299">        <span class="tok-str">&quot;gnupg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L300">    ]</span>
-<span class="ln" id="L301">}</span>
+<span class="ln" id="L287"><span class="tok-com">/// The command that installs GnuPG inside the WSL distribution.</span></span>
+<span class="ln" id="L288"><span class="tok-com">///</span></span>
+<span class="ln" id="L289"><span class="tok-com">/// Shown rather than run. It needs root inside that distribution, and a</span></span>
+<span class="ln" id="L290"><span class="tok-com">/// program that asks for somebody&#x27;s password to install something is a</span></span>
+<span class="ln" id="L291"><span class="tok-com">/// program to be suspicious of; run in a terminal, the reader can see what</span></span>
+<span class="ln" id="L292"><span class="tok-com">/// they are approving. This is the same rule the companion list follows.</span></span>
+<span class="ln" id="L293"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install_in_wsl</span>() -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L294">    vec![</span>
+<span class="ln" id="L295">        <span class="tok-str">&quot;wsl&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L296">        <span class="tok-str">&quot;--&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L297">        <span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L298">        <span class="tok-str">&quot;apt-get&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L299">        <span class="tok-str">&quot;install&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L300">        <span class="tok-str">&quot;-y&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L301">        <span class="tok-str">&quot;gnupg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L302">    ]</span>
+<span class="ln" id="L303">}</span>
 </span>
-<span class="ln" id="L302"></span>
-<span class="ln" id="L303"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L304"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L305">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L306"></span>
-<span class="ln" id="L307">    <span class="tok-kw">fn</span> <span class="tok-fn">native_only</span>() -&gt; Survey {</span>
-<span class="ln" id="L308">        Survey {</span>
-<span class="ln" id="L309">            native: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/usr/bin/gpg&quot;</span>)),</span>
-<span class="ln" id="L310">            wsl: None,</span>
-<span class="ln" id="L311">        }</span>
-<span class="ln" id="L312">    }</span>
-<span class="ln" id="L313"></span>
-<span class="ln" id="L314">    <span class="tok-kw">fn</span> <span class="tok-fn">wsl_with_gpg</span>() -&gt; Survey {</span>
-<span class="ln" id="L315">        Survey {</span>
-<span class="ln" id="L316">            native: None,</span>
-<span class="ln" id="L317">            wsl: <span class="tok-fn">Some</span>(Wsl {</span>
-<span class="ln" id="L318">                program: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;C:\\Windows\\System32\\wsl.exe&quot;</span>),</span>
-<span class="ln" id="L319">                gpg: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;/usr/bin/gpg&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L320">            }),</span>
-<span class="ln" id="L321">        }</span>
-<span class="ln" id="L322">    }</span>
-<span class="ln" id="L323"></span>
-<span class="ln" id="L324">    <span class="tok-com">/// The rule this module exists for.</span></span>
-<span class="ln" id="L325">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L326">    <span class="tok-kw">fn</span> <span class="tok-fn">an_installed_gnupg_is_not_used_until_it_is_chosen</span>() {</span>
-<span class="ln" id="L327">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(None, &amp;<span class="tok-fn">native_only</span>());</span>
-<span class="ln" id="L328">        assert_eq!(</span>
-<span class="ln" id="L329">            backend,</span>
-<span class="ln" id="L330">            Backend::BuiltIn {</span>
-<span class="ln" id="L331">                because: Because::NothingChosen</span>
-<span class="ln" id="L332">            },</span>
-<span class="ln" id="L333">            <span class="tok-str">&quot;a gpg on PATH was used without anybody asking for it&quot;</span></span>
-<span class="ln" id="L334">        );</span>
-<span class="ln" id="L335">        assert!(!backend.<span class="tok-fn">is_second_opinion</span>());</span>
-<span class="ln" id="L336">    }</span>
-<span class="ln" id="L337"></span>
-<span class="ln" id="L338">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L339">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_is_true_of_a_gnupg_inside_wsl</span>() {</span>
-<span class="ln" id="L340">        assert_eq!(</span>
-<span class="ln" id="L341">            <span class="tok-fn">resolve</span>(None, &amp;<span class="tok-fn">wsl_with_gpg</span>()),</span>
-<span class="ln" id="L342">            Backend::BuiltIn {</span>
-<span class="ln" id="L343">                because: Because::NothingChosen</span>
-<span class="ln" id="L344">            }</span>
-<span class="ln" id="L345">        );</span>
-<span class="ln" id="L346">    }</span>
-<span class="ln" id="L347"></span>
-<span class="ln" id="L348">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L349">    <span class="tok-kw">fn</span> <span class="tok-fn">choosing_one_uses_it</span>() {</span>
-<span class="ln" id="L350">        assert_eq!(</span>
-<span class="ln" id="L351">            <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Native), &amp;<span class="tok-fn">native_only</span>()),</span>
-<span class="ln" id="L352">            Backend::<span class="tok-fn">Native</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/usr/bin/gpg&quot;</span>))</span>
-<span class="ln" id="L353">        );</span>
-<span class="ln" id="L354">        assert_eq!(</span>
-<span class="ln" id="L355">            <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;<span class="tok-fn">wsl_with_gpg</span>()),</span>
-<span class="ln" id="L356">            Backend::Wsl {</span>
-<span class="ln" id="L357">                program: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;C:\\Windows\\System32\\wsl.exe&quot;</span>),</span>
-<span class="ln" id="L358">                gpg: <span class="tok-str">&quot;/usr/bin/gpg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L359">            }</span>
-<span class="ln" id="L360">        );</span>
-<span class="ln" id="L361">    }</span>
-<span class="ln" id="L362"></span>
-<span class="ln" id="L363">    <span class="tok-com">/// A choice that has gone away falls back to a check that works, and says</span></span>
-<span class="ln" id="L364">    <span class="tok-com">/// which one it made. Falling back silently would let somebody believe a</span></span>
-<span class="ln" id="L365">    <span class="tok-com">/// second opinion had been taken when none had.</span></span>
-<span class="ln" id="L366">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L367">    <span class="tok-kw">fn</span> <span class="tok-fn">a_choice_that_is_no_longer_installed_falls_back_and_says_so</span>() {</span>
-<span class="ln" id="L368">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Native), &amp;Survey::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L369">        assert_eq!(</span>
-<span class="ln" id="L370">            backend,</span>
-<span class="ln" id="L371">            Backend::BuiltIn {</span>
-<span class="ln" id="L372">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Native)</span>
-<span class="ln" id="L373">            }</span>
-<span class="ln" id="L374">        );</span>
-<span class="ln" id="L375">        assert!(backend.<span class="tok-fn">plainly</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not on this machine&quot;</span>));</span>
-<span class="ln" id="L376"></span>
-<span class="ln" id="L377">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;Survey::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L378">        assert_eq!(</span>
-<span class="ln" id="L379">            backend,</span>
-<span class="ln" id="L380">            Backend::BuiltIn {</span>
-<span class="ln" id="L381">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Wsl)</span>
-<span class="ln" id="L382">            }</span>
-<span class="ln" id="L383">        );</span>
-<span class="ln" id="L384">    }</span>
-<span class="ln" id="L385"></span>
-<span class="ln" id="L386">    <span class="tok-com">/// WSL being installed is not the same as GnuPG being installed inside it.</span></span>
-<span class="ln" id="L387">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L388">    <span class="tok-kw">fn</span> <span class="tok-fn">wsl_without_gnupg_in_it_is_not_a_route</span>() {</span>
-<span class="ln" id="L389">        <span class="tok-kw">let</span> survey = Survey {</span>
-<span class="ln" id="L390">            native: None,</span>
-<span class="ln" id="L391">            wsl: <span class="tok-fn">Some</span>(Wsl {</span>
-<span class="ln" id="L392">                program: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;wsl.exe&quot;</span>),</span>
-<span class="ln" id="L393">                gpg: None,</span>
-<span class="ln" id="L394">            }),</span>
-<span class="ln" id="L395">        };</span>
-<span class="ln" id="L396">        assert!(!survey.<span class="tok-fn">supports</span>(Choice::Wsl));</span>
-<span class="ln" id="L397">        assert_eq!(</span>
-<span class="ln" id="L398">            <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;survey),</span>
-<span class="ln" id="L399">            Backend::BuiltIn {</span>
-<span class="ln" id="L400">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Wsl)</span>
-<span class="ln" id="L401">            }</span>
-<span class="ln" id="L402">        );</span>
-<span class="ln" id="L403">    }</span>
-<span class="ln" id="L404"></span>
-<span class="ln" id="L405">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L406">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wsl_command_is_the_same_command_run_through_wsl</span>() {</span>
-<span class="ln" id="L407">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;<span class="tok-fn">wsl_with_gpg</span>());</span>
-<span class="ln" id="L408">        assert_eq!(</span>
-<span class="ln" id="L409">            backend.<span class="tok-fn">spell</span>(<span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span>),</span>
-<span class="ln" id="L410">            <span class="tok-str">&quot;wsl gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span></span>
-<span class="ln" id="L411">        );</span>
-<span class="ln" id="L412">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Native), &amp;<span class="tok-fn">native_only</span>());</span>
-<span class="ln" id="L413">        assert_eq!(</span>
-<span class="ln" id="L414">            backend.<span class="tok-fn">spell</span>(<span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span>),</span>
-<span class="ln" id="L415">            <span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span></span>
-<span class="ln" id="L416">        );</span>
-<span class="ln" id="L417">    }</span>
-<span class="ln" id="L418"></span>
-<span class="ln" id="L419">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">every_choice_survives_being_written_down_and_read_back</span>() {</span>
-<span class="ln" id="L421">        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> Choice::ALL {</span>
-<span class="ln" id="L422">            assert_eq!(Choice::<span class="tok-fn">from_key</span>(choice.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*choice));</span>
-<span class="ln" id="L423">        }</span>
-<span class="ln" id="L424">        assert_eq!(Choice::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nonsense&quot;</span>), None);</span>
-<span class="ln" id="L425">    }</span>
-<span class="ln" id="L426"></span>
-<span class="ln" id="L427">    <span class="tok-com">/// The WSL install command is shown, not run, and it is the command a</span></span>
-<span class="ln" id="L428">    <span class="tok-com">/// person would type.</span></span>
-<span class="ln" id="L429">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L430">    <span class="tok-kw">fn</span> <span class="tok-fn">the_wsl_install_command_is_the_one_a_person_would_type</span>() {</span>
-<span class="ln" id="L431">        <span class="tok-kw">let</span> argv = <span class="tok-fn">install_in_wsl</span>();</span>
-<span class="ln" id="L432">        assert_eq!(argv.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(String::as_str), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;wsl&quot;</span>));</span>
-<span class="ln" id="L433">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|part| part == <span class="tok-str">&quot;sudo&quot;</span>),</span>
-<span class="ln" id="L434">                <span class="tok-str">&quot;installing inside the distribution needs root there&quot;</span>);</span>
-<span class="ln" id="L435">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|part| part == <span class="tok-str">&quot;gnupg&quot;</span>));</span>
-<span class="ln" id="L436">    }</span>
-<span class="ln" id="L437"></span>
-<span class="ln" id="L438">    <span class="tok-com">/// Looking must not start anything. The check is on the source, because</span></span>
-<span class="ln" id="L439">    <span class="tok-com">/// the failure would be a Linux distribution booting when a window opened</span></span>
-<span class="ln" id="L440">    <span class="tok-com">/// and no assertion about a return value would catch that.</span></span>
-<span class="ln" id="L441">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L442">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_does_not_run_a_program</span>() {</span>
-<span class="ln" id="L443">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;backend.rs&quot;</span>);</span>
-<span class="ln" id="L444">        <span class="tok-kw">let</span> looking = source</span>
-<span class="ln" id="L445">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;pub fn look() -&gt; Survey {&quot;</span>)</span>
-<span class="ln" id="L446">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
-<span class="ln" id="L447">            .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n}&quot;</span>).<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L448">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;look() exists&quot;</span>);</span>
-<span class="ln" id="L449">        assert!(</span>
-<span class="ln" id="L450">            !looking.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new&quot;</span>),</span>
-<span class="ln" id="L451">            <span class="tok-str">&quot;look() starts a program; starting wsl.exe boots a Linux \</span></span>
-<span class="ln" id="L452"><span class="tok-str">             distribution, which belongs behind look_in_wsl where somebody \</span></span>
-<span class="ln" id="L453"><span class="tok-str">             asked for it&quot;</span></span>
-<span class="ln" id="L454">        );</span>
-<span class="ln" id="L455">    }</span>
-<span class="ln" id="L456"></span>
-<span class="ln" id="L457">    <span class="tok-com">/// The built-in check is always available. It is the only one that can be</span></span>
-<span class="ln" id="L458">    <span class="tok-com">/// promised, because it is the only one that is part of this program.</span></span>
-<span class="ln" id="L459">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L460">    <span class="tok-kw">fn</span> <span class="tok-fn">the_built_in_check_is_always_available</span>() {</span>
-<span class="ln" id="L461">        assert!(Survey::<span class="tok-fn">default</span>().<span class="tok-fn">supports</span>(Choice::BuiltIn));</span>
-<span class="ln" id="L462">        assert!(!Survey::<span class="tok-fn">default</span>().<span class="tok-fn">supports</span>(Choice::Native));</span>
-<span class="ln" id="L463">        assert!(!Survey::<span class="tok-fn">default</span>().<span class="tok-fn">supports</span>(Choice::Wsl));</span>
-<span class="ln" id="L464">    }</span>
-<span class="ln" id="L465">}</span>
+<span class="ln" id="L304"></span>
+<span class="ln" id="L305"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L306"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L307">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L308"></span>
+<span class="ln" id="L309">    <span class="tok-kw">fn</span> <span class="tok-fn">native_only</span>() -&gt; Survey {</span>
+<span class="ln" id="L310">        Survey {</span>
+<span class="ln" id="L311">            native: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/usr/bin/gpg&quot;</span>)),</span>
+<span class="ln" id="L312">            wsl: None,</span>
+<span class="ln" id="L313">        }</span>
+<span class="ln" id="L314">    }</span>
+<span class="ln" id="L315"></span>
+<span class="ln" id="L316">    <span class="tok-kw">fn</span> <span class="tok-fn">wsl_with_gpg</span>() -&gt; Survey {</span>
+<span class="ln" id="L317">        Survey {</span>
+<span class="ln" id="L318">            native: None,</span>
+<span class="ln" id="L319">            wsl: <span class="tok-fn">Some</span>(Wsl {</span>
+<span class="ln" id="L320">                program: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;C:\\Windows\\System32\\wsl.exe&quot;</span>),</span>
+<span class="ln" id="L321">                gpg: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;/usr/bin/gpg&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L322">            }),</span>
+<span class="ln" id="L323">        }</span>
+<span class="ln" id="L324">    }</span>
+<span class="ln" id="L325"></span>
+<span class="ln" id="L326">    <span class="tok-com">/// The rule this module exists for.</span></span>
+<span class="ln" id="L327">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L328">    <span class="tok-kw">fn</span> <span class="tok-fn">an_installed_gnupg_is_not_used_until_it_is_chosen</span>() {</span>
+<span class="ln" id="L329">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(None, &amp;<span class="tok-fn">native_only</span>());</span>
+<span class="ln" id="L330">        assert_eq!(</span>
+<span class="ln" id="L331">            backend,</span>
+<span class="ln" id="L332">            Backend::BuiltIn {</span>
+<span class="ln" id="L333">                because: Because::NothingChosen</span>
+<span class="ln" id="L334">            },</span>
+<span class="ln" id="L335">            <span class="tok-str">&quot;a gpg on PATH was used without anybody asking for it&quot;</span></span>
+<span class="ln" id="L336">        );</span>
+<span class="ln" id="L337">        assert!(!backend.<span class="tok-fn">is_second_opinion</span>());</span>
+<span class="ln" id="L338">    }</span>
+<span class="ln" id="L339"></span>
+<span class="ln" id="L340">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L341">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_is_true_of_a_gnupg_inside_wsl</span>() {</span>
+<span class="ln" id="L342">        assert_eq!(</span>
+<span class="ln" id="L343">            <span class="tok-fn">resolve</span>(None, &amp;<span class="tok-fn">wsl_with_gpg</span>()),</span>
+<span class="ln" id="L344">            Backend::BuiltIn {</span>
+<span class="ln" id="L345">                because: Because::NothingChosen</span>
+<span class="ln" id="L346">            }</span>
+<span class="ln" id="L347">        );</span>
+<span class="ln" id="L348">    }</span>
+<span class="ln" id="L349"></span>
+<span class="ln" id="L350">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">choosing_one_uses_it</span>() {</span>
+<span class="ln" id="L352">        assert_eq!(</span>
+<span class="ln" id="L353">            <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Native), &amp;<span class="tok-fn">native_only</span>()),</span>
+<span class="ln" id="L354">            Backend::<span class="tok-fn">Native</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/usr/bin/gpg&quot;</span>))</span>
+<span class="ln" id="L355">        );</span>
+<span class="ln" id="L356">        assert_eq!(</span>
+<span class="ln" id="L357">            <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;<span class="tok-fn">wsl_with_gpg</span>()),</span>
+<span class="ln" id="L358">            Backend::Wsl {</span>
+<span class="ln" id="L359">                program: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;C:\\Windows\\System32\\wsl.exe&quot;</span>),</span>
+<span class="ln" id="L360">                gpg: <span class="tok-str">&quot;/usr/bin/gpg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L361">            }</span>
+<span class="ln" id="L362">        );</span>
+<span class="ln" id="L363">    }</span>
+<span class="ln" id="L364"></span>
+<span class="ln" id="L365">    <span class="tok-com">/// A choice that has gone away falls back to a check that works, and says</span></span>
+<span class="ln" id="L366">    <span class="tok-com">/// which one it made. Falling back silently would let somebody believe a</span></span>
+<span class="ln" id="L367">    <span class="tok-com">/// second opinion had been taken when none had.</span></span>
+<span class="ln" id="L368">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L369">    <span class="tok-kw">fn</span> <span class="tok-fn">a_choice_that_is_no_longer_installed_falls_back_and_says_so</span>() {</span>
+<span class="ln" id="L370">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Native), &amp;Survey::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L371">        assert_eq!(</span>
+<span class="ln" id="L372">            backend,</span>
+<span class="ln" id="L373">            Backend::BuiltIn {</span>
+<span class="ln" id="L374">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Native)</span>
+<span class="ln" id="L375">            }</span>
+<span class="ln" id="L376">        );</span>
+<span class="ln" id="L377">        assert!(backend.<span class="tok-fn">plainly</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not on this machine&quot;</span>));</span>
+<span class="ln" id="L378"></span>
+<span class="ln" id="L379">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;Survey::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L380">        assert_eq!(</span>
+<span class="ln" id="L381">            backend,</span>
+<span class="ln" id="L382">            Backend::BuiltIn {</span>
+<span class="ln" id="L383">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Wsl)</span>
+<span class="ln" id="L384">            }</span>
+<span class="ln" id="L385">        );</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">    <span class="tok-com">/// WSL being installed is not the same as GnuPG being installed inside it.</span></span>
+<span class="ln" id="L389">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L390">    <span class="tok-kw">fn</span> <span class="tok-fn">wsl_without_gnupg_in_it_is_not_a_route</span>() {</span>
+<span class="ln" id="L391">        <span class="tok-kw">let</span> survey = Survey {</span>
+<span class="ln" id="L392">            native: None,</span>
+<span class="ln" id="L393">            wsl: <span class="tok-fn">Some</span>(Wsl {</span>
+<span class="ln" id="L394">                program: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;wsl.exe&quot;</span>),</span>
+<span class="ln" id="L395">                gpg: None,</span>
+<span class="ln" id="L396">            }),</span>
+<span class="ln" id="L397">        };</span>
+<span class="ln" id="L398">        assert!(!survey.<span class="tok-fn">supports</span>(Choice::Wsl));</span>
+<span class="ln" id="L399">        assert_eq!(</span>
+<span class="ln" id="L400">            <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;survey),</span>
+<span class="ln" id="L401">            Backend::BuiltIn {</span>
+<span class="ln" id="L402">                because: Because::<span class="tok-fn">ChosenIsMissing</span>(Choice::Wsl)</span>
+<span class="ln" id="L403">            }</span>
+<span class="ln" id="L404">        );</span>
+<span class="ln" id="L405">    }</span>
+<span class="ln" id="L406"></span>
+<span class="ln" id="L407">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L408">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wsl_command_is_the_same_command_run_through_wsl</span>() {</span>
+<span class="ln" id="L409">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Wsl), &amp;<span class="tok-fn">wsl_with_gpg</span>());</span>
+<span class="ln" id="L410">        assert_eq!(</span>
+<span class="ln" id="L411">            backend.<span class="tok-fn">spell</span>(<span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span>),</span>
+<span class="ln" id="L412">            <span class="tok-str">&quot;wsl gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span></span>
+<span class="ln" id="L413">        );</span>
+<span class="ln" id="L414">        <span class="tok-kw">let</span> backend = <span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(Choice::Native), &amp;<span class="tok-fn">native_only</span>());</span>
+<span class="ln" id="L415">        assert_eq!(</span>
+<span class="ln" id="L416">            backend.<span class="tok-fn">spell</span>(<span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span>),</span>
+<span class="ln" id="L417">            <span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span></span>
+<span class="ln" id="L418">        );</span>
+<span class="ln" id="L419">    }</span>
+<span class="ln" id="L420"></span>
+<span class="ln" id="L421">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L422">    <span class="tok-kw">fn</span> <span class="tok-fn">every_choice_survives_being_written_down_and_read_back</span>() {</span>
+<span class="ln" id="L423">        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> Choice::ALL {</span>
+<span class="ln" id="L424">            assert_eq!(Choice::<span class="tok-fn">from_key</span>(choice.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*choice));</span>
+<span class="ln" id="L425">        }</span>
+<span class="ln" id="L426">        assert_eq!(Choice::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nonsense&quot;</span>), None);</span>
+<span class="ln" id="L427">    }</span>
+<span class="ln" id="L428"></span>
+<span class="ln" id="L429">    <span class="tok-com">/// The WSL install command is shown, not run, and it is the command a</span></span>
+<span class="ln" id="L430">    <span class="tok-com">/// person would type.</span></span>
+<span class="ln" id="L431">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L432">    <span class="tok-kw">fn</span> <span class="tok-fn">the_wsl_install_command_is_the_one_a_person_would_type</span>() {</span>
+<span class="ln" id="L433">        <span class="tok-kw">let</span> argv = <span class="tok-fn">install_in_wsl</span>();</span>
+<span class="ln" id="L434">        assert_eq!(argv.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(String::as_str), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;wsl&quot;</span>));</span>
+<span class="ln" id="L435">        assert!(</span>
+<span class="ln" id="L436">            argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|part| part == <span class="tok-str">&quot;sudo&quot;</span>),</span>
+<span class="ln" id="L437">            <span class="tok-str">&quot;installing inside the distribution needs root there&quot;</span></span>
+<span class="ln" id="L438">        );</span>
+<span class="ln" id="L439">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|part| part == <span class="tok-str">&quot;gnupg&quot;</span>));</span>
+<span class="ln" id="L440">    }</span>
+<span class="ln" id="L441"></span>
+<span class="ln" id="L442">    <span class="tok-com">/// Looking must not start anything. The check is on the source, because</span></span>
+<span class="ln" id="L443">    <span class="tok-com">/// the failure would be a Linux distribution booting when a window opened</span></span>
+<span class="ln" id="L444">    <span class="tok-com">/// and no assertion about a return value would catch that.</span></span>
+<span class="ln" id="L445">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L446">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_does_not_run_a_program</span>() {</span>
+<span class="ln" id="L447">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;backend.rs&quot;</span>);</span>
+<span class="ln" id="L448">        <span class="tok-kw">let</span> looking = source</span>
+<span class="ln" id="L449">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;pub fn look() -&gt; Survey {&quot;</span>)</span>
+<span class="ln" id="L450">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L451">            .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n}&quot;</span>).<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L452">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;look() exists&quot;</span>);</span>
+<span class="ln" id="L453">        assert!(</span>
+<span class="ln" id="L454">            !looking.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new&quot;</span>),</span>
+<span class="ln" id="L455">            <span class="tok-str">&quot;look() starts a program; starting wsl.exe boots a Linux \</span></span>
+<span class="ln" id="L456"><span class="tok-str">             distribution, which belongs behind look_in_wsl where somebody \</span></span>
+<span class="ln" id="L457"><span class="tok-str">             asked for it&quot;</span></span>
+<span class="ln" id="L458">        );</span>
+<span class="ln" id="L459">    }</span>
+<span class="ln" id="L460"></span>
+<span class="ln" id="L461">    <span class="tok-com">/// The built-in check is always available. It is the only one that can be</span></span>
+<span class="ln" id="L462">    <span class="tok-com">/// promised, because it is the only one that is part of this program.</span></span>
+<span class="ln" id="L463">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L464">    <span class="tok-kw">fn</span> <span class="tok-fn">the_built_in_check_is_always_available</span>() {</span>
+<span class="ln" id="L465">        assert!(Survey::<span class="tok-fn">default</span>().<span class="tok-fn">supports</span>(Choice::BuiltIn));</span>
+<span class="ln" id="L466">        assert!(!Survey::<span class="tok-fn">default</span>().<span class="tok-fn">supports</span>(Choice::Native));</span>
+<span class="ln" id="L467">        assert!(!Survey::<span class="tok-fn">default</span>().<span class="tok-fn">supports</span>(Choice::Wsl));</span>
+<span class="ln" id="L468">    }</span>
+<span class="ln" id="L469">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

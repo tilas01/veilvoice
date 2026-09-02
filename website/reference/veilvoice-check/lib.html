@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-check/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-check/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-check.html">veilvoice-check</a> &middot; 471 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-check.html">veilvoice-check</a> &middot; 472 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-a-library-and-not-only-a-program">Why this is a library and not only a program</a>
@@ -72,18 +72,18 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>471 lines defining <strong>11 functions</strong> (9 public), <strong>2 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>472 lines defining <strong>11 functions</strong> (9 public), <strong>2 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 96</span> &middot; Something that went wrong, in words a person can act on.</li>
-<li><code>struct Checked</code> <span style="color:var(--muted)">line 284</span> &middot; What a full check found.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 97</span> &middot; Something that went wrong, in words a person can act on.</li>
+<li><code>struct Checked</code> <span style="color:var(--muted)">line 285</span> &middot; What a full check found.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>sha256_bytes</code> <span style="color:var(--muted)">line 179</span> &middot; SHA-256 of bytes already in memory.
+<li><code>sha256_bytes</code> <span style="color:var(--muted)">line 180</span> &middot; SHA-256 of bytes already in memory.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>hex</code></span>
 </li>
-<li><code>names_in_sums</code> <span style="color:var(--muted)">line 245</span> &middot; Every name a SHA256SUMS lists, in order.
+<li><code>names_in_sums</code> <span style="color:var(--muted)">line 246</span> &middot; Every name a SHA256SUMS lists, in order.
 </li>
-<li><code>check_file</code> <span style="color:var(--muted)">line 307</span> &middot; The whole check: signature first, then the hash.
+<li><code>check_file</code> <span style="color:var(--muted)">line 308</span> &middot; The whole check: signature first, then the hash.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>digest_from_sums</code>, <code>digests_match</code>, <code>fingerprint_of</code>, <code>key</code>, <code>sha256_file</code>, <code>verify_detached</code>, <code>hex</code></span>
 </li>
 </ul>
@@ -113,57 +113,57 @@
 <a href="lib.src.html#fn-error-fmt">
 <rect x="20.0" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="74.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="74.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
+<text x="74.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 113</text>
 </a>
 <a href="lib.src.html#fn-key">
 <rect x="154.6" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="200.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">key</text>
-<text x="200.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="200.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
 <a href="lib.src.html#fn-fingerprint_of">
 <rect x="150.6" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="221.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fingerprint_of</text>
-<text x="221.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
+<text x="221.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="lib.src.html#fn-sha256_file">
 <rect x="273.1" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="331.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sha256_file</text>
-<text x="331.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
+<text x="331.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 160</text>
 </a>
 <a href="lib.src.html#fn-sha256_bytes">
 <rect x="415.7" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="478.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sha256_bytes</text>
-<text x="478.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
+<text x="478.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
 </a>
 <a href="lib.src.html#fn-hex">
 <rect x="317.4" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="363.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hex</text>
-<text x="363.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
+<text x="363.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 186</text>
 </a>
 <a href="lib.src.html#fn-digests_match">
 <rect x="43.0" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="109.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digests_match</text>
-<text x="109.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
+<text x="109.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
 <a href="lib.src.html#fn-digest_from_sums">
 <rect x="201.8" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="280.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digest_from_sums</text>
-<text x="280.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 208</text>
+<text x="280.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
 </a>
 <a href="lib.src.html#fn-names_in_sums">
 <rect x="384.7" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="451.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">names_in_sums</text>
-<text x="451.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+<text x="451.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 246</text>
 </a>
 <a href="lib.src.html#fn-verify_detached">
 <rect x="138.5" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">verify_detached</text>
-<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
+<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 264</text>
 </a>
 <a href="lib.src.html#fn-check_file">
 <rect x="313.4" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="367.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check_file</text>
-<text x="367.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 307</text>
+<text x="367.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -182,17 +182,17 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_fmt[&quot;Error::fmt&lt;br/&gt;line 112&quot;]
-    n_key[&quot;key&lt;br/&gt;line 133&quot;]
-    n_fingerprint_of[&quot;fingerprint_of&lt;br/&gt;line 146&quot;]
-    n_sha256_file[&quot;sha256_file&lt;br/&gt;line 159&quot;]
-    n_sha256_bytes([&quot;sha256_bytes&lt;br/&gt;line 179&quot;])
-    n_hex[&quot;hex&lt;br/&gt;line 185&quot;]
-    n_digests_match[&quot;digests_match&lt;br/&gt;line 198&quot;]
-    n_digest_from_sums[&quot;digest_from_sums&lt;br/&gt;line 208&quot;]
-    n_names_in_sums([&quot;names_in_sums&lt;br/&gt;line 245&quot;])
-    n_verify_detached[&quot;verify_detached&lt;br/&gt;line 263&quot;]
-    n_check_file([&quot;check_file&lt;br/&gt;line 307&quot;])
+    n_fmt[&quot;Error::fmt&lt;br/&gt;line 113&quot;]
+    n_key[&quot;key&lt;br/&gt;line 134&quot;]
+    n_fingerprint_of[&quot;fingerprint_of&lt;br/&gt;line 147&quot;]
+    n_sha256_file[&quot;sha256_file&lt;br/&gt;line 160&quot;]
+    n_sha256_bytes([&quot;sha256_bytes&lt;br/&gt;line 180&quot;])
+    n_hex[&quot;hex&lt;br/&gt;line 186&quot;]
+    n_digests_match[&quot;digests_match&lt;br/&gt;line 199&quot;]
+    n_digest_from_sums[&quot;digest_from_sums&lt;br/&gt;line 209&quot;]
+    n_names_in_sums([&quot;names_in_sums&lt;br/&gt;line 246&quot;])
+    n_verify_detached[&quot;verify_detached&lt;br/&gt;line 264&quot;]
+    n_check_file([&quot;check_file&lt;br/&gt;line 308&quot;])
     n_check_file --&gt; n_digest_from_sums
     n_check_file --&gt; n_digests_match
     n_check_file --&gt; n_fingerprint_of
@@ -202,17 +202,17 @@ flowchart TD
     n_key --&gt; n_fingerprint_of
     n_sha256_bytes --&gt; n_hex
     n_sha256_file --&gt; n_hex
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L112&quot; &quot;open the source&quot;
-    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L133&quot; &quot;open the source&quot;
-    click n_fingerprint_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L146&quot; &quot;open the source&quot;
-    click n_sha256_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L159&quot; &quot;open the source&quot;
-    click n_sha256_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L179&quot; &quot;open the source&quot;
-    click n_hex href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L185&quot; &quot;open the source&quot;
-    click n_digests_match href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L198&quot; &quot;open the source&quot;
-    click n_digest_from_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L208&quot; &quot;open the source&quot;
-    click n_names_in_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L245&quot; &quot;open the source&quot;
-    click n_verify_detached href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L263&quot; &quot;open the source&quot;
-    click n_check_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L307&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L113&quot; &quot;open the source&quot;
+    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L134&quot; &quot;open the source&quot;
+    click n_fingerprint_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L147&quot; &quot;open the source&quot;
+    click n_sha256_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L160&quot; &quot;open the source&quot;
+    click n_sha256_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L180&quot; &quot;open the source&quot;
+    click n_hex href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L186&quot; &quot;open the source&quot;
+    click n_digests_match href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L199&quot; &quot;open the source&quot;
+    click n_digest_from_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L209&quot; &quot;open the source&quot;
+    click n_names_in_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L246&quot; &quot;open the source&quot;
+    click n_verify_detached href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L264&quot; &quot;open the source&quot;
+    click n_check_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L308&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_sha256_bytes,n_names_in_sums,n_check_file entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -225,22 +225,22 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>PUBLIC_KEY</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-public_key">71</a></td><td>The project&#x27;s signing key, in ASCII armour.</td></tr>
-<tr><td><code>FINGERPRINT</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-fingerprint">83</a></td><td>The fingerprint, written out rather than derived.</td></tr>
-<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-scope">86</a></td><td>What a passing check is worth, in the words a user should be shown.</td></tr>
-<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-error">96</a></td><td>Something that went wrong, in words a person can act on.</td></tr>
-<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-fmt">112</a></td><td></td></tr>
-<tr><td><code>key</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-key">133</a></td><td>The embedded key, with its fingerprint checked.</td></tr>
-<tr><td><code>fingerprint_of</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-fingerprint_of">146</a></td><td>A key&#x27;s fingerprint, uppercase hex, no spaces.</td></tr>
-<tr><td><code>sha256_file</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-sha256_file">159</a></td><td>SHA-256 of a file, read in chunks.</td></tr>
-<tr><td><code>sha256_bytes</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-sha256_bytes">179</a></td><td>SHA-256 of bytes already in memory.</td></tr>
-<tr><td><code>hex</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-hex">185</a></td><td></td></tr>
-<tr><td><code>digests_match</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-digests_match">198</a></td><td>Compare two hex digests without caring about case or stray whitespace.</td></tr>
-<tr><td><code>digest_from_sums</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-digest_from_sums">208</a></td><td>Find a file&#x27;s line in a sha256sum-format list.</td></tr>
-<tr><td><code>names_in_sums</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-names_in_sums">245</a></td><td>Every name a SHA256SUMS lists, in order.</td></tr>
-<tr><td><code>verify_detached</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-verify_detached">263</a></td><td>Verify a detached signature over data using key.</td></tr>
-<tr><td><code>Checked</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-checked">284</a></td><td>What a full check found.</td></tr>
-<tr><td><code>check_file</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-check_file">307</a></td><td>The whole check: signature first, then the hash.</td></tr>
+<tr><td><code>PUBLIC_KEY</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-public_key">72</a></td><td>The project&#x27;s signing key, in ASCII armour.</td></tr>
+<tr><td><code>FINGERPRINT</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-fingerprint">84</a></td><td>The fingerprint, written out rather than derived.</td></tr>
+<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-scope">87</a></td><td>What a passing check is worth, in the words a user should be shown.</td></tr>
+<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-error">97</a></td><td>Something that went wrong, in words a person can act on.</td></tr>
+<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-fmt">113</a></td><td></td></tr>
+<tr><td><code>key</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-key">134</a></td><td>The embedded key, with its fingerprint checked.</td></tr>
+<tr><td><code>fingerprint_of</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-fingerprint_of">147</a></td><td>A key&#x27;s fingerprint, uppercase hex, no spaces.</td></tr>
+<tr><td><code>sha256_file</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-sha256_file">160</a></td><td>SHA-256 of a file, read in chunks.</td></tr>
+<tr><td><code>sha256_bytes</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-sha256_bytes">180</a></td><td>SHA-256 of bytes already in memory.</td></tr>
+<tr><td><code>hex</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-hex">186</a></td><td></td></tr>
+<tr><td><code>digests_match</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-digests_match">199</a></td><td>Compare two hex digests without caring about case or stray whitespace.</td></tr>
+<tr><td><code>digest_from_sums</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-digest_from_sums">209</a></td><td>Find a file&#x27;s line in a sha256sum-format list.</td></tr>
+<tr><td><code>names_in_sums</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-names_in_sums">246</a></td><td>Every name a SHA256SUMS lists, in order.</td></tr>
+<tr><td><code>verify_detached</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-verify_detached">264</a></td><td>Verify a detached signature over data using key.</td></tr>
+<tr><td><code>Checked</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-checked">285</a></td><td>What a full check found.</td></tr>
+<tr><td><code>check_file</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-check_file">308</a></td><td>The whole check: signature first, then the hash.</td></tr>
 </tbody></table>
 </section>
 </div></div>
