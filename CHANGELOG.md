@@ -27,8 +27,30 @@ Nothing yet. The next release goes here.
 - The website is published again after a release, instead of going stale.
 - The guide describes the application that actually ships, including where it
   runs and how anything reaches the network.
+- There is a guide for each program now, and installing is a dropdown per
+  system in the README.
 
 **In full**
+
+### Guides, one per program
+
+- A guide for each of the three programs, so somebody holding one of them does
+  not have to read about the other two to find their part: checking a download,
+  the command line, the desktop application. They are in `docs/`, in the wiki,
+  and in every release archive.
+
+- They are assembled from the user guide rather than written beside it. Three
+  hand-maintained descriptions of one application is how documentation goes
+  stale in one place and not the others, so there is one source and a check
+  that fails the build when a guide and that source disagree.
+
+- The verifier finally has a section of its own. It is the program you are
+  meant to run *first*, and it was the only one with no guide.
+
+- Installing is now a dropdown per system in the README: Linux, macOS,
+  Windows, WSL, the BSDs, and building it yourself. Each is one command to get
+  running and ends by checking the download, and the build-it-yourself route
+  says what to check on your own machine before reporting a mismatch.
 
 ### An idle window costs nothing now
 

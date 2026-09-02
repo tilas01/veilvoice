@@ -219,6 +219,31 @@ Found by photographing the tab and looking at it, immediately after writing it.
 That is twice in this round that reading the picture caught what reading the
 patch did not, which is the same lesson as F-113 in the same afternoon.
 
+### Three programs, three guides, and the one that had none
+
+Not a finding, and the gap is worth recording because of which program had it.
+
+The user guide describes all three programs in one document, which is right for
+somebody reading the project and wrong for somebody holding one program. A
+release ships `veilvoice`, `veilvoice-gui` and `veilvoice-verify`, and the wiki
+carried no guide for any of them: 186 pages, all of them generated reference,
+and nothing a person would read to learn how to use the thing.
+
+**The one with no section at all was the verifier**, which is the program this
+project tells people to run *first*, before trusting either of the others. It
+had a tab in the window and a page on the site and no guide.
+
+The three guides are assembled from the user guide rather than written beside
+it, for the reason this document has recorded five times: three hand-maintained
+descriptions of one application go stale in one place and not the others. There
+is one source, and `--check` regenerates into memory and compares.
+
+The assembly caught its own defect immediately. A guide sitting in `docs/`
+links to its neighbours by bare file name, which resolves there and resolves to
+nothing in the wiki, where every page is a flat name. The link suite found two
+broken links in the generated pages before they were committed, and the fix is
+a rule about the namespace rather than a list of links to patch.
+
 ### F-120 -- the guide credited a program the update check has never used
 
 `docs/USER_GUIDE.md`, written earlier in this same round.
