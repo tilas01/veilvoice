@@ -749,11 +749,11 @@
 <span class="ln" id="L655">            <span class="tok-kw">return</span>;</span>
 <span class="ln" id="L656">        }</span>
 <span class="ln" id="L657">        <span class="tok-kw">let</span> busy = <span class="tok-kw">self</span>.<span class="tok-fn">busy</span>();</span>
-<span class="ln" id="L658">        egui::Frame::<span class="tok-fn">none</span>()</span>
+<span class="ln" id="L658">        egui::Frame::<span class="tok-fn">new</span>()</span>
 <span class="ln" id="L659">            .<span class="tok-fn">fill</span>(p::<span class="tok-fn">bg_dark</span>())</span>
 <span class="ln" id="L660">            .<span class="tok-fn">stroke</span>(egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">red</span>()))</span>
-<span class="ln" id="L661">            .<span class="tok-fn">rounding</span>(<span class="tok-num">8.0</span>)</span>
-<span class="ln" id="L662">            .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">symmetric</span>(<span class="tok-num">14.0</span>, <span class="tok-num">12.0</span>))</span>
+<span class="ln" id="L661">            .<span class="tok-fn">corner_radius</span>(<span class="tok-num">8</span>)</span>
+<span class="ln" id="L662">            .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">symmetric</span>(<span class="tok-num">14</span>, <span class="tok-num">12</span>))</span>
 <span class="ln" id="L663">            .<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L664">                ui.<span class="tok-fn">label</span>(</span>
 <span class="ln" id="L665">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The app lock was interfered with&quot;</span>)</span>

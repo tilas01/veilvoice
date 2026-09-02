@@ -212,8 +212,8 @@ install it.**
 ```bash
 # Windows MSI (needs: dotnet tool install -g wix)
 wix build packaging/wix/veilvoice.wxs -arch x64 \
-    -d Version=0.1.16 -d BinDir=dist/veilvoice-v0.1.16-windows-x86_64 \
-    -o dist/VeilVoice-0.1.16-x64.msi
+    -d Version=0.1.17 -d BinDir=dist/veilvoice-v0.1.17-windows-x86_64 \
+    -o dist/VeilVoice-0.1.17-x64.msi
 ```
 
 The WiX source refers to `packaging/wix/LICENSE.rtf` for the licence dialog,
@@ -238,7 +238,7 @@ dpkg-buildpackage -us -uc -b
 
 # Fedora / RHEL / openSUSE
 rpmbuild -ba packaging/rpm/veilvoice.spec \
-    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.16"
+    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.17"
 
 # Flatpak  (regenerate cargo-sources.json from Cargo.lock first)
 python flatpak-cargo-generator.py Cargo.lock -o packaging/flatpak/cargo-sources.json

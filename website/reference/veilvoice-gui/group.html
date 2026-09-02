@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/group.svg" alt="group.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/group.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1668 lines &middot; <a href="group.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1673 lines &middot; <a href="group.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-toggle-does-not-persist-and-the-tick-that-makes-it-persist-is-separate">The toggle does not persist, and the tick that makes it persist is separate</a>
@@ -69,12 +69,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1668 lines defining <strong>39 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1673 lines defining <strong>39 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Person</code> <span style="color:var(--muted)">line 70</span> &middot; One person, as the panel holds them.</li>
 <li><code>struct Outputs</code> <span style="color:var(--muted)">line 93</span> &middot; What comes out of a group render.</li>
 <li><code>struct Group</code> <span style="color:var(--muted)">line 158</span> &middot; The group-mode panel&#x27;s state.</li>
-<li><code>struct Job</code> <span style="color:var(--muted)">line 1125</span> &middot; Everything one render needs, taken from the panel at the moment the button was pressed.</li>
+<li><code>struct Job</code> <span style="color:var(--muted)">line 1130</span> &middot; Everything one render needs, taken from the panel at the moment the button was pressed.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Outputs::any</code> <span style="color:var(--muted)">line 114</span> &middot; Whether anything at all would be written.
@@ -93,7 +93,7 @@
 <li><code>Group::tab</code> <span style="color:var(--muted)">line 339</span> &middot; The whole panel.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>collect_dialogs</code>, <code>files_and_theme</code>, <code>mode_controls</code>, <code>output_controls</code>, <code>people_list</code>, <code>profile_controls</code>, <code>render_controls</code>, <code>strip</code>, <code>voice_mode_controls</code>, <code>from_workspace</code>, <code>to_workspace</code></span>
 </li>
-<li><code>Group::drain</code> <span style="color:var(--muted)">line 916</span> &middot; Take the worker&#x27;s answer if it has one.
+<li><code>Group::drain</code> <span style="color:var(--muted)">line 921</span> &middot; Take the worker&#x27;s answer if it has one.
 </li>
 </ul>
 </section>
@@ -222,22 +222,22 @@
 <a href="group.src.html#fn-group-to_workspace">
 <rect x="190.8" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="281.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::to_workspace</text>
-<text x="281.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 833</text>
+<text x="281.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 838</text>
 </a>
 <a href="group.src.html#fn-group-from_workspace">
 <rect x="398.0" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="496.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::from_workspace</text>
-<text x="496.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 859</text>
+<text x="496.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 864</text>
 </a>
 <a href="group.src.html#fn-group-is_busy">
 <rect x="366.9" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="437.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::is_busy</text>
-<text x="437.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 911</text>
+<text x="437.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 916</text>
 </a>
 <a href="group.src.html#fn-assigned_colour">
 <rect x="247.2" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="321.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">assigned_colour</text>
-<text x="321.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1255</text>
+<text x="321.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1260</text>
 </a>
 <rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -275,10 +275,10 @@ flowchart TD
     n_voice_mode_controls[&quot;Group::voice_mode_controls&lt;br/&gt;line 604&quot;]
     n_strip[&quot;Group::strip&lt;br/&gt;line 645&quot;]
     n_people_list[&quot;Group::people_list&lt;br/&gt;line 680&quot;]
-    n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 833&quot;]
-    n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 859&quot;]
-    n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 911&quot;]
-    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1255&quot;]
+    n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 838&quot;]
+    n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 864&quot;]
+    n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 916&quot;]
+    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1260&quot;]
     n_add --&gt; n_at
     n_body --&gt; n_collect_dialogs
     n_body --&gt; n_mode_controls
@@ -316,10 +316,10 @@ flowchart TD
     click n_voice_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L604&quot; &quot;open the source&quot;
     click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L645&quot; &quot;open the source&quot;
     click n_people_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L680&quot; &quot;open the source&quot;
-    click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L833&quot; &quot;open the source&quot;
-    click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L859&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L911&quot; &quot;open the source&quot;
-    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1255&quot; &quot;open the source&quot;
+    click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L838&quot; &quot;open the source&quot;
+    click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916&quot; &quot;open the source&quot;
+    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1260&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -360,21 +360,21 @@ flowchart TD
 <tr><td><code>Group::voice_mode_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-voice_mode_controls">604</a></td><td>A voice each, or one voice between everybody.</td></tr>
 <tr><td><code>Group::strip</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-strip">645</a></td><td>The picture: a circle per person, in their colour, with their name.</td></tr>
 <tr><td><code>Group::people_list</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-people_list">680</a></td><td>One row per person: colour, name, and a way to remove them.</td></tr>
-<tr><td><code>Group::palette_picker</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-palette_picker">748</a></td><td>Every colour in every palette, as swatches.</td></tr>
-<tr><td><code>Group::swatch</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-swatch">787</a></td><td>One clickable colour.</td></tr>
-<tr><td><code>Group::output_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-output_controls">809</a></td><td>What a render writes.</td></tr>
-<tr><td><code>Group::to_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-to_workspace">833</a></td><td>This panel as a saveable project.</td></tr>
-<tr><td><code>Group::from_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-from_workspace">859</a></td><td>Put a saved project back.</td></tr>
-<tr><td><code>Group::is_busy</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-is_busy">911</a></td><td>Whether a render is running, so the window keeps repainting.</td></tr>
-<tr><td><code>Group::drain</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-drain">916</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
-<tr><td><code>Group::files_and_theme</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-files_and_theme">932</a></td><td>The recording, the plan, the title and the palette.</td></tr>
-<tr><td><code>Group::render_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-render_controls">1022</a></td><td>The button, and what came of pressing it.</td></tr>
-<tr><td><code>Group::start</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-start">1078</a></td><td>Start a render on a thread of its own.</td></tr>
-<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="group.src.html#fn-file_name">1113</a></td><td>The last component of a path, for showing beside a button.</td></tr>
-<tr><td><code>Job</code> <sub>struct</sub></td><td><a href="group.src.html#fn-job">1125</a></td><td>Everything one render needs, taken from the panel at the moment the button was pressed.</td></tr>
-<tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="group.src.html#fn-render_now">1145</a></td><td>Do the render.</td></tr>
-<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="group.src.html#fn-with_extension">1243</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
-<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-assigned_colour">1255</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
+<tr><td><code>Group::palette_picker</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-palette_picker">752</a></td><td>Every colour in every palette, as swatches.</td></tr>
+<tr><td><code>Group::swatch</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-swatch">791</a></td><td>One clickable colour.</td></tr>
+<tr><td><code>Group::output_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-output_controls">814</a></td><td>What a render writes.</td></tr>
+<tr><td><code>Group::to_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-to_workspace">838</a></td><td>This panel as a saveable project.</td></tr>
+<tr><td><code>Group::from_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-from_workspace">864</a></td><td>Put a saved project back.</td></tr>
+<tr><td><code>Group::is_busy</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-is_busy">916</a></td><td>Whether a render is running, so the window keeps repainting.</td></tr>
+<tr><td><code>Group::drain</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-drain">921</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
+<tr><td><code>Group::files_and_theme</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-files_and_theme">937</a></td><td>The recording, the plan, the title and the palette.</td></tr>
+<tr><td><code>Group::render_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-render_controls">1027</a></td><td>The button, and what came of pressing it.</td></tr>
+<tr><td><code>Group::start</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-start">1083</a></td><td>Start a render on a thread of its own.</td></tr>
+<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="group.src.html#fn-file_name">1118</a></td><td>The last component of a path, for showing beside a button.</td></tr>
+<tr><td><code>Job</code> <sub>struct</sub></td><td><a href="group.src.html#fn-job">1130</a></td><td>Everything one render needs, taken from the panel at the moment the button was pressed.</td></tr>
+<tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="group.src.html#fn-render_now">1150</a></td><td>Do the render.</td></tr>
+<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="group.src.html#fn-with_extension">1248</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
+<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-assigned_colour">1260</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
 </tbody></table>
 </section>
 </div></div>

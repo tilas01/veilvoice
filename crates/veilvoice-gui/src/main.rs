@@ -173,10 +173,7 @@ fn main() -> eframe::Result<()> {
 
     let result = eframe::run_native(
         "VeilVoice",
-        eframe::NativeOptions {
-            viewport,
-            ..Default::default()
-        },
+        veilvoice_gui::graphics::options(viewport),
         Box::new(|cc| Ok(Box::new(veilvoice_gui::VeilVoiceApp::new(cc)))),
     );
 

@@ -34,7 +34,12 @@ Description: irreversible voice de-identification, fully offline
 
 Package: veilvoice-gui
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, veilvoice (= ${binary:Version})
+# libxkbcommon-x11-0 is named explicitly and the rest is left to shlibs.
+# The window toolkit opens that one by name at startup rather than linking
+# against it, so dpkg-shlibdeps cannot see it: the package installed
+# cleanly and the application aborted before drawing anything.
+Depends: ${shlibs:Depends}, ${misc:Depends}, veilvoice (= ${binary:Version}),
+         libxkbcommon-x11-0
 Description: irreversible voice de-identification - desktop application
  The VeilVoice desktop application.
  .

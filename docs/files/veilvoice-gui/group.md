@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/group.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1668 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1673 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
 
 ## Contents
 
@@ -80,14 +80,14 @@ restart is a mode somebody eventually forgets is on.
 
 ## What this file contains
 
-1668 lines defining **39 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1673 lines defining **39 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Person` (line 70) -- One person, as the panel holds them.
 - `struct Outputs` (line 93) -- What comes out of a group render.
 - `struct Group` (line 158) -- The group-mode panel's state.
-- `struct Job` (line 1125) -- Everything one render needs, taken from the panel at the moment the button was pressed.
+- `struct Job` (line 1130) -- Everything one render needs, taken from the panel at the moment the button was pressed.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -100,7 +100,7 @@ restart is a mode somebody eventually forgets is on.
 - `Group::to_plan` (line 323) -- Build a plan from the panel: names in slot order, no turns.
 - `Group::tab` (line 339) -- The whole panel.
   - reaches: `body`, `collect_dialogs`, `files_and_theme`, `mode_controls`, `output_controls`, `people_list`, `profile_controls`, `render_controls`, `strip`, `voice_mode_controls`, `from_workspace`, `to_workspace`
-- `Group::drain` (line 916) -- Take the worker's answer if it has one.
+- `Group::drain` (line 921) -- Take the worker's answer if it has one.
 
 ## What calls what
 
@@ -143,10 +143,10 @@ flowchart TD
     n_voice_mode_controls["Group::voice_mode_controls<br/>line 604"]
     n_strip["Group::strip<br/>line 645"]
     n_people_list["Group::people_list<br/>line 680"]
-    n_to_workspace["Group::to_workspace<br/>line 833"]
-    n_from_workspace["Group::from_workspace<br/>line 859"]
-    n_is_busy["Group::is_busy<br/>line 911"]
-    n_assigned_colour["assigned_colour<br/>line 1255"]
+    n_to_workspace["Group::to_workspace<br/>line 838"]
+    n_from_workspace["Group::from_workspace<br/>line 864"]
+    n_is_busy["Group::is_busy<br/>line 916"]
+    n_assigned_colour["assigned_colour<br/>line 1260"]
     n_add --> n_at
     n_body --> n_collect_dialogs
     n_body --> n_mode_controls
@@ -184,10 +184,10 @@ flowchart TD
     click n_voice_mode_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L604" "open the source"
     click n_strip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L645" "open the source"
     click n_people_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L680" "open the source"
-    click n_to_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L833" "open the source"
-    click n_from_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L859" "open the source"
-    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L911" "open the source"
-    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1255" "open the source"
+    click n_to_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L838" "open the source"
+    click n_from_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864" "open the source"
+    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916" "open the source"
+    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1260" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -230,21 +230,21 @@ flowchart TD
 | `Group::voice_mode_controls` <sub>fn</sub> | [604](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L604) | A voice each, or one voice between everybody. |
 | `Group::strip` <sub>fn</sub> | [645](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L645) | The picture: a circle per person, in their colour, with their name. |
 | `Group::people_list` <sub>fn</sub> | [680](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L680) | One row per person: colour, name, and a way to remove them. |
-| `Group::palette_picker` <sub>fn</sub> | [748](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L748) | Every colour in every palette, as swatches. |
-| `Group::swatch` <sub>fn</sub> | [787](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L787) | One clickable colour. |
-| `Group::output_controls` <sub>fn</sub> | [809](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L809) | What a render writes. |
-| `Group::to_workspace` <sub>pub fn</sub> | [833](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L833) | This panel as a saveable project. |
-| `Group::from_workspace` <sub>pub fn</sub> | [859](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L859) | Put a saved project back. |
-| `Group::is_busy` <sub>pub fn</sub> | [911](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L911) | Whether a render is running, so the window keeps repainting. |
-| `Group::drain` <sub>pub fn</sub> | [916](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916) | Take the worker's answer if it has one. |
-| `Group::files_and_theme` <sub>fn</sub> | [932](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L932) | The recording, the plan, the title and the palette. |
-| `Group::render_controls` <sub>fn</sub> | [1022](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1022) | The button, and what came of pressing it. |
-| `Group::start` <sub>fn</sub> | [1078](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1078) | Start a render on a thread of its own. |
-| `file_name` <sub>fn</sub> | [1113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1113) | The last component of a path, for showing beside a button. |
-| `Job` <sub>struct</sub> | [1125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1125) | Everything one render needs, taken from the panel at the moment the button was pressed. |
-| `render_now` <sub>fn</sub> | [1145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1145) | Do the render. |
-| `with_extension` <sub>fn</sub> | [1243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243) | Replace the last extension, keeping any .veiled before it. |
-| `assigned_colour` <sub>pub fn</sub> | [1255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1255) | The colour a slot is given, as an egui colour. |
+| `Group::palette_picker` <sub>fn</sub> | [752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L752) | Every colour in every palette, as swatches. |
+| `Group::swatch` <sub>fn</sub> | [791](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L791) | One clickable colour. |
+| `Group::output_controls` <sub>fn</sub> | [814](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L814) | What a render writes. |
+| `Group::to_workspace` <sub>pub fn</sub> | [838](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L838) | This panel as a saveable project. |
+| `Group::from_workspace` <sub>pub fn</sub> | [864](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864) | Put a saved project back. |
+| `Group::is_busy` <sub>pub fn</sub> | [916](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916) | Whether a render is running, so the window keeps repainting. |
+| `Group::drain` <sub>pub fn</sub> | [921](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L921) | Take the worker's answer if it has one. |
+| `Group::files_and_theme` <sub>fn</sub> | [937](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L937) | The recording, the plan, the title and the palette. |
+| `Group::render_controls` <sub>fn</sub> | [1027](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1027) | The button, and what came of pressing it. |
+| `Group::start` <sub>fn</sub> | [1083](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1083) | Start a render on a thread of its own. |
+| `file_name` <sub>fn</sub> | [1118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1118) | The last component of a path, for showing beside a button. |
+| `Job` <sub>struct</sub> | [1130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1130) | Everything one render needs, taken from the panel at the moment the button was pressed. |
+| `render_now` <sub>fn</sub> | [1150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1150) | Do the render. |
+| `with_extension` <sub>fn</sub> | [1248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1248) | Replace the last extension, keeping any .veiled before it. |
+| `assigned_colour` <sub>pub fn</sub> | [1260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1260) | The colour a slot is given, as an egui colour. |
 
 ---
 

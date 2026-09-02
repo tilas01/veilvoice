@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="settings.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1245 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="settings.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1246 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1119,247 +1119,248 @@
 <span class="ln" id="L1003">                ui.<span class="tok-fn">allocate_exact_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">26.0</span>, <span class="tok-num">18.0</span>), egui::Sense::<span class="tok-fn">hover</span>());</span>
 <span class="ln" id="L1004">            <span class="tok-kw">if</span> ui.<span class="tok-fn">is_rect_visible</span>(rect) {</span>
 <span class="ln" id="L1005">                ui.<span class="tok-fn">painter</span>()</span>
-<span class="ln" id="L1006">                    .<span class="tok-fn">rect_filled</span>(rect, egui::Rounding::<span class="tok-fn">same</span>(<span class="tok-num">3.0</span>), colour);</span>
+<span class="ln" id="L1006">                    .<span class="tok-fn">rect_filled</span>(rect, egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">3</span>), colour);</span>
 <span class="ln" id="L1007">                ui.<span class="tok-fn">painter</span>().<span class="tok-fn">rect_stroke</span>(</span>
 <span class="ln" id="L1008">                    rect,</span>
-<span class="ln" id="L1009">                    egui::Rounding::<span class="tok-fn">same</span>(<span class="tok-num">3.0</span>),</span>
+<span class="ln" id="L1009">                    egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">3</span>),</span>
 <span class="ln" id="L1010">                    egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()),</span>
-<span class="ln" id="L1011">                );</span>
-<span class="ln" id="L1012">            }</span>
-<span class="ln" id="L1013">            response.<span class="tok-fn">on_hover_text</span>(name);</span>
-<span class="ln" id="L1014">        }</span>
-<span class="ln" id="L1015">    });</span>
-<span class="ln" id="L1016">}</span>
+<span class="ln" id="L1011">                    egui::StrokeKind::Inside,</span>
+<span class="ln" id="L1012">                );</span>
+<span class="ln" id="L1013">            }</span>
+<span class="ln" id="L1014">            response.<span class="tok-fn">on_hover_text</span>(name);</span>
+<span class="ln" id="L1015">        }</span>
+<span class="ln" id="L1016">    });</span>
+<span class="ln" id="L1017">}</span>
 </span>
-<span class="ln" id="L1017"></span>
-<span class="ln" id="L1018"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1019"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L1020">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L1021"></span>
-<span class="ln" id="L1022">    <span class="tok-com">/// Drive the settings tab once, with no window.</span></span>
-<span class="ln" id="L1023">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(settings: &amp;<span class="tok-kw">mut</span> Settings) {</span>
-<span class="ln" id="L1024">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1025">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L1026">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">tab</span>(ui, ctx));</span>
-<span class="ln" id="L1027">        });</span>
-<span class="ln" id="L1028">    }</span>
-<span class="ln" id="L1029"></span>
-<span class="ln" id="L1030">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1031">    <span class="tok-kw">fn</span> <span class="tok-fn">every_page_renders_without_a_window</span>() {</span>
-<span class="ln" id="L1032">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1033">        <span class="tok-kw">for</span> (page, _, _) <span class="tok-kw">in</span> Page::ALL {</span>
-<span class="ln" id="L1034">            settings.page = *page;</span>
-<span class="ln" id="L1035">            <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
-<span class="ln" id="L1036">        }</span>
-<span class="ln" id="L1037">    }</span>
-<span class="ln" id="L1038"></span>
-<span class="ln" id="L1039">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1040">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_panel_renders</span>() {</span>
-<span class="ln" id="L1041">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1042">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1043">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L1044">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">first_run_panel</span>(ui));</span>
-<span class="ln" id="L1045">        });</span>
-<span class="ln" id="L1046">    }</span>
-<span class="ln" id="L1047"></span>
-<span class="ln" id="L1048">    <span class="tok-com">/// The menu has to cover the pages and the pages have to cover the menu, or</span></span>
-<span class="ln" id="L1049">    <span class="tok-com">/// a page becomes unreachable.</span></span>
-<span class="ln" id="L1050">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1051">    <span class="tok-kw">fn</span> <span class="tok-fn">the_menu_lists_every_page_exactly_once</span>() {</span>
-<span class="ln" id="L1052">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;Page&gt; = Page::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(p, _, _)| *p).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1053">        <span class="tok-kw">let</span> count = seen.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L1054">        seen.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L1055">        assert_eq!(seen.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;a page is listed twice&quot;</span>);</span>
-<span class="ln" id="L1056">        assert_eq!(count, <span class="tok-num">5</span>, <span class="tok-str">&quot;a page was added without a menu entry&quot;</span>);</span>
-<span class="ln" id="L1057">        <span class="tok-kw">for</span> (_, label, blurb) <span class="tok-kw">in</span> Page::ALL {</span>
-<span class="ln" id="L1058">            assert!(!label.<span class="tok-fn">is_empty</span>() &amp;&amp; !blurb.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L1059">        }</span>
-<span class="ln" id="L1060">    }</span>
-<span class="ln" id="L1061"></span>
-<span class="ln" id="L1062">    <span class="tok-com">/// A first run has not been configured; answering it must stick.</span></span>
-<span class="ln" id="L1063">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1064">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_is_offered_once</span>() {</span>
-<span class="ln" id="L1065">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1066">            prefs: Prefs::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1067">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1068">        };</span>
-<span class="ln" id="L1069">        settings.first_run = !settings.prefs.configured;</span>
-<span class="ln" id="L1070">        assert!(settings.<span class="tok-fn">needs_first_run</span>());</span>
-<span class="ln" id="L1071"></span>
-<span class="ln" id="L1072">        settings.prefs.configured = true;</span>
-<span class="ln" id="L1073">        settings.first_run = false;</span>
-<span class="ln" id="L1074">        assert!(!settings.<span class="tok-fn">needs_first_run</span>());</span>
-<span class="ln" id="L1075">    }</span>
-<span class="ln" id="L1076"></span>
-<span class="ln" id="L1077">    <span class="tok-com">/// Defaults are what the request asked for: animation on, offered at the</span></span>
-<span class="ln" id="L1078">    <span class="tok-com">/// start, switchable afterwards.</span></span>
-<span class="ln" id="L1079">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1080">    <span class="tok-kw">fn</span> <span class="tok-fn">animation_is_on_by_default_and_can_be_turned_off</span>() {</span>
-<span class="ln" id="L1081">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1082">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1083">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
-<span class="ln" id="L1084">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
-<span class="ln" id="L1085"></span>
-<span class="ln" id="L1086">        settings.prefs.animated_icon = false;</span>
-<span class="ln" id="L1087">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled, <span class="tok-str">&quot;only the mark was stilled&quot;</span>);</span>
-<span class="ln" id="L1088">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
-<span class="ln" id="L1089"></span>
-<span class="ln" id="L1090">        settings.prefs.animations = false;</span>
-<span class="ln" id="L1091">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
-<span class="ln" id="L1092">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
-<span class="ln" id="L1093">    }</span>
-<span class="ln" id="L1094"></span>
-<span class="ln" id="L1095">    <span class="tok-com">/// Choosing a theme must apply it and record it.</span></span>
-<span class="ln" id="L1096">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1097">    <span class="tok-kw">fn</span> <span class="tok-fn">choosing_a_theme_applies_and_records_it</span>() {</span>
-<span class="ln" id="L1098">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1099">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1100">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L1101">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1102">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L1103">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1104">        };</span>
-<span class="ln" id="L1105"></span>
-<span class="ln" id="L1106">        assert!(<span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;nord&quot;</span>));</span>
-<span class="ln" id="L1107">        settings.prefs.theme = <span class="tok-str">&quot;nord&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1108">        settings.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L1109"></span>
-<span class="ln" id="L1110">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path).theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
-<span class="ln" id="L1111">        assert!(settings.save_error.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, settings.save_error);</span>
-<span class="ln" id="L1112"></span>
-<span class="ln" id="L1113">        <span class="tok-com">// And it comes back on the next launch.</span></span>
-<span class="ln" id="L1114">        <span class="tok-kw">let</span> reloaded = Settings {</span>
-<span class="ln" id="L1115">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
-<span class="ln" id="L1116">            path: <span class="tok-fn">Some</span>(path),</span>
-<span class="ln" id="L1117">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1118">        };</span>
-<span class="ln" id="L1119">        assert_eq!(reloaded.prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
-<span class="ln" id="L1120">        <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1121">    }</span>
-<span class="ln" id="L1122"></span>
-<span class="ln" id="L1123">    <span class="tok-com">/// A save that cannot happen must not be silent, and must not lose the</span></span>
-<span class="ln" id="L1124">    <span class="tok-com">/// choice for this session either.</span></span>
-<span class="ln" id="L1125">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1126">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_save_is_reported_rather_than_swallowed</span>() {</span>
-<span class="ln" id="L1127">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1128">            path: None,</span>
-<span class="ln" id="L1129">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1130">        };</span>
-<span class="ln" id="L1131">        settings.prefs.animations = false;</span>
-<span class="ln" id="L1132">        settings.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L1133">        assert!(settings.save_error.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the failure was swallowed&quot;</span>);</span>
-<span class="ln" id="L1134">        assert!(!settings.prefs.animations, <span class="tok-str">&quot;the choice was lost as well&quot;</span>);</span>
-<span class="ln" id="L1135">        <span class="tok-com">// And the panel shows it.</span></span>
-<span class="ln" id="L1136">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
-<span class="ln" id="L1137">    }</span>
-<span class="ln" id="L1138"></span>
-<span class="ln" id="L1139">    <span class="tok-com">/// Reset must not touch anything that is not a presentation choice.</span></span>
-<span class="ln" id="L1140">    <span class="tok-com">/// An installed copy never offers to install itself, whatever the</span></span>
-<span class="ln" id="L1141">    <span class="tok-com">/// preference says. The preference is only about the portable case.</span></span>
-<span class="ln" id="L1142">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1143">    <span class="tok-kw">fn</span> <span class="tok-fn">the_install_tab_is_never_offered_by_an_installed_copy</span>() {</span>
-<span class="ln" id="L1144">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1145">        assert!(</span>
-<span class="ln" id="L1146">            settings.<span class="tok-fn">show_install_tab</span>(false),</span>
-<span class="ln" id="L1147">            <span class="tok-str">&quot;a portable copy offers it by default&quot;</span></span>
-<span class="ln" id="L1148">        );</span>
-<span class="ln" id="L1149">        assert!(</span>
-<span class="ln" id="L1150">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
-<span class="ln" id="L1151">            <span class="tok-str">&quot;an installed copy must never offer to install itself&quot;</span></span>
-<span class="ln" id="L1152">        );</span>
-<span class="ln" id="L1153"></span>
-<span class="ln" id="L1154">        settings.prefs.hide_install_tab = true;</span>
-<span class="ln" id="L1155">        assert!(</span>
-<span class="ln" id="L1156">            !settings.<span class="tok-fn">show_install_tab</span>(false),</span>
-<span class="ln" id="L1157">            <span class="tok-str">&quot;the preference hides it on a portable copy&quot;</span></span>
-<span class="ln" id="L1158">        );</span>
-<span class="ln" id="L1159">        assert!(</span>
-<span class="ln" id="L1160">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
-<span class="ln" id="L1161">            <span class="tok-str">&quot;and an installed copy is still never offered it&quot;</span></span>
-<span class="ln" id="L1162">        );</span>
-<span class="ln" id="L1163">    }</span>
-<span class="ln" id="L1164"></span>
-<span class="ln" id="L1165">    <span class="tok-com">/// The tick is remembered. A preference that has to be set on every launch</span></span>
-<span class="ln" id="L1166">    <span class="tok-com">/// is not a preference.</span></span>
-<span class="ln" id="L1167">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1168">    <span class="tok-kw">fn</span> <span class="tok-fn">hiding_the_install_tab_survives_a_reload</span>() {</span>
-<span class="ln" id="L1169">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1170">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L1171">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1172">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L1173">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1174">        };</span>
-<span class="ln" id="L1175">        settings.<span class="tok-fn">set_hide_install_tab</span>(true);</span>
-<span class="ln" id="L1176">        assert!(</span>
-<span class="ln" id="L1177">            settings.<span class="tok-fn">save_error</span>().<span class="tok-fn">is_none</span>(),</span>
-<span class="ln" id="L1178">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
-<span class="ln" id="L1179">            settings.<span class="tok-fn">save_error</span>()</span>
-<span class="ln" id="L1180">        );</span>
-<span class="ln" id="L1181">        assert!(Prefs::<span class="tok-fn">load</span>(&amp;path).hide_install_tab);</span>
-<span class="ln" id="L1182">    }</span>
-<span class="ln" id="L1183"></span>
-<span class="ln" id="L1184">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1185">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_leaves_the_first_run_answered</span>() {</span>
-<span class="ln" id="L1186">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1187">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1188">            path: <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>)),</span>
-<span class="ln" id="L1189">            prefs: Prefs {</span>
-<span class="ln" id="L1190">                theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1191">                animations: false,</span>
-<span class="ln" id="L1192">                animated_icon: false,</span>
-<span class="ln" id="L1193">                configured: true,</span>
-<span class="ln" id="L1194">                notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1195">                failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1196">                live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1197">                hide_install_tab: false,</span>
-<span class="ln" id="L1198">                always_group: false,</span>
-<span class="ln" id="L1199">                seal_with_app_lock: false,</span>
-<span class="ln" id="L1200">                vault_dir: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1201">                vault_tool: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1202">                vault_hidden: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1203">                autolock: false,</span>
-<span class="ln" id="L1204">                autolock_after: <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L1205">                autolock_floor: <span class="tok-kw">crate</span>::autolock::FLOOR_SECS,</span>
-<span class="ln" id="L1206">                autolock_ceiling: <span class="tok-kw">crate</span>::autolock::CEILING_SECS,</span>
-<span class="ln" id="L1207">                recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L1208">            },</span>
-<span class="ln" id="L1209">            page: Page::Storage,</span>
-<span class="ln" id="L1210">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1211">        };</span>
-<span class="ln" id="L1212"></span>
-<span class="ln" id="L1213">        <span class="tok-kw">let</span> configured = settings.prefs.configured;</span>
-<span class="ln" id="L1214">        settings.prefs = Prefs {</span>
-<span class="ln" id="L1215">            configured,</span>
-<span class="ln" id="L1216">            ..Prefs::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1217">        };</span>
-<span class="ln" id="L1218">        settings.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L1219"></span>
-<span class="ln" id="L1220">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1221">        assert!(settings.prefs.animations);</span>
-<span class="ln" id="L1222">        assert!(</span>
-<span class="ln" id="L1223">            settings.prefs.configured,</span>
-<span class="ln" id="L1224">            <span class="tok-str">&quot;reset must not ask the first-run question again&quot;</span></span>
-<span class="ln" id="L1225">        );</span>
-<span class="ln" id="L1226">    }</span>
-<span class="ln" id="L1227"></span>
-<span class="ln" id="L1228">    <span class="tok-com">/// Loading must survive a settings file full of nonsense.</span></span>
-<span class="ln" id="L1229">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1230">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_file_leaves_a_usable_panel_that_says_so</span>() {</span>
-<span class="ln" id="L1231">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1232">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L1233">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;this is not a settings file\n@@@@\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1234"></span>
-<span class="ln" id="L1235">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1236">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
-<span class="ln" id="L1237">            path: <span class="tok-fn">Some</span>(path),</span>
-<span class="ln" id="L1238">            page: Page::Storage,</span>
-<span class="ln" id="L1239">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1240">        };</span>
-<span class="ln" id="L1241">        assert!(settings.prefs.recovered_from_corrupt_file);</span>
-<span class="ln" id="L1242">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1243">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
-<span class="ln" id="L1244">    }</span>
-<span class="ln" id="L1245">}</span>
+<span class="ln" id="L1018"></span>
+<span class="ln" id="L1019"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1020"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L1021">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1022"></span>
+<span class="ln" id="L1023">    <span class="tok-com">/// Drive the settings tab once, with no window.</span></span>
+<span class="ln" id="L1024">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(settings: &amp;<span class="tok-kw">mut</span> Settings) {</span>
+<span class="ln" id="L1025">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1026">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L1027">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">tab</span>(ui, ctx));</span>
+<span class="ln" id="L1028">        });</span>
+<span class="ln" id="L1029">    }</span>
+<span class="ln" id="L1030"></span>
+<span class="ln" id="L1031">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1032">    <span class="tok-kw">fn</span> <span class="tok-fn">every_page_renders_without_a_window</span>() {</span>
+<span class="ln" id="L1033">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1034">        <span class="tok-kw">for</span> (page, _, _) <span class="tok-kw">in</span> Page::ALL {</span>
+<span class="ln" id="L1035">            settings.page = *page;</span>
+<span class="ln" id="L1036">            <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
+<span class="ln" id="L1037">        }</span>
+<span class="ln" id="L1038">    }</span>
+<span class="ln" id="L1039"></span>
+<span class="ln" id="L1040">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1041">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_panel_renders</span>() {</span>
+<span class="ln" id="L1042">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1043">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1044">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L1045">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">first_run_panel</span>(ui));</span>
+<span class="ln" id="L1046">        });</span>
+<span class="ln" id="L1047">    }</span>
+<span class="ln" id="L1048"></span>
+<span class="ln" id="L1049">    <span class="tok-com">/// The menu has to cover the pages and the pages have to cover the menu, or</span></span>
+<span class="ln" id="L1050">    <span class="tok-com">/// a page becomes unreachable.</span></span>
+<span class="ln" id="L1051">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1052">    <span class="tok-kw">fn</span> <span class="tok-fn">the_menu_lists_every_page_exactly_once</span>() {</span>
+<span class="ln" id="L1053">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;Page&gt; = Page::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(p, _, _)| *p).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1054">        <span class="tok-kw">let</span> count = seen.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L1055">        seen.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L1056">        assert_eq!(seen.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;a page is listed twice&quot;</span>);</span>
+<span class="ln" id="L1057">        assert_eq!(count, <span class="tok-num">5</span>, <span class="tok-str">&quot;a page was added without a menu entry&quot;</span>);</span>
+<span class="ln" id="L1058">        <span class="tok-kw">for</span> (_, label, blurb) <span class="tok-kw">in</span> Page::ALL {</span>
+<span class="ln" id="L1059">            assert!(!label.<span class="tok-fn">is_empty</span>() &amp;&amp; !blurb.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L1060">        }</span>
+<span class="ln" id="L1061">    }</span>
+<span class="ln" id="L1062"></span>
+<span class="ln" id="L1063">    <span class="tok-com">/// A first run has not been configured; answering it must stick.</span></span>
+<span class="ln" id="L1064">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1065">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_is_offered_once</span>() {</span>
+<span class="ln" id="L1066">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1067">            prefs: Prefs::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1068">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1069">        };</span>
+<span class="ln" id="L1070">        settings.first_run = !settings.prefs.configured;</span>
+<span class="ln" id="L1071">        assert!(settings.<span class="tok-fn">needs_first_run</span>());</span>
+<span class="ln" id="L1072"></span>
+<span class="ln" id="L1073">        settings.prefs.configured = true;</span>
+<span class="ln" id="L1074">        settings.first_run = false;</span>
+<span class="ln" id="L1075">        assert!(!settings.<span class="tok-fn">needs_first_run</span>());</span>
+<span class="ln" id="L1076">    }</span>
+<span class="ln" id="L1077"></span>
+<span class="ln" id="L1078">    <span class="tok-com">/// Defaults are what the request asked for: animation on, offered at the</span></span>
+<span class="ln" id="L1079">    <span class="tok-com">/// start, switchable afterwards.</span></span>
+<span class="ln" id="L1080">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1081">    <span class="tok-kw">fn</span> <span class="tok-fn">animation_is_on_by_default_and_can_be_turned_off</span>() {</span>
+<span class="ln" id="L1082">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1083">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1084">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
+<span class="ln" id="L1085">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
+<span class="ln" id="L1086"></span>
+<span class="ln" id="L1087">        settings.prefs.animated_icon = false;</span>
+<span class="ln" id="L1088">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled, <span class="tok-str">&quot;only the mark was stilled&quot;</span>);</span>
+<span class="ln" id="L1089">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
+<span class="ln" id="L1090"></span>
+<span class="ln" id="L1091">        settings.prefs.animations = false;</span>
+<span class="ln" id="L1092">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
+<span class="ln" id="L1093">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
+<span class="ln" id="L1094">    }</span>
+<span class="ln" id="L1095"></span>
+<span class="ln" id="L1096">    <span class="tok-com">/// Choosing a theme must apply it and record it.</span></span>
+<span class="ln" id="L1097">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1098">    <span class="tok-kw">fn</span> <span class="tok-fn">choosing_a_theme_applies_and_records_it</span>() {</span>
+<span class="ln" id="L1099">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1100">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1101">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L1102">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1103">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L1104">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1105">        };</span>
+<span class="ln" id="L1106"></span>
+<span class="ln" id="L1107">        assert!(<span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;nord&quot;</span>));</span>
+<span class="ln" id="L1108">        settings.prefs.theme = <span class="tok-str">&quot;nord&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1109">        settings.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L1110"></span>
+<span class="ln" id="L1111">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path).theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
+<span class="ln" id="L1112">        assert!(settings.save_error.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, settings.save_error);</span>
+<span class="ln" id="L1113"></span>
+<span class="ln" id="L1114">        <span class="tok-com">// And it comes back on the next launch.</span></span>
+<span class="ln" id="L1115">        <span class="tok-kw">let</span> reloaded = Settings {</span>
+<span class="ln" id="L1116">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
+<span class="ln" id="L1117">            path: <span class="tok-fn">Some</span>(path),</span>
+<span class="ln" id="L1118">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1119">        };</span>
+<span class="ln" id="L1120">        assert_eq!(reloaded.prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
+<span class="ln" id="L1121">        <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1122">    }</span>
+<span class="ln" id="L1123"></span>
+<span class="ln" id="L1124">    <span class="tok-com">/// A save that cannot happen must not be silent, and must not lose the</span></span>
+<span class="ln" id="L1125">    <span class="tok-com">/// choice for this session either.</span></span>
+<span class="ln" id="L1126">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1127">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_save_is_reported_rather_than_swallowed</span>() {</span>
+<span class="ln" id="L1128">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1129">            path: None,</span>
+<span class="ln" id="L1130">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1131">        };</span>
+<span class="ln" id="L1132">        settings.prefs.animations = false;</span>
+<span class="ln" id="L1133">        settings.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L1134">        assert!(settings.save_error.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the failure was swallowed&quot;</span>);</span>
+<span class="ln" id="L1135">        assert!(!settings.prefs.animations, <span class="tok-str">&quot;the choice was lost as well&quot;</span>);</span>
+<span class="ln" id="L1136">        <span class="tok-com">// And the panel shows it.</span></span>
+<span class="ln" id="L1137">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
+<span class="ln" id="L1138">    }</span>
+<span class="ln" id="L1139"></span>
+<span class="ln" id="L1140">    <span class="tok-com">/// Reset must not touch anything that is not a presentation choice.</span></span>
+<span class="ln" id="L1141">    <span class="tok-com">/// An installed copy never offers to install itself, whatever the</span></span>
+<span class="ln" id="L1142">    <span class="tok-com">/// preference says. The preference is only about the portable case.</span></span>
+<span class="ln" id="L1143">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1144">    <span class="tok-kw">fn</span> <span class="tok-fn">the_install_tab_is_never_offered_by_an_installed_copy</span>() {</span>
+<span class="ln" id="L1145">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1146">        assert!(</span>
+<span class="ln" id="L1147">            settings.<span class="tok-fn">show_install_tab</span>(false),</span>
+<span class="ln" id="L1148">            <span class="tok-str">&quot;a portable copy offers it by default&quot;</span></span>
+<span class="ln" id="L1149">        );</span>
+<span class="ln" id="L1150">        assert!(</span>
+<span class="ln" id="L1151">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
+<span class="ln" id="L1152">            <span class="tok-str">&quot;an installed copy must never offer to install itself&quot;</span></span>
+<span class="ln" id="L1153">        );</span>
+<span class="ln" id="L1154"></span>
+<span class="ln" id="L1155">        settings.prefs.hide_install_tab = true;</span>
+<span class="ln" id="L1156">        assert!(</span>
+<span class="ln" id="L1157">            !settings.<span class="tok-fn">show_install_tab</span>(false),</span>
+<span class="ln" id="L1158">            <span class="tok-str">&quot;the preference hides it on a portable copy&quot;</span></span>
+<span class="ln" id="L1159">        );</span>
+<span class="ln" id="L1160">        assert!(</span>
+<span class="ln" id="L1161">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
+<span class="ln" id="L1162">            <span class="tok-str">&quot;and an installed copy is still never offered it&quot;</span></span>
+<span class="ln" id="L1163">        );</span>
+<span class="ln" id="L1164">    }</span>
+<span class="ln" id="L1165"></span>
+<span class="ln" id="L1166">    <span class="tok-com">/// The tick is remembered. A preference that has to be set on every launch</span></span>
+<span class="ln" id="L1167">    <span class="tok-com">/// is not a preference.</span></span>
+<span class="ln" id="L1168">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1169">    <span class="tok-kw">fn</span> <span class="tok-fn">hiding_the_install_tab_survives_a_reload</span>() {</span>
+<span class="ln" id="L1170">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1171">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L1172">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1173">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L1174">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1175">        };</span>
+<span class="ln" id="L1176">        settings.<span class="tok-fn">set_hide_install_tab</span>(true);</span>
+<span class="ln" id="L1177">        assert!(</span>
+<span class="ln" id="L1178">            settings.<span class="tok-fn">save_error</span>().<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L1179">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
+<span class="ln" id="L1180">            settings.<span class="tok-fn">save_error</span>()</span>
+<span class="ln" id="L1181">        );</span>
+<span class="ln" id="L1182">        assert!(Prefs::<span class="tok-fn">load</span>(&amp;path).hide_install_tab);</span>
+<span class="ln" id="L1183">    }</span>
+<span class="ln" id="L1184"></span>
+<span class="ln" id="L1185">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1186">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_leaves_the_first_run_answered</span>() {</span>
+<span class="ln" id="L1187">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1188">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1189">            path: <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>)),</span>
+<span class="ln" id="L1190">            prefs: Prefs {</span>
+<span class="ln" id="L1191">                theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1192">                animations: false,</span>
+<span class="ln" id="L1193">                animated_icon: false,</span>
+<span class="ln" id="L1194">                configured: true,</span>
+<span class="ln" id="L1195">                notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1196">                failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1197">                live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1198">                hide_install_tab: false,</span>
+<span class="ln" id="L1199">                always_group: false,</span>
+<span class="ln" id="L1200">                seal_with_app_lock: false,</span>
+<span class="ln" id="L1201">                vault_dir: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1202">                vault_tool: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1203">                vault_hidden: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1204">                autolock: false,</span>
+<span class="ln" id="L1205">                autolock_after: <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L1206">                autolock_floor: <span class="tok-kw">crate</span>::autolock::FLOOR_SECS,</span>
+<span class="ln" id="L1207">                autolock_ceiling: <span class="tok-kw">crate</span>::autolock::CEILING_SECS,</span>
+<span class="ln" id="L1208">                recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L1209">            },</span>
+<span class="ln" id="L1210">            page: Page::Storage,</span>
+<span class="ln" id="L1211">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1212">        };</span>
+<span class="ln" id="L1213"></span>
+<span class="ln" id="L1214">        <span class="tok-kw">let</span> configured = settings.prefs.configured;</span>
+<span class="ln" id="L1215">        settings.prefs = Prefs {</span>
+<span class="ln" id="L1216">            configured,</span>
+<span class="ln" id="L1217">            ..Prefs::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1218">        };</span>
+<span class="ln" id="L1219">        settings.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L1220"></span>
+<span class="ln" id="L1221">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1222">        assert!(settings.prefs.animations);</span>
+<span class="ln" id="L1223">        assert!(</span>
+<span class="ln" id="L1224">            settings.prefs.configured,</span>
+<span class="ln" id="L1225">            <span class="tok-str">&quot;reset must not ask the first-run question again&quot;</span></span>
+<span class="ln" id="L1226">        );</span>
+<span class="ln" id="L1227">    }</span>
+<span class="ln" id="L1228"></span>
+<span class="ln" id="L1229">    <span class="tok-com">/// Loading must survive a settings file full of nonsense.</span></span>
+<span class="ln" id="L1230">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1231">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_file_leaves_a_usable_panel_that_says_so</span>() {</span>
+<span class="ln" id="L1232">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1233">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L1234">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;this is not a settings file\n@@@@\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1235"></span>
+<span class="ln" id="L1236">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1237">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
+<span class="ln" id="L1238">            path: <span class="tok-fn">Some</span>(path),</span>
+<span class="ln" id="L1239">            page: Page::Storage,</span>
+<span class="ln" id="L1240">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1241">        };</span>
+<span class="ln" id="L1242">        assert!(settings.prefs.recovered_from_corrupt_file);</span>
+<span class="ln" id="L1243">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1244">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
+<span class="ln" id="L1245">    }</span>
+<span class="ln" id="L1246">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

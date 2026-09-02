@@ -38,6 +38,189 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-fourth round: the same symptom, and the cause this time
+
+Six defects (F-122 to F-127). The round exists because the previous one
+declared the idle window fixed and it was not. That is worth stating plainly at
+the top rather than working up to: v0.1.16 removed a repaint timer, measured an
+improvement, and shipped a window still drawing sixty frames a second when
+nobody was touching it. The measurement was real and the conclusion drawn from
+it was wrong, because the thing measured was one cause among two and the
+smaller one.
+
+What made the difference this time was not more care. It was that the window
+toolkit, upgraded for other reasons, can be asked *why* it was told to draw.
+The answer took ten seconds to obtain and named a file and a line number. Four
+of the five findings below follow from asking a program a question instead of
+reasoning about it.
+
+### F-122 -- an untouched window drew sixty frames a second, to animate a logo
+
+`veilvoice-gui/src/soundbar.rs`.
+
+Measured with `egui::Context::repaint_causes` over ten seconds of an untouched
+window on the file tab: 559 of 566 frames were requested by line 117 of that
+file. That is the animated mark in the header, the row of bars that rises and
+falls, asking for another frame every 33 milliseconds for as long as the
+program was open, on every tab, whether or not anybody could see it.
+
+F-112 in the previous round found and removed a 500 ms repaint timer and
+recorded the idle window as costing nothing. It cost less. This was the rest of
+it, and it was four times larger.
+
+Two of its costs are ones a person notices rather than ones a profiler does. A
+laptop left open at this screen never lets its processor idle. And the reported
+symptom this whole line of work started from was that dragging the window lags:
+`egui` has no partial repaint, so animating 46 by 22 pixels means redrawing
+1400 by 1000, and every frame of a drag was competing with a full redraw
+nothing had asked for.
+
+The mark now moves only while somebody could be watching it: not while the
+window is unfocused, not while it is being moved or resized, and at twenty
+frames a second rather than thirty. The drag case is detected from the window's
+own rectangle changing between frames, which is the only signal either `egui`
+or `winit` offers for it, and it resumes a quarter of a second after the window
+stops.
+
+Pausing without resetting is deliberate and is a second, smaller defect avoided
+rather than introduced: the resting shape is every bar at the midpoint, so
+freezing there would make every click into another window snap the row flat. A
+paused mark holds the shape it had.
+
+Measured after: no frames at all on an untouched window, and 0.1 percent of one
+processor.
+
+### F-123 -- a library the packaging could not know about
+
+`crates/veilvoice-gui/Cargo.toml`, `packaging/debian/control`,
+`packaging/rpm/veilvoice.spec`.
+
+Upgrading `eframe` from 0.29 to 0.32 added a runtime dependency on
+`libxkbcommon-x11`, which the toolkit opens by name at startup rather than
+linking against. Nothing that derives a package's dependencies from a binary's
+linkage can see that: `dpkg-shlibdeps` and the RPM dependency generator both
+read what a binary links, and this is not linked.
+
+So the application compiled, packaged and installed perfectly and then aborted
+before drawing anything, on any machine without that library. It was found by
+running the built binary on this one, which did not have it.
+
+This is the shape worth recording rather than the library. A dependency that
+only exists at run time is invisible to every check this project runs before
+shipping: the build passes, the tests pass, the packages build, the archives
+verify. The only thing that finds it is starting the program somewhere it has
+not been started before, which is now what happens after every toolkit
+upgrade.
+
+Named explicitly in the `.deb` and the `.rpm`, installed in CI, and explained
+in the README's install block and in the guide.
+
+### F-124 -- every crash report named a cause it had not checked
+
+`veilvoice-gui/src/crashlog.rs`.
+
+Each report ended with the same paragraph: that the most likely cause is a
+machine that could not give the application an OpenGL context. That is a
+reasonable guess for a window that never appeared and it was printed under
+every panic regardless of what the panic said.
+
+F-123 is what made it a defect rather than a wording preference. The report for
+that failure carried the real message two lines up, "Library libxkbcommon-x11.so
+could not be loaded", and then sent the reader to look at their graphics
+driver. A report that confidently names a cause it did not check is worse than
+one that names none: the reader believes it.
+
+The note is now chosen from the panic message, and matched on the shape of a
+loader's complaint rather than on one library's name, so the next dependency of
+this kind is covered without an edit. Anything unrecognised keeps the graphics
+note, which remains the best guess when there is nothing else to go on.
+
+### F-125 -- the screenshot harness cut two tabs off unless you knew better
+
+`tools/shots/gui.sh`.
+
+The harness captured at 1400 by 1000 by default. Two tabs are taller than that:
+`group` needs 1315 and `install` needs 1095, and both came out with their
+bottoms missing.
+
+The committed pictures were the right size, which is why this survived. They
+were right because whoever ran the script last passed a larger height by hand.
+A tool that produces correct output only for somebody who already knows the
+answer is not a tool, and the first person to run it without that knowledge was
+this round.
+
+It now captures tall enough for the longest tab and lets `fit.py` trim each
+picture back to its own content, with the existing floor keeping the short ones
+at the size the window actually is. No per-tab table, which would go stale the
+next time a panel grows a paragraph.
+
+### F-126 -- one version, twelve hand-kept copies, nothing checking them
+
+`Cargo.toml` and twelve other files.
+
+The workspace version was repeated by hand in the README's four install
+blocks, the reproducible-build example in two documents, the WiX recipe, the
+Homebrew formula, the Flatpak manifest, the RPM spec and the packaging
+documentation. Nothing derived any of them from `Cargo.toml`, and no check
+compared them.
+
+This document has recorded this shape more times than any other, most recently
+as F-121. What makes this instance worth its own number is where it lands. The
+README's install block is the first thing a new reader runs. A release that
+forgets to bump it hands them a command that downloads the *previous* version,
+and the verifier then confirms that download is genuine, because it is. The
+failure looks exactly like success.
+
+`tools/release/version.py` reads `Cargo.toml` and moves or checks every copy,
+and the check runs in `tools/verify.py` with every other generator. The three
+files that keep a history are handled differently: only their newest entry is
+checked, and setting a version prepends rather than edits, because rewriting a
+changelog to match the present is vandalism.
+
+### F-127 -- the guard on the front page's defect count was reading a quotation
+
+`tools/site-tests/css.test.js`.
+
+The front page states how many defects the audit has found. A suite check
+compares that against `docs/AUDIT.md` so the two cannot drift, which is the
+right idea and is why the number is a digit rather than a word.
+
+It matched the plain-text phrase `audit rounds (F-1 to F-N)`. The audit
+contains that phrase twice. Once as its verdict, and once *inside F-105's
+write-up*, where the stale verdict F-105 exists to describe is quoted in full.
+The quotation is earlier in the file, so the check read it.
+
+So the front page said "104 defects found and fixed across eighteen audit
+rounds" for six rounds, and this check passed every time, because it was
+comparing the page against a sentence that had been publicly identified as
+wrong and preserved as evidence. A guard reading the thing it was built to
+catch.
+
+The check is now anchored on the verdict's bold markers, which a quotation of a
+sentence does not carry, and it compares the round count as well as the defect
+count, because those two drifted separately the last time. The page now says
+126 and twenty-four.
+
+Worth stating in general terms, because this is the third guard in this project
+found to be checking the wrong text rather than checking nothing: a pattern
+matched against a document has to be anchored on something that cannot appear
+in prose *about* the thing being matched. Documentation that quotes its own
+history is documentation a loose pattern will match twice.
+
+### What was examined and found nothing
+
+**The layout after the toolkit upgrade.** Every tab was captured before and
+after and compared. The only difference is that the two links at the foot of
+the verify tab now render as links, which is an improvement the new version
+made on its own.
+
+**Hardware acceleration.** Checked rather than assumed: the defaults did
+already request a GPU context. They are now named in the source with the
+reasoning beside them, because a default is a property of the version in
+`Cargo.lock` and an upgrade can move it without a line of this project
+changing. The About tab reports the context actually obtained, read from the
+driver, so the claim and the fact are separately visible.
+
 ## The twenty-third round: what an idle window costs, measured for the first time
 
 Nine defects (F-113 to F-121). The round is different from the ones before it
@@ -2660,7 +2843,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1182 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1196 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4307,8 +4490,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and twenty-one defects found and fixed (F-1 to F-121), across
-twenty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and twenty-seven defects found and fixed (F-1 to F-127), across
+twenty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

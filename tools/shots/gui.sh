@@ -49,10 +49,25 @@ out="${1:-$here/assets/screenshots}"
 #
 # 1100x720 is what the window opens at, and it is too small for this: the tab
 # strip does not fit and the longest tab is cut off partway down, so the
-# picture shows a panel with its bottom missing. This is the same size
+# picture shows a panel with its bottom missing. 1400 across is the same width
 # `gui.ps1` uses, so the two scripts produce comparable images.
+#
+# The height is 1600 and that is not the height of the finished pictures.
+#
+# It used to be 1000, which is the height the window is meant to be, and two
+# tabs are taller than that: `group` needs 1315 and `install` needs 1095. Those
+# two came out with their bottoms cut off, and the committed pictures were the
+# right size only because whoever ran this last happened to know to pass a
+# bigger height. A tool that produces correct output only for somebody who
+# already knows the answer is not a tool.
+#
+# So it captures tall enough for the longest tab and `fit.py` trims each one
+# back to its own content afterwards, with a floor of 1000 so the short ones
+# stay the size the window actually is. Every tab gets a picture that fits it,
+# by measurement rather than by memory, and nothing here needs a per-tab table
+# that would go stale the next time a panel grows a paragraph.
 width="${SHOT_WIDTH:-1400}"
-height="${SHOT_HEIGHT:-1000}"
+height="${SHOT_HEIGHT:-1600}"
 
 for tool in Xvfb xwd; do
   command -v "$tool" >/dev/null 2>&1 || {

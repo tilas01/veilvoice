@@ -231,7 +231,12 @@ fn bar(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
             egui::Stroke::new(1.5, p::fg()),
         );
     }
-    painter.rect_stroke(rect, 2.0, egui::Stroke::new(1.0, p::border()));
+    painter.rect_stroke(
+        rect,
+        2.0,
+        egui::Stroke::new(1.0, p::border()),
+        egui::StrokeKind::Inside,
+    );
 
     let text = if db <= meter::FLOOR_DB {
         " -inf".to_string()
@@ -334,11 +339,11 @@ pub fn show(
                 .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-16.0, -16.0))
                 .order(egui::Order::Foreground)
                 .show(ctx, |ui| {
-                    egui::Frame::none()
+                    egui::Frame::new()
                         .fill(p::surface())
                         .stroke(egui::Stroke::new(1.0, p::border()))
-                        .rounding(8.0)
-                        .inner_margin(egui::Margin::symmetric(12.0, 8.0))
+                        .corner_radius(8)
+                        .inner_margin(egui::Margin::symmetric(12, 8))
                         .show(ui, |ui| {
                             action = row(ui, levels, preview, true);
                         });

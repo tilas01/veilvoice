@@ -29,6 +29,36 @@
 //! the battery cost behind. The caller decides by passing a [`Motion`], and the
 //! only way to animate is to ask for it.
 //!
+//! # Cost when it is switched on, which is the interesting one
+//!
+//! Motion is on by default, and this is the only thing in the application that
+//! moves without being asked to. Everything else draws when something happens.
+//! So with the default settings, on the file tab, doing nothing, the window was
+//! redrawing about sixty times a second for ever, and it was this: measured
+//! with `Context::repaint_causes`, which named line 117 of this file as the
+//! reason for 559 of 566 frames.
+//!
+//! An animated logo is not worth a permanently busy window, and two of the
+//! costs are ones a user actually notices rather than ones a profiler does.
+//! A laptop lid left open at this screen never lets the processor idle. And a
+//! window being dragged is competing, every frame, with a full redraw it did
+//! not need, which is what "it lags when I move it" is made of.
+//!
+//! So the mark now moves in the three circumstances where somebody can see it
+//! moving, and rests otherwise:
+//!
+//! - **Not while the window is unfocused.** A background window is still.
+//! - **Not while the window is being moved or resized.** Detected from the
+//!   window's own rectangle changing between frames, and resumed a quarter of
+//!   a second after it stops. This is the drag case specifically.
+//! - **Not faster than [`FRAMES_PER_SECOND`].** The cycle is 1.9 seconds long
+//!   and eased; twenty frames a second is indistinguishable from thirty here,
+//!   and costs two thirds as much.
+//!
+//! Resting is not the same as resetting. Freezing at the midpoint would make
+//! every click into another window snap the row flat, so a paused mark holds
+//! the shape it had when it paused and picks the cycle up from there.
+//!
 //! # In plain words
 //!
 //! The little row of bars in the corner that rises and falls.
@@ -42,10 +72,26 @@
 
 use crate::prefs::Motion;
 use crate::theme::palette as p;
-use egui::{Color32, Rect, Rounding, Sense, Ui, Vec2};
+use egui::{Color32, CornerRadius, Rect, Sense, Ui, Vec2};
 
 /// Seconds for one full rise and fall. Matches the website's `1.9s`.
 const PERIOD: f32 = 1.9;
+
+/// How often the mark is redrawn while it is moving.
+///
+/// Twenty rather than the thirty it used to ask for. Over a 1.9 second eased
+/// cycle the two are not tellable apart, and every one of these frames is a
+/// redraw of the whole window, not of the 46 by 22 pixels that changed: egui
+/// has no partial repaint, so the cheapest frame is the one not drawn.
+pub const FRAMES_PER_SECOND: u64 = 20;
+
+/// How long the window must hold still before the mark starts moving again.
+///
+/// A drag delivers a new window rectangle every few milliseconds, so anything
+/// shorter than this restarts the animation between two frames of the same
+/// drag and achieves nothing. A quarter of a second is below the point where
+/// somebody notices the mark was waiting.
+const SETTLE: f64 = 0.25;
 
 /// Per-bar phase offsets in seconds, matching the `animation-delay` values in
 /// `website/index.html`. Twelve bars, deliberately not in order, so the row
@@ -72,15 +118,85 @@ fn height_fraction(time: f32, delay: f32) -> f32 {
     MIN_FRACTION + (MAX_FRACTION - MIN_FRACTION) * eased
 }
 
+/// Whether the window is holding still enough for the mark to move.
+///
+/// Two questions, both asked of the window rather than of the application:
+/// does it have focus, and has its rectangle stopped changing.
+///
+/// The focus answer defaults to *yes* when the platform does not report one.
+/// A mark frozen for ever on a system that never says "focused" is a worse
+/// failure than one that animates when it did not have to, and there are
+/// window managers that do not send focus events at all.
+///
+/// The rectangle answer is how a drag is detected. There is no "the user is
+/// dragging me" signal in `egui` or `winit` to ask for; there is the window's
+/// own position and size, which changes on every frame of a drag and on no
+/// frame of anything else. Stored in `egui`'s temporary memory, so it lives
+/// exactly as long as the context and costs no field on any struct.
+fn window_is_settled(ctx: &egui::Context) -> bool {
+    let focused = ctx.input(|i| i.viewport().focused).unwrap_or(true);
+    if !focused {
+        return false;
+    }
+
+    let id = egui::Id::new("veilvoice-soundbar-window-rect");
+    let (rect, now) = ctx.input(|i| (i.viewport().outer_rect, i.time));
+    let Some(rect) = rect else {
+        // A platform that does not report the window rectangle cannot be
+        // asked whether it is moving. Treat it as still rather than never
+        // animating there.
+        return true;
+    };
+
+    let last: Option<(egui::Rect, f64)> = ctx.memory(|m| m.data.get_temp(id));
+    let moved_at = match last {
+        Some((was, when)) if was == rect => when,
+        _ => now,
+    };
+    ctx.memory_mut(|m| m.data.insert_temp(id, (rect, moved_at)));
+
+    let settled = now - moved_at >= SETTLE;
+    if !settled {
+        // Come back and look again once it could have settled, or the mark
+        // stays frozen after the drag ends until something else moves.
+        ctx.request_repaint_after(std::time::Duration::from_secs_f64(SETTLE));
+    }
+    settled
+}
+
+/// The clock the bars are drawn against, which is not always the real one.
+///
+/// While the mark is moving this is the application clock. While it is resting
+/// it is the moment it stopped, held in temporary memory, so the row keeps the
+/// shape it had rather than snapping to the midpoint the instant the window
+/// loses focus. Clicking away from the window and back should not make the
+/// logo jump.
+fn animation_clock(ctx: &egui::Context, moving: bool, time: f32) -> f32 {
+    let id = egui::Id::new("veilvoice-soundbar-clock");
+    if moving {
+        ctx.memory_mut(|m| m.data.insert_temp(id, time));
+        time
+    } else {
+        ctx.memory(|m| m.data.get_temp(id)).unwrap_or(time)
+    }
+}
+
 /// Draw the mark at `size`, returning the response so it can carry a tooltip.
 ///
 /// `time` is the application clock in seconds. When `motion` disallows
 /// movement every bar is drawn at its resting height and nothing is scheduled.
+/// When motion is allowed but the window is unfocused or being dragged, the
+/// bars hold their last shape and nothing is scheduled either.
 pub fn draw(ui: &mut Ui, size: Vec2, motion: Motion, time: f32) -> egui::Response {
     let (rect, response) = ui.allocate_exact_size(size, Sense::hover());
     if !ui.is_rect_visible(rect) {
         return response;
     }
+
+    // Asked once per draw, before any bar is positioned, so every bar in the
+    // row agrees about which frame this is.
+    let moving = motion.icon && window_is_settled(ui.ctx());
+    let time = animation_clock(ui.ctx(), moving, time);
 
     let bars = DELAYS.len();
     // A gap of a quarter of a bar's width, as on the website (5 px bar, 3 px
@@ -92,7 +208,7 @@ pub fn draw(ui: &mut Ui, size: Vec2, motion: Motion, time: f32) -> egui::Respons
     let left = rect.center().x - total / 2.0;
 
     let painter = ui.painter();
-    let rounding = Rounding::same((bar_width * 0.4).min(2.0));
+    let rounding = CornerRadius::same((bar_width * 0.4).min(2.0) as u8);
 
     for (index, delay) in DELAYS.iter().enumerate() {
         // At rest every bar sits at the midpoint, so a still mark reads as a
@@ -112,9 +228,12 @@ pub fn draw(ui: &mut Ui, size: Vec2, motion: Motion, time: f32) -> egui::Respons
     }
 
     // Only ask for another frame if something will actually differ in it.
-    if motion.icon {
+    // `moving`, not `motion.icon`: an unfocused or dragging window is not
+    // going to look different next frame, and asking anyway is how a window
+    // that appears to be doing nothing keeps a processor busy.
+    if moving {
         ui.ctx()
-            .request_repaint_after(std::time::Duration::from_millis(33));
+            .request_repaint_after(std::time::Duration::from_millis(1000 / FRAMES_PER_SECOND));
     }
 
     response
@@ -148,6 +267,65 @@ mod tests {
             false,
         )
     }
+
+    /// A frame of input describing a window: is it focused, where is it, and
+    /// what time is it. `None` for the rectangle stands for a platform that
+    /// does not report one.
+    fn frame(focused: Option<bool>, rect: Option<egui::Rect>, time: f64) -> egui::RawInput {
+        let mut input = egui::RawInput {
+            time: Some(time),
+            ..Default::default()
+        };
+        let id = egui::ViewportId::ROOT;
+        let viewport = input.viewports.entry(id).or_default();
+        viewport.focused = focused;
+        viewport.outer_rect = rect;
+        input
+    }
+
+    /// The bar heights drawn for one frame of that input.
+    fn heights_for(
+        ctx: &egui::Context,
+        input: egui::RawInput,
+        motion: Motion,
+        time: f32,
+    ) -> Vec<u32> {
+        let output = ctx.run(input, |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                draw(ui, egui::vec2(120.0, 40.0), motion, time);
+            });
+        });
+        let mut heights = Vec::new();
+        for clipped in output.shapes {
+            if let egui::Shape::Rect(r) = &clipped.shape {
+                heights.push((r.rect.height() * 100.0) as u32);
+            }
+        }
+        heights
+    }
+
+    /// The soonest repaint the context asked for after that frame.
+    fn soonest_after(
+        ctx: &egui::Context,
+        input: egui::RawInput,
+        motion: Motion,
+        time: f32,
+    ) -> std::time::Duration {
+        let output = ctx.run(input, |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                draw(ui, egui::vec2(120.0, 40.0), motion, time);
+            });
+        });
+        output
+            .viewport_output
+            .values()
+            .map(|v| v.repaint_delay)
+            .min()
+            .unwrap_or(std::time::Duration::MAX)
+    }
+
+    const SOMEWHERE: fn() -> egui::Rect =
+        || egui::Rect::from_min_size(egui::pos2(100.0, 100.0), egui::vec2(800.0, 600.0));
 
     fn still() -> Motion {
         Motion::resolve(
@@ -306,6 +484,190 @@ mod tests {
 
     /// The delays are copied from the website's markup; if that list changes
     /// and this one does not, the two marks stop matching.
+
+    #[test]
+    fn an_unfocused_window_does_not_animate() {
+        // The case that makes a laptop warm: the application is open behind
+        // something else and nobody can see the mark at all.
+        let ctx = egui::Context::default();
+        let rect = SOMEWHERE();
+        // Settle it first, focused, so the "unmoved for a quarter second"
+        // condition is satisfied and focus is the only thing being tested.
+        for step in 0..4 {
+            heights_for(
+                &ctx,
+                frame(Some(true), Some(rect), step as f64 * 0.2),
+                moving(),
+                step as f32 * 0.2,
+            );
+        }
+
+        let first = heights_for(&ctx, frame(Some(false), Some(rect), 2.0), moving(), 2.0);
+        let later = heights_for(&ctx, frame(Some(false), Some(rect), 2.9), moving(), 2.9);
+        assert_eq!(
+            first, later,
+            "the mark moved with the window unfocused, half a period apart"
+        );
+
+        let delay = soonest_after(&ctx, frame(Some(false), Some(rect), 3.5), moving(), 3.5);
+        assert!(
+            delay >= std::time::Duration::from_secs(1),
+            "an unfocused window is still driving the frame rate: {delay:?}"
+        );
+    }
+
+    #[test]
+    fn a_window_being_dragged_does_not_animate() {
+        // The reported symptom: dragging the window is jerky. Every frame of
+        // a drag delivers a new rectangle, and each one used to come with a
+        // full redraw this animation had asked for.
+        let ctx = egui::Context::default();
+        for step in 0..4 {
+            heights_for(
+                &ctx,
+                frame(Some(true), Some(SOMEWHERE()), step as f64 * 0.2),
+                moving(),
+                step as f32 * 0.2,
+            );
+        }
+        let settled = heights_for(
+            &ctx,
+            frame(Some(true), Some(SOMEWHERE()), 1.0),
+            moving(),
+            1.0,
+        );
+
+        // Now move it, one frame at a time, as a drag does.
+        let mut dragged = Vec::new();
+        for step in 0..6 {
+            let moved = SOMEWHERE().translate(egui::vec2(step as f32 * 7.0, 0.0));
+            let time = 1.0 + step as f64 * 0.05;
+            dragged.push(heights_for(
+                &ctx,
+                frame(Some(true), Some(moved), time),
+                moving(),
+                time as f32,
+            ));
+        }
+        for (index, shape) in dragged.iter().enumerate() {
+            assert_eq!(
+                shape, &settled,
+                "the mark advanced on drag frame {index}, which is the redraw \
+                 that competes with the window move"
+            );
+        }
+    }
+
+    #[test]
+    fn the_mark_starts_again_once_the_window_stops() {
+        // Pausing during a drag is only correct if it resumes afterwards. A
+        // permanently frozen logo is a different bug, not a fix.
+        let ctx = egui::Context::default();
+        let rect = SOMEWHERE();
+        let paused = heights_for(
+            &ctx,
+            frame(Some(true), Some(rect.translate(egui::vec2(9.0, 0.0))), 1.0),
+            moving(),
+            1.0,
+        );
+
+        // Hold still for longer than SETTLE, then look again half a period on.
+        let mut latest = paused.clone();
+        for step in 1..8 {
+            let time = 1.0 + step as f64 * 0.2;
+            latest = heights_for(
+                &ctx,
+                frame(Some(true), Some(rect), time),
+                moving(),
+                time as f32,
+            );
+        }
+        assert_ne!(
+            latest, paused,
+            "the mark never resumed after the window stopped moving"
+        );
+    }
+
+    #[test]
+    fn a_paused_mark_keeps_the_shape_it_had() {
+        // Freezing at the resting midpoint would make every click into another
+        // window snap the row flat, which is a new visible glitch traded for
+        // the old invisible one.
+        let ctx = egui::Context::default();
+        let rect = SOMEWHERE();
+        let mut running = Vec::new();
+        for step in 0..6 {
+            let time = step as f64 * 0.2;
+            running = heights_for(
+                &ctx,
+                frame(Some(true), Some(rect), time),
+                moving(),
+                time as f32,
+            );
+        }
+        let frozen = heights_for(&ctx, frame(Some(false), Some(rect), 1.4), moving(), 1.4);
+        assert_eq!(
+            frozen, running,
+            "losing focus changed the shape of the mark rather than holding it"
+        );
+    }
+
+    #[test]
+    fn a_platform_that_reports_nothing_still_animates() {
+        // No focus and no window rectangle: a mark frozen for ever there would
+        // be a worse failure than one that animates when it need not.
+        let ctx = egui::Context::default();
+        let mut delay = std::time::Duration::MAX;
+        for step in 0..4 {
+            delay = soonest_after(
+                &ctx,
+                frame(None, None, step as f64 * 0.1),
+                moving(),
+                step as f32 * 0.1,
+            );
+        }
+        assert!(
+            delay <= std::time::Duration::from_millis(1000 / FRAMES_PER_SECOND + 10),
+            "a platform reporting neither focus nor geometry stopped the mark: {delay:?}"
+        );
+    }
+
+    #[test]
+    fn the_frame_rate_is_the_documented_one() {
+        let ctx = egui::Context::default();
+        let rect = SOMEWHERE();
+        let mut delay = std::time::Duration::MAX;
+        for step in 0..6 {
+            delay = soonest_after(
+                &ctx,
+                frame(Some(true), Some(rect), step as f64 * 0.2),
+                moving(),
+                step as f32 * 0.2,
+            );
+        }
+        // What comes back is not what was asked for, and the difference is
+        // deliberate on egui's side: it subtracts one predicted frame from
+        // every delay so a repaint does not land late. So the reported figure
+        // is up to one frame short of the request, and a test comparing them
+        // for equality is asserting the frame rate of the machine it runs on.
+        let requested = std::time::Duration::from_millis(1000 / FRAMES_PER_SECOND);
+        let one_frame = std::time::Duration::from_millis(17);
+        assert!(
+            delay <= requested,
+            "asked to be repainted later than the rate this module documents: \
+             {delay:?} against {requested:?}"
+        );
+        assert!(
+            delay + one_frame >= requested,
+            "asked to be repainted far sooner than this module documents: \
+             {delay:?} against {requested:?}"
+        );
+        // A constant, so the compiler settles it: the whole point of this
+        // change was to ask for fewer whole-window redraws than the thirty a
+        // second it used to.
+        const { assert!(FRAMES_PER_SECOND < 30) };
+    }
+
     #[test]
     fn the_delays_match_the_website_markup() {
         let html = std::fs::read_to_string(
