@@ -239,6 +239,42 @@ extracts every fenced block in the guide that begins `VEILCONV1` and parses it,
 so a guide edited into something the program refuses fails the build, and so
 does a parser tightened past what the guide shows.
 
+### The rest of the command line, run rather than read
+
+Four findings in this round came from running the programs, so the remaining
+commands were run too. This is the part of a round worth recording precisely
+because it found nothing: "we looked and there was nothing" is a result, and
+the standard at the top of this document says so.
+
+Every subcommand was invoked with its input redirected, which is the condition
+that produced F-109, and each was given the arguments its own `--help`
+describes rather than the ones guessed at.
+
+| What was run | What it did |
+|---|---|
+| `guard init`, `guard check` | Wrote the record, then reported nothing changed. Says in its own output that the record is unsealed and that anything able to rewrite the files can rewrite it. |
+| `sentry plant`, `sentry check` | Planted a canary and reported it intact. |
+| A canary rewritten | Reported `rewritten: 2971 bytes at 4.23 bits/byte`, and exit 1. The entropy is the useful part: it is how encrypted rubbish looks. |
+| A canary deleted | Reported `gone -- deleted, or replaced by something written under another name`, and exit 1. |
+| `video` with no ffmpeg | Printed the exact command it would have run, said nothing was run, pointed at the page that needs nothing installed, and exited **0**. Nothing failed, so nothing is reported as failing. |
+| `capture status`, `list`, `calls` | Each reported, exit 0. |
+| `appctl check`, `log` | `No baseline yet`, exit 0. |
+| `volumes`, `accel`, `input`, `privilege`, `companions`, `policy status`, `info`, `devices`, `clean` | Each reported, exit 0. |
+| Unknown subcommands and missing arguments | Exit 2. Runtime failures exit 1. `--help` and `--version` exit 0. |
+
+Two things are worth drawing out of a table of successes.
+
+**The exit codes are already right, and that is not a small thing.** F-108 was
+an exit code: a verifier answering 0 about a directory the caller never named.
+Every other command distinguishes a usage error from a runtime failure from
+success, so a script can tell the three apart.
+
+**`video` exiting 0 without ffmpeg is a decision, not an oversight.** A missing
+optional tool is not a failure of the thing that was asked for: the page was
+written and plays everywhere. Reporting it as an error would teach a reader to
+ignore this program's errors, which is the same reasoning `veilvoice-verify`
+applies to a GnuPG that cannot run.
+
 ### Closing F-110's class rather than its instance
 
 F-110 is the fourth finding of one shape: a document describing the program,
