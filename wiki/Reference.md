@@ -171,6 +171,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`autolock.rs`|File-veilvoice-gui-autolock]] &middot; Locking the window again after a period of no use.
 - [[`crashlog.rs`|File-veilvoice-gui-crashlog]] &middot; Make a failure that produces no output produce some.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &middot; Asking for a file without stopping the window.
+- [[`graphics.rs`|File-veilvoice-gui-graphics]] &middot; What the window is drawn with, asked for explicitly and then reported.
 - [[`group.rs`|File-veilvoice-gui-group]] &middot; Group mode: several people in one recording, each with a name and a colour.
 - [[`integrity.rs`|File-veilvoice-gui-integrity]] &middot; The integrity record, taken and checked by the window rather than by hand.
 - [[`layout.rs`|File-veilvoice-gui-layout]] &middot; Centring a row of widgets, which egui does not do by nesting.

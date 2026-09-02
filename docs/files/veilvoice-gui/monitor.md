@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/monitor.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 414 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 419 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs)
 
 ## Contents
 
@@ -81,13 +81,13 @@ wrong.
 
 ## What this file contains
 
-414 lines defining **9 functions** (7 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+419 lines defining **9 functions** (7 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Style` (line 63) -- Where the monitor sits, or whether it is shown at all.
 - `struct Levels` (line 137) -- The smoothed levels the monitor and the live tab both draw.
-- `enum Action` (line 254) -- What the reader did with the monitor this frame.
+- `enum Action` (line 259) -- What the reader did with the monitor this frame.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -97,7 +97,7 @@ wrong.
 - `Style::from_key` (line 122) -- Read a style back.
 - `Levels::update` (line 161) -- Take a new reading.
 - `Levels::clear` (line 192) -- Back to nothing, for when a session stops.
-- `show` (line 313) -- Draw the monitor for this frame.
+- `show` (line 318) -- Draw the monitor for this frame.
   - reaches: `row`, `bar`
 
 ## What calls what
@@ -127,8 +127,8 @@ flowchart TD
     n_update(["Levels::update<br/>line 161"])
     n_clear(["Levels::clear<br/>line 192"])
     n_bar["bar<br/>line 203"]
-    n_row["row<br/>line 268"]
-    n_show(["show<br/>line 313"])
+    n_row["row<br/>line 273"]
+    n_show(["show<br/>line 318"])
     n_row --> n_bar
     n_show --> n_row
     click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L75" "open the source"
@@ -138,8 +138,8 @@ flowchart TD
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L161" "open the source"
     click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L192" "open the source"
     click n_bar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L203" "open the source"
-    click n_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L268" "open the source"
-    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L313" "open the source"
+    click n_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273" "open the source"
+    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_note,n_key,n_from_key,n_update,n_clear,n_show entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -163,9 +163,9 @@ flowchart TD
 | `Levels::update` <sub>pub fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L161) | Take a new reading. |
 | `Levels::clear` <sub>pub fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L192) | Back to nothing, for when a session stops. |
 | `bar` <sub>fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L203) | A compact bar, for the strip. |
-| `Action` <sub>pub enum</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L254) | What the reader did with the monitor this frame. |
-| `row` <sub>fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L268) | Draw the row itself. |
-| `show` <sub>pub fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L313) | Draw the monitor for this frame. |
+| `Action` <sub>pub enum</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L259) | What the reader did with the monitor this frame. |
+| `row` <sub>fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273) | Draw the row itself. |
+| `show` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318) | Draw the monitor for this frame. |
 
 ---
 

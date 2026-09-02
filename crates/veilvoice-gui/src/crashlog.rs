@@ -111,13 +111,9 @@ pub fn write(path: &Path, kind: &str, detail: &str) {
     text.push_str(
         "\n\n\
          This file was written on your machine and sent nowhere. VeilVoice has\n\
-         no network code at all. Delete it whenever you like.\n\n\
-         If the window never appeared, the most likely cause is that this\n\
-         computer could not give the application an OpenGL context. This is common\n\
-         in a virtual machine, over a remote desktop session, or with hybrid\n\
-         graphics. The command-line tool `veilvoice` does the same work and\n\
-         needs no graphics at all.\n",
+         no network code at all. Delete it whenever you like.\n\n",
     );
+    text.push_str(&advice(detail));
 
     if let Some(parent) = path.parent() {
         let _ = std::fs::create_dir_all(parent);
@@ -126,6 +122,65 @@ pub fn write(path: &Path, kind: &str, detail: &str) {
         let _ = file.write_all(text.as_bytes());
         let _ = file.flush();
     }
+}
+
+/// The paragraph that tries to be useful about *this* failure.
+///
+/// # Why this is not one paragraph
+///
+/// It was. Every report ended with the same note about OpenGL contexts, which
+/// is the right guess for a window that never appeared and the wrong one for
+/// most of the ways this program can actually fail. A report that confidently
+/// names a cause it did not check is worse than one that names none: it sends
+/// the reader to look at their graphics driver while the real message, two
+/// lines above, says a keyboard library is missing.
+///
+/// That happened here rather than in theory. Upgrading the window toolkit
+/// added a runtime dependency on `libxkbcommon-x11`, which is opened by name
+/// at startup and therefore invisible to every packaging tool that works out
+/// dependencies from what a binary links against. On a machine without it the
+/// application built, installed and packaged perfectly and then aborted before
+/// drawing anything, and the report blamed the GPU.
+///
+/// So the note is chosen from the panic message. The library case names the
+/// library and the package that carries it on each family of Linux; anything
+/// unrecognised keeps the graphics note, which remains the best guess when
+/// there is nothing else to go on.
+fn advice(detail: &str) -> String {
+    if let Some(library) = missing_library(detail) {
+        return format!(
+            "This looks like a missing system library rather than a fault in\n\
+             VeilVoice: {library} could not be opened. It is a shared library the\n\
+             window toolkit loads by name at startup, so a package manager\n\
+             cannot tell it is needed and will not have pulled it in.\n\n\
+             On Debian and Ubuntu:  sudo apt install libxkbcommon-x11-0\n\
+             On Fedora and RHEL:    sudo dnf install libxkbcommon-x11\n\
+             On Arch:               sudo pacman -S libxkbcommon-x11\n\
+             On Alpine:             sudo apk add libxkbcommon-x11\n\n\
+             The command-line tool `veilvoice` does the same work and needs\n\
+             none of this.\n"
+        );
+    }
+
+    "If the window never appeared, the most likely cause is that this\n     computer could not give the application an OpenGL context. This is common\n     in a virtual machine, over a remote desktop session, or with hybrid\n     graphics. The command-line tool `veilvoice` does the same work and\n     needs no graphics at all.\n"
+        .to_string()
+}
+
+/// The name of the shared library a panic message says could not be loaded.
+///
+/// Matched on the shape of the message rather than on one library's name, so
+/// the next toolkit upgrade that adds one is covered without an edit here.
+/// `xkbcommon-dl` writes "Library libfoo.so could not be loaded."; the same
+/// shape covers the other dynamic loaders in this dependency graph.
+fn missing_library(detail: &str) -> Option<&str> {
+    let lowered = detail.to_ascii_lowercase();
+    if !lowered.contains("could not be loaded") && !lowered.contains("cannot open shared object") {
+        return None;
+    }
+    detail
+        .split_whitespace()
+        .find(|word| word.contains(".so") || word.contains(".dll") || word.contains(".dylib"))
+        .map(|word| word.trim_matches(|c: char| !c.is_ascii_graphic() || c == ',' || c == ':'))
 }
 
 /// Install the panic hook. Call once, as early in `main` as possible.
@@ -228,6 +283,50 @@ mod tests {
             "no alternative offered: {text}"
         );
         let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    #[test]
+    fn a_missing_library_is_named_instead_of_the_graphics_card() {
+        // The failure this was written for: the window toolkit opens
+        // libxkbcommon-x11 by name at startup, so nothing that derives
+        // dependencies from linkage knows it is needed. The old report sent
+        // the reader to look at their GPU.
+        let path = scratch("library");
+        write(
+            &path,
+            "a panic",
+            "Library libxkbcommon-x11.so could not be loaded.",
+        );
+        let text = std::fs::read_to_string(&path).expect("written");
+        assert!(
+            text.contains("libxkbcommon-x11.so"),
+            "the library was not named: {text}"
+        );
+        assert!(
+            text.contains("apt install") && text.contains("dnf install"),
+            "no way to fix it was offered: {text}"
+        );
+        assert!(
+            !text.contains("OpenGL"),
+            "still blaming the graphics stack for a missing library: {text}"
+        );
+        let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    #[test]
+    fn the_loader_message_shape_is_matched_not_one_library_name() {
+        // The next toolkit upgrade that adds a loaded-by-name library should
+        // be covered without an edit here.
+        assert_eq!(
+            missing_library("Library libsomething-else.so could not be loaded."),
+            Some("libsomething-else.so")
+        );
+        assert_eq!(
+            missing_library("libfoo.so.1: cannot open shared object file"),
+            Some("libfoo.so.1")
+        );
+        assert_eq!(missing_library("index out of bounds"), None);
+        assert_eq!(missing_library("the window could not be created"), None);
     }
 
     #[test]

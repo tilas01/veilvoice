@@ -643,11 +643,11 @@ impl Group {
     /// This is the part the request was actually about. A mode you can only
     /// tell is on by reading a checkbox is a mode that gets left on.
     fn strip(&mut self, ui: &mut Ui) {
-        egui::Frame::none()
+        egui::Frame::new()
             .fill(p::bg_dark())
             .stroke(egui::Stroke::new(1.0, p::border()))
-            .rounding(8.0)
-            .inner_margin(egui::Margin::symmetric(14.0, 12.0))
+            .corner_radius(8)
+            .inner_margin(egui::Margin::symmetric(14, 12))
             .show(ui, |ui| {
                 ui.horizontal_wrapped(|ui| {
                     for slot in 0..self.people.len() {
@@ -686,8 +686,12 @@ impl Group {
                 let (rect, response) =
                     ui.allocate_exact_size(egui::vec2(22.0, 22.0), egui::Sense::click());
                 ui.painter().rect_filled(rect, 5.0, colour);
-                ui.painter()
-                    .rect_stroke(rect, 5.0, egui::Stroke::new(1.0, p::border()));
+                ui.painter().rect_stroke(
+                    rect,
+                    5.0,
+                    egui::Stroke::new(1.0, p::border()),
+                    egui::StrokeKind::Inside,
+                );
                 if response.clicked() {
                     self.picking = if self.picking == Some(slot) {
                         None
@@ -746,11 +750,11 @@ impl Group {
     /// from them looks like part of the same thing. Grouped by palette and
     /// named, because "the third blue" is not a thing anybody can ask for.
     fn palette_picker(&mut self, ui: &mut Ui, slot: usize) {
-        egui::Frame::none()
+        egui::Frame::new()
             .fill(p::surface())
             .stroke(egui::Stroke::new(1.0, p::border()))
-            .rounding(6.0)
-            .inner_margin(egui::Margin::same(10.0))
+            .corner_radius(6)
+            .inner_margin(egui::Margin::same(10))
             .show(ui, |ui| {
                 ui.label(
                     RichText::new("the ten a slot can be given")
@@ -798,6 +802,7 @@ impl Group {
                     p::border()
                 }
             }),
+            egui::StrokeKind::Inside,
         );
         if response.clicked() {
             self.people[slot].colour = Some(colour);

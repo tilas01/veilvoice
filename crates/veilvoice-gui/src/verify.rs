@@ -507,8 +507,12 @@ impl Verify {
         } else {
             (p::border(), p::muted(), "drop files here")
         };
-        ui.painter()
-            .rect_stroke(rect, 9.0, egui::Stroke::new(1.5, edge));
+        ui.painter().rect_stroke(
+            rect,
+            9.0,
+            egui::Stroke::new(1.5, edge),
+            egui::StrokeKind::Inside,
+        );
         ui.painter().text(
             rect.center(),
             egui::Align2::CENTER_CENTER,
@@ -733,7 +737,7 @@ impl Verify {
                     Checker::Wsl => "GnuPG inside WSL",
                 };
                 if ui
-                    .add_enabled(usable, egui::SelectableLabel::new(chosen, label))
+                    .add_enabled(usable, egui::Button::selectable(chosen, label))
                     .clicked()
                 {
                     self.checker = Some(*choice);

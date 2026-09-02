@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-gui/src/soundbar.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 360 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 722 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
 
 ## Contents
 
 - [The same mark as the website](#the-same-mark-as-the-website)
 - [Why it is drawn rather than rendered from a GIF](#why-it-is-drawn-rather-than-rendered-from-a-gif)
 - [Cost when it is switched off](#cost-when-it-is-switched-off)
+- [Cost when it is switched on, which is the interesting one](#cost-when-it-is-switched-on-which-is-the-interesting-one)
 - [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
@@ -53,6 +54,36 @@ schedules a frame every 16 ms has turned the animation off visually and left
 the battery cost behind. The caller decides by passing a `Motion`, and the
 only way to animate is to ask for it.
 
+# Cost when it is switched on, which is the interesting one
+
+Motion is on by default, and this is the only thing in the application that
+moves without being asked to. Everything else draws when something happens.
+So with the default settings, on the file tab, doing nothing, the window was
+redrawing about sixty times a second for ever, and it was this: measured
+with `Context::repaint_causes`, which named line 117 of this file as the
+reason for 559 of 566 frames.
+
+An animated logo is not worth a permanently busy window, and two of the
+costs are ones a user actually notices rather than ones a profiler does.
+A laptop lid left open at this screen never lets the processor idle. And a
+window being dragged is competing, every frame, with a full redraw it did
+not need, which is what "it lags when I move it" is made of.
+
+So the mark now moves in the three circumstances where somebody can see it
+moving, and rests otherwise:
+
+- **Not while the window is unfocused.** A background window is still.
+- **Not while the window is being moved or resized.** Detected from the
+window's own rectangle changing between frames, and resumed a quarter of
+a second after it stops. This is the drag case specifically.
+- **Not faster than `FRAMES_PER_SECOND`.** The cycle is 1.9 seconds long
+and eased; twenty frames a second is indistinguishable from thirty here,
+and costs two thirds as much.
+
+Resting is not the same as resetting. Freezing at the midpoint would make
+every click into another window snap the row flat, so a paused mark holds
+the shape it had when it paused and picks the cycle up from there.
+
 # In plain words
 
 The little row of bars in the corner that rises and falls.
@@ -66,12 +97,12 @@ ignores it is animation that makes an application unusable for them.
 
 ## What this file contains
 
-360 lines defining **3 functions** (1 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+722 lines defining **5 functions** (1 public), **0 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `draw` (line 79) -- Draw the mark at size, returning the response so it can carry a tooltip.
-  - reaches: `colour_for`, `height_fraction`
+- `draw` (line 190) -- Draw the mark at size, returning the response so it can carry a tooltip.
+  - reaches: `animation_clock`, `colour_for`, `height_fraction`, `window_is_settled`
 
 ## What calls what
 
@@ -93,18 +124,24 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_height_fraction["height_fraction<br/>line 63"]
-    n_draw(["draw<br/>line 79"])
-    n_colour_for["colour_for<br/>line 125"]
+    n_height_fraction["height_fraction<br/>line 109"]
+    n_window_is_settled["window_is_settled<br/>line 136"]
+    n_animation_clock["animation_clock<br/>line 174"]
+    n_draw(["draw<br/>line 190"])
+    n_colour_for["colour_for<br/>line 244"]
+    n_draw --> n_animation_clock
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
-    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L63" "open the source"
-    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L79" "open the source"
-    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L125" "open the source"
+    n_draw --> n_window_is_settled
+    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109" "open the source"
+    click n_window_is_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136" "open the source"
+    click n_animation_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L190" "open the source"
+    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L244" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_draw entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_height_fraction,n_colour_for helper
+    class n_height_fraction,n_window_is_settled,n_animation_clock,n_colour_for helper
 ```
 
 </details>
@@ -113,13 +150,17 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `PERIOD` <sub>const</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L48) | Seconds for one full rise and fall. |
-| `DELAYS` <sub>const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L53) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
-| `MIN_FRACTION` <sub>const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L58) | Height as a fraction of the available box, matching 16% and 82%. |
-| `MAX_FRACTION` <sub>const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L59) |  |
-| `height_fraction` <sub>fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L63) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
-| `draw` <sub>pub fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L79) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `colour_for` <sub>fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L125) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
+| `PERIOD` <sub>const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L78) | Seconds for one full rise and fall. |
+| `FRAMES_PER_SECOND` <sub>pub const</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L86) | How often the mark is redrawn while it is moving. |
+| `SETTLE` <sub>const</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L94) | How long the window must hold still before the mark starts moving again. |
+| `DELAYS` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L99) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
+| `MIN_FRACTION` <sub>const</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L104) | Height as a fraction of the available box, matching 16% and 82%. |
+| `MAX_FRACTION` <sub>const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L105) |  |
+| `height_fraction` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
+| `window_is_settled` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136) | Whether the window is holding still enough for the mark to move. |
+| `animation_clock` <sub>fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174) | The clock the bars are drawn against, which is not always the real one. |
+| `draw` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L190) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `colour_for` <sub>fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L244) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
 
 ---
 

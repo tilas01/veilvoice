@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/theme.svg" alt="theme.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/theme.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 783 lines &middot; <a href="theme.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 784 lines &middot; <a href="theme.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#one-palette-three-front-ends">One palette, three front-ends</a>
@@ -63,7 +63,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>783 lines defining <strong>8 functions</strong> (7 public), <strong>1 type</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>784 lines defining <strong>8 functions</strong> (7 public), <strong>1 type</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Theme</code> <span style="color:var(--muted)">line 54</span> &middot; One complete colour scheme.</li>
 </ul>
@@ -135,7 +135,7 @@
 <a href="theme.src.html#fn-install">
 <rect x="281.1" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="327.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="327.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 458</text>
+<text x="327.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 459</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -161,7 +161,7 @@ flowchart TD
     n_set_by_id([&quot;set_by_id&lt;br/&gt;line 315&quot;])
     n_user_font_paths[&quot;user_font_paths&lt;br/&gt;line 420&quot;]
     n_install_fonts([&quot;install_fonts&lt;br/&gt;line 435&quot;])
-    n_install[&quot;install&lt;br/&gt;line 458&quot;]
+    n_install[&quot;install&lt;br/&gt;line 459&quot;]
     n_active --&gt; n_themes
     n_by_id --&gt; n_themes
     n_install --&gt; n_active
@@ -175,7 +175,7 @@ flowchart TD
     click n_set_by_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L315&quot; &quot;open the source&quot;
     click n_user_font_paths href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420&quot; &quot;open the source&quot;
     click n_install_fonts href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L458&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L459&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load_custom,n_set_by_id,n_install_fonts entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -202,7 +202,7 @@ flowchart TD
 <tr><td><code>JETBRAINS_MONO_PATHS</code> <sub>const</sub></td><td><a href="theme.src.html#fn-jetbrains_mono_paths">408</a></td><td>Places JetBrains Mono is normally installed.</td></tr>
 <tr><td><code>user_font_paths</code> <sub>fn</sub></td><td><a href="theme.src.html#fn-user_font_paths">420</a></td><td></td></tr>
 <tr><td><code>install_fonts</code> <sub>pub fn</sub></td><td><a href="theme.src.html#fn-install_fonts">435</a></td><td>Load JetBrains Mono if the system has it.</td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="theme.src.html#fn-install">458</a></td><td>Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="theme.src.html#fn-install">459</a></td><td>Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</td></tr>
 </tbody></table>
 </section>
 </div></div>

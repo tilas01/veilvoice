@@ -36,7 +36,7 @@
 //! drift apart. Choosing one applies it straight away and it is remembered for
 //! next time.
 
-use egui::{Color32, FontFamily, FontId, Rounding, Stroke, TextStyle, Visuals};
+use egui::{Color32, CornerRadius, FontFamily, FontId, Stroke, TextStyle, Visuals};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::OnceLock;
 
@@ -438,9 +438,10 @@ pub fn install_fonts(ctx: &egui::Context) -> bool {
             continue;
         };
         let mut fonts = egui::FontDefinitions::default();
-        fonts
-            .font_data
-            .insert("jetbrains".to_owned(), egui::FontData::from_owned(bytes));
+        fonts.font_data.insert(
+            "jetbrains".to_owned(),
+            std::sync::Arc::new(egui::FontData::from_owned(bytes)),
+        );
         for family in [FontFamily::Monospace, FontFamily::Proportional] {
             fonts
                 .families
@@ -475,7 +476,7 @@ pub fn install(ctx: &egui::Context) {
     visuals.selection.stroke = Stroke::new(1.0, p::blue());
     visuals.hyperlink_color = p::cyan();
 
-    let rounding = Rounding::same(4.0);
+    let rounding = CornerRadius::same(4);
     for (widget, fill) in [
         (&mut visuals.widgets.noninteractive, p::bg_dark()),
         (&mut visuals.widgets.inactive, p::surface()),
@@ -485,7 +486,7 @@ pub fn install(ctx: &egui::Context) {
     ] {
         widget.bg_fill = fill;
         widget.weak_bg_fill = fill;
-        widget.rounding = rounding;
+        widget.corner_radius = rounding;
         widget.bg_stroke = Stroke::new(1.0, p::border());
         widget.fg_stroke = Stroke::new(1.0, p::fg());
     }
