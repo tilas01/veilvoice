@@ -237,6 +237,85 @@ function run() {
   }
 
   failures += changelogDates(fail, pass);
+  failures += releaseDatesAgree(fail, pass);
+  return failures;
+}
+
+/**
+ * A release is dated the same day in every file that dates it.
+ *
+ * Three files record when each version came out, by hand and separately: the
+ * Debian changelog, the RPM spec's `%changelog`, and the AppStream metainfo
+ * the Flatpak ships. Nothing derives any of them from the others.
+ *
+ * They agree today. This is here because the weekday check above exists: that
+ * defect was one wrong date copied into two of these three files, which is
+ * proof that they are edited together, by hand, and can part company. A
+ * software centre shows the metainfo date and a distribution shows the
+ * changelog, so a reader can be told two different days a release happened.
+ *
+ * Only versions a file actually mentions are compared. The RPM spec's history
+ * reaches further back than the others, and that is not drift.
+ */
+function releaseDatesAgree(fail, pass) {
+  let failures = 0;
+  const MONTHS = {
+    Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
+    Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
+  };
+  const dated = new Map();
+  const note = (version, where, date) => {
+    if (!dated.has(version)) { dated.set(version, new Map()); }
+    dated.get(version).set(where, date);
+  };
+
+  // AppStream: <release version="0.1.16" date="2026-09-01"/>
+  const meta = read("packaging/flatpak/io.github.tilas01.VeilVoice.metainfo.xml");
+  for (const m of meta.matchAll(/<release\s+version="([\d.]+)"\s+date="([\d-]+)"/g)) {
+    note(m[1], "the Flatpak metainfo", m[2]);
+  }
+
+  // RPM: * Tue Sep 01 2026 Name <mail> - 0.1.16-1
+  const spec = read("packaging/rpm/veilvoice.spec");
+  const changelog = spec.slice(spec.indexOf("%changelog"));
+  for (const m of changelog.matchAll(
+    /^\* \w{3} (\w{3}) (\d{2}) (\d{4})[^\n]*?-\s*([\d.]+)-\d/gm
+  )) {
+    note(m[4], "the RPM spec", `${m[3]}-${MONTHS[m[1]] || "??"}-${m[2]}`);
+  }
+
+  // Debian: the version heading, then the ` -- ` line that closes that entry.
+  const deb = read("packaging/debian/changelog");
+  const versions = [...deb.matchAll(/^veilvoice \(([\d.]+)-\d\)/gm)].map((m) => m[1]);
+  const stamps = [...deb.matchAll(/^ -- .*?>\s+\w{3}, (\d{2}) (\w{3}) (\d{4})/gm)];
+  versions.forEach((version, at) => {
+    const m = stamps[at];
+    if (m) { note(version, "the Debian changelog", `${m[3]}-${MONTHS[m[2]] || "??"}-${m[1]}`); }
+  });
+
+  let compared = 0;
+  for (const [version, places] of dated) {
+    if (places.size < 2) { continue; }
+    compared += 1;
+    const days = new Set(places.values());
+    if (days.size > 1) {
+      failures += 1;
+      const said = [...places]
+        .map(([where, day]) => `${where} says ${day}`)
+        .join(", and ");
+      fail(`version ${version} is dated differently in each file: ${said}. A ` +
+           "software centre shows one of these and a distribution shows " +
+           "another, so a reader is told two days a release happened.");
+    }
+  }
+
+  if (compared === 0) {
+    failures += 1;
+    fail("no version is dated in more than one packaging file, so this check " +
+         "is comparing nothing");
+  } else if (failures === 0) {
+    pass(`${compared} release(s) are dated the same day in every file that dates them`);
+  }
   return failures;
 }
 
