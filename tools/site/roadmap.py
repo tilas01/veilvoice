@@ -114,6 +114,34 @@ def markers(text):
                 break
         return title
 
+    # A line that looks like a marker row and does not parse is not skipped.
+    #
+    # `63b` was such a row. It sat in a table between 63 and the next section,
+    # written exactly like its neighbours, carrying a status like its
+    # neighbours, and `ROW` requires a plain integer, so it matched nothing and
+    # was dropped without a word. It never appeared on the website, never
+    # appeared in the picture, and was in no count of anything, for as long as
+    # it existed.
+    #
+    # A parser that silently ignores what it cannot read turns a typo into an
+    # invisible item, which is the worst of both: the document says the work is
+    # tracked and nothing tracks it. So anything shaped like a row and not
+    # matched is a failure here, loudly, rather than a gap nobody sees.
+    looks_like_a_row = re.compile(r"^\|\s*[^|\s]+\s*\|.*\|\s*\*\*\w+\*\*\s*\|", re.M)
+    parsed_at = {m.start() for m in ROW.finditer(text)}
+    for candidate in looks_like_a_row.finditer(text):
+        if candidate.start() in parsed_at:
+            continue
+        if section_of(candidate.start()) in SKIP_SECTIONS:
+            continue
+        raise SystemExit(
+            "a row in ROADMAP.md looks like a marker and does not parse:\n"
+            "    %s\n"
+            "  A row needs a plain integer, a marker, and a bold status of\n"
+            "  done, next, planned or blocked. Fix the row: a row this cannot\n"
+            "  read is a row that appears nowhere."
+            % candidate.group(0).strip()[:120])
+
     out = []
     for match in ROW.finditer(text):
         title = section_of(match.start())
@@ -129,6 +157,63 @@ def markers(text):
             "status": match.group("status"),
             "estimate": estimate,
         })
+    return out
+
+
+def split_marker(marker):
+    """A marker's bold title, and the rest of it.
+
+    Every row in `ROADMAP.md` is written as `**A short name**: what that
+    actually means`, and the page used to print the whole string as one line.
+    In a list of a hundred that reads as a wall: the name and the explanation
+    have the same weight, so neither is scannable and the explanation is not
+    reachable except by reading every word of it.
+
+    Split here rather than in the template, because a handful of the oldest
+    rows have no bold title at all and the caller should not have to know
+    which. Those come back with no title and their whole text as the detail,
+    which renders as it always did.
+    """
+    match = re.match(r"^\*\*(?P<title>.+?)\*\*\s*[:.]?\s*(?P<detail>.*)$", marker,
+                     re.S)
+    if not match:
+        return "", marker
+    return match.group("title"), match.group("detail").strip()
+
+
+def anchor(title):
+    """A stable `#id` for a section heading.
+
+    The same shape GitHub gives a heading, so a link written against the
+    document works against the page: lowercased, spaces to hyphens, everything
+    else dropped.
+    """
+    slug = re.sub(r"[^a-z0-9\s-]", "", title.lower())
+    return re.sub(r"\s+", "-", slug.strip())
+
+
+def prose_for(text, sections):
+    """The paragraphs a section opens with, before its table.
+
+    This is where the reasoning behind a group of markers is written, and the
+    page threw all of it away: it kept the rows and dropped the sentences that
+    say why the rows exist. A reader of the page saw a list; a reader of the
+    document saw an argument.
+    """
+    out = {}
+    for index, (start, title) in enumerate(sections):
+        end = sections[index + 1][0] if index + 1 < len(sections) else len(text)
+        chunk = text[start:end]
+        # Everything between the heading and the first table row or the first
+        # horizontal rule, whichever comes first.
+        body_text = chunk.split("\n", 1)[1] if "\n" in chunk else ""
+        lines = []
+        for line in body_text.split("\n"):
+            if line.startswith("|") or line.startswith("---"):
+                break
+            lines.append(line)
+        paragraphs = [p.strip() for p in "\n".join(lines).split("\n\n") if p.strip()]
+        out[title] = paragraphs
     return out
 
 
@@ -415,7 +500,31 @@ def wrap(text, columns):
 
 # --- the page ----------------------------------------------------------------
 
-def body(colours, groups, counts, generated_at):
+def marker_html(title, detail):
+    """A marker's name in bold and its explanation after it."""
+    if not title:
+        return docs.inline_html(detail)
+    if not detail:
+        return "<strong>%s</strong>" % docs.inline_html(title)
+    return '<strong>%s</strong> <span class="marker-detail">%s</span>' % (
+        docs.inline_html(title), docs.inline_html(detail))
+
+
+def marker_item(row):
+    """One list entry, addressable on its own.
+
+    The number is the link. A roadmap item somebody wants to point at is the
+    unit of conversation about this project, and until now the only way to send
+    one was to send the whole page and say which paragraph.
+    """
+    title, detail = split_marker(row["marker"])
+    return ('<li id="m%d"><a class="marker-link" href="#m%d" '
+            'aria-label="link to item %d">%d</a> %s</li>'
+            % (row["number"], row["number"], row["number"], row["number"],
+               marker_html(title, detail)))
+
+
+def body(colours, groups, counts, generated_at, prose):
     """The page under the picture: the same markers, as readable rows."""
     total = sum(counts.values())
     done = counts.get("done", 0)
@@ -462,26 +571,58 @@ def body(colours, groups, counts, generated_at):
     outstanding = [row for _, rows in groups for row in rows
                    if row["status"] in ("next", "planned")]
     for row in outstanding:
-        add("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>"
-            % (row["number"], docs.inline_html(row["marker"]),
-               docs.esc(row["status"]), docs.esc(row["estimate"] or "not estimated")))
+        title, detail = split_marker(row["marker"])
+        add('<tr id="m%d"><td><a class="marker-link" href="#m%d" '
+            'aria-label="link to item %d">%d</a></td><td>%s</td><td>%s</td>'
+            "<td>%s</td></tr>"
+            % (row["number"], row["number"], row["number"], row["number"],
+               marker_html(title, detail), docs.esc(row["status"]),
+               docs.esc(row["estimate"] or "not estimated")))
     add("</tbody></table>")
 
+    # Written for the case where there are none, because there are none now
+    # and a heading over an empty list reads as a page that failed to load.
+    blocked = [r for _, rows in groups for r in rows if r["status"] == "blocked"]
     add('<h2 id="blocked">Blocked, and why that is not the same as late</h2>')
-    add('<p>These are waiting on a decision or on somebody else&#8217;s rules '
-        'rather than on effort. Working harder does not move them, and '
-        '<a href="https://github.com/%s/blob/%s/ROADMAP.md">the roadmap</a> '
-        'says what each one is waiting for.</p>' % (docs.REPO, docs.REF))
-    add("<ul>")
-    for row in [r for _, rows in groups for r in rows if r["status"] == "blocked"]:
-        add("<li>%s</li>" % docs.inline_html(row["marker"]))
-    add("</ul>")
+    if blocked:
+        add('<p>These are waiting on a decision or on somebody else&#8217;s rules '
+            'rather than on effort. Working harder does not move them, and '
+            '<a href="https://github.com/%s/blob/%s/ROADMAP.md">the roadmap</a> '
+            'says what each one is waiting for.</p>' % (docs.REPO, docs.REF))
+        add('<ul class="markers">')
+        for row in blocked:
+            add(marker_item(row))
+        add("</ul>")
+    else:
+        add('<p>Nothing is blocked. Five items were, some of them for months, '
+            'each waiting on a decision rather than on effort, and they have '
+            'been taken off rather than left to make the list look busy. '
+            '<a href="https://github.com/%s/blob/%s/ROADMAP.md">The roadmap</a> '
+            'says what each one was, what it was waiting for, and why the '
+            'reasoning is kept even though the item is gone.</p>'
+            % (docs.REPO, docs.REF))
 
+    # Grouped by the section it is written under, with the paragraphs that
+    # section opens with. One flat list of a hundred items answers "how much is
+    # done" and nothing else; the sections are where the reasoning is, and
+    # dropping them was dropping the argument and keeping the score.
     add('<h2 id="done">Everything that is finished</h2>')
-    add("<ul>")
-    for row in [r for _, rows in groups for r in rows if r["status"] == "done"]:
-        add("<li>%s</li>" % docs.inline_html(row["marker"]))
-    add("</ul>")
+    add('<p>In the order the roadmap lists it, under the heading it was asked '
+        'for. Every item links to itself, so one can be sent to somebody on '
+        'its own.</p>')
+    for title, rows in groups:
+        finished = [row for row in rows if row["status"] == "done"]
+        if not finished:
+            continue
+        slug = anchor(title)
+        add('<h3 id="%s">%s <a class="marker-link" href="#%s" '
+            'aria-label="link to this section">#</a></h3>' % (slug, docs.esc(title), slug))
+        for paragraph in prose.get(title, []):
+            add("<p>%s</p>" % docs.inline_html(paragraph.replace("\n", " ")))
+        add('<ul class="markers">')
+        for row in finished:
+            add(marker_item(row))
+        add("</ul>")
 
     add('<p style="color:var(--muted);font-size:13px">Generated from '
         '<code>ROADMAP.md</code> at commit time by '
@@ -510,6 +651,7 @@ def build(root):
     for row in rows:
         counts[row["status"]] = counts.get(row["status"], 0) + 1
 
+    prose = prose_for(text, [(m.start(), m.group("title")) for m in HEADING.finditer(text)])
     note = ("%d items across %d sections." % (len(rows), len(groups)))
     drawing = graphic(colours, groups, counts)
 
@@ -521,7 +663,7 @@ def build(root):
         "roadmap",
         "Roadmap",
         "What is built, what is coming, and roughly when. Generated from ROADMAP.md.",
-        "\n".join(body(colours, groups, counts, note)),
+        "\n".join(body(colours, groups, counts, note, prose)),
         # This page is written for itself, so its `#anchor` links point at
         # its own headings rather than at sections of the front page.
         relink_body=False,

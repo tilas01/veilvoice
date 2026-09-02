@@ -1830,6 +1830,51 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
 .diagram { margin: 14px 0; overflow-x: auto; }
 .diagram svg { display: block; margin: 0 auto; }
 
+/* The roadmap's items, each addressable on its own.
+ *
+ * A roadmap item is the unit people talk about this project in, and until
+ * these anchors existed the only way to point at one was to send the whole
+ * page and say which paragraph. The number is the link because the number is
+ * already there and already unique: adding a separate link glyph beside it
+ * would be two things where one will do.
+ *
+ * The link is quiet until the row is hovered or the link itself is focused.
+ * Permalinks that shout are a distraction on a list of a hundred, and ones
+ * that only appear on hover are unreachable by keyboard, so both. */
+ul.markers { list-style: none; padding-left: 0; }
+ul.markers li {
+  margin: 0 0 10px;
+  padding-left: 44px;
+  text-indent: -44px;
+}
+.marker-link {
+  display: inline-block;
+  min-width: 34px;
+  color: var(--muted);
+  text-decoration: none;
+  text-indent: 0;
+  opacity: 0.55;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+ul.markers li:hover .marker-link,
+tr:hover > td .marker-link,
+.marker-link:hover,
+.marker-link:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+}
+/* The explanation after the name, one step back so the name is scannable in
+   a long list without the explanation being hidden from anybody who wants it. */
+.marker-detail { color: var(--muted); }
+/* A row or item arrived at by its own link says so, otherwise following a
+   permalink into a list of a hundred lands you nowhere in particular. */
+ul.markers li:target,
+tr:target > td {
+  background: var(--bg-inset);
+}
+ul.markers li:target { box-shadow: -8px 0 0 var(--bg-inset), 8px 0 0 var(--bg-inset); }
+h3:target { color: var(--accent); }
+
 /* Every box in a flowchart is a link, and on these pages it goes to the file's
  * source on this site rather than off to GitHub. That is worth making obvious,
  * and it costs one hover state and no script.
