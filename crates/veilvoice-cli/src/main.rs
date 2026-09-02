@@ -2446,6 +2446,179 @@ mod tests {
     use super::*;
     use clap::CommandFactory;
 
+    /// Every command the documentation shows is a command this program has.
+    ///
+    /// # The class this exists to close
+    ///
+    /// F-110 was an example plan in `docs/USER_GUIDE.md` that the parser
+    /// refused. F-101 was a download page linking two files that were never
+    /// published. F-103 was a screenshot compared against a file written by
+    /// the same command, so neither could catch the other. F-71 was two
+    /// hand-typed copies of a number that drifted together.
+    ///
+    /// All the same shape: a document describing the program, and nothing
+    /// comparing the two. Prose about behaviour goes stale silently, because
+    /// the compiler never reads it and the reader who would notice is the one
+    /// who has already been misled.
+    ///
+    /// So the documentation is read here and checked against clap's own tree.
+    /// Not against a list kept beside it, which would be another copy to
+    /// drift: against the definition the program is built from.
+    ///
+    /// # Telling a command from a sentence
+    ///
+    /// The word "veilvoice" appears in these documents as prose, as sample
+    /// output and as a command, and only the last is checkable. The first
+    /// version of this test walked every occurrence and quietly skipped
+    /// anything it could not resolve, which made it blind to exactly the
+    /// defect it was written for: `veilvoice frobnicate` was added to the
+    /// guide and the test passed.
+    ///
+    /// An invocation is therefore taken to be one that a reader could copy:
+    /// the whole of an inline code span, or a line inside a fenced block,
+    /// beginning with `veilvoice`. That excludes the alert
+    /// `● veilvoice is now using your microphone`, which is in a fence and is
+    /// output rather than something to type.
+    ///
+    /// # What it can and cannot say
+    ///
+    /// It checks that a documented subcommand exists and that a documented
+    /// long flag belongs to the subcommand it is shown with. That is the half
+    /// a machine can settle. Whether the example *works* is not checkable
+    /// here and is what running it is for: F-110 needed somebody to type it.
+    #[test]
+    fn every_command_the_documentation_shows_exists() {
+        let docs = [
+            ("README.md", include_str!("../../../README.md")),
+            (
+                "docs/USER_GUIDE.md",
+                include_str!("../../../docs/USER_GUIDE.md"),
+            ),
+            ("docs/INSTALL.md", include_str!("../../../docs/INSTALL.md")),
+        ];
+
+        let root = Cli::command();
+        let mut problems: Vec<String> = Vec::new();
+        let mut checked = 0_usize;
+
+        for (name, text) in docs {
+            let text = text.replace("\r\n", "\n");
+            let mut fenced = false;
+            for (number, line) in text.lines().enumerate() {
+                if line.trim_start().starts_with("```") {
+                    fenced = !fenced;
+                    continue;
+                }
+
+                // Everything a reader could copy and run, from this line.
+                let mut candidates: Vec<&str> = Vec::new();
+                if fenced {
+                    let bare = line.trim_start().trim_start_matches("$ ").trim_start();
+                    candidates.push(bare);
+                } else {
+                    let mut rest = line;
+                    while let Some(open) = rest.find('`') {
+                        let after = &rest[open + 1..];
+                        match after.find('`') {
+                            Some(close) => {
+                                candidates.push(&after[..close]);
+                                rest = &after[close + 1..];
+                            }
+                            None => break,
+                        }
+                    }
+                }
+
+                for candidate in candidates {
+                    let Some(after) = candidate.strip_prefix("veilvoice") else {
+                        continue;
+                    };
+                    if !after.starts_with(' ') {
+                        // `veilvoice-verify` and `veilvoice-gui` are other
+                        // programs, with arguments of their own.
+                        continue;
+                    }
+                    let mut words = after.split_whitespace().peekable();
+                    let mut node = &root;
+                    let mut path: Vec<String> = Vec::new();
+
+                    // The leading words are subcommands until one is not.
+                    while let Some(word) = words.peek().copied() {
+                        if word.starts_with('-')
+                            || word.contains('.')
+                            || word.contains('/')
+                            || word.contains('<')
+                            || !word.chars().all(|c| c.is_ascii_lowercase() || c == '-')
+                        {
+                            break;
+                        }
+                        match node.find_subcommand(word) {
+                            Some(next) => {
+                                path.push(word.to_string());
+                                node = next;
+                                words.next();
+                            }
+                            None => {
+                                problems.push(format!(
+                                    "{name}:{}: `veilvoice {}{word}` is documented, and \
+                                     there is no such command",
+                                    number + 1,
+                                    path.iter().map(|p| format!("{p} ")).collect::<String>()
+                                ));
+                                break;
+                            }
+                        }
+                    }
+                    if path.is_empty() {
+                        continue;
+                    }
+                    checked += 1;
+
+                    for word in words {
+                        if !word.starts_with("--") {
+                            continue;
+                        }
+                        let flag: String = word
+                            .trim_start_matches("--")
+                            .chars()
+                            .take_while(|c| c.is_ascii_lowercase() || *c == '-')
+                            .collect();
+                        if flag.is_empty() || flag == "help" || flag == "version" {
+                            continue;
+                        }
+                        let known = node.get_arguments().any(|a| {
+                            a.get_long() == Some(flag.as_str())
+                                || a.get_all_aliases()
+                                    .map(|all| all.iter().any(|x| *x == flag))
+                                    .unwrap_or(false)
+                        });
+                        if !known {
+                            problems.push(format!(
+                                "{name}:{}: `veilvoice {} --{flag}` is documented, and \
+                                 `{}` has no `--{flag}`",
+                                number + 1,
+                                path.join(" "),
+                                path.join(" ")
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        assert!(
+            checked > 20,
+            "only {checked} documented invocations were found, which means this \
+             test has stopped reading the documentation rather than that the \
+             documentation stopped showing commands"
+        );
+        assert!(
+            problems.is_empty(),
+            "the documentation shows commands this program does not have:\n  {}",
+            problems.join("\n  ")
+        );
+    }
+
     #[test]
     fn cli_definition_is_valid() {
         Cli::command().debug_assert();
