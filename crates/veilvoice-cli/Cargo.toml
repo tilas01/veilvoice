@@ -19,6 +19,8 @@ default = ["live"]
 live = ["veilvoice-audio/live"]
 
 [dependencies]
+veilvoice-gnupg = { path = "../veilvoice-gnupg" }
+veilvoice-check = { path = "../veilvoice-check" }
 veilvoice-core = { path = "../veilvoice-core" }
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 veilvoice-guard = { path = "../veilvoice-guard" }

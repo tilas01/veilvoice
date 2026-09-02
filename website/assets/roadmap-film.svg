@@ -19,7 +19,7 @@
 </style>
 <defs><clipPath id="film-view"><rect x="0" y="46.0" width="640" height="294.0"/></clipPath></defs>
 <rect x="0" y="0" width="640" height="360" rx="10" fill="var(--bg-inset, #16161e)"/>
-<text x="20.0" y="26" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)">92 markers finished</text>
+<text x="20.0" y="26" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)">92 items finished</text>
 <line x1="0" y1="38.0" x2="640" y2="38.0" stroke="var(--border, #2f3549)"/>
 <g clip-path="url(#film-view)">
 <g class="film-list">

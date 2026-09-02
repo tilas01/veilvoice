@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-setup/src/companions.rs</code></h1>
-<p style="color:var(--muted)"><a href="companions.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 771 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="companions.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 855 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -230,636 +230,724 @@
 <span class="ln" id="L172">            <span class="tok-str">&quot;blackhole&quot;</span> =&gt; <span class="tok-fn">detect_blackhole</span>(),</span>
 <span class="ln" id="L173">            <span class="tok-str">&quot;pipewire&quot;</span> =&gt; <span class="tok-fn">detect_pipewire</span>(),</span>
 <span class="ln" id="L174">            <span class="tok-str">&quot;audacity&quot;</span> =&gt; <span class="tok-fn">detect_audacity</span>(),</span>
-<span class="ln" id="L175">            other =&gt; Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;no probe is written for {other}&quot;</span>)),</span>
-<span class="ln" id="L176">        }</span>
-<span class="ln" id="L177">    }</span>
+<span class="ln" id="L175">            <span class="tok-str">&quot;gnupg&quot;</span> =&gt; <span class="tok-fn">detect_gnupg</span>(),</span>
+<span class="ln" id="L176">            other =&gt; Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;no probe is written for {other}&quot;</span>)),</span>
+<span class="ln" id="L177">        }</span>
+<span class="ln" id="L178">    }</span>
 </span>
-<span class="ln" id="L178"></span>
+<span class="ln" id="L179"></span>
 <span class="src-item" id="fn-companion-offer">
-<span class="ln" id="L179">    <span class="tok-com">/// What could be done about it on this platform.</span></span>
-<span class="ln" id="L180">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">offer</span>(&amp;<span class="tok-kw">self</span>) -&gt; Offer {</span>
-<span class="ln" id="L181">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.key {</span>
-<span class="ln" id="L182">            <span class="tok-com">// Proprietary, and a driver. Their installer, run by them, after</span></span>
-<span class="ln" id="L183">            <span class="tok-com">// their licence has been read by the person it binds.</span></span>
-<span class="ln" id="L184">            <span class="tok-str">&quot;vb-cable&quot;</span> =&gt; {</span>
-<span class="ln" id="L185">                <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L186">                    Offer::<span class="tok-fn">Page</span>(<span class="tok-kw">self</span>.page)</span>
-<span class="ln" id="L187">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L188">                    Offer::NotOnThisPlatform</span>
-<span class="ln" id="L189">                }</span>
-<span class="ln" id="L190">            }</span>
-<span class="ln" id="L191">            <span class="tok-str">&quot;blackhole&quot;</span> =&gt; {</span>
-<span class="ln" id="L192">                <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
-<span class="ln" id="L193">                    <span class="tok-fn">brew</span>(&amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;--cask&quot;</span>, <span class="tok-str">&quot;blackhole-2ch&quot;</span>])</span>
-<span class="ln" id="L194">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L195">                    Offer::NotOnThisPlatform</span>
-<span class="ln" id="L196">                }</span>
-<span class="ln" id="L197">            }</span>
-<span class="ln" id="L198">            <span class="tok-str">&quot;pipewire&quot;</span> =&gt; {</span>
-<span class="ln" id="L199">                <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;linux&quot;</span>) {</span>
-<span class="ln" id="L200">                    Offer::<span class="tok-fn">PartOfTheSystem</span>(</span>
-<span class="ln" id="L201">                        <span class="tok-str">&quot;PipeWire is part of your distribution&#x27;s audio stack. If it is \</span></span>
-<span class="ln" id="L202"><span class="tok-str">                         missing, install it the way you install anything else on this \</span></span>
-<span class="ln" id="L203"><span class="tok-str">                         system -- VeilVoice replacing a component of your operating \</span></span>
-<span class="ln" id="L204"><span class="tok-str">                         system is not something it should be doing.&quot;</span>,</span>
-<span class="ln" id="L205">                    )</span>
-<span class="ln" id="L206">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L207">                    Offer::NotOnThisPlatform</span>
-<span class="ln" id="L208">                }</span>
-<span class="ln" id="L209">            }</span>
-<span class="ln" id="L210">            <span class="tok-str">&quot;audacity&quot;</span> =&gt; <span class="tok-fn">audacity_offer</span>(),</span>
-<span class="ln" id="L211">            other =&gt; Offer::<span class="tok-fn">NoKnownRoute</span>(format!(<span class="tok-str">&quot;no route is written for {other}&quot;</span>)),</span>
-<span class="ln" id="L212">        }</span>
-<span class="ln" id="L213">    }</span>
+<span class="ln" id="L180">    <span class="tok-com">/// What could be done about it on this platform.</span></span>
+<span class="ln" id="L181">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">offer</span>(&amp;<span class="tok-kw">self</span>) -&gt; Offer {</span>
+<span class="ln" id="L182">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.key {</span>
+<span class="ln" id="L183">            <span class="tok-com">// Proprietary, and a driver. Their installer, run by them, after</span></span>
+<span class="ln" id="L184">            <span class="tok-com">// their licence has been read by the person it binds.</span></span>
+<span class="ln" id="L185">            <span class="tok-str">&quot;vb-cable&quot;</span> =&gt; {</span>
+<span class="ln" id="L186">                <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L187">                    Offer::<span class="tok-fn">Page</span>(<span class="tok-kw">self</span>.page)</span>
+<span class="ln" id="L188">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L189">                    Offer::NotOnThisPlatform</span>
+<span class="ln" id="L190">                }</span>
+<span class="ln" id="L191">            }</span>
+<span class="ln" id="L192">            <span class="tok-str">&quot;blackhole&quot;</span> =&gt; {</span>
+<span class="ln" id="L193">                <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
+<span class="ln" id="L194">                    <span class="tok-fn">brew</span>(&amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;--cask&quot;</span>, <span class="tok-str">&quot;blackhole-2ch&quot;</span>])</span>
+<span class="ln" id="L195">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L196">                    Offer::NotOnThisPlatform</span>
+<span class="ln" id="L197">                }</span>
+<span class="ln" id="L198">            }</span>
+<span class="ln" id="L199">            <span class="tok-str">&quot;pipewire&quot;</span> =&gt; {</span>
+<span class="ln" id="L200">                <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;linux&quot;</span>) {</span>
+<span class="ln" id="L201">                    Offer::<span class="tok-fn">PartOfTheSystem</span>(</span>
+<span class="ln" id="L202">                        <span class="tok-str">&quot;PipeWire is part of your distribution&#x27;s audio stack. If it is \</span></span>
+<span class="ln" id="L203"><span class="tok-str">                         missing, install it the way you install anything else on this \</span></span>
+<span class="ln" id="L204"><span class="tok-str">                         system -- VeilVoice replacing a component of your operating \</span></span>
+<span class="ln" id="L205"><span class="tok-str">                         system is not something it should be doing.&quot;</span>,</span>
+<span class="ln" id="L206">                    )</span>
+<span class="ln" id="L207">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L208">                    Offer::NotOnThisPlatform</span>
+<span class="ln" id="L209">                }</span>
+<span class="ln" id="L210">            }</span>
+<span class="ln" id="L211">            <span class="tok-str">&quot;audacity&quot;</span> =&gt; <span class="tok-fn">audacity_offer</span>(),</span>
+<span class="ln" id="L212">            <span class="tok-str">&quot;gnupg&quot;</span> =&gt; <span class="tok-fn">gnupg_offer</span>(),</span>
+<span class="ln" id="L213">            other =&gt; Offer::<span class="tok-fn">NoKnownRoute</span>(format!(<span class="tok-str">&quot;no route is written for {other}&quot;</span>)),</span>
+<span class="ln" id="L214">        }</span>
+<span class="ln" id="L215">    }</span>
 </span>
-<span class="ln" id="L214">}</span>
-<span class="ln" id="L215"></span>
+<span class="ln" id="L216">}</span>
+<span class="ln" id="L217"></span>
 <span class="src-item" id="fn-all">
-<span class="ln" id="L216"><span class="tok-com">/// Every companion this project knows about, in the order a front end should</span></span>
-<span class="ln" id="L217"><span class="tok-com">/// show them.</span></span>
-<span class="ln" id="L218"><span class="tok-com">///</span></span>
-<span class="ln" id="L219"><span class="tok-com">/// The audio routing one comes first because it is the one live mode actually</span></span>
-<span class="ln" id="L220"><span class="tok-com">/// needs; the editor is a convenience. Entries for other platforms are</span></span>
-<span class="ln" id="L221"><span class="tok-com">/// deliberately kept in the list rather than compiled away: [`for_this_platform`]</span></span>
-<span class="ln" id="L222"><span class="tok-com">/// filters, and a reader looking at the source should be able to see the whole</span></span>
-<span class="ln" id="L223"><span class="tok-com">/// set without switching machines.</span></span>
-<span class="ln" id="L224"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;[Companion] = &amp;[</span>
-<span class="ln" id="L225">    Companion {</span>
-<span class="ln" id="L226">        key: <span class="tok-str">&quot;vb-cable&quot;</span>,</span>
-<span class="ln" id="L227">        name: <span class="tok-str">&quot;VB-CABLE&quot;</span>,</span>
-<span class="ln" id="L228">        vendor: <span class="tok-str">&quot;VB-Audio Software&quot;</span>,</span>
-<span class="ln" id="L229">        licence: <span class="tok-str">&quot;proprietary donationware -- not free software&quot;</span>,</span>
-<span class="ln" id="L230">        what: <span class="tok-str">&quot;A virtual audio cable: a playback device whose output appears as a \</span></span>
-<span class="ln" id="L231"><span class="tok-str">               recording device.&quot;</span>,</span>
-<span class="ln" id="L232">        why: <span class="tok-str">&quot;Live mode writes the veiled voice to an output. A virtual cable is what \</span></span>
-<span class="ln" id="L233"><span class="tok-str">              lets a call application pick it up as a microphone. Without one, live \</span></span>
-<span class="ln" id="L234"><span class="tok-str">              mode still runs -- you simply have nowhere useful to send it.&quot;</span>,</span>
-<span class="ln" id="L235">        page: <span class="tok-str">&quot;https://vb-audio.com/Cable/&quot;</span>,</span>
-<span class="ln" id="L236">    },</span>
+<span class="ln" id="L218"><span class="tok-com">/// Every companion this project knows about, in the order a front end should</span></span>
+<span class="ln" id="L219"><span class="tok-com">/// show them.</span></span>
+<span class="ln" id="L220"><span class="tok-com">///</span></span>
+<span class="ln" id="L221"><span class="tok-com">/// The audio routing one comes first because it is the one live mode actually</span></span>
+<span class="ln" id="L222"><span class="tok-com">/// needs; the editor is a convenience. Entries for other platforms are</span></span>
+<span class="ln" id="L223"><span class="tok-com">/// deliberately kept in the list rather than compiled away: [`for_this_platform`]</span></span>
+<span class="ln" id="L224"><span class="tok-com">/// filters, and a reader looking at the source should be able to see the whole</span></span>
+<span class="ln" id="L225"><span class="tok-com">/// set without switching machines.</span></span>
+<span class="ln" id="L226"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;[Companion] = &amp;[</span>
+<span class="ln" id="L227">    Companion {</span>
+<span class="ln" id="L228">        key: <span class="tok-str">&quot;vb-cable&quot;</span>,</span>
+<span class="ln" id="L229">        name: <span class="tok-str">&quot;VB-CABLE&quot;</span>,</span>
+<span class="ln" id="L230">        vendor: <span class="tok-str">&quot;VB-Audio Software&quot;</span>,</span>
+<span class="ln" id="L231">        licence: <span class="tok-str">&quot;proprietary donationware -- not free software&quot;</span>,</span>
+<span class="ln" id="L232">        what: <span class="tok-str">&quot;A virtual audio cable: a playback device whose output appears as a \</span></span>
+<span class="ln" id="L233"><span class="tok-str">               recording device.&quot;</span>,</span>
+<span class="ln" id="L234">        why: <span class="tok-str">&quot;Live mode writes the veiled voice to an output. A virtual cable is what \</span></span>
+<span class="ln" id="L235"><span class="tok-str">              lets a call application pick it up as a microphone. Without one, live \</span></span>
+<span class="ln" id="L236"><span class="tok-str">              mode still runs -- you simply have nowhere useful to send it.&quot;</span>,</span>
+<span class="ln" id="L237">        page: <span class="tok-str">&quot;https://vb-audio.com/Cable/&quot;</span>,</span>
+<span class="ln" id="L238">    },</span>
 </span>
-<span class="ln" id="L237">    Companion {</span>
-<span class="ln" id="L238">        key: <span class="tok-str">&quot;blackhole&quot;</span>,</span>
-<span class="ln" id="L239">        name: <span class="tok-str">&quot;BlackHole&quot;</span>,</span>
-<span class="ln" id="L240">        vendor: <span class="tok-str">&quot;Existential Audio&quot;</span>,</span>
-<span class="ln" id="L241">        licence: <span class="tok-str">&quot;MIT&quot;</span>,</span>
-<span class="ln" id="L242">        what: <span class="tok-str">&quot;A virtual audio driver for macOS, doing the same job VB-CABLE does on \</span></span>
-<span class="ln" id="L243"><span class="tok-str">               Windows.&quot;</span>,</span>
-<span class="ln" id="L244">        why: <span class="tok-str">&quot;The route from live mode into a call on macOS.&quot;</span>,</span>
-<span class="ln" id="L245">        page: <span class="tok-str">&quot;https://existential.audio/blackhole/&quot;</span>,</span>
-<span class="ln" id="L246">    },</span>
-<span class="ln" id="L247">    Companion {</span>
-<span class="ln" id="L248">        key: <span class="tok-str">&quot;pipewire&quot;</span>,</span>
-<span class="ln" id="L249">        name: <span class="tok-str">&quot;PipeWire&quot;</span>,</span>
-<span class="ln" id="L250">        vendor: <span class="tok-str">&quot;the PipeWire project&quot;</span>,</span>
-<span class="ln" id="L251">        licence: <span class="tok-str">&quot;MIT&quot;</span>,</span>
-<span class="ln" id="L252">        what: <span class="tok-str">&quot;The audio server most current Linux distributions already use.&quot;</span>,</span>
-<span class="ln" id="L253">        why: <span class="tok-str">&quot;Its null sink is the virtual cable on Linux, so live mode needs no extra \</span></span>
-<span class="ln" id="L254"><span class="tok-str">              software at all on a machine that already runs it.&quot;</span>,</span>
-<span class="ln" id="L255">        page: <span class="tok-str">&quot;https://pipewire.org/&quot;</span>,</span>
-<span class="ln" id="L256">    },</span>
-<span class="ln" id="L257">    Companion {</span>
-<span class="ln" id="L258">        key: <span class="tok-str">&quot;audacity&quot;</span>,</span>
-<span class="ln" id="L259">        name: <span class="tok-str">&quot;Audacity&quot;</span>,</span>
-<span class="ln" id="L260">        vendor: <span class="tok-str">&quot;the Audacity team&quot;</span>,</span>
-<span class="ln" id="L261">        licence: <span class="tok-str">&quot;GPL-2.0-or-later&quot;</span>,</span>
-<span class="ln" id="L262">        what: <span class="tok-str">&quot;A free audio editor and recorder.&quot;</span>,</span>
-<span class="ln" id="L263">        why: <span class="tok-str">&quot;Useful for recording a file and for trimming one before veiling it. It is \</span></span>
-<span class="ln" id="L264"><span class="tok-str">              recommended and never embedded: GPL-2.0-or-later cannot be combined with \</span></span>
-<span class="ln" id="L265"><span class="tok-str">              this project&#x27;s GPL-3.0-or-later.&quot;</span>,</span>
-<span class="ln" id="L266">        page: <span class="tok-str">&quot;https://www.audacityteam.org/&quot;</span>,</span>
-<span class="ln" id="L267">    },</span>
-<span class="ln" id="L268">];</span>
-<span class="ln" id="L269"></span>
+<span class="ln" id="L239">    Companion {</span>
+<span class="ln" id="L240">        key: <span class="tok-str">&quot;blackhole&quot;</span>,</span>
+<span class="ln" id="L241">        name: <span class="tok-str">&quot;BlackHole&quot;</span>,</span>
+<span class="ln" id="L242">        vendor: <span class="tok-str">&quot;Existential Audio&quot;</span>,</span>
+<span class="ln" id="L243">        licence: <span class="tok-str">&quot;MIT&quot;</span>,</span>
+<span class="ln" id="L244">        what: <span class="tok-str">&quot;A virtual audio driver for macOS, doing the same job VB-CABLE does on \</span></span>
+<span class="ln" id="L245"><span class="tok-str">               Windows.&quot;</span>,</span>
+<span class="ln" id="L246">        why: <span class="tok-str">&quot;The route from live mode into a call on macOS.&quot;</span>,</span>
+<span class="ln" id="L247">        page: <span class="tok-str">&quot;https://existential.audio/blackhole/&quot;</span>,</span>
+<span class="ln" id="L248">    },</span>
+<span class="ln" id="L249">    Companion {</span>
+<span class="ln" id="L250">        key: <span class="tok-str">&quot;pipewire&quot;</span>,</span>
+<span class="ln" id="L251">        name: <span class="tok-str">&quot;PipeWire&quot;</span>,</span>
+<span class="ln" id="L252">        vendor: <span class="tok-str">&quot;the PipeWire project&quot;</span>,</span>
+<span class="ln" id="L253">        licence: <span class="tok-str">&quot;MIT&quot;</span>,</span>
+<span class="ln" id="L254">        what: <span class="tok-str">&quot;The audio server most current Linux distributions already use.&quot;</span>,</span>
+<span class="ln" id="L255">        why: <span class="tok-str">&quot;Its null sink is the virtual cable on Linux, so live mode needs no extra \</span></span>
+<span class="ln" id="L256"><span class="tok-str">              software at all on a machine that already runs it.&quot;</span>,</span>
+<span class="ln" id="L257">        page: <span class="tok-str">&quot;https://pipewire.org/&quot;</span>,</span>
+<span class="ln" id="L258">    },</span>
+<span class="ln" id="L259">    Companion {</span>
+<span class="ln" id="L260">        key: <span class="tok-str">&quot;gnupg&quot;</span>,</span>
+<span class="ln" id="L261">        name: <span class="tok-str">&quot;GnuPG&quot;</span>,</span>
+<span class="ln" id="L262">        vendor: <span class="tok-str">&quot;the GnuPG project&quot;</span>,</span>
+<span class="ln" id="L263">        licence: <span class="tok-str">&quot;GPL-3.0-or-later&quot;</span>,</span>
+<span class="ln" id="L264">        what: <span class="tok-str">&quot;The standard OpenPGP implementation: the `gpg` command that checks \</span></span>
+<span class="ln" id="L265"><span class="tok-str">               signatures.&quot;</span>,</span>
+<span class="ln" id="L266">        why: <span class="tok-str">&quot;VeilVoice checks a release signature itself, with code in this binary. \</span></span>
+<span class="ln" id="L267"><span class="tok-str">              That is the check telling you a download is genuine, made by a program \</span></span>
+<span class="ln" id="L268"><span class="tok-str">              that came out of that download. GnuPG is a second opinion from software \</span></span>
+<span class="ln" id="L269"><span class="tok-str">              this project did not write, and it is the one worth having.&quot;</span>,</span>
+<span class="ln" id="L270">        page: <span class="tok-str">&quot;https://gnupg.org/&quot;</span>,</span>
+<span class="ln" id="L271">    },</span>
+<span class="ln" id="L272">    Companion {</span>
+<span class="ln" id="L273">        key: <span class="tok-str">&quot;audacity&quot;</span>,</span>
+<span class="ln" id="L274">        name: <span class="tok-str">&quot;Audacity&quot;</span>,</span>
+<span class="ln" id="L275">        vendor: <span class="tok-str">&quot;the Audacity team&quot;</span>,</span>
+<span class="ln" id="L276">        licence: <span class="tok-str">&quot;GPL-2.0-or-later&quot;</span>,</span>
+<span class="ln" id="L277">        what: <span class="tok-str">&quot;A free audio editor and recorder.&quot;</span>,</span>
+<span class="ln" id="L278">        why: <span class="tok-str">&quot;Useful for recording a file and for trimming one before veiling it. It is \</span></span>
+<span class="ln" id="L279"><span class="tok-str">              recommended and never embedded: GPL-2.0-or-later cannot be combined with \</span></span>
+<span class="ln" id="L280"><span class="tok-str">              this project&#x27;s GPL-3.0-or-later.&quot;</span>,</span>
+<span class="ln" id="L281">        page: <span class="tok-str">&quot;https://www.audacityteam.org/&quot;</span>,</span>
+<span class="ln" id="L282">    },</span>
+<span class="ln" id="L283">];</span>
+<span class="ln" id="L284"></span>
 <span class="src-item" id="fn-for_this_platform">
-<span class="ln" id="L270"><span class="tok-com">/// The companions that mean anything on the platform this is running on.</span></span>
-<span class="ln" id="L271"><span class="tok-com">///</span></span>
-<span class="ln" id="L272"><span class="tok-com">/// Audacity is on every platform; each virtual-cable entry is on exactly one.</span></span>
-<span class="ln" id="L273"><span class="tok-com">/// Offering a macOS driver to a Windows user is noise, and noise in a security</span></span>
-<span class="ln" id="L274"><span class="tok-com">/// tool&#x27;s interface is how the parts that matter stop being read.</span></span>
-<span class="ln" id="L275"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">for_this_platform</span>() -&gt; Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> Companion&gt; {</span>
-<span class="ln" id="L276">    ALL.<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L277">        .<span class="tok-fn">filter</span>(|companion| !matches!(companion.<span class="tok-fn">offer</span>(), Offer::NotOnThisPlatform))</span>
-<span class="ln" id="L278">        .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L279">}</span>
+<span class="ln" id="L285"><span class="tok-com">/// The companions that mean anything on the platform this is running on.</span></span>
+<span class="ln" id="L286"><span class="tok-com">///</span></span>
+<span class="ln" id="L287"><span class="tok-com">/// Audacity is on every platform; each virtual-cable entry is on exactly one.</span></span>
+<span class="ln" id="L288"><span class="tok-com">/// Offering a macOS driver to a Windows user is noise, and noise in a security</span></span>
+<span class="ln" id="L289"><span class="tok-com">/// tool&#x27;s interface is how the parts that matter stop being read.</span></span>
+<span class="ln" id="L290"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">for_this_platform</span>() -&gt; Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> Companion&gt; {</span>
+<span class="ln" id="L291">    ALL.<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L292">        .<span class="tok-fn">filter</span>(|companion| !matches!(companion.<span class="tok-fn">offer</span>(), Offer::NotOnThisPlatform))</span>
+<span class="ln" id="L293">        .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L294">}</span>
 </span>
-<span class="ln" id="L280"></span>
+<span class="ln" id="L295"></span>
 <span class="src-item" id="fn-by_key">
-<span class="ln" id="L281"><span class="tok-com">/// Find one by [`Companion::key`].</span></span>
-<span class="ln" id="L282"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">by_key</span>(key: &amp;str) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> Companion&gt; {</span>
-<span class="ln" id="L283">    ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|companion| companion.key == key)</span>
-<span class="ln" id="L284">}</span>
+<span class="ln" id="L296"><span class="tok-com">/// Find one by [`Companion::key`].</span></span>
+<span class="ln" id="L297"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">by_key</span>(key: &amp;str) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> Companion&gt; {</span>
+<span class="ln" id="L298">    ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|companion| companion.key == key)</span>
+<span class="ln" id="L299">}</span>
 </span>
-<span class="ln" id="L285"></span>
+<span class="ln" id="L300"></span>
 <span class="src-item" id="fn-run">
-<span class="ln" id="L286"><span class="tok-com">/// Run an offer, and return what it printed.</span></span>
-<span class="ln" id="L287"><span class="tok-com">///</span></span>
-<span class="ln" id="L288"><span class="tok-com">/// Refuses anything [`Offer::is_runnable`] rejects. That refusal is the point:</span></span>
-<span class="ln" id="L289"><span class="tok-com">/// a front end that has a &quot;yes&quot; button should not be able to turn it into</span></span>
-<span class="ln" id="L290"><span class="tok-com">/// `sudo` by passing a different offer, and the check lives here rather than</span></span>
-<span class="ln" id="L291"><span class="tok-com">/// in each front end so there is one of it.</span></span>
-<span class="ln" id="L292"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(offer: &amp;Offer) -&gt; Result&lt;String, String&gt; {</span>
-<span class="ln" id="L293">    <span class="tok-kw">let</span> Offer::Command { argv, .. } = offer <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L294">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;this is not something VeilVoice runs for you&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L295">    };</span>
-<span class="ln" id="L296">    <span class="tok-kw">if</span> !offer.<span class="tok-fn">is_runnable</span>() {</span>
-<span class="ln" id="L297">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(</span>
-<span class="ln" id="L298">            <span class="tok-str">&quot;this command needs administrator rights, which VeilVoice does not ask for. \</span></span>
-<span class="ln" id="L299"><span class="tok-str">             Run it yourself in a terminal.&quot;</span></span>
-<span class="ln" id="L300">                .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L301">        );</span>
-<span class="ln" id="L302">    }</span>
-<span class="ln" id="L303">    <span class="tok-kw">let</span> (program, arguments) = argv</span>
-<span class="ln" id="L304">        .<span class="tok-fn">split_first</span>()</span>
-<span class="ln" id="L305">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;an empty command&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L306">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(program)</span>
-<span class="ln" id="L307">        .<span class="tok-fn">args</span>(arguments)</span>
-<span class="ln" id="L308">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L309">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not run {program}: {error}&quot;</span>))?;</span>
-<span class="ln" id="L310">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L311">    <span class="tok-kw">let</span> complaint = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr);</span>
-<span class="ln" id="L312">    <span class="tok-kw">if</span> !complaint.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L313">        report.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
-<span class="ln" id="L314">        report.<span class="tok-fn">push_str</span>(&amp;complaint);</span>
-<span class="ln" id="L315">    }</span>
-<span class="ln" id="L316">    <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L317">        <span class="tok-fn">Ok</span>(report)</span>
-<span class="ln" id="L318">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L319">        <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{program} failed:\n{}&quot;</span>, report.<span class="tok-fn">trim</span>()))</span>
-<span class="ln" id="L320">    }</span>
-<span class="ln" id="L321">}</span>
+<span class="ln" id="L301"><span class="tok-com">/// Run an offer, and return what it printed.</span></span>
+<span class="ln" id="L302"><span class="tok-com">///</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// Refuses anything [`Offer::is_runnable`] rejects. That refusal is the point:</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// a front end that has a &quot;yes&quot; button should not be able to turn it into</span></span>
+<span class="ln" id="L305"><span class="tok-com">/// `sudo` by passing a different offer, and the check lives here rather than</span></span>
+<span class="ln" id="L306"><span class="tok-com">/// in each front end so there is one of it.</span></span>
+<span class="ln" id="L307"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(offer: &amp;Offer) -&gt; Result&lt;String, String&gt; {</span>
+<span class="ln" id="L308">    <span class="tok-kw">let</span> Offer::Command { argv, .. } = offer <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L309">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;this is not something VeilVoice runs for you&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L310">    };</span>
+<span class="ln" id="L311">    <span class="tok-kw">if</span> !offer.<span class="tok-fn">is_runnable</span>() {</span>
+<span class="ln" id="L312">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(</span>
+<span class="ln" id="L313">            <span class="tok-str">&quot;this command needs administrator rights, which VeilVoice does not ask for. \</span></span>
+<span class="ln" id="L314"><span class="tok-str">             Run it yourself in a terminal.&quot;</span></span>
+<span class="ln" id="L315">                .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L316">        );</span>
+<span class="ln" id="L317">    }</span>
+<span class="ln" id="L318">    <span class="tok-kw">let</span> (program, arguments) = argv</span>
+<span class="ln" id="L319">        .<span class="tok-fn">split_first</span>()</span>
+<span class="ln" id="L320">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;an empty command&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L321">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(program)</span>
+<span class="ln" id="L322">        .<span class="tok-fn">args</span>(arguments)</span>
+<span class="ln" id="L323">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L324">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not run {program}: {error}&quot;</span>))?;</span>
+<span class="ln" id="L325">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L326">    <span class="tok-kw">let</span> complaint = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr);</span>
+<span class="ln" id="L327">    <span class="tok-kw">if</span> !complaint.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L328">        report.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
+<span class="ln" id="L329">        report.<span class="tok-fn">push_str</span>(&amp;complaint);</span>
+<span class="ln" id="L330">    }</span>
+<span class="ln" id="L331">    <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L332">        <span class="tok-fn">Ok</span>(report)</span>
+<span class="ln" id="L333">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L334">        <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{program} failed:\n{}&quot;</span>, report.<span class="tok-fn">trim</span>()))</span>
+<span class="ln" id="L335">    }</span>
+<span class="ln" id="L336">}</span>
 </span>
-<span class="ln" id="L322"></span>
+<span class="ln" id="L337"></span>
 <span class="src-item" id="fn-open_page">
-<span class="ln" id="L323"><span class="tok-com">/// Open a companion&#x27;s own page in the user&#x27;s browser.</span></span>
-<span class="ln" id="L324"><span class="tok-com">///</span></span>
-<span class="ln" id="L325"><span class="tok-com">/// This is what VeilVoice does instead of installing proprietary software:</span></span>
-<span class="ln" id="L326"><span class="tok-com">/// it takes you to the people who wrote it, so their licence is accepted by</span></span>
-<span class="ln" id="L327"><span class="tok-com">/// the person it binds and their installer is run by the person who chose it.</span></span>
-<span class="ln" id="L328"><span class="tok-com">///</span></span>
-<span class="ln" id="L329"><span class="tok-com">/// Refuses anything that is not `https://`. The URLs here are constants in</span></span>
-<span class="ln" id="L330"><span class="tok-com">/// this file rather than anything a user or a file supplies, so this cannot</span></span>
-<span class="ln" id="L331"><span class="tok-com">/// currently fail -- which is the reason to check now, while it is cheap,</span></span>
-<span class="ln" id="L332"><span class="tok-com">/// rather than after somebody makes the list configurable.</span></span>
-<span class="ln" id="L333"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open_page</span>(url: &amp;str) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L334">    <span class="tok-kw">if</span> !url.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>) {</span>
-<span class="ln" id="L335">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;refusing to open {url}: only https is opened&quot;</span>));</span>
-<span class="ln" id="L336">    }</span>
-<span class="ln" id="L337">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> spawn = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L338">        <span class="tok-com">// `start` is a `cmd` builtin, not a program. The empty argument is the</span></span>
-<span class="ln" id="L339">        <span class="tok-com">// window title: without it `start` treats the first quoted argument as</span></span>
-<span class="ln" id="L340">        <span class="tok-com">// the title and opens nothing.</span></span>
-<span class="ln" id="L341">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-str">&quot;cmd&quot;</span>);</span>
-<span class="ln" id="L342">        command.<span class="tok-fn">args</span>([<span class="tok-str">&quot;/c&quot;</span>, <span class="tok-str">&quot;start&quot;</span>, <span class="tok-str">&quot;&quot;</span>, url]);</span>
-<span class="ln" id="L343">        command</span>
-<span class="ln" id="L344">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
-<span class="ln" id="L345">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-str">&quot;open&quot;</span>);</span>
-<span class="ln" id="L346">        command.<span class="tok-fn">arg</span>(url);</span>
-<span class="ln" id="L347">        command</span>
-<span class="ln" id="L348">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L349">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-str">&quot;xdg-open&quot;</span>);</span>
-<span class="ln" id="L350">        command.<span class="tok-fn">arg</span>(url);</span>
-<span class="ln" id="L351">        command</span>
-<span class="ln" id="L352">    };</span>
-<span class="ln" id="L353">    <span class="tok-com">// Spawned rather than waited on: `xdg-open` may not return until the</span></span>
-<span class="ln" id="L354">    <span class="tok-com">// browser it started exits, and a window frozen behind somebody&#x27;s browser</span></span>
-<span class="ln" id="L355">    <span class="tok-com">// is not what &quot;open their page&quot; should mean.</span></span>
-<span class="ln" id="L356">    spawn</span>
-<span class="ln" id="L357">        .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L358">        .<span class="tok-fn">map</span>(|_| ())</span>
-<span class="ln" id="L359">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not open a browser: {error}&quot;</span>))</span>
-<span class="ln" id="L360">}</span>
+<span class="ln" id="L338"><span class="tok-com">/// Open a companion&#x27;s own page in the user&#x27;s browser.</span></span>
+<span class="ln" id="L339"><span class="tok-com">///</span></span>
+<span class="ln" id="L340"><span class="tok-com">/// This is what VeilVoice does instead of installing proprietary software:</span></span>
+<span class="ln" id="L341"><span class="tok-com">/// it takes you to the people who wrote it, so their licence is accepted by</span></span>
+<span class="ln" id="L342"><span class="tok-com">/// the person it binds and their installer is run by the person who chose it.</span></span>
+<span class="ln" id="L343"><span class="tok-com">///</span></span>
+<span class="ln" id="L344"><span class="tok-com">/// Refuses anything that is not `https://`. The URLs here are constants in</span></span>
+<span class="ln" id="L345"><span class="tok-com">/// this file rather than anything a user or a file supplies, so this cannot</span></span>
+<span class="ln" id="L346"><span class="tok-com">/// currently fail -- which is the reason to check now, while it is cheap,</span></span>
+<span class="ln" id="L347"><span class="tok-com">/// rather than after somebody makes the list configurable.</span></span>
+<span class="ln" id="L348"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open_page</span>(url: &amp;str) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L349">    <span class="tok-kw">if</span> !url.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>) {</span>
+<span class="ln" id="L350">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;refusing to open {url}: only https is opened&quot;</span>));</span>
+<span class="ln" id="L351">    }</span>
+<span class="ln" id="L352">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> spawn = <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L353">        <span class="tok-com">// `start` is a `cmd` builtin, not a program. The empty argument is the</span></span>
+<span class="ln" id="L354">        <span class="tok-com">// window title: without it `start` treats the first quoted argument as</span></span>
+<span class="ln" id="L355">        <span class="tok-com">// the title and opens nothing.</span></span>
+<span class="ln" id="L356">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-str">&quot;cmd&quot;</span>);</span>
+<span class="ln" id="L357">        command.<span class="tok-fn">args</span>([<span class="tok-str">&quot;/c&quot;</span>, <span class="tok-str">&quot;start&quot;</span>, <span class="tok-str">&quot;&quot;</span>, url]);</span>
+<span class="ln" id="L358">        command</span>
+<span class="ln" id="L359">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
+<span class="ln" id="L360">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-str">&quot;open&quot;</span>);</span>
+<span class="ln" id="L361">        command.<span class="tok-fn">arg</span>(url);</span>
+<span class="ln" id="L362">        command</span>
+<span class="ln" id="L363">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L364">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-str">&quot;xdg-open&quot;</span>);</span>
+<span class="ln" id="L365">        command.<span class="tok-fn">arg</span>(url);</span>
+<span class="ln" id="L366">        command</span>
+<span class="ln" id="L367">    };</span>
+<span class="ln" id="L368">    <span class="tok-com">// Spawned rather than waited on: `xdg-open` may not return until the</span></span>
+<span class="ln" id="L369">    <span class="tok-com">// browser it started exits, and a window frozen behind somebody&#x27;s browser</span></span>
+<span class="ln" id="L370">    <span class="tok-com">// is not what &quot;open their page&quot; should mean.</span></span>
+<span class="ln" id="L371">    spawn</span>
+<span class="ln" id="L372">        .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L373">        .<span class="tok-fn">map</span>(|_| ())</span>
+<span class="ln" id="L374">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not open a browser: {error}&quot;</span>))</span>
+<span class="ln" id="L375">}</span>
 </span>
-<span class="ln" id="L361"></span>
-<span class="ln" id="L362"><span class="tok-com">// --- the probes -------------------------------------------------------------</span></span>
-<span class="ln" id="L363"></span>
+<span class="ln" id="L376"></span>
+<span class="ln" id="L377"><span class="tok-com">// --- the probes -------------------------------------------------------------</span></span>
+<span class="ln" id="L378"></span>
 <span class="src-item" id="fn-on_path">
-<span class="ln" id="L364"><span class="tok-com">/// Is `stem` an executable on this process&#x27;s `PATH`?</span></span>
-<span class="ln" id="L365"><span class="tok-com">///</span></span>
-<span class="ln" id="L366"><span class="tok-com">/// Walks the entries rather than spawning `where`/`which`, which would cost a</span></span>
-<span class="ln" id="L367"><span class="tok-com">/// subprocess to answer a question about a string this process already holds.</span></span>
-<span class="ln" id="L368"><span class="tok-kw">fn</span> <span class="tok-fn">on_path</span>(stem: &amp;str) -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L369">    <span class="tok-kw">let</span> names: Vec&lt;String&gt; = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L370">        vec![format!(<span class="tok-str">&quot;{stem}.exe&quot;</span>), format!(<span class="tok-str">&quot;{stem}.bat&quot;</span>)]</span>
-<span class="ln" id="L371">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L372">        vec![stem.<span class="tok-fn">to_string</span>()]</span>
-<span class="ln" id="L373">    };</span>
-<span class="ln" id="L374">    <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?;</span>
-<span class="ln" id="L375">    <span class="tok-kw">for</span> directory <span class="tok-kw">in</span> std::env::<span class="tok-fn">split_paths</span>(&amp;path) {</span>
-<span class="ln" id="L376">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> &amp;names {</span>
-<span class="ln" id="L377">            <span class="tok-kw">let</span> candidate = directory.<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L378">            <span class="tok-kw">if</span> candidate.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L379">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(candidate);</span>
-<span class="ln" id="L380">            }</span>
-<span class="ln" id="L381">        }</span>
-<span class="ln" id="L382">    }</span>
-<span class="ln" id="L383">    None</span>
-<span class="ln" id="L384">}</span>
+<span class="ln" id="L379"><span class="tok-com">/// Is `stem` an executable on this process&#x27;s `PATH`?</span></span>
+<span class="ln" id="L380"><span class="tok-com">///</span></span>
+<span class="ln" id="L381"><span class="tok-com">/// Walks the entries rather than spawning `where`/`which`, which would cost a</span></span>
+<span class="ln" id="L382"><span class="tok-com">/// subprocess to answer a question about a string this process already holds.</span></span>
+<span class="ln" id="L383"><span class="tok-kw">fn</span> <span class="tok-fn">on_path</span>(stem: &amp;str) -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L384">    <span class="tok-kw">let</span> names: Vec&lt;String&gt; = <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L385">        vec![format!(<span class="tok-str">&quot;{stem}.exe&quot;</span>), format!(<span class="tok-str">&quot;{stem}.bat&quot;</span>)]</span>
+<span class="ln" id="L386">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L387">        vec![stem.<span class="tok-fn">to_string</span>()]</span>
+<span class="ln" id="L388">    };</span>
+<span class="ln" id="L389">    <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?;</span>
+<span class="ln" id="L390">    <span class="tok-kw">for</span> directory <span class="tok-kw">in</span> std::env::<span class="tok-fn">split_paths</span>(&amp;path) {</span>
+<span class="ln" id="L391">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> &amp;names {</span>
+<span class="ln" id="L392">            <span class="tok-kw">let</span> candidate = directory.<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L393">            <span class="tok-kw">if</span> candidate.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L394">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(candidate);</span>
+<span class="ln" id="L395">            }</span>
+<span class="ln" id="L396">        }</span>
+<span class="ln" id="L397">    }</span>
+<span class="ln" id="L398">    None</span>
+<span class="ln" id="L399">}</span>
 </span>
-<span class="ln" id="L385"></span>
+<span class="ln" id="L400"></span>
 <span class="src-item" id="fn-first_existing">
-<span class="ln" id="L386"><span class="tok-com">/// The first of `candidates` that exists.</span></span>
-<span class="ln" id="L387"><span class="tok-kw">fn</span> <span class="tok-fn">first_existing</span>(candidates: &amp;[PathBuf]) -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L388">    candidates.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|path| path.<span class="tok-fn">exists</span>()).<span class="tok-fn">cloned</span>()</span>
-<span class="ln" id="L389">}</span>
+<span class="ln" id="L401"><span class="tok-com">/// The first of `candidates` that exists.</span></span>
+<span class="ln" id="L402"><span class="tok-kw">fn</span> <span class="tok-fn">first_existing</span>(candidates: &amp;[PathBuf]) -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L403">    candidates.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|path| path.<span class="tok-fn">exists</span>()).<span class="tok-fn">cloned</span>()</span>
+<span class="ln" id="L404">}</span>
 </span>
-<span class="ln" id="L390"></span>
+<span class="ln" id="L405"></span>
 <span class="src-item" id="fn-env_path">
-<span class="ln" id="L391"><span class="tok-kw">fn</span> <span class="tok-fn">env_path</span>(name: &amp;str, rest: &amp;[&amp;str]) -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L392">    <span class="tok-kw">let</span> base = std::env::<span class="tok-fn">var_os</span>(name)?;</span>
-<span class="ln" id="L393">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path = PathBuf::<span class="tok-fn">from</span>(base);</span>
-<span class="ln" id="L394">    <span class="tok-kw">for</span> part <span class="tok-kw">in</span> rest {</span>
-<span class="ln" id="L395">        path.<span class="tok-fn">push</span>(part);</span>
-<span class="ln" id="L396">    }</span>
-<span class="ln" id="L397">    <span class="tok-fn">Some</span>(path)</span>
-<span class="ln" id="L398">}</span>
+<span class="ln" id="L406"><span class="tok-kw">fn</span> <span class="tok-fn">env_path</span>(name: &amp;str, rest: &amp;[&amp;str]) -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L407">    <span class="tok-kw">let</span> base = std::env::<span class="tok-fn">var_os</span>(name)?;</span>
+<span class="ln" id="L408">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path = PathBuf::<span class="tok-fn">from</span>(base);</span>
+<span class="ln" id="L409">    <span class="tok-kw">for</span> part <span class="tok-kw">in</span> rest {</span>
+<span class="ln" id="L410">        path.<span class="tok-fn">push</span>(part);</span>
+<span class="ln" id="L411">    }</span>
+<span class="ln" id="L412">    <span class="tok-fn">Some</span>(path)</span>
+<span class="ln" id="L413">}</span>
 </span>
-<span class="ln" id="L399"></span>
+<span class="ln" id="L414"></span>
 <span class="src-item" id="fn-detect_vb_cable">
-<span class="ln" id="L400"><span class="tok-com">/// VB-CABLE installs an audio driver, and a driver is a file in a directory</span></span>
-<span class="ln" id="L401"><span class="tok-com">/// any user can read. That is a faster and steadier probe than sweeping the</span></span>
-<span class="ln" id="L402"><span class="tok-com">/// uninstall registry, which is large, slow, and describes what was installed</span></span>
-<span class="ln" id="L403"><span class="tok-com">/// rather than what is loaded.</span></span>
-<span class="ln" id="L404"><span class="tok-kw">fn</span> <span class="tok-fn">detect_vb_cable</span>() -&gt; Presence {</span>
-<span class="ln" id="L405">    <span class="tok-kw">if</span> !cfg!(windows) {</span>
-<span class="ln" id="L406">        <span class="tok-kw">return</span> Presence::NotDetected;</span>
-<span class="ln" id="L407">    }</span>
-<span class="ln" id="L408">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(drivers) = <span class="tok-fn">env_path</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>, &amp;[<span class="tok-str">&quot;System32&quot;</span>, <span class="tok-str">&quot;drivers&quot;</span>]) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L409">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;this system does not say where Windows is&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L410">    };</span>
-<span class="ln" id="L411">    <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;drivers) {</span>
-<span class="ln" id="L412">        <span class="tok-fn">Ok</span>(entries) =&gt; entries,</span>
-<span class="ln" id="L413">        <span class="tok-fn">Err</span>(error) =&gt; {</span>
-<span class="ln" id="L414">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;cannot read {}: {error}&quot;</span>, drivers.<span class="tok-fn">display</span>()))</span>
-<span class="ln" id="L415">        }</span>
-<span class="ln" id="L416">    };</span>
-<span class="ln" id="L417">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L418">        <span class="tok-kw">let</span> name = entry.<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L419">        <span class="tok-kw">if</span> name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;vbaudio&quot;</span>) {</span>
-<span class="ln" id="L420">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(entry.<span class="tok-fn">path</span>().<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L421">        }</span>
+<span class="ln" id="L415"><span class="tok-com">/// VB-CABLE installs an audio driver, and a driver is a file in a directory</span></span>
+<span class="ln" id="L416"><span class="tok-com">/// any user can read. That is a faster and steadier probe than sweeping the</span></span>
+<span class="ln" id="L417"><span class="tok-com">/// uninstall registry, which is large, slow, and describes what was installed</span></span>
+<span class="ln" id="L418"><span class="tok-com">/// rather than what is loaded.</span></span>
+<span class="ln" id="L419"><span class="tok-kw">fn</span> <span class="tok-fn">detect_vb_cable</span>() -&gt; Presence {</span>
+<span class="ln" id="L420">    <span class="tok-kw">if</span> !cfg!(windows) {</span>
+<span class="ln" id="L421">        <span class="tok-kw">return</span> Presence::NotDetected;</span>
 <span class="ln" id="L422">    }</span>
-<span class="ln" id="L423">    Presence::NotDetected</span>
-<span class="ln" id="L424">}</span>
-</span>
-<span class="ln" id="L425"></span>
-<span class="src-item" id="fn-detect_blackhole">
-<span class="ln" id="L426"><span class="tok-com">/// BlackHole is a HAL plug-in, and those live in exactly one place.</span></span>
-<span class="ln" id="L427"><span class="tok-kw">fn</span> <span class="tok-fn">detect_blackhole</span>() -&gt; Presence {</span>
-<span class="ln" id="L428">    <span class="tok-kw">if</span> !cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
-<span class="ln" id="L429">        <span class="tok-kw">return</span> Presence::NotDetected;</span>
-<span class="ln" id="L430">    }</span>
-<span class="ln" id="L431">    <span class="tok-kw">let</span> plugins = Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/Library/Audio/Plug-Ins/HAL&quot;</span>);</span>
-<span class="ln" id="L432">    <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read_dir</span>(plugins) {</span>
-<span class="ln" id="L433">        <span class="tok-fn">Ok</span>(entries) =&gt; entries,</span>
-<span class="ln" id="L434">        <span class="tok-fn">Err</span>(error) =&gt; {</span>
-<span class="ln" id="L435">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;cannot read {}: {error}&quot;</span>, plugins.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L423">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(drivers) = <span class="tok-fn">env_path</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>, &amp;[<span class="tok-str">&quot;System32&quot;</span>, <span class="tok-str">&quot;drivers&quot;</span>]) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L424">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;this system does not say where Windows is&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L425">    };</span>
+<span class="ln" id="L426">    <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;drivers) {</span>
+<span class="ln" id="L427">        <span class="tok-fn">Ok</span>(entries) =&gt; entries,</span>
+<span class="ln" id="L428">        <span class="tok-fn">Err</span>(error) =&gt; {</span>
+<span class="ln" id="L429">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;cannot read {}: {error}&quot;</span>, drivers.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L430">        }</span>
+<span class="ln" id="L431">    };</span>
+<span class="ln" id="L432">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L433">        <span class="tok-kw">let</span> name = entry.<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L434">        <span class="tok-kw">if</span> name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;vbaudio&quot;</span>) {</span>
+<span class="ln" id="L435">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(entry.<span class="tok-fn">path</span>().<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
 <span class="ln" id="L436">        }</span>
-<span class="ln" id="L437">    };</span>
-<span class="ln" id="L438">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L439">        <span class="tok-kw">let</span> name = entry.<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L440">        <span class="tok-kw">if</span> name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;blackhole&quot;</span>) {</span>
-<span class="ln" id="L441">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(entry.<span class="tok-fn">path</span>().<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L442">        }</span>
-<span class="ln" id="L443">    }</span>
-<span class="ln" id="L444">    Presence::NotDetected</span>
-<span class="ln" id="L445">}</span>
+<span class="ln" id="L437">    }</span>
+<span class="ln" id="L438">    Presence::NotDetected</span>
+<span class="ln" id="L439">}</span>
 </span>
-<span class="ln" id="L446"></span>
+<span class="ln" id="L440"></span>
+<span class="src-item" id="fn-detect_blackhole">
+<span class="ln" id="L441"><span class="tok-com">/// BlackHole is a HAL plug-in, and those live in exactly one place.</span></span>
+<span class="ln" id="L442"><span class="tok-kw">fn</span> <span class="tok-fn">detect_blackhole</span>() -&gt; Presence {</span>
+<span class="ln" id="L443">    <span class="tok-kw">if</span> !cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
+<span class="ln" id="L444">        <span class="tok-kw">return</span> Presence::NotDetected;</span>
+<span class="ln" id="L445">    }</span>
+<span class="ln" id="L446">    <span class="tok-kw">let</span> plugins = Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/Library/Audio/Plug-Ins/HAL&quot;</span>);</span>
+<span class="ln" id="L447">    <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read_dir</span>(plugins) {</span>
+<span class="ln" id="L448">        <span class="tok-fn">Ok</span>(entries) =&gt; entries,</span>
+<span class="ln" id="L449">        <span class="tok-fn">Err</span>(error) =&gt; {</span>
+<span class="ln" id="L450">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;cannot read {}: {error}&quot;</span>, plugins.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L451">        }</span>
+<span class="ln" id="L452">    };</span>
+<span class="ln" id="L453">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L454">        <span class="tok-kw">let</span> name = entry.<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L455">        <span class="tok-kw">if</span> name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;blackhole&quot;</span>) {</span>
+<span class="ln" id="L456">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(entry.<span class="tok-fn">path</span>().<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L457">        }</span>
+<span class="ln" id="L458">    }</span>
+<span class="ln" id="L459">    Presence::NotDetected</span>
+<span class="ln" id="L460">}</span>
+</span>
+<span class="ln" id="L461"></span>
 <span class="src-item" id="fn-detect_pipewire">
-<span class="ln" id="L447"><span class="tok-com">/// PipeWire is running or it is not, and `pw-cli` beside it is the sign that</span></span>
-<span class="ln" id="L448"><span class="tok-com">/// the userspace tools are installed. Either name is enough to say &quot;present&quot;.</span></span>
-<span class="ln" id="L449"><span class="tok-kw">fn</span> <span class="tok-fn">detect_pipewire</span>() -&gt; Presence {</span>
-<span class="ln" id="L450">    <span class="tok-kw">if</span> !cfg!(target_os = <span class="tok-str">&quot;linux&quot;</span>) {</span>
-<span class="ln" id="L451">        <span class="tok-kw">return</span> Presence::NotDetected;</span>
-<span class="ln" id="L452">    }</span>
-<span class="ln" id="L453">    <span class="tok-kw">match</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;pipewire&quot;</span>).<span class="tok-fn">or_else</span>(|| <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;pw-cli&quot;</span>)) {</span>
-<span class="ln" id="L454">        <span class="tok-fn">Some</span>(found) =&gt; Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L455">        None =&gt; Presence::NotDetected,</span>
-<span class="ln" id="L456">    }</span>
-<span class="ln" id="L457">}</span>
+<span class="ln" id="L462"><span class="tok-com">/// PipeWire is running or it is not, and `pw-cli` beside it is the sign that</span></span>
+<span class="ln" id="L463"><span class="tok-com">/// the userspace tools are installed. Either name is enough to say &quot;present&quot;.</span></span>
+<span class="ln" id="L464"><span class="tok-kw">fn</span> <span class="tok-fn">detect_pipewire</span>() -&gt; Presence {</span>
+<span class="ln" id="L465">    <span class="tok-kw">if</span> !cfg!(target_os = <span class="tok-str">&quot;linux&quot;</span>) {</span>
+<span class="ln" id="L466">        <span class="tok-kw">return</span> Presence::NotDetected;</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468">    <span class="tok-kw">match</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;pipewire&quot;</span>).<span class="tok-fn">or_else</span>(|| <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;pw-cli&quot;</span>)) {</span>
+<span class="ln" id="L469">        <span class="tok-fn">Some</span>(found) =&gt; Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L470">        None =&gt; Presence::NotDetected,</span>
+<span class="ln" id="L471">    }</span>
+<span class="ln" id="L472">}</span>
 </span>
-<span class="ln" id="L458"></span>
+<span class="ln" id="L473"></span>
 <span class="src-item" id="fn-detect_audacity">
-<span class="ln" id="L459"><span class="tok-com">/// Audacity is on `PATH` on Unix and in one of three directories on Windows.</span></span>
-<span class="ln" id="L460"><span class="tok-kw">fn</span> <span class="tok-fn">detect_audacity</span>() -&gt; Presence {</span>
-<span class="ln" id="L461">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(found) = <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;audacity&quot;</span>) {</span>
-<span class="ln" id="L462">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L463">    }</span>
-<span class="ln" id="L464">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> candidates = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L465">    <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L466">        <span class="tok-kw">for</span> variable <span class="tok-kw">in</span> [<span class="tok-str">&quot;ProgramFiles&quot;</span>, <span class="tok-str">&quot;ProgramFiles(x86)&quot;</span>] {</span>
-<span class="ln" id="L467">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">env_path</span>(variable, &amp;[<span class="tok-str">&quot;Audacity&quot;</span>, <span class="tok-str">&quot;audacity.exe&quot;</span>]) {</span>
-<span class="ln" id="L468">                candidates.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L469">            }</span>
-<span class="ln" id="L470">        }</span>
-<span class="ln" id="L471">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">env_path</span>(<span class="tok-str">&quot;LOCALAPPDATA&quot;</span>, &amp;[<span class="tok-str">&quot;Programs&quot;</span>, <span class="tok-str">&quot;Audacity&quot;</span>, <span class="tok-str">&quot;audacity.exe&quot;</span>]) {</span>
-<span class="ln" id="L472">            candidates.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L473">        }</span>
-<span class="ln" id="L474">    }</span>
-<span class="ln" id="L475">    <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
-<span class="ln" id="L476">        candidates.<span class="tok-fn">push</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/Applications/Audacity.app&quot;</span>));</span>
-<span class="ln" id="L477">    }</span>
-<span class="ln" id="L478">    <span class="tok-kw">match</span> <span class="tok-fn">first_existing</span>(&amp;candidates) {</span>
-<span class="ln" id="L479">        <span class="tok-fn">Some</span>(found) =&gt; Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L480">        None =&gt; Presence::NotDetected,</span>
-<span class="ln" id="L481">    }</span>
-<span class="ln" id="L482">}</span>
+<span class="ln" id="L474"><span class="tok-com">/// Audacity is on `PATH` on Unix and in one of three directories on Windows.</span></span>
+<span class="ln" id="L475"><span class="tok-kw">fn</span> <span class="tok-fn">detect_audacity</span>() -&gt; Presence {</span>
+<span class="ln" id="L476">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(found) = <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;audacity&quot;</span>) {</span>
+<span class="ln" id="L477">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L478">    }</span>
+<span class="ln" id="L479">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> candidates = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L480">    <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L481">        <span class="tok-kw">for</span> variable <span class="tok-kw">in</span> [<span class="tok-str">&quot;ProgramFiles&quot;</span>, <span class="tok-str">&quot;ProgramFiles(x86)&quot;</span>] {</span>
+<span class="ln" id="L482">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">env_path</span>(variable, &amp;[<span class="tok-str">&quot;Audacity&quot;</span>, <span class="tok-str">&quot;audacity.exe&quot;</span>]) {</span>
+<span class="ln" id="L483">                candidates.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L484">            }</span>
+<span class="ln" id="L485">        }</span>
+<span class="ln" id="L486">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">env_path</span>(<span class="tok-str">&quot;LOCALAPPDATA&quot;</span>, &amp;[<span class="tok-str">&quot;Programs&quot;</span>, <span class="tok-str">&quot;Audacity&quot;</span>, <span class="tok-str">&quot;audacity.exe&quot;</span>]) {</span>
+<span class="ln" id="L487">            candidates.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L488">        }</span>
+<span class="ln" id="L489">    }</span>
+<span class="ln" id="L490">    <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
+<span class="ln" id="L491">        candidates.<span class="tok-fn">push</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/Applications/Audacity.app&quot;</span>));</span>
+<span class="ln" id="L492">    }</span>
+<span class="ln" id="L493">    <span class="tok-kw">match</span> <span class="tok-fn">first_existing</span>(&amp;candidates) {</span>
+<span class="ln" id="L494">        <span class="tok-fn">Some</span>(found) =&gt; Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L495">        None =&gt; Presence::NotDetected,</span>
+<span class="ln" id="L496">    }</span>
+<span class="ln" id="L497">}</span>
 </span>
-<span class="ln" id="L483"></span>
-<span class="ln" id="L484"><span class="tok-com">// --- the offers -------------------------------------------------------------</span></span>
-<span class="ln" id="L485"></span>
+<span class="ln" id="L498"></span>
+<span class="ln" id="L499"><span class="tok-com">// --- the offers -------------------------------------------------------------</span></span>
+<span class="ln" id="L500"></span>
 <span class="src-item" id="fn-brew">
-<span class="ln" id="L486"><span class="tok-kw">fn</span> <span class="tok-fn">brew</span>(arguments: &amp;[&amp;str]) -&gt; Offer {</span>
-<span class="ln" id="L487">    <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;brew&quot;</span>).<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L488">        <span class="tok-kw">return</span> Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
-<span class="ln" id="L489">            <span class="tok-str">&quot;Homebrew is not installed, and VeilVoice is not going to install a package \</span></span>
-<span class="ln" id="L490"><span class="tok-str">             manager for you. Get it from https://brew.sh, or download the software from \</span></span>
-<span class="ln" id="L491"><span class="tok-str">             its own page.&quot;</span></span>
-<span class="ln" id="L492">                .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L493">        );</span>
-<span class="ln" id="L494">    }</span>
-<span class="ln" id="L495">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> argv = vec![<span class="tok-str">&quot;brew&quot;</span>.<span class="tok-fn">to_string</span>()];</span>
-<span class="ln" id="L496">    argv.<span class="tok-fn">extend</span>(arguments.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|part| part.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L497">    Offer::Command {</span>
-<span class="ln" id="L498">        argv,</span>
-<span class="ln" id="L499">        via: <span class="tok-str">&quot;Homebrew&quot;</span>,</span>
-<span class="ln" id="L500">        <span class="tok-com">// Homebrew installs into a prefix the user owns, on purpose.</span></span>
-<span class="ln" id="L501">        needs_privilege: false,</span>
-<span class="ln" id="L502">    }</span>
-<span class="ln" id="L503">}</span>
+<span class="ln" id="L501"><span class="tok-kw">fn</span> <span class="tok-fn">brew</span>(arguments: &amp;[&amp;str]) -&gt; Offer {</span>
+<span class="ln" id="L502">    <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;brew&quot;</span>).<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L503">        <span class="tok-kw">return</span> Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
+<span class="ln" id="L504">            <span class="tok-str">&quot;Homebrew is not installed, and VeilVoice is not going to install a package \</span></span>
+<span class="ln" id="L505"><span class="tok-str">             manager for you. Get it from https://brew.sh, or download the software from \</span></span>
+<span class="ln" id="L506"><span class="tok-str">             its own page.&quot;</span></span>
+<span class="ln" id="L507">                .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L508">        );</span>
+<span class="ln" id="L509">    }</span>
+<span class="ln" id="L510">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> argv = vec![<span class="tok-str">&quot;brew&quot;</span>.<span class="tok-fn">to_string</span>()];</span>
+<span class="ln" id="L511">    argv.<span class="tok-fn">extend</span>(arguments.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|part| part.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L512">    Offer::Command {</span>
+<span class="ln" id="L513">        argv,</span>
+<span class="ln" id="L514">        via: <span class="tok-str">&quot;Homebrew&quot;</span>,</span>
+<span class="ln" id="L515">        <span class="tok-com">// Homebrew installs into a prefix the user owns, on purpose.</span></span>
+<span class="ln" id="L516">        needs_privilege: false,</span>
+<span class="ln" id="L517">    }</span>
+<span class="ln" id="L518">}</span>
 </span>
-<span class="ln" id="L504"></span>
-<span class="src-item" id="fn-audacity_offer">
-<span class="ln" id="L505"><span class="tok-com">/// The route to Audacity differs per platform, and on Linux per distribution.</span></span>
-<span class="ln" id="L506"><span class="tok-com">///</span></span>
-<span class="ln" id="L507"><span class="tok-com">/// The package managers here are the same list `install/install.sh` uses, in</span></span>
-<span class="ln" id="L508"><span class="tok-com">/// the same order, so the two agree about what this machine is. The ones that</span></span>
-<span class="ln" id="L509"><span class="tok-com">/// need `sudo` are marked as needing it rather than being run: this program is</span></span>
-<span class="ln" id="L510"><span class="tok-com">/// not going to prompt for a root password.</span></span>
-<span class="ln" id="L511"><span class="tok-kw">fn</span> <span class="tok-fn">audacity_offer</span>() -&gt; Offer {</span>
-<span class="ln" id="L512">    <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L513">        <span class="tok-kw">return</span> <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;winget&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L514">            Offer::Command {</span>
-<span class="ln" id="L515">                argv: vec![</span>
-<span class="ln" id="L516">                    <span class="tok-str">&quot;winget&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L517">                    <span class="tok-str">&quot;install&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L518">                    <span class="tok-str">&quot;--id&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L519">                    <span class="tok-str">&quot;Audacity.Audacity&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L520">                    <span class="tok-str">&quot;-e&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L521">                    <span class="tok-str">&quot;--accept-package-agreements&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L522">                    <span class="tok-str">&quot;--accept-source-agreements&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L523">                ],</span>
-<span class="ln" id="L524">                via: <span class="tok-str">&quot;winget&quot;</span>,</span>
-<span class="ln" id="L525">                <span class="tok-com">// winget elevates itself for a machine-scope package, with</span></span>
-<span class="ln" id="L526">                <span class="tok-com">// Windows asking the user rather than this program.</span></span>
-<span class="ln" id="L527">                needs_privilege: false,</span>
-<span class="ln" id="L528">            }</span>
-<span class="ln" id="L529">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L530">            Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
-<span class="ln" id="L531">                <span class="tok-str">&quot;winget is not on this system. Download Audacity from its own page.&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L532">            )</span>
-<span class="ln" id="L533">        };</span>
-<span class="ln" id="L534">    }</span>
-<span class="ln" id="L535">    <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
-<span class="ln" id="L536">        <span class="tok-kw">return</span> <span class="tok-fn">brew</span>(&amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;--cask&quot;</span>, <span class="tok-str">&quot;audacity&quot;</span>]);</span>
+<span class="ln" id="L519"></span>
+<span class="src-item" id="fn-detect_gnupg">
+<span class="ln" id="L520"><span class="tok-com">/// The route to Audacity differs per platform, and on Linux per distribution.</span></span>
+<span class="ln" id="L521"><span class="tok-com">///</span></span>
+<span class="ln" id="L522"><span class="tok-com">/// The package managers here are the same list `install/install.sh` uses, in</span></span>
+<span class="ln" id="L523"><span class="tok-com">/// the same order, so the two agree about what this machine is. The ones that</span></span>
+<span class="ln" id="L524"><span class="tok-com">/// need `sudo` are marked as needing it rather than being run: this program is</span></span>
+<span class="ln" id="L525"><span class="tok-com">/// not going to prompt for a root password.</span></span>
+<span class="ln" id="L526"><span class="tok-com">/// GnuPG, which is on `PATH` or is not.</span></span>
+<span class="ln" id="L527"><span class="tok-com">///</span></span>
+<span class="ln" id="L528"><span class="tok-com">/// No hunt through program directories, unlike the audio companions. A `gpg`</span></span>
+<span class="ln" id="L529"><span class="tok-com">/// that is installed but not on `PATH` is one the commands printed beside the</span></span>
+<span class="ln" id="L530"><span class="tok-com">/// verifier would not find either, so reporting it as present would be</span></span>
+<span class="ln" id="L531"><span class="tok-com">/// reporting something the reader cannot use.</span></span>
+<span class="ln" id="L532"><span class="tok-kw">fn</span> <span class="tok-fn">detect_gnupg</span>() -&gt; Presence {</span>
+<span class="ln" id="L533">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;gpg&quot;</span>, <span class="tok-str">&quot;gpg2&quot;</span>] {</span>
+<span class="ln" id="L534">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(found) = <span class="tok-fn">on_path</span>(name) {</span>
+<span class="ln" id="L535">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(found.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L536">        }</span>
 <span class="ln" id="L537">    }</span>
-<span class="ln" id="L538">    <span class="tok-com">// Linux and the BSDs: whichever package manager is actually here.</span></span>
-<span class="ln" id="L539">    <span class="tok-kw">for</span> (manager, install) <span class="tok-kw">in</span> UNIX_PACKAGE_MANAGERS {</span>
-<span class="ln" id="L540">        <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(manager).<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L541">            continue;</span>
-<span class="ln" id="L542">        }</span>
-<span class="ln" id="L543">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> argv = vec![<span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(), (*manager).<span class="tok-fn">to_string</span>()];</span>
-<span class="ln" id="L544">        argv.<span class="tok-fn">extend</span>(install.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|part| (*part).<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L545">        argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;audacity&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L546">        <span class="tok-kw">return</span> Offer::Command {</span>
-<span class="ln" id="L547">            argv,</span>
-<span class="ln" id="L548">            via: manager,</span>
-<span class="ln" id="L549">            needs_privilege: true,</span>
-<span class="ln" id="L550">        };</span>
-<span class="ln" id="L551">    }</span>
-<span class="ln" id="L552">    Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
-<span class="ln" id="L553">        <span class="tok-str">&quot;no package manager this program recognises is on PATH. Install Audacity the \</span></span>
-<span class="ln" id="L554"><span class="tok-str">         way you install anything else on this system.&quot;</span></span>
-<span class="ln" id="L555">            .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L556">    )</span>
-<span class="ln" id="L557">}</span>
+<span class="ln" id="L538">    Presence::NotDetected</span>
+<span class="ln" id="L539">}</span>
 </span>
-<span class="ln" id="L558"></span>
-<span class="src-item" id="fn-unix_package_managers">
-<span class="ln" id="L559"><span class="tok-com">/// Package managers, and the arguments that install one named package</span></span>
-<span class="ln" id="L560"><span class="tok-com">/// non-interactively. The same set and the same order as `install/install.sh`.</span></span>
-<span class="ln" id="L561"><span class="tok-kw">const</span> UNIX_PACKAGE_MANAGERS: &amp;[(&amp;str, &amp;[&amp;str])] = &amp;[</span>
-<span class="ln" id="L562">    (<span class="tok-str">&quot;apt-get&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
-<span class="ln" id="L563">    (<span class="tok-str">&quot;dnf&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
-<span class="ln" id="L564">    (<span class="tok-str">&quot;pacman&quot;</span>, &amp;[<span class="tok-str">&quot;-S&quot;</span>, <span class="tok-str">&quot;--noconfirm&quot;</span>]),</span>
-<span class="ln" id="L565">    (<span class="tok-str">&quot;zypper&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
-<span class="ln" id="L566">    (<span class="tok-str">&quot;apk&quot;</span>, &amp;[<span class="tok-str">&quot;add&quot;</span>]),</span>
-<span class="ln" id="L567">    (<span class="tok-str">&quot;pkg&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
-<span class="ln" id="L568">];</span>
+<span class="ln" id="L540"></span>
+<span class="src-item" id="fn-gnupg_offer">
+<span class="ln" id="L541"><span class="tok-com">/// How GnuPG would be installed here.</span></span>
+<span class="ln" id="L542"><span class="tok-com">///</span></span>
+<span class="ln" id="L543"><span class="tok-com">/// On Windows this is Gpg4win through winget, which is the packaging almost</span></span>
+<span class="ln" id="L544"><span class="tok-com">/// everybody means by &quot;GnuPG on Windows&quot;. The other route on Windows is a</span></span>
+<span class="ln" id="L545"><span class="tok-com">/// `gpg` inside WSL, which is not an install of anything on Windows itself</span></span>
+<span class="ln" id="L546"><span class="tok-com">/// and is offered separately by `veilvoice-gnupg`.</span></span>
+<span class="ln" id="L547"><span class="tok-kw">fn</span> <span class="tok-fn">gnupg_offer</span>() -&gt; Offer {</span>
+<span class="ln" id="L548">    <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L549">        <span class="tok-kw">return</span> <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;winget&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L550">            Offer::Command {</span>
+<span class="ln" id="L551">                argv: vec![</span>
+<span class="ln" id="L552">                    <span class="tok-str">&quot;winget&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L553">                    <span class="tok-str">&quot;install&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L554">                    <span class="tok-str">&quot;--id&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L555">                    <span class="tok-str">&quot;GnuPG.Gpg4win&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L556">                    <span class="tok-str">&quot;-e&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L557">                    <span class="tok-str">&quot;--accept-package-agreements&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L558">                    <span class="tok-str">&quot;--accept-source-agreements&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L559">                ],</span>
+<span class="ln" id="L560">                via: <span class="tok-str">&quot;winget&quot;</span>,</span>
+<span class="ln" id="L561">                needs_privilege: false,</span>
+<span class="ln" id="L562">            }</span>
+<span class="ln" id="L563">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L564">            Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
+<span class="ln" id="L565">                <span class="tok-str">&quot;winget is not on this system. Gpg4win can be downloaded from \</span></span>
+<span class="ln" id="L566"><span class="tok-str">                 gpg4win.org, or a `gpg` inside WSL can be used instead.&quot;</span></span>
+<span class="ln" id="L567">                    .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L568">            )</span>
+<span class="ln" id="L569">        };</span>
+<span class="ln" id="L570">    }</span>
+<span class="ln" id="L571">    <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
+<span class="ln" id="L572">        <span class="tok-kw">return</span> <span class="tok-fn">brew</span>(&amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;gnupg&quot;</span>]);</span>
+<span class="ln" id="L573">    }</span>
+<span class="ln" id="L574">    <span class="tok-kw">for</span> (manager, install) <span class="tok-kw">in</span> UNIX_PACKAGE_MANAGERS {</span>
+<span class="ln" id="L575">        <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(manager).<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L576">            continue;</span>
+<span class="ln" id="L577">        }</span>
+<span class="ln" id="L578">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> argv = vec![<span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(), (*manager).<span class="tok-fn">to_string</span>()];</span>
+<span class="ln" id="L579">        argv.<span class="tok-fn">extend</span>(install.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|part| (*part).<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L580">        <span class="tok-com">// Debian and Ubuntu call it `gnupg`; so do Fedora and Arch.</span></span>
+<span class="ln" id="L581">        argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;gnupg&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L582">        <span class="tok-kw">return</span> Offer::Command {</span>
+<span class="ln" id="L583">            argv,</span>
+<span class="ln" id="L584">            via: manager,</span>
+<span class="ln" id="L585">            needs_privilege: true,</span>
+<span class="ln" id="L586">        };</span>
+<span class="ln" id="L587">    }</span>
+<span class="ln" id="L588">    Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
+<span class="ln" id="L589">        <span class="tok-str">&quot;no package manager this program recognises is on PATH. Install GnuPG the \</span></span>
+<span class="ln" id="L590"><span class="tok-str">         way you install anything else on this system.&quot;</span></span>
+<span class="ln" id="L591">            .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L592">    )</span>
+<span class="ln" id="L593">}</span>
 </span>
-<span class="ln" id="L569"></span>
-<span class="ln" id="L570"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L571"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L572">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L573"></span>
-<span class="ln" id="L574">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L575">    <span class="tok-kw">fn</span> <span class="tok-fn">every_companion_has_a_probe_and_a_route</span>() {</span>
-<span class="ln" id="L576">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L577">            <span class="tok-com">// A probe that is not written returns Unknown with that wording,</span></span>
-<span class="ln" id="L578">            <span class="tok-com">// which is the failure this catches.</span></span>
-<span class="ln" id="L579">            <span class="tok-kw">let</span> presence = companion.<span class="tok-fn">detect</span>();</span>
-<span class="ln" id="L580">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::<span class="tok-fn">Unknown</span>(reason) = &amp;presence {</span>
-<span class="ln" id="L581">                assert!(</span>
-<span class="ln" id="L582">                    !reason.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no probe is written&quot;</span>),</span>
-<span class="ln" id="L583">                    <span class="tok-str">&quot;{} has no probe&quot;</span>,</span>
-<span class="ln" id="L584">                    companion.key</span>
-<span class="ln" id="L585">                );</span>
-<span class="ln" id="L586">            }</span>
-<span class="ln" id="L587">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::<span class="tok-fn">NoKnownRoute</span>(reason) = companion.<span class="tok-fn">offer</span>() {</span>
-<span class="ln" id="L588">                assert!(</span>
-<span class="ln" id="L589">                    !reason.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no route is written&quot;</span>),</span>
-<span class="ln" id="L590">                    <span class="tok-str">&quot;{} has no route&quot;</span>,</span>
-<span class="ln" id="L591">                    companion.key</span>
-<span class="ln" id="L592">                );</span>
-<span class="ln" id="L593">            }</span>
-<span class="ln" id="L594">        }</span>
-<span class="ln" id="L595">    }</span>
-<span class="ln" id="L596"></span>
-<span class="ln" id="L597">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L598">    <span class="tok-kw">fn</span> <span class="tok-fn">detection_changes_nothing_and_is_repeatable</span>() {</span>
-<span class="ln" id="L599">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L600">            <span class="tok-kw">let</span> first = companion.<span class="tok-fn">detect</span>();</span>
-<span class="ln" id="L601">            <span class="tok-kw">let</span> second = companion.<span class="tok-fn">detect</span>();</span>
-<span class="ln" id="L602">            assert_eq!(</span>
-<span class="ln" id="L603">                first, second,</span>
-<span class="ln" id="L604">                <span class="tok-str">&quot;{} answered differently twice: a probe has a side effect&quot;</span>,</span>
-<span class="ln" id="L605">                companion.key</span>
-<span class="ln" id="L606">            );</span>
-<span class="ln" id="L607">        }</span>
-<span class="ln" id="L608">    }</span>
-<span class="ln" id="L609"></span>
-<span class="ln" id="L610">    <span class="tok-com">/// The keys a front end stores must be stable and unique.</span></span>
-<span class="ln" id="L611">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L612">    <span class="tok-kw">fn</span> <span class="tok-fn">keys_are_unique</span>() {</span>
-<span class="ln" id="L613">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|c| c.key).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L614">        keys.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L615">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L616">        keys.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L617">        assert_eq!(before, keys.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;two companions share a key&quot;</span>);</span>
+<span class="ln" id="L594"></span>
+<span class="src-item" id="fn-audacity_offer">
+<span class="ln" id="L595"><span class="tok-kw">fn</span> <span class="tok-fn">audacity_offer</span>() -&gt; Offer {</span>
+<span class="ln" id="L596">    <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L597">        <span class="tok-kw">return</span> <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;winget&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L598">            Offer::Command {</span>
+<span class="ln" id="L599">                argv: vec![</span>
+<span class="ln" id="L600">                    <span class="tok-str">&quot;winget&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L601">                    <span class="tok-str">&quot;install&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L602">                    <span class="tok-str">&quot;--id&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L603">                    <span class="tok-str">&quot;Audacity.Audacity&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L604">                    <span class="tok-str">&quot;-e&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L605">                    <span class="tok-str">&quot;--accept-package-agreements&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L606">                    <span class="tok-str">&quot;--accept-source-agreements&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L607">                ],</span>
+<span class="ln" id="L608">                via: <span class="tok-str">&quot;winget&quot;</span>,</span>
+<span class="ln" id="L609">                <span class="tok-com">// winget elevates itself for a machine-scope package, with</span></span>
+<span class="ln" id="L610">                <span class="tok-com">// Windows asking the user rather than this program.</span></span>
+<span class="ln" id="L611">                needs_privilege: false,</span>
+<span class="ln" id="L612">            }</span>
+<span class="ln" id="L613">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L614">            Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
+<span class="ln" id="L615">                <span class="tok-str">&quot;winget is not on this system. Download Audacity from its own page.&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L616">            )</span>
+<span class="ln" id="L617">        };</span>
 <span class="ln" id="L618">    }</span>
-<span class="ln" id="L619"></span>
-<span class="ln" id="L620">    <span class="tok-com">/// Every companion names its author and its licence. Somebody being asked</span></span>
-<span class="ln" id="L621">    <span class="tok-com">/// to install software is entitled to both before they answer, and an</span></span>
-<span class="ln" id="L622">    <span class="tok-com">/// empty string here would render as a blank line nobody notices.</span></span>
-<span class="ln" id="L623">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L624">    <span class="tok-kw">fn</span> <span class="tok-fn">each_one_says_who_wrote_it_and_under_what_licence</span>() {</span>
-<span class="ln" id="L625">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L626">            assert!(!companion.vendor.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
-<span class="ln" id="L627">            assert!(!companion.licence.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
-<span class="ln" id="L628">            assert!(!companion.what.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
-<span class="ln" id="L629">            assert!(!companion.why.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
-<span class="ln" id="L630">            assert!(</span>
-<span class="ln" id="L631">                companion.page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>),</span>
-<span class="ln" id="L632">                <span class="tok-str">&quot;{} must link over https&quot;</span>,</span>
-<span class="ln" id="L633">                companion.key</span>
-<span class="ln" id="L634">            );</span>
-<span class="ln" id="L635">        }</span>
-<span class="ln" id="L636">    }</span>
-<span class="ln" id="L637"></span>
-<span class="ln" id="L638">    <span class="tok-com">/// VB-CABLE is proprietary donationware, and the offer must never become a</span></span>
-<span class="ln" id="L639">    <span class="tok-com">/// download-and-run. This is a locked position, not a default.</span></span>
-<span class="ln" id="L640">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L641">    <span class="tok-kw">fn</span> <span class="tok-fn">proprietary_software_is_only_ever_a_link</span>() {</span>
-<span class="ln" id="L642">        <span class="tok-kw">let</span> cable = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;vb-cable&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;VB-CABLE is in the list&quot;</span>);</span>
-<span class="ln" id="L643">        assert!(cable.licence.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;proprietary&quot;</span>));</span>
-<span class="ln" id="L644">        <span class="tok-kw">match</span> cable.<span class="tok-fn">offer</span>() {</span>
-<span class="ln" id="L645">            Offer::<span class="tok-fn">Page</span>(url) =&gt; assert_eq!(url, cable.page),</span>
-<span class="ln" id="L646">            Offer::NotOnThisPlatform =&gt; {} <span class="tok-com">// not Windows; nothing is offered</span></span>
-<span class="ln" id="L647">            other =&gt; panic!(<span class="tok-str">&quot;VB-CABLE must only ever be a link, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L648">        }</span>
-<span class="ln" id="L649">    }</span>
-<span class="ln" id="L650"></span>
-<span class="ln" id="L651">    <span class="tok-com">/// A front end must not be able to hand `run` something that needs root.</span></span>
-<span class="ln" id="L652">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L653">    <span class="tok-kw">fn</span> <span class="tok-fn">run_refuses_anything_needing_privilege</span>() {</span>
-<span class="ln" id="L654">        <span class="tok-kw">let</span> offer = Offer::Command {</span>
-<span class="ln" id="L655">            argv: vec![<span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;apt-get&quot;</span>.<span class="tok-fn">to_string</span>()],</span>
-<span class="ln" id="L656">            via: <span class="tok-str">&quot;apt-get&quot;</span>,</span>
-<span class="ln" id="L657">            needs_privilege: true,</span>
-<span class="ln" id="L658">        };</span>
-<span class="ln" id="L659">        assert!(!offer.<span class="tok-fn">is_runnable</span>());</span>
-<span class="ln" id="L660">        <span class="tok-kw">let</span> error = <span class="tok-fn">run</span>(&amp;offer).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a privileged command must be refused&quot;</span>);</span>
-<span class="ln" id="L661">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;administrator&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L662"></span>
-<span class="ln" id="L663">        assert!(<span class="tok-fn">run</span>(&amp;Offer::<span class="tok-fn">Page</span>(<span class="tok-str">&quot;https://example.invalid&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L664">        assert!(<span class="tok-fn">run</span>(&amp;Offer::NotOnThisPlatform).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L665">    }</span>
-<span class="ln" id="L666"></span>
-<span class="ln" id="L667">    <span class="tok-com">/// Any command that starts with `sudo` must be marked as needing</span></span>
-<span class="ln" id="L668">    <span class="tok-com">/// privilege, or `run` would happily spawn it and block on a password</span></span>
-<span class="ln" id="L669">    <span class="tok-com">/// prompt no window can answer.</span></span>
-<span class="ln" id="L670">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L671">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sudo_command_is_always_marked_privileged</span>() {</span>
-<span class="ln" id="L672">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L673">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command {</span>
-<span class="ln" id="L674">                argv,</span>
-<span class="ln" id="L675">                needs_privilege,</span>
-<span class="ln" id="L676">                ..</span>
-<span class="ln" id="L677">            } = companion.<span class="tok-fn">offer</span>()</span>
-<span class="ln" id="L678">            {</span>
-<span class="ln" id="L679">                <span class="tok-kw">if</span> argv.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(|first| first == <span class="tok-str">&quot;sudo&quot;</span>).<span class="tok-fn">unwrap_or</span>(false) {</span>
-<span class="ln" id="L680">                    assert!(</span>
-<span class="ln" id="L681">                        needs_privilege,</span>
-<span class="ln" id="L682">                        <span class="tok-str">&quot;{} would run sudo without saying so&quot;</span>,</span>
-<span class="ln" id="L683">                        companion.key</span>
-<span class="ln" id="L684">                    );</span>
-<span class="ln" id="L685">                }</span>
-<span class="ln" id="L686">            }</span>
-<span class="ln" id="L687">        }</span>
-<span class="ln" id="L688">    }</span>
-<span class="ln" id="L689"></span>
-<span class="ln" id="L690">    <span class="tok-com">/// Presence has three states and the middle one is not a claim about the</span></span>
-<span class="ln" id="L691">    <span class="tok-com">/// machine. If this ever reads &quot;not installed&quot; the wording has drifted.</span></span>
-<span class="ln" id="L692">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L693">    <span class="tok-kw">fn</span> <span class="tok-fn">not_detected_does_not_claim_absence</span>() {</span>
-<span class="ln" id="L694">        <span class="tok-kw">let</span> text = Presence::NotDetected.<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L695">        assert!(</span>
-<span class="ln" id="L696">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not found where it usually installs&quot;</span>),</span>
-<span class="ln" id="L697">            <span class="tok-str">&quot;{text}&quot;</span></span>
-<span class="ln" id="L698">        );</span>
-<span class="ln" id="L699">        assert!(!text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not installed&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L700">        assert!(Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;no reason&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L701">            .<span class="tok-fn">describe</span>()</span>
-<span class="ln" id="L702">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not tell&quot;</span>));</span>
-<span class="ln" id="L703">        assert!(!Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">is_present</span>());</span>
-<span class="ln" id="L704">        assert!(!Presence::NotDetected.<span class="tok-fn">is_present</span>());</span>
-<span class="ln" id="L705">        assert!(Presence::<span class="tok-fn">Present</span>(<span class="tok-str">&quot;/somewhere&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">is_present</span>());</span>
-<span class="ln" id="L706">    }</span>
-<span class="ln" id="L707"></span>
-<span class="ln" id="L708">    <span class="tok-com">/// The platform list is a filter, never an empty screen: Audacity applies</span></span>
-<span class="ln" id="L709">    <span class="tok-com">/// everywhere, so there is always at least one entry.</span></span>
-<span class="ln" id="L710">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L711">    <span class="tok-kw">fn</span> <span class="tok-fn">this_platform_has_at_least_the_editor</span>() {</span>
-<span class="ln" id="L712">        <span class="tok-kw">let</span> here = <span class="tok-fn">for_this_platform</span>();</span>
-<span class="ln" id="L713">        assert!(</span>
-<span class="ln" id="L714">            here.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|companion| companion.key == <span class="tok-str">&quot;audacity&quot;</span>),</span>
-<span class="ln" id="L715">            <span class="tok-str">&quot;Audacity applies on every platform&quot;</span></span>
-<span class="ln" id="L716">        );</span>
-<span class="ln" id="L717">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> here {</span>
-<span class="ln" id="L718">            assert!(!matches!(companion.<span class="tok-fn">offer</span>(), Offer::NotOnThisPlatform));</span>
+<span class="ln" id="L619">    <span class="tok-kw">if</span> cfg!(target_os = <span class="tok-str">&quot;macos&quot;</span>) {</span>
+<span class="ln" id="L620">        <span class="tok-kw">return</span> <span class="tok-fn">brew</span>(&amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;--cask&quot;</span>, <span class="tok-str">&quot;audacity&quot;</span>]);</span>
+<span class="ln" id="L621">    }</span>
+<span class="ln" id="L622">    <span class="tok-com">// Linux and the BSDs: whichever package manager is actually here.</span></span>
+<span class="ln" id="L623">    <span class="tok-kw">for</span> (manager, install) <span class="tok-kw">in</span> UNIX_PACKAGE_MANAGERS {</span>
+<span class="ln" id="L624">        <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(manager).<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L625">            continue;</span>
+<span class="ln" id="L626">        }</span>
+<span class="ln" id="L627">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> argv = vec![<span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(), (*manager).<span class="tok-fn">to_string</span>()];</span>
+<span class="ln" id="L628">        argv.<span class="tok-fn">extend</span>(install.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|part| (*part).<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L629">        argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;audacity&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L630">        <span class="tok-kw">return</span> Offer::Command {</span>
+<span class="ln" id="L631">            argv,</span>
+<span class="ln" id="L632">            via: manager,</span>
+<span class="ln" id="L633">            needs_privilege: true,</span>
+<span class="ln" id="L634">        };</span>
+<span class="ln" id="L635">    }</span>
+<span class="ln" id="L636">    Offer::<span class="tok-fn">NoKnownRoute</span>(</span>
+<span class="ln" id="L637">        <span class="tok-str">&quot;no package manager this program recognises is on PATH. Install Audacity the \</span></span>
+<span class="ln" id="L638"><span class="tok-str">         way you install anything else on this system.&quot;</span></span>
+<span class="ln" id="L639">            .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L640">    )</span>
+<span class="ln" id="L641">}</span>
+</span>
+<span class="ln" id="L642"></span>
+<span class="src-item" id="fn-unix_package_managers">
+<span class="ln" id="L643"><span class="tok-com">/// Package managers, and the arguments that install one named package</span></span>
+<span class="ln" id="L644"><span class="tok-com">/// non-interactively. The same set and the same order as `install/install.sh`.</span></span>
+<span class="ln" id="L645"><span class="tok-kw">const</span> UNIX_PACKAGE_MANAGERS: &amp;[(&amp;str, &amp;[&amp;str])] = &amp;[</span>
+<span class="ln" id="L646">    (<span class="tok-str">&quot;apt-get&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
+<span class="ln" id="L647">    (<span class="tok-str">&quot;dnf&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
+<span class="ln" id="L648">    (<span class="tok-str">&quot;pacman&quot;</span>, &amp;[<span class="tok-str">&quot;-S&quot;</span>, <span class="tok-str">&quot;--noconfirm&quot;</span>]),</span>
+<span class="ln" id="L649">    (<span class="tok-str">&quot;zypper&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
+<span class="ln" id="L650">    (<span class="tok-str">&quot;apk&quot;</span>, &amp;[<span class="tok-str">&quot;add&quot;</span>]),</span>
+<span class="ln" id="L651">    (<span class="tok-str">&quot;pkg&quot;</span>, &amp;[<span class="tok-str">&quot;install&quot;</span>, <span class="tok-str">&quot;-y&quot;</span>]),</span>
+<span class="ln" id="L652">];</span>
+</span>
+<span class="ln" id="L653"></span>
+<span class="ln" id="L654"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L655"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L656">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L657"></span>
+<span class="ln" id="L658">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L659">    <span class="tok-kw">fn</span> <span class="tok-fn">every_companion_has_a_probe_and_a_route</span>() {</span>
+<span class="ln" id="L660">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L661">            <span class="tok-com">// A probe that is not written returns Unknown with that wording,</span></span>
+<span class="ln" id="L662">            <span class="tok-com">// which is the failure this catches.</span></span>
+<span class="ln" id="L663">            <span class="tok-kw">let</span> presence = companion.<span class="tok-fn">detect</span>();</span>
+<span class="ln" id="L664">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::<span class="tok-fn">Unknown</span>(reason) = &amp;presence {</span>
+<span class="ln" id="L665">                assert!(</span>
+<span class="ln" id="L666">                    !reason.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no probe is written&quot;</span>),</span>
+<span class="ln" id="L667">                    <span class="tok-str">&quot;{} has no probe&quot;</span>,</span>
+<span class="ln" id="L668">                    companion.key</span>
+<span class="ln" id="L669">                );</span>
+<span class="ln" id="L670">            }</span>
+<span class="ln" id="L671">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::<span class="tok-fn">NoKnownRoute</span>(reason) = companion.<span class="tok-fn">offer</span>() {</span>
+<span class="ln" id="L672">                assert!(</span>
+<span class="ln" id="L673">                    !reason.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no route is written&quot;</span>),</span>
+<span class="ln" id="L674">                    <span class="tok-str">&quot;{} has no route&quot;</span>,</span>
+<span class="ln" id="L675">                    companion.key</span>
+<span class="ln" id="L676">                );</span>
+<span class="ln" id="L677">            }</span>
+<span class="ln" id="L678">        }</span>
+<span class="ln" id="L679">    }</span>
+<span class="ln" id="L680"></span>
+<span class="ln" id="L681">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L682">    <span class="tok-kw">fn</span> <span class="tok-fn">detection_changes_nothing_and_is_repeatable</span>() {</span>
+<span class="ln" id="L683">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L684">            <span class="tok-kw">let</span> first = companion.<span class="tok-fn">detect</span>();</span>
+<span class="ln" id="L685">            <span class="tok-kw">let</span> second = companion.<span class="tok-fn">detect</span>();</span>
+<span class="ln" id="L686">            assert_eq!(</span>
+<span class="ln" id="L687">                first, second,</span>
+<span class="ln" id="L688">                <span class="tok-str">&quot;{} answered differently twice: a probe has a side effect&quot;</span>,</span>
+<span class="ln" id="L689">                companion.key</span>
+<span class="ln" id="L690">            );</span>
+<span class="ln" id="L691">        }</span>
+<span class="ln" id="L692">    }</span>
+<span class="ln" id="L693"></span>
+<span class="ln" id="L694">    <span class="tok-com">/// The keys a front end stores must be stable and unique.</span></span>
+<span class="ln" id="L695">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L696">    <span class="tok-kw">fn</span> <span class="tok-fn">keys_are_unique</span>() {</span>
+<span class="ln" id="L697">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|c| c.key).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L698">        keys.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L699">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L700">        keys.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L701">        assert_eq!(before, keys.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;two companions share a key&quot;</span>);</span>
+<span class="ln" id="L702">    }</span>
+<span class="ln" id="L703"></span>
+<span class="ln" id="L704">    <span class="tok-com">/// Every companion names its author and its licence. Somebody being asked</span></span>
+<span class="ln" id="L705">    <span class="tok-com">/// to install software is entitled to both before they answer, and an</span></span>
+<span class="ln" id="L706">    <span class="tok-com">/// empty string here would render as a blank line nobody notices.</span></span>
+<span class="ln" id="L707">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L708">    <span class="tok-kw">fn</span> <span class="tok-fn">each_one_says_who_wrote_it_and_under_what_licence</span>() {</span>
+<span class="ln" id="L709">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L710">            assert!(!companion.vendor.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
+<span class="ln" id="L711">            assert!(!companion.licence.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
+<span class="ln" id="L712">            assert!(!companion.what.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
+<span class="ln" id="L713">            assert!(!companion.why.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, companion.key);</span>
+<span class="ln" id="L714">            assert!(</span>
+<span class="ln" id="L715">                companion.page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>),</span>
+<span class="ln" id="L716">                <span class="tok-str">&quot;{} must link over https&quot;</span>,</span>
+<span class="ln" id="L717">                companion.key</span>
+<span class="ln" id="L718">            );</span>
 <span class="ln" id="L719">        }</span>
 <span class="ln" id="L720">    }</span>
 <span class="ln" id="L721"></span>
-<span class="ln" id="L722">    <span class="tok-com">/// Exactly one virtual-cable companion is shown per platform. Two would</span></span>
-<span class="ln" id="L723">    <span class="tok-com">/// mean somebody is being offered a driver for an operating system they</span></span>
-<span class="ln" id="L724">    <span class="tok-com">/// are not running.</span></span>
-<span class="ln" id="L725">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L726">    <span class="tok-kw">fn</span> <span class="tok-fn">one_virtual_cable_at_most_per_platform</span>() {</span>
-<span class="ln" id="L727">        <span class="tok-kw">let</span> cables = <span class="tok-fn">for_this_platform</span>()</span>
-<span class="ln" id="L728">            .<span class="tok-fn">into_iter</span>()</span>
-<span class="ln" id="L729">            .<span class="tok-fn">filter</span>(|companion| matches!(companion.key, <span class="tok-str">&quot;vb-cable&quot;</span> | <span class="tok-str">&quot;blackhole&quot;</span>))</span>
-<span class="ln" id="L730">            .<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L731">        assert!(cables &lt;= <span class="tok-num">1</span>, <span class="tok-str">&quot;{cables} virtual cables offered at once&quot;</span>);</span>
-<span class="ln" id="L732">    }</span>
-<span class="ln" id="L733"></span>
-<span class="ln" id="L734">    <span class="tok-com">/// Only https, and the check is here rather than at each call site.</span></span>
-<span class="ln" id="L735">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L736">    <span class="tok-kw">fn</span> <span class="tok-fn">only_https_pages_are_opened</span>() {</span>
-<span class="ln" id="L737">        <span class="tok-kw">for</span> refused <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L738">            <span class="tok-str">&quot;http://example.invalid&quot;</span>,</span>
-<span class="ln" id="L739">            <span class="tok-str">&quot;file:///etc/passwd&quot;</span>,</span>
-<span class="ln" id="L740">            <span class="tok-str">&quot;javascript:alert(1)&quot;</span>,</span>
-<span class="ln" id="L741">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L742">        ] {</span>
-<span class="ln" id="L743">            <span class="tok-kw">let</span> error = <span class="tok-fn">open_page</span>(refused).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;should refuse&quot;</span>);</span>
-<span class="ln" id="L744">            assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only https&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L745">        }</span>
-<span class="ln" id="L746">    }</span>
-<span class="ln" id="L747"></span>
-<span class="ln" id="L748">    <span class="tok-com">/// Every page in the list must be one `open_page` would accept, or a</span></span>
-<span class="ln" id="L749">    <span class="tok-com">/// button in the interface leads to an error message.</span></span>
-<span class="ln" id="L750">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L751">    <span class="tok-kw">fn</span> <span class="tok-fn">every_page_is_one_that_could_be_opened</span>() {</span>
-<span class="ln" id="L752">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L753">            assert!(</span>
-<span class="ln" id="L754">                companion.page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>),</span>
-<span class="ln" id="L755">                <span class="tok-str">&quot;{} would be refused by open_page&quot;</span>,</span>
-<span class="ln" id="L756">                companion.key</span>
-<span class="ln" id="L757">            );</span>
-<span class="ln" id="L758">        }</span>
-<span class="ln" id="L759">    }</span>
-<span class="ln" id="L760"></span>
-<span class="ln" id="L761">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L762">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_key_is_none</span>() {</span>
-<span class="ln" id="L763">        assert!(<span class="tok-fn">by_key</span>(<span class="tok-str">&quot;not-a-companion&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L764">        assert!(<span class="tok-fn">by_key</span>(<span class="tok-str">&quot;audacity&quot;</span>).<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L765">    }</span>
-<span class="ln" id="L766"></span>
-<span class="ln" id="L767">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L768">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_on_path_is_found_for_a_nonsense_name</span>() {</span>
-<span class="ln" id="L769">        assert!(<span class="tok-fn">on_path</span>(<span class="tok-str">&quot;this-program-does-not-exist-42&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L770">    }</span>
-<span class="ln" id="L771">}</span>
+<span class="ln" id="L722">    <span class="tok-com">/// VB-CABLE is proprietary donationware, and the offer must never become a</span></span>
+<span class="ln" id="L723">    <span class="tok-com">/// download-and-run. This is a locked position, not a default.</span></span>
+<span class="ln" id="L724">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L725">    <span class="tok-kw">fn</span> <span class="tok-fn">proprietary_software_is_only_ever_a_link</span>() {</span>
+<span class="ln" id="L726">        <span class="tok-kw">let</span> cable = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;vb-cable&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;VB-CABLE is in the list&quot;</span>);</span>
+<span class="ln" id="L727">        assert!(cable.licence.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;proprietary&quot;</span>));</span>
+<span class="ln" id="L728">        <span class="tok-kw">match</span> cable.<span class="tok-fn">offer</span>() {</span>
+<span class="ln" id="L729">            Offer::<span class="tok-fn">Page</span>(url) =&gt; assert_eq!(url, cable.page),</span>
+<span class="ln" id="L730">            Offer::NotOnThisPlatform =&gt; {} <span class="tok-com">// not Windows; nothing is offered</span></span>
+<span class="ln" id="L731">            other =&gt; panic!(<span class="tok-str">&quot;VB-CABLE must only ever be a link, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L732">        }</span>
+<span class="ln" id="L733">    }</span>
+<span class="ln" id="L734"></span>
+<span class="ln" id="L735">    <span class="tok-com">/// A front end must not be able to hand `run` something that needs root.</span></span>
+<span class="ln" id="L736">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L737">    <span class="tok-kw">fn</span> <span class="tok-fn">run_refuses_anything_needing_privilege</span>() {</span>
+<span class="ln" id="L738">        <span class="tok-kw">let</span> offer = Offer::Command {</span>
+<span class="ln" id="L739">            argv: vec![<span class="tok-str">&quot;sudo&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;apt-get&quot;</span>.<span class="tok-fn">to_string</span>()],</span>
+<span class="ln" id="L740">            via: <span class="tok-str">&quot;apt-get&quot;</span>,</span>
+<span class="ln" id="L741">            needs_privilege: true,</span>
+<span class="ln" id="L742">        };</span>
+<span class="ln" id="L743">        assert!(!offer.<span class="tok-fn">is_runnable</span>());</span>
+<span class="ln" id="L744">        <span class="tok-kw">let</span> error = <span class="tok-fn">run</span>(&amp;offer).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a privileged command must be refused&quot;</span>);</span>
+<span class="ln" id="L745">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;administrator&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L746"></span>
+<span class="ln" id="L747">        assert!(<span class="tok-fn">run</span>(&amp;Offer::<span class="tok-fn">Page</span>(<span class="tok-str">&quot;https://example.invalid&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L748">        assert!(<span class="tok-fn">run</span>(&amp;Offer::NotOnThisPlatform).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L749">    }</span>
+<span class="ln" id="L750"></span>
+<span class="ln" id="L751">    <span class="tok-com">/// Any command that starts with `sudo` must be marked as needing</span></span>
+<span class="ln" id="L752">    <span class="tok-com">/// privilege, or `run` would happily spawn it and block on a password</span></span>
+<span class="ln" id="L753">    <span class="tok-com">/// prompt no window can answer.</span></span>
+<span class="ln" id="L754">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L755">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sudo_command_is_always_marked_privileged</span>() {</span>
+<span class="ln" id="L756">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L757">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command {</span>
+<span class="ln" id="L758">                argv,</span>
+<span class="ln" id="L759">                needs_privilege,</span>
+<span class="ln" id="L760">                ..</span>
+<span class="ln" id="L761">            } = companion.<span class="tok-fn">offer</span>()</span>
+<span class="ln" id="L762">            {</span>
+<span class="ln" id="L763">                <span class="tok-kw">if</span> argv.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(|first| first == <span class="tok-str">&quot;sudo&quot;</span>).<span class="tok-fn">unwrap_or</span>(false) {</span>
+<span class="ln" id="L764">                    assert!(</span>
+<span class="ln" id="L765">                        needs_privilege,</span>
+<span class="ln" id="L766">                        <span class="tok-str">&quot;{} would run sudo without saying so&quot;</span>,</span>
+<span class="ln" id="L767">                        companion.key</span>
+<span class="ln" id="L768">                    );</span>
+<span class="ln" id="L769">                }</span>
+<span class="ln" id="L770">            }</span>
+<span class="ln" id="L771">        }</span>
+<span class="ln" id="L772">    }</span>
+<span class="ln" id="L773"></span>
+<span class="ln" id="L774">    <span class="tok-com">/// Presence has three states and the middle one is not a claim about the</span></span>
+<span class="ln" id="L775">    <span class="tok-com">/// machine. If this ever reads &quot;not installed&quot; the wording has drifted.</span></span>
+<span class="ln" id="L776">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L777">    <span class="tok-kw">fn</span> <span class="tok-fn">not_detected_does_not_claim_absence</span>() {</span>
+<span class="ln" id="L778">        <span class="tok-kw">let</span> text = Presence::NotDetected.<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L779">        assert!(</span>
+<span class="ln" id="L780">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not found where it usually installs&quot;</span>),</span>
+<span class="ln" id="L781">            <span class="tok-str">&quot;{text}&quot;</span></span>
+<span class="ln" id="L782">        );</span>
+<span class="ln" id="L783">        assert!(!text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not installed&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L784">        assert!(Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;no reason&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L785">            .<span class="tok-fn">describe</span>()</span>
+<span class="ln" id="L786">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not tell&quot;</span>));</span>
+<span class="ln" id="L787">        assert!(!Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">is_present</span>());</span>
+<span class="ln" id="L788">        assert!(!Presence::NotDetected.<span class="tok-fn">is_present</span>());</span>
+<span class="ln" id="L789">        assert!(Presence::<span class="tok-fn">Present</span>(<span class="tok-str">&quot;/somewhere&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">is_present</span>());</span>
+<span class="ln" id="L790">    }</span>
+<span class="ln" id="L791"></span>
+<span class="ln" id="L792">    <span class="tok-com">/// The platform list is a filter, never an empty screen: Audacity applies</span></span>
+<span class="ln" id="L793">    <span class="tok-com">/// everywhere, so there is always at least one entry.</span></span>
+<span class="ln" id="L794">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L795">    <span class="tok-kw">fn</span> <span class="tok-fn">this_platform_has_at_least_the_editor</span>() {</span>
+<span class="ln" id="L796">        <span class="tok-kw">let</span> here = <span class="tok-fn">for_this_platform</span>();</span>
+<span class="ln" id="L797">        assert!(</span>
+<span class="ln" id="L798">            here.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|companion| companion.key == <span class="tok-str">&quot;audacity&quot;</span>),</span>
+<span class="ln" id="L799">            <span class="tok-str">&quot;Audacity applies on every platform&quot;</span></span>
+<span class="ln" id="L800">        );</span>
+<span class="ln" id="L801">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> here {</span>
+<span class="ln" id="L802">            assert!(!matches!(companion.<span class="tok-fn">offer</span>(), Offer::NotOnThisPlatform));</span>
+<span class="ln" id="L803">        }</span>
+<span class="ln" id="L804">    }</span>
+<span class="ln" id="L805"></span>
+<span class="ln" id="L806">    <span class="tok-com">/// Exactly one virtual-cable companion is shown per platform. Two would</span></span>
+<span class="ln" id="L807">    <span class="tok-com">/// mean somebody is being offered a driver for an operating system they</span></span>
+<span class="ln" id="L808">    <span class="tok-com">/// are not running.</span></span>
+<span class="ln" id="L809">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L810">    <span class="tok-kw">fn</span> <span class="tok-fn">one_virtual_cable_at_most_per_platform</span>() {</span>
+<span class="ln" id="L811">        <span class="tok-kw">let</span> cables = <span class="tok-fn">for_this_platform</span>()</span>
+<span class="ln" id="L812">            .<span class="tok-fn">into_iter</span>()</span>
+<span class="ln" id="L813">            .<span class="tok-fn">filter</span>(|companion| matches!(companion.key, <span class="tok-str">&quot;vb-cable&quot;</span> | <span class="tok-str">&quot;blackhole&quot;</span>))</span>
+<span class="ln" id="L814">            .<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L815">        assert!(cables &lt;= <span class="tok-num">1</span>, <span class="tok-str">&quot;{cables} virtual cables offered at once&quot;</span>);</span>
+<span class="ln" id="L816">    }</span>
+<span class="ln" id="L817"></span>
+<span class="ln" id="L818">    <span class="tok-com">/// Only https, and the check is here rather than at each call site.</span></span>
+<span class="ln" id="L819">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L820">    <span class="tok-kw">fn</span> <span class="tok-fn">only_https_pages_are_opened</span>() {</span>
+<span class="ln" id="L821">        <span class="tok-kw">for</span> refused <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L822">            <span class="tok-str">&quot;http://example.invalid&quot;</span>,</span>
+<span class="ln" id="L823">            <span class="tok-str">&quot;file:///etc/passwd&quot;</span>,</span>
+<span class="ln" id="L824">            <span class="tok-str">&quot;javascript:alert(1)&quot;</span>,</span>
+<span class="ln" id="L825">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L826">        ] {</span>
+<span class="ln" id="L827">            <span class="tok-kw">let</span> error = <span class="tok-fn">open_page</span>(refused).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;should refuse&quot;</span>);</span>
+<span class="ln" id="L828">            assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only https&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L829">        }</span>
+<span class="ln" id="L830">    }</span>
+<span class="ln" id="L831"></span>
+<span class="ln" id="L832">    <span class="tok-com">/// Every page in the list must be one `open_page` would accept, or a</span></span>
+<span class="ln" id="L833">    <span class="tok-com">/// button in the interface leads to an error message.</span></span>
+<span class="ln" id="L834">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L835">    <span class="tok-kw">fn</span> <span class="tok-fn">every_page_is_one_that_could_be_opened</span>() {</span>
+<span class="ln" id="L836">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L837">            assert!(</span>
+<span class="ln" id="L838">                companion.page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>),</span>
+<span class="ln" id="L839">                <span class="tok-str">&quot;{} would be refused by open_page&quot;</span>,</span>
+<span class="ln" id="L840">                companion.key</span>
+<span class="ln" id="L841">            );</span>
+<span class="ln" id="L842">        }</span>
+<span class="ln" id="L843">    }</span>
+<span class="ln" id="L844"></span>
+<span class="ln" id="L845">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L846">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_key_is_none</span>() {</span>
+<span class="ln" id="L847">        assert!(<span class="tok-fn">by_key</span>(<span class="tok-str">&quot;not-a-companion&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L848">        assert!(<span class="tok-fn">by_key</span>(<span class="tok-str">&quot;audacity&quot;</span>).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L849">    }</span>
+<span class="ln" id="L850"></span>
+<span class="ln" id="L851">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L852">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_on_path_is_found_for_a_nonsense_name</span>() {</span>
+<span class="ln" id="L853">        assert!(<span class="tok-fn">on_path</span>(<span class="tok-str">&quot;this-program-does-not-exist-42&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L854">    }</span>
+<span class="ln" id="L855">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

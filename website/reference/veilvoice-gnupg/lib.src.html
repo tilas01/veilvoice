@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gnupg/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 860 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 863 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -137,816 +137,819 @@
 <span class="ln" id="L90"></span>
 <span class="ln" id="L91"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
 <span class="ln" id="L92"></span>
+<span class="ln" id="L93"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> backend;</span>
+<span class="ln" id="L94"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> script;</span>
+<span class="ln" id="L95"></span>
 <span class="src-item" id="fn-on_path">
-<span class="ln" id="L93"><span class="tok-com">/// Where GnuPG is, if it is on `PATH`.</span></span>
-<span class="ln" id="L94"><span class="tok-com">///</span></span>
-<span class="ln" id="L95"><span class="tok-com">/// A lookup and nothing else: it never runs the program to find out.</span></span>
-<span class="ln" id="L96"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">on_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L97">    <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?;</span>
-<span class="ln" id="L98">    <span class="tok-kw">for</span> dir <span class="tok-kw">in</span> std::env::<span class="tok-fn">split_paths</span>(&amp;path) {</span>
-<span class="ln" id="L99">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;gpg&quot;</span>, <span class="tok-str">&quot;gpg2&quot;</span>, <span class="tok-str">&quot;gpg.exe&quot;</span>, <span class="tok-str">&quot;gpg2.exe&quot;</span>] {</span>
-<span class="ln" id="L100">            <span class="tok-kw">let</span> candidate = dir.<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L101">            <span class="tok-kw">if</span> candidate.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L102">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(candidate);</span>
-<span class="ln" id="L103">            }</span>
-<span class="ln" id="L104">        }</span>
-<span class="ln" id="L105">    }</span>
-<span class="ln" id="L106">    None</span>
-<span class="ln" id="L107">}</span>
+<span class="ln" id="L96"><span class="tok-com">/// Where GnuPG is, if it is on `PATH`.</span></span>
+<span class="ln" id="L97"><span class="tok-com">///</span></span>
+<span class="ln" id="L98"><span class="tok-com">/// A lookup and nothing else: it never runs the program to find out.</span></span>
+<span class="ln" id="L99"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">on_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L100">    <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?;</span>
+<span class="ln" id="L101">    <span class="tok-kw">for</span> dir <span class="tok-kw">in</span> std::env::<span class="tok-fn">split_paths</span>(&amp;path) {</span>
+<span class="ln" id="L102">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;gpg&quot;</span>, <span class="tok-str">&quot;gpg2&quot;</span>, <span class="tok-str">&quot;gpg.exe&quot;</span>, <span class="tok-str">&quot;gpg2.exe&quot;</span>] {</span>
+<span class="ln" id="L103">            <span class="tok-kw">let</span> candidate = dir.<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L104">            <span class="tok-kw">if</span> candidate.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L105">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(candidate);</span>
+<span class="ln" id="L106">            }</span>
+<span class="ln" id="L107">        }</span>
+<span class="ln" id="L108">    }</span>
+<span class="ln" id="L109">    None</span>
+<span class="ln" id="L110">}</span>
 </span>
-<span class="ln" id="L108"></span>
+<span class="ln" id="L111"></span>
 <span class="src-item" id="fn-outcome">
-<span class="ln" id="L109"><span class="tok-com">/// What GnuPG made of a signature.</span></span>
-<span class="ln" id="L110"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
-<span class="ln" id="L111"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Outcome {</span>
-<span class="ln" id="L112">    <span class="tok-com">/// A valid signature by the key that was expected.</span></span>
-<span class="ln" id="L113">    Good,</span>
-<span class="ln" id="L114">    <span class="tok-com">/// A valid signature by some other key. **Not a pass.** See the module note.</span></span>
-<span class="ln" id="L115">    AnotherKey {</span>
-<span class="ln" id="L116">        <span class="tok-com">/// The fingerprint that actually signed it.</span></span>
-<span class="ln" id="L117">        fingerprint: String,</span>
-<span class="ln" id="L118">    },</span>
-<span class="ln" id="L119">    <span class="tok-com">/// The signature does not match the data.</span></span>
-<span class="ln" id="L120">    Bad,</span>
-<span class="ln" id="L121">    <span class="tok-com">/// The signing key is not in the keyring, so nothing could be decided.</span></span>
-<span class="ln" id="L122">    NoKey,</span>
-<span class="ln" id="L123">    <span class="tok-com">/// GnuPG ran and said nothing this understands.</span></span>
-<span class="ln" id="L124">    Unclear,</span>
-<span class="ln" id="L125">}</span>
+<span class="ln" id="L112"><span class="tok-com">/// What GnuPG made of a signature.</span></span>
+<span class="ln" id="L113"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
+<span class="ln" id="L114"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Outcome {</span>
+<span class="ln" id="L115">    <span class="tok-com">/// A valid signature by the key that was expected.</span></span>
+<span class="ln" id="L116">    Good,</span>
+<span class="ln" id="L117">    <span class="tok-com">/// A valid signature by some other key. **Not a pass.** See the module note.</span></span>
+<span class="ln" id="L118">    AnotherKey {</span>
+<span class="ln" id="L119">        <span class="tok-com">/// The fingerprint that actually signed it.</span></span>
+<span class="ln" id="L120">        fingerprint: String,</span>
+<span class="ln" id="L121">    },</span>
+<span class="ln" id="L122">    <span class="tok-com">/// The signature does not match the data.</span></span>
+<span class="ln" id="L123">    Bad,</span>
+<span class="ln" id="L124">    <span class="tok-com">/// The signing key is not in the keyring, so nothing could be decided.</span></span>
+<span class="ln" id="L125">    NoKey,</span>
+<span class="ln" id="L126">    <span class="tok-com">/// GnuPG ran and said nothing this understands.</span></span>
+<span class="ln" id="L127">    Unclear,</span>
+<span class="ln" id="L128">}</span>
 </span>
-<span class="ln" id="L126"></span>
-<span class="ln" id="L127"><span class="tok-kw">impl</span> Outcome {</span>
+<span class="ln" id="L129"></span>
+<span class="ln" id="L130"><span class="tok-kw">impl</span> Outcome {</span>
 <span class="src-item" id="fn-outcome-is_good">
-<span class="ln" id="L128">    <span class="tok-com">/// Whether this is the one outcome that means the file is as published.</span></span>
-<span class="ln" id="L129">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_good</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L130">        *<span class="tok-kw">self</span> == Outcome::Good</span>
-<span class="ln" id="L131">    }</span>
+<span class="ln" id="L131">    <span class="tok-com">/// Whether this is the one outcome that means the file is as published.</span></span>
+<span class="ln" id="L132">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_good</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L133">        *<span class="tok-kw">self</span> == Outcome::Good</span>
+<span class="ln" id="L134">    }</span>
 </span>
-<span class="ln" id="L132"></span>
+<span class="ln" id="L135"></span>
 <span class="src-item" id="fn-outcome-plainly">
-<span class="ln" id="L133">    <span class="tok-com">/// One line saying what happened, in words a reader can act on.</span></span>
-<span class="ln" id="L134">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">plainly</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L135">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L136">            Outcome::Good =&gt; <span class="tok-str">&quot;your GnuPG agrees: signed by the VeilVoice key&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L137">            Outcome::AnotherKey { fingerprint } =&gt; format!(</span>
-<span class="ln" id="L138">                <span class="tok-str">&quot;your GnuPG found a good signature by {fingerprint}, which is NOT the \</span></span>
-<span class="ln" id="L139"><span class="tok-str">                 VeilVoice key. Treat this download as unverified.&quot;</span></span>
-<span class="ln" id="L140">            ),</span>
-<span class="ln" id="L141">            Outcome::Bad =&gt; <span class="tok-str">&quot;your GnuPG says the signature does not match the file&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L142">            Outcome::NoKey =&gt; <span class="tok-str">&quot;your GnuPG has no key that could check this signature&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L143">            Outcome::Unclear =&gt; <span class="tok-str">&quot;your GnuPG ran and gave no answer this could read&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L144">        }</span>
-<span class="ln" id="L145">    }</span>
+<span class="ln" id="L136">    <span class="tok-com">/// One line saying what happened, in words a reader can act on.</span></span>
+<span class="ln" id="L137">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">plainly</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L138">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L139">            Outcome::Good =&gt; <span class="tok-str">&quot;your GnuPG agrees: signed by the VeilVoice key&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L140">            Outcome::AnotherKey { fingerprint } =&gt; format!(</span>
+<span class="ln" id="L141">                <span class="tok-str">&quot;your GnuPG found a good signature by {fingerprint}, which is NOT the \</span></span>
+<span class="ln" id="L142"><span class="tok-str">                 VeilVoice key. Treat this download as unverified.&quot;</span></span>
+<span class="ln" id="L143">            ),</span>
+<span class="ln" id="L144">            Outcome::Bad =&gt; <span class="tok-str">&quot;your GnuPG says the signature does not match the file&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L145">            Outcome::NoKey =&gt; <span class="tok-str">&quot;your GnuPG has no key that could check this signature&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L146">            Outcome::Unclear =&gt; <span class="tok-str">&quot;your GnuPG ran and gave no answer this could read&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L147">        }</span>
+<span class="ln" id="L148">    }</span>
 </span>
-<span class="ln" id="L146">}</span>
-<span class="ln" id="L147"></span>
+<span class="ln" id="L149">}</span>
+<span class="ln" id="L150"></span>
 <span class="src-item" id="fn-run">
-<span class="ln" id="L148"><span class="tok-com">/// One run of GnuPG, and what it said.</span></span>
-<span class="ln" id="L149"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
-<span class="ln" id="L150"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Run {</span>
-<span class="ln" id="L151">    <span class="tok-com">/// The command, as a reader could type it themselves.</span></span>
-<span class="ln" id="L152">    <span class="tok-kw">pub</span> command: String,</span>
-<span class="ln" id="L153">    <span class="tok-com">/// What it decided.</span></span>
-<span class="ln" id="L154">    <span class="tok-kw">pub</span> outcome: Outcome,</span>
-<span class="ln" id="L155">    <span class="tok-com">/// The `[GNUPG:]` status lines, with the prefix removed.</span></span>
-<span class="ln" id="L156">    <span class="tok-com">///</span></span>
-<span class="ln" id="L157">    <span class="tok-com">/// Kept so a front end can show what GnuPG actually said rather than only</span></span>
-<span class="ln" id="L158">    <span class="tok-com">/// this crate&#x27;s reading of it. A verifier that hides its evidence is asking</span></span>
-<span class="ln" id="L159">    <span class="tok-com">/// to be taken on trust, which is the thing being avoided.</span></span>
-<span class="ln" id="L160">    <span class="tok-kw">pub</span> status: Vec&lt;String&gt;,</span>
-<span class="ln" id="L161">    <span class="tok-com">/// What GnuPG printed for a person to read, trimmed.</span></span>
-<span class="ln" id="L162">    <span class="tok-com">///</span></span>
-<span class="ln" id="L163">    <span class="tok-com">/// Never parsed -- see the module note on why the prose is not the channel</span></span>
-<span class="ln" id="L164">    <span class="tok-com">/// to decide anything from -- and worth showing when the status lines said</span></span>
-<span class="ln" id="L165">    <span class="tok-com">/// nothing this understands. &quot;GnuPG gave no answer this could read&quot; helps</span></span>
-<span class="ln" id="L166">    <span class="tok-com">/// nobody; &quot;no valid OpenPGP data found&quot; tells them the file is not a</span></span>
-<span class="ln" id="L167">    <span class="tok-com">/// signature at all.</span></span>
-<span class="ln" id="L168">    <span class="tok-kw">pub</span> said: String,</span>
-<span class="ln" id="L169">}</span>
+<span class="ln" id="L151"><span class="tok-com">/// One run of GnuPG, and what it said.</span></span>
+<span class="ln" id="L152"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
+<span class="ln" id="L153"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Run {</span>
+<span class="ln" id="L154">    <span class="tok-com">/// The command, as a reader could type it themselves.</span></span>
+<span class="ln" id="L155">    <span class="tok-kw">pub</span> command: String,</span>
+<span class="ln" id="L156">    <span class="tok-com">/// What it decided.</span></span>
+<span class="ln" id="L157">    <span class="tok-kw">pub</span> outcome: Outcome,</span>
+<span class="ln" id="L158">    <span class="tok-com">/// The `[GNUPG:]` status lines, with the prefix removed.</span></span>
+<span class="ln" id="L159">    <span class="tok-com">///</span></span>
+<span class="ln" id="L160">    <span class="tok-com">/// Kept so a front end can show what GnuPG actually said rather than only</span></span>
+<span class="ln" id="L161">    <span class="tok-com">/// this crate&#x27;s reading of it. A verifier that hides its evidence is asking</span></span>
+<span class="ln" id="L162">    <span class="tok-com">/// to be taken on trust, which is the thing being avoided.</span></span>
+<span class="ln" id="L163">    <span class="tok-kw">pub</span> status: Vec&lt;String&gt;,</span>
+<span class="ln" id="L164">    <span class="tok-com">/// What GnuPG printed for a person to read, trimmed.</span></span>
+<span class="ln" id="L165">    <span class="tok-com">///</span></span>
+<span class="ln" id="L166">    <span class="tok-com">/// Never parsed -- see the module note on why the prose is not the channel</span></span>
+<span class="ln" id="L167">    <span class="tok-com">/// to decide anything from -- and worth showing when the status lines said</span></span>
+<span class="ln" id="L168">    <span class="tok-com">/// nothing this understands. &quot;GnuPG gave no answer this could read&quot; helps</span></span>
+<span class="ln" id="L169">    <span class="tok-com">/// nobody; &quot;no valid OpenPGP data found&quot; tells them the file is not a</span></span>
+<span class="ln" id="L170">    <span class="tok-com">/// signature at all.</span></span>
+<span class="ln" id="L171">    <span class="tok-kw">pub</span> said: String,</span>
+<span class="ln" id="L172">}</span>
 </span>
-<span class="ln" id="L170"></span>
+<span class="ln" id="L173"></span>
 <span class="src-item" id="fn-imported">
-<span class="ln" id="L171"><span class="tok-com">/// Whether the key was already in the keyring.</span></span>
-<span class="ln" id="L172"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
-<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Imported {</span>
-<span class="ln" id="L174">    <span class="tok-com">/// It was added by this run.</span></span>
-<span class="ln" id="L175">    Added,</span>
-<span class="ln" id="L176">    <span class="tok-com">/// It was already there and nothing changed.</span></span>
-<span class="ln" id="L177">    AlreadyThere,</span>
-<span class="ln" id="L178">}</span>
+<span class="ln" id="L174"><span class="tok-com">/// Whether the key was already in the keyring.</span></span>
+<span class="ln" id="L175"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
+<span class="ln" id="L176"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Imported {</span>
+<span class="ln" id="L177">    <span class="tok-com">/// It was added by this run.</span></span>
+<span class="ln" id="L178">    Added,</span>
+<span class="ln" id="L179">    <span class="tok-com">/// It was already there and nothing changed.</span></span>
+<span class="ln" id="L180">    AlreadyThere,</span>
+<span class="ln" id="L181">}</span>
 </span>
-<span class="ln" id="L179"></span>
+<span class="ln" id="L182"></span>
 <span class="src-item" id="fn-import">
-<span class="ln" id="L180"><span class="tok-com">/// The key, in the keyring.</span></span>
-<span class="ln" id="L181"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
-<span class="ln" id="L182"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Import {</span>
-<span class="ln" id="L183">    <span class="tok-com">/// The fingerprint GnuPG reported for what it took in.</span></span>
-<span class="ln" id="L184">    <span class="tok-kw">pub</span> fingerprint: String,</span>
-<span class="ln" id="L185">    <span class="tok-com">/// Whether this run put it there.</span></span>
-<span class="ln" id="L186">    <span class="tok-kw">pub</span> what: Imported,</span>
-<span class="ln" id="L187">}</span>
+<span class="ln" id="L183"><span class="tok-com">/// The key, in the keyring.</span></span>
+<span class="ln" id="L184"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
+<span class="ln" id="L185"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Import {</span>
+<span class="ln" id="L186">    <span class="tok-com">/// The fingerprint GnuPG reported for what it took in.</span></span>
+<span class="ln" id="L187">    <span class="tok-kw">pub</span> fingerprint: String,</span>
+<span class="ln" id="L188">    <span class="tok-com">/// Whether this run put it there.</span></span>
+<span class="ln" id="L189">    <span class="tok-kw">pub</span> what: Imported,</span>
+<span class="ln" id="L190">}</span>
 </span>
-<span class="ln" id="L188"></span>
-<span class="ln" id="L189"><span class="tok-kw">impl</span> Import {</span>
+<span class="ln" id="L191"></span>
+<span class="ln" id="L192"><span class="tok-kw">impl</span> Import {</span>
 <span class="src-item" id="fn-import-note">
-<span class="ln" id="L190">    <span class="tok-com">/// What was done to the reader&#x27;s keyring, and how to undo it.</span></span>
-<span class="ln" id="L191">    <span class="tok-com">///</span></span>
-<span class="ln" id="L192">    <span class="tok-com">/// GnuPG has no field for a note about somebody else&#x27;s key. Measured: there</span></span>
-<span class="ln" id="L193">    <span class="tok-com">/// is no `--comment` that survives an import, and the only way to attach</span></span>
-<span class="ln" id="L194">    <span class="tok-com">/// text to a key you do not own is a local certification, which needs a</span></span>
-<span class="ln" id="L195">    <span class="tok-com">/// secret key of your own that a reader may not have. So the note is said</span></span>
-<span class="ln" id="L196">    <span class="tok-com">/// here, where the person who will wonder about it is looking, and the</span></span>
-<span class="ln" id="L197">    <span class="tok-com">/// removal is one line rather than a paragraph of `--edit-key`.</span></span>
-<span class="ln" id="L198">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">note</span>(&amp;<span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L199">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L200">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.what {</span>
-<span class="ln" id="L201">            Imported::Added =&gt; out.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L202">                <span class="tok-str">&quot;VeilVoice added its signing key {} to your GnuPG keyring.&quot;</span>,</span>
-<span class="ln" id="L203">                <span class="tok-kw">self</span>.fingerprint</span>
-<span class="ln" id="L204">            )),</span>
-<span class="ln" id="L205">            Imported::AlreadyThere =&gt; out.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L206">                <span class="tok-str">&quot;Your GnuPG keyring already had the VeilVoice signing key {}.&quot;</span>,</span>
-<span class="ln" id="L207">                <span class="tok-kw">self</span>.fingerprint</span>
-<span class="ln" id="L208">            )),</span>
-<span class="ln" id="L209">        }</span>
-<span class="ln" id="L210">        out.<span class="tok-fn">push</span>(<span class="tok-str">&quot;It is a public key: it lets you check signatures and can sign&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L211">        out.<span class="tok-fn">push</span>(<span class="tok-str">&quot;nothing and decrypt nothing. It carries no e-mail address.&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L212">        out.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L213">            <span class="tok-str">&quot;To remove it:  gpg --delete-keys {}&quot;</span>,</span>
-<span class="ln" id="L214">            <span class="tok-kw">self</span>.fingerprint</span>
-<span class="ln" id="L215">        ));</span>
-<span class="ln" id="L216">        out</span>
-<span class="ln" id="L217">    }</span>
+<span class="ln" id="L193">    <span class="tok-com">/// What was done to the reader&#x27;s keyring, and how to undo it.</span></span>
+<span class="ln" id="L194">    <span class="tok-com">///</span></span>
+<span class="ln" id="L195">    <span class="tok-com">/// GnuPG has no field for a note about somebody else&#x27;s key. Measured: there</span></span>
+<span class="ln" id="L196">    <span class="tok-com">/// is no `--comment` that survives an import, and the only way to attach</span></span>
+<span class="ln" id="L197">    <span class="tok-com">/// text to a key you do not own is a local certification, which needs a</span></span>
+<span class="ln" id="L198">    <span class="tok-com">/// secret key of your own that a reader may not have. So the note is said</span></span>
+<span class="ln" id="L199">    <span class="tok-com">/// here, where the person who will wonder about it is looking, and the</span></span>
+<span class="ln" id="L200">    <span class="tok-com">/// removal is one line rather than a paragraph of `--edit-key`.</span></span>
+<span class="ln" id="L201">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">note</span>(&amp;<span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L202">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L203">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.what {</span>
+<span class="ln" id="L204">            Imported::Added =&gt; out.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L205">                <span class="tok-str">&quot;VeilVoice added its signing key {} to your GnuPG keyring.&quot;</span>,</span>
+<span class="ln" id="L206">                <span class="tok-kw">self</span>.fingerprint</span>
+<span class="ln" id="L207">            )),</span>
+<span class="ln" id="L208">            Imported::AlreadyThere =&gt; out.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L209">                <span class="tok-str">&quot;Your GnuPG keyring already had the VeilVoice signing key {}.&quot;</span>,</span>
+<span class="ln" id="L210">                <span class="tok-kw">self</span>.fingerprint</span>
+<span class="ln" id="L211">            )),</span>
+<span class="ln" id="L212">        }</span>
+<span class="ln" id="L213">        out.<span class="tok-fn">push</span>(<span class="tok-str">&quot;It is a public key: it lets you check signatures and can sign&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L214">        out.<span class="tok-fn">push</span>(<span class="tok-str">&quot;nothing and decrypt nothing. It carries no e-mail address.&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L215">        out.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L216">            <span class="tok-str">&quot;To remove it:  gpg --delete-keys {}&quot;</span>,</span>
+<span class="ln" id="L217">            <span class="tok-kw">self</span>.fingerprint</span>
+<span class="ln" id="L218">        ));</span>
+<span class="ln" id="L219">        out</span>
+<span class="ln" id="L220">    }</span>
 </span>
-<span class="ln" id="L218">}</span>
-<span class="ln" id="L219"></span>
+<span class="ln" id="L221">}</span>
+<span class="ln" id="L222"></span>
 <span class="src-item" id="fn-gnupg">
-<span class="ln" id="L220"><span class="tok-com">/// A GnuPG to run, and the keyring to run it against.</span></span>
-<span class="ln" id="L221"><span class="tok-com">///</span></span>
-<span class="ln" id="L222"><span class="tok-com">/// A value rather than a pair of free functions, because the keyring is part of</span></span>
-<span class="ln" id="L223"><span class="tok-com">/// the question. The default is the one the reader already uses, which is the</span></span>
-<span class="ln" id="L224"><span class="tok-com">/// point of the feature: after this, their own `gpg --verify` works. A caller</span></span>
-<span class="ln" id="L225"><span class="tok-com">/// that wants isolation -- this crate&#x27;s own tests, and anything that should not</span></span>
-<span class="ln" id="L226"><span class="tok-com">/// touch somebody&#x27;s keyring -- names a directory instead and gets a GnuPG that</span></span>
-<span class="ln" id="L227"><span class="tok-com">/// can neither see nor change anything else.</span></span>
-<span class="ln" id="L228"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
-<span class="ln" id="L229"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Gnupg {</span>
-<span class="ln" id="L230">    program: PathBuf,</span>
-<span class="ln" id="L231">    home: Option&lt;PathBuf&gt;,</span>
-<span class="ln" id="L232">}</span>
+<span class="ln" id="L223"><span class="tok-com">/// A GnuPG to run, and the keyring to run it against.</span></span>
+<span class="ln" id="L224"><span class="tok-com">///</span></span>
+<span class="ln" id="L225"><span class="tok-com">/// A value rather than a pair of free functions, because the keyring is part of</span></span>
+<span class="ln" id="L226"><span class="tok-com">/// the question. The default is the one the reader already uses, which is the</span></span>
+<span class="ln" id="L227"><span class="tok-com">/// point of the feature: after this, their own `gpg --verify` works. A caller</span></span>
+<span class="ln" id="L228"><span class="tok-com">/// that wants isolation -- this crate&#x27;s own tests, and anything that should not</span></span>
+<span class="ln" id="L229"><span class="tok-com">/// touch somebody&#x27;s keyring -- names a directory instead and gets a GnuPG that</span></span>
+<span class="ln" id="L230"><span class="tok-com">/// can neither see nor change anything else.</span></span>
+<span class="ln" id="L231"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
+<span class="ln" id="L232"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Gnupg {</span>
+<span class="ln" id="L233">    program: PathBuf,</span>
+<span class="ln" id="L234">    home: Option&lt;PathBuf&gt;,</span>
+<span class="ln" id="L235">}</span>
 </span>
-<span class="ln" id="L233"></span>
-<span class="ln" id="L234"><span class="tok-kw">impl</span> Gnupg {</span>
+<span class="ln" id="L236"></span>
+<span class="ln" id="L237"><span class="tok-kw">impl</span> Gnupg {</span>
 <span class="src-item" id="fn-gnupg-found">
-<span class="ln" id="L235">    <span class="tok-com">/// The GnuPG on `PATH`, if there is one.</span></span>
-<span class="ln" id="L236">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">found</span>() -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="ln" id="L237">        <span class="tok-fn">on_path</span>().<span class="tok-fn">map</span>(Self::at).<span class="tok-fn">ok_or</span>(Error::NotInstalled)</span>
-<span class="ln" id="L238">    }</span>
+<span class="ln" id="L238">    <span class="tok-com">/// The GnuPG on `PATH`, if there is one.</span></span>
+<span class="ln" id="L239">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">found</span>() -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L240">        <span class="tok-fn">on_path</span>().<span class="tok-fn">map</span>(Self::at).<span class="tok-fn">ok_or</span>(Error::NotInstalled)</span>
+<span class="ln" id="L241">    }</span>
 </span>
-<span class="ln" id="L239"></span>
+<span class="ln" id="L242"></span>
 <span class="src-item" id="fn-gnupg-at">
-<span class="ln" id="L240">    <span class="tok-com">/// A particular GnuPG, using the keyring its owner already has.</span></span>
-<span class="ln" id="L241">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">at</span>(program: PathBuf) -&gt; Self {</span>
-<span class="ln" id="L242">        Self {</span>
-<span class="ln" id="L243">            program,</span>
-<span class="ln" id="L244">            home: None,</span>
-<span class="ln" id="L245">        }</span>
-<span class="ln" id="L246">    }</span>
+<span class="ln" id="L243">    <span class="tok-com">/// A particular GnuPG, using the keyring its owner already has.</span></span>
+<span class="ln" id="L244">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">at</span>(program: PathBuf) -&gt; Self {</span>
+<span class="ln" id="L245">        Self {</span>
+<span class="ln" id="L246">            program,</span>
+<span class="ln" id="L247">            home: None,</span>
+<span class="ln" id="L248">        }</span>
+<span class="ln" id="L249">    }</span>
 </span>
-<span class="ln" id="L247"></span>
+<span class="ln" id="L250"></span>
 <span class="src-item" id="fn-gnupg-in_home">
-<span class="ln" id="L248">    <span class="tok-com">/// The same GnuPG, against a keyring of its own.</span></span>
-<span class="ln" id="L249">    <span class="tok-com">///</span></span>
-<span class="ln" id="L250">    <span class="tok-com">/// Nothing outside that directory is read or written, so this neither adds</span></span>
-<span class="ln" id="L251">    <span class="tok-com">/// a key to somebody&#x27;s own keyring nor sees one that is in it.</span></span>
-<span class="ln" id="L252">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">in_home</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, home: PathBuf) -&gt; Self {</span>
-<span class="ln" id="L253">        <span class="tok-kw">self</span>.home = <span class="tok-fn">Some</span>(home);</span>
-<span class="ln" id="L254">        <span class="tok-kw">self</span></span>
-<span class="ln" id="L255">    }</span>
+<span class="ln" id="L251">    <span class="tok-com">/// The same GnuPG, against a keyring of its own.</span></span>
+<span class="ln" id="L252">    <span class="tok-com">///</span></span>
+<span class="ln" id="L253">    <span class="tok-com">/// Nothing outside that directory is read or written, so this neither adds</span></span>
+<span class="ln" id="L254">    <span class="tok-com">/// a key to somebody&#x27;s own keyring nor sees one that is in it.</span></span>
+<span class="ln" id="L255">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">in_home</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, home: PathBuf) -&gt; Self {</span>
+<span class="ln" id="L256">        <span class="tok-kw">self</span>.home = <span class="tok-fn">Some</span>(home);</span>
+<span class="ln" id="L257">        <span class="tok-kw">self</span></span>
+<span class="ln" id="L258">    }</span>
 </span>
-<span class="ln" id="L256"></span>
+<span class="ln" id="L259"></span>
 <span class="src-item" id="fn-gnupg-program">
-<span class="ln" id="L257">    <span class="tok-com">/// Where this GnuPG is.</span></span>
-<span class="ln" id="L258">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">program</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;Path {</span>
-<span class="ln" id="L259">        &amp;<span class="tok-kw">self</span>.program</span>
-<span class="ln" id="L260">    }</span>
+<span class="ln" id="L260">    <span class="tok-com">/// Where this GnuPG is.</span></span>
+<span class="ln" id="L261">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">program</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;Path {</span>
+<span class="ln" id="L262">        &amp;<span class="tok-kw">self</span>.program</span>
+<span class="ln" id="L263">    }</span>
 </span>
-<span class="ln" id="L261"></span>
+<span class="ln" id="L264"></span>
 <span class="src-item" id="fn-gnupg-base">
-<span class="ln" id="L262">    <span class="tok-com">/// The arguments every call here shares.</span></span>
-<span class="ln" id="L263">    <span class="tok-com">///</span></span>
-<span class="ln" id="L264">    <span class="tok-com">/// `--batch` and `--no-tty` so nothing ever waits for a person who is not</span></span>
-<span class="ln" id="L265">    <span class="tok-com">/// there. `--status-fd 1` for the machine-readable channel, on standard</span></span>
-<span class="ln" id="L266">    <span class="tok-com">/// output, where GnuPG&#x27;s prose does not go.</span></span>
-<span class="ln" id="L267">    <span class="tok-kw">fn</span> <span class="tok-fn">base</span>(&amp;<span class="tok-kw">self</span>) -&gt; Command {</span>
-<span class="ln" id="L268">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = Command::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">self</span>.program);</span>
-<span class="ln" id="L269">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = &amp;<span class="tok-kw">self</span>.home {</span>
-<span class="ln" id="L270">            command.<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--homedir&quot;</span>).<span class="tok-fn">arg</span>(home);</span>
-<span class="ln" id="L271">        }</span>
-<span class="ln" id="L272">        command</span>
-<span class="ln" id="L273">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;--batch&quot;</span>, <span class="tok-str">&quot;--no-tty&quot;</span>, <span class="tok-str">&quot;--status-fd&quot;</span>, <span class="tok-str">&quot;1&quot;</span>])</span>
-<span class="ln" id="L274">            .<span class="tok-fn">stdin</span>(Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L275">            .<span class="tok-fn">stdout</span>(Stdio::<span class="tok-fn">piped</span>())</span>
-<span class="ln" id="L276">            .<span class="tok-fn">stderr</span>(Stdio::<span class="tok-fn">piped</span>());</span>
-<span class="ln" id="L277">        command</span>
-<span class="ln" id="L278">    }</span>
+<span class="ln" id="L265">    <span class="tok-com">/// The arguments every call here shares.</span></span>
+<span class="ln" id="L266">    <span class="tok-com">///</span></span>
+<span class="ln" id="L267">    <span class="tok-com">/// `--batch` and `--no-tty` so nothing ever waits for a person who is not</span></span>
+<span class="ln" id="L268">    <span class="tok-com">/// there. `--status-fd 1` for the machine-readable channel, on standard</span></span>
+<span class="ln" id="L269">    <span class="tok-com">/// output, where GnuPG&#x27;s prose does not go.</span></span>
+<span class="ln" id="L270">    <span class="tok-kw">fn</span> <span class="tok-fn">base</span>(&amp;<span class="tok-kw">self</span>) -&gt; Command {</span>
+<span class="ln" id="L271">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = Command::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">self</span>.program);</span>
+<span class="ln" id="L272">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = &amp;<span class="tok-kw">self</span>.home {</span>
+<span class="ln" id="L273">            command.<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--homedir&quot;</span>).<span class="tok-fn">arg</span>(home);</span>
+<span class="ln" id="L274">        }</span>
+<span class="ln" id="L275">        command</span>
+<span class="ln" id="L276">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;--batch&quot;</span>, <span class="tok-str">&quot;--no-tty&quot;</span>, <span class="tok-str">&quot;--status-fd&quot;</span>, <span class="tok-str">&quot;1&quot;</span>])</span>
+<span class="ln" id="L277">            .<span class="tok-fn">stdin</span>(Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L278">            .<span class="tok-fn">stdout</span>(Stdio::<span class="tok-fn">piped</span>())</span>
+<span class="ln" id="L279">            .<span class="tok-fn">stderr</span>(Stdio::<span class="tok-fn">piped</span>());</span>
+<span class="ln" id="L280">        command</span>
+<span class="ln" id="L281">    }</span>
 </span>
-<span class="ln" id="L279"></span>
+<span class="ln" id="L282"></span>
 <span class="src-item" id="fn-gnupg-import">
-<span class="ln" id="L280">    <span class="tok-com">/// Put a key into the keyring this GnuPG is using.</span></span>
-<span class="ln" id="L281">    <span class="tok-com">///</span></span>
-<span class="ln" id="L282">    <span class="tok-com">/// The armour goes in on standard input, so nothing is written to disk and</span></span>
-<span class="ln" id="L283">    <span class="tok-com">/// no temporary file is left behind if this is interrupted.</span></span>
+<span class="ln" id="L283">    <span class="tok-com">/// Put a key into the keyring this GnuPG is using.</span></span>
 <span class="ln" id="L284">    <span class="tok-com">///</span></span>
-<span class="ln" id="L285">    <span class="tok-com">/// `expected` is checked against what GnuPG says it imported. The two can</span></span>
-<span class="ln" id="L286">    <span class="tok-com">/// only differ if the armour handed in is not the key it claims to be,</span></span>
-<span class="ln" id="L287">    <span class="tok-com">/// which is worth failing on rather than reporting a successful import of</span></span>
-<span class="ln" id="L288">    <span class="tok-com">/// something else.</span></span>
-<span class="ln" id="L289">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">import</span>(&amp;<span class="tok-kw">self</span>, armour: &amp;str, expected: &amp;str) -&gt; Result&lt;Import, Error&gt; {</span>
-<span class="ln" id="L290">        <span class="tok-kw">use</span> std::io::Write <span class="tok-kw">as</span> _;</span>
-<span class="ln" id="L291"></span>
-<span class="ln" id="L292">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">self</span>.<span class="tok-fn">base</span>();</span>
-<span class="ln" id="L293">        command.<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--import&quot;</span>).<span class="tok-fn">stdin</span>(Stdio::<span class="tok-fn">piped</span>());</span>
-<span class="ln" id="L294">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = command</span>
-<span class="ln" id="L295">            .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L296">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;{e}&quot;</span>)))?;</span>
-<span class="ln" id="L297">        <span class="tok-com">// Written before the output is read: GnuPG takes the whole key before</span></span>
-<span class="ln" id="L298">        <span class="tok-com">// it says anything, so reading first would be waiting for a program</span></span>
-<span class="ln" id="L299">        <span class="tok-com">// that is waiting for us.</span></span>
-<span class="ln" id="L300">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(stdin) = child.stdin.<span class="tok-fn">as_mut</span>() {</span>
-<span class="ln" id="L301">            stdin</span>
-<span class="ln" id="L302">                .<span class="tok-fn">write_all</span>(armour.<span class="tok-fn">as_bytes</span>())</span>
-<span class="ln" id="L303">                .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;could not hand GnuPG the key: {e}&quot;</span>)))?;</span>
-<span class="ln" id="L304">        }</span>
-<span class="ln" id="L305">        <span class="tok-fn">drop</span>(child.stdin.<span class="tok-fn">take</span>());</span>
-<span class="ln" id="L306">        <span class="tok-kw">let</span> output = child</span>
-<span class="ln" id="L307">            .<span class="tok-fn">wait_with_output</span>()</span>
-<span class="ln" id="L308">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;{e}&quot;</span>)))?;</span>
-<span class="ln" id="L309">        <span class="tok-kw">let</span> status = <span class="tok-fn">status_lines</span>(&amp;output.stdout);</span>
-<span class="ln" id="L310"></span>
-<span class="ln" id="L311">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(ok) = <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;IMPORT_OK&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L312">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">CouldNotRun</span>(format!(</span>
-<span class="ln" id="L313">                <span class="tok-str">&quot;GnuPG did not say it imported anything: {}&quot;</span>,</span>
-<span class="ln" id="L314">                String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L315">            )));</span>
-<span class="ln" id="L316">        };</span>
-<span class="ln" id="L317">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> parts = ok.<span class="tok-fn">split_whitespace</span>();</span>
-<span class="ln" id="L318">        <span class="tok-kw">let</span> flags = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> fingerprint = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L320">        <span class="tok-kw">if</span> !<span class="tok-fn">same_fingerprint</span>(&amp;fingerprint, expected) {</span>
-<span class="ln" id="L321">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">CouldNotRun</span>(format!(</span>
-<span class="ln" id="L322">                <span class="tok-str">&quot;GnuPG imported {fingerprint}, which is not {expected}&quot;</span></span>
-<span class="ln" id="L323">            )));</span>
-<span class="ln" id="L324">        }</span>
-<span class="ln" id="L325">        <span class="tok-com">// Flag 0 means nothing about the key changed, which is GnuPG&#x27;s way of</span></span>
-<span class="ln" id="L326">        <span class="tok-com">// saying it already had it. Anything else means something was added.</span></span>
-<span class="ln" id="L327">        <span class="tok-kw">let</span> what = <span class="tok-kw">if</span> flags == <span class="tok-str">&quot;0&quot;</span> {</span>
-<span class="ln" id="L328">            Imported::AlreadyThere</span>
-<span class="ln" id="L329">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L330">            Imported::Added</span>
-<span class="ln" id="L331">        };</span>
-<span class="ln" id="L332">        <span class="tok-fn">Ok</span>(Import { fingerprint, what })</span>
-<span class="ln" id="L333">    }</span>
+<span class="ln" id="L285">    <span class="tok-com">/// The armour goes in on standard input, so nothing is written to disk and</span></span>
+<span class="ln" id="L286">    <span class="tok-com">/// no temporary file is left behind if this is interrupted.</span></span>
+<span class="ln" id="L287">    <span class="tok-com">///</span></span>
+<span class="ln" id="L288">    <span class="tok-com">/// `expected` is checked against what GnuPG says it imported. The two can</span></span>
+<span class="ln" id="L289">    <span class="tok-com">/// only differ if the armour handed in is not the key it claims to be,</span></span>
+<span class="ln" id="L290">    <span class="tok-com">/// which is worth failing on rather than reporting a successful import of</span></span>
+<span class="ln" id="L291">    <span class="tok-com">/// something else.</span></span>
+<span class="ln" id="L292">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">import</span>(&amp;<span class="tok-kw">self</span>, armour: &amp;str, expected: &amp;str) -&gt; Result&lt;Import, Error&gt; {</span>
+<span class="ln" id="L293">        <span class="tok-kw">use</span> std::io::Write <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L294"></span>
+<span class="ln" id="L295">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">self</span>.<span class="tok-fn">base</span>();</span>
+<span class="ln" id="L296">        command.<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--import&quot;</span>).<span class="tok-fn">stdin</span>(Stdio::<span class="tok-fn">piped</span>());</span>
+<span class="ln" id="L297">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = command</span>
+<span class="ln" id="L298">            .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L299">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;{e}&quot;</span>)))?;</span>
+<span class="ln" id="L300">        <span class="tok-com">// Written before the output is read: GnuPG takes the whole key before</span></span>
+<span class="ln" id="L301">        <span class="tok-com">// it says anything, so reading first would be waiting for a program</span></span>
+<span class="ln" id="L302">        <span class="tok-com">// that is waiting for us.</span></span>
+<span class="ln" id="L303">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(stdin) = child.stdin.<span class="tok-fn">as_mut</span>() {</span>
+<span class="ln" id="L304">            stdin</span>
+<span class="ln" id="L305">                .<span class="tok-fn">write_all</span>(armour.<span class="tok-fn">as_bytes</span>())</span>
+<span class="ln" id="L306">                .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;could not hand GnuPG the key: {e}&quot;</span>)))?;</span>
+<span class="ln" id="L307">        }</span>
+<span class="ln" id="L308">        <span class="tok-fn">drop</span>(child.stdin.<span class="tok-fn">take</span>());</span>
+<span class="ln" id="L309">        <span class="tok-kw">let</span> output = child</span>
+<span class="ln" id="L310">            .<span class="tok-fn">wait_with_output</span>()</span>
+<span class="ln" id="L311">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;{e}&quot;</span>)))?;</span>
+<span class="ln" id="L312">        <span class="tok-kw">let</span> status = <span class="tok-fn">status_lines</span>(&amp;output.stdout);</span>
+<span class="ln" id="L313"></span>
+<span class="ln" id="L314">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(ok) = <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;IMPORT_OK&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L315">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">CouldNotRun</span>(format!(</span>
+<span class="ln" id="L316">                <span class="tok-str">&quot;GnuPG did not say it imported anything: {}&quot;</span>,</span>
+<span class="ln" id="L317">                String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L318">            )));</span>
+<span class="ln" id="L319">        };</span>
+<span class="ln" id="L320">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> parts = ok.<span class="tok-fn">split_whitespace</span>();</span>
+<span class="ln" id="L321">        <span class="tok-kw">let</span> flags = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L322">        <span class="tok-kw">let</span> fingerprint = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L323">        <span class="tok-kw">if</span> !<span class="tok-fn">same_fingerprint</span>(&amp;fingerprint, expected) {</span>
+<span class="ln" id="L324">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">CouldNotRun</span>(format!(</span>
+<span class="ln" id="L325">                <span class="tok-str">&quot;GnuPG imported {fingerprint}, which is not {expected}&quot;</span></span>
+<span class="ln" id="L326">            )));</span>
+<span class="ln" id="L327">        }</span>
+<span class="ln" id="L328">        <span class="tok-com">// Flag 0 means nothing about the key changed, which is GnuPG&#x27;s way of</span></span>
+<span class="ln" id="L329">        <span class="tok-com">// saying it already had it. Anything else means something was added.</span></span>
+<span class="ln" id="L330">        <span class="tok-kw">let</span> what = <span class="tok-kw">if</span> flags == <span class="tok-str">&quot;0&quot;</span> {</span>
+<span class="ln" id="L331">            Imported::AlreadyThere</span>
+<span class="ln" id="L332">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L333">            Imported::Added</span>
+<span class="ln" id="L334">        };</span>
+<span class="ln" id="L335">        <span class="tok-fn">Ok</span>(Import { fingerprint, what })</span>
+<span class="ln" id="L336">    }</span>
 </span>
-<span class="ln" id="L334"></span>
+<span class="ln" id="L337"></span>
 <span class="src-item" id="fn-gnupg-verify">
-<span class="ln" id="L335">    <span class="tok-com">/// Check a detached signature with this machine&#x27;s GnuPG.</span></span>
-<span class="ln" id="L336">    <span class="tok-com">///</span></span>
-<span class="ln" id="L337">    <span class="tok-com">/// `expected` is the fingerprint that must have signed it. A valid</span></span>
-<span class="ln" id="L338">    <span class="tok-com">/// signature by any other key is [`Outcome::AnotherKey`] and is a failure;</span></span>
-<span class="ln" id="L339">    <span class="tok-com">/// see the module note for why that is the check nobody should be asked to</span></span>
-<span class="ln" id="L340">    <span class="tok-com">/// remember to make.</span></span>
-<span class="ln" id="L341">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">verify</span>(&amp;<span class="tok-kw">self</span>, signature: &amp;Path, data: &amp;Path, expected: &amp;str) -&gt; Result&lt;Run, Error&gt; {</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> output = <span class="tok-kw">self</span></span>
-<span class="ln" id="L343">            .<span class="tok-fn">base</span>()</span>
-<span class="ln" id="L344">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--verify&quot;</span>)</span>
-<span class="ln" id="L345">            .<span class="tok-fn">arg</span>(signature)</span>
-<span class="ln" id="L346">            .<span class="tok-fn">arg</span>(data)</span>
-<span class="ln" id="L347">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L348">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;{e}&quot;</span>)))?;</span>
-<span class="ln" id="L349">        <span class="tok-kw">let</span> status = <span class="tok-fn">status_lines</span>(&amp;output.stdout);</span>
-<span class="ln" id="L350">        <span class="tok-kw">let</span> command = format!(<span class="tok-str">&quot;gpg --verify {} {}&quot;</span>, signature.<span class="tok-fn">display</span>(), data.<span class="tok-fn">display</span>());</span>
-<span class="ln" id="L351"></span>
-<span class="ln" id="L352">        <span class="tok-com">// Order matters. `VALIDSIG` is the only line carrying a full</span></span>
-<span class="ln" id="L353">        <span class="tok-com">// fingerprint, so it is read first and compared. `GOODSIG` alone</span></span>
-<span class="ln" id="L354">        <span class="tok-com">// carries a key id, which is short enough to be chosen by an attacker</span></span>
-<span class="ln" id="L355">        <span class="tok-com">// and is never enough on its own.</span></span>
-<span class="ln" id="L356">        <span class="tok-com">//</span></span>
-<span class="ln" id="L357">        <span class="tok-com">// F-100: *every* `VALIDSIG`, not the first. A file can carry more than</span></span>
-<span class="ln" id="L358">        <span class="tok-com">// one signature and the expected key&#x27;s may not be the one GnuPG prints</span></span>
-<span class="ln" id="L359">        <span class="tok-com">// first.</span></span>
-<span class="ln" id="L360">        <span class="tok-com">// **F-104.** Every fingerprint a `VALIDSIG` names, not only the first.</span></span>
-<span class="ln" id="L361">        <span class="tok-com">//</span></span>
-<span class="ln" id="L362">        <span class="tok-com">// The line is</span></span>
-<span class="ln" id="L363">        <span class="tok-com">//</span></span>
-<span class="ln" id="L364">        <span class="tok-com">//   VALIDSIG &lt;signing key&gt; &lt;date&gt; &lt;ts&gt; &lt;expire&gt; &lt;version&gt; &lt;reserved&gt;</span></span>
-<span class="ln" id="L365">        <span class="tok-com">//            &lt;pubkey-algo&gt; &lt;hash-algo&gt; &lt;sig-class&gt; &lt;primary key&gt;</span></span>
+<span class="ln" id="L338">    <span class="tok-com">/// Check a detached signature with this machine&#x27;s GnuPG.</span></span>
+<span class="ln" id="L339">    <span class="tok-com">///</span></span>
+<span class="ln" id="L340">    <span class="tok-com">/// `expected` is the fingerprint that must have signed it. A valid</span></span>
+<span class="ln" id="L341">    <span class="tok-com">/// signature by any other key is [`Outcome::AnotherKey`] and is a failure;</span></span>
+<span class="ln" id="L342">    <span class="tok-com">/// see the module note for why that is the check nobody should be asked to</span></span>
+<span class="ln" id="L343">    <span class="tok-com">/// remember to make.</span></span>
+<span class="ln" id="L344">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">verify</span>(&amp;<span class="tok-kw">self</span>, signature: &amp;Path, data: &amp;Path, expected: &amp;str) -&gt; Result&lt;Run, Error&gt; {</span>
+<span class="ln" id="L345">        <span class="tok-kw">let</span> output = <span class="tok-kw">self</span></span>
+<span class="ln" id="L346">            .<span class="tok-fn">base</span>()</span>
+<span class="ln" id="L347">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--verify&quot;</span>)</span>
+<span class="ln" id="L348">            .<span class="tok-fn">arg</span>(signature)</span>
+<span class="ln" id="L349">            .<span class="tok-fn">arg</span>(data)</span>
+<span class="ln" id="L350">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L351">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">CouldNotRun</span>(format!(<span class="tok-str">&quot;{e}&quot;</span>)))?;</span>
+<span class="ln" id="L352">        <span class="tok-kw">let</span> status = <span class="tok-fn">status_lines</span>(&amp;output.stdout);</span>
+<span class="ln" id="L353">        <span class="tok-kw">let</span> command = format!(<span class="tok-str">&quot;gpg --verify {} {}&quot;</span>, signature.<span class="tok-fn">display</span>(), data.<span class="tok-fn">display</span>());</span>
+<span class="ln" id="L354"></span>
+<span class="ln" id="L355">        <span class="tok-com">// Order matters. `VALIDSIG` is the only line carrying a full</span></span>
+<span class="ln" id="L356">        <span class="tok-com">// fingerprint, so it is read first and compared. `GOODSIG` alone</span></span>
+<span class="ln" id="L357">        <span class="tok-com">// carries a key id, which is short enough to be chosen by an attacker</span></span>
+<span class="ln" id="L358">        <span class="tok-com">// and is never enough on its own.</span></span>
+<span class="ln" id="L359">        <span class="tok-com">//</span></span>
+<span class="ln" id="L360">        <span class="tok-com">// F-100: *every* `VALIDSIG`, not the first. A file can carry more than</span></span>
+<span class="ln" id="L361">        <span class="tok-com">// one signature and the expected key&#x27;s may not be the one GnuPG prints</span></span>
+<span class="ln" id="L362">        <span class="tok-com">// first.</span></span>
+<span class="ln" id="L363">        <span class="tok-com">// **F-104.** Every fingerprint a `VALIDSIG` names, not only the first.</span></span>
+<span class="ln" id="L364">        <span class="tok-com">//</span></span>
+<span class="ln" id="L365">        <span class="tok-com">// The line is</span></span>
 <span class="ln" id="L366">        <span class="tok-com">//</span></span>
-<span class="ln" id="L367">        <span class="tok-com">// and the **first** field is the key that made the signature while the</span></span>
-<span class="ln" id="L368">        <span class="tok-com">// **last** is the primary key it belongs to. Only the first was read.</span></span>
+<span class="ln" id="L367">        <span class="tok-com">//   VALIDSIG &lt;signing key&gt; &lt;date&gt; &lt;ts&gt; &lt;expire&gt; &lt;version&gt; &lt;reserved&gt;</span></span>
+<span class="ln" id="L368">        <span class="tok-com">//            &lt;pubkey-algo&gt; &lt;hash-algo&gt; &lt;sig-class&gt; &lt;primary key&gt;</span></span>
 <span class="ln" id="L369">        <span class="tok-com">//</span></span>
-<span class="ln" id="L370">        <span class="tok-com">// For a key that signs with itself those two are the same string and</span></span>
-<span class="ln" id="L371">        <span class="tok-com">// the mistake is invisible, which is exactly the key this was measured</span></span>
-<span class="ln" id="L372">        <span class="tok-com">// against while it was being written. This project&#x27;s release key signs</span></span>
-<span class="ln" id="L373">        <span class="tok-com">// with a subkey, as most do, so on the real thing they differ: the</span></span>
-<span class="ln" id="L374">        <span class="tok-com">// published fingerprint is the primary key&#x27;s and the signature carries</span></span>
-<span class="ln" id="L375">        <span class="tok-com">// the subkey&#x27;s.</span></span>
-<span class="ln" id="L376">        <span class="tok-com">//</span></span>
-<span class="ln" id="L377">        <span class="tok-com">// The result was a verifier that called a genuine, correctly signed</span></span>
-<span class="ln" id="L378">        <span class="tok-com">// release **unverified**, in the loudest words it has, for every reader</span></span>
-<span class="ln" id="L379">        <span class="tok-com">// with GnuPG installed. Found by running it against the published</span></span>
-<span class="ln" id="L380">        <span class="tok-com">// v0.1.15 rather than against a fixture.</span></span>
-<span class="ln" id="L381">        <span class="tok-kw">let</span> signers: Vec&lt;String&gt; = <span class="tok-fn">fields</span>(&amp;status, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
-<span class="ln" id="L382">            .<span class="tok-fn">flat_map</span>(|valid| {</span>
-<span class="ln" id="L383">                <span class="tok-kw">let</span> parts: Vec&lt;&amp;str&gt; = valid.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L384">                <span class="tok-kw">let</span> first = parts.<span class="tok-fn">first</span>().<span class="tok-fn">copied</span>();</span>
-<span class="ln" id="L385">                <span class="tok-kw">let</span> last = parts.<span class="tok-fn">last</span>().<span class="tok-fn">copied</span>().<span class="tok-fn">filter</span>(|_| parts.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
-<span class="ln" id="L386">                [first, last].<span class="tok-fn">into_iter</span>().<span class="tok-fn">flatten</span>().collect::&lt;Vec&lt;&amp;str&gt;&gt;()</span>
-<span class="ln" id="L387">            })</span>
-<span class="ln" id="L388">            .<span class="tok-fn">map</span>(str::to_string)</span>
-<span class="ln" id="L389">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L390">        <span class="tok-kw">let</span> outcome = <span class="tok-kw">if</span> !signers.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L391">            <span class="tok-kw">if</span> signers</span>
-<span class="ln" id="L392">                .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L393">                .<span class="tok-fn">any</span>(|signer| <span class="tok-fn">same_fingerprint</span>(signer, expected))</span>
-<span class="ln" id="L394">            {</span>
-<span class="ln" id="L395">                Outcome::Good</span>
-<span class="ln" id="L396">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L397">                Outcome::AnotherKey {</span>
-<span class="ln" id="L398">                    fingerprint: signers.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
-<span class="ln" id="L399">                }</span>
-<span class="ln" id="L400">            }</span>
-<span class="ln" id="L401">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;BADSIG&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L402">            Outcome::Bad</span>
-<span class="ln" id="L403">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;NO_PUBKEY&quot;</span>).<span class="tok-fn">is_some</span>() || <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;ERRSIG&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L404">            Outcome::NoKey</span>
-<span class="ln" id="L405">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L406">            Outcome::Unclear</span>
-<span class="ln" id="L407">        };</span>
-<span class="ln" id="L408"></span>
-<span class="ln" id="L409">        <span class="tok-fn">Ok</span>(Run {</span>
-<span class="ln" id="L410">            command,</span>
-<span class="ln" id="L411">            outcome,</span>
-<span class="ln" id="L412">            status,</span>
-<span class="ln" id="L413">            said: String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L414">        })</span>
-<span class="ln" id="L415">    }</span>
+<span class="ln" id="L370">        <span class="tok-com">// and the **first** field is the key that made the signature while the</span></span>
+<span class="ln" id="L371">        <span class="tok-com">// **last** is the primary key it belongs to. Only the first was read.</span></span>
+<span class="ln" id="L372">        <span class="tok-com">//</span></span>
+<span class="ln" id="L373">        <span class="tok-com">// For a key that signs with itself those two are the same string and</span></span>
+<span class="ln" id="L374">        <span class="tok-com">// the mistake is invisible, which is exactly the key this was measured</span></span>
+<span class="ln" id="L375">        <span class="tok-com">// against while it was being written. This project&#x27;s release key signs</span></span>
+<span class="ln" id="L376">        <span class="tok-com">// with a subkey, as most do, so on the real thing they differ: the</span></span>
+<span class="ln" id="L377">        <span class="tok-com">// published fingerprint is the primary key&#x27;s and the signature carries</span></span>
+<span class="ln" id="L378">        <span class="tok-com">// the subkey&#x27;s.</span></span>
+<span class="ln" id="L379">        <span class="tok-com">//</span></span>
+<span class="ln" id="L380">        <span class="tok-com">// The result was a verifier that called a genuine, correctly signed</span></span>
+<span class="ln" id="L381">        <span class="tok-com">// release **unverified**, in the loudest words it has, for every reader</span></span>
+<span class="ln" id="L382">        <span class="tok-com">// with GnuPG installed. Found by running it against the published</span></span>
+<span class="ln" id="L383">        <span class="tok-com">// v0.1.15 rather than against a fixture.</span></span>
+<span class="ln" id="L384">        <span class="tok-kw">let</span> signers: Vec&lt;String&gt; = <span class="tok-fn">fields</span>(&amp;status, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
+<span class="ln" id="L385">            .<span class="tok-fn">flat_map</span>(|valid| {</span>
+<span class="ln" id="L386">                <span class="tok-kw">let</span> parts: Vec&lt;&amp;str&gt; = valid.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L387">                <span class="tok-kw">let</span> first = parts.<span class="tok-fn">first</span>().<span class="tok-fn">copied</span>();</span>
+<span class="ln" id="L388">                <span class="tok-kw">let</span> last = parts.<span class="tok-fn">last</span>().<span class="tok-fn">copied</span>().<span class="tok-fn">filter</span>(|_| parts.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
+<span class="ln" id="L389">                [first, last].<span class="tok-fn">into_iter</span>().<span class="tok-fn">flatten</span>().collect::&lt;Vec&lt;&amp;str&gt;&gt;()</span>
+<span class="ln" id="L390">            })</span>
+<span class="ln" id="L391">            .<span class="tok-fn">map</span>(str::to_string)</span>
+<span class="ln" id="L392">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L393">        <span class="tok-kw">let</span> outcome = <span class="tok-kw">if</span> !signers.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L394">            <span class="tok-kw">if</span> signers</span>
+<span class="ln" id="L395">                .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L396">                .<span class="tok-fn">any</span>(|signer| <span class="tok-fn">same_fingerprint</span>(signer, expected))</span>
+<span class="ln" id="L397">            {</span>
+<span class="ln" id="L398">                Outcome::Good</span>
+<span class="ln" id="L399">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L400">                Outcome::AnotherKey {</span>
+<span class="ln" id="L401">                    fingerprint: signers.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
+<span class="ln" id="L402">                }</span>
+<span class="ln" id="L403">            }</span>
+<span class="ln" id="L404">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;BADSIG&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L405">            Outcome::Bad</span>
+<span class="ln" id="L406">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;NO_PUBKEY&quot;</span>).<span class="tok-fn">is_some</span>() || <span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;ERRSIG&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L407">            Outcome::NoKey</span>
+<span class="ln" id="L408">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L409">            Outcome::Unclear</span>
+<span class="ln" id="L410">        };</span>
+<span class="ln" id="L411"></span>
+<span class="ln" id="L412">        <span class="tok-fn">Ok</span>(Run {</span>
+<span class="ln" id="L413">            command,</span>
+<span class="ln" id="L414">            outcome,</span>
+<span class="ln" id="L415">            status,</span>
+<span class="ln" id="L416">            said: String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L417">        })</span>
+<span class="ln" id="L418">    }</span>
 </span>
-<span class="ln" id="L416">}</span>
-<span class="ln" id="L417"></span>
+<span class="ln" id="L419">}</span>
+<span class="ln" id="L420"></span>
 <span class="src-item" id="fn-status_lines">
-<span class="ln" id="L418"><span class="tok-com">/// The `[GNUPG:]` lines out of what GnuPG printed, prefix removed.</span></span>
-<span class="ln" id="L419"><span class="tok-kw">fn</span> <span class="tok-fn">status_lines</span>(stdout: &amp;[u8]) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L420">    String::<span class="tok-fn">from_utf8_lossy</span>(stdout)</span>
-<span class="ln" id="L421">        .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L422">        .<span class="tok-fn">filter_map</span>(|line| line.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;[GNUPG:] &quot;</span>))</span>
-<span class="ln" id="L423">        .<span class="tok-fn">map</span>(str::to_string)</span>
-<span class="ln" id="L424">        .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L425">}</span>
+<span class="ln" id="L421"><span class="tok-com">/// The `[GNUPG:]` lines out of what GnuPG printed, prefix removed.</span></span>
+<span class="ln" id="L422"><span class="tok-kw">fn</span> <span class="tok-fn">status_lines</span>(stdout: &amp;[u8]) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L423">    String::<span class="tok-fn">from_utf8_lossy</span>(stdout)</span>
+<span class="ln" id="L424">        .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L425">        .<span class="tok-fn">filter_map</span>(|line| line.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;[GNUPG:] &quot;</span>))</span>
+<span class="ln" id="L426">        .<span class="tok-fn">map</span>(str::to_string)</span>
+<span class="ln" id="L427">        .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L428">}</span>
 </span>
-<span class="ln" id="L426"></span>
+<span class="ln" id="L429"></span>
 <span class="src-item" id="fn-field">
-<span class="ln" id="L427"><span class="tok-com">/// The rest of the first status line whose first word is `keyword`.</span></span>
-<span class="ln" id="L428"><span class="tok-com">///</span></span>
-<span class="ln" id="L429"><span class="tok-com">/// The space is load bearing: without it `NO_PUBKEY` would match a line</span></span>
-<span class="ln" id="L430"><span class="tok-com">/// beginning `NO_PUBKEYS`, and a keyword GnuPG adds later could quietly change</span></span>
-<span class="ln" id="L431"><span class="tok-com">/// what this decides.</span></span>
-<span class="ln" id="L432"><span class="tok-kw">fn</span> field&lt;&#x27;a&gt;(status: &amp;&#x27;a [String], keyword: &amp;&#x27;a str) -&gt; Option&lt;&amp;&#x27;a str&gt; {</span>
-<span class="ln" id="L433">    <span class="tok-fn">fields</span>(status, keyword).<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L434">}</span>
+<span class="ln" id="L430"><span class="tok-com">/// The rest of the first status line whose first word is `keyword`.</span></span>
+<span class="ln" id="L431"><span class="tok-com">///</span></span>
+<span class="ln" id="L432"><span class="tok-com">/// The space is load bearing: without it `NO_PUBKEY` would match a line</span></span>
+<span class="ln" id="L433"><span class="tok-com">/// beginning `NO_PUBKEYS`, and a keyword GnuPG adds later could quietly change</span></span>
+<span class="ln" id="L434"><span class="tok-com">/// what this decides.</span></span>
+<span class="ln" id="L435"><span class="tok-kw">fn</span> field&lt;&#x27;a&gt;(status: &amp;&#x27;a [String], keyword: &amp;&#x27;a str) -&gt; Option&lt;&amp;&#x27;a str&gt; {</span>
+<span class="ln" id="L436">    <span class="tok-fn">fields</span>(status, keyword).<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L437">}</span>
 </span>
-<span class="ln" id="L435"></span>
+<span class="ln" id="L438"></span>
 <span class="src-item" id="fn-fields">
-<span class="ln" id="L436"><span class="tok-com">/// Every status line whose first word is `keyword`.</span></span>
-<span class="ln" id="L437"><span class="tok-com">///</span></span>
-<span class="ln" id="L438"><span class="tok-com">/// **F-100.** A file can carry more than one signature, and GnuPG reports each</span></span>
-<span class="ln" id="L439"><span class="tok-com">/// one: several `NEWSIG`/`VALIDSIG` blocks in a single run. Reading only the</span></span>
-<span class="ln" id="L440"><span class="tok-com">/// first meant that a release signed by the project key *and* by somebody</span></span>
-<span class="ln" id="L441"><span class="tok-com">/// else&#x27;s, in that other order, was reported as signed by the wrong key and</span></span>
-<span class="ln" id="L442"><span class="tok-com">/// refused.</span></span>
-<span class="ln" id="L443"><span class="tok-com">///</span></span>
-<span class="ln" id="L444"><span class="tok-com">/// That is the safe direction and it is still wrong: refusing a genuine release</span></span>
-<span class="ln" id="L445"><span class="tok-com">/// teaches people that the verifier is unreliable, and a verifier people work</span></span>
-<span class="ln" id="L446"><span class="tok-com">/// around is worse than none. What matters is whether the expected key signed</span></span>
-<span class="ln" id="L447"><span class="tok-com">/// this data, and that question is asked of every signature rather than of</span></span>
-<span class="ln" id="L448"><span class="tok-com">/// whichever GnuPG happened to print first.</span></span>
-<span class="ln" id="L449"><span class="tok-kw">fn</span> fields&lt;&#x27;a&gt;(status: &amp;&#x27;a [String], keyword: &amp;&#x27;a str) -&gt; <span class="tok-kw">impl</span> Iterator&lt;Item = &amp;&#x27;a str&gt; {</span>
-<span class="ln" id="L450">    status</span>
-<span class="ln" id="L451">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L452">        .<span class="tok-fn">filter_map</span>(<span class="tok-kw">move</span> |line| line.<span class="tok-fn">strip_prefix</span>(keyword)?.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&#x27; &#x27;</span>))</span>
-<span class="ln" id="L453">}</span>
+<span class="ln" id="L439"><span class="tok-com">/// Every status line whose first word is `keyword`.</span></span>
+<span class="ln" id="L440"><span class="tok-com">///</span></span>
+<span class="ln" id="L441"><span class="tok-com">/// **F-100.** A file can carry more than one signature, and GnuPG reports each</span></span>
+<span class="ln" id="L442"><span class="tok-com">/// one: several `NEWSIG`/`VALIDSIG` blocks in a single run. Reading only the</span></span>
+<span class="ln" id="L443"><span class="tok-com">/// first meant that a release signed by the project key *and* by somebody</span></span>
+<span class="ln" id="L444"><span class="tok-com">/// else&#x27;s, in that other order, was reported as signed by the wrong key and</span></span>
+<span class="ln" id="L445"><span class="tok-com">/// refused.</span></span>
+<span class="ln" id="L446"><span class="tok-com">///</span></span>
+<span class="ln" id="L447"><span class="tok-com">/// That is the safe direction and it is still wrong: refusing a genuine release</span></span>
+<span class="ln" id="L448"><span class="tok-com">/// teaches people that the verifier is unreliable, and a verifier people work</span></span>
+<span class="ln" id="L449"><span class="tok-com">/// around is worse than none. What matters is whether the expected key signed</span></span>
+<span class="ln" id="L450"><span class="tok-com">/// this data, and that question is asked of every signature rather than of</span></span>
+<span class="ln" id="L451"><span class="tok-com">/// whichever GnuPG happened to print first.</span></span>
+<span class="ln" id="L452"><span class="tok-kw">fn</span> fields&lt;&#x27;a&gt;(status: &amp;&#x27;a [String], keyword: &amp;&#x27;a str) -&gt; <span class="tok-kw">impl</span> Iterator&lt;Item = &amp;&#x27;a str&gt; {</span>
+<span class="ln" id="L453">    status</span>
+<span class="ln" id="L454">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L455">        .<span class="tok-fn">filter_map</span>(<span class="tok-kw">move</span> |line| line.<span class="tok-fn">strip_prefix</span>(keyword)?.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&#x27; &#x27;</span>))</span>
+<span class="ln" id="L456">}</span>
 </span>
-<span class="ln" id="L454"></span>
+<span class="ln" id="L457"></span>
 <span class="src-item" id="fn-same_fingerprint">
-<span class="ln" id="L455"><span class="tok-com">/// Whether two fingerprints are the same, ignoring case and spacing.</span></span>
-<span class="ln" id="L456"><span class="tok-com">///</span></span>
-<span class="ln" id="L457"><span class="tok-com">/// GnuPG prints them unspaced and uppercase; a fingerprint copied off a website</span></span>
-<span class="ln" id="L458"><span class="tok-com">/// often arrives in groups of four. Comparing the two as typed would refuse a</span></span>
-<span class="ln" id="L459"><span class="tok-com">/// correct key over its formatting. Two empty strings are not a match, so a run</span></span>
-<span class="ln" id="L460"><span class="tok-com">/// that produced no fingerprint at all cannot compare equal to an expectation</span></span>
-<span class="ln" id="L461"><span class="tok-com">/// of nothing.</span></span>
-<span class="ln" id="L462"><span class="tok-kw">fn</span> <span class="tok-fn">same_fingerprint</span>(a: &amp;str, b: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L463">    <span class="tok-kw">let</span> strip = |text: &amp;str| {</span>
-<span class="ln" id="L464">        text.<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L465">            .<span class="tok-fn">filter</span>(|c| !c.<span class="tok-fn">is_whitespace</span>())</span>
-<span class="ln" id="L466">            .<span class="tok-fn">flat_map</span>(char::to_uppercase)</span>
-<span class="ln" id="L467">            .collect::&lt;String&gt;()</span>
-<span class="ln" id="L468">    };</span>
-<span class="ln" id="L469">    <span class="tok-kw">let</span> (a, b) = (<span class="tok-fn">strip</span>(a), <span class="tok-fn">strip</span>(b));</span>
-<span class="ln" id="L470">    !a.<span class="tok-fn">is_empty</span>() &amp;&amp; a == b</span>
-<span class="ln" id="L471">}</span>
+<span class="ln" id="L458"><span class="tok-com">/// Whether two fingerprints are the same, ignoring case and spacing.</span></span>
+<span class="ln" id="L459"><span class="tok-com">///</span></span>
+<span class="ln" id="L460"><span class="tok-com">/// GnuPG prints them unspaced and uppercase; a fingerprint copied off a website</span></span>
+<span class="ln" id="L461"><span class="tok-com">/// often arrives in groups of four. Comparing the two as typed would refuse a</span></span>
+<span class="ln" id="L462"><span class="tok-com">/// correct key over its formatting. Two empty strings are not a match, so a run</span></span>
+<span class="ln" id="L463"><span class="tok-com">/// that produced no fingerprint at all cannot compare equal to an expectation</span></span>
+<span class="ln" id="L464"><span class="tok-com">/// of nothing.</span></span>
+<span class="ln" id="L465"><span class="tok-kw">fn</span> <span class="tok-fn">same_fingerprint</span>(a: &amp;str, b: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L466">    <span class="tok-kw">let</span> strip = |text: &amp;str| {</span>
+<span class="ln" id="L467">        text.<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L468">            .<span class="tok-fn">filter</span>(|c| !c.<span class="tok-fn">is_whitespace</span>())</span>
+<span class="ln" id="L469">            .<span class="tok-fn">flat_map</span>(char::to_uppercase)</span>
+<span class="ln" id="L470">            .collect::&lt;String&gt;()</span>
+<span class="ln" id="L471">    };</span>
+<span class="ln" id="L472">    <span class="tok-kw">let</span> (a, b) = (<span class="tok-fn">strip</span>(a), <span class="tok-fn">strip</span>(b));</span>
+<span class="ln" id="L473">    !a.<span class="tok-fn">is_empty</span>() &amp;&amp; a == b</span>
+<span class="ln" id="L474">}</span>
 </span>
-<span class="ln" id="L472"></span>
+<span class="ln" id="L475"></span>
 <span class="src-item" id="fn-commands">
-<span class="ln" id="L473"><span class="tok-com">/// The commands a reader can type to get this answer without VeilVoice.</span></span>
-<span class="ln" id="L474"><span class="tok-com">///</span></span>
-<span class="ln" id="L475"><span class="tok-com">/// Printed as well as run, always. See the module note: running GnuPG makes the</span></span>
-<span class="ln" id="L476"><span class="tok-com">/// implementation independent and does not make the invocation independent, and</span></span>
-<span class="ln" id="L477"><span class="tok-com">/// only the reader can supply that.</span></span>
-<span class="ln" id="L478"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">commands</span>(sums: &amp;Path, signature: &amp;Path, key: Option&lt;&amp;Path&gt;) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L479">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L480">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(key) = key {</span>
-<span class="ln" id="L481">        out.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;gpg --import {}&quot;</span>, key.<span class="tok-fn">display</span>()));</span>
-<span class="ln" id="L482">    }</span>
-<span class="ln" id="L483">    out.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L484">        <span class="tok-str">&quot;gpg --verify {} {}&quot;</span>,</span>
-<span class="ln" id="L485">        signature.<span class="tok-fn">display</span>(),</span>
-<span class="ln" id="L486">        sums.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L487">    ));</span>
-<span class="ln" id="L488">    out.<span class="tok-fn">push</span>(<span class="tok-str">&quot;sha256sum -c SHA256SUMS --ignore-missing&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L489">    out</span>
-<span class="ln" id="L490">}</span>
+<span class="ln" id="L476"><span class="tok-com">/// The commands a reader can type to get this answer without VeilVoice.</span></span>
+<span class="ln" id="L477"><span class="tok-com">///</span></span>
+<span class="ln" id="L478"><span class="tok-com">/// Printed as well as run, always. See the module note: running GnuPG makes the</span></span>
+<span class="ln" id="L479"><span class="tok-com">/// implementation independent and does not make the invocation independent, and</span></span>
+<span class="ln" id="L480"><span class="tok-com">/// only the reader can supply that.</span></span>
+<span class="ln" id="L481"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">commands</span>(sums: &amp;Path, signature: &amp;Path, key: Option&lt;&amp;Path&gt;) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L482">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L483">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(key) = key {</span>
+<span class="ln" id="L484">        out.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;gpg --import {}&quot;</span>, key.<span class="tok-fn">display</span>()));</span>
+<span class="ln" id="L485">    }</span>
+<span class="ln" id="L486">    out.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L487">        <span class="tok-str">&quot;gpg --verify {} {}&quot;</span>,</span>
+<span class="ln" id="L488">        signature.<span class="tok-fn">display</span>(),</span>
+<span class="ln" id="L489">        sums.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L490">    ));</span>
+<span class="ln" id="L491">    out.<span class="tok-fn">push</span>(<span class="tok-str">&quot;sha256sum -c SHA256SUMS --ignore-missing&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L492">    out</span>
+<span class="ln" id="L493">}</span>
 </span>
-<span class="ln" id="L491"></span>
-<span class="ln" id="L492"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L493"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L494">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L495"></span>
-<span class="ln" id="L496">    <span class="tok-com">/// The project&#x27;s own key, so the import test imports the real thing.</span></span>
-<span class="ln" id="L497">    <span class="tok-kw">const</span> KEY: &amp;str = include_str!(concat!(</span>
-<span class="ln" id="L498">        env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>),</span>
-<span class="ln" id="L499">        <span class="tok-str">&quot;/../../website/assets/veilvoice-signing-key.asc&quot;</span></span>
-<span class="ln" id="L500">    ));</span>
-<span class="ln" id="L501">    <span class="tok-kw">const</span> FINGERPRINT: &amp;str = <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>;</span>
-<span class="ln" id="L502"></span>
-<span class="ln" id="L503">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L504">    <span class="tok-kw">fn</span> <span class="tok-fn">a_fingerprint_is_compared_by_its_digits_and_not_its_spacing</span>() {</span>
-<span class="ln" id="L505">        assert!(<span class="tok-fn">same_fingerprint</span>(</span>
-<span class="ln" id="L506">            <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>,</span>
-<span class="ln" id="L507">            <span class="tok-str">&quot;8101 FB3B B28D 02FB 239E  0CDF 9CC1 C7E7 A9B5 833A&quot;</span></span>
-<span class="ln" id="L508">        ));</span>
-<span class="ln" id="L509">        assert!(<span class="tok-fn">same_fingerprint</span>(</span>
-<span class="ln" id="L510">            <span class="tok-str">&quot;8101fb3bb28d02fb239e0cdf9cc1c7e7a9b5833a&quot;</span>,</span>
-<span class="ln" id="L511">            <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span></span>
-<span class="ln" id="L512">        ));</span>
-<span class="ln" id="L513">        assert!(!<span class="tok-fn">same_fingerprint</span>(</span>
-<span class="ln" id="L514">            <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>,</span>
-<span class="ln" id="L515">            <span class="tok-str">&quot;0000FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span></span>
-<span class="ln" id="L516">        ));</span>
-<span class="ln" id="L517">    }</span>
-<span class="ln" id="L518"></span>
-<span class="ln" id="L519">    <span class="tok-com">/// Two empty strings are not a match. Otherwise a run that produced no</span></span>
-<span class="ln" id="L520">    <span class="tok-com">/// fingerprint would compare equal to an expectation of nothing.</span></span>
-<span class="ln" id="L521">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L522">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_does_not_match_nothing</span>() {</span>
-<span class="ln" id="L523">        assert!(!<span class="tok-fn">same_fingerprint</span>(<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;&quot;</span>));</span>
-<span class="ln" id="L524">        assert!(!<span class="tok-fn">same_fingerprint</span>(<span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;&quot;</span>));</span>
-<span class="ln" id="L525">    }</span>
-<span class="ln" id="L526"></span>
-<span class="ln" id="L527">    <span class="tok-com">/// The four shapes, taken from GnuPG 2.4.4 rather than from the manual.</span></span>
-<span class="ln" id="L528">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L529">    <span class="tok-kw">fn</span> <span class="tok-fn">the_status_channel_is_read_and_the_prose_is_not</span>() {</span>
-<span class="ln" id="L530">        <span class="tok-kw">let</span> good = <span class="tok-fn">status_lines</span>(</span>
-<span class="ln" id="L531">            b<span class="tok-str">&quot;[GNUPG:] NEWSIG\n\</span></span>
-<span class="ln" id="L532"><span class="tok-str">              [GNUPG:] GOODSIG F63C0EF4DF07E273 testkey\n\</span></span>
-<span class="ln" id="L533"><span class="tok-str">              [GNUPG:] VALIDSIG 520A54F1437E8CE8E18416AEF63C0EF4DF07E273 2026-08-31 1788205030 0 4 0 1 10 00 520A54F1437E8CE8E18416AEF63C0EF4DF07E273\n&quot;</span>,</span>
-<span class="ln" id="L534">        );</span>
-<span class="ln" id="L535">        assert_eq!(</span>
-<span class="ln" id="L536">            <span class="tok-fn">field</span>(&amp;good, <span class="tok-str">&quot;VALIDSIG&quot;</span>).<span class="tok-fn">and_then</span>(|v| v.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>()),</span>
-<span class="ln" id="L537">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;520A54F1437E8CE8E18416AEF63C0EF4DF07E273&quot;</span>)</span>
-<span class="ln" id="L538">        );</span>
-<span class="ln" id="L539">        assert!(<span class="tok-fn">field</span>(&amp;good, <span class="tok-str">&quot;BADSIG&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L540"></span>
-<span class="ln" id="L541">        <span class="tok-kw">let</span> bad = <span class="tok-fn">status_lines</span>(b<span class="tok-str">&quot;[GNUPG:] BADSIG F63C0EF4DF07E273 testkey\n&quot;</span>);</span>
-<span class="ln" id="L542">        assert!(<span class="tok-fn">field</span>(&amp;bad, <span class="tok-str">&quot;BADSIG&quot;</span>).<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L543">        assert!(<span class="tok-fn">field</span>(&amp;bad, <span class="tok-str">&quot;VALIDSIG&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L544"></span>
-<span class="ln" id="L545">        <span class="tok-kw">let</span> missing = <span class="tok-fn">status_lines</span>(b<span class="tok-str">&quot;[GNUPG:] NO_PUBKEY F63C0EF4DF07E273\n&quot;</span>);</span>
-<span class="ln" id="L546">        assert!(<span class="tok-fn">field</span>(&amp;missing, <span class="tok-str">&quot;NO_PUBKEY&quot;</span>).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L494"></span>
+<span class="ln" id="L495"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L496"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L497">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L498"></span>
+<span class="ln" id="L499">    <span class="tok-com">/// The project&#x27;s own key, so the import test imports the real thing.</span></span>
+<span class="ln" id="L500">    <span class="tok-kw">const</span> KEY: &amp;str = include_str!(concat!(</span>
+<span class="ln" id="L501">        env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>),</span>
+<span class="ln" id="L502">        <span class="tok-str">&quot;/../../website/assets/veilvoice-signing-key.asc&quot;</span></span>
+<span class="ln" id="L503">    ));</span>
+<span class="ln" id="L504">    <span class="tok-kw">const</span> FINGERPRINT: &amp;str = <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>;</span>
+<span class="ln" id="L505"></span>
+<span class="ln" id="L506">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L507">    <span class="tok-kw">fn</span> <span class="tok-fn">a_fingerprint_is_compared_by_its_digits_and_not_its_spacing</span>() {</span>
+<span class="ln" id="L508">        assert!(<span class="tok-fn">same_fingerprint</span>(</span>
+<span class="ln" id="L509">            <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>,</span>
+<span class="ln" id="L510">            <span class="tok-str">&quot;8101 FB3B B28D 02FB 239E  0CDF 9CC1 C7E7 A9B5 833A&quot;</span></span>
+<span class="ln" id="L511">        ));</span>
+<span class="ln" id="L512">        assert!(<span class="tok-fn">same_fingerprint</span>(</span>
+<span class="ln" id="L513">            <span class="tok-str">&quot;8101fb3bb28d02fb239e0cdf9cc1c7e7a9b5833a&quot;</span>,</span>
+<span class="ln" id="L514">            <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span></span>
+<span class="ln" id="L515">        ));</span>
+<span class="ln" id="L516">        assert!(!<span class="tok-fn">same_fingerprint</span>(</span>
+<span class="ln" id="L517">            <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>,</span>
+<span class="ln" id="L518">            <span class="tok-str">&quot;0000FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span></span>
+<span class="ln" id="L519">        ));</span>
+<span class="ln" id="L520">    }</span>
+<span class="ln" id="L521"></span>
+<span class="ln" id="L522">    <span class="tok-com">/// Two empty strings are not a match. Otherwise a run that produced no</span></span>
+<span class="ln" id="L523">    <span class="tok-com">/// fingerprint would compare equal to an expectation of nothing.</span></span>
+<span class="ln" id="L524">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L525">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_does_not_match_nothing</span>() {</span>
+<span class="ln" id="L526">        assert!(!<span class="tok-fn">same_fingerprint</span>(<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;&quot;</span>));</span>
+<span class="ln" id="L527">        assert!(!<span class="tok-fn">same_fingerprint</span>(<span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;&quot;</span>));</span>
+<span class="ln" id="L528">    }</span>
+<span class="ln" id="L529"></span>
+<span class="ln" id="L530">    <span class="tok-com">/// The four shapes, taken from GnuPG 2.4.4 rather than from the manual.</span></span>
+<span class="ln" id="L531">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L532">    <span class="tok-kw">fn</span> <span class="tok-fn">the_status_channel_is_read_and_the_prose_is_not</span>() {</span>
+<span class="ln" id="L533">        <span class="tok-kw">let</span> good = <span class="tok-fn">status_lines</span>(</span>
+<span class="ln" id="L534">            b<span class="tok-str">&quot;[GNUPG:] NEWSIG\n\</span></span>
+<span class="ln" id="L535"><span class="tok-str">              [GNUPG:] GOODSIG F63C0EF4DF07E273 testkey\n\</span></span>
+<span class="ln" id="L536"><span class="tok-str">              [GNUPG:] VALIDSIG 520A54F1437E8CE8E18416AEF63C0EF4DF07E273 2026-08-31 1788205030 0 4 0 1 10 00 520A54F1437E8CE8E18416AEF63C0EF4DF07E273\n&quot;</span>,</span>
+<span class="ln" id="L537">        );</span>
+<span class="ln" id="L538">        assert_eq!(</span>
+<span class="ln" id="L539">            <span class="tok-fn">field</span>(&amp;good, <span class="tok-str">&quot;VALIDSIG&quot;</span>).<span class="tok-fn">and_then</span>(|v| v.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>()),</span>
+<span class="ln" id="L540">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;520A54F1437E8CE8E18416AEF63C0EF4DF07E273&quot;</span>)</span>
+<span class="ln" id="L541">        );</span>
+<span class="ln" id="L542">        assert!(<span class="tok-fn">field</span>(&amp;good, <span class="tok-str">&quot;BADSIG&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L543"></span>
+<span class="ln" id="L544">        <span class="tok-kw">let</span> bad = <span class="tok-fn">status_lines</span>(b<span class="tok-str">&quot;[GNUPG:] BADSIG F63C0EF4DF07E273 testkey\n&quot;</span>);</span>
+<span class="ln" id="L545">        assert!(<span class="tok-fn">field</span>(&amp;bad, <span class="tok-str">&quot;BADSIG&quot;</span>).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L546">        assert!(<span class="tok-fn">field</span>(&amp;bad, <span class="tok-str">&quot;VALIDSIG&quot;</span>).<span class="tok-fn">is_none</span>());</span>
 <span class="ln" id="L547"></span>
-<span class="ln" id="L548">        <span class="tok-kw">let</span> imported =</span>
-<span class="ln" id="L549">            <span class="tok-fn">status_lines</span>(b<span class="tok-str">&quot;[GNUPG:] IMPORT_OK 1 520A54F1437E8CE8E18416AEF63C0EF4DF07E273\n&quot;</span>);</span>
-<span class="ln" id="L550">        assert_eq!(</span>
-<span class="ln" id="L551">            <span class="tok-fn">field</span>(&amp;imported, <span class="tok-str">&quot;IMPORT_OK&quot;</span>),</span>
-<span class="ln" id="L552">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;1 520A54F1437E8CE8E18416AEF63C0EF4DF07E273&quot;</span>)</span>
-<span class="ln" id="L553">        );</span>
-<span class="ln" id="L554">    }</span>
-<span class="ln" id="L555"></span>
-<span class="ln" id="L556">    <span class="tok-com">/// **F-100.** A file can carry more than one signature, and the expected</span></span>
-<span class="ln" id="L557">    <span class="tok-com">/// key&#x27;s may not be the one GnuPG prints first.</span></span>
-<span class="ln" id="L558">    <span class="tok-com">///</span></span>
-<span class="ln" id="L559">    <span class="tok-com">/// Reading only the first meant a genuine release signed by two keys was</span></span>
-<span class="ln" id="L560">    <span class="tok-com">/// reported as signed by the wrong one and refused. That is the safe</span></span>
-<span class="ln" id="L561">    <span class="tok-com">/// direction and it is still wrong: a verifier people learn to work around</span></span>
-<span class="ln" id="L562">    <span class="tok-com">/// is worse than none.</span></span>
-<span class="ln" id="L563">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L564">    <span class="tok-kw">fn</span> <span class="tok-fn">the_expected_key_is_looked_for_in_every_signature_not_the_first</span>() {</span>
-<span class="ln" id="L565">        <span class="tok-kw">let</span> two = <span class="tok-fn">status_lines</span>(</span>
-<span class="ln" id="L566">            b<span class="tok-str">&quot;[GNUPG:] NEWSIG\n\</span></span>
-<span class="ln" id="L567"><span class="tok-str">              [GNUPG:] VALIDSIG 0000000000000000000000000000000000000000 2026-08-31 1 0 4 0 1 10 00 0000000000000000000000000000000000000000\n\</span></span>
-<span class="ln" id="L568"><span class="tok-str">              [GNUPG:] NEWSIG\n\</span></span>
-<span class="ln" id="L569"><span class="tok-str">              [GNUPG:] VALIDSIG 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A 2026-08-31 1 0 4 0 1 10 00 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n&quot;</span>,</span>
-<span class="ln" id="L570">        );</span>
-<span class="ln" id="L571">        <span class="tok-kw">let</span> signers: Vec&lt;&amp;str&gt; = <span class="tok-fn">fields</span>(&amp;two, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
-<span class="ln" id="L572">            .<span class="tok-fn">filter_map</span>(|v| v.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L573">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L574">        assert_eq!(signers.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;both signatures must be seen&quot;</span>);</span>
-<span class="ln" id="L575">        assert!(</span>
-<span class="ln" id="L576">            signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)),</span>
-<span class="ln" id="L577">            <span class="tok-str">&quot;the expected key signed it, second&quot;</span></span>
-<span class="ln" id="L578">        );</span>
-<span class="ln" id="L579"></span>
-<span class="ln" id="L580">        <span class="tok-com">// And a run where it signed nothing is still not a pass.</span></span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> neither = <span class="tok-fn">status_lines</span>(</span>
-<span class="ln" id="L582">            b<span class="tok-str">&quot;[GNUPG:] VALIDSIG 0000000000000000000000000000000000000000 2026-08-31 1 0 4 0 1 10 00 0000000000000000000000000000000000000000\n&quot;</span>,</span>
-<span class="ln" id="L583">        );</span>
-<span class="ln" id="L584">        <span class="tok-kw">let</span> signers: Vec&lt;&amp;str&gt; = <span class="tok-fn">fields</span>(&amp;neither, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
-<span class="ln" id="L585">            .<span class="tok-fn">filter_map</span>(|v| v.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L586">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L587">        assert!(!signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)));</span>
-<span class="ln" id="L588">    }</span>
-<span class="ln" id="L589"></span>
-<span class="ln" id="L590">    <span class="tok-com">/// **F-104.** A signature made by a subkey belongs to its primary key.</span></span>
-<span class="ln" id="L591">    <span class="tok-com">///</span></span>
-<span class="ln" id="L592">    <span class="tok-com">/// `VALIDSIG` names the signing key first and the primary key last, and</span></span>
-<span class="ln" id="L593">    <span class="tok-com">/// only the first was read. For a key that signs with itself the two are</span></span>
-<span class="ln" id="L594">    <span class="tok-com">/// the same string and the mistake cannot be seen, which is the shape of</span></span>
-<span class="ln" id="L595">    <span class="tok-com">/// key this was first measured against. This project&#x27;s release key signs</span></span>
-<span class="ln" id="L596">    <span class="tok-com">/// with a subkey, so the real release exercised the case the fixture could</span></span>
-<span class="ln" id="L597">    <span class="tok-com">/// not, and the verifier called a genuine release unverified.</span></span>
-<span class="ln" id="L598">    <span class="tok-com">///</span></span>
-<span class="ln" id="L599">    <span class="tok-com">/// The line below is the one GnuPG actually printed for v0.1.15.</span></span>
-<span class="ln" id="L600">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L601">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signature_made_by_a_subkey_is_the_primary_key_that_owns_it</span>() {</span>
-<span class="ln" id="L602">        <span class="tok-kw">let</span> real = <span class="tok-fn">status_lines</span>(</span>
-<span class="ln" id="L603">            b<span class="tok-str">&quot;[GNUPG:] VALIDSIG 83ABD67A93772B3FA15D2642BD752A144704C231 2026-09-01 1788263691 0 4 0 1 10 00 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n&quot;</span>,</span>
-<span class="ln" id="L604">        );</span>
-<span class="ln" id="L605">        <span class="tok-kw">let</span> signers: Vec&lt;String&gt; = <span class="tok-fn">fields</span>(&amp;real, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
-<span class="ln" id="L606">            .<span class="tok-fn">flat_map</span>(|valid| {</span>
-<span class="ln" id="L607">                <span class="tok-kw">let</span> parts: Vec&lt;&amp;str&gt; = valid.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L608">                <span class="tok-kw">let</span> first = parts.<span class="tok-fn">first</span>().<span class="tok-fn">copied</span>();</span>
-<span class="ln" id="L609">                <span class="tok-kw">let</span> last = parts.<span class="tok-fn">last</span>().<span class="tok-fn">copied</span>().<span class="tok-fn">filter</span>(|_| parts.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
-<span class="ln" id="L610">                [first, last].<span class="tok-fn">into_iter</span>().<span class="tok-fn">flatten</span>().collect::&lt;Vec&lt;&amp;str&gt;&gt;()</span>
-<span class="ln" id="L611">            })</span>
-<span class="ln" id="L612">            .<span class="tok-fn">map</span>(str::to_string)</span>
-<span class="ln" id="L613">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L614">        assert!(</span>
-<span class="ln" id="L615">            signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)),</span>
-<span class="ln" id="L616">            <span class="tok-str">&quot;the primary key is the one published, and it signed this: {signers:?}&quot;</span></span>
-<span class="ln" id="L617">        );</span>
-<span class="ln" id="L618">        <span class="tok-com">// And the subkey is still reported, so nothing is lost by looking at</span></span>
-<span class="ln" id="L619">        <span class="tok-com">// both: a caller expecting the subkey&#x27;s fingerprint also matches.</span></span>
-<span class="ln" id="L620">        assert!(signers</span>
-<span class="ln" id="L621">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L622">            .<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, <span class="tok-str">&quot;83ABD67A93772B3FA15D2642BD752A144704C231&quot;</span>)));</span>
-<span class="ln" id="L623"></span>
-<span class="ln" id="L624">        <span class="tok-com">// A signature by a key that is neither is still refused.</span></span>
-<span class="ln" id="L625">        <span class="tok-kw">let</span> other = <span class="tok-fn">status_lines</span>(</span>
-<span class="ln" id="L626">            b<span class="tok-str">&quot;[GNUPG:] VALIDSIG 1111111111111111111111111111111111111111 2026-09-01 1 0 4 0 1 10 00 2222222222222222222222222222222222222222\n&quot;</span>,</span>
-<span class="ln" id="L627">        );</span>
-<span class="ln" id="L628">        <span class="tok-kw">let</span> signers: Vec&lt;String&gt; = <span class="tok-fn">fields</span>(&amp;other, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
-<span class="ln" id="L629">            .<span class="tok-fn">flat_map</span>(|valid| {</span>
-<span class="ln" id="L630">                <span class="tok-kw">let</span> parts: Vec&lt;&amp;str&gt; = valid.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L631">                <span class="tok-kw">let</span> first = parts.<span class="tok-fn">first</span>().<span class="tok-fn">copied</span>();</span>
-<span class="ln" id="L632">                <span class="tok-kw">let</span> last = parts.<span class="tok-fn">last</span>().<span class="tok-fn">copied</span>().<span class="tok-fn">filter</span>(|_| parts.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
-<span class="ln" id="L633">                [first, last].<span class="tok-fn">into_iter</span>().<span class="tok-fn">flatten</span>().collect::&lt;Vec&lt;&amp;str&gt;&gt;()</span>
-<span class="ln" id="L634">            })</span>
-<span class="ln" id="L635">            .<span class="tok-fn">map</span>(str::to_string)</span>
-<span class="ln" id="L636">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L637">        assert!(!signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)));</span>
-<span class="ln" id="L638">    }</span>
-<span class="ln" id="L639"></span>
-<span class="ln" id="L640">    <span class="tok-com">/// Prose is never read, so a translated GnuPG cannot change the answer.</span></span>
-<span class="ln" id="L641">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L642">    <span class="tok-kw">fn</span> <span class="tok-fn">a_translated_good_signature_line_is_not_a_status_line</span>() {</span>
-<span class="ln" id="L643">        <span class="tok-kw">let</span> translated = <span class="tok-fn">status_lines</span>(</span>
-<span class="ln" id="L644">            <span class="tok-str">&quot;gpg: Korrekte Signatur von \&quot;tilas01\&quot;\n[GNUPG:] BADSIG AA testkey\n&quot;</span>.<span class="tok-fn">as_bytes</span>(),</span>
-<span class="ln" id="L645">        );</span>
-<span class="ln" id="L646">        assert_eq!(translated, vec![<span class="tok-str">&quot;BADSIG AA testkey&quot;</span>.<span class="tok-fn">to_string</span>()]);</span>
-<span class="ln" id="L647">    }</span>
-<span class="ln" id="L648"></span>
-<span class="ln" id="L649">    <span class="tok-com">/// A keyword matches only as a whole word.</span></span>
-<span class="ln" id="L650">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L651">    <span class="tok-kw">fn</span> <span class="tok-fn">a_longer_keyword_is_not_the_one_being_looked_for</span>() {</span>
-<span class="ln" id="L652">        <span class="tok-kw">let</span> status = vec![<span class="tok-str">&quot;NO_PUBKEYX AA&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;VALIDSIGGED BB&quot;</span>.<span class="tok-fn">to_string</span>()];</span>
-<span class="ln" id="L653">        assert!(<span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;NO_PUBKEY&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L654">        assert!(<span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;VALIDSIG&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L655">    }</span>
-<span class="ln" id="L656"></span>
-<span class="ln" id="L657">    <span class="tok-com">/// Only one outcome is a pass, and a good signature by the wrong key is not</span></span>
-<span class="ln" id="L658">    <span class="tok-com">/// it. This is the check the release notes ask a reader to make by hand.</span></span>
-<span class="ln" id="L659">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L660">    <span class="tok-kw">fn</span> <span class="tok-fn">only_the_expected_key_is_a_pass</span>() {</span>
-<span class="ln" id="L661">        assert!(Outcome::Good.<span class="tok-fn">is_good</span>());</span>
-<span class="ln" id="L662">        assert!(!Outcome::AnotherKey {</span>
-<span class="ln" id="L663">            fingerprint: <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>)</span>
-<span class="ln" id="L664">        }</span>
-<span class="ln" id="L665">        .<span class="tok-fn">is_good</span>());</span>
-<span class="ln" id="L666">        assert!(!Outcome::Bad.<span class="tok-fn">is_good</span>());</span>
-<span class="ln" id="L667">        assert!(!Outcome::NoKey.<span class="tok-fn">is_good</span>());</span>
-<span class="ln" id="L668">        assert!(!Outcome::Unclear.<span class="tok-fn">is_good</span>());</span>
-<span class="ln" id="L669">        assert!(Outcome::AnotherKey {</span>
-<span class="ln" id="L670">            fingerprint: <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>)</span>
-<span class="ln" id="L671">        }</span>
-<span class="ln" id="L672">        .<span class="tok-fn">plainly</span>()</span>
-<span class="ln" id="L673">        .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NOT the&quot;</span>));</span>
-<span class="ln" id="L674">    }</span>
-<span class="ln" id="L675"></span>
-<span class="ln" id="L676">    <span class="tok-com">/// The commands are the independent article and must name both files.</span></span>
-<span class="ln" id="L677">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L678">    <span class="tok-kw">fn</span> <span class="tok-fn">the_printed_commands_are_runnable_as_printed</span>() {</span>
-<span class="ln" id="L679">        <span class="tok-kw">let</span> lines = <span class="tok-fn">commands</span>(</span>
-<span class="ln" id="L680">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>),</span>
-<span class="ln" id="L681">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>),</span>
-<span class="ln" id="L682">            <span class="tok-fn">Some</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-signing-key.asc&quot;</span>)),</span>
-<span class="ln" id="L683">        );</span>
-<span class="ln" id="L684">        assert_eq!(lines[<span class="tok-num">0</span>], <span class="tok-str">&quot;gpg --import veilvoice-signing-key.asc&quot;</span>);</span>
-<span class="ln" id="L685">        assert_eq!(lines[<span class="tok-num">1</span>], <span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span>);</span>
-<span class="ln" id="L686">        assert!(lines[<span class="tok-num">2</span>].<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;sha256sum -c&quot;</span>));</span>
-<span class="ln" id="L687">    }</span>
-<span class="ln" id="L688"></span>
-<span class="ln" id="L689">    <span class="tok-com">/// Nothing here ever asks a person for anything: these run where no</span></span>
-<span class="ln" id="L690">    <span class="tok-com">/// terminal exists, and a GnuPG that stopped to prompt would hang a</span></span>
-<span class="ln" id="L691">    <span class="tok-com">/// verifier somebody double-clicked.</span></span>
-<span class="ln" id="L692">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L693">    <span class="tok-kw">fn</span> <span class="tok-fn">every_call_is_unattended</span>() {</span>
-<span class="ln" id="L694">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>);</span>
-<span class="ln" id="L695">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L696">        <span class="tok-kw">for</span> flag <span class="tok-kw">in</span> [<span class="tok-str">&quot;--batch&quot;</span>, <span class="tok-str">&quot;--no-tty&quot;</span>, <span class="tok-str">&quot;--status-fd&quot;</span>] {</span>
-<span class="ln" id="L697">            assert!(body.<span class="tok-fn">contains</span>(flag), <span class="tok-str">&quot;{flag} is not passed&quot;</span>);</span>
-<span class="ln" id="L698">        }</span>
-<span class="ln" id="L699">        assert!(</span>
-<span class="ln" id="L700">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--yes&quot;</span>),</span>
-<span class="ln" id="L701">            <span class="tok-str">&quot;nothing here overwrites anything, so nothing here needs --yes&quot;</span></span>
-<span class="ln" id="L702">        );</span>
-<span class="ln" id="L703">    }</span>
-<span class="ln" id="L704"></span>
-<span class="ln" id="L705">    <span class="tok-com">/// The note says what was done and how to undo it, because a key that</span></span>
-<span class="ln" id="L706">    <span class="tok-com">/// appears in somebody&#x27;s keyring without explanation is a thing they will</span></span>
-<span class="ln" id="L707">    <span class="tok-com">/// later find and not understand.</span></span>
-<span class="ln" id="L708">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L709">    <span class="tok-kw">fn</span> <span class="tok-fn">the_note_says_what_changed_and_how_to_put_it_back</span>() {</span>
-<span class="ln" id="L710">        <span class="tok-kw">let</span> added = Import {</span>
-<span class="ln" id="L711">            fingerprint: FINGERPRINT.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L712">            what: Imported::Added,</span>
-<span class="ln" id="L713">        }</span>
-<span class="ln" id="L714">        .<span class="tok-fn">note</span>()</span>
-<span class="ln" id="L715">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L716">        assert!(added.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;added its signing key&quot;</span>));</span>
-<span class="ln" id="L717">        assert!(added.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;gpg --delete-keys {FINGERPRINT}&quot;</span>)));</span>
-<span class="ln" id="L718">        assert!(added.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;public key&quot;</span>));</span>
-<span class="ln" id="L719"></span>
-<span class="ln" id="L720">        <span class="tok-kw">let</span> already = Import {</span>
-<span class="ln" id="L721">            fingerprint: FINGERPRINT.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L722">            what: Imported::AlreadyThere,</span>
-<span class="ln" id="L723">        }</span>
-<span class="ln" id="L724">        .<span class="tok-fn">note</span>()</span>
-<span class="ln" id="L725">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L726">        assert!(already.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;already had&quot;</span>));</span>
-<span class="ln" id="L727">    }</span>
-<span class="ln" id="L728"></span>
-<span class="ln" id="L729">    <span class="tok-com">/// Somewhere for a keyring that is nobody&#x27;s real one.</span></span>
-<span class="ln" id="L730">    <span class="tok-com">///</span></span>
-<span class="ln" id="L731">    <span class="tok-com">/// # Unique per call, not per instant</span></span>
-<span class="ln" id="L732">    <span class="tok-com">///</span></span>
-<span class="ln" id="L733">    <span class="tok-com">/// F-106. This used to name the directory after the clock alone, and every</span></span>
-<span class="ln" id="L734">    <span class="tok-com">/// test that takes one deletes it when it finishes. Cargo runs these tests</span></span>
-<span class="ln" id="L735">    <span class="tok-com">/// on threads at the same moment, so two calls landing in the same tick</span></span>
-<span class="ln" id="L736">    <span class="tok-com">/// share a directory, and the first test to finish deletes the second</span></span>
-<span class="ln" id="L737">    <span class="tok-com">/// test&#x27;s keyring out from under it. On Linux the nanoseconds always</span></span>
-<span class="ln" id="L738">    <span class="tok-com">/// differed and it never happened; on macOS the clock is coarser and it</span></span>
-<span class="ln" id="L739">    <span class="tok-com">/// did, as a keyring that existed for the first import and was gone for</span></span>
-<span class="ln" id="L740">    <span class="tok-com">/// the second.</span></span>
-<span class="ln" id="L741">    <span class="tok-com">///</span></span>
-<span class="ln" id="L742">    <span class="tok-com">/// So the name carries a counter that is unique within the process</span></span>
-<span class="ln" id="L743">    <span class="tok-com">/// whatever the clock does, and the clock only separates one run from the</span></span>
-<span class="ln" id="L744">    <span class="tok-com">/// next. `create_dir` rather than `create_dir_all` is the other half:</span></span>
-<span class="ln" id="L745">    <span class="tok-com">/// `create_dir_all` treats &quot;it is already there&quot; as success, which is</span></span>
-<span class="ln" id="L746">    <span class="tok-com">/// exactly the case that must not be silent.</span></span>
-<span class="ln" id="L747">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_home</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L748">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicU64, Ordering};</span>
-<span class="ln" id="L749">        <span class="tok-kw">static</span> NEXT: AtomicU64 = AtomicU64::<span class="tok-fn">new</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L750"></span>
-<span class="ln" id="L751">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L752">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L753">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
-<span class="ln" id="L754">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L755">        <span class="tok-kw">let</span> seat = NEXT.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed);</span>
-<span class="ln" id="L756">        <span class="tok-com">// Short, and not under a long temporary path: GnuPG puts an agent</span></span>
-<span class="ln" id="L757">        <span class="tok-com">// socket in here and a long directory name overflows the sockaddr,</span></span>
-<span class="ln" id="L758">        <span class="tok-com">// which fails as &quot;error running gpg-agent&quot; and looks like a bug in</span></span>
-<span class="ln" id="L759">        <span class="tok-com">// this code. Measured while writing this test.</span></span>
-<span class="ln" id="L760">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;vvg{:x}{seat:x}&quot;</span>, stamp <span class="tok-kw">as</span> u64));</span>
-<span class="ln" id="L761">        std::fs::<span class="tok-fn">create_dir</span>(&amp;path).<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L762">        <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L763">        {</span>
-<span class="ln" id="L764">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt <span class="tok-kw">as</span> _;</span>
-<span class="ln" id="L765">            std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o700)).<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L766">        }</span>
-<span class="ln" id="L767">        <span class="tok-fn">Some</span>(path)</span>
-<span class="ln" id="L768">    }</span>
-<span class="ln" id="L769"></span>
-<span class="ln" id="L770">    <span class="tok-com">/// Two scratch homes are two directories, however close together they are</span></span>
-<span class="ln" id="L771">    <span class="tok-com">/// asked for.</span></span>
-<span class="ln" id="L772">    <span class="tok-com">///</span></span>
-<span class="ln" id="L773">    <span class="tok-com">/// The defect this exists to stop coming back is F-106, and it was</span></span>
-<span class="ln" id="L774">    <span class="tok-com">/// invisible precisely because it needed two calls in one clock tick.</span></span>
-<span class="ln" id="L775">    <span class="tok-com">/// Asking for a hundred in a loop is the cheapest way to make that</span></span>
-<span class="ln" id="L776">    <span class="tok-com">/// certain: with the clock alone as the key, a run of these collides on</span></span>
-<span class="ln" id="L777">    <span class="tok-com">/// any machine whose clock is coarser than the loop is fast.</span></span>
-<span class="ln" id="L778">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L779">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_homes_are_never_the_same_directory_twice</span>() {</span>
-<span class="ln" id="L780">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> made = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L781">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
-<span class="ln" id="L782">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() {</span>
-<span class="ln" id="L783">                assert!(!made.<span class="tok-fn">contains</span>(&amp;home), <span class="tok-str">&quot;{home:?} was handed out twice&quot;</span>);</span>
-<span class="ln" id="L784">                made.<span class="tok-fn">push</span>(home);</span>
-<span class="ln" id="L785">            }</span>
-<span class="ln" id="L786">        }</span>
-<span class="ln" id="L787">        assert!(!made.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;no scratch home could be made at all&quot;</span>);</span>
-<span class="ln" id="L788">        <span class="tok-kw">for</span> home <span class="tok-kw">in</span> made {</span>
-<span class="ln" id="L789">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L790">        }</span>
-<span class="ln" id="L791">    }</span>
-<span class="ln" id="L792"></span>
-<span class="ln" id="L793">    <span class="tok-com">/// The real key, into a real GnuPG, twice.</span></span>
-<span class="ln" id="L794">    <span class="tok-com">///</span></span>
-<span class="ln" id="L795">    <span class="tok-com">/// Skipped where GnuPG is not installed, because that is a fact about the</span></span>
-<span class="ln" id="L796">    <span class="tok-com">/// machine rather than a failure of this code, and the whole crate already</span></span>
-<span class="ln" id="L797">    <span class="tok-com">/// reports [`Error::NotInstalled`] for it.</span></span>
-<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">the_real_key_imports_into_a_real_gnupg_and_says_so_the_second_time</span>() {</span>
-<span class="ln" id="L800">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L801">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L802">        };</span>
-<span class="ln" id="L803">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L548">        <span class="tok-kw">let</span> missing = <span class="tok-fn">status_lines</span>(b<span class="tok-str">&quot;[GNUPG:] NO_PUBKEY F63C0EF4DF07E273\n&quot;</span>);</span>
+<span class="ln" id="L549">        assert!(<span class="tok-fn">field</span>(&amp;missing, <span class="tok-str">&quot;NO_PUBKEY&quot;</span>).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L550"></span>
+<span class="ln" id="L551">        <span class="tok-kw">let</span> imported =</span>
+<span class="ln" id="L552">            <span class="tok-fn">status_lines</span>(b<span class="tok-str">&quot;[GNUPG:] IMPORT_OK 1 520A54F1437E8CE8E18416AEF63C0EF4DF07E273\n&quot;</span>);</span>
+<span class="ln" id="L553">        assert_eq!(</span>
+<span class="ln" id="L554">            <span class="tok-fn">field</span>(&amp;imported, <span class="tok-str">&quot;IMPORT_OK&quot;</span>),</span>
+<span class="ln" id="L555">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;1 520A54F1437E8CE8E18416AEF63C0EF4DF07E273&quot;</span>)</span>
+<span class="ln" id="L556">        );</span>
+<span class="ln" id="L557">    }</span>
+<span class="ln" id="L558"></span>
+<span class="ln" id="L559">    <span class="tok-com">/// **F-100.** A file can carry more than one signature, and the expected</span></span>
+<span class="ln" id="L560">    <span class="tok-com">/// key&#x27;s may not be the one GnuPG prints first.</span></span>
+<span class="ln" id="L561">    <span class="tok-com">///</span></span>
+<span class="ln" id="L562">    <span class="tok-com">/// Reading only the first meant a genuine release signed by two keys was</span></span>
+<span class="ln" id="L563">    <span class="tok-com">/// reported as signed by the wrong one and refused. That is the safe</span></span>
+<span class="ln" id="L564">    <span class="tok-com">/// direction and it is still wrong: a verifier people learn to work around</span></span>
+<span class="ln" id="L565">    <span class="tok-com">/// is worse than none.</span></span>
+<span class="ln" id="L566">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L567">    <span class="tok-kw">fn</span> <span class="tok-fn">the_expected_key_is_looked_for_in_every_signature_not_the_first</span>() {</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> two = <span class="tok-fn">status_lines</span>(</span>
+<span class="ln" id="L569">            b<span class="tok-str">&quot;[GNUPG:] NEWSIG\n\</span></span>
+<span class="ln" id="L570"><span class="tok-str">              [GNUPG:] VALIDSIG 0000000000000000000000000000000000000000 2026-08-31 1 0 4 0 1 10 00 0000000000000000000000000000000000000000\n\</span></span>
+<span class="ln" id="L571"><span class="tok-str">              [GNUPG:] NEWSIG\n\</span></span>
+<span class="ln" id="L572"><span class="tok-str">              [GNUPG:] VALIDSIG 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A 2026-08-31 1 0 4 0 1 10 00 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n&quot;</span>,</span>
+<span class="ln" id="L573">        );</span>
+<span class="ln" id="L574">        <span class="tok-kw">let</span> signers: Vec&lt;&amp;str&gt; = <span class="tok-fn">fields</span>(&amp;two, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
+<span class="ln" id="L575">            .<span class="tok-fn">filter_map</span>(|v| v.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L576">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L577">        assert_eq!(signers.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;both signatures must be seen&quot;</span>);</span>
+<span class="ln" id="L578">        assert!(</span>
+<span class="ln" id="L579">            signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)),</span>
+<span class="ln" id="L580">            <span class="tok-str">&quot;the expected key signed it, second&quot;</span></span>
+<span class="ln" id="L581">        );</span>
+<span class="ln" id="L582"></span>
+<span class="ln" id="L583">        <span class="tok-com">// And a run where it signed nothing is still not a pass.</span></span>
+<span class="ln" id="L584">        <span class="tok-kw">let</span> neither = <span class="tok-fn">status_lines</span>(</span>
+<span class="ln" id="L585">            b<span class="tok-str">&quot;[GNUPG:] VALIDSIG 0000000000000000000000000000000000000000 2026-08-31 1 0 4 0 1 10 00 0000000000000000000000000000000000000000\n&quot;</span>,</span>
+<span class="ln" id="L586">        );</span>
+<span class="ln" id="L587">        <span class="tok-kw">let</span> signers: Vec&lt;&amp;str&gt; = <span class="tok-fn">fields</span>(&amp;neither, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
+<span class="ln" id="L588">            .<span class="tok-fn">filter_map</span>(|v| v.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L589">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L590">        assert!(!signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)));</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">    <span class="tok-com">/// **F-104.** A signature made by a subkey belongs to its primary key.</span></span>
+<span class="ln" id="L594">    <span class="tok-com">///</span></span>
+<span class="ln" id="L595">    <span class="tok-com">/// `VALIDSIG` names the signing key first and the primary key last, and</span></span>
+<span class="ln" id="L596">    <span class="tok-com">/// only the first was read. For a key that signs with itself the two are</span></span>
+<span class="ln" id="L597">    <span class="tok-com">/// the same string and the mistake cannot be seen, which is the shape of</span></span>
+<span class="ln" id="L598">    <span class="tok-com">/// key this was first measured against. This project&#x27;s release key signs</span></span>
+<span class="ln" id="L599">    <span class="tok-com">/// with a subkey, so the real release exercised the case the fixture could</span></span>
+<span class="ln" id="L600">    <span class="tok-com">/// not, and the verifier called a genuine release unverified.</span></span>
+<span class="ln" id="L601">    <span class="tok-com">///</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// The line below is the one GnuPG actually printed for v0.1.15.</span></span>
+<span class="ln" id="L603">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L604">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signature_made_by_a_subkey_is_the_primary_key_that_owns_it</span>() {</span>
+<span class="ln" id="L605">        <span class="tok-kw">let</span> real = <span class="tok-fn">status_lines</span>(</span>
+<span class="ln" id="L606">            b<span class="tok-str">&quot;[GNUPG:] VALIDSIG 83ABD67A93772B3FA15D2642BD752A144704C231 2026-09-01 1788263691 0 4 0 1 10 00 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n&quot;</span>,</span>
+<span class="ln" id="L607">        );</span>
+<span class="ln" id="L608">        <span class="tok-kw">let</span> signers: Vec&lt;String&gt; = <span class="tok-fn">fields</span>(&amp;real, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
+<span class="ln" id="L609">            .<span class="tok-fn">flat_map</span>(|valid| {</span>
+<span class="ln" id="L610">                <span class="tok-kw">let</span> parts: Vec&lt;&amp;str&gt; = valid.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L611">                <span class="tok-kw">let</span> first = parts.<span class="tok-fn">first</span>().<span class="tok-fn">copied</span>();</span>
+<span class="ln" id="L612">                <span class="tok-kw">let</span> last = parts.<span class="tok-fn">last</span>().<span class="tok-fn">copied</span>().<span class="tok-fn">filter</span>(|_| parts.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
+<span class="ln" id="L613">                [first, last].<span class="tok-fn">into_iter</span>().<span class="tok-fn">flatten</span>().collect::&lt;Vec&lt;&amp;str&gt;&gt;()</span>
+<span class="ln" id="L614">            })</span>
+<span class="ln" id="L615">            .<span class="tok-fn">map</span>(str::to_string)</span>
+<span class="ln" id="L616">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L617">        assert!(</span>
+<span class="ln" id="L618">            signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)),</span>
+<span class="ln" id="L619">            <span class="tok-str">&quot;the primary key is the one published, and it signed this: {signers:?}&quot;</span></span>
+<span class="ln" id="L620">        );</span>
+<span class="ln" id="L621">        <span class="tok-com">// And the subkey is still reported, so nothing is lost by looking at</span></span>
+<span class="ln" id="L622">        <span class="tok-com">// both: a caller expecting the subkey&#x27;s fingerprint also matches.</span></span>
+<span class="ln" id="L623">        assert!(signers</span>
+<span class="ln" id="L624">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L625">            .<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, <span class="tok-str">&quot;83ABD67A93772B3FA15D2642BD752A144704C231&quot;</span>)));</span>
+<span class="ln" id="L626"></span>
+<span class="ln" id="L627">        <span class="tok-com">// A signature by a key that is neither is still refused.</span></span>
+<span class="ln" id="L628">        <span class="tok-kw">let</span> other = <span class="tok-fn">status_lines</span>(</span>
+<span class="ln" id="L629">            b<span class="tok-str">&quot;[GNUPG:] VALIDSIG 1111111111111111111111111111111111111111 2026-09-01 1 0 4 0 1 10 00 2222222222222222222222222222222222222222\n&quot;</span>,</span>
+<span class="ln" id="L630">        );</span>
+<span class="ln" id="L631">        <span class="tok-kw">let</span> signers: Vec&lt;String&gt; = <span class="tok-fn">fields</span>(&amp;other, <span class="tok-str">&quot;VALIDSIG&quot;</span>)</span>
+<span class="ln" id="L632">            .<span class="tok-fn">flat_map</span>(|valid| {</span>
+<span class="ln" id="L633">                <span class="tok-kw">let</span> parts: Vec&lt;&amp;str&gt; = valid.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L634">                <span class="tok-kw">let</span> first = parts.<span class="tok-fn">first</span>().<span class="tok-fn">copied</span>();</span>
+<span class="ln" id="L635">                <span class="tok-kw">let</span> last = parts.<span class="tok-fn">last</span>().<span class="tok-fn">copied</span>().<span class="tok-fn">filter</span>(|_| parts.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
+<span class="ln" id="L636">                [first, last].<span class="tok-fn">into_iter</span>().<span class="tok-fn">flatten</span>().collect::&lt;Vec&lt;&amp;str&gt;&gt;()</span>
+<span class="ln" id="L637">            })</span>
+<span class="ln" id="L638">            .<span class="tok-fn">map</span>(str::to_string)</span>
+<span class="ln" id="L639">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L640">        assert!(!signers.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|s| <span class="tok-fn">same_fingerprint</span>(s, FINGERPRINT)));</span>
+<span class="ln" id="L641">    }</span>
+<span class="ln" id="L642"></span>
+<span class="ln" id="L643">    <span class="tok-com">/// Prose is never read, so a translated GnuPG cannot change the answer.</span></span>
+<span class="ln" id="L644">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L645">    <span class="tok-kw">fn</span> <span class="tok-fn">a_translated_good_signature_line_is_not_a_status_line</span>() {</span>
+<span class="ln" id="L646">        <span class="tok-kw">let</span> translated = <span class="tok-fn">status_lines</span>(</span>
+<span class="ln" id="L647">            <span class="tok-str">&quot;gpg: Korrekte Signatur von \&quot;tilas01\&quot;\n[GNUPG:] BADSIG AA testkey\n&quot;</span>.<span class="tok-fn">as_bytes</span>(),</span>
+<span class="ln" id="L648">        );</span>
+<span class="ln" id="L649">        assert_eq!(translated, vec![<span class="tok-str">&quot;BADSIG AA testkey&quot;</span>.<span class="tok-fn">to_string</span>()]);</span>
+<span class="ln" id="L650">    }</span>
+<span class="ln" id="L651"></span>
+<span class="ln" id="L652">    <span class="tok-com">/// A keyword matches only as a whole word.</span></span>
+<span class="ln" id="L653">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L654">    <span class="tok-kw">fn</span> <span class="tok-fn">a_longer_keyword_is_not_the_one_being_looked_for</span>() {</span>
+<span class="ln" id="L655">        <span class="tok-kw">let</span> status = vec![<span class="tok-str">&quot;NO_PUBKEYX AA&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;VALIDSIGGED BB&quot;</span>.<span class="tok-fn">to_string</span>()];</span>
+<span class="ln" id="L656">        assert!(<span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;NO_PUBKEY&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L657">        assert!(<span class="tok-fn">field</span>(&amp;status, <span class="tok-str">&quot;VALIDSIG&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L658">    }</span>
+<span class="ln" id="L659"></span>
+<span class="ln" id="L660">    <span class="tok-com">/// Only one outcome is a pass, and a good signature by the wrong key is not</span></span>
+<span class="ln" id="L661">    <span class="tok-com">/// it. This is the check the release notes ask a reader to make by hand.</span></span>
+<span class="ln" id="L662">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L663">    <span class="tok-kw">fn</span> <span class="tok-fn">only_the_expected_key_is_a_pass</span>() {</span>
+<span class="ln" id="L664">        assert!(Outcome::Good.<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L665">        assert!(!Outcome::AnotherKey {</span>
+<span class="ln" id="L666">            fingerprint: <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>)</span>
+<span class="ln" id="L667">        }</span>
+<span class="ln" id="L668">        .<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L669">        assert!(!Outcome::Bad.<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L670">        assert!(!Outcome::NoKey.<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L671">        assert!(!Outcome::Unclear.<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L672">        assert!(Outcome::AnotherKey {</span>
+<span class="ln" id="L673">            fingerprint: <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>)</span>
+<span class="ln" id="L674">        }</span>
+<span class="ln" id="L675">        .<span class="tok-fn">plainly</span>()</span>
+<span class="ln" id="L676">        .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NOT the&quot;</span>));</span>
+<span class="ln" id="L677">    }</span>
+<span class="ln" id="L678"></span>
+<span class="ln" id="L679">    <span class="tok-com">/// The commands are the independent article and must name both files.</span></span>
+<span class="ln" id="L680">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L681">    <span class="tok-kw">fn</span> <span class="tok-fn">the_printed_commands_are_runnable_as_printed</span>() {</span>
+<span class="ln" id="L682">        <span class="tok-kw">let</span> lines = <span class="tok-fn">commands</span>(</span>
+<span class="ln" id="L683">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>),</span>
+<span class="ln" id="L684">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>),</span>
+<span class="ln" id="L685">            <span class="tok-fn">Some</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-signing-key.asc&quot;</span>)),</span>
+<span class="ln" id="L686">        );</span>
+<span class="ln" id="L687">        assert_eq!(lines[<span class="tok-num">0</span>], <span class="tok-str">&quot;gpg --import veilvoice-signing-key.asc&quot;</span>);</span>
+<span class="ln" id="L688">        assert_eq!(lines[<span class="tok-num">1</span>], <span class="tok-str">&quot;gpg --verify SHA256SUMS.asc SHA256SUMS&quot;</span>);</span>
+<span class="ln" id="L689">        assert!(lines[<span class="tok-num">2</span>].<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;sha256sum -c&quot;</span>));</span>
+<span class="ln" id="L690">    }</span>
+<span class="ln" id="L691"></span>
+<span class="ln" id="L692">    <span class="tok-com">/// Nothing here ever asks a person for anything: these run where no</span></span>
+<span class="ln" id="L693">    <span class="tok-com">/// terminal exists, and a GnuPG that stopped to prompt would hang a</span></span>
+<span class="ln" id="L694">    <span class="tok-com">/// verifier somebody double-clicked.</span></span>
+<span class="ln" id="L695">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L696">    <span class="tok-kw">fn</span> <span class="tok-fn">every_call_is_unattended</span>() {</span>
+<span class="ln" id="L697">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>);</span>
+<span class="ln" id="L698">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L699">        <span class="tok-kw">for</span> flag <span class="tok-kw">in</span> [<span class="tok-str">&quot;--batch&quot;</span>, <span class="tok-str">&quot;--no-tty&quot;</span>, <span class="tok-str">&quot;--status-fd&quot;</span>] {</span>
+<span class="ln" id="L700">            assert!(body.<span class="tok-fn">contains</span>(flag), <span class="tok-str">&quot;{flag} is not passed&quot;</span>);</span>
+<span class="ln" id="L701">        }</span>
+<span class="ln" id="L702">        assert!(</span>
+<span class="ln" id="L703">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--yes&quot;</span>),</span>
+<span class="ln" id="L704">            <span class="tok-str">&quot;nothing here overwrites anything, so nothing here needs --yes&quot;</span></span>
+<span class="ln" id="L705">        );</span>
+<span class="ln" id="L706">    }</span>
+<span class="ln" id="L707"></span>
+<span class="ln" id="L708">    <span class="tok-com">/// The note says what was done and how to undo it, because a key that</span></span>
+<span class="ln" id="L709">    <span class="tok-com">/// appears in somebody&#x27;s keyring without explanation is a thing they will</span></span>
+<span class="ln" id="L710">    <span class="tok-com">/// later find and not understand.</span></span>
+<span class="ln" id="L711">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L712">    <span class="tok-kw">fn</span> <span class="tok-fn">the_note_says_what_changed_and_how_to_put_it_back</span>() {</span>
+<span class="ln" id="L713">        <span class="tok-kw">let</span> added = Import {</span>
+<span class="ln" id="L714">            fingerprint: FINGERPRINT.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L715">            what: Imported::Added,</span>
+<span class="ln" id="L716">        }</span>
+<span class="ln" id="L717">        .<span class="tok-fn">note</span>()</span>
+<span class="ln" id="L718">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L719">        assert!(added.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;added its signing key&quot;</span>));</span>
+<span class="ln" id="L720">        assert!(added.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;gpg --delete-keys {FINGERPRINT}&quot;</span>)));</span>
+<span class="ln" id="L721">        assert!(added.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;public key&quot;</span>));</span>
+<span class="ln" id="L722"></span>
+<span class="ln" id="L723">        <span class="tok-kw">let</span> already = Import {</span>
+<span class="ln" id="L724">            fingerprint: FINGERPRINT.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L725">            what: Imported::AlreadyThere,</span>
+<span class="ln" id="L726">        }</span>
+<span class="ln" id="L727">        .<span class="tok-fn">note</span>()</span>
+<span class="ln" id="L728">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L729">        assert!(already.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;already had&quot;</span>));</span>
+<span class="ln" id="L730">    }</span>
+<span class="ln" id="L731"></span>
+<span class="ln" id="L732">    <span class="tok-com">/// Somewhere for a keyring that is nobody&#x27;s real one.</span></span>
+<span class="ln" id="L733">    <span class="tok-com">///</span></span>
+<span class="ln" id="L734">    <span class="tok-com">/// # Unique per call, not per instant</span></span>
+<span class="ln" id="L735">    <span class="tok-com">///</span></span>
+<span class="ln" id="L736">    <span class="tok-com">/// F-106. This used to name the directory after the clock alone, and every</span></span>
+<span class="ln" id="L737">    <span class="tok-com">/// test that takes one deletes it when it finishes. Cargo runs these tests</span></span>
+<span class="ln" id="L738">    <span class="tok-com">/// on threads at the same moment, so two calls landing in the same tick</span></span>
+<span class="ln" id="L739">    <span class="tok-com">/// share a directory, and the first test to finish deletes the second</span></span>
+<span class="ln" id="L740">    <span class="tok-com">/// test&#x27;s keyring out from under it. On Linux the nanoseconds always</span></span>
+<span class="ln" id="L741">    <span class="tok-com">/// differed and it never happened; on macOS the clock is coarser and it</span></span>
+<span class="ln" id="L742">    <span class="tok-com">/// did, as a keyring that existed for the first import and was gone for</span></span>
+<span class="ln" id="L743">    <span class="tok-com">/// the second.</span></span>
+<span class="ln" id="L744">    <span class="tok-com">///</span></span>
+<span class="ln" id="L745">    <span class="tok-com">/// So the name carries a counter that is unique within the process</span></span>
+<span class="ln" id="L746">    <span class="tok-com">/// whatever the clock does, and the clock only separates one run from the</span></span>
+<span class="ln" id="L747">    <span class="tok-com">/// next. `create_dir` rather than `create_dir_all` is the other half:</span></span>
+<span class="ln" id="L748">    <span class="tok-com">/// `create_dir_all` treats &quot;it is already there&quot; as success, which is</span></span>
+<span class="ln" id="L749">    <span class="tok-com">/// exactly the case that must not be silent.</span></span>
+<span class="ln" id="L750">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_home</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L751">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicU64, Ordering};</span>
+<span class="ln" id="L752">        <span class="tok-kw">static</span> NEXT: AtomicU64 = AtomicU64::<span class="tok-fn">new</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L753"></span>
+<span class="ln" id="L754">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L755">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L756">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L757">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L758">        <span class="tok-kw">let</span> seat = NEXT.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed);</span>
+<span class="ln" id="L759">        <span class="tok-com">// Short, and not under a long temporary path: GnuPG puts an agent</span></span>
+<span class="ln" id="L760">        <span class="tok-com">// socket in here and a long directory name overflows the sockaddr,</span></span>
+<span class="ln" id="L761">        <span class="tok-com">// which fails as &quot;error running gpg-agent&quot; and looks like a bug in</span></span>
+<span class="ln" id="L762">        <span class="tok-com">// this code. Measured while writing this test.</span></span>
+<span class="ln" id="L763">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;vvg{:x}{seat:x}&quot;</span>, stamp <span class="tok-kw">as</span> u64));</span>
+<span class="ln" id="L764">        std::fs::<span class="tok-fn">create_dir</span>(&amp;path).<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L765">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L766">        {</span>
+<span class="ln" id="L767">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L768">            std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o700)).<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L769">        }</span>
+<span class="ln" id="L770">        <span class="tok-fn">Some</span>(path)</span>
+<span class="ln" id="L771">    }</span>
+<span class="ln" id="L772"></span>
+<span class="ln" id="L773">    <span class="tok-com">/// Two scratch homes are two directories, however close together they are</span></span>
+<span class="ln" id="L774">    <span class="tok-com">/// asked for.</span></span>
+<span class="ln" id="L775">    <span class="tok-com">///</span></span>
+<span class="ln" id="L776">    <span class="tok-com">/// The defect this exists to stop coming back is F-106, and it was</span></span>
+<span class="ln" id="L777">    <span class="tok-com">/// invisible precisely because it needed two calls in one clock tick.</span></span>
+<span class="ln" id="L778">    <span class="tok-com">/// Asking for a hundred in a loop is the cheapest way to make that</span></span>
+<span class="ln" id="L779">    <span class="tok-com">/// certain: with the clock alone as the key, a run of these collides on</span></span>
+<span class="ln" id="L780">    <span class="tok-com">/// any machine whose clock is coarser than the loop is fast.</span></span>
+<span class="ln" id="L781">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L782">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_homes_are_never_the_same_directory_twice</span>() {</span>
+<span class="ln" id="L783">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> made = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L784">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
+<span class="ln" id="L785">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() {</span>
+<span class="ln" id="L786">                assert!(!made.<span class="tok-fn">contains</span>(&amp;home), <span class="tok-str">&quot;{home:?} was handed out twice&quot;</span>);</span>
+<span class="ln" id="L787">                made.<span class="tok-fn">push</span>(home);</span>
+<span class="ln" id="L788">            }</span>
+<span class="ln" id="L789">        }</span>
+<span class="ln" id="L790">        assert!(!made.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;no scratch home could be made at all&quot;</span>);</span>
+<span class="ln" id="L791">        <span class="tok-kw">for</span> home <span class="tok-kw">in</span> made {</span>
+<span class="ln" id="L792">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L793">        }</span>
+<span class="ln" id="L794">    }</span>
+<span class="ln" id="L795"></span>
+<span class="ln" id="L796">    <span class="tok-com">/// The real key, into a real GnuPG, twice.</span></span>
+<span class="ln" id="L797">    <span class="tok-com">///</span></span>
+<span class="ln" id="L798">    <span class="tok-com">/// Skipped where GnuPG is not installed, because that is a fact about the</span></span>
+<span class="ln" id="L799">    <span class="tok-com">/// machine rather than a failure of this code, and the whole crate already</span></span>
+<span class="ln" id="L800">    <span class="tok-com">/// reports [`Error::NotInstalled`] for it.</span></span>
+<span class="ln" id="L801">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L802">    <span class="tok-kw">fn</span> <span class="tok-fn">the_real_key_imports_into_a_real_gnupg_and_says_so_the_second_time</span>() {</span>
+<span class="ln" id="L803">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L804">            <span class="tok-kw">return</span>;</span>
 <span class="ln" id="L805">        };</span>
-<span class="ln" id="L806">        <span class="tok-kw">let</span> gpg = gpg.<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L807"></span>
-<span class="ln" id="L808">        <span class="tok-kw">let</span> first = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT);</span>
-<span class="ln" id="L809">        <span class="tok-com">// A GnuPG that cannot start its agent cannot import either, and that</span></span>
-<span class="ln" id="L810">        <span class="tok-com">// is the machine rather than this code. Anything it does report has to</span></span>
-<span class="ln" id="L811">        <span class="tok-com">// be the right key.</span></span>
-<span class="ln" id="L812">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(first) = first {</span>
-<span class="ln" id="L813">            assert_eq!(first.what, Imported::Added, <span class="tok-str">&quot;the first import adds it&quot;</span>);</span>
-<span class="ln" id="L814">            assert!(<span class="tok-fn">same_fingerprint</span>(&amp;first.fingerprint, FINGERPRINT));</span>
-<span class="ln" id="L815"></span>
-<span class="ln" id="L816">            <span class="tok-kw">let</span> again = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a second import&quot;</span>);</span>
-<span class="ln" id="L817">            assert_eq!(</span>
-<span class="ln" id="L818">                again.what,</span>
-<span class="ln" id="L819">                Imported::AlreadyThere,</span>
-<span class="ln" id="L820">                <span class="tok-str">&quot;the second import changes nothing&quot;</span></span>
-<span class="ln" id="L821">            );</span>
-<span class="ln" id="L822"></span>
-<span class="ln" id="L823">            <span class="tok-com">// And it is refused when the caller expects a different key.</span></span>
-<span class="ln" id="L824">            <span class="tok-kw">let</span> wrong = gpg.<span class="tok-fn">import</span>(KEY, &amp;<span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>));</span>
-<span class="ln" id="L825">            assert!(wrong.<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{wrong:?}&quot;</span>);</span>
-<span class="ln" id="L826">        }</span>
-<span class="ln" id="L827">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L828">    }</span>
-<span class="ln" id="L829"></span>
-<span class="ln" id="L830">    <span class="tok-com">/// A signature nobody can check is `NoKey`, not a pass.</span></span>
-<span class="ln" id="L831">    <span class="tok-com">///</span></span>
-<span class="ln" id="L832">    <span class="tok-com">/// Run against an empty keyring, so the answer cannot come from a key that</span></span>
-<span class="ln" id="L833">    <span class="tok-com">/// happens to be on the machine running the tests.</span></span>
-<span class="ln" id="L834">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L835">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signature_with_no_key_to_check_it_is_never_a_pass</span>() {</span>
-<span class="ln" id="L836">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L837">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L838">        };</span>
-<span class="ln" id="L839">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L806">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L807">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L808">        };</span>
+<span class="ln" id="L809">        <span class="tok-kw">let</span> gpg = gpg.<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L810"></span>
+<span class="ln" id="L811">        <span class="tok-kw">let</span> first = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT);</span>
+<span class="ln" id="L812">        <span class="tok-com">// A GnuPG that cannot start its agent cannot import either, and that</span></span>
+<span class="ln" id="L813">        <span class="tok-com">// is the machine rather than this code. Anything it does report has to</span></span>
+<span class="ln" id="L814">        <span class="tok-com">// be the right key.</span></span>
+<span class="ln" id="L815">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(first) = first {</span>
+<span class="ln" id="L816">            assert_eq!(first.what, Imported::Added, <span class="tok-str">&quot;the first import adds it&quot;</span>);</span>
+<span class="ln" id="L817">            assert!(<span class="tok-fn">same_fingerprint</span>(&amp;first.fingerprint, FINGERPRINT));</span>
+<span class="ln" id="L818"></span>
+<span class="ln" id="L819">            <span class="tok-kw">let</span> again = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a second import&quot;</span>);</span>
+<span class="ln" id="L820">            assert_eq!(</span>
+<span class="ln" id="L821">                again.what,</span>
+<span class="ln" id="L822">                Imported::AlreadyThere,</span>
+<span class="ln" id="L823">                <span class="tok-str">&quot;the second import changes nothing&quot;</span></span>
+<span class="ln" id="L824">            );</span>
+<span class="ln" id="L825"></span>
+<span class="ln" id="L826">            <span class="tok-com">// And it is refused when the caller expects a different key.</span></span>
+<span class="ln" id="L827">            <span class="tok-kw">let</span> wrong = gpg.<span class="tok-fn">import</span>(KEY, &amp;<span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>));</span>
+<span class="ln" id="L828">            assert!(wrong.<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{wrong:?}&quot;</span>);</span>
+<span class="ln" id="L829">        }</span>
+<span class="ln" id="L830">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L831">    }</span>
+<span class="ln" id="L832"></span>
+<span class="ln" id="L833">    <span class="tok-com">/// A signature nobody can check is `NoKey`, not a pass.</span></span>
+<span class="ln" id="L834">    <span class="tok-com">///</span></span>
+<span class="ln" id="L835">    <span class="tok-com">/// Run against an empty keyring, so the answer cannot come from a key that</span></span>
+<span class="ln" id="L836">    <span class="tok-com">/// happens to be on the machine running the tests.</span></span>
+<span class="ln" id="L837">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L838">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signature_with_no_key_to_check_it_is_never_a_pass</span>() {</span>
+<span class="ln" id="L839">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L840">            <span class="tok-kw">return</span>;</span>
 <span class="ln" id="L841">        };</span>
-<span class="ln" id="L842">        <span class="tok-kw">let</span> data = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
-<span class="ln" id="L843">        <span class="tok-kw">let</span> signature = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>);</span>
-<span class="ln" id="L844">        std::fs::<span class="tok-fn">write</span>(&amp;data, b<span class="tok-str">&quot;a hash  a file\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L845">        std::fs::<span class="tok-fn">write</span>(</span>
-<span class="ln" id="L846">            &amp;signature,</span>
-<span class="ln" id="L847">            b<span class="tok-str">&quot;-----BEGIN PGP SIGNATURE-----\n\nbm90IGEgc2lnbmF0dXJl\n=aaaa\n\</span></span>
-<span class="ln" id="L848"><span class="tok-str">              -----END PGP SIGNATURE-----\n&quot;</span>,</span>
-<span class="ln" id="L849">        )</span>
-<span class="ln" id="L850">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L851"></span>
-<span class="ln" id="L852">        <span class="tok-kw">let</span> run = gpg</span>
-<span class="ln" id="L853">            .<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>())</span>
-<span class="ln" id="L854">            .<span class="tok-fn">verify</span>(&amp;signature, &amp;data, FINGERPRINT)</span>
-<span class="ln" id="L855">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;gpg runs&quot;</span>);</span>
-<span class="ln" id="L856">        assert!(!run.outcome.<span class="tok-fn">is_good</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, run.outcome);</span>
-<span class="ln" id="L857">        assert!(run.command.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--verify&quot;</span>));</span>
-<span class="ln" id="L858">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L859">    }</span>
-<span class="ln" id="L860">}</span>
+<span class="ln" id="L842">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L843">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L844">        };</span>
+<span class="ln" id="L845">        <span class="tok-kw">let</span> data = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
+<span class="ln" id="L846">        <span class="tok-kw">let</span> signature = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>);</span>
+<span class="ln" id="L847">        std::fs::<span class="tok-fn">write</span>(&amp;data, b<span class="tok-str">&quot;a hash  a file\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L848">        std::fs::<span class="tok-fn">write</span>(</span>
+<span class="ln" id="L849">            &amp;signature,</span>
+<span class="ln" id="L850">            b<span class="tok-str">&quot;-----BEGIN PGP SIGNATURE-----\n\nbm90IGEgc2lnbmF0dXJl\n=aaaa\n\</span></span>
+<span class="ln" id="L851"><span class="tok-str">              -----END PGP SIGNATURE-----\n&quot;</span>,</span>
+<span class="ln" id="L852">        )</span>
+<span class="ln" id="L853">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L854"></span>
+<span class="ln" id="L855">        <span class="tok-kw">let</span> run = gpg</span>
+<span class="ln" id="L856">            .<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>())</span>
+<span class="ln" id="L857">            .<span class="tok-fn">verify</span>(&amp;signature, &amp;data, FINGERPRINT)</span>
+<span class="ln" id="L858">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;gpg runs&quot;</span>);</span>
+<span class="ln" id="L859">        assert!(!run.outcome.<span class="tok-fn">is_good</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, run.outcome);</span>
+<span class="ln" id="L860">        assert!(run.command.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--verify&quot;</span>));</span>
+<span class="ln" id="L861">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L862">    }</span>
+<span class="ln" id="L863">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

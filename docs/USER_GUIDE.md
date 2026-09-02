@@ -43,6 +43,68 @@ folder and it is gone.
 
 ---
 
+## 2.5 The three programs, and which one you want
+
+A release contains three executables. They overlap on purpose, and which one to
+reach for depends only on what you have in front of you.
+
+| Program | What it is for |
+|---|---|
+| `veilvoice` | The command line. Everything the application does, over SSH, in a container, in a script, or on a machine with no graphics toolkit at all. |
+| `veilvoice-gui` | The window. The same engine with somewhere to click, plus the things that only make sense with a screen: live level meters, the app lock, the microphone monitor. |
+| `veilvoice-verify` | Checking that the download you just made is the one that was published. It is a separate program so that it is usable before you trust the other two. |
+
+### Which parts are built in, and which are not
+
+Everything VeilVoice does is in these binaries. There is no runtime to install,
+no service, no plugin directory, and nothing is downloaded on first run.
+
+That includes the parts people expect to be separate:
+
+- **The signature check.** The signing key is compiled into the programs, and
+  the OpenPGP verification is Rust code in this repository. `veilvoice-verify`
+  needs no GnuPG to do its job.
+- **The audio decoders**, the resampler, the encryption, the key exchange, the
+  hashing. All of it is in the binary.
+- **The at-rest encryption**, including the post-quantum half.
+
+Three things are genuinely outside, and each is optional:
+
+- **GnuPG**, for a second opinion on a release signature. Worth having, and
+  explained under §7.
+- **A virtual audio cable**, if you want live mode to feed a call. On Linux
+  this is usually PipeWire, which is already there.
+- **`ffmpeg`**, only if you ask for a video file. Without it, the command
+  prints exactly what it would have run and exits successfully, because
+  nothing failed.
+
+`veilvoice companions` lists all of them, says whether this machine has each,
+and prints the one command that would install it. It never runs somebody
+else's installer.
+
+### How anything reaches the network, given that nothing here is a network client
+
+VeilVoice bundles no HTTP client, and this is checked rather than claimed:
+nothing in the workspace links one. Two features nonetheless involve the
+network, and the way they do it is the point.
+
+**Check for updates**, in the desktop application only, asks the operating
+system's own HTTPS tool to fetch one small file: `curl` on macOS and most
+Linux systems, PowerShell's web request on Windows. VeilVoice starts that
+program, reads what it printed, and parses a version number. It is a button;
+it is never automatic; and the command line has no such feature at all.
+
+**Installing a companion** does not fetch anything either. It runs the package
+manager already on the machine, which is the thing your system already trusts
+to install software, and for anything needing root it prints the command
+instead of running it.
+
+The consequence worth stating: there is no code path in VeilVoice that opens a
+socket. A firewall rule that blocks it entirely costs you the update button and
+nothing else.
+
+---
+
 ## 3. The desktop app
 
 `veilvoice-gui`. One tab for each thing it does, in the strip across the

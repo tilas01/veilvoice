@@ -527,6 +527,29 @@ enum Command {
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
     },
+    /// Check a download, and what does the checking
+    ///
+    /// With no arguments this explains how a VeilVoice release is verified:
+    /// which files you need, where they are published, what VeilVoice checks
+    /// by itself, and what GnuPG adds that VeilVoice cannot add for itself.
+    ///
+    /// `--script` writes a short shell script that does the check with `gpg`
+    /// and `sha256sum` and nothing from this project. That is the point of it.
+    /// The program telling you a download is genuine came out of that
+    /// download, so the check worth most is the one made by software this
+    /// project did not write.
+    ///
+    /// The full check, including every file extracted out of the archive, is
+    /// `veilvoice-verify`, which ships in the same release.
+    Verify {
+        /// Write the verification script to standard output instead.
+        #[arg(long)]
+        script: bool,
+        /// Write the macOS spelling of it, which uses `shasum` rather than
+        /// `sha256sum`.
+        #[arg(long)]
+        macos: bool,
+    },
     /// Turn a veiled recording into a video with a black picture
     ///
     /// For posting somewhere that will not accept an audio file. The picture is
@@ -921,6 +944,76 @@ impl From<CleanPolicy> for Policy {
     }
 }
 
+
+/// What checking a release actually involves, and who does which part.
+///
+/// Written out here rather than left to the website, because somebody on a
+/// machine with no browser is exactly the person most likely to be checking a
+/// download by hand.
+fn explain_verification(flavour: veilvoice_gnupg::script::Flavour) {
+    let survey = veilvoice_gnupg::backend::look();
+    println!("Checking a VeilVoice release");
+    println!();
+    println!("  Three files, all published together on the releases page:");
+    println!("    the archive          the thing you downloaded");
+    println!("    SHA256SUMS           a hash for every file in the release");
+    println!("    SHA256SUMS.asc       a signature over that list");
+    println!();
+    println!("  https://github.com/tilas01/veilvoice/releases/latest");
+    println!();
+    println!("  The signing key is published beside them as");
+    println!("  `veilvoice-signing-key.asc`, and is in the repository at");
+    println!("  website/assets/veilvoice-signing-key.asc, so it can be fetched");
+    println!("  from somewhere other than the release being checked.");
+    println!();
+    println!("    fingerprint  {}", veilvoice_check::FINGERPRINT);
+    println!();
+    println!("  Compare that against the fingerprint on the website and in");
+    println!("  README.md. It is the one step nothing can do for you.");
+    println!();
+    println!("What is already in this binary");
+    println!();
+    println!("  The signature check itself, in Rust, with the key above compiled");
+    println!("  in. Nothing needs installing for it, on any platform. It is what");
+    println!("  `veilvoice-verify` uses, and it also checks every file extracted");
+    println!("  out of the archive against a signed contents list.");
+    println!();
+    println!("  What it cannot do is vouch for itself. This program came out of");
+    println!("  the download it would be checking, so a tampered release ships a");
+    println!("  tampered checker. That is not a bug to fix; it is why the second");
+    println!("  opinion below is worth having.");
+    println!();
+    println!("GnuPG, which is not part of VeilVoice");
+    match &survey.native {
+        Some(path) => println!("  found at {}", path.display()),
+        None => println!("  not on PATH. `veilvoice companions --install gnupg` prints the"),
+    }
+    if survey.native.is_none() {
+        println!("  command that installs it; VeilVoice does not run installers.");
+    }
+    if let Some(wsl) = &survey.wsl {
+        println!();
+        println!("  WSL is on this machine, at {}.", wsl.program.display());
+        println!("  A `gpg` inside it works just as well, and `wsl gpg ...` is how");
+        println!("  the commands are spelled. VeilVoice does not start WSL to find");
+        println!("  out what is in it unless you ask, because starting it starts a");
+        println!("  Linux distribution.");
+    }
+    println!();
+    println!("  Nothing here runs GnuPG on its own. An implementation other than");
+    println!("  this one is used when you choose it, in the desktop application");
+    println!("  under Verify, and not because one happened to be on PATH.");
+    println!();
+    println!("The script");
+    println!();
+    println!("  veilvoice verify --script > {}", flavour.file_name());
+    println!();
+    println!("  Sixty lines of shell using gpg and the system hash tool. Read it");
+    println!("  before running it: the reason to use it rather than this program");
+    println!("  is that it is not this program.");
+}
+
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match run(cli.command) {
@@ -1306,6 +1399,20 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         },
+
+        Command::Verify { script, macos } => {
+            let flavour = if macos {
+                veilvoice_gnupg::script::Flavour::MacOs
+            } else {
+                veilvoice_gnupg::script::Flavour::Linux
+            };
+            if script {
+                print!("{}", veilvoice_gnupg::script::shell(flavour));
+                return Ok(());
+            }
+            explain_verification(flavour);
+            Ok(())
+        }
 
         Command::Companions { install: wanted } => match wanted {
             None => {
