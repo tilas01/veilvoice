@@ -398,7 +398,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.16: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1,140 tests across 27
+destinations, CLI and GUI are implemented and tested (1,141 tests across 27
 crates plus doctests, and 16 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for nine
