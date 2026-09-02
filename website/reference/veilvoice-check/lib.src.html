@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-check/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-check.html">veilvoice-check</a> &middot; 471 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-check.html">veilvoice-check</a> &middot; 472 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -97,453 +97,454 @@
 <span class="ln" id="L54"><span class="tok-com">//! built the same thing and got the same answer.</span></span>
 <span class="ln" id="L55"></span>
 <span class="ln" id="L56"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> contents;</span>
-<span class="ln" id="L57"></span>
-<span class="ln" id="L58"><span class="tok-kw">use</span> std::fmt::Write <span class="tok-kw">as</span> _;</span>
-<span class="ln" id="L59"><span class="tok-kw">use</span> std::path::Path;</span>
-<span class="ln" id="L60"></span>
-<span class="ln" id="L61"><span class="tok-kw">use</span> pgp::composed::{Deserializable, DetachedSignature, SignedPublicKey};</span>
-<span class="ln" id="L62"><span class="tok-kw">use</span> pgp::types::KeyDetails <span class="tok-kw">as</span> _;</span>
-<span class="ln" id="L63"><span class="tok-kw">use</span> sha2::{Digest, Sha256};</span>
-<span class="ln" id="L64"></span>
+<span class="ln" id="L57"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reproduce;</span>
+<span class="ln" id="L58"></span>
+<span class="ln" id="L59"><span class="tok-kw">use</span> std::fmt::Write <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L60"><span class="tok-kw">use</span> std::path::Path;</span>
+<span class="ln" id="L61"></span>
+<span class="ln" id="L62"><span class="tok-kw">use</span> pgp::composed::{Deserializable, DetachedSignature, SignedPublicKey};</span>
+<span class="ln" id="L63"><span class="tok-kw">use</span> pgp::types::KeyDetails <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L64"><span class="tok-kw">use</span> sha2::{Digest, Sha256};</span>
+<span class="ln" id="L65"></span>
 <span class="src-item" id="fn-public_key">
-<span class="ln" id="L65"><span class="tok-com">/// The project&#x27;s signing key, in ASCII armour.</span></span>
-<span class="ln" id="L66"><span class="tok-com">///</span></span>
-<span class="ln" id="L67"><span class="tok-com">/// Read from the copy the website serves, so there is exactly one key file in</span></span>
-<span class="ln" id="L68"><span class="tok-com">/// this repository and no chance of a second one drifting from it. A test</span></span>
-<span class="ln" id="L69"><span class="tok-com">/// asserts this key&#x27;s fingerprint is [`FINGERPRINT`]; if somebody swaps the</span></span>
-<span class="ln" id="L70"><span class="tok-com">/// file, the build fails rather than a verifier trusting a new key.</span></span>
-<span class="ln" id="L71"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> PUBLIC_KEY: &amp;str = include_str!(concat!(</span>
-<span class="ln" id="L72">    env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>),</span>
-<span class="ln" id="L73">    <span class="tok-str">&quot;/../../website/assets/veilvoice-signing-key.asc&quot;</span></span>
-<span class="ln" id="L74">));</span>
+<span class="ln" id="L66"><span class="tok-com">/// The project&#x27;s signing key, in ASCII armour.</span></span>
+<span class="ln" id="L67"><span class="tok-com">///</span></span>
+<span class="ln" id="L68"><span class="tok-com">/// Read from the copy the website serves, so there is exactly one key file in</span></span>
+<span class="ln" id="L69"><span class="tok-com">/// this repository and no chance of a second one drifting from it. A test</span></span>
+<span class="ln" id="L70"><span class="tok-com">/// asserts this key&#x27;s fingerprint is [`FINGERPRINT`]; if somebody swaps the</span></span>
+<span class="ln" id="L71"><span class="tok-com">/// file, the build fails rather than a verifier trusting a new key.</span></span>
+<span class="ln" id="L72"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> PUBLIC_KEY: &amp;str = include_str!(concat!(</span>
+<span class="ln" id="L73">    env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>),</span>
+<span class="ln" id="L74">    <span class="tok-str">&quot;/../../website/assets/veilvoice-signing-key.asc&quot;</span></span>
+<span class="ln" id="L75">));</span>
 </span>
-<span class="ln" id="L75"></span>
+<span class="ln" id="L76"></span>
 <span class="src-item" id="fn-fingerprint">
-<span class="ln" id="L76"><span class="tok-com">/// The fingerprint, written out rather than derived.</span></span>
-<span class="ln" id="L77"><span class="tok-com">///</span></span>
-<span class="ln" id="L78"><span class="tok-com">/// Deriving it from [`PUBLIC_KEY`] would make this constant agree with the key</span></span>
-<span class="ln" id="L79"><span class="tok-com">/// automatically, which sounds like an improvement and is the opposite of one:</span></span>
-<span class="ln" id="L80"><span class="tok-com">/// the whole point is that a reader can compare this string against the one</span></span>
-<span class="ln" id="L81"><span class="tok-com">/// published in `README.md`, on the website and in the release notes. A value</span></span>
-<span class="ln" id="L82"><span class="tok-com">/// computed from the very file it is meant to authenticate checks nothing.</span></span>
-<span class="ln" id="L83"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FINGERPRINT: &amp;str = <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>;</span>
+<span class="ln" id="L77"><span class="tok-com">/// The fingerprint, written out rather than derived.</span></span>
+<span class="ln" id="L78"><span class="tok-com">///</span></span>
+<span class="ln" id="L79"><span class="tok-com">/// Deriving it from [`PUBLIC_KEY`] would make this constant agree with the key</span></span>
+<span class="ln" id="L80"><span class="tok-com">/// automatically, which sounds like an improvement and is the opposite of one:</span></span>
+<span class="ln" id="L81"><span class="tok-com">/// the whole point is that a reader can compare this string against the one</span></span>
+<span class="ln" id="L82"><span class="tok-com">/// published in `README.md`, on the website and in the release notes. A value</span></span>
+<span class="ln" id="L83"><span class="tok-com">/// computed from the very file it is meant to authenticate checks nothing.</span></span>
+<span class="ln" id="L84"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FINGERPRINT: &amp;str = <span class="tok-str">&quot;8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A&quot;</span>;</span>
 </span>
-<span class="ln" id="L84"></span>
+<span class="ln" id="L85"></span>
 <span class="src-item" id="fn-scope">
-<span class="ln" id="L85"><span class="tok-com">/// What a passing check is worth, in the words a user should be shown.</span></span>
-<span class="ln" id="L86"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SCOPE: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L87"><span class="tok-str">A good signature and a matching hash prove this file is the one the holder of \</span></span>
-<span class="ln" id="L88"><span class="tok-str">this key published. They do not prove it is safe, that the source compiles to \</span></span>
-<span class="ln" id="L89"><span class="tok-str">it, or that the key belongs to anybody in particular. The check worth more \</span></span>
-<span class="ln" id="L90"><span class="tok-str">than any of these is somebody other than the author building the same tag and \</span></span>
-<span class="ln" id="L91"><span class="tok-str">getting the same hash -- and that is a check this program cannot perform for \</span></span>
-<span class="ln" id="L92"><span class="tok-str">you.&quot;</span>;</span>
+<span class="ln" id="L86"><span class="tok-com">/// What a passing check is worth, in the words a user should be shown.</span></span>
+<span class="ln" id="L87"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SCOPE: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L88"><span class="tok-str">A good signature and a matching hash prove this file is the one the holder of \</span></span>
+<span class="ln" id="L89"><span class="tok-str">this key published. They do not prove it is safe, that the source compiles to \</span></span>
+<span class="ln" id="L90"><span class="tok-str">it, or that the key belongs to anybody in particular. The check worth more \</span></span>
+<span class="ln" id="L91"><span class="tok-str">than any of these is somebody other than the author building the same tag and \</span></span>
+<span class="ln" id="L92"><span class="tok-str">getting the same hash -- and that is a check this program cannot perform for \</span></span>
+<span class="ln" id="L93"><span class="tok-str">you.&quot;</span>;</span>
 </span>
-<span class="ln" id="L93"></span>
+<span class="ln" id="L94"></span>
 <span class="src-item" id="fn-error">
-<span class="ln" id="L94"><span class="tok-com">/// Something that went wrong, in words a person can act on.</span></span>
-<span class="ln" id="L95"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L96"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
-<span class="ln" id="L97">    <span class="tok-com">/// A file could not be read.</span></span>
-<span class="ln" id="L98">    <span class="tok-fn">Io</span>(String),</span>
-<span class="ln" id="L99">    <span class="tok-com">/// The embedded key, or a signature, does not parse.</span></span>
-<span class="ln" id="L100">    <span class="tok-fn">Malformed</span>(String),</span>
-<span class="ln" id="L101">    <span class="tok-com">/// The signature did not verify against this key.</span></span>
-<span class="ln" id="L102">    <span class="tok-com">///</span></span>
-<span class="ln" id="L103">    <span class="tok-com">/// Distinct from the others on purpose: everything else means &quot;the check</span></span>
-<span class="ln" id="L104">    <span class="tok-com">/// could not be completed&quot;, and this one means &quot;the check completed and</span></span>
-<span class="ln" id="L105">    <span class="tok-com">/// the answer is no&quot;.</span></span>
-<span class="ln" id="L106">    BadSignature,</span>
-<span class="ln" id="L107">    <span class="tok-com">/// The list has no line for this file.</span></span>
-<span class="ln" id="L108">    <span class="tok-fn">NotListed</span>(String),</span>
-<span class="ln" id="L109">}</span>
+<span class="ln" id="L95"><span class="tok-com">/// Something that went wrong, in words a person can act on.</span></span>
+<span class="ln" id="L96"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L97"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
+<span class="ln" id="L98">    <span class="tok-com">/// A file could not be read.</span></span>
+<span class="ln" id="L99">    <span class="tok-fn">Io</span>(String),</span>
+<span class="ln" id="L100">    <span class="tok-com">/// The embedded key, or a signature, does not parse.</span></span>
+<span class="ln" id="L101">    <span class="tok-fn">Malformed</span>(String),</span>
+<span class="ln" id="L102">    <span class="tok-com">/// The signature did not verify against this key.</span></span>
+<span class="ln" id="L103">    <span class="tok-com">///</span></span>
+<span class="ln" id="L104">    <span class="tok-com">/// Distinct from the others on purpose: everything else means &quot;the check</span></span>
+<span class="ln" id="L105">    <span class="tok-com">/// could not be completed&quot;, and this one means &quot;the check completed and</span></span>
+<span class="ln" id="L106">    <span class="tok-com">/// the answer is no&quot;.</span></span>
+<span class="ln" id="L107">    BadSignature,</span>
+<span class="ln" id="L108">    <span class="tok-com">/// The list has no line for this file.</span></span>
+<span class="ln" id="L109">    <span class="tok-fn">NotListed</span>(String),</span>
+<span class="ln" id="L110">}</span>
 </span>
-<span class="ln" id="L110"></span>
-<span class="ln" id="L111"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L111"></span>
+<span class="ln" id="L112"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-fmt">
-<span class="ln" id="L112">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L113">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L114">            Self::<span class="tok-fn">Io</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
-<span class="ln" id="L115">            Self::<span class="tok-fn">Malformed</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
-<span class="ln" id="L116">            Self::BadSignature =&gt; write!(f, <span class="tok-str">&quot;the signature was not made by this key&quot;</span>),</span>
-<span class="ln" id="L117">            Self::<span class="tok-fn">NotListed</span>(name) =&gt; {</span>
-<span class="ln" id="L118">                write!(f, <span class="tok-str">&quot;{name} is not listed in that SHA256SUMS&quot;</span>)</span>
-<span class="ln" id="L119">            }</span>
-<span class="ln" id="L120">        }</span>
-<span class="ln" id="L121">    }</span>
+<span class="ln" id="L113">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L114">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L115">            Self::<span class="tok-fn">Io</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
+<span class="ln" id="L116">            Self::<span class="tok-fn">Malformed</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
+<span class="ln" id="L117">            Self::BadSignature =&gt; write!(f, <span class="tok-str">&quot;the signature was not made by this key&quot;</span>),</span>
+<span class="ln" id="L118">            Self::<span class="tok-fn">NotListed</span>(name) =&gt; {</span>
+<span class="ln" id="L119">                write!(f, <span class="tok-str">&quot;{name} is not listed in that SHA256SUMS&quot;</span>)</span>
+<span class="ln" id="L120">            }</span>
+<span class="ln" id="L121">        }</span>
+<span class="ln" id="L122">    }</span>
 </span>
-<span class="ln" id="L122">}</span>
-<span class="ln" id="L123"></span>
-<span class="ln" id="L124"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
-<span class="ln" id="L125"></span>
-<span class="ln" id="L126"><span class="tok-com">// `gnupg_commands` and `gnupg_on_path` used to live here, and moved to</span></span>
-<span class="ln" id="L127"><span class="tok-com">// `veilvoice-gnupg` when that crate was written. This crate&#x27;s own note says it</span></span>
-<span class="ln" id="L128"><span class="tok-com">// never runs a program, and a crate that hands out the arguments for one is</span></span>
-<span class="ln" id="L129"><span class="tok-com">// half a step from doing it: keeping the two apart is what lets that sentence</span></span>
-<span class="ln" id="L130"><span class="tok-com">// stay true and checkable. Both front ends call the new crate directly.</span></span>
-<span class="ln" id="L131"></span>
+<span class="ln" id="L123">}</span>
+<span class="ln" id="L124"></span>
+<span class="ln" id="L125"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
+<span class="ln" id="L126"></span>
+<span class="ln" id="L127"><span class="tok-com">// `gnupg_commands` and `gnupg_on_path` used to live here, and moved to</span></span>
+<span class="ln" id="L128"><span class="tok-com">// `veilvoice-gnupg` when that crate was written. This crate&#x27;s own note says it</span></span>
+<span class="ln" id="L129"><span class="tok-com">// never runs a program, and a crate that hands out the arguments for one is</span></span>
+<span class="ln" id="L130"><span class="tok-com">// half a step from doing it: keeping the two apart is what lets that sentence</span></span>
+<span class="ln" id="L131"><span class="tok-com">// stay true and checkable. Both front ends call the new crate directly.</span></span>
+<span class="ln" id="L132"></span>
 <span class="src-item" id="fn-key">
-<span class="ln" id="L132"><span class="tok-com">/// The embedded key, with its fingerprint checked.</span></span>
-<span class="ln" id="L133"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">key</span>() -&gt; Result&lt;SignedPublicKey, Error&gt; {</span>
-<span class="ln" id="L134">    <span class="tok-kw">let</span> (key, _) = SignedPublicKey::<span class="tok-fn">from_string</span>(PUBLIC_KEY)</span>
-<span class="ln" id="L135">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;the embedded public key does not parse: {e}&quot;</span>)))?;</span>
-<span class="ln" id="L136">    <span class="tok-kw">let</span> actual = <span class="tok-fn">fingerprint_of</span>(&amp;key);</span>
-<span class="ln" id="L137">    <span class="tok-kw">if</span> actual != FINGERPRINT {</span>
-<span class="ln" id="L138">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L139">            <span class="tok-str">&quot;the embedded key&#x27;s fingerprint is {actual}, not {FINGERPRINT}&quot;</span></span>
-<span class="ln" id="L140">        )));</span>
-<span class="ln" id="L141">    }</span>
-<span class="ln" id="L142">    <span class="tok-fn">Ok</span>(key)</span>
-<span class="ln" id="L143">}</span>
+<span class="ln" id="L133"><span class="tok-com">/// The embedded key, with its fingerprint checked.</span></span>
+<span class="ln" id="L134"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">key</span>() -&gt; Result&lt;SignedPublicKey, Error&gt; {</span>
+<span class="ln" id="L135">    <span class="tok-kw">let</span> (key, _) = SignedPublicKey::<span class="tok-fn">from_string</span>(PUBLIC_KEY)</span>
+<span class="ln" id="L136">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;the embedded public key does not parse: {e}&quot;</span>)))?;</span>
+<span class="ln" id="L137">    <span class="tok-kw">let</span> actual = <span class="tok-fn">fingerprint_of</span>(&amp;key);</span>
+<span class="ln" id="L138">    <span class="tok-kw">if</span> actual != FINGERPRINT {</span>
+<span class="ln" id="L139">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L140">            <span class="tok-str">&quot;the embedded key&#x27;s fingerprint is {actual}, not {FINGERPRINT}&quot;</span></span>
+<span class="ln" id="L141">        )));</span>
+<span class="ln" id="L142">    }</span>
+<span class="ln" id="L143">    <span class="tok-fn">Ok</span>(key)</span>
+<span class="ln" id="L144">}</span>
 </span>
-<span class="ln" id="L144"></span>
+<span class="ln" id="L145"></span>
 <span class="src-item" id="fn-fingerprint_of">
-<span class="ln" id="L145"><span class="tok-com">/// A key&#x27;s fingerprint, uppercase hex, no spaces.</span></span>
-<span class="ln" id="L146"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">fingerprint_of</span>(key: &amp;SignedPublicKey) -&gt; String {</span>
-<span class="ln" id="L147">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L148">    <span class="tok-kw">for</span> byte <span class="tok-kw">in</span> key.<span class="tok-fn">fingerprint</span>().<span class="tok-fn">as_bytes</span>() {</span>
-<span class="ln" id="L149">        <span class="tok-kw">let</span> _ = write!(out, <span class="tok-str">&quot;{byte:02X}&quot;</span>);</span>
-<span class="ln" id="L150">    }</span>
-<span class="ln" id="L151">    out</span>
-<span class="ln" id="L152">}</span>
+<span class="ln" id="L146"><span class="tok-com">/// A key&#x27;s fingerprint, uppercase hex, no spaces.</span></span>
+<span class="ln" id="L147"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">fingerprint_of</span>(key: &amp;SignedPublicKey) -&gt; String {</span>
+<span class="ln" id="L148">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L149">    <span class="tok-kw">for</span> byte <span class="tok-kw">in</span> key.<span class="tok-fn">fingerprint</span>().<span class="tok-fn">as_bytes</span>() {</span>
+<span class="ln" id="L150">        <span class="tok-kw">let</span> _ = write!(out, <span class="tok-str">&quot;{byte:02X}&quot;</span>);</span>
+<span class="ln" id="L151">    }</span>
+<span class="ln" id="L152">    out</span>
+<span class="ln" id="L153">}</span>
 </span>
-<span class="ln" id="L153"></span>
+<span class="ln" id="L154"></span>
 <span class="src-item" id="fn-sha256_file">
-<span class="ln" id="L154"><span class="tok-com">/// SHA-256 of a file, read in chunks.</span></span>
-<span class="ln" id="L155"><span class="tok-com">///</span></span>
-<span class="ln" id="L156"><span class="tok-com">/// Streamed rather than read whole: a release archive is tens of megabytes and</span></span>
-<span class="ln" id="L157"><span class="tok-com">/// there is no reason for this to need that much memory at once. The web</span></span>
-<span class="ln" id="L158"><span class="tok-com">/// verifier had the same problem in the other direction -- finding F-36.</span></span>
-<span class="ln" id="L159"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">sha256_file</span>(path: &amp;Path) -&gt; Result&lt;String, Error&gt; {</span>
-<span class="ln" id="L160">    <span class="tok-kw">use</span> std::io::Read;</span>
-<span class="ln" id="L161"></span>
-<span class="ln" id="L162">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> file = std::fs::File::<span class="tok-fn">open</span>(path)</span>
-<span class="ln" id="L163">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot open {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())))?;</span>
-<span class="ln" id="L164">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hasher = Sha256::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L165">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> buffer = vec![0u8; <span class="tok-num">64</span> * <span class="tok-num">1024</span>];</span>
-<span class="ln" id="L166">    loop {</span>
-<span class="ln" id="L167">        <span class="tok-kw">let</span> read = file</span>
-<span class="ln" id="L168">            .<span class="tok-fn">read</span>(&amp;<span class="tok-kw">mut</span> buffer)</span>
-<span class="ln" id="L169">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot read {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())))?;</span>
-<span class="ln" id="L170">        <span class="tok-kw">if</span> read == <span class="tok-num">0</span> {</span>
-<span class="ln" id="L171">            break;</span>
-<span class="ln" id="L172">        }</span>
-<span class="ln" id="L173">        hasher.<span class="tok-fn">update</span>(&amp;buffer[..read]);</span>
-<span class="ln" id="L174">    }</span>
-<span class="ln" id="L175">    <span class="tok-fn">Ok</span>(<span class="tok-fn">hex</span>(&amp;hasher.<span class="tok-fn">finalize</span>()))</span>
-<span class="ln" id="L176">}</span>
+<span class="ln" id="L155"><span class="tok-com">/// SHA-256 of a file, read in chunks.</span></span>
+<span class="ln" id="L156"><span class="tok-com">///</span></span>
+<span class="ln" id="L157"><span class="tok-com">/// Streamed rather than read whole: a release archive is tens of megabytes and</span></span>
+<span class="ln" id="L158"><span class="tok-com">/// there is no reason for this to need that much memory at once. The web</span></span>
+<span class="ln" id="L159"><span class="tok-com">/// verifier had the same problem in the other direction -- finding F-36.</span></span>
+<span class="ln" id="L160"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">sha256_file</span>(path: &amp;Path) -&gt; Result&lt;String, Error&gt; {</span>
+<span class="ln" id="L161">    <span class="tok-kw">use</span> std::io::Read;</span>
+<span class="ln" id="L162"></span>
+<span class="ln" id="L163">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> file = std::fs::File::<span class="tok-fn">open</span>(path)</span>
+<span class="ln" id="L164">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot open {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())))?;</span>
+<span class="ln" id="L165">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hasher = Sha256::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L166">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> buffer = vec![0u8; <span class="tok-num">64</span> * <span class="tok-num">1024</span>];</span>
+<span class="ln" id="L167">    loop {</span>
+<span class="ln" id="L168">        <span class="tok-kw">let</span> read = file</span>
+<span class="ln" id="L169">            .<span class="tok-fn">read</span>(&amp;<span class="tok-kw">mut</span> buffer)</span>
+<span class="ln" id="L170">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot read {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())))?;</span>
+<span class="ln" id="L171">        <span class="tok-kw">if</span> read == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L172">            break;</span>
+<span class="ln" id="L173">        }</span>
+<span class="ln" id="L174">        hasher.<span class="tok-fn">update</span>(&amp;buffer[..read]);</span>
+<span class="ln" id="L175">    }</span>
+<span class="ln" id="L176">    <span class="tok-fn">Ok</span>(<span class="tok-fn">hex</span>(&amp;hasher.<span class="tok-fn">finalize</span>()))</span>
+<span class="ln" id="L177">}</span>
 </span>
-<span class="ln" id="L177"></span>
+<span class="ln" id="L178"></span>
 <span class="src-item" id="fn-sha256_bytes">
-<span class="ln" id="L178"><span class="tok-com">/// SHA-256 of bytes already in memory.</span></span>
-<span class="ln" id="L179"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">sha256_bytes</span>(data: &amp;[u8]) -&gt; String {</span>
-<span class="ln" id="L180">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hasher = Sha256::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L181">    hasher.<span class="tok-fn">update</span>(data);</span>
-<span class="ln" id="L182">    <span class="tok-fn">hex</span>(&amp;hasher.<span class="tok-fn">finalize</span>())</span>
-<span class="ln" id="L183">}</span>
+<span class="ln" id="L179"><span class="tok-com">/// SHA-256 of bytes already in memory.</span></span>
+<span class="ln" id="L180"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">sha256_bytes</span>(data: &amp;[u8]) -&gt; String {</span>
+<span class="ln" id="L181">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hasher = Sha256::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L182">    hasher.<span class="tok-fn">update</span>(data);</span>
+<span class="ln" id="L183">    <span class="tok-fn">hex</span>(&amp;hasher.<span class="tok-fn">finalize</span>())</span>
+<span class="ln" id="L184">}</span>
 </span>
-<span class="ln" id="L184"></span>
+<span class="ln" id="L185"></span>
 <span class="src-item" id="fn-hex">
-<span class="ln" id="L185"><span class="tok-kw">fn</span> <span class="tok-fn">hex</span>(bytes: &amp;[u8]) -&gt; String {</span>
-<span class="ln" id="L186">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">with_capacity</span>(bytes.<span class="tok-fn">len</span>() * <span class="tok-num">2</span>);</span>
-<span class="ln" id="L187">    <span class="tok-kw">for</span> byte <span class="tok-kw">in</span> bytes {</span>
-<span class="ln" id="L188">        <span class="tok-kw">let</span> _ = write!(out, <span class="tok-str">&quot;{byte:02x}&quot;</span>);</span>
-<span class="ln" id="L189">    }</span>
-<span class="ln" id="L190">    out</span>
-<span class="ln" id="L191">}</span>
+<span class="ln" id="L186"><span class="tok-kw">fn</span> <span class="tok-fn">hex</span>(bytes: &amp;[u8]) -&gt; String {</span>
+<span class="ln" id="L187">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">with_capacity</span>(bytes.<span class="tok-fn">len</span>() * <span class="tok-num">2</span>);</span>
+<span class="ln" id="L188">    <span class="tok-kw">for</span> byte <span class="tok-kw">in</span> bytes {</span>
+<span class="ln" id="L189">        <span class="tok-kw">let</span> _ = write!(out, <span class="tok-str">&quot;{byte:02x}&quot;</span>);</span>
+<span class="ln" id="L190">    }</span>
+<span class="ln" id="L191">    out</span>
+<span class="ln" id="L192">}</span>
 </span>
-<span class="ln" id="L192"></span>
+<span class="ln" id="L193"></span>
 <span class="src-item" id="fn-digests_match">
-<span class="ln" id="L193"><span class="tok-com">/// Compare two hex digests without caring about case or stray whitespace.</span></span>
-<span class="ln" id="L194"><span class="tok-com">///</span></span>
-<span class="ln" id="L195"><span class="tok-com">/// Not constant time, and deliberately so: both values are public, and there</span></span>
-<span class="ln" id="L196"><span class="tok-com">/// is no secret here for a timing difference to leak. Saying that plainly is</span></span>
-<span class="ln" id="L197"><span class="tok-com">/// better than a `subtle` dependency that implies there was a threat.</span></span>
-<span class="ln" id="L198"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">digests_match</span>(a: &amp;str, b: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L199">    a.<span class="tok-fn">trim</span>().<span class="tok-fn">eq_ignore_ascii_case</span>(b.<span class="tok-fn">trim</span>())</span>
-<span class="ln" id="L200">}</span>
+<span class="ln" id="L194"><span class="tok-com">/// Compare two hex digests without caring about case or stray whitespace.</span></span>
+<span class="ln" id="L195"><span class="tok-com">///</span></span>
+<span class="ln" id="L196"><span class="tok-com">/// Not constant time, and deliberately so: both values are public, and there</span></span>
+<span class="ln" id="L197"><span class="tok-com">/// is no secret here for a timing difference to leak. Saying that plainly is</span></span>
+<span class="ln" id="L198"><span class="tok-com">/// better than a `subtle` dependency that implies there was a threat.</span></span>
+<span class="ln" id="L199"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">digests_match</span>(a: &amp;str, b: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L200">    a.<span class="tok-fn">trim</span>().<span class="tok-fn">eq_ignore_ascii_case</span>(b.<span class="tok-fn">trim</span>())</span>
+<span class="ln" id="L201">}</span>
 </span>
-<span class="ln" id="L201"></span>
+<span class="ln" id="L202"></span>
 <span class="src-item" id="fn-digest_from_sums">
-<span class="ln" id="L202"><span class="tok-com">/// Find a file&#x27;s line in a `sha256sum`-format list.</span></span>
-<span class="ln" id="L203"><span class="tok-com">///</span></span>
-<span class="ln" id="L204"><span class="tok-com">/// The format is `&lt;hex&gt;  &lt;name&gt;`, and `sha256sum` writes a `*` before the name</span></span>
-<span class="ln" id="L205"><span class="tok-com">/// for a binary-mode hash. Only the file&#x27;s base name is compared: the list is</span></span>
-<span class="ln" id="L206"><span class="tok-com">/// written with plain names, and the file being checked is usually somewhere</span></span>
-<span class="ln" id="L207"><span class="tok-com">/// else entirely.</span></span>
-<span class="ln" id="L208"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">digest_from_sums</span>(sums: &amp;str, wanted: &amp;str) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L209">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> sums.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L210">        <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L211">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() || line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>) {</span>
-<span class="ln" id="L212">            continue;</span>
-<span class="ln" id="L213">        }</span>
-<span class="ln" id="L214">        <span class="tok-com">// `continue`, not `?`. A `?` here returns from the whole function on</span></span>
-<span class="ln" id="L215">        <span class="tok-com">// the first line that has no whitespace in it, so one malformed line</span></span>
-<span class="ln" id="L216">        <span class="tok-com">// near the top of a list makes every hash below it invisible -- and</span></span>
-<span class="ln" id="L217">        <span class="tok-com">// the answer would be &quot;not listed&quot;, which reads as &quot;wrong release&quot;</span></span>
-<span class="ln" id="L218">        <span class="tok-com">// rather than as &quot;this file is unreadable&quot;. The portable verifier&#x27;s</span></span>
-<span class="ln" id="L219">        <span class="tok-com">// own test caught this within a minute of the code moving here.</span></span>
-<span class="ln" id="L220">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((digest, name)) = line.<span class="tok-fn">split_once</span>(char::is_whitespace) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L221">            continue;</span>
-<span class="ln" id="L222">        };</span>
-<span class="ln" id="L223">        <span class="tok-kw">let</span> name = name.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;*&#x27;</span>);</span>
-<span class="ln" id="L224">        <span class="tok-com">// A line like `aaaa   ` has a digest and no name. Without this it</span></span>
-<span class="ln" id="L225">        <span class="tok-com">// matches a `wanted` of &quot;&quot; -- which is what a path with no final</span></span>
-<span class="ln" id="L226">        <span class="tok-com">// component gives -- and the caller is handed a digest for a file that</span></span>
-<span class="ln" id="L227">        <span class="tok-com">// was never listed. Nothing downstream would notice: it looks exactly</span></span>
-<span class="ln" id="L228">        <span class="tok-com">// like a successful lookup.</span></span>
-<span class="ln" id="L229">        <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L230">            continue;</span>
-<span class="ln" id="L231">        }</span>
-<span class="ln" id="L232">        <span class="tok-kw">if</span> name == wanted {</span>
-<span class="ln" id="L233">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(digest.<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L234">        }</span>
-<span class="ln" id="L235">    }</span>
-<span class="ln" id="L236">    None</span>
-<span class="ln" id="L237">}</span>
+<span class="ln" id="L203"><span class="tok-com">/// Find a file&#x27;s line in a `sha256sum`-format list.</span></span>
+<span class="ln" id="L204"><span class="tok-com">///</span></span>
+<span class="ln" id="L205"><span class="tok-com">/// The format is `&lt;hex&gt;  &lt;name&gt;`, and `sha256sum` writes a `*` before the name</span></span>
+<span class="ln" id="L206"><span class="tok-com">/// for a binary-mode hash. Only the file&#x27;s base name is compared: the list is</span></span>
+<span class="ln" id="L207"><span class="tok-com">/// written with plain names, and the file being checked is usually somewhere</span></span>
+<span class="ln" id="L208"><span class="tok-com">/// else entirely.</span></span>
+<span class="ln" id="L209"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">digest_from_sums</span>(sums: &amp;str, wanted: &amp;str) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L210">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> sums.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L211">        <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L212">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() || line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>) {</span>
+<span class="ln" id="L213">            continue;</span>
+<span class="ln" id="L214">        }</span>
+<span class="ln" id="L215">        <span class="tok-com">// `continue`, not `?`. A `?` here returns from the whole function on</span></span>
+<span class="ln" id="L216">        <span class="tok-com">// the first line that has no whitespace in it, so one malformed line</span></span>
+<span class="ln" id="L217">        <span class="tok-com">// near the top of a list makes every hash below it invisible -- and</span></span>
+<span class="ln" id="L218">        <span class="tok-com">// the answer would be &quot;not listed&quot;, which reads as &quot;wrong release&quot;</span></span>
+<span class="ln" id="L219">        <span class="tok-com">// rather than as &quot;this file is unreadable&quot;. The portable verifier&#x27;s</span></span>
+<span class="ln" id="L220">        <span class="tok-com">// own test caught this within a minute of the code moving here.</span></span>
+<span class="ln" id="L221">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((digest, name)) = line.<span class="tok-fn">split_once</span>(char::is_whitespace) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L222">            continue;</span>
+<span class="ln" id="L223">        };</span>
+<span class="ln" id="L224">        <span class="tok-kw">let</span> name = name.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;*&#x27;</span>);</span>
+<span class="ln" id="L225">        <span class="tok-com">// A line like `aaaa   ` has a digest and no name. Without this it</span></span>
+<span class="ln" id="L226">        <span class="tok-com">// matches a `wanted` of &quot;&quot; -- which is what a path with no final</span></span>
+<span class="ln" id="L227">        <span class="tok-com">// component gives -- and the caller is handed a digest for a file that</span></span>
+<span class="ln" id="L228">        <span class="tok-com">// was never listed. Nothing downstream would notice: it looks exactly</span></span>
+<span class="ln" id="L229">        <span class="tok-com">// like a successful lookup.</span></span>
+<span class="ln" id="L230">        <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L231">            continue;</span>
+<span class="ln" id="L232">        }</span>
+<span class="ln" id="L233">        <span class="tok-kw">if</span> name == wanted {</span>
+<span class="ln" id="L234">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(digest.<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L235">        }</span>
+<span class="ln" id="L236">    }</span>
+<span class="ln" id="L237">    None</span>
+<span class="ln" id="L238">}</span>
 </span>
-<span class="ln" id="L238"></span>
+<span class="ln" id="L239"></span>
 <span class="src-item" id="fn-names_in_sums">
-<span class="ln" id="L239"><span class="tok-com">/// Every name a `SHA256SUMS` lists, in order.</span></span>
-<span class="ln" id="L240"><span class="tok-com">///</span></span>
-<span class="ln" id="L241"><span class="tok-com">/// For an interface that wants to say *what it could have checked* when the</span></span>
-<span class="ln" id="L242"><span class="tok-com">/// file dropped on it is not in the list. &quot;Not listed&quot; on its own leaves the</span></span>
-<span class="ln" id="L243"><span class="tok-com">/// reader guessing whether they downloaded the wrong thing or the wrong</span></span>
-<span class="ln" id="L244"><span class="tok-com">/// release.</span></span>
-<span class="ln" id="L245"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">names_in_sums</span>(sums: &amp;str) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L246">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L247">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> sums.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L248">        <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L249">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() || line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>) {</span>
-<span class="ln" id="L250">            continue;</span>
-<span class="ln" id="L251">        }</span>
-<span class="ln" id="L252">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((_, name)) = line.<span class="tok-fn">split_once</span>(char::is_whitespace) {</span>
-<span class="ln" id="L253">            <span class="tok-kw">let</span> name = name.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;*&#x27;</span>);</span>
-<span class="ln" id="L254">            <span class="tok-kw">if</span> !name.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L255">                names.<span class="tok-fn">push</span>(name.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L256">            }</span>
-<span class="ln" id="L257">        }</span>
-<span class="ln" id="L258">    }</span>
-<span class="ln" id="L259">    names</span>
-<span class="ln" id="L260">}</span>
+<span class="ln" id="L240"><span class="tok-com">/// Every name a `SHA256SUMS` lists, in order.</span></span>
+<span class="ln" id="L241"><span class="tok-com">///</span></span>
+<span class="ln" id="L242"><span class="tok-com">/// For an interface that wants to say *what it could have checked* when the</span></span>
+<span class="ln" id="L243"><span class="tok-com">/// file dropped on it is not in the list. &quot;Not listed&quot; on its own leaves the</span></span>
+<span class="ln" id="L244"><span class="tok-com">/// reader guessing whether they downloaded the wrong thing or the wrong</span></span>
+<span class="ln" id="L245"><span class="tok-com">/// release.</span></span>
+<span class="ln" id="L246"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">names_in_sums</span>(sums: &amp;str) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L247">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L248">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> sums.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L249">        <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L250">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() || line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>) {</span>
+<span class="ln" id="L251">            continue;</span>
+<span class="ln" id="L252">        }</span>
+<span class="ln" id="L253">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((_, name)) = line.<span class="tok-fn">split_once</span>(char::is_whitespace) {</span>
+<span class="ln" id="L254">            <span class="tok-kw">let</span> name = name.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;*&#x27;</span>);</span>
+<span class="ln" id="L255">            <span class="tok-kw">if</span> !name.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L256">                names.<span class="tok-fn">push</span>(name.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L257">            }</span>
+<span class="ln" id="L258">        }</span>
+<span class="ln" id="L259">    }</span>
+<span class="ln" id="L260">    names</span>
+<span class="ln" id="L261">}</span>
 </span>
-<span class="ln" id="L261"></span>
+<span class="ln" id="L262"></span>
 <span class="src-item" id="fn-verify_detached">
-<span class="ln" id="L262"><span class="tok-com">/// Verify a detached signature over `data` using `key`.</span></span>
-<span class="ln" id="L263"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">verify_detached</span>(key: &amp;SignedPublicKey, signature: &amp;str, data: &amp;[u8]) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="ln" id="L264">    <span class="tok-kw">let</span> (signature, _) = DetachedSignature::<span class="tok-fn">from_string</span>(signature).<span class="tok-fn">map_err</span>(|e| {</span>
-<span class="ln" id="L265">        Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;the signature file does not parse as OpenPGP: {e}&quot;</span>))</span>
-<span class="ln" id="L266">    })?;</span>
-<span class="ln" id="L267"></span>
-<span class="ln" id="L268">    <span class="tok-com">// Try the primary key and every subkey. Release signatures are normally</span></span>
-<span class="ln" id="L269">    <span class="tok-com">// made by a signing subkey rather than the primary -- checking only the</span></span>
-<span class="ln" id="L270">    <span class="tok-com">// primary would reject every genuine signature this project has ever made.</span></span>
-<span class="ln" id="L271">    <span class="tok-kw">if</span> signature.<span class="tok-fn">verify</span>(key, data).<span class="tok-fn">is_ok</span>() {</span>
-<span class="ln" id="L272">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L273">    }</span>
-<span class="ln" id="L274">    <span class="tok-kw">for</span> subkey <span class="tok-kw">in</span> &amp;key.public_subkeys {</span>
-<span class="ln" id="L275">        <span class="tok-kw">if</span> signature.<span class="tok-fn">verify</span>(subkey, data).<span class="tok-fn">is_ok</span>() {</span>
-<span class="ln" id="L276">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L277">        }</span>
-<span class="ln" id="L278">    }</span>
-<span class="ln" id="L279">    <span class="tok-fn">Err</span>(Error::BadSignature)</span>
-<span class="ln" id="L280">}</span>
+<span class="ln" id="L263"><span class="tok-com">/// Verify a detached signature over `data` using `key`.</span></span>
+<span class="ln" id="L264"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">verify_detached</span>(key: &amp;SignedPublicKey, signature: &amp;str, data: &amp;[u8]) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L265">    <span class="tok-kw">let</span> (signature, _) = DetachedSignature::<span class="tok-fn">from_string</span>(signature).<span class="tok-fn">map_err</span>(|e| {</span>
+<span class="ln" id="L266">        Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;the signature file does not parse as OpenPGP: {e}&quot;</span>))</span>
+<span class="ln" id="L267">    })?;</span>
+<span class="ln" id="L268"></span>
+<span class="ln" id="L269">    <span class="tok-com">// Try the primary key and every subkey. Release signatures are normally</span></span>
+<span class="ln" id="L270">    <span class="tok-com">// made by a signing subkey rather than the primary -- checking only the</span></span>
+<span class="ln" id="L271">    <span class="tok-com">// primary would reject every genuine signature this project has ever made.</span></span>
+<span class="ln" id="L272">    <span class="tok-kw">if</span> signature.<span class="tok-fn">verify</span>(key, data).<span class="tok-fn">is_ok</span>() {</span>
+<span class="ln" id="L273">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L274">    }</span>
+<span class="ln" id="L275">    <span class="tok-kw">for</span> subkey <span class="tok-kw">in</span> &amp;key.public_subkeys {</span>
+<span class="ln" id="L276">        <span class="tok-kw">if</span> signature.<span class="tok-fn">verify</span>(subkey, data).<span class="tok-fn">is_ok</span>() {</span>
+<span class="ln" id="L277">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L278">        }</span>
+<span class="ln" id="L279">    }</span>
+<span class="ln" id="L280">    <span class="tok-fn">Err</span>(Error::BadSignature)</span>
+<span class="ln" id="L281">}</span>
 </span>
-<span class="ln" id="L281"></span>
+<span class="ln" id="L282"></span>
 <span class="src-item" id="fn-checked">
-<span class="ln" id="L282"><span class="tok-com">/// What a full check found.</span></span>
-<span class="ln" id="L283"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L284"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Checked {</span>
-<span class="ln" id="L285">    <span class="tok-com">/// The name looked up in the list.</span></span>
-<span class="ln" id="L286">    <span class="tok-kw">pub</span> name: String,</span>
-<span class="ln" id="L287">    <span class="tok-com">/// The hash of the file on disk.</span></span>
-<span class="ln" id="L288">    <span class="tok-kw">pub</span> actual: String,</span>
-<span class="ln" id="L289">    <span class="tok-com">/// The hash the signed list gives for it.</span></span>
-<span class="ln" id="L290">    <span class="tok-kw">pub</span> expected: String,</span>
-<span class="ln" id="L291">    <span class="tok-com">/// Whether the two are the same.</span></span>
-<span class="ln" id="L292">    <span class="tok-kw">pub</span> matched: bool,</span>
-<span class="ln" id="L293">    <span class="tok-com">/// The fingerprint of the key the signature verified against.</span></span>
-<span class="ln" id="L294">    <span class="tok-kw">pub</span> fingerprint: String,</span>
-<span class="ln" id="L295">}</span>
+<span class="ln" id="L283"><span class="tok-com">/// What a full check found.</span></span>
+<span class="ln" id="L284"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L285"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Checked {</span>
+<span class="ln" id="L286">    <span class="tok-com">/// The name looked up in the list.</span></span>
+<span class="ln" id="L287">    <span class="tok-kw">pub</span> name: String,</span>
+<span class="ln" id="L288">    <span class="tok-com">/// The hash of the file on disk.</span></span>
+<span class="ln" id="L289">    <span class="tok-kw">pub</span> actual: String,</span>
+<span class="ln" id="L290">    <span class="tok-com">/// The hash the signed list gives for it.</span></span>
+<span class="ln" id="L291">    <span class="tok-kw">pub</span> expected: String,</span>
+<span class="ln" id="L292">    <span class="tok-com">/// Whether the two are the same.</span></span>
+<span class="ln" id="L293">    <span class="tok-kw">pub</span> matched: bool,</span>
+<span class="ln" id="L294">    <span class="tok-com">/// The fingerprint of the key the signature verified against.</span></span>
+<span class="ln" id="L295">    <span class="tok-kw">pub</span> fingerprint: String,</span>
+<span class="ln" id="L296">}</span>
 </span>
-<span class="ln" id="L296"></span>
+<span class="ln" id="L297"></span>
 <span class="src-item" id="fn-check_file">
-<span class="ln" id="L297"><span class="tok-com">/// The whole check: signature first, then the hash.</span></span>
-<span class="ln" id="L298"><span class="tok-com">///</span></span>
-<span class="ln" id="L299"><span class="tok-com">/// # The order is the point</span></span>
-<span class="ln" id="L300"><span class="tok-com">///</span></span>
-<span class="ln" id="L301"><span class="tok-com">/// The signature is verified over the **bytes of the list** before any number</span></span>
-<span class="ln" id="L302"><span class="tok-com">/// in that list is read. A checker that compared the hash first and verified</span></span>
-<span class="ln" id="L303"><span class="tok-com">/// afterwards would, for the moment between the two, be trusting an unsigned</span></span>
-<span class="ln" id="L304"><span class="tok-com">/// document, and an attacker who can hand you a file can hand you a</span></span>
-<span class="ln" id="L305"><span class="tok-com">/// `SHA256SUMS` to go with it. Getting this order wrong produces a program that</span></span>
-<span class="ln" id="L306"><span class="tok-com">/// passes all its own tests and proves nothing.</span></span>
-<span class="ln" id="L307"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check_file</span>(file: &amp;Path, sums: &amp;str, signature: &amp;str) -&gt; Result&lt;Checked, Error&gt; {</span>
-<span class="ln" id="L308">    <span class="tok-kw">let</span> key = <span class="tok-fn">key</span>()?;</span>
-<span class="ln" id="L309">    <span class="tok-fn">verify_detached</span>(&amp;key, signature, sums.<span class="tok-fn">as_bytes</span>())?;</span>
-<span class="ln" id="L310"></span>
-<span class="ln" id="L311">    <span class="tok-com">// A path with no final component -- a directory, a root, `..` -- has no</span></span>
-<span class="ln" id="L312">    <span class="tok-com">// name to look up, and asking for one would be asking the list about</span></span>
-<span class="ln" id="L313">    <span class="tok-com">// nothing. Refused here rather than turned into an empty string that some</span></span>
-<span class="ln" id="L314">    <span class="tok-com">// malformed line might happen to match.</span></span>
-<span class="ln" id="L315">    <span class="tok-kw">let</span> name = file</span>
-<span class="ln" id="L316">        .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L317">        .<span class="tok-fn">map</span>(|n| n.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>())</span>
-<span class="ln" id="L318">        .<span class="tok-fn">ok_or_else</span>(|| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;{} does not name a file&quot;</span>, file.<span class="tok-fn">display</span>())))?;</span>
-<span class="ln" id="L319">    <span class="tok-kw">let</span> expected = <span class="tok-fn">digest_from_sums</span>(sums, &amp;name).<span class="tok-fn">ok_or_else</span>(|| Error::<span class="tok-fn">NotListed</span>(name.<span class="tok-fn">clone</span>()))?;</span>
-<span class="ln" id="L320">    <span class="tok-kw">let</span> actual = <span class="tok-fn">sha256_file</span>(file)?;</span>
-<span class="ln" id="L321"></span>
-<span class="ln" id="L322">    <span class="tok-fn">Ok</span>(Checked {</span>
-<span class="ln" id="L323">        matched: <span class="tok-fn">digests_match</span>(&amp;actual, &amp;expected),</span>
-<span class="ln" id="L324">        name,</span>
-<span class="ln" id="L325">        actual,</span>
-<span class="ln" id="L326">        expected,</span>
-<span class="ln" id="L327">        fingerprint: <span class="tok-fn">fingerprint_of</span>(&amp;key),</span>
-<span class="ln" id="L328">    })</span>
-<span class="ln" id="L329">}</span>
+<span class="ln" id="L298"><span class="tok-com">/// The whole check: signature first, then the hash.</span></span>
+<span class="ln" id="L299"><span class="tok-com">///</span></span>
+<span class="ln" id="L300"><span class="tok-com">/// # The order is the point</span></span>
+<span class="ln" id="L301"><span class="tok-com">///</span></span>
+<span class="ln" id="L302"><span class="tok-com">/// The signature is verified over the **bytes of the list** before any number</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// in that list is read. A checker that compared the hash first and verified</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// afterwards would, for the moment between the two, be trusting an unsigned</span></span>
+<span class="ln" id="L305"><span class="tok-com">/// document, and an attacker who can hand you a file can hand you a</span></span>
+<span class="ln" id="L306"><span class="tok-com">/// `SHA256SUMS` to go with it. Getting this order wrong produces a program that</span></span>
+<span class="ln" id="L307"><span class="tok-com">/// passes all its own tests and proves nothing.</span></span>
+<span class="ln" id="L308"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check_file</span>(file: &amp;Path, sums: &amp;str, signature: &amp;str) -&gt; Result&lt;Checked, Error&gt; {</span>
+<span class="ln" id="L309">    <span class="tok-kw">let</span> key = <span class="tok-fn">key</span>()?;</span>
+<span class="ln" id="L310">    <span class="tok-fn">verify_detached</span>(&amp;key, signature, sums.<span class="tok-fn">as_bytes</span>())?;</span>
+<span class="ln" id="L311"></span>
+<span class="ln" id="L312">    <span class="tok-com">// A path with no final component -- a directory, a root, `..` -- has no</span></span>
+<span class="ln" id="L313">    <span class="tok-com">// name to look up, and asking for one would be asking the list about</span></span>
+<span class="ln" id="L314">    <span class="tok-com">// nothing. Refused here rather than turned into an empty string that some</span></span>
+<span class="ln" id="L315">    <span class="tok-com">// malformed line might happen to match.</span></span>
+<span class="ln" id="L316">    <span class="tok-kw">let</span> name = file</span>
+<span class="ln" id="L317">        .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L318">        .<span class="tok-fn">map</span>(|n| n.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>())</span>
+<span class="ln" id="L319">        .<span class="tok-fn">ok_or_else</span>(|| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;{} does not name a file&quot;</span>, file.<span class="tok-fn">display</span>())))?;</span>
+<span class="ln" id="L320">    <span class="tok-kw">let</span> expected = <span class="tok-fn">digest_from_sums</span>(sums, &amp;name).<span class="tok-fn">ok_or_else</span>(|| Error::<span class="tok-fn">NotListed</span>(name.<span class="tok-fn">clone</span>()))?;</span>
+<span class="ln" id="L321">    <span class="tok-kw">let</span> actual = <span class="tok-fn">sha256_file</span>(file)?;</span>
+<span class="ln" id="L322"></span>
+<span class="ln" id="L323">    <span class="tok-fn">Ok</span>(Checked {</span>
+<span class="ln" id="L324">        matched: <span class="tok-fn">digests_match</span>(&amp;actual, &amp;expected),</span>
+<span class="ln" id="L325">        name,</span>
+<span class="ln" id="L326">        actual,</span>
+<span class="ln" id="L327">        expected,</span>
+<span class="ln" id="L328">        fingerprint: <span class="tok-fn">fingerprint_of</span>(&amp;key),</span>
+<span class="ln" id="L329">    })</span>
+<span class="ln" id="L330">}</span>
 </span>
-<span class="ln" id="L330"></span>
-<span class="ln" id="L331"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L332"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L333">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L334">    <span class="tok-kw">use</span> std::io::Write;</span>
-<span class="ln" id="L335"></span>
-<span class="ln" id="L336">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L337">    <span class="tok-kw">fn</span> <span class="tok-fn">the_embedded_key_parses_and_is_the_published_fingerprint</span>() {</span>
-<span class="ln" id="L338">        <span class="tok-kw">let</span> key = <span class="tok-fn">key</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the embedded key must parse&quot;</span>);</span>
-<span class="ln" id="L339">        assert_eq!(<span class="tok-fn">fingerprint_of</span>(&amp;key), FINGERPRINT);</span>
-<span class="ln" id="L340">    }</span>
-<span class="ln" id="L341"></span>
-<span class="ln" id="L342">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L343">    <span class="tok-kw">fn</span> <span class="tok-fn">a_known_vector_hashes_correctly</span>() {</span>
-<span class="ln" id="L344">        <span class="tok-com">// The SHA-256 of the empty string, which is the one digest anybody can</span></span>
-<span class="ln" id="L345">        <span class="tok-com">// check against a reference without running this code.</span></span>
-<span class="ln" id="L346">        assert_eq!(</span>
-<span class="ln" id="L347">            <span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;&quot;</span>),</span>
-<span class="ln" id="L348">            <span class="tok-str">&quot;e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&quot;</span></span>
-<span class="ln" id="L349">        );</span>
-<span class="ln" id="L350">        assert_eq!(</span>
-<span class="ln" id="L351">            <span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;abc&quot;</span>),</span>
-<span class="ln" id="L352">            <span class="tok-str">&quot;ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad&quot;</span></span>
-<span class="ln" id="L353">        );</span>
-<span class="ln" id="L354">    }</span>
-<span class="ln" id="L355"></span>
-<span class="ln" id="L356">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L357">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_hashes_the_same_as_its_bytes</span>() {</span>
-<span class="ln" id="L358">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L359">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;thing.bin&quot;</span>);</span>
-<span class="ln" id="L360">        <span class="tok-com">// Larger than the 64 KiB read buffer, so the chunked path is the one</span></span>
-<span class="ln" id="L361">        <span class="tok-com">// being tested rather than a single read.</span></span>
-<span class="ln" id="L362">        <span class="tok-kw">let</span> data: Vec&lt;u8&gt; = (<span class="tok-num">0</span>..200_000u32).<span class="tok-fn">map</span>(|n| (n % <span class="tok-num">251</span>) <span class="tok-kw">as</span> u8).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L363">        std::fs::File::<span class="tok-fn">create</span>(&amp;path)</span>
-<span class="ln" id="L364">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L365">            .<span class="tok-fn">write_all</span>(&amp;data)</span>
-<span class="ln" id="L366">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L367">        assert_eq!(<span class="tok-fn">sha256_file</span>(&amp;path).<span class="tok-fn">unwrap</span>(), <span class="tok-fn">sha256_bytes</span>(&amp;data));</span>
-<span class="ln" id="L368">    }</span>
-<span class="ln" id="L369"></span>
-<span class="ln" id="L370">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L371">    <span class="tok-kw">fn</span> <span class="tok-fn">digests_compare_without_caring_about_case_or_space</span>() {</span>
-<span class="ln" id="L372">        assert!(<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;ABCD&quot;</span>, <span class="tok-str">&quot;abcd&quot;</span>));</span>
-<span class="ln" id="L373">        assert!(<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;  abcd\n&quot;</span>, <span class="tok-str">&quot;abcd&quot;</span>));</span>
-<span class="ln" id="L374">        assert!(!<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;abcd&quot;</span>, <span class="tok-str">&quot;abce&quot;</span>));</span>
-<span class="ln" id="L375">        assert!(!<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;abcd&quot;</span>));</span>
-<span class="ln" id="L376">    }</span>
-<span class="ln" id="L377"></span>
-<span class="ln" id="L378">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L379">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sums_line_is_found_by_base_name_in_either_mode</span>() {</span>
-<span class="ln" id="L380">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L381"><span class="tok-str"># a comment</span></span>
-<span class="ln" id="L382"><span class="tok-str">aaaa  plain.txt</span></span>
-<span class="ln" id="L383"><span class="tok-str">bbbb *binary.bin</span></span>
-<span class="ln" id="L384"></span>
-<span class="ln" id="L385"><span class="tok-str">cccc  spaced name.zip</span></span>
-<span class="ln" id="L386"><span class="tok-str">&quot;</span>;</span>
-<span class="ln" id="L387">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;plain.txt&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;aaaa&quot;</span>));</span>
-<span class="ln" id="L388">        assert_eq!(</span>
-<span class="ln" id="L389">            <span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;binary.bin&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L390">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;bbbb&quot;</span>)</span>
-<span class="ln" id="L391">        );</span>
-<span class="ln" id="L392">        assert_eq!(</span>
-<span class="ln" id="L393">            <span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;spaced name.zip&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L394">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;cccc&quot;</span>)</span>
-<span class="ln" id="L395">        );</span>
-<span class="ln" id="L396">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;missing&quot;</span>), None);</span>
-<span class="ln" id="L397">    }</span>
-<span class="ln" id="L398"></span>
-<span class="ln" id="L399">    <span class="tok-com">/// A line with a digest and no name must not answer a lookup for &quot;&quot;,</span></span>
-<span class="ln" id="L400">    <span class="tok-com">/// which is what a path with no final component gives.</span></span>
-<span class="ln" id="L401">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L402">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nameless_line_matches_nothing</span>() {</span>
-<span class="ln" id="L403">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;aaaa   \nbbbb  real.zip\n&quot;</span>;</span>
-<span class="ln" id="L404">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;&quot;</span>), None);</span>
-<span class="ln" id="L405">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;real.zip&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;bbbb&quot;</span>));</span>
-<span class="ln" id="L406">    }</span>
-<span class="ln" id="L407"></span>
-<span class="ln" id="L408">    <span class="tok-com">/// And a path with nothing to look up is refused rather than turned into</span></span>
-<span class="ln" id="L409">    <span class="tok-com">/// that empty string in the first place.</span></span>
-<span class="ln" id="L410">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L411">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_with_no_file_name_is_refused</span>() {</span>
-<span class="ln" id="L412">        <span class="tok-kw">let</span> error = <span class="tok-fn">check_file</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;..&quot;</span>), <span class="tok-str">&quot;aaaa  x\n&quot;</span>, <span class="tok-str">&quot;sig&quot;</span>)</span>
-<span class="ln" id="L413">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;`..` names no file&quot;</span>);</span>
-<span class="ln" id="L414">        <span class="tok-com">// Refused before the signature is even parsed would be wrong too; what</span></span>
-<span class="ln" id="L415">        <span class="tok-com">// matters is that it never reaches a lookup with an empty name.</span></span>
-<span class="ln" id="L416">        assert!(!matches!(error, Error::<span class="tok-fn">NotListed</span>(<span class="tok-kw">ref</span> n) <span class="tok-kw">if</span> n.<span class="tok-fn">is_empty</span>()));</span>
-<span class="ln" id="L417">    }</span>
-<span class="ln" id="L418"></span>
-<span class="ln" id="L419">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">the_names_can_be_listed_for_an_error_message</span>() {</span>
-<span class="ln" id="L421">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;aaaa  one.zip\nbbbb *two.tar.gz\n# note\n&quot;</span>;</span>
-<span class="ln" id="L422">        assert_eq!(<span class="tok-fn">names_in_sums</span>(sums), vec![<span class="tok-str">&quot;one.zip&quot;</span>, <span class="tok-str">&quot;two.tar.gz&quot;</span>]);</span>
-<span class="ln" id="L423">        assert!(<span class="tok-fn">names_in_sums</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L424">    }</span>
-<span class="ln" id="L425"></span>
-<span class="ln" id="L426">    <span class="tok-com">/// The order this checks things in is the whole of its value, so it is</span></span>
-<span class="ln" id="L427">    <span class="tok-com">/// asserted rather than assumed: an unverifiable signature must stop the</span></span>
-<span class="ln" id="L428">    <span class="tok-com">/// check before any hash from that list is read.</span></span>
-<span class="ln" id="L429">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L430">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bad_signature_stops_the_check_before_any_hash_is_believed</span>() {</span>
-<span class="ln" id="L431">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L432">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
-<span class="ln" id="L433">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;pretend this is a release&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L434">        <span class="tok-kw">let</span> sums = format!(<span class="tok-str">&quot;{}  release.zip\n&quot;</span>, <span class="tok-fn">sha256_file</span>(&amp;path).<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L435"></span>
-<span class="ln" id="L436">        <span class="tok-com">// A hash that would match perfectly, under a signature that is not one.</span></span>
-<span class="ln" id="L437">        <span class="tok-kw">let</span> error = <span class="tok-fn">check_file</span>(&amp;path, &amp;sums, <span class="tok-str">&quot;not an OpenPGP signature at all&quot;</span>)</span>
-<span class="ln" id="L438">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unparseable signature cannot pass&quot;</span>);</span>
-<span class="ln" id="L439">        assert!(</span>
-<span class="ln" id="L440">            matches!(error, Error::<span class="tok-fn">Malformed</span>(_)),</span>
-<span class="ln" id="L441">            <span class="tok-str">&quot;expected a parse failure, got {error:?}&quot;</span></span>
-<span class="ln" id="L442">        );</span>
-<span class="ln" id="L443">    }</span>
-<span class="ln" id="L444"></span>
-<span class="ln" id="L445">    <span class="tok-com">/// &quot;Not listed&quot; is a different answer from &quot;does not match&quot;, and a front</span></span>
-<span class="ln" id="L446">    <span class="tok-com">/// end has to be able to tell them apart: one means the wrong release, the</span></span>
-<span class="ln" id="L447">    <span class="tok-com">/// other means a bad file.</span></span>
-<span class="ln" id="L448">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L449">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_missing_from_the_list_is_its_own_answer</span>() {</span>
-<span class="ln" id="L450">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;aaaa  something-else.zip\n&quot;</span>;</span>
-<span class="ln" id="L451">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;mine.zip&quot;</span>), None);</span>
-<span class="ln" id="L452">        <span class="tok-kw">let</span> error = Error::<span class="tok-fn">NotListed</span>(<span class="tok-str">&quot;mine.zip&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L453">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;mine.zip&quot;</span>));</span>
-<span class="ln" id="L454">        assert_ne!(error, Error::BadSignature);</span>
-<span class="ln" id="L455">    }</span>
-<span class="ln" id="L456"></span>
-<span class="ln" id="L457">    <span class="tok-com">/// The scope note has to state the limits, not only the capability. Every</span></span>
-<span class="ln" id="L458">    <span class="tok-com">/// front end shows this text, so it is checked here once.</span></span>
-<span class="ln" id="L459">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L460">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_says_what_a_pass_does_not_prove</span>() {</span>
-<span class="ln" id="L461">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L462">        <span class="tok-kw">for</span> phrase <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L463">            <span class="tok-str">&quot;do not prove it is safe&quot;</span>,</span>
-<span class="ln" id="L464">            <span class="tok-str">&quot;the source compiles to it&quot;</span>,</span>
-<span class="ln" id="L465">            <span class="tok-str">&quot;belongs to anybody in particular&quot;</span>,</span>
-<span class="ln" id="L466">            <span class="tok-str">&quot;somebody other than the author&quot;</span>,</span>
-<span class="ln" id="L467">        ] {</span>
-<span class="ln" id="L468">            assert!(scope.<span class="tok-fn">contains</span>(phrase), <span class="tok-str">&quot;the scope note must say {phrase:?}&quot;</span>);</span>
-<span class="ln" id="L469">        }</span>
-<span class="ln" id="L470">    }</span>
-<span class="ln" id="L471">}</span>
+<span class="ln" id="L331"></span>
+<span class="ln" id="L332"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L333"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L334">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L335">    <span class="tok-kw">use</span> std::io::Write;</span>
+<span class="ln" id="L336"></span>
+<span class="ln" id="L337">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L338">    <span class="tok-kw">fn</span> <span class="tok-fn">the_embedded_key_parses_and_is_the_published_fingerprint</span>() {</span>
+<span class="ln" id="L339">        <span class="tok-kw">let</span> key = <span class="tok-fn">key</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the embedded key must parse&quot;</span>);</span>
+<span class="ln" id="L340">        assert_eq!(<span class="tok-fn">fingerprint_of</span>(&amp;key), FINGERPRINT);</span>
+<span class="ln" id="L341">    }</span>
+<span class="ln" id="L342"></span>
+<span class="ln" id="L343">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L344">    <span class="tok-kw">fn</span> <span class="tok-fn">a_known_vector_hashes_correctly</span>() {</span>
+<span class="ln" id="L345">        <span class="tok-com">// The SHA-256 of the empty string, which is the one digest anybody can</span></span>
+<span class="ln" id="L346">        <span class="tok-com">// check against a reference without running this code.</span></span>
+<span class="ln" id="L347">        assert_eq!(</span>
+<span class="ln" id="L348">            <span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;&quot;</span>),</span>
+<span class="ln" id="L349">            <span class="tok-str">&quot;e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&quot;</span></span>
+<span class="ln" id="L350">        );</span>
+<span class="ln" id="L351">        assert_eq!(</span>
+<span class="ln" id="L352">            <span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;abc&quot;</span>),</span>
+<span class="ln" id="L353">            <span class="tok-str">&quot;ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad&quot;</span></span>
+<span class="ln" id="L354">        );</span>
+<span class="ln" id="L355">    }</span>
+<span class="ln" id="L356"></span>
+<span class="ln" id="L357">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L358">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_hashes_the_same_as_its_bytes</span>() {</span>
+<span class="ln" id="L359">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L360">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;thing.bin&quot;</span>);</span>
+<span class="ln" id="L361">        <span class="tok-com">// Larger than the 64 KiB read buffer, so the chunked path is the one</span></span>
+<span class="ln" id="L362">        <span class="tok-com">// being tested rather than a single read.</span></span>
+<span class="ln" id="L363">        <span class="tok-kw">let</span> data: Vec&lt;u8&gt; = (<span class="tok-num">0</span>..200_000u32).<span class="tok-fn">map</span>(|n| (n % <span class="tok-num">251</span>) <span class="tok-kw">as</span> u8).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L364">        std::fs::File::<span class="tok-fn">create</span>(&amp;path)</span>
+<span class="ln" id="L365">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L366">            .<span class="tok-fn">write_all</span>(&amp;data)</span>
+<span class="ln" id="L367">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L368">        assert_eq!(<span class="tok-fn">sha256_file</span>(&amp;path).<span class="tok-fn">unwrap</span>(), <span class="tok-fn">sha256_bytes</span>(&amp;data));</span>
+<span class="ln" id="L369">    }</span>
+<span class="ln" id="L370"></span>
+<span class="ln" id="L371">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L372">    <span class="tok-kw">fn</span> <span class="tok-fn">digests_compare_without_caring_about_case_or_space</span>() {</span>
+<span class="ln" id="L373">        assert!(<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;ABCD&quot;</span>, <span class="tok-str">&quot;abcd&quot;</span>));</span>
+<span class="ln" id="L374">        assert!(<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;  abcd\n&quot;</span>, <span class="tok-str">&quot;abcd&quot;</span>));</span>
+<span class="ln" id="L375">        assert!(!<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;abcd&quot;</span>, <span class="tok-str">&quot;abce&quot;</span>));</span>
+<span class="ln" id="L376">        assert!(!<span class="tok-fn">digests_match</span>(<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;abcd&quot;</span>));</span>
+<span class="ln" id="L377">    }</span>
+<span class="ln" id="L378"></span>
+<span class="ln" id="L379">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L380">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sums_line_is_found_by_base_name_in_either_mode</span>() {</span>
+<span class="ln" id="L381">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L382"><span class="tok-str"># a comment</span></span>
+<span class="ln" id="L383"><span class="tok-str">aaaa  plain.txt</span></span>
+<span class="ln" id="L384"><span class="tok-str">bbbb *binary.bin</span></span>
+<span class="ln" id="L385"></span>
+<span class="ln" id="L386"><span class="tok-str">cccc  spaced name.zip</span></span>
+<span class="ln" id="L387"><span class="tok-str">&quot;</span>;</span>
+<span class="ln" id="L388">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;plain.txt&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;aaaa&quot;</span>));</span>
+<span class="ln" id="L389">        assert_eq!(</span>
+<span class="ln" id="L390">            <span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;binary.bin&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L391">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;bbbb&quot;</span>)</span>
+<span class="ln" id="L392">        );</span>
+<span class="ln" id="L393">        assert_eq!(</span>
+<span class="ln" id="L394">            <span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;spaced name.zip&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L395">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;cccc&quot;</span>)</span>
+<span class="ln" id="L396">        );</span>
+<span class="ln" id="L397">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;missing&quot;</span>), None);</span>
+<span class="ln" id="L398">    }</span>
+<span class="ln" id="L399"></span>
+<span class="ln" id="L400">    <span class="tok-com">/// A line with a digest and no name must not answer a lookup for &quot;&quot;,</span></span>
+<span class="ln" id="L401">    <span class="tok-com">/// which is what a path with no final component gives.</span></span>
+<span class="ln" id="L402">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L403">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nameless_line_matches_nothing</span>() {</span>
+<span class="ln" id="L404">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;aaaa   \nbbbb  real.zip\n&quot;</span>;</span>
+<span class="ln" id="L405">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;&quot;</span>), None);</span>
+<span class="ln" id="L406">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;real.zip&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;bbbb&quot;</span>));</span>
+<span class="ln" id="L407">    }</span>
+<span class="ln" id="L408"></span>
+<span class="ln" id="L409">    <span class="tok-com">/// And a path with nothing to look up is refused rather than turned into</span></span>
+<span class="ln" id="L410">    <span class="tok-com">/// that empty string in the first place.</span></span>
+<span class="ln" id="L411">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L412">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_with_no_file_name_is_refused</span>() {</span>
+<span class="ln" id="L413">        <span class="tok-kw">let</span> error = <span class="tok-fn">check_file</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;..&quot;</span>), <span class="tok-str">&quot;aaaa  x\n&quot;</span>, <span class="tok-str">&quot;sig&quot;</span>)</span>
+<span class="ln" id="L414">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;`..` names no file&quot;</span>);</span>
+<span class="ln" id="L415">        <span class="tok-com">// Refused before the signature is even parsed would be wrong too; what</span></span>
+<span class="ln" id="L416">        <span class="tok-com">// matters is that it never reaches a lookup with an empty name.</span></span>
+<span class="ln" id="L417">        assert!(!matches!(error, Error::<span class="tok-fn">NotListed</span>(<span class="tok-kw">ref</span> n) <span class="tok-kw">if</span> n.<span class="tok-fn">is_empty</span>()));</span>
+<span class="ln" id="L418">    }</span>
+<span class="ln" id="L419"></span>
+<span class="ln" id="L420">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L421">    <span class="tok-kw">fn</span> <span class="tok-fn">the_names_can_be_listed_for_an_error_message</span>() {</span>
+<span class="ln" id="L422">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;aaaa  one.zip\nbbbb *two.tar.gz\n# note\n&quot;</span>;</span>
+<span class="ln" id="L423">        assert_eq!(<span class="tok-fn">names_in_sums</span>(sums), vec![<span class="tok-str">&quot;one.zip&quot;</span>, <span class="tok-str">&quot;two.tar.gz&quot;</span>]);</span>
+<span class="ln" id="L424">        assert!(<span class="tok-fn">names_in_sums</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L425">    }</span>
+<span class="ln" id="L426"></span>
+<span class="ln" id="L427">    <span class="tok-com">/// The order this checks things in is the whole of its value, so it is</span></span>
+<span class="ln" id="L428">    <span class="tok-com">/// asserted rather than assumed: an unverifiable signature must stop the</span></span>
+<span class="ln" id="L429">    <span class="tok-com">/// check before any hash from that list is read.</span></span>
+<span class="ln" id="L430">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L431">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bad_signature_stops_the_check_before_any_hash_is_believed</span>() {</span>
+<span class="ln" id="L432">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L433">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
+<span class="ln" id="L434">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;pretend this is a release&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L435">        <span class="tok-kw">let</span> sums = format!(<span class="tok-str">&quot;{}  release.zip\n&quot;</span>, <span class="tok-fn">sha256_file</span>(&amp;path).<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L436"></span>
+<span class="ln" id="L437">        <span class="tok-com">// A hash that would match perfectly, under a signature that is not one.</span></span>
+<span class="ln" id="L438">        <span class="tok-kw">let</span> error = <span class="tok-fn">check_file</span>(&amp;path, &amp;sums, <span class="tok-str">&quot;not an OpenPGP signature at all&quot;</span>)</span>
+<span class="ln" id="L439">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unparseable signature cannot pass&quot;</span>);</span>
+<span class="ln" id="L440">        assert!(</span>
+<span class="ln" id="L441">            matches!(error, Error::<span class="tok-fn">Malformed</span>(_)),</span>
+<span class="ln" id="L442">            <span class="tok-str">&quot;expected a parse failure, got {error:?}&quot;</span></span>
+<span class="ln" id="L443">        );</span>
+<span class="ln" id="L444">    }</span>
+<span class="ln" id="L445"></span>
+<span class="ln" id="L446">    <span class="tok-com">/// &quot;Not listed&quot; is a different answer from &quot;does not match&quot;, and a front</span></span>
+<span class="ln" id="L447">    <span class="tok-com">/// end has to be able to tell them apart: one means the wrong release, the</span></span>
+<span class="ln" id="L448">    <span class="tok-com">/// other means a bad file.</span></span>
+<span class="ln" id="L449">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L450">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_missing_from_the_list_is_its_own_answer</span>() {</span>
+<span class="ln" id="L451">        <span class="tok-kw">let</span> sums = <span class="tok-str">&quot;aaaa  something-else.zip\n&quot;</span>;</span>
+<span class="ln" id="L452">        assert_eq!(<span class="tok-fn">digest_from_sums</span>(sums, <span class="tok-str">&quot;mine.zip&quot;</span>), None);</span>
+<span class="ln" id="L453">        <span class="tok-kw">let</span> error = Error::<span class="tok-fn">NotListed</span>(<span class="tok-str">&quot;mine.zip&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L454">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;mine.zip&quot;</span>));</span>
+<span class="ln" id="L455">        assert_ne!(error, Error::BadSignature);</span>
+<span class="ln" id="L456">    }</span>
+<span class="ln" id="L457"></span>
+<span class="ln" id="L458">    <span class="tok-com">/// The scope note has to state the limits, not only the capability. Every</span></span>
+<span class="ln" id="L459">    <span class="tok-com">/// front end shows this text, so it is checked here once.</span></span>
+<span class="ln" id="L460">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L461">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_says_what_a_pass_does_not_prove</span>() {</span>
+<span class="ln" id="L462">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L463">        <span class="tok-kw">for</span> phrase <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L464">            <span class="tok-str">&quot;do not prove it is safe&quot;</span>,</span>
+<span class="ln" id="L465">            <span class="tok-str">&quot;the source compiles to it&quot;</span>,</span>
+<span class="ln" id="L466">            <span class="tok-str">&quot;belongs to anybody in particular&quot;</span>,</span>
+<span class="ln" id="L467">            <span class="tok-str">&quot;somebody other than the author&quot;</span>,</span>
+<span class="ln" id="L468">        ] {</span>
+<span class="ln" id="L469">            assert!(scope.<span class="tok-fn">contains</span>(phrase), <span class="tok-str">&quot;the scope note must say {phrase:?}&quot;</span>);</span>
+<span class="ln" id="L470">        }</span>
+<span class="ln" id="L471">    }</span>
+<span class="ln" id="L472">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

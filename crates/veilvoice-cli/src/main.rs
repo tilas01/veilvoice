@@ -545,8 +545,18 @@ enum Command {
         /// Write the verification script to standard output instead.
         #[arg(long)]
         script: bool,
-        /// Write the macOS spelling of it, which uses `shasum` rather than
-        /// `sha256sum`.
+        /// Write a script that rebuilds the release from source and compares
+        /// the result with the published binary. A stronger check than a
+        /// hash: a hash proves the file is the one whose hash was signed, and
+        /// says nothing about what is inside it.
+        #[arg(long)]
+        build_script: bool,
+        /// Which system the script is for: linux, macos, bsd or windows.
+        /// Defaults to this one.
+        #[arg(long, value_name = "SYSTEM")]
+        system: Option<String>,
+        /// The macOS spelling of the verification script, which uses `shasum`
+        /// rather than `sha256sum`. A shorthand for `--system macos`.
         #[arg(long)]
         macos: bool,
     },
@@ -944,13 +954,15 @@ impl From<CleanPolicy> for Policy {
     }
 }
 
-
 /// What checking a release actually involves, and who does which part.
 ///
 /// Written out here rather than left to the website, because somebody on a
 /// machine with no browser is exactly the person most likely to be checking a
 /// download by hand.
-fn explain_verification(flavour: veilvoice_gnupg::script::Flavour) {
+fn explain_verification(
+    flavour: veilvoice_gnupg::script::Flavour,
+    system: veilvoice_check::reproduce::System,
+) {
     let survey = veilvoice_gnupg::backend::look();
     println!("Checking a VeilVoice release");
     println!();
@@ -1011,8 +1023,18 @@ fn explain_verification(flavour: veilvoice_gnupg::script::Flavour) {
     println!("  Sixty lines of shell using gpg and the system hash tool. Read it");
     println!("  before running it: the reason to use it rather than this program");
     println!("  is that it is not this program.");
+    println!();
+    println!("The stronger check");
+    println!();
+    println!("  veilvoice verify --build-script > {}", system.file_name());
+    println!();
+    println!("  A hash proves the file is the one whose hash was signed. It says");
+    println!("  nothing about what is inside it, because the same person signed");
+    println!("  both. That script rebuilds the release from source and compares");
+    println!("  the result, so a match means the published binary is what this");
+    println!("  source compiles to. It needs git and a Rust toolchain, and it");
+    println!("  installs neither.");
 }
-
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
@@ -1400,17 +1422,48 @@ fn run(command: Command) -> Result<(), String> {
             }
         },
 
-        Command::Verify { script, macos } => {
-            let flavour = if macos {
-                veilvoice_gnupg::script::Flavour::MacOs
-            } else {
-                veilvoice_gnupg::script::Flavour::Linux
+        Command::Verify {
+            script,
+            build_script,
+            system,
+            macos,
+        } => {
+            let named = system.as_deref().map(|name| {
+                veilvoice_check::reproduce::System::from_key(name).ok_or_else(|| {
+                    format!(
+                        "unknown system {name:?}. One of: {}",
+                        veilvoice_check::reproduce::System::ALL
+                            .iter()
+                            .map(|s| s.key())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    )
+                })
+            });
+            let system = match named {
+                Some(Ok(system)) => system,
+                Some(Err(why)) => return Err(why),
+                None if macos => veilvoice_check::reproduce::System::MacOs,
+                None => veilvoice_check::reproduce::System::here(),
+            };
+            if build_script {
+                print!("{}", veilvoice_check::reproduce::script(system));
+                return Ok(());
+            }
+            // The verification script knows only two spellings, because the
+            // only thing that differs is the hash tool, and the BSDs use the
+            // same one Linux does for this purpose.
+            let flavour = match system {
+                veilvoice_check::reproduce::System::MacOs => {
+                    veilvoice_gnupg::script::Flavour::MacOs
+                }
+                _ => veilvoice_gnupg::script::Flavour::Linux,
             };
             if script {
                 print!("{}", veilvoice_gnupg::script::shell(flavour));
                 return Ok(());
             }
-            explain_verification(flavour);
+            explain_verification(flavour, system);
             Ok(())
         }
 

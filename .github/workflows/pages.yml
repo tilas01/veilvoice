@@ -17,6 +17,22 @@ on:
       - 'assets/**'
       - 'README.md'
       - '.github/workflows/pages.yml'
+  # After a release, always.
+  #
+  # The site is not only documentation: the download page names the current
+  # version, the releases page is generated from CHANGELOG.md, and the verify
+  # page describes files that a release publishes. Cutting a release changed
+  # all of that and deployed none of it, because a tag push touches no path in
+  # the list above. The site stayed on the previous release until somebody
+  # happened to edit a file under `website/`, which could be days.
+  #
+  # So the release workflow finishing is a reason to publish, on the same
+  # footing as somebody editing a page. Success only: a release that failed
+  # halfway is not something to redeploy the site for.
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+
   workflow_dispatch:
 
 permissions:
@@ -32,8 +48,19 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # A failed release is not a reason to publish. Every other trigger is: a
+    # push to main, or somebody pressing the button.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
+      # The default branch explicitly. On a `workflow_run` the checkout would
+      # otherwise be the commit that triggered the release, which is a tag; the
+      # site is published from `main`, and for a release those are the same
+      # commit until they are not.
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       # The banner and icons are generated, and the site is the most visible
       # place a stale copy would show. Regenerating and diffing here keeps the

@@ -49,6 +49,7 @@ Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUM
 
 - [[`contents.rs`|File-veilvoice-check-contents]] &middot; The signed list of what is inside each release archive.
 - [[`lib.rs`|File-veilvoice-check-lib]] &middot; Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.
+- [[`reproduce.rs`|File-veilvoice-check-reproduce]] &middot; A script that rebuilds a release and compares it with what was published.
 
 ## [[veilvoice-cli|Crate-veilvoice-cli]]
 
@@ -190,6 +191,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`updates.rs`|File-veilvoice-gui-updates]] &middot; The manual update check, as the window shows it.
 - [[`verify.rs`|File-veilvoice-gui-verify]] &middot; The verify tab: drop a download on the window and be told what it is.
 - [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] &middot; The device monitor, moved off the thread that paints.
+- [[`window.rs`|File-veilvoice-gui-window]] &middot; How big the window opens, and why it is not a constant.
 
 ## [[veilvoice-meta|Crate-veilvoice-meta]]
 

@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/watchfeed.svg" alt="watchfeed.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/watchfeed.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 381 lines &middot; <a href="watchfeed.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 417 lines &middot; <a href="watchfeed.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-file-exists">Why this file exists</a>
@@ -69,7 +69,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>381 lines defining <strong>11 functions</strong> (10 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>417 lines defining <strong>11 functions</strong> (10 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Update</code> <span style="color:var(--muted)">line 63</span> &middot; One look at the machine.</li>
 <li><code>struct WatchFeed</code> <span style="color:var(--muted)">line 73</span> &middot; The window&#x27;s end of the monitor.</li>
@@ -78,21 +78,21 @@
 <li><code>WatchFeed::start</code> <span style="color:var(--muted)">line 115</span> &middot; Start watching, on a thread of its own.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>idle</code></span>
 </li>
-<li><code>WatchFeed::unseen</code> <span style="color:var(--muted)">line 163</span> &middot; Alerts that have arrived and not yet been shown as a notification.
+<li><code>WatchFeed::unseen</code> <span style="color:var(--muted)">line 199</span> &middot; Alerts that have arrived and not yet been shown as a notification.
 </li>
-<li><code>WatchFeed::has_unseen</code> <span style="color:var(--muted)">line 168</span> &middot; Whether anything is waiting to be shown.
+<li><code>WatchFeed::has_unseen</code> <span style="color:var(--muted)">line 204</span> &middot; Whether anything is waiting to be shown.
 </li>
-<li><code>WatchFeed::drain</code> <span style="color:var(--muted)">line 176</span> &middot; Take whatever has arrived.
+<li><code>WatchFeed::drain</code> <span style="color:var(--muted)">line 212</span> &middot; Take whatever has arrived.
 </li>
-<li><code>WatchFeed::active</code> <span style="color:var(--muted)">line 221</span> &middot; What is holding a device right now.
+<li><code>WatchFeed::active</code> <span style="color:var(--muted)">line 257</span> &middot; What is holding a device right now.
 </li>
-<li><code>WatchFeed::log</code> <span style="color:var(--muted)">line 226</span> &middot; What has started and stopped, oldest first.
+<li><code>WatchFeed::log</code> <span style="color:var(--muted)">line 262</span> &middot; What has started and stopped, oldest first.
 </li>
-<li><code>WatchFeed::error</code> <span style="color:var(--muted)">line 231</span> &middot; Why the monitor is not answering, if it is not.
+<li><code>WatchFeed::error</code> <span style="color:var(--muted)">line 267</span> &middot; Why the monitor is not answering, if it is not.
 </li>
-<li><code>WatchFeed::support</code> <span style="color:var(--muted)">line 236</span> &middot; What this platform can detect at all.
+<li><code>WatchFeed::support</code> <span style="color:var(--muted)">line 272</span> &middot; What this platform can detect at all.
 </li>
-<li><code>WatchFeed::is_watching</code> <span style="color:var(--muted)">line 241</span> &middot; Whether there is a worker running.
+<li><code>WatchFeed::is_watching</code> <span style="color:var(--muted)">line 277</span> &middot; Whether there is a worker running.
 </li>
 </ul>
 </section>
@@ -129,42 +129,42 @@
 <a href="watchfeed.src.html#fn-watchfeed-unseen">
 <rect x="414.1" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="496.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::unseen</text>
-<text x="496.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 163</text>
+<text x="496.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-has_unseen">
 <rect x="20.0" y="120.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="118.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::has_unseen</text>
-<text x="118.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
+<text x="118.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-drain">
 <rect x="243.3" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="321.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::drain</text>
-<text x="321.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 176</text>
+<text x="321.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-active">
 <rect x="426.2" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="508.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::active</text>
-<text x="508.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 221</text>
+<text x="508.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-log">
 <rect x="44.2" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="114.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::log</text>
-<text x="114.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
+<text x="114.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 262</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-error">
 <rect x="211.0" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="289.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::error</text>
-<text x="289.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
+<text x="289.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-support">
 <rect x="394.0" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="480.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::support</text>
-<text x="480.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 236</text>
+<text x="480.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
 </a>
 <a href="watchfeed.src.html#fn-watchfeed-is_watching">
 <rect x="203.0" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="305.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">WatchFeed::is_watching</text>
-<text x="305.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
+<text x="305.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 277</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -186,27 +186,27 @@ flowchart TD
     n_default[&quot;WatchFeed::default&lt;br/&gt;line 91&quot;]
     n_idle[&quot;WatchFeed::idle&lt;br/&gt;line 99&quot;]
     n_start([&quot;WatchFeed::start&lt;br/&gt;line 115&quot;])
-    n_unseen([&quot;WatchFeed::unseen&lt;br/&gt;line 163&quot;])
-    n_has_unseen([&quot;WatchFeed::has_unseen&lt;br/&gt;line 168&quot;])
-    n_drain([&quot;WatchFeed::drain&lt;br/&gt;line 176&quot;])
-    n_active([&quot;WatchFeed::active&lt;br/&gt;line 221&quot;])
-    n_log([&quot;WatchFeed::log&lt;br/&gt;line 226&quot;])
-    n_error([&quot;WatchFeed::error&lt;br/&gt;line 231&quot;])
-    n_support([&quot;WatchFeed::support&lt;br/&gt;line 236&quot;])
-    n_is_watching([&quot;WatchFeed::is_watching&lt;br/&gt;line 241&quot;])
+    n_unseen([&quot;WatchFeed::unseen&lt;br/&gt;line 199&quot;])
+    n_has_unseen([&quot;WatchFeed::has_unseen&lt;br/&gt;line 204&quot;])
+    n_drain([&quot;WatchFeed::drain&lt;br/&gt;line 212&quot;])
+    n_active([&quot;WatchFeed::active&lt;br/&gt;line 257&quot;])
+    n_log([&quot;WatchFeed::log&lt;br/&gt;line 262&quot;])
+    n_error([&quot;WatchFeed::error&lt;br/&gt;line 267&quot;])
+    n_support([&quot;WatchFeed::support&lt;br/&gt;line 272&quot;])
+    n_is_watching([&quot;WatchFeed::is_watching&lt;br/&gt;line 277&quot;])
     n_default --&gt; n_idle
     n_start --&gt; n_idle
     click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L91&quot; &quot;open the source&quot;
     click n_idle href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L99&quot; &quot;open the source&quot;
     click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L115&quot; &quot;open the source&quot;
-    click n_unseen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L163&quot; &quot;open the source&quot;
-    click n_has_unseen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L168&quot; &quot;open the source&quot;
-    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L176&quot; &quot;open the source&quot;
-    click n_active href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L221&quot; &quot;open the source&quot;
-    click n_log href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L226&quot; &quot;open the source&quot;
-    click n_error href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L231&quot; &quot;open the source&quot;
-    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L236&quot; &quot;open the source&quot;
-    click n_is_watching href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L241&quot; &quot;open the source&quot;
+    click n_unseen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L199&quot; &quot;open the source&quot;
+    click n_has_unseen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L204&quot; &quot;open the source&quot;
+    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L212&quot; &quot;open the source&quot;
+    click n_active href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L257&quot; &quot;open the source&quot;
+    click n_log href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L262&quot; &quot;open the source&quot;
+    click n_error href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L267&quot; &quot;open the source&quot;
+    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L272&quot; &quot;open the source&quot;
+    click n_is_watching href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs#L277&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_unseen,n_has_unseen,n_drain,n_active,n_log,n_error,n_support,n_is_watching entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -226,14 +226,14 @@ flowchart TD
 <tr><td><code>WatchFeed::default</code> <sub>fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-default">91</a></td><td></td></tr>
 <tr><td><code>WatchFeed::idle</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-idle">99</a></td><td>A feed that watches nothing.</td></tr>
 <tr><td><code>WatchFeed::start</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-start">115</a></td><td>Start watching, on a thread of its own.</td></tr>
-<tr><td><code>WatchFeed::unseen</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-unseen">163</a></td><td>Alerts that have arrived and not yet been shown as a notification.</td></tr>
-<tr><td><code>WatchFeed::has_unseen</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-has_unseen">168</a></td><td>Whether anything is waiting to be shown.</td></tr>
-<tr><td><code>WatchFeed::drain</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-drain">176</a></td><td>Take whatever has arrived.</td></tr>
-<tr><td><code>WatchFeed::active</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-active">221</a></td><td>What is holding a device right now.</td></tr>
-<tr><td><code>WatchFeed::log</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-log">226</a></td><td>What has started and stopped, oldest first.</td></tr>
-<tr><td><code>WatchFeed::error</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-error">231</a></td><td>Why the monitor is not answering, if it is not.</td></tr>
-<tr><td><code>WatchFeed::support</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-support">236</a></td><td>What this platform can detect at all.</td></tr>
-<tr><td><code>WatchFeed::is_watching</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-is_watching">241</a></td><td>Whether there is a worker running.</td></tr>
+<tr><td><code>WatchFeed::unseen</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-unseen">199</a></td><td>Alerts that have arrived and not yet been shown as a notification.</td></tr>
+<tr><td><code>WatchFeed::has_unseen</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-has_unseen">204</a></td><td>Whether anything is waiting to be shown.</td></tr>
+<tr><td><code>WatchFeed::drain</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-drain">212</a></td><td>Take whatever has arrived.</td></tr>
+<tr><td><code>WatchFeed::active</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-active">257</a></td><td>What is holding a device right now.</td></tr>
+<tr><td><code>WatchFeed::log</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-log">262</a></td><td>What has started and stopped, oldest first.</td></tr>
+<tr><td><code>WatchFeed::error</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-error">267</a></td><td>Why the monitor is not answering, if it is not.</td></tr>
+<tr><td><code>WatchFeed::support</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-support">272</a></td><td>What this platform can detect at all.</td></tr>
+<tr><td><code>WatchFeed::is_watching</code> <sub>pub fn</sub></td><td><a href="watchfeed.src.html#fn-watchfeed-is_watching">277</a></td><td>Whether there is a worker running.</td></tr>
 </tbody></table>
 </section>
 </div></div>

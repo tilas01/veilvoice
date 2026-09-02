@@ -58,7 +58,6 @@
 #![warn(missing_docs)]
 
 mod app;
-pub mod window;
 pub mod autolock;
 pub mod crashlog;
 pub mod dialog;
@@ -80,6 +79,7 @@ pub mod theme;
 pub mod updates;
 pub mod verify;
 pub mod watchfeed;
+pub mod window;
 
 pub use app::VeilVoiceApp;
 

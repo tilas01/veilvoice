@@ -38,6 +38,187 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-third round: what an idle window costs, measured for the first time
+
+Seven defects (F-113 to F-119). The round is different from the ones before it
+in one way that matters: **the desktop application can now be run on a machine
+with no screen**, under Xvfb, so what it does when nobody is touching it is a
+number rather than a suspicion. Two of the seven were found that way and could
+not have been found any other way from here.
+
+### F-113 -- the verify tab said everything three times
+
+`veilvoice-gui/src/verify.rs`.
+
+The GnuPG section was the last statement of `slot_row`, and `slot_row` is
+called once for each of the three file slots. So the tab carried three copies
+of the heading "The same check, typed by you", three copies of the paragraph
+under it, and three copies of "choose a hash list and a signature above",
+threaded between the three file rows.
+
+It is in every published screenshot of that tab, and has been since the
+section was written.
+
+Nothing caught it because every piece of it was correct. The section draws what
+it should. The row draws what it should. Only the place one was called from was
+wrong, and no test looked at that, because tests here look at what functions
+produce rather than where they are invoked.
+
+Found by reading a screenshot. Not by reading the code: the call is the last
+line of a forty-line function and looks exactly like the end of a panel.
+
+The regression test reads the call site, which is the thing that was wrong, and
+asserts there is one of them and that it is not inside `slot_row`.
+
+### F-114 -- three buttons in a column, at three different x positions
+
+Same file, same screenshot.
+
+The three `choose…` buttons sat at three different places. The cause was
+
+    RichText::new(format!("{label:<16}"))
+
+which pads a label with trailing spaces to fake a column. That aligns nothing
+outside a terminal: the interface font is proportional, so a space is not the
+width of a letter, and egui gives trailing whitespace no reliable width at all.
+`the download`, `SHA256SUMS` and `SHA256SUMS.asc` are three different widths on
+screen whatever they are padded to.
+
+**This is the second time this exact habit has been taken out of this
+application.** The passphrase fields had it, were fixed, and the fix was
+written where the passphrase fields are. So when the same idea was needed on
+another tab it was written again from scratch, wrongly.
+
+The fix now lives in `layout::column` and both call it, which is the only
+arrangement that stops a third copy appearing on the next tab somebody writes.
+
+### F-115 -- an untouched window redrew itself twice a second, for ever
+
+`veilvoice-gui/src/watchfeed.rs` and `app.rs`.
+
+With the animations off, on a tab with nothing on it, with nobody touching the
+machine:
+
+| | frames per second | processor |
+|---|---:|---:|
+| Before | 2.1 | 7.1% to 9.0% |
+| After | none | 0.2% |
+
+Twenty seconds a tab, all nine tabs, frames counted by the program itself and
+processor time read from `/proc`. Every tab was 2.1, including the monitor tab,
+which draws two lines of text.
+
+**Two reasonable decisions met.** The microphone monitor's thread sent an
+update on every poll, whether or not anything had changed. The window woke
+every 500 ms to ask the channel whether anything had arrived. Each half is the
+sort of thing that reads fine in review; the comment beside the second one even
+explains, correctly, why 500 ms is cheap. Together they are a program that
+never sleeps, on every tab, whether or not the monitor is the thing on screen.
+
+The thread with the news now asks for the repaint, because it is the only thing
+that knows there is any, and it only speaks when something actually changed.
+
+**Worth stating plainly: the previous round could not have found this.** The
+comment in `app.rs` said so at the time -- "this machine has no display and the
+frame time is not measurable from here" -- and that sentence was true when it
+was written. What changed is not the code but what can be run.
+
+`VEILVOICE_FRAME_LOG=1` now prints frames per second to stderr. The About tab
+already showed how long a frame took, which answers "is drawing slow" and is
+the wrong question: a window drawing sixty fast frames a second while idle
+looks healthiest of all by that measure.
+
+### F-116 -- the guide described a five-tab application that has nine
+
+`docs/USER_GUIDE.md`.
+
+It opened "`veilvoice-gui`. Five tabs." and documented five. There are nine.
+The four missing were **group**, **verify**, **settings** and **install** --
+including the tab this project tells people to use before running a download it
+has just told them not to trust.
+
+The fifth finding of one shape: a document describing the program, with nothing
+comparing the two. The remedy is the one used each time. Every tab now has a
+section named for the key it answers to, and a test walks `Tab::ALL` and fails
+the build for any tab without one.
+
+The count is gone rather than corrected. A number typed beside a list is a copy
+of the list's length and goes stale the first time the list changes, which is
+exactly what happened; a second test refuses to let one back in.
+
+### F-117 -- the generated verification script printed a pass over a rejected signature
+
+`veilvoice-gnupg/src/script.rs`. **Written this round, and wrong within the
+hour.**
+
+`veilvoice verify --script` writes a short shell script that checks a release
+with GnuPG and the system hash tool and nothing from this project. The first
+version had:
+
+    gpg --verify SHA256SUMS.asc SHA256SUMS 2>&1 | sed 's/^/    /'
+    say "signature   SHA256SUMS is signed by a key in your keyring"
+
+A pipeline's exit status is the status of its **last** command. That is `sed`,
+which succeeded. `set -e` never fired, and the script printed its pass line
+directly underneath GnuPG saying *the signature could not be verified*.
+
+Found by running it against a deliberately tampered release, which is the only
+way this could have been found: every test in the file passed, the script
+looked right, and it is four lines long.
+
+It now captures the output instead of piping it, and it does something the
+first version did not do at all: **checks that the signature is by this
+project's fingerprint**, not merely that GnuPG called it good. GnuPG reports a
+good signature for any key in your keyring, including one an attacker talked
+you into importing, and that is precisely what a substituted release looks
+like. Verified by generating a second key, signing a hash list with it, and
+confirming the script refuses while `gpg --verify` alone says "Good signature".
+
+Five paths were then run against the **published v0.1.15**: genuine release
+passes; tampered hash refused; tampered signature refused; good signature by
+the wrong key refused; and a folder with none of the release in it reported as
+having nothing to check, rather than as a mismatch.
+
+### F-118 -- the window opened too small for its own longest panel
+
+`veilvoice-gui/src/main.rs`, now `window.rs`.
+
+It opened at 1100 by 720, always. The group panel is 1288 pixels of content, so
+the window opened on a panel with its bottom third missing and nothing saying
+so; a reader had to find the scrollbar to learn there was more.
+
+The obvious repair breaks something else, which is presumably why it stood: a
+window 1400 by 1000 does not fit a 1366 by 768 laptop, and one that opens
+partly off the bottom of the screen looks like a broken program.
+
+So the size is no longer a constant. It is a preference clamped to what the
+monitor can show, applied on the first frame, when the monitor size is known
+for the first time.
+
+**The clamp was wrong first, in a way worth recording.** It reserved nine
+tenths of the screen, which on a 1920 by 1080 display -- the commonest desktop
+screen there is -- gives 972 and would have shrunk the window to avoid a task
+bar 40 pixels tall. What a window actually loses is a title bar and a task bar,
+and those are a fixed number of pixels whatever the screen is. The allowance is
+now in pixels and the test that caught it names 1080p specifically.
+
+The floor for manual resizing is unchanged. Nothing here stops somebody
+dragging the window small; it stops the program from opening that way.
+
+### F-119 -- the chooser appeared only once it no longer mattered
+
+`veilvoice-gui/src/verify.rs`. **Also written this round.**
+
+The new section letting somebody choose which OpenPGP implementation does the
+checking was called at the end of `gnupg_section`, which returns early when the
+hash list and signature have not been chosen yet. Choosing a checker is a
+decision made *before* checking anything, so it appeared only after the point
+where it was any use.
+
+Found by photographing the tab and looking at it, immediately after writing it.
+That is twice in this round that reading the picture caught what reading the
+patch did not, which is the same lesson as F-113 in the same afternoon.
+
 ## The twenty-second round: the verify page that had no verifier
 
 Two defects (F-111 and F-112), both found by driving the website in a real
@@ -2370,7 +2551,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1141 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1181 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4017,8 +4198,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and twelve defects found and fixed (F-1 to F-112), across
-twenty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and nineteen defects found and fixed (F-1 to F-119), across
+twenty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

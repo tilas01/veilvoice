@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gnupg/script.svg" alt="script.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gnupg/src/script.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 281 lines &middot; <a href="script.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 283 lines &middot; <a href="script.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-script-at-all-when-there-is-a-verifier">Why a script at all, when there is a verifier</a>
@@ -62,14 +62,14 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>281 lines defining <strong>4 functions</strong> (2 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>283 lines defining <strong>4 functions</strong> (2 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Flavour</code> <span style="color:var(--muted)">line 37</span> &middot; Which system the script is being written for.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Flavour::file_name</code> <span style="color:var(--muted)">line 62</span> &middot; The name a reader would give the file.
+<li><code>Flavour::file_name</code> <span style="color:var(--muted)">line 64</span> &middot; The name a reader would give the file.
 </li>
-<li><code>shell</code> <span style="color:var(--muted)">line 71</span> &middot; The script, with the fingerprint compiled in from the one source of it.
+<li><code>shell</code> <span style="color:var(--muted)">line 73</span> &middot; The script, with the fingerprint compiled in from the one source of it.
 </li>
 </ul>
 </section>
@@ -99,12 +99,12 @@
 <a href="script.src.html#fn-flavour-file_name">
 <rect x="83.5" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="170.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Flavour::file_name</text>
-<text x="170.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 62</text>
+<text x="170.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 64</text>
 </a>
 <a href="script.src.html#fn-shell">
 <rect x="282.6" y="120.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="324.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shell</text>
-<text x="324.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
+<text x="324.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -124,12 +124,12 @@
 flowchart TD
     n_hash_check[&quot;Flavour::hash_check&lt;br/&gt;line 46&quot;]
     n_install_hint[&quot;Flavour::install_hint&lt;br/&gt;line 54&quot;]
-    n_file_name([&quot;Flavour::file_name&lt;br/&gt;line 62&quot;])
-    n_shell([&quot;shell&lt;br/&gt;line 71&quot;])
+    n_file_name([&quot;Flavour::file_name&lt;br/&gt;line 64&quot;])
+    n_shell([&quot;shell&lt;br/&gt;line 73&quot;])
     click n_hash_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L46&quot; &quot;open the source&quot;
     click n_install_hint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L54&quot; &quot;open the source&quot;
-    click n_file_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L62&quot; &quot;open the source&quot;
-    click n_shell href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L71&quot; &quot;open the source&quot;
+    click n_file_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64&quot; &quot;open the source&quot;
+    click n_shell href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L73&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_file_name,n_shell entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -143,8 +143,8 @@ flowchart TD
 <tr><td><code>Flavour</code> <sub>pub enum</sub></td><td><a href="script.src.html#fn-flavour">37</a></td><td>Which system the script is being written for.</td></tr>
 <tr><td><code>Flavour::hash_check</code> <sub>fn</sub></td><td><a href="script.src.html#fn-flavour-hash_check">46</a></td><td>The command that checks a file against SHA256SUMS.</td></tr>
 <tr><td><code>Flavour::install_hint</code> <sub>fn</sub></td><td><a href="script.src.html#fn-flavour-install_hint">54</a></td><td>What to type if GnuPG is not installed.</td></tr>
-<tr><td><code>Flavour::file_name</code> <sub>pub fn</sub></td><td><a href="script.src.html#fn-flavour-file_name">62</a></td><td>The name a reader would give the file.</td></tr>
-<tr><td><code>shell</code> <sub>pub fn</sub></td><td><a href="script.src.html#fn-shell">71</a></td><td>The script, with the fingerprint compiled in from the one source of it.</td></tr>
+<tr><td><code>Flavour::file_name</code> <sub>pub fn</sub></td><td><a href="script.src.html#fn-flavour-file_name">64</a></td><td>The name a reader would give the file.</td></tr>
+<tr><td><code>shell</code> <sub>pub fn</sub></td><td><a href="script.src.html#fn-shell">73</a></td><td>The script, with the fingerprint compiled in from the one source of it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

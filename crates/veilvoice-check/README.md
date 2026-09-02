@@ -93,10 +93,12 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>471 lines"])
+    n_lib(["lib.rs<br/>472 lines"])
     n_contents["contents.rs<br/>623 lines"]
+    n_reproduce["reproduce.rs<br/>436 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" "open the source"
     click n_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" "open the source"
+    click n_reproduce href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs" "open the source"
 ```
 
 </details>
@@ -106,7 +108,8 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | 623 | The signed list of what is inside each release archive. |
-| [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | 471 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
+| [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | 472 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
+| [`reproduce.rs`](../../docs/files/veilvoice-check/reproduce.md) | 436 | A script that rebuilds a release and compares it with what was published. |
 
 ## Public items
 
@@ -136,6 +139,8 @@ flowchart TD
 | `fn verify_detached` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | Verify a detached signature over data using key. |
 | `struct Checked` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | What a full check found. |
 | `fn check_file` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The whole check: signature first, then the hash. |
+| `enum System` | [`reproduce.rs`](../../docs/files/veilvoice-check/reproduce.md) | The system a script is being written for. |
+| `fn script` | [`reproduce.rs`](../../docs/files/veilvoice-check/reproduce.md) | The script for this system. |
 
 ## Reading it elsewhere
 
