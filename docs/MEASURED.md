@@ -17,7 +17,7 @@ F-77 in `docs/AUDIT.md`.
 
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 1141 |
+| Tests, measured by running them | 1167 |
 | Crates in the workspace | 27 |
 | Website suites | 17 |
 | Findings written up in the audit | 112 |

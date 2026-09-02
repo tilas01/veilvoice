@@ -205,6 +205,20 @@ pub struct VeilVoiceApp {
     tab: Tab,
     jetbrains: bool,
 
+    /// Whether frames are being counted, from `VEILVOICE_FRAME_LOG`.
+    frame_log: bool,
+    /// Frames drawn since the last report.
+    frames: u32,
+    /// When that report was, in the window's own clock.
+    frames_since: f64,
+
+    /// Whether the window has been fitted to the screen yet.
+    ///
+    /// The fit happens once, on the first frame, because that is the
+    /// first moment the monitor size is known. See
+    /// [`VeilVoiceApp::fit_to_the_screen`].
+    fitted: bool,
+
     // Shared engine settings.
     intensity: f32,
     neutralise_accent: bool,
@@ -340,6 +354,44 @@ fn preferred_input(inputs: &[devices::DeviceInfo]) -> Option<String> {
 }
 
 impl VeilVoiceApp {
+    /// Frames per second, to stderr, when `VEILVOICE_FRAME_LOG` is set.
+    ///
+    /// # Why a counter and not a frame time
+    ///
+    /// The About tab already shows how long a frame took, which answers "is
+    /// drawing slow". It does not answer the question people actually have,
+    /// which is "why is this using processor time when I am not touching it".
+    /// An idle window should draw *no* frames. One drawing sixty a second is
+    /// costing a laptop its battery whether each frame is fast or not, and a
+    /// frame time cannot tell those apart: the fast-drawing runaway looks
+    /// healthiest of all.
+    ///
+    /// Off unless asked for, printed once a second, and to stderr rather than
+    /// into the window, because the person reading it is diagnosing rather
+    /// than using.
+    fn count_frames(&mut self, ctx: &egui::Context) {
+        if !self.frame_log {
+            return;
+        }
+        self.frames += 1;
+        let now = ctx.input(|i| i.time);
+        if self.frames_since == 0.0 {
+            self.frames_since = now;
+            return;
+        }
+        let elapsed = now - self.frames_since;
+        if elapsed >= 1.0 {
+            eprintln!(
+                "veilvoice-gui: {:.1} frames/s on the {} tab ({:.1} ms each)",
+                self.frames as f64 / elapsed,
+                self.tab.key(),
+                self.frame_ms
+            );
+            self.frames = 0;
+            self.frames_since = now;
+        }
+    }
+
     /// The application with no devices enumerated.
     ///
     /// `Default` calls this after asking the system what it has. Tests that are
@@ -347,6 +399,10 @@ impl VeilVoiceApp {
     /// platform's audio stack exactly once instead of once per test.
     fn without_devices() -> Self {
         Self {
+            frame_log: std::env::var_os("VEILVOICE_FRAME_LOG").is_some(),
+            frames: 0,
+            frames_since: 0.0,
+            fitted: false,
             tab: Tab::File,
             jetbrains: false,
             intensity: 1.0,
@@ -572,7 +628,7 @@ impl VeilVoiceApp {
             // The one place the monitor thread is started. Everything else
             // constructs an idle feed, so no test and no `Default` reaches the
             // machine.
-            watch: WatchFeed::start(),
+            watch: WatchFeed::start(cc.egui_ctx.clone()),
             ..Default::default()
         };
         // Marker 86. Before the first frame, and so before anything can be
@@ -656,8 +712,51 @@ impl VeilVoiceApp {
     }
 }
 
+impl VeilVoiceApp {
+    /// Open at a size this screen can actually show, once, on the first frame.
+    ///
+    /// The size the window is *created* with has to be chosen before there is
+    /// a window, and therefore before anything knows how big the screen is.
+    /// So it is created at the preferred size and corrected here, on the first
+    /// frame, when egui can say what the monitor is.
+    ///
+    /// Once only. Re-fitting on every frame would undo a resize the moment
+    /// somebody made one, which is a window that fights its user; and because
+    /// a resize causes a frame, it would also be a loop.
+    ///
+    /// Skipped entirely when `--size` was given: that is somebody, or the
+    /// screenshot harness, saying exactly what they want.
+    fn fit_to_the_screen(&mut self, ctx: &egui::Context) {
+        if self.fitted {
+            return;
+        }
+        self.fitted = true;
+        if crate::window::requested_size().is_some() {
+            return;
+        }
+        let monitor = ctx.input(|i| i.viewport().monitor_size);
+        let Some(monitor) = monitor else {
+            return;
+        };
+        let want = crate::window::opening_size(Some([monitor.x, monitor.y]), None);
+        let now = ctx.input(|i| i.viewport().inner_rect.map(|r| r.size()));
+        // Only when it actually differs, and by enough to be a real
+        // difference rather than a rounding one. Sending the command
+        // unconditionally would make the window flicker on every launch.
+        if now.is_none_or(|size| (size.x - want[0]).abs() > 1.0 || (size.y - want[1]).abs() > 1.0)
+        {
+            ctx.send_viewport_cmd(egui::ViewportCommand::InnerSize(egui::vec2(
+                want[0], want[1],
+            )));
+        }
+    }
+}
+
 impl eframe::App for VeilVoiceApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.fit_to_the_screen(ctx);
+        self.count_frames(ctx);
+
         // How long the last frame took, smoothed. `stable_dt` rather than `dt`
         // because the raw one spikes whenever the window has been idle and the
         // spike says nothing about how fast the drawing is.
@@ -1024,12 +1123,12 @@ impl eframe::App for VeilVoiceApp {
             // only advance while somebody was looking at it, which is the one
             // time it should not.
             ctx.request_repaint_after(std::time::Duration::from_secs(1));
-        } else if self.watch.is_watching() {
-            // Only often enough to notice an update that has arrived. The work
-            // itself happens elsewhere, so this is a cheap wake rather than a
-            // scan.
-            ctx.request_repaint_after(std::time::Duration::from_millis(500));
         }
+        // Nothing here for the microphone monitor. It runs on its own thread
+        // and asks for a repaint when it has something to report, which is the
+        // only moment a repaint is worth anything. Waking twice a second to
+        // ask whether it had news is what made an untouched window draw 2.1
+        // frames a second on every tab, for ever.
     }
 }
 
@@ -2029,6 +2128,47 @@ mod tests {
         assert_eq!(
             blocking, 0,
             "a channel on the draw path is read with a blocking recv; use try_recv"
+        );
+    }
+
+    /// An untouched window draws nothing.
+    ///
+    /// # The measurement this is here to keep
+    ///
+    /// With the animations off and nobody touching it, the window drew **2.1
+    /// frames a second on every one of the nine tabs, for ever**, and cost 7
+    /// to 9 per cent of a core doing it. After this it draws none, and costs
+    /// 0.2 per cent. Measured on the same machine, twenty seconds a tab, with
+    /// `VEILVOICE_FRAME_LOG=1` counting the frames and `/proc` counting the
+    /// time.
+    ///
+    /// The cause was a pair of reasonable-looking decisions meeting. The
+    /// microphone monitor sent an update on every poll whether or not
+    /// anything had changed, and this file woke the window twice a second to
+    /// ask the channel whether anything had arrived. Each half is the sort of
+    /// thing that reads fine in review. Together they are a program that never
+    /// sleeps.
+    ///
+    /// The rule now is that the thread with the news asks for the repaint,
+    /// because it is the only thing that knows there is any. This checks the
+    /// window is not asking on a timer instead.
+    #[test]
+    fn the_window_does_not_wake_itself_to_check_on_the_monitor() {
+        let source = include_str!("app.rs").replace("\r\n", "\n");
+        // The code only. This file is read by this test, and the name in the
+        // assertion below is itself a match: the first version of this test
+        // failed on its own message.
+        let source = source.split("\n#[cfg(test)]").next().unwrap();
+        let update_at = source
+            .find("fn update(&mut self")
+            .expect("update exists");
+        let drawing = &source[update_at..];
+        assert!(
+            !drawing.contains("self.watch.is_watching()"),
+            "the draw path asks whether the monitor is running so it can wake \
+             on a timer. An idle window then never stops drawing: this cost \
+             2.1 frames a second on every tab. The monitor thread asks for a \
+             repaint when it has something to report."
         );
     }
 

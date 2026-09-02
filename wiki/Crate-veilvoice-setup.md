@@ -91,7 +91,7 @@ you who makes each one, and installs none of them unless you say so.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>169 lines"])
-    n_companions["companions.rs<br/>771 lines"]
+    n_companions["companions.rs<br/>855 lines"]
     n_install["install.rs<br/>568 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
     n_volumes --> n_companions
@@ -107,7 +107,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`companions.rs`|File-veilvoice-setup-companions]] | 771 | Optional third-party software, detected rather than assumed. |
+| [[`companions.rs`|File-veilvoice-setup-companions]] | 855 | Optional third-party software, detected rather than assumed. |
 | [[`install.rs`|File-veilvoice-setup-install]] | 568 | Put this program somewhere the system can find it. |
 | [[`lib.rs`|File-veilvoice-setup-lib]] | 169 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [[`volumes.rs`|File-veilvoice-setup-volumes]] | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |

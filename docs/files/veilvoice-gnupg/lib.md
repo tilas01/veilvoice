@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gnupg/src/lib.rs`
 
-[`veilvoice-gnupg`](../../../crates/veilvoice-gnupg/README.md) &middot; 860 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs)
+[`veilvoice-gnupg`](../../../crates/veilvoice-gnupg/README.md) &middot; 863 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs)
 
 ## Contents
 
@@ -91,32 +91,32 @@ part that is easiest to skip.
 
 ## What this file contains
 
-860 lines defining **17 functions** (11 public), **6 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+863 lines defining **17 functions** (11 public), **6 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Error` (line 75) -- Something that stopped GnuPG being asked at all.
-- `enum Outcome` (line 111) -- What GnuPG made of a signature.
-- `struct Run` (line 150) -- One run of GnuPG, and what it said.
-- `enum Imported` (line 173) -- Whether the key was already in the keyring.
-- `struct Import` (line 182) -- The key, in the keyring.
-- `struct Gnupg` (line 229) -- A GnuPG to run, and the keyring to run it against.
+- `enum Outcome` (line 114) -- What GnuPG made of a signature.
+- `struct Run` (line 153) -- One run of GnuPG, and what it said.
+- `enum Imported` (line 176) -- Whether the key was already in the keyring.
+- `struct Import` (line 185) -- The key, in the keyring.
+- `struct Gnupg` (line 232) -- A GnuPG to run, and the keyring to run it against.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Outcome::is_good` (line 129) -- Whether this is the one outcome that means the file is as published.
-- `Outcome::plainly` (line 134) -- One line saying what happened, in words a reader can act on.
-- `Import::note` (line 198) -- What was done to the reader's keyring, and how to undo it.
-- `Gnupg::found` (line 236) -- The GnuPG on PATH, if there is one.
+- `Outcome::is_good` (line 132) -- Whether this is the one outcome that means the file is as published.
+- `Outcome::plainly` (line 137) -- One line saying what happened, in words a reader can act on.
+- `Import::note` (line 201) -- What was done to the reader's keyring, and how to undo it.
+- `Gnupg::found` (line 239) -- The GnuPG on PATH, if there is one.
   - reaches: `on_path`
-- `Gnupg::at` (line 241) -- A particular GnuPG, using the keyring its owner already has.
-- `Gnupg::in_home` (line 252) -- The same GnuPG, against a keyring of its own.
-- `Gnupg::program` (line 258) -- Where this GnuPG is.
-- `Gnupg::import` (line 289) -- Put a key into the keyring this GnuPG is using.
+- `Gnupg::at` (line 244) -- A particular GnuPG, using the keyring its owner already has.
+- `Gnupg::in_home` (line 255) -- The same GnuPG, against a keyring of its own.
+- `Gnupg::program` (line 261) -- Where this GnuPG is.
+- `Gnupg::import` (line 292) -- Put a key into the keyring this GnuPG is using.
   - reaches: `base`, `field`, `same_fingerprint`, `status_lines`, `fields`
-- `Gnupg::verify` (line 341) -- Check a detached signature with this machine's GnuPG.
+- `Gnupg::verify` (line 344) -- Check a detached signature with this machine's GnuPG.
   - reaches: `base`, `field`, `fields`, `same_fingerprint`, `status_lines`
-- `commands` (line 478) -- The commands a reader can type to get this answer without VeilVoice.
+- `commands` (line 481) -- The commands a reader can type to get this answer without VeilVoice.
 
 ## What calls what
 
@@ -139,22 +139,22 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_fmt["Error::fmt<br/>line 83"]
-    n_on_path["on_path<br/>line 96"]
-    n_is_good(["Outcome::is_good<br/>line 129"])
-    n_plainly(["Outcome::plainly<br/>line 134"])
-    n_note(["Import::note<br/>line 198"])
-    n_found(["Gnupg::found<br/>line 236"])
-    n_at(["Gnupg::at<br/>line 241"])
-    n_in_home(["Gnupg::in_home<br/>line 252"])
-    n_program(["Gnupg::program<br/>line 258"])
-    n_base["Gnupg::base<br/>line 267"]
-    n_import(["Gnupg::import<br/>line 289"])
-    n_verify(["Gnupg::verify<br/>line 341"])
-    n_status_lines["status_lines<br/>line 419"]
-    n_field["field<br/>line 432"]
-    n_fields["fields<br/>line 449"]
-    n_same_fingerprint["same_fingerprint<br/>line 462"]
-    n_commands(["commands<br/>line 478"])
+    n_on_path["on_path<br/>line 99"]
+    n_is_good(["Outcome::is_good<br/>line 132"])
+    n_plainly(["Outcome::plainly<br/>line 137"])
+    n_note(["Import::note<br/>line 201"])
+    n_found(["Gnupg::found<br/>line 239"])
+    n_at(["Gnupg::at<br/>line 244"])
+    n_in_home(["Gnupg::in_home<br/>line 255"])
+    n_program(["Gnupg::program<br/>line 261"])
+    n_base["Gnupg::base<br/>line 270"]
+    n_import(["Gnupg::import<br/>line 292"])
+    n_verify(["Gnupg::verify<br/>line 344"])
+    n_status_lines["status_lines<br/>line 422"]
+    n_field["field<br/>line 435"]
+    n_fields["fields<br/>line 452"]
+    n_same_fingerprint["same_fingerprint<br/>line 465"]
+    n_commands(["commands<br/>line 481"])
     n_field --> n_fields
     n_found --> n_on_path
     n_import --> n_base
@@ -167,22 +167,22 @@ flowchart TD
     n_verify --> n_same_fingerprint
     n_verify --> n_status_lines
     click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L83" "open the source"
-    click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L96" "open the source"
-    click n_is_good href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L129" "open the source"
-    click n_plainly href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L134" "open the source"
-    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L198" "open the source"
-    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L236" "open the source"
-    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L241" "open the source"
-    click n_in_home href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L252" "open the source"
-    click n_program href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L258" "open the source"
-    click n_base href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L267" "open the source"
-    click n_import href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L289" "open the source"
-    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L341" "open the source"
-    click n_status_lines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L419" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L432" "open the source"
-    click n_fields href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L449" "open the source"
-    click n_same_fingerprint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L462" "open the source"
-    click n_commands href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L478" "open the source"
+    click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L99" "open the source"
+    click n_is_good href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L132" "open the source"
+    click n_plainly href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L137" "open the source"
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L201" "open the source"
+    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L239" "open the source"
+    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L244" "open the source"
+    click n_in_home href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L255" "open the source"
+    click n_program href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L261" "open the source"
+    click n_base href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L270" "open the source"
+    click n_import href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L292" "open the source"
+    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L344" "open the source"
+    click n_status_lines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L422" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L435" "open the source"
+    click n_fields href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L452" "open the source"
+    click n_same_fingerprint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L465" "open the source"
+    click n_commands href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L481" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_good,n_plainly,n_note,n_found,n_at,n_in_home,n_program,n_import,n_verify,n_commands entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -199,27 +199,27 @@ flowchart TD
 |---|---:|---|
 | `Error` <sub>pub enum</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L75) | Something that stopped GnuPG being asked at all. |
 | `Error::fmt` <sub>fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L83) |  |
-| `on_path` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L96) | Where GnuPG is, if it is on PATH. |
-| `Outcome` <sub>pub enum</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L111) | What GnuPG made of a signature. |
-| `Outcome::is_good` <sub>pub fn</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L129) | Whether this is the one outcome that means the file is as published. |
-| `Outcome::plainly` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L134) | One line saying what happened, in words a reader can act on. |
-| `Run` <sub>pub struct</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L150) | One run of GnuPG, and what it said. |
-| `Imported` <sub>pub enum</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L173) | Whether the key was already in the keyring. |
-| `Import` <sub>pub struct</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L182) | The key, in the keyring. |
-| `Import::note` <sub>pub fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L198) | What was done to the reader's keyring, and how to undo it. |
-| `Gnupg` <sub>pub struct</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L229) | A GnuPG to run, and the keyring to run it against. |
-| `Gnupg::found` <sub>pub fn</sub> | [236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L236) | The GnuPG on PATH, if there is one. |
-| `Gnupg::at` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L241) | A particular GnuPG, using the keyring its owner already has. |
-| `Gnupg::in_home` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L252) | The same GnuPG, against a keyring of its own. |
-| `Gnupg::program` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L258) | Where this GnuPG is. |
-| `Gnupg::base` <sub>fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L267) | The arguments every call here shares. |
-| `Gnupg::import` <sub>pub fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L289) | Put a key into the keyring this GnuPG is using. |
-| `Gnupg::verify` <sub>pub fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L341) | Check a detached signature with this machine's GnuPG. |
-| `status_lines` <sub>fn</sub> | [419](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L419) | The GNUPG: lines out of what GnuPG printed, prefix removed. |
-| `field` <sub>fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L432) | The rest of the first status line whose first word is keyword. |
-| `fields` <sub>fn</sub> | [449](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L449) | Every status line whose first word is keyword. |
-| `same_fingerprint` <sub>fn</sub> | [462](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L462) | Whether two fingerprints are the same, ignoring case and spacing. |
-| `commands` <sub>pub fn</sub> | [478](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L478) | The commands a reader can type to get this answer without VeilVoice. |
+| `on_path` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L99) | Where GnuPG is, if it is on PATH. |
+| `Outcome` <sub>pub enum</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L114) | What GnuPG made of a signature. |
+| `Outcome::is_good` <sub>pub fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L132) | Whether this is the one outcome that means the file is as published. |
+| `Outcome::plainly` <sub>pub fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L137) | One line saying what happened, in words a reader can act on. |
+| `Run` <sub>pub struct</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L153) | One run of GnuPG, and what it said. |
+| `Imported` <sub>pub enum</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L176) | Whether the key was already in the keyring. |
+| `Import` <sub>pub struct</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L185) | The key, in the keyring. |
+| `Import::note` <sub>pub fn</sub> | [201](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L201) | What was done to the reader's keyring, and how to undo it. |
+| `Gnupg` <sub>pub struct</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L232) | A GnuPG to run, and the keyring to run it against. |
+| `Gnupg::found` <sub>pub fn</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L239) | The GnuPG on PATH, if there is one. |
+| `Gnupg::at` <sub>pub fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L244) | A particular GnuPG, using the keyring its owner already has. |
+| `Gnupg::in_home` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L255) | The same GnuPG, against a keyring of its own. |
+| `Gnupg::program` <sub>pub fn</sub> | [261](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L261) | Where this GnuPG is. |
+| `Gnupg::base` <sub>fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L270) | The arguments every call here shares. |
+| `Gnupg::import` <sub>pub fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L292) | Put a key into the keyring this GnuPG is using. |
+| `Gnupg::verify` <sub>pub fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L344) | Check a detached signature with this machine's GnuPG. |
+| `status_lines` <sub>fn</sub> | [422](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L422) | The GNUPG: lines out of what GnuPG printed, prefix removed. |
+| `field` <sub>fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L435) | The rest of the first status line whose first word is keyword. |
+| `fields` <sub>fn</sub> | [452](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L452) | Every status line whose first word is keyword. |
+| `same_fingerprint` <sub>fn</sub> | [465](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L465) | Whether two fingerprints are the same, ignoring case and spacing. |
+| `commands` <sub>pub fn</sub> | [481](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L481) | The commands a reader can type to get this answer without VeilVoice. |
 
 ---
 

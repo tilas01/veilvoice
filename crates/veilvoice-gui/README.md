@@ -95,14 +95,14 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>86 lines"])
-    n_main(["main.rs<br/>179 lines"])
-    n_app["app.rs<br/>2458 lines"]
+    n_main(["main.rs<br/>289 lines"])
+    n_app["app.rs<br/>2520 lines"]
     n_autolock["autolock.rs<br/>326 lines"]
     n_crashlog["crashlog.rs<br/>266 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
     n_group["group.rs<br/>1668 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
-    n_layout["layout.rs<br/>247 lines"]
+    n_layout["layout.rs<br/>280 lines"]
     n_monitor["monitor.rs<br/>414 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
@@ -116,7 +116,7 @@ flowchart TD
     n_storage["storage.rs<br/>659 lines"]
     n_theme["theme.rs<br/>783 lines"]
     n_updates["updates.rs<br/>246 lines"]
-    n_verify["verify.rs<br/>1237 lines"]
+    n_verify["verify.rs<br/>1580 lines"]
     n_watchfeed["watchfeed.rs<br/>381 lines"]
     n_app --> n_crashlog
     n_app --> n_dialog
@@ -172,6 +172,7 @@ flowchart TD
     n_theme --> n_palettes
     n_updates --> n_theme
     n_verify --> n_dialog
+    n_verify --> n_layout
     n_verify --> n_theme
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" "open the source"
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" "open the source"
@@ -205,15 +206,15 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2458 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2520 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 326 | Locking the window again after a period of no use. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 266 | Make a failure that produces no output produce some. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1668 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
-| [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 247 | Centring a row of widgets, which egui does not do by nesting. |
+| [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 86 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
-| [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 179 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
+| [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 289 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 414 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
@@ -227,7 +228,7 @@ flowchart TD
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 783 | Colour schemes for the desktop app. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
-| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1237 | The verify tab: drop a download on the window and be told what it is. |
+| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1580 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 381 | The device monitor, moved off the thread that paints. |
 
 ## Public items
@@ -257,6 +258,7 @@ flowchart TD
 | `struct Integrity` | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | The integrity record as the window drives it. |
 | `fn record_path` | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | Where the record is kept, beside the app lock and under the same rules. |
 | `fn centred_row` | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | Draw a row of widgets centred in the width available. |
+| `fn column` | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | A fixed-width column inside a row, so what follows it starts at one x. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | Crate version string, surfaced in the About panel. |
 | `enum Style` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | Where the monitor sits, or whether it is shown at all. |
 | `struct Levels` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | The smoothed levels the monitor and the live tab both draw. |

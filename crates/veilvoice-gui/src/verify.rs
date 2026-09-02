@@ -67,6 +67,7 @@
 //! asks your own GnuPG the same question and shows you its answer.
 
 use crate::layout::column;
+use veilvoice_gnupg::backend::{self, Choice as Checker, Survey};
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
 use std::path::{Path, PathBuf};
@@ -176,7 +177,38 @@ pub struct Verify {
     /// loop that drew the button is over. Without it a chosen file lands in
     /// whichever slot happened to be drawn when the dialog closed.
     choosing_for: Option<Slot>,
+
+    /// Which OpenPGP implementation the reader chose, if any.
+    ///
+    /// `None` is not "decide for me": it is the ordinary state, and it means
+    /// the check built into this binary. See [`veilvoice_gnupg::backend`].
+    checker: Option<Checker>,
+    /// What is installed, once somebody has asked. `None` means nobody has.
+    ///
+    /// Not filled in at launch, because on Windows finding out whether GnuPG
+    /// is inside WSL means starting WSL, and starting a Linux distribution
+    /// because a window opened is not a thing to do.
+    survey: Option<Survey>,
+    /// When the commands were last copied, so the button can say it happened.
+    copied: Option<f64>,
 }
+
+/// How long the copy button says "copied", in seconds.
+///
+/// Long enough to read, short enough that it is clearly about the press that
+/// just happened rather than a state the button is in.
+const COPIED_FOR: f64 = 2.5;
+
+/// Where every release, and the files published beside it, actually are.
+///
+/// The verify tab asks for a hash list and a signature and used to say
+/// nothing about where a person gets one.
+const RELEASES_PAGE: &str = "https://github.com/tilas01/veilvoice/releases/latest";
+
+/// The signing key, in the repository as well as in each release, so it can be
+/// fetched from somewhere other than the release being checked.
+const SIGNING_KEY_IN_REPO: &str =
+    "https://github.com/tilas01/veilvoice/blob/main/website/assets/veilvoice-signing-key.asc";
 
 /// The width the slot labels are given, so the file names beside them start
 /// level. Wide enough for `SHA256SUMS.asc`, which is the longest.
@@ -429,6 +461,33 @@ impl Verify {
             .color(p::muted())
             .small(),
         );
+
+        // Where the three files come from.
+        //
+        // The tab asks for a hash list and a signature and, until this was
+        // here, never said where a person gets one. They are published beside
+        // every archive, and the answer is one line.
+        ui.add_space(8.0);
+        ui.label(
+            RichText::new("Where these files come from")
+                .color(p::blue())
+                .small(),
+        );
+        ui.label(
+            RichText::new(
+                "`SHA256SUMS` and `SHA256SUMS.asc` are published beside every archive \
+                 on the releases page, and so is the signing key, as \
+                 `veilvoice-signing-key.asc`. The same key is in this repository. \
+                 Download all three from the same release you are checking.",
+            )
+            .color(p::muted())
+            .small(),
+        );
+        ui.horizontal(|ui| {
+            ui.hyperlink_to("the releases page", RELEASES_PAGE);
+            ui.label(RichText::new("and").color(p::muted()).small());
+            ui.hyperlink_to("the signing key in the repository", SIGNING_KEY_IN_REPO);
+        });
     }
 
     /// The rectangle that lights up while files are over the window.
@@ -576,16 +635,45 @@ impl Verify {
         let key = sums.with_file_name("veilvoice-signing-key.asc");
         let key = key.is_file().then_some(key);
         let commands = veilvoice_gnupg::commands(&sums, &signature, key.as_deref());
-        let script = commands.join("\n");
 
         ui.add_space(4.0);
+        let backend = backend::resolve(self.checker, self.survey.as_ref().unwrap_or(&Survey::default()));
         for line in &commands {
-            ui.label(RichText::new(line).color(p::fg()).monospace());
+            ui.label(RichText::new(backend.spell(line)).color(p::fg()).monospace());
         }
         ui.add_space(4.0);
-        if ui.button("copy these commands").clicked() {
-            ui.ctx().copy_text(script);
+
+        // The copy button answers. A button that does nothing visible when
+        // pressed leaves somebody pressing it again to find out whether it
+        // worked, and a clipboard is not somewhere they can easily look.
+        let now = ui.input(|i| i.time);
+        let just_copied = self
+            .copied
+            .is_some_and(|at| now - at < COPIED_FOR);
+        ui.horizontal(|ui| {
+            if ui.button("copy these commands").clicked() {
+                let script: Vec<String> =
+                    commands.iter().map(|line| backend.spell(line)).collect();
+                ui.ctx().copy_text(script.join("\n"));
+                self.copied = Some(now);
+            }
+            if just_copied {
+                ui.label(
+                    RichText::new(format!(
+                        "copied, {} lines, ready to paste into a terminal",
+                        commands.len()
+                    ))
+                    .color(p::green())
+                    .small(),
+                );
+            }
+        });
+        if just_copied {
+            // Keep drawing until the message has had its time, or it would sit
+            // there until something else caused a repaint.
+            ui.ctx().request_repaint_after(std::time::Duration::from_millis(250));
         }
+
         ui.label(
             RichText::new(
                 "Worth doing. VeilVoice checked the signature with a key built into \
@@ -596,6 +684,146 @@ impl Verify {
             .color(p::muted())
             .small(),
         );
+
+        self.checker_section(ui);
+    }
+
+    /// Which implementation checks the signature, and the choice behind it.
+    ///
+    /// Three of them, and the difference is the whole point: the built-in
+    /// check is made by a program that came out of the download it is
+    /// checking, and the others are not. See [`veilvoice_gnupg::backend`] for
+    /// why an installed GnuPG is still not used until it is chosen.
+    fn checker_section(&mut self, ui: &mut Ui) {
+        ui.add_space(12.0);
+        ui.label(
+            RichText::new("Which program does the checking")
+                .color(p::blue())
+                .small(),
+        );
+
+        let survey = self.survey.clone().unwrap_or_default();
+        let backend = backend::resolve(self.checker, &survey);
+        ui.label(
+            RichText::new(backend.plainly())
+                .color(if backend.is_second_opinion() {
+                    p::green()
+                } else {
+                    p::muted()
+                })
+                .small(),
+        );
+
+        ui.horizontal(|ui| {
+            for choice in Checker::ALL {
+                let usable = survey.supports(*choice) || *choice == Checker::BuiltIn;
+                let chosen = self.checker == Some(*choice);
+                let label = match choice {
+                    Checker::BuiltIn => "VeilVoice's own check",
+                    Checker::Native => "GnuPG on this machine",
+                    Checker::Wsl => "GnuPG inside WSL",
+                };
+                if ui
+                    .add_enabled(usable, egui::SelectableLabel::new(chosen, label))
+                    .clicked()
+                {
+                    self.checker = Some(*choice);
+                }
+            }
+            if ui.button("look again").clicked() {
+                let mut fresh = backend::look();
+                // Asking WSL what it has means starting WSL, so it happens
+                // here, when somebody pressed a button, and not at launch.
+                if let Some(wsl) = fresh.wsl.as_mut() {
+                    wsl.gpg = backend::look_in_wsl(&wsl.program);
+                }
+                self.survey = Some(fresh);
+            }
+        });
+
+        if self.survey.is_none() {
+            ui.label(
+                RichText::new(
+                    "Nothing has been looked for yet. \"look again\" checks this \
+                     machine, and on Windows asks WSL as well, which starts it.",
+                )
+                .color(p::muted())
+                .small(),
+            );
+            return;
+        }
+
+        // What to do when the one they want is not here.
+        if !survey.supports(Checker::Native) {
+            if let Some(companion) =
+                veilvoice_setup::companions::ALL.iter().find(|c| c.key == "gnupg")
+            {
+                match companion.offer() {
+                    veilvoice_setup::companions::Offer::Command { argv, via, .. } => {
+                        ui.label(
+                            RichText::new(format!(
+                                "GnuPG is not on this machine. To install it, via {via}:"
+                            ))
+                            .color(p::muted())
+                            .small(),
+                        );
+                        self.copyable_command(ui, &argv.join(" "));
+                    }
+                    other => {
+                        ui.label(
+                            RichText::new(format!(
+                                "GnuPG is not on this machine. {}",
+                                match other {
+                                    veilvoice_setup::companions::Offer::NoKnownRoute(why) => why,
+                                    veilvoice_setup::companions::Offer::Page(page) =>
+                                        format!("It can be downloaded from {page}."),
+                                    _ => "Install it the way you install anything else \
+                                          on this system."
+                                        .to_string(),
+                                }
+                            ))
+                            .color(p::muted())
+                            .small(),
+                        );
+                    }
+                }
+            }
+        }
+
+        if let Some(wsl) = survey.wsl.as_ref() {
+            if wsl.gpg.is_none() {
+                ui.label(
+                    RichText::new(
+                        "WSL is here and GnuPG inside it is not. To install it there:",
+                    )
+                    .color(p::muted())
+                    .small(),
+                );
+                self.copyable_command(ui, &backend::install_in_wsl().join(" "));
+                ui.label(
+                    RichText::new(
+                        "That needs root inside the distribution. VeilVoice does not \
+                         ask for a password and will not run it: run it in a terminal, \
+                         where you can see what you are approving.",
+                    )
+                    .color(p::muted())
+                    .small(),
+                );
+            }
+        }
+    }
+
+    /// One command, shown as it would be typed, with a button that copies it
+    /// and says it did.
+    fn copyable_command(&mut self, ui: &mut Ui, command: &str) {
+        let now = ui.input(|i| i.time);
+        ui.horizontal(|ui| {
+            ui.label(RichText::new(command).color(p::fg()).monospace());
+            if ui.small_button("copy").clicked() {
+                ui.ctx().copy_text(command.to_string());
+                self.copied = Some(now);
+            }
+        });
     }
 
     /// The answer, in the colour it deserves.
@@ -1104,6 +1332,29 @@ mod tests {
             Some(Err(Error::Io(why))) => assert!(why.contains("without answering"), "{why}"),
             other => panic!("expected a reported failure, got {other:?}"),
         }
+    }
+
+    /// The signing key this tab points at is a file that exists here.
+    ///
+    /// A link to a key is worth exactly as much as the key being at the other
+    /// end of it. The path is the one `veilvoice-check` compiles the key in
+    /// from, so if the file moves, both this link and that include break
+    /// together rather than the link rotting quietly.
+    #[test]
+    fn the_signing_key_link_points_at_the_key_that_is_compiled_in() {
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../website/assets/veilvoice-signing-key.asc"
+        );
+        assert!(
+            std::path::Path::new(path).is_file(),
+            "the signing key is not at {path}, so the link on the verify tab \
+             points at nothing"
+        );
+        assert!(
+            SIGNING_KEY_IN_REPO.ends_with("website/assets/veilvoice-signing-key.asc"),
+            "the link and the file have parted company: {SIGNING_KEY_IN_REPO}"
+        );
     }
 
     /// The GnuPG section is drawn once, not once for each file slot.
