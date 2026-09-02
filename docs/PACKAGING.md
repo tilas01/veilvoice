@@ -48,8 +48,42 @@ database and so cannot see that `cargo`, `gcc`, `alsa`, `gtk+-3.0` and
 by hand before the flag was used. It needed `--nocheck`, so the spec's own
 `%check` stanza has never run as part of an RPM build, although the identical
 command runs inside the Debian build. It has not been installed with `rpm -i`,
-because doing that on a Debian machine tests nothing, and `rpmlint` has not
-been run. Nothing has been uploaded anywhere.
+because doing that on a Debian machine tests nothing. Nothing has been uploaded
+anywhere.
+
+#### rpmlint, and what it found
+
+`rpmlint` 2.10 has now been run over both binary packages and the source RPM.
+It found two real defects, both now fixed, and eighteen reports that are its
+default configuration disagreeing with current RPM practice rather than
+anything wrong with this spec. Both halves are listed, because a tool's output
+quoted selectively is worth nothing.
+
+**Fixed.** Four `description-line-too-long` errors: two lines of `%description`
+were exactly 80 characters against a limit of 79. And, separately, `rpmbuild`
+itself warned `bogus date in %changelog` for `Sun Aug 31 2026`, which was a
+Monday. Both are the kind of thing a distribution's review would bounce, and
+neither was visible until the package was built and linted.
+
+**Not fixed, with the reason.** These are reported against a default
+configuration that predates, or disagrees with, how RPM packages are written
+now. Each is a judgement, and a Fedora reviewer is who would settle it:
+
+| Report | Why it stands |
+|---|---|
+| `no-group-tag` ×3 | `Group:` is obsolete and Fedora dropped it. Adding one to satisfy a linter would be adding a tag no packaging guide asks for. |
+| `no-buildroot-tag` | `BuildRoot:` has been unnecessary since RPM 4.6. |
+| `no-packager-tag` ×3 | `Packager:` identifies the build system rather than the software, and is set by whoever builds, not by the spec. |
+| `invalid-license GPL-3.0-or-later` ×3 | That is the correct SPDX identifier, and SPDX is what Fedora now requires. The linter's bundled list is what is out of date. |
+| `no-signature` ×3 | True, and expected: these were built locally. Release artefacts are signed by the release job. |
+| `manpage-not-compressed bz2` ×3 | The pages are gzipped, which is what these distributions use. |
+| `no-dependency-on locales-gui` | A heuristic for packages that ship translations. This one ships none. |
+| `requires-on-release` | The `-gui` subpackage requires the exact release of the base package, deliberately: they are built together and share a version. |
+
+What this does not settle is the thing the whole section is about. `rpmlint`
+reads a package; it does not install one, and it ran on Ubuntu against packages
+built on Ubuntu. It is one more check than there was, and it is not a Fedora
+build.
 
 ### What the Debian build actually proved, and what it did not
 
