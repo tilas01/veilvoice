@@ -12,11 +12,111 @@ Nothing yet. The next release goes here.
 
 ## v0.1.16
 
-A verifier that finds the release you are standing in and no longer calls a
-genuine one unverified, a verify page that can now actually verify, buttons
-that line up with the buttons beside them, pictures that grow rather than
-cutting their words, no em dash left anywhere in the repository, and the
-audit's own arithmetic checked by a machine instead of by hand.
+A window that costs nothing when you are not using it, opens big enough to
+read, and no longer says everything three times on its verify tab. A shell
+script that checks a release without trusting VeilVoice to check it. A
+verifier that finds the release you are standing in and no longer calls a
+genuine one unverified. Screenshots that can be taken on any machine. And a
+guide that describes the application that actually ships.
+
+### An idle window costs nothing now
+
+- The window drew 2.1 frames a second on every tab, for ever, with the
+  animations off and nobody touching it, and spent 7 to 9 per cent of a
+  processor core doing it. It now draws none and spends 0.2. The microphone
+  monitor sent an update on every poll whether or not anything had changed,
+  and the window woke twice a second to ask whether one had arrived. The
+  thread with the news asks for the redraw now, and only when there is news.
+
+- Measured, not guessed. The desktop application can be run on a machine with
+  no screen for the first time, so this is a number: twenty seconds a tab, all
+  nine tabs, frames counted by the program and processor time read from the
+  system. `VEILVOICE_FRAME_LOG=1` prints frames per second for anybody
+  diagnosing a slow machine.
+
+- The window opens at a size that fits its own panels. It opened at 1100 by
+  720 always, and the longest panel is 1288 pixels tall, so it opened with its
+  bottom third missing. It now opens at 1400 by 1000, reduced on the first
+  frame to whatever the monitor can actually show, leaving room for a title
+  bar and a task bar. Dragging it smaller still works exactly as before.
+
+### The verify tab
+
+- It drew its GnuPG section once for each of the three file rows, so the tab
+  carried three copies of the same heading, paragraph and hint. One now.
+
+- The three `choose…` buttons sat at three different places, because the
+  labels beside them were padded with spaces to fake a column. That aligns
+  nothing in a proportional font. It is the second time this habit has been
+  taken out of the application, so the fix now lives in one place that both
+  callers use.
+
+- It says which program is doing the checking, and lets you choose: this
+  binary's own code, a GnuPG on the machine, or a GnuPG inside WSL on Windows.
+  Nothing external runs until you pick it, even if it was installed long
+  before VeilVoice was. Where one is missing, the command that installs it is
+  shown, with a copy button that says it copied.
+
+- It says where `SHA256SUMS`, its signature and the signing key come from, and
+  links to the releases page and to the key in this repository. It had been
+  asking for three files without ever saying where anybody gets them.
+
+### Checking a release without trusting VeilVoice to do it
+
+- `veilvoice verify` explains how a release is checked, which parts are built
+  into the binary and which are not, and what GnuPG adds that this project
+  cannot add for itself.
+
+- `veilvoice verify --script` writes a short shell script that does the whole
+  check with `gpg` and the system hash tool and nothing from this project.
+  That is the point of it: the program telling you a download is genuine came
+  out of that download.
+
+- The script refuses a good signature by the wrong key. GnuPG calls a
+  signature good when any key in your keyring made it, and a substituted
+  release is exactly that. Checked by signing a hash list with a second key
+  and confirming the script says no while `gpg --verify` says "Good
+  signature". Run against the published v0.1.15: a genuine release passes, a
+  tampered hash, a tampered signature and a wrong key are each refused by
+  name, and a folder with none of the release in it says there was nothing to
+  check rather than reporting a mismatch.
+
+- GnuPG is in the companion list, so `veilvoice companions --install gnupg`
+  prints the command for this machine. VeilVoice still never runs an
+  installer.
+
+### Screenshots, taken on any machine
+
+- The nine window captures no longer need one particular Windows computer.
+  `tools/shots/gui.sh` takes them on Linux with no display attached, and the
+  pictures come out the same size by construction rather than by cropping
+  afterwards.
+
+- Each picture is trimmed to what it contains. There is no one window size
+  that suits all nine tabs: 1000 tall cuts the group panel in half, and 1320
+  shows the monitor tab as a strip of content above nine hundred pixels of
+  nothing. Eight come out identical and the ninth is taller because its panel
+  genuinely is.
+
+- The width and height on each `<img>` are read from the file now instead of
+  being typed once. They said 1371 by 988 and the pictures are not that size,
+  which makes a page jump as it loads rather than reserving the right room.
+
+- The captures are taken under a configuration made moments earlier and thrown
+  away after, so no setting or policy belonging to the person running the
+  script applies, and the animated mark is stilled so two photographs of the
+  same tab do not differ.
+
+### The guide describes the application that exists
+
+- It said "Five tabs" and documented five. There are nine, and the four
+  missing were group, verify, settings and install, including the tab this
+  project points people to before running a download. All four are written up,
+  and a test fails the build for any tab without a section.
+
+- A new section says what the three programs are for, which parts are inside
+  them, and how anything reaches the network at all given that none of them
+  contains a network client.
 
 ### The verify page can verify
 

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gnupg/src/backend.rs`
 
-[`veilvoice-gnupg`](../../../crates/veilvoice-gnupg/README.md) &middot; 465 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs)
+[`veilvoice-gnupg`](../../../crates/veilvoice-gnupg/README.md) &middot; 469 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs)
 
 ## Contents
 
@@ -65,7 +65,7 @@ machine.
 
 ## What this file contains
 
-465 lines defining **12 functions** (11 public), **5 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+469 lines defining **12 functions** (11 public), **5 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -82,13 +82,13 @@ machine.
 - `Survey::supports` (line 105) -- Whether a choice could actually be used right now.
 - `Because::plainly` (line 146) -- What to tell the reader.
 - `resolve` (line 172) -- The checker to use, from what was chosen and what is here.
-- `Backend::is_second_opinion` (line 204) -- Whether an OpenPGP implementation other than this one is doing the work.
-- `Backend::plainly` (line 209) -- A one-line description for a reader.
-- `Backend::spell` (line 223) -- How a command written for gpg is spelled for this backend.
-- `look` (line 245) -- What is here, without running anything.
+- `Backend::is_second_opinion` (line 206) -- Whether an OpenPGP implementation other than this one is doing the work.
+- `Backend::plainly` (line 211) -- A one-line description for a reader.
+- `Backend::spell` (line 225) -- How a command written for gpg is spelled for this backend.
+- `look` (line 247) -- What is here, without running anything.
   - reaches: `wsl_program`
-- `look_in_wsl` (line 273) -- Ask the WSL distribution where its gpg is.
-- `install_in_wsl` (line 291) -- The command that installs GnuPG inside the WSL distribution.
+- `look_in_wsl` (line 275) -- Ask the WSL distribution where its gpg is.
+- `install_in_wsl` (line 293) -- The command that installs GnuPG inside the WSL distribution.
 
 ## What calls what
 
@@ -115,26 +115,26 @@ flowchart TD
     n_supports(["Survey::supports<br/>line 105"])
     n_plainly(["Because::plainly<br/>line 146"])
     n_resolve(["resolve<br/>line 172"])
-    n_is_second_opinion(["Backend::is_second_opinion<br/>line 204"])
-    n_plainly(["Backend::plainly<br/>line 209"])
-    n_spell(["Backend::spell<br/>line 223"])
-    n_look(["look<br/>line 245"])
-    n_wsl_program["wsl_program<br/>line 253"]
-    n_look_in_wsl(["look_in_wsl<br/>line 273"])
-    n_install_in_wsl(["install_in_wsl<br/>line 291"])
+    n_is_second_opinion(["Backend::is_second_opinion<br/>line 206"])
+    n_plainly(["Backend::plainly<br/>line 211"])
+    n_spell(["Backend::spell<br/>line 225"])
+    n_look(["look<br/>line 247"])
+    n_wsl_program["wsl_program<br/>line 255"]
+    n_look_in_wsl(["look_in_wsl<br/>line 275"])
+    n_install_in_wsl(["install_in_wsl<br/>line 293"])
     n_look --> n_wsl_program
     click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L62" "open the source"
     click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L71" "open the source"
     click n_supports href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L105" "open the source"
     click n_plainly href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L146" "open the source"
     click n_resolve href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L172" "open the source"
-    click n_is_second_opinion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L204" "open the source"
-    click n_plainly href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L209" "open the source"
-    click n_spell href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L223" "open the source"
-    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L245" "open the source"
-    click n_wsl_program href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L253" "open the source"
-    click n_look_in_wsl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L273" "open the source"
-    click n_install_in_wsl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L291" "open the source"
+    click n_is_second_opinion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L206" "open the source"
+    click n_plainly href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L211" "open the source"
+    click n_spell href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L225" "open the source"
+    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L247" "open the source"
+    click n_wsl_program href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L255" "open the source"
+    click n_look_in_wsl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L275" "open the source"
+    click n_install_in_wsl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L293" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_from_key,n_supports,n_plainly,n_resolve,n_is_second_opinion,n_plainly,n_spell,n_look,n_look_in_wsl,n_install_in_wsl entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -158,13 +158,13 @@ flowchart TD
 | `Because` <sub>pub enum</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L135) | Why the built-in check is the one running. |
 | `Because::plainly` <sub>pub fn</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L146) | What to tell the reader. |
 | `resolve` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L172) | The checker to use, from what was chosen and what is here. |
-| `Backend::is_second_opinion` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L204) | Whether an OpenPGP implementation other than this one is doing the work. |
-| `Backend::plainly` <sub>pub fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L209) | A one-line description for a reader. |
-| `Backend::spell` <sub>pub fn</sub> | [223](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L223) | How a command written for gpg is spelled for this backend. |
-| `look` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L245) | What is here, without running anything. |
-| `wsl_program` <sub>fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L253) | wsl.exe, if this is Windows and it is installed. |
-| `look_in_wsl` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L273) | Ask the WSL distribution where its gpg is. |
-| `install_in_wsl` <sub>pub fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L291) | The command that installs GnuPG inside the WSL distribution. |
+| `Backend::is_second_opinion` <sub>pub fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L206) | Whether an OpenPGP implementation other than this one is doing the work. |
+| `Backend::plainly` <sub>pub fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L211) | A one-line description for a reader. |
+| `Backend::spell` <sub>pub fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L225) | How a command written for gpg is spelled for this backend. |
+| `look` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L247) | What is here, without running anything. |
+| `wsl_program` <sub>fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L255) | wsl.exe, if this is Windows and it is installed. |
+| `look_in_wsl` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L275) | Ask the WSL distribution where its gpg is. |
+| `install_in_wsl` <sub>pub fn</sub> | [293](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs#L293) | The command that installs GnuPG inside the WSL distribution. |
 
 ---
 

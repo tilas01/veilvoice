@@ -743,8 +743,7 @@ impl VeilVoiceApp {
         // Only when it actually differs, and by enough to be a real
         // difference rather than a rounding one. Sending the command
         // unconditionally would make the window flicker on every launch.
-        if now.is_none_or(|size| (size.x - want[0]).abs() > 1.0 || (size.y - want[1]).abs() > 1.0)
-        {
+        if now.is_none_or(|size| (size.x - want[0]).abs() > 1.0 || (size.y - want[1]).abs() > 1.0) {
             ctx.send_viewport_cmd(egui::ViewportCommand::InnerSize(egui::vec2(
                 want[0], want[1],
             )));
@@ -2159,9 +2158,7 @@ mod tests {
         // assertion below is itself a match: the first version of this test
         // failed on its own message.
         let source = source.split("\n#[cfg(test)]").next().unwrap();
-        let update_at = source
-            .find("fn update(&mut self")
-            .expect("update exists");
+        let update_at = source.find("fn update(&mut self").expect("update exists");
         let drawing = &source[update_at..];
         assert!(
             !drawing.contains("self.watch.is_watching()"),
@@ -2221,8 +2218,13 @@ mod tests {
     fn the_user_guide_does_not_count_the_tabs_by_hand() {
         let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
         for wrong in [
-            "Three tabs", "Four tabs", "Five tabs", "Six tabs", "Seven tabs",
-            "Eight tabs", "Ten tabs",
+            "Three tabs",
+            "Four tabs",
+            "Five tabs",
+            "Six tabs",
+            "Seven tabs",
+            "Eight tabs",
+            "Ten tabs",
         ] {
             assert!(
                 !guide.contains(wrong),

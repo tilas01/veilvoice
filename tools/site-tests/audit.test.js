@@ -122,22 +122,34 @@ function run() {
   }
 
   // The README's headline, in digits.
+  //
+  // It used to carry the range as well, as "(F-1 to F-112)", and this checked
+  // both halves. The numbers have come out of the README: they are working
+  // references for the audit and for the code, and a reader of the front page
+  // is being told an index number for a defect they cannot look up from
+  // there. So only the count is claimed, and only the count is checked.
+  //
+  // The range is still checked, in the audit's own verdict below, which is
+  // where somebody who wants a finding by number is already standing.
   const readme = read("README.md");
-  const claim = /\*\*(\d+) defects\*\*\s*\(F-1 to F-(\d+)\)/.exec(readme);
+  const claim = /\*\*(\d+) defects\*\*/.exec(readme);
   if (!claim) {
-    fail("README.md no longer states its defect count as " +
-         "'**N defects** (F-1 to F-M)', so nothing here can check it");
+    fail("README.md no longer states its defect count as '**N defects**', " +
+         "so nothing here can check it against the audit");
+  } else if (Number(claim[1]) !== writtenUp) {
+    fail(`README.md claims ${claim[1]} defects; the audit writes up ${writtenUp}`);
   } else {
-    if (Number(claim[1]) !== writtenUp) {
-      fail(`README.md claims ${claim[1]} defects; the audit writes up ${writtenUp}`);
-    } else {
-      pass(`README.md's ${claim[1]} matches the audit`);
-    }
-    if (Number(claim[2]) !== highest) {
-      fail(`README.md says the numbers run to F-${claim[2]}; they run to F-${highest}`);
-    } else {
-      pass(`README.md's range ends at F-${highest}, which is the last number used`);
-    }
+    pass(`README.md's ${claim[1]} matches the audit`);
+  }
+
+  // And no finding numbers anywhere in it. They are for the audit.
+  const numbered = readme.match(/F-\d+/g);
+  if (numbered) {
+    fail(`README.md carries finding numbers (${[...new Set(numbered)].join(", ")}). ` +
+         "Those are working references for the audit and for the code; on the " +
+         "front page they are an index into a document the reader is not in.");
+  } else {
+    pass("README.md carries no finding numbers");
   }
 
   // The audit's own verdict, which states the total in words and the range in
