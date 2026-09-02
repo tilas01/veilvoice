@@ -195,6 +195,7 @@ function run() {
   }
 
   failures += windowCaptureChecks(fail, pass);
+  failures += roadmapChecks(fail, pass);
   return failures;
 }
 
@@ -317,6 +318,70 @@ function windowCaptureChecks(fail, pass) {
   }
 
   return failures - before;
+}
+
+/**
+ * The roadmap picture says what each square is, and does not say a number.
+ *
+ * # What a grid of numbers tells a reader
+ *
+ * Nothing. Ninety-six squares each carrying an index into a document the
+ * reader is not looking at, and the one thing they want to know -- what this
+ * square is -- was the thing the square did not say. The name lives in the
+ * `<title>`, which every browser shows on hover and a screen reader reads
+ * out, and that is now all a square carries.
+ *
+ * Both halves are checked, because either one alone would pass while the
+ * picture was wrong: numbers with no names, or names with numbers still
+ * printed over them.
+ */
+function roadmapChecks(fail, pass) {
+  let failures = 0;
+  const drawing = "website/assets/roadmap.svg";
+  const full = path.join(ROOT, drawing);
+  if (!fs.existsSync(full)) {
+    fail(`${drawing} is missing, so the roadmap has no picture`);
+    return 1;
+  }
+  const svg = fs.readFileSync(full, "utf8");
+
+  const squares = (svg.match(/class="rm-square"/g) || []).length;
+  const named = (svg.match(/<title>[^<]+<\/title>/g) || []).length;
+  if (squares === 0) {
+    fail(`${drawing} has no squares, so this suite is reading it wrongly`);
+    failures += 1;
+  } else if (named < squares) {
+    fail(`${drawing} draws ${squares} squares and names ${named} of them. A ` +
+         "square with no title is a coloured box a reader cannot identify.");
+    failures += 1;
+  } else {
+    pass(`all ${squares} roadmap squares say what they are`);
+  }
+
+  // A bare number drawn as text: the index that used to sit in each square.
+  const numbered = svg.match(/>\s*\d{1,3}\s*<\/text>/g);
+  if (numbered) {
+    fail(`${drawing} prints ${numbered.length} bare number(s) as text. Those ` +
+         "are indexes into ROADMAP.md, which is not where the reader is.");
+    failures += 1;
+  } else {
+    pass("the roadmap picture prints no bare item numbers");
+  }
+
+  // The reveal, and the promise that somebody who asked for less movement
+  // gets a still picture rather than a faster animation.
+  if (!/@keyframes\s+rm-in/.test(svg)) {
+    fail(`${drawing} has no reveal animation`);
+    failures += 1;
+  } else if (!/prefers-reduced-motion/.test(svg)) {
+    fail(`${drawing} animates without honouring prefers-reduced-motion, so a ` +
+         "reader who asked their system for less movement gets it anyway");
+    failures += 1;
+  } else {
+    pass("the roadmap reveal stops for anybody who asked for less movement");
+  }
+
+  return failures;
 }
 
 module.exports = { run, name: "generated pictures, with all their words inside" };
