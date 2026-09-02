@@ -40,7 +40,7 @@ longer offered as the explanation for anything.
 
 ## The twenty-third round: what an idle window costs, measured for the first time
 
-Seven defects (F-113 to F-119). The round is different from the ones before it
+Nine defects (F-113 to F-121). The round is different from the ones before it
 in one way that matters: **the desktop application can now be run on a machine
 with no screen**, under Xvfb, so what it does when nobody is touching it is a
 number rather than a suspicion. Two of the seven were found that way and could
@@ -219,6 +219,52 @@ Found by photographing the tab and looking at it, immediately after writing it.
 That is twice in this round that reading the picture caught what reading the
 patch did not, which is the same lesson as F-113 in the same afternoon.
 
+### F-120 -- the guide credited a program the update check has never used
+
+`docs/USER_GUIDE.md`, written earlier in this same round.
+
+The new section explaining how VeilVoice reaches the network said the update
+check uses "PowerShell's web request on Windows". It does not, and never has.
+It looks for `%SystemRoot%\System32\curl.exe`, by absolute path.
+
+Two things are worth separating here. The sentence was written from reasoning
+about what a program *would* plausibly do, beside a program that says exactly
+what it does, in a repository whose recurring finding is documents that
+describe the program without anything comparing the two. It was wrong on the
+day it was written, in a section added specifically to be accurate about this.
+
+The absolute path is the part that matters and the part the guess lost.
+Windows searches the current directory before `PATH`, so a `curl.exe` sitting
+beside VeilVoice would be the program that ran; an earlier round recorded that
+exact attack against a different call. Describing the lookup as "the system's
+tool" hid the one property that makes it safe.
+
+The test compares the two rather than trusting them to agree: it reads every
+absolute path out of `find_tool` and requires the guide to mention each.
+
+**It found a second error immediately.** The first version of the guide
+mentioned only `curl`; the program falls back to `wget` at the same three
+paths, and the test failed on `/bin/wget` before the fix was a minute old.
+
+### F-121 -- the README said a release is built for nine targets, and it is eleven
+
+`README.md`, and the platform table added to `docs/USER_GUIDE.md` earlier in
+this round, which said ten.
+
+Counted against the published v0.1.15, which carries eleven archives. Neither
+number was ever right, and the guide's wrong one was written while looking at
+the workflow.
+
+A number typed into prose beside a list is a copy of that list's length. This
+document has recorded that shape four times, and produced it twice more in one
+afternoon: once in the README, which had been wrong across at least two
+releases with nothing noticing, and once in a section written to correct the
+README.
+
+The count now comes from `release.yml`, by counting the labels in the build
+matrix and the three BSD jobs that build in a VM. The only way to change the
+number in the README is to change what is actually built.
+
 ### The roadmap picture said nothing about itself
 
 Not a finding, and worth recording because it was published and looked
@@ -245,8 +291,8 @@ nobody notices until it looks broken.
 Also not a finding. The guide now carries the platform table, because "it runs
 everywhere" was doing work it could not support.
 
-Ten platforms get a signed archive. The desktop application ships for eight of
-them; the BSDs get the command line only, and the reason is specific rather
+Eleven platforms get a signed archive. The desktop application ships for eight
+of them; the BSDs get the command line only, and the reason is specific rather
 than a gap waiting to be filled: the audio library has no backend for them, so
 live capture cannot work and a window built around it would have nothing to
 listen to. Everything that operates on a file runs there exactly as it does
@@ -2589,7 +2635,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1181 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1182 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4236,7 +4282,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and nineteen defects found and fixed (F-1 to F-119), across
+**One hundred and twenty-one defects found and fixed (F-1 to F-121), across
 twenty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

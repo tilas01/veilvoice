@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-update/src/lib.rs`
 
-[[veilvoice-update|Crate-veilvoice-update]] &middot; 536 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/src/lib.rs)
+[[veilvoice-update|Crate-veilvoice-update]] &middot; 583 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/src/lib.rs)
 
 ## Contents
 
@@ -82,7 +82,7 @@ anything.
 
 ## What this file contains
 
-536 lines defining **8 functions** (4 public), **4 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+583 lines defining **8 functions** (4 public), **4 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
