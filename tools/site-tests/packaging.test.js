@@ -236,6 +236,88 @@ function run() {
     pass("packaging/debian/rules is executable in the index");
   }
 
+  failures += changelogDates(fail, pass);
+  return failures;
+}
+
+/**
+ * Every changelog entry's weekday matches its date.
+ *
+ * # The defect this exists to stop coming back
+ *
+ * `Sun, 31 Aug 2026` in the Debian changelog and `Sun Aug 31 2026` in the RPM
+ * spec. 31 August 2026 was a Monday. One wrong weekday, copied into two
+ * packaging files, sitting in both for as long as they had existed.
+ *
+ * Neither is cosmetic. `rpmbuild` prints `bogus date in %changelog` and
+ * lintian carries `debian-changelog-has-wrong-day-of-week`, so both would be
+ * bounced by a distribution's review. Nothing here noticed, because nothing
+ * here built the packages: `docs/PACKAGING.md` said these formats "parse", and
+ * a date with the wrong weekday parses perfectly.
+ *
+ * # Why this check and not the build
+ *
+ * Building both packages takes a full release compile and two toolchains, and
+ * it already happens by hand and is written up. This is the part that can run
+ * on every commit, on any machine, in milliseconds. It does not replace the
+ * build; it catches the one class of defect that a build found and that
+ * nothing else was looking for.
+ */
+function changelogDates(fail, pass) {
+  let failures = 0;
+  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTHS = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+  };
+
+  const sources = [
+    {
+      file: "packaging/debian/changelog",
+      // ` -- Name <mail>  Tue, 01 Sep 2026 00:00:00 +0000`
+      pattern: /^ -- .*?>\s+(\w{3}), (\d{2}) (\w{3}) (\d{4})/gm,
+      order: (m) => [m[1], m[2], m[3], m[4]]
+    },
+    {
+      file: "packaging/rpm/veilvoice.spec",
+      // `* Tue Sep 01 2026 Name <mail> - 0.1.16-1`
+      pattern: /^\* (\w{3}) (\w{3}) (\d{2}) (\d{4})/gm,
+      order: (m) => [m[1], m[3], m[2], m[4]]
+    }
+  ];
+
+  let checked = 0;
+  for (const { file, pattern, order } of sources) {
+    const text = read(file);
+    let m;
+    pattern.lastIndex = 0;
+    while ((m = pattern.exec(text)) !== null) {
+      const [dow, day, mon, year] = order(m);
+      if (!(mon in MONTHS)) {
+        failures += 1;
+        fail(`${file}: "${mon}" is not a month name`);
+        continue;
+      }
+      checked += 1;
+      const date = new Date(Date.UTC(Number(year), MONTHS[mon], Number(day)));
+      const actual = DAYS[date.getUTCDay()];
+      if (actual !== dow) {
+        failures += 1;
+        fail(`${file}: "${dow}, ${day} ${mon} ${year}" is wrong; that date is ` +
+             `a ${actual}. rpmbuild calls this a bogus date and lintian has ` +
+             "debian-changelog-has-wrong-day-of-week, so a distribution's " +
+             "review would bounce it.");
+      }
+    }
+  }
+
+  if (checked < 2) {
+    failures += 1;
+    fail("no changelog dates were found in either packaging file, so this " +
+         "check is reading nothing");
+  } else if (failures === 0) {
+    pass(`${checked} packaging changelog dates have the right weekday`);
+  }
   return failures;
 }
 

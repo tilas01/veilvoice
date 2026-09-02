@@ -18,4 +18,4 @@ veilvoice (0.1.15-1) unstable; urgency=medium
     compares it against the workspace version and fails the build if the
     two disagree.
 
- -- tilas01 <tilas01@users.noreply.github.com>  Sun, 31 Aug 2026 00:00:00 +0000
+ -- tilas01 <tilas01@users.noreply.github.com>  Mon, 31 Aug 2026 00:00:00 +0000
