@@ -55,6 +55,18 @@ instead of by hand.
   what it is. Checking first rather than reporting the failure afterwards keeps
   the message the same on Windows.
 
+- **F-110** The example plan printed in `docs/USER_GUIDE.md` did not parse.
+  Copying it to write a first conversation plan gave `unknown keyword "turn
+  19.000"`. The format separates fields with two spaces so a speaker's name and
+  a subtitle can contain single ones, and the guide's example lines its columns
+  up by eye, so the turn beginning `19.000` has one space after `turn` because
+  the number is a digit wider. Neither half was wrong alone and nothing
+  compared them. The fields that cannot contain a space, meaning the keyword,
+  the speaker index and the timestamps, now end at any run of whitespace; two
+  spaces still separate the fields that can, so every plan that parsed before
+  parses identically. The regression test reads the example out of the guide
+  rather than keeping a copy, because a copy is the thing that drifts.
+
 ### Buttons line up with the buttons beside them
 
 The desktop application padded its passphrase labels with trailing spaces to
