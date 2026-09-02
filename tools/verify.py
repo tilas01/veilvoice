@@ -109,6 +109,9 @@ GENERATORS = [
     ("screenshot sizes on the pages", [sys.executable, "tools/shots/attrs.py"]),
     ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
+    # After the documentation generator, which owns the wiki directory:
+    # these are per-program views of the user guide and land in it too.
+    ("per-program guides", [sys.executable, "tools/docs/guides.py"]),
     # The website's own source, which `generate.py` does not cover: it reads
     # Rust doc comments, and these are JavaScript and CSS. Imports the same
     # module for the palette and the drawing code, so it goes after it.
@@ -140,6 +143,8 @@ CHECKS = [
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
+    ("per-program guides match the user guide",
+     [sys.executable, "tools/docs/guides.py", "--check"]),
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
