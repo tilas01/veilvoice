@@ -11,29 +11,36 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project, such as a platform's rules or a decision that
 has not been taken, that is written down rather than absorbed into a number.
 
-**Where we are now:** **v0.1.14 is released**, signed and published for
+**Where we are now:** **v0.1.17 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
-Since v0.1.14: every box in every flowchart on the reference pages opens the
-file it names **on this site**, in the theme the reader chose, with the whole
-function marked; a safety catch that reported a program it had closed as still
-running; and a test that failed one run in forty and was passing the other
-thirty-nine.
+This line used to name v0.1.14 while three releases went out past it, which is
+why the version in it is now checked against `Cargo.toml` by
+`tools/release/version.py` along with every other copy of it.
 
-Since v0.1.13: **Failsafe**, on by default, which notices the moment another
-program picks up a real microphone while you are being veiled; a baseline that
-learns what normally runs here; a report of what privilege VeilVoice holds; a
-randomised ratchet interval that had been written and never called; and an
-interface that reads like English instead of shouting. Seven file dialogs that
-froze the whole window while they were open are now threaded.
+Since v0.1.16: the window is genuinely idle when nobody is touching it, and the
+cause of the frames it was drawing was found by asking the toolkit rather than
+by reasoning about the code. The toolkit itself moved forward two versions, the
+About tab reports the graphics driver that actually drew the window, and a
+crash caused by a missing system library names the library and the package that
+carries it.
 
-Since v0.1.12: the verifier can build this repository and compare what comes
-out against the published hashes, group mode is visible in the desktop
-application, projects and profiles can be saved, and the number of speakers is
-capped at a limit that was **measured** rather than chosen. The reproducibility
-check was verified by running it: two builds of this tree in two separate
-target directories, all three binaries byte for byte identical.
+Since v0.1.15: a guide for each of the three programs, in the documentation, in
+the wiki and in every release archive; installing as a dropdown per system;
+verification and reproducible-build scripts for Linux, macOS, WSL, the BSDs and
+Windows; and the website republished automatically after a release.
+
+Since v0.1.14: the verifier checks every file you extracted and then asks your
+own GnuPG the same question, offering to install it if you have none; the
+release page lists every archive of every release; and the desktop application
+opens at a size you can read.
+
+**Every item on this page is linkable on its own.** The
+[roadmap page](https://tilas01.github.io/veilvoice/roadmap.html) gives each one
+an anchor: item 98 is at `roadmap.html#m98`, and each heading below has one
+too, so a single marker can be sent to somebody without sending the whole
+list.
 
 ---
 
@@ -84,7 +91,6 @@ target directories, all three binaries byte for byte identical.
 | 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | - |
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **done** | - |
 | 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **done** | - |
-| 29 | One single binary: the same executable runs as the desktop app or as the command line, installed or portable | **blocked** | - |
 | 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | - |
 | 31 | Optional companion setup: VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere, detected if present and installed only if confirmed | **done** | - |
 | 32 | The site's search presented as an **index**, and animated | **done** | - |
@@ -98,7 +104,6 @@ it cannot do as plainly as what it can.
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
 | 33 | Screen-capture detection: which recorders are running, muted per program by an allowlist | **done** | - |
-| 34 | Hide VeilVoice's own window from screen capture and recording | **blocked** | - |
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | - |
 | 36 | `veilvoice-sentry`: ransomware canaries and mass-change rate detection | **done** | - |
 | 37 | `veilvoice-appctl`: learn what runs, then allowlist it, with time-limited grants and a log | **done** | - |
@@ -108,7 +113,6 @@ it cannot do as plainly as what it can.
 | 65 | **Failsafe**: on by default: notice the moment another program picks up a *real* microphone while you are being veiled, warn, and close it | **done** | - |
 | 41 | Notification overlay: rounded, translucent, contrast computed, or an alert, or off | **done** | - |
 | 42 | Duress and decoy passwords | **done** | - |
-| 43 | Transcription through your own API key, given **veiled audio only** | **blocked** | - |
 
 ## Conversations, subtitles and video
 
@@ -160,8 +164,6 @@ about the signal, which is already done.
 | 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | - |
 | 62 | **A name and a colour per speaker in the app**: the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | - |
 | 63 | **Live levels while a recording is running**, in the app and in the terminal | **done** | - |
-| 63b | **A wave per speaker while recording**: the same picture, but split by who is talking | **blocked** | - |
-| 64 | **Speaker detection through software you already have**: detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | - |
 
 ## Seeing it before you install it
 
@@ -234,6 +236,48 @@ it can honestly be made rather than to keep apologising for it.
 | 95 | **One version per release, in order, enforced**: the tag, the workspace and every package definition checked against each other before a release can go out | **done** | - |
 | 96 | **v0.1.15 released**: the audit run over everything since v0.1.14, CI green, and the release published | **done** | - |
 | 97 | **A verifier anybody can use, checking everything**: one press or one command checks the signature, the archive, every file you extracted, and then asks your own GnuPG the same question | **done** | - |
+
+---
+
+## The window, and the things that were marked done and were not
+
+Two rows above were marked **done** before they were, and this section exists
+partly to say so. Marker 79 declared a window that does not stutter, twice: once
+when the drawing thread was cleared, and again when a repaint timer was removed
+and the improvement measured. Both changes were real and neither reached the
+cause, which was the animated logo asking for another frame thirty times a
+second whether or not anybody could see it. Marker 95 declared one version per
+release enforced, and the enforcement covered the package definitions and not
+the twelve other places, the README's install block among them, that repeat the
+version by hand.
+
+Neither is being un-marked. What was done was done. The correction is that a
+marker means the work described happened, not that the symptom is gone, and
+this list is more useful if the difference is visible.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 98 | **A window that is genuinely idle**: the cause of the frames found by asking the toolkit rather than by reasoning, the animation stopped when the window is unfocused or being dragged, and the result measured to nothing | **done** | - |
+| 99 | **The window toolkit brought forward**: `eframe` and `egui` from 0.29 to 0.32, which is what made the frames answerable, and the runtime dependency it added declared everywhere a package can declare it | **done** | - |
+| 100 | **What drew the window, reported**: the graphics choices named in the source with their reasoning, and the driver actually obtained shown on the About tab, read from the driver | **done** | - |
+| 101 | **Crash reports about the failure they are about**: the closing note chosen from the panic rather than the same guess every time, and a missing system library named along with the package that carries it | **done** | - |
+| 102 | **One version, in one file**: every other copy derived from `Cargo.toml` or checked against it, with the files that keep a history added to rather than rewritten | **done** | - |
+| 103 | **v0.1.17 released**: the idle window fixed at the cause, the toolkit upgraded, and the release published | **done** | - |
+
+---
+
+## Asked for while v0.1.17 was being built
+
+Everything here came from one message and they belong together: somebody
+arriving at this project for the first time, deciding whether to trust it,
+installing it, and finding their way around it without reading a manual.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 104 | **A demonstration that is the program**: the website's demo driven by real recorded sessions of all three binaries rather than by invented text, in the reader's chosen theme, and sitting with the screenshots rather than away from them | **next** | 3 |
+| 105 | **A crash report offered rather than buried**: the report already written to disk surfaced by a notice on the next launch, with what it contains shown before anything is sent and the filing left to the person | **planned** | 2 |
+| 106 | **A first run that explains itself**: a short tour that can be skipped and comes back on a new version, and an offer to install with portable and installed said plainly, overwriting an older install and saying to restart the terminal | **planned** | 3 |
+| 107 | **VeilVoice on a phone**: an Android package a person can install without developer tools, and iOS if it can be built and signed under a pseudonym, which is the part that decides it | **planned** | 10 |
 
 ---
 
@@ -1160,6 +1204,47 @@ are recorded here rather than edited out of history.
 - **USB device allowlisting, and BadUSB keystroke-timing defence.** Removed
   2026-08-19 at the maintainer's request, before any code was written. Nothing
   in the tree depended on them.
+
+- **The four items that were blocked.** Removed 2026-09-02 at the maintainer's
+  request. Each had been sitting on a decision rather than on effort, in some
+  cases for months, and a roadmap where a quarter of the open items cannot move
+  is a roadmap that reads as stalled when it is not. They were:
+
+  - *One single binary*, the same executable running as either front end. The
+    desktop application links a window toolkit, an OpenGL stack and a font;
+    the command line links none of it, and the archives ship a command-line
+    build for the platforms where the window cannot be built at all. One
+    binary means every command-line user carrying a graphics stack they never
+    open.
+
+  - *Hiding VeilVoice's own window from screen capture*. Windows offers this
+    and it is honest only there. On Linux and the BSDs a compositor decides,
+    and on macOS the interface for it does not exist, so shipping it would
+    have meant a switch that protects you on one platform and lies on three.
+
+  - *Transcription through your own API key*. The reasoning is written above
+    and stands: it needs a decision about which providers actually accept
+    audio, taken from a machine that can check, and nobody has taken it.
+
+  - *Speaker detection through software you already have*. Measured and
+    reported above: the named candidate turned out to host no speech models
+    at all, and starting it opened a port and made a network request nobody
+    asked for. Which program to detect instead is an open question, not a
+    task.
+
+  - *A wave per speaker while recording*, which was waiting on that same
+    speaker detection and could not have moved without it. This one was
+    numbered `63b`, and the roadmap's own generator silently skipped it
+    because a row's number has to be a plain integer to be parsed, so it had
+    never appeared on the website, in the picture, or in any count. That is
+    fixed below whether or not this row exists: the generator now refuses a
+    row it cannot read instead of dropping it.
+
+  Nothing in the tree depended on any of them, and the honest alternatives
+  they were meant to improve on, one microphone per person or a turn list,
+  remain and remain the default. The paragraphs explaining what each was
+  waiting for are kept above rather than deleted, because that reasoning is
+  the useful part and it is what a future decision would start from.
 
 ---
 
