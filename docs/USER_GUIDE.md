@@ -82,6 +82,44 @@ Three things are genuinely outside, and each is optional:
 and prints the one command that would install it. It never runs somebody
 else's installer.
 
+### What runs where
+
+Ten platforms get a signed archive with every release, and the table says what
+is in each one. It is not the same everywhere, and where it is not, that is a
+limit of what the platform offers rather than something waiting to be written.
+
+| Platform | Command line | Desktop app | Live microphone |
+|---|---|---|---|
+| Windows 10 and 11, x86-64 | yes | yes | yes, with a virtual cable |
+| macOS on Intel | yes | yes | yes, with a virtual cable |
+| macOS on Apple Silicon | yes | yes | yes, with a virtual cable |
+| Linux, x86-64 and arm64 | yes | yes | yes, through PipeWire |
+| Linux, statically linked (musl) | yes | yes | yes |
+| Raspberry Pi and other armv7 | yes | yes | yes |
+| WSL on Windows | yes | yes, with WSLg | through the Windows side |
+| FreeBSD, OpenBSD, NetBSD | yes | not shipped | no |
+
+**Any Linux distribution.** The `.deb` and `.rpm` are conveniences, not
+requirements: the plain archive is a folder of binaries that needs no package
+manager, and the statically linked build needs no system libraries at all,
+which is the one to reach for on a distribution nothing else fits.
+
+**The BSDs get the command line only, and the reason is specific.** The audio
+library VeilVoice uses has no backend for them, so live capture cannot work
+there and the desktop application is built around a window that would have
+nothing to listen to. Everything that operates on a file, meaning
+de-identification, encryption, metadata cleaning and verification, is pure Rust
+and runs exactly as it does anywhere else.
+
+**WSL is Linux**, so the command line runs unchanged. The window needs WSLg,
+which recent Windows has by default. A microphone belongs to Windows rather
+than to the distribution, so live mode is the Windows build's job.
+
+**Nothing is emulated and nothing is a wrapper.** Every archive is a native
+build for that processor, compiled from the same source with the same pinned
+compiler, and built twice in separate directories and compared byte for byte
+before it ships.
+
 ### How anything reaches the network, given that nothing here is a network client
 
 VeilVoice bundles no HTTP client, and this is checked rather than claimed:

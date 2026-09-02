@@ -176,6 +176,30 @@ def graphic(colours, groups, counts):
         'role="img" aria-label="every roadmap item, coloured by state">'
         % (WIDTH, height, WIDTH, height))
     add("<!-- %s from ROADMAP.md. Do not edit. -->" % MARKER)
+    # The reveal, and the hover, written into the drawing.
+    #
+    # In the drawing rather than in `main.css` because this file is also
+    # written to `assets/roadmap.svg` and opened on its own, where no
+    # stylesheet of ours is loaded. A picture that animates in one place and
+    # not the other is the sort of difference nobody notices until it looks
+    # broken.
+    #
+    # `transform-box: fill-box` is what makes `transform-origin: center` mean
+    # the square's own centre rather than the origin of the whole drawing.
+    # Without it every square flies in from the top-left corner.
+    add('<style>'
+        '.rm-square{transform-box:fill-box;transform-origin:center;'
+        'animation:rm-in .45s cubic-bezier(.2,.8,.3,1) both;'
+        'transition:filter .15s ease}'
+        '.rm-square:hover{filter:brightness(1.35)}'
+        '@keyframes rm-in{from{opacity:0;transform:scale(.4)}'
+        'to{opacity:1;transform:none}}'
+        # Somebody who has asked their system for less movement gets the
+        # finished picture, immediately, rather than a faster version of the
+        # same animation.
+        '@media (prefers-reduced-motion:reduce){'
+        '.rm-square{animation:none}}'
+        '</style>')
     add('<rect x="0" y="0" width="%.0f" height="%.0f" rx="10" '
         'fill="var(--bg-inset, %s)"/>' % (WIDTH, height, colours["bg-inset"]))
 
@@ -200,16 +224,29 @@ def graphic(colours, groups, counts):
             x = MARGIN + column * (SQUARE + GAP)
             square_y = top + LABEL_H + line * (SQUARE + GAP)
             colour = token[row["status"]]
-            add('<g><title>%s. %s (%s)</title>'
-                '<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="4" '
-                'fill="var(--%s, %s)" opacity="%s"/>'
-                '<text x="%.1f" y="%.1f" font-family="%s" font-size="9" '
-                'fill="var(--bg-inset, %s)" text-anchor="middle">%d</text></g>'
-                % (row["number"], docs.esc(plain(row["marker"])[:90]), row["status"],
-                   x, square_y, SQUARE, SQUARE, colour, colours[colour],
-                   "1" if row["status"] == "done" else "0.85",
-                   x + SQUARE / 2, square_y + SQUARE / 2 + 3.2, docs.MONO,
-                   colours["bg-inset"], row["number"]))
+            # No number drawn in the square.
+            #
+            # It used to carry one, and a grid of ninety-six numbered squares
+            # tells a reader nothing: the number is an index into a document
+            # they are not in, and the one thing they want -- what this square
+            # is -- was the thing it did not say. The name is in the `<title>`,
+            # which every browser shows on hover and which a screen reader
+            # reads, and it is now the only thing the square carries.
+            #
+            # The status opacity moves to the group so the square's own
+            # opacity is free for the reveal below.
+            add('<g opacity="%s"><title>%s (%s)</title>'
+                '<rect class="rm-square" style="animation-delay:%dms" '
+                'x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="4" '
+                'fill="var(--%s, %s)"/></g>'
+                % ("1" if row["status"] == "done" else "0.85",
+                   docs.esc(plain(row["marker"])[:90]), row["status"],
+                   # Staggered along each row, and capped: ninety-six squares
+                   # at 12 ms each would take a second and a quarter to
+                   # finish, which is a page that looks slow rather than one
+                   # that looks alive.
+                   min(index * 12, 600),
+                   x, square_y, SQUARE, SQUARE, colour, colours[colour]))
 
     # The legend, two to a row, so a narrow screen does not scale the picture
     # down to fit one long line of it.
@@ -437,15 +474,13 @@ def body(colours, groups, counts, generated_at):
         'says what each one is waiting for.</p>' % (docs.REPO, docs.REF))
     add("<ul>")
     for row in [r for _, rows in groups for r in rows if r["status"] == "blocked"]:
-        add("<li><strong>%d.</strong> %s</li>"
-            % (row["number"], docs.inline_html(row["marker"])))
+        add("<li>%s</li>" % docs.inline_html(row["marker"]))
     add("</ul>")
 
     add('<h2 id="done">Everything that is finished</h2>')
     add("<ul>")
     for row in [r for _, rows in groups for r in rows if r["status"] == "done"]:
-        add("<li><strong>%d.</strong> %s</li>"
-            % (row["number"], docs.inline_html(row["marker"])))
+        add("<li>%s</li>" % docs.inline_html(row["marker"]))
     add("</ul>")
 
     add('<p style="color:var(--muted);font-size:13px">Generated from '

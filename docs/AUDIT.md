@@ -219,6 +219,44 @@ Found by photographing the tab and looking at it, immediately after writing it.
 That is twice in this round that reading the picture caught what reading the
 patch did not, which is the same lesson as F-113 in the same afternoon.
 
+### The roadmap picture said nothing about itself
+
+Not a finding, and worth recording because it was published and looked
+finished. The roadmap page drew ninety-six squares, each carrying its item
+number, and the number is an index into `ROADMAP.md`, which is not where the
+reader is standing. The one question a reader has about a square is what it
+*is*, and that was the one thing it did not say.
+
+The names were already in the drawing, in a `<title>` on each square, which is
+what a browser shows on hover and what a screen reader reads out. So the fix
+was to take the numbers away rather than to add anything: the square is now a
+colour with a name attached, and the picture reads as a state of the project
+instead of a list of references.
+
+The squares fade in, staggered, and stop doing so for anybody whose system
+asks for less movement. The stylesheet is written inside the drawing rather
+than into `main.css`, because the same file is served on its own at
+`assets/roadmap.svg` where none of the site's stylesheets are loaded, and a
+picture that animates in one place and not the other is the kind of difference
+nobody notices until it looks broken.
+
+### Where the two programs run, written down
+
+Also not a finding. The guide now carries the platform table, because "it runs
+everywhere" was doing work it could not support.
+
+Ten platforms get a signed archive. The desktop application ships for eight of
+them; the BSDs get the command line only, and the reason is specific rather
+than a gap waiting to be filled: the audio library has no backend for them, so
+live capture cannot work and a window built around it would have nothing to
+listen to. Everything that operates on a file runs there exactly as it does
+anywhere else.
+
+The new code in this round was checked against `armv7-unknown-linux-gnueabihf`
+and `i686-unknown-linux-gnu` as well as the host, because two of the three
+new modules do arithmetic on sizes and one of them parses a header, and 32-bit
+is where that sort of thing has gone wrong here before.
+
 ## The twenty-second round: the verify page that had no verifier
 
 Two defects (F-111 and F-112), both found by driving the website in a real
