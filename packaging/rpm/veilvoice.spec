@@ -32,14 +32,15 @@ BuildRequires:  pkgconfig(gtk+-3.0)
 BuildRequires:  pkgconfig(xkbcommon)
 
 %description
-VeilVoice destroys the biometric voiceprint of a speaker -- pitch, formants,
-timbre, micro-timing and the melody of an accent -- so that neither software nor
-a human listener can re-identify the speaker or reconstruct the original voice,
-while the words themselves stay clean and transcribable.
+VeilVoice destroys the biometric voiceprint of a speaker: pitch, formants,
+timbre, micro-timing and the melody of an accent. Neither software nor a
+human listener can re-identify the speaker or reconstruct the original
+voice, while the words themselves stay clean and transcribable.
 
-It does not hide what was said. Intelligibility is preserved on purpose, and the
-words remain in the output and can be transcribed. If the message itself is
-sensitive, encrypt it; that is a separate problem with a separate answer.
+It does not hide what was said. Intelligibility is preserved on purpose,
+and the words remain in the output and can be transcribed. If the message
+itself is sensitive, encrypt it; that is a separate problem with a
+separate answer.
 
 Fully offline by construction: there is no networking code in the project and
 the build fails if an HTTP client enters the dependency graph.
@@ -100,7 +101,7 @@ cargo test --release --locked --workspace
 * Tue Sep 01 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.16-1
 - See CHANGELOG.md in the source for what changed in this release.
 
-* Sun Aug 31 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.15-1
+* Mon Aug 31 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.15-1
 - See CHANGELOG.md in the source for what changed. The newest entry here is
 - compared against the workspace version by the site suite.
 * Fri Aug 28 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.14-1

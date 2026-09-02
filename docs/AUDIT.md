@@ -3788,9 +3788,26 @@ the top of this document now says.
    real: `man veilvoice` produced nothing. It is now fixed, in the packaging
    rather than by hand, and the fix is described in item 10.
 
-   Still open: nothing has been uploaded anywhere, `rpmlint` has not been run,
-   the Debian build used a rustup toolchain rather than Debian's own `cargo`
-   and `rustc` packages, and four formats remain drafts.
+   **`rpmlint` has now been run** over both binary packages and the source RPM,
+   and it found two real defects. Two `%description` lines were exactly 80
+   characters against a limit of 79, and `rpmbuild` separately warned `bogus
+   date in %changelog` for `Sun Aug 31 2026`, which was a Monday. Both are
+   fixed, both would have been bounced by a distribution's review, and neither
+   was visible until the package was built and linted rather than parsed.
+
+   The other eighteen reports are `rpmlint`'s default configuration disagreeing
+   with how RPM packages are written now: it wants a `Group:` tag that Fedora
+   dropped, a `BuildRoot:` unnecessary since RPM 4.6, a `Packager:` that
+   identifies the builder rather than the software, and it calls
+   `GPL-3.0-or-later` an invalid licence when that is the SPDX identifier
+   Fedora requires. `docs/PACKAGING.md` lists all eighteen with the reason each
+   stands, because a linter's output quoted selectively is worth nothing.
+
+   Still open: nothing has been uploaded anywhere, the Debian build used a
+   rustup toolchain rather than Debian's own `cargo` and `rustc` packages, and
+   four formats remain drafts. `rpmlint` reads a package rather than installing
+   one, and it ran on Ubuntu against packages built on Ubuntu, so it is one
+   more check than there was and it is not a Fedora build.
 
 8. **`rsa` carries an unfixable advisory** (A-6). Accepted on the ground that
    the verifier performs no private-key operation, and enforced by a CI job
