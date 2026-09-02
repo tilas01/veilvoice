@@ -93,7 +93,7 @@ passed through, because audio nobody claimed has not been disguised.
 flowchart TD
     n_lib(["lib.rs<br/>180 lines"])
     n_mode["mode.rs<br/>286 lines"]
-    n_plan["plan.rs<br/>947 lines"]
+    n_plan["plan.rs<br/>1084 lines"]
     n_render["render.rs<br/>851 lines"]
     n_subtitles["subtitles.rs<br/>276 lines"]
     n_plan --> n_mode
@@ -112,6 +112,6 @@ flowchart TD
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-conversation-lib]] | 180 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
 | [[`mode.rs`|File-veilvoice-conversation-mode]] | 286 | How many voices a group gets, and the trade between the two answers. |
-| [[`plan.rs`|File-veilvoice-conversation-plan]] | 947 | Who is in the recording, and who is speaking when. |
+| [[`plan.rs`|File-veilvoice-conversation-plan]] | 1084 | Who is in the recording, and who is speaking when. |
 | [[`render.rs`|File-veilvoice-conversation-render]] | 851 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] | 276 | Subtitles, from the same plan the audio is rendered from. |

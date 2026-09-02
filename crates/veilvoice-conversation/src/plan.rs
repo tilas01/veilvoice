@@ -132,6 +132,16 @@ pub struct Conversation {
     mode: crate::mode::VoiceMode,
 }
 
+/// The first whitespace-separated word, and everything after it.
+///
+/// `None` when the line has no whitespace at all, which is a line with only a
+/// keyword on it and nothing for the keyword to act on.
+fn split_word(line: &str) -> Option<(&str, &str)> {
+    let at = line.find(char::is_whitespace)?;
+    let (word, rest) = line.split_at(at);
+    Some((word, rest.trim_start_matches(char::is_whitespace)))
+}
+
 impl Conversation {
     /// An empty plan.
     pub fn new() -> Self {
@@ -446,7 +456,20 @@ impl Conversation {
             if line.trim().is_empty() {
                 continue;
             }
-            let Some((keyword, rest)) = line.split_once("  ") else {
+            // F-110. The keyword is one word, so any run of whitespace ends it.
+            //
+            // This used to be `split_once("  ")`, requiring exactly two spaces
+            // after the keyword, and the example printed in `docs/USER_GUIDE.md`
+            // does not have two on every line: `turn 19.000  22.400  0` lines
+            // its columns up with one, because the number is a digit wider.
+            // Anybody writing their first plan by copying the guide was told
+            // `unknown keyword "turn 19.000"`.
+            //
+            // Two spaces still separate the fields that may contain single
+            // spaces, which is a speaker's name and a turn's words. It never
+            // needed to separate the fields that cannot: a keyword, an index
+            // and a pair of timestamps.
+            let Some((keyword, rest)) = split_word(line) else {
                 return Err(Error::Malformed(format!(
                     "line {number}: no keyword, found {line:?}"
                 )));
@@ -454,10 +477,18 @@ impl Conversation {
             match keyword {
                 "title" => conversation.title = Some(rest.trim().to_string()),
                 "speaker" => {
-                    let mut parts = rest.splitn(3, "  ");
-                    let declared = parts.next().unwrap_or_default().trim();
+                    // The index is a number and cannot hold a space; the
+                    // name can, so the name and the optional picture path are
+                    // still separated from each other by two.
+                    let (declared, rest) = split_word(rest).unwrap_or((rest, ""));
+                    let declared = declared.trim();
+                    let mut parts = rest.splitn(2, "  ");
                     let name = parts.next().unwrap_or_default().trim();
-                    let picture = parts.next().map(|p| PathBuf::from(p.trim()));
+                    let picture = parts
+                        .next()
+                        .map(|p| p.trim())
+                        .filter(|p| !p.is_empty())
+                        .map(PathBuf::from);
                     let declared: usize = declared.parse().map_err(|_| {
                         Error::Malformed(format!("line {number}: bad index {declared:?}"))
                     })?;
@@ -478,11 +509,17 @@ impl Conversation {
                     })?;
                 }
                 "turn" => {
-                    let mut parts = rest.splitn(4, "  ");
-                    let start = parts.next().unwrap_or_default().trim();
-                    let end = parts.next().unwrap_or_default().trim();
-                    let speaker = parts.next().unwrap_or_default().trim();
-                    let text = parts.next().map(|t| t.trim().to_string());
+                    // Three numbers, then whatever words were written. None
+                    // of the three can contain a space, so each ends at the
+                    // first run of whitespace and the rest of the line is the
+                    // subtitle, single spaces and all.
+                    let (start, rest) = split_word(rest).unwrap_or((rest, ""));
+                    let (end, rest) = split_word(rest).unwrap_or((rest, ""));
+                    let (speaker, rest) = split_word(rest).unwrap_or((rest, ""));
+                    let start = start.trim();
+                    let end = end.trim();
+                    let speaker = speaker.trim();
+                    let text = Some(rest.trim().to_string());
                     let start: f64 = start.parse().map_err(|_| {
                         Error::Malformed(format!("line {number}: bad start {start:?}"))
                     })?;
@@ -943,5 +980,105 @@ mod tests {
             text: None,
         };
         assert!((turn.duration() - 2.5).abs() < 1e-9);
+    }
+}
+
+#[cfg(test)]
+mod guide_tests {
+    use super::*;
+
+    /// **F-110.** The plan printed in the user guide has to parse.
+    ///
+    /// The guide is where somebody writing their first plan copies from, and
+    /// the example it prints was rejected: `unknown keyword "turn 19.000"`.
+    /// The parser wanted exactly two spaces between every field, and the
+    /// guide's third turn line uses one, because `19.000` is a digit wider
+    /// than `4.100` and the columns were lined up by eye.
+    ///
+    /// Neither was wrong on its own. The example is what a person would write
+    /// and the parser was stricter than it needed to be about the fields that
+    /// cannot contain a space, and nothing compared the two.
+    ///
+    /// So this reads the guide rather than a copy of it. A copy would drift,
+    /// which is the failure it is here to prevent: F-71 is the same shape, and
+    /// so is F-103.
+    #[test]
+    fn the_plan_in_the_user_guide_parses() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        let mut blocks = Vec::new();
+        let mut current: Option<Vec<&str>> = None;
+        for line in guide.lines() {
+            if line.starts_with("```") {
+                if let Some(block) = current.take() {
+                    blocks.push(block.join("\n"));
+                } else {
+                    current = Some(Vec::new());
+                }
+                continue;
+            }
+            if let Some(block) = current.as_mut() {
+                block.push(line);
+            }
+        }
+
+        let plans: Vec<&String> = blocks
+            .iter()
+            .filter(|b| b.trim_start().starts_with(MAGIC))
+            .collect();
+        assert!(
+            !plans.is_empty(),
+            "the user guide no longer shows a plan beginning {MAGIC}, so either \
+             the format changed or this test has stopped reading the guide"
+        );
+
+        for plan in plans {
+            let parsed = Conversation::parse(plan).unwrap_or_else(|e| {
+                panic!(
+                    "the plan printed in docs/USER_GUIDE.md does not parse: {e}\n\
+                     Somebody copying it to write their first plan gets this.\n\
+                     ---\n{plan}\n---"
+                )
+            });
+            assert!(
+                !parsed.speakers().is_empty() && !parsed.turns().is_empty(),
+                "the guide's plan parsed to nothing useful"
+            );
+        }
+    }
+
+    /// One space, two spaces, and a tab all separate the numbers.
+    ///
+    /// The columns in a hand-written plan are lined up by eye, so what falls
+    /// between two numbers is whatever made them line up that day.
+    #[test]
+    fn the_numbers_may_be_separated_by_any_whitespace() {
+        let plans = [
+            "VEILCONV1\nspeaker 0 Me\nturn 0.0 1.0 0 hello\n",
+            "VEILCONV1\nspeaker  0  Me\nturn  0.0  1.0  0  hello\n",
+            "VEILCONV1\nspeaker\t0\tMe\nturn\t0.0\t1.0\t0\thello\n",
+            "VEILCONV1\nspeaker   0   Me\nturn 0.0    1.0  0   hello\n",
+        ];
+        for plan in plans {
+            let parsed =
+                Conversation::parse(plan).unwrap_or_else(|e| panic!("{plan:?} did not parse: {e}"));
+            assert_eq!(parsed.speakers().len(), 1, "{plan:?}");
+            assert_eq!(parsed.turns().len(), 1, "{plan:?}");
+            assert_eq!(parsed.turns()[0].text.as_deref(), Some("hello"), "{plan:?}");
+        }
+    }
+
+    /// A name and a subtitle keep the single spaces inside them.
+    ///
+    /// This is what the two-space rule was for, and it still holds: the fields
+    /// that can contain a space are still separated by two.
+    #[test]
+    fn names_and_subtitles_keep_their_own_spaces() {
+        let plan = "VEILCONV1\nspeaker  0  Sam Smith\nturn  0.0  1.0  0  So, how did it go?\n";
+        let parsed = Conversation::parse(plan).expect("parses");
+        assert_eq!(parsed.speakers()[0].name, "Sam Smith");
+        assert_eq!(
+            parsed.turns()[0].text.as_deref(),
+            Some("So, how did it go?")
+        );
     }
 }
