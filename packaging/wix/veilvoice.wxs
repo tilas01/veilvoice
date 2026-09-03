@@ -7,8 +7,8 @@
   Build (needs the WiX .NET tool: `dotnet tool install -g wix`):
 
       wix build packaging/wix/veilvoice.wxs -arch x64 ^
-          -d Version=0.1.17 -d BinDir=dist\veilvoice-v0.1.17-windows-x86_64 ^
-          -o dist/VeilVoice-0.1.17-x64.msi
+          -d Version=0.1.18 -d BinDir=dist\veilvoice-v0.1.18-windows-x86_64 ^
+          -o dist/VeilVoice-0.1.18-x64.msi
 
   # What this installs, and what it deliberately does not
 
