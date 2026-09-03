@@ -175,6 +175,7 @@ CHECKS = [
     ("measured numbers match the tree",
      [sys.executable, "tools/measured/generate.py", "--check"]),
     ("website suites", ["node", "tools/site-tests/run.js"]),
+    ("the local site serves every page", [sys.executable, "tools/site/serve.py", "--check"]),
 ]
 
 CARGO = [

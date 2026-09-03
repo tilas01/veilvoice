@@ -280,6 +280,7 @@ installing it, and finding their way around it without reading a manual.
 | 107 | **VeilVoice on a phone**: an Android package a person can install without developer tools, and iOS if it can be built and signed under a pseudonym, which is the part that decides it | **planned** | 10 |
 | 109 | **An obfuscated program folder**: VeilVoice's own files encrypted under names derived from the app-lock passphrase, with decoys among them, so the lock protects data rather than only a window | planned | - |
 | 110 | **A first-run setup and tour**: the app lock, the recording passphrase and the autolock explained and offered once, skipping whichever is already set | planned | - |
+| 111 | **Host the website locally**: a script and an nginx config that serve `website/` exactly as GitHub Pages does, so the site survives the repo or Pages going down, and is the audit surface during development | **done** | - |
 
 **What was checked before estimating that, rather than after.** The same rule
 that turned the speaker-detection question from planned into a measurement was
