@@ -79,12 +79,14 @@ pub mod kdf;
 pub mod lock;
 pub mod privatefile;
 pub mod shred;
+pub mod tape;
 pub mod vault;
 pub mod weave;
 
 pub use amnesia::Secret;
 pub use lock::{AppLock, LockStore};
 pub use shred::{shred_file, Passes, ShredReport};
+pub use tape::Tape;
 pub use vault::Vault;
 
 /// Crate version string, surfaced in the About panel.
@@ -160,6 +162,10 @@ pub enum Error {
     /// The password was changed, but the second copy of the lock could not be
     /// updated, so it still holds the previous one.
     AppLockSpareStale,
+    /// A [`tape::Tape`] was asked to copy itself into a buffer that is not its
+    /// own length. Refused rather than part-filled: a recording written into a
+    /// buffer sized for a different one is a truncated file nothing would flag.
+    TapeLength,
 }
 
 impl std::fmt::Display for Error {
@@ -205,6 +211,9 @@ impl std::fmt::Display for Error {
                 "the password was changed here, but the administrator-owned copy of the lock \
                  still holds the previous one. Run VeilVoice as an administrator once to \
                  finish the change."
+            }
+            Self::TapeLength => {
+                "the buffer offered for the recording is not the length of the recording"
             }
         };
         f.write_str(msg)
