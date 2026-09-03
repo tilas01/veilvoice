@@ -40,9 +40,10 @@ longer offered as the explanation for anything.
 
 ## The twenty-sixth round: the file with more in it had the weaker permission
 
-Four defects (F-133 to F-136), found by running commands nobody had run here
-before, looking at what landed on disk, and then sweeping for the rest of the
-class rather than waiting to stumble on it.
+Five defects (F-133 to F-137), found by running commands nobody had run here
+before, looking at what landed on disk, sweeping for the rest of the class
+rather than waiting to stumble on it, and then checking the claims this round's
+own new interface text was making.
 
 The round is short and the first finding is the most serious thing this audit
 has recorded in several rounds, so it goes first and without preamble.
@@ -124,6 +125,35 @@ asked what it holds. Three more were the same mistake:
   volume has a hidden one inside it. Somebody reading that file learns a hidden
   volume exists, which is the single thing a hidden volume conceals, and learns
   where to look.
+
+### F-137 -- the crash panel promised something the panic message cannot guarantee
+
+`veilvoice-gui/src/crashreport.rs`.
+
+The panel added earlier in this round lists what a crash report holds, so
+somebody can decide whether to paste it into a public issue tracker. It said,
+flatly, that the report *contains* no file names.
+
+Most of a report is written in advance: the version, the operating system and
+processor, the time. The panic message is not. It is whatever the panicking
+code passed, and the hook catches panics from the whole process, VeilVoice's
+dependencies included.
+
+Checked rather than assumed, and the check is now a test. No panic in any code
+that reaches a shipped binary formats a path into its message: the test walks
+every `.rs` file under `crates/`, skips `tests/`, `benches/` and `examples/`
+because a panic there is read by whoever ran it, and fails on any `expect`,
+`panic!` or `assert!` that also mentions `display()`. It was run against a
+deliberately planted offender and catches it.
+
+So the claim is true of VeilVoice. It is not something VeilVoice can promise on
+a decoder's behalf, and the panel was doing exactly that. It now says which
+four things VeilVoice puts in, names the error message as the one part not
+written in advance, and points at the button that shows the whole text.
+
+A promise that cannot be kept is worse than an accurate description with a
+button next to it, and this is a panel whose entire job is helping somebody
+decide what to publish.
 
 ### What the sweep decided to leave
 
@@ -3180,7 +3210,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1214 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1215 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4827,7 +4857,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and thirty-six defects found and fixed (F-1 to F-136), across
+**One hundred and thirty-seven defects found and fixed (F-1 to F-137), across
 twenty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

@@ -11,13 +11,13 @@
 
 # `crates/veilvoice-gui/src/crashreport.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 268 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 289 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs)
 
 ## Contents
 
 - [What was wrong with where this used to be](#what-was-wrong-with-where-this-used-to-be)
 - [Why it is offered rather than sent](#why-it-is-offered-rather-than-sent)
-- [And it says what is in it](#and-it-says-what-is-in-it)
+- [And it says what is in it, without overpromising](#and-it-says-what-is-in-it-without-overpromising)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -55,27 +55,37 @@ question if you can read what "this" is. Then two buttons: copy it, and
 open the issue tracker in a browser. What happens after that is the
 person's decision and their clipboard.
 
-# And it says what is in it
+# And it says what is in it, without overpromising
 
-The report carries the version, the operating system and processor, the
-panic message and the source location. It carries no file names, no
-settings, no passphrase and nothing about the audio. That list is in the
-panel rather than in this comment, because somebody deciding whether to
-paste it into a public issue tracker needs it in front of them.
+The report carries the version, the operating system and processor, when it
+happened, the panic message and the source location. VeilVoice puts in no
+file names, no settings, no passphrase and nothing about the audio.
+
+The panel used to say flatly that the report *contains* no file names. That
+is a promise about the panic message, and the panic message is the one part
+nobody writes in advance. No panic in VeilVoice's own code formats a path --
+there is a test for that, in `crashlog`, and it reads the source rather than
+trusting the claim -- but a decoder or a toolkit it depends on could put one
+there, and this program cannot promise on their behalf.
+
+So the panel says what VeilVoice puts in, names the error message as the
+part that is not written in advance, and offers the whole text to read. A
+promise that cannot be kept is worse than an accurate description with a
+button next to it.
 
 ## What this file contains
 
-268 lines defining **3 functions** (3 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+289 lines defining **3 functions** (3 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Offer` (line 60) -- What the panel is showing, kept across frames.
+- `struct Offer` (line 70) -- What the panel is showing, kept across frames.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Offer::look` (line 74) -- Read the previous report, if there is one.
-- `Offer::waiting` (line 84) -- Whether there is anything to show.
-- `Offer::panel` (line 95) -- Draw the offer.
+- `Offer::look` (line 84) -- Read the previous report, if there is one.
+- `Offer::waiting` (line 94) -- Whether there is anything to show.
+- `Offer::panel` (line 105) -- Draw the offer.
 
 ## What calls what
 
@@ -97,12 +107,12 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_look(["Offer::look<br/>line 74"])
-    n_waiting(["Offer::waiting<br/>line 84"])
-    n_panel(["Offer::panel<br/>line 95"])
-    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L74" "open the source"
-    click n_waiting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L84" "open the source"
-    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L95" "open the source"
+    n_look(["Offer::look<br/>line 84"])
+    n_waiting(["Offer::waiting<br/>line 94"])
+    n_panel(["Offer::panel<br/>line 105"])
+    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L84" "open the source"
+    click n_waiting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L94" "open the source"
+    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L105" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_look,n_waiting,n_panel entry
 ```
@@ -113,13 +123,13 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `NEW_ISSUE` <sub>pub const</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L50) | Where a report goes, if the person wants to file one. |
-| `ISSUES` <sub>pub const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L53) | The issue tracker itself, linked from About whether or not anything crashed. |
-| `COPIED_FOR` <sub>const</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L56) | How long the copy button says it copied, in seconds. |
-| `Offer` <sub>pub struct</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L60) | What the panel is showing, kept across frames. |
-| `Offer::look` <sub>pub fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L74) | Read the previous report, if there is one. |
-| `Offer::waiting` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L84) | Whether there is anything to show. |
-| `Offer::panel` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L95) | Draw the offer. |
+| `NEW_ISSUE` <sub>pub const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L60) | Where a report goes, if the person wants to file one. |
+| `ISSUES` <sub>pub const</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L63) | The issue tracker itself, linked from About whether or not anything crashed. |
+| `COPIED_FOR` <sub>const</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L66) | How long the copy button says it copied, in seconds. |
+| `Offer` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L70) | What the panel is showing, kept across frames. |
+| `Offer::look` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L84) | Read the previous report, if there is one. |
+| `Offer::waiting` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L94) | Whether there is anything to show. |
+| `Offer::panel` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L105) | Draw the offer. |
 
 ---
 

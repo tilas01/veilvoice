@@ -85,8 +85,8 @@ flowchart TD
     n_main(["main.rs<br/>190 lines"])
     n_app["app.rs<br/>2760 lines"]
     n_autolock["autolock.rs<br/>326 lines"]
-    n_crashlog["crashlog.rs<br/>365 lines"]
-    n_crashreport["crashreport.rs<br/>268 lines"]
+    n_crashlog["crashlog.rs<br/>443 lines"]
+    n_crashreport["crashreport.rs<br/>289 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
     n_graphics["graphics.rs<br/>158 lines"]
     n_group["group.rs<br/>1745 lines"]
@@ -209,8 +209,8 @@ flowchart TD
 |---|---:|---|
 | [[`app.rs`|File-veilvoice-gui-app]] | 2760 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`autolock.rs`|File-veilvoice-gui-autolock]] | 326 | Locking the window again after a period of no use. |
-| [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 365 | Make a failure that produces no output produce some. |
-| [[`crashreport.rs`|File-veilvoice-gui-crashreport]] | 268 | Offering the report from the last crash, on the run after it. |
+| [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 443 | Make a failure that produces no output produce some. |
+| [[`crashreport.rs`|File-veilvoice-gui-crashreport]] | 289 | Offering the report from the last crash, on the run after it. |
 | [[`dialog.rs`|File-veilvoice-gui-dialog]] | 369 | Asking for a file without stopping the window. |
 | [[`graphics.rs`|File-veilvoice-gui-graphics]] | 158 | What the window is drawn with, asked for explicitly and then reported. |
 | [[`group.rs`|File-veilvoice-gui-group]] | 1745 | Group mode: several people in one recording, each with a name and a colour. |

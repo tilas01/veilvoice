@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/crashlog.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 365 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 443 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs)
 
 ## Contents
 
@@ -73,7 +73,7 @@ application opens. It stays on your machine and is never sent anywhere.
 
 ## What this file contains
 
-365 lines defining **9 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+443 lines defining **9 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
