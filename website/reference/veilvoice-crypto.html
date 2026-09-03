@@ -115,7 +115,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="veilvoice-crypto/lib.src.html">
 <rect x="20.0" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="70.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="70.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">214 lines</text>
+<text x="70.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">223 lines</text>
 </a>
 <a href="veilvoice-crypto/aead.src.html">
 <rect x="146.5" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -158,9 +158,14 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <text x="145.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">308 lines</text>
 </a>
 <a href="veilvoice-crypto/shred.src.html">
-<rect x="225.9" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
-<text x="276.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shred.rs</text>
-<text x="276.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">415 lines</text>
+<rect x="162.7" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shred.rs</text>
+<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">415 lines</text>
+</a>
+<a href="veilvoice-crypto/tape.src.html">
+<rect x="289.2" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="339.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tape.rs</text>
+<text x="339.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">346 lines</text>
 </a>
 <a href="veilvoice-crypto/vault.src.html">
 <rect x="242.1" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -180,7 +185,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;214 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;223 lines&quot;])
     n_aead[&quot;aead.rs&lt;br/&gt;178 lines&quot;]
     n_amnesia[&quot;amnesia.rs&lt;br/&gt;327 lines&quot;]
     n_container[&quot;container.rs&lt;br/&gt;535 lines&quot;]
@@ -190,6 +195,7 @@ flowchart TD
     n_lock[&quot;lock.rs&lt;br/&gt;1823 lines&quot;]
     n_privatefile[&quot;privatefile.rs&lt;br/&gt;308 lines&quot;]
     n_shred[&quot;shred.rs&lt;br/&gt;415 lines&quot;]
+    n_tape[&quot;tape.rs&lt;br/&gt;346 lines&quot;]
     n_vault[&quot;vault.rs&lt;br/&gt;615 lines&quot;]
     n_weave[&quot;weave.rs&lt;br/&gt;1314 lines&quot;]
     n_hoard --&gt; n_amnesia
@@ -211,6 +217,7 @@ flowchart TD
     click n_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs&quot; &quot;open the source&quot;
     click n_privatefile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs&quot; &quot;open the source&quot;
     click n_shred href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs&quot; &quot;open the source&quot;
+    click n_tape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs&quot; &quot;open the source&quot;
     click n_vault href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs&quot; &quot;open the source&quot;
     click n_weave href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -225,10 +232,11 @@ flowchart TD
 <tr><td><a href="veilvoice-crypto/hoard.html"><code>hoard.rs</code></a></td><td>1037</td><td>The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing.</td></tr>
 <tr><td><a href="veilvoice-crypto/hybrid.html"><code>hybrid.rs</code></a></td><td>448</td><td>Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.</td></tr>
 <tr><td><a href="veilvoice-crypto/kdf.html"><code>kdf.rs</code></a></td><td>525</td><td>Password-based key derivation with Argon2id.</td></tr>
-<tr><td><a href="veilvoice-crypto/lib.html"><code>lib.rs</code></a></td><td>214</td><td>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</td></tr>
+<tr><td><a href="veilvoice-crypto/lib.html"><code>lib.rs</code></a></td><td>223</td><td>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</td></tr>
 <tr><td><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a></td><td>1823</td><td>The application lock: an Argon2id password verifier with a rate limit.</td></tr>
 <tr><td><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a></td><td>308</td><td>Writing a file that only its owner can read.</td></tr>
 <tr><td><a href="veilvoice-crypto/shred.html"><code>shred.rs</code></a></td><td>415</td><td>Secure erasure, the self-destruct.</td></tr>
+<tr><td><a href="veilvoice-crypto/tape.html"><code>tape.rs</code></a></td><td>346</td><td>A recording held in locked, zeroizing memory while it is still being made.</td></tr>
 <tr><td><a href="veilvoice-crypto/vault.html"><code>vault.rs</code></a></td><td>615</td><td>Where the app lock is kept: two copies, unpredictable names, and a restore.</td></tr>
 <tr><td><a href="veilvoice-crypto/weave.html"><code>weave.rs</code></a></td><td>1314</td><td>Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both.</td></tr>
 <tr><td><a href="veilvoice-crypto/examples-seal_and_open.html"><code>seal_and_open.rs</code></a></td><td>80</td><td><span style="color:var(--muted)">no module documentation yet</span></td></tr>

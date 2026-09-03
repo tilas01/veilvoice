@@ -85,6 +85,7 @@
 <li><a href="veilvoice-audio/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</span></li>
 <li><a href="veilvoice-audio/live.html"><code>live.rs</code></a> <span style="color:var(--muted)">Live microphone scrambling.</span></li>
 <li><a href="veilvoice-audio/meter.html"><code>meter.rs</code></a> <span style="color:var(--muted)">The scale a level meter is drawn on.</span></li>
+<li><a href="veilvoice-audio/record.html"><code>record.rs</code></a> <span style="color:var(--muted)">Recording the veiled voice without it ever reaching unprotected memory.</span></li>
 </ul>
 </section>
 <section id="veilvoice-capture">
@@ -125,6 +126,7 @@
 <li><a href="veilvoice-cli/meter.html"><code>meter.rs</code></a> <span style="color:var(--muted)">Level meters for veilvoice live, on a scale that means something.</span></li>
 <li><a href="veilvoice-cli/policy.html"><code>policy.rs</code></a> <span style="color:var(--muted)">veilvoice policy -- settings that can only be tightened.</span></li>
 <li><a href="veilvoice-cli/priv_mode.html"><code>priv_mode.rs</code></a> <span style="color:var(--muted)">veilvoice privilege shows what VeilVoice runs with, and what it can see.</span></li>
+<li><a href="veilvoice-cli/record.html"><code>record.rs</code></a> <span style="color:var(--muted)">veilvoice record -- capture the veiled voice straight into an encrypted file.</span></li>
 <li><a href="veilvoice-cli/sentry.html"><code>sentry.rs</code></a> <span style="color:var(--muted)">veilvoice sentry -- canaries, baselines, and what changed since.</span></li>
 <li><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a> <span style="color:var(--muted)">Tokyo Night colouring for the terminal.</span></li>
 </ul>
@@ -173,6 +175,7 @@
 <li><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">The application lock: an Argon2id password verifier with a rate limit.</span></li>
 <li><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a> <span style="color:var(--muted)">Writing a file that only its owner can read.</span></li>
 <li><a href="veilvoice-crypto/shred.html"><code>shred.rs</code></a> <span style="color:var(--muted)">Secure erasure, the self-destruct.</span></li>
+<li><a href="veilvoice-crypto/tape.html"><code>tape.rs</code></a> <span style="color:var(--muted)">A recording held in locked, zeroizing memory while it is still being made.</span></li>
 <li><a href="veilvoice-crypto/vault.html"><code>vault.rs</code></a> <span style="color:var(--muted)">Where the app lock is kept: two copies, unpredictable names, and a restore.</span></li>
 <li><a href="veilvoice-crypto/weave.html"><code>weave.rs</code></a> <span style="color:var(--muted)">Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both.</span></li>
 <li><a href="veilvoice-crypto/examples-seal_and_open.html"><code>seal_and_open.rs</code></a> <span style="color:var(--muted)"></span></li>

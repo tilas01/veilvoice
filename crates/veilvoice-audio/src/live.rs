@@ -91,7 +91,29 @@ impl LiveSession {
     pub fn start(
         input: &cpal::Device,
         output: &cpal::Device,
+        config: DeidConfig,
+    ) -> Result<Self, Error> {
+        Self::start_recording(input, output, config, None)
+    }
+
+    /// Start scrambling, and copy the veiled voice into `sink` as it is
+    /// produced.
+    ///
+    /// The sink is fed from inside the output callback, which is where the
+    /// veiled samples exist and the only place they exist before they reach the
+    /// device. Taking them anywhere else would mean a second copy of the audio
+    /// living somewhere unprotected, which is the thing
+    /// [`record`](crate::record) is for avoiding.
+    ///
+    /// [`Sink::write`](crate::record::Sink::write) is realtime-safe, so this
+    /// costs the callback a memcpy into an already-allocated ring and nothing
+    /// else. A sink that cannot keep up drops samples and counts them rather
+    /// than stalling the audio somebody is speaking into.
+    pub fn start_recording(
+        input: &cpal::Device,
+        output: &cpal::Device,
         mut config: DeidConfig,
+        mut sink: Option<crate::record::Sink>,
     ) -> Result<Self, Error> {
         let in_cfg = input
             .default_input_config()
@@ -163,6 +185,13 @@ impl LiveSession {
                     }
 
                     deid.process(&scratch_in[..frames], &mut scratch_out[..frames]);
+
+                    // The veiled voice, at the one moment it exists. Copied
+                    // into the recorder's ring here rather than read back from
+                    // the device, which would be a second unprotected copy.
+                    if let Some(sink) = sink.as_mut() {
+                        sink.write(&scratch_out[..frames]);
+                    }
 
                     let mut peak = 0.0f32;
                     for (frame, &s) in data.chunks_mut(out_channels).zip(&scratch_out[..frames]) {
