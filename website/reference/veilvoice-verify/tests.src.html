@@ -231,7 +231,7 @@
 <span class="ln" id="L161"><span class="tok-com">/// it in a pipeline where a stray line is a parse error.</span></span>
 <span class="ln" id="L162"><span class="tok-com">///</span></span>
 <span class="ln" id="L163"><span class="tok-com">/// So the source itself is checked. Every `print!`, `println!` and `eprintln!`</span></span>
-<span class="ln" id="L164"><span class="tok-com">/// in `main.rs` must be reached through one of the three macros that gate on</span></span>
+<span class="ln" id="L164"><span class="tok-com">/// in `lib.rs` must be reached through one of the three macros that gate on</span></span>
 <span class="ln" id="L165"><span class="tok-com">/// the level, or from inside an explicit `if report::level() &gt;= ...` block, or</span></span>
 <span class="ln" id="L166"><span class="tok-com">/// be one of the few lines that are not reports about a check at all.</span></span>
 <span class="ln" id="L167"><span class="tok-com">///</span></span>
@@ -249,7 +249,7 @@
 <span class="ln" id="L179">    <span class="tok-com">// including on the developer machine that had just run them.</span></span>
 <span class="ln" id="L180">    <span class="tok-com">// Normalised here as well as pinned in .gitattributes: a test that</span></span>
 <span class="ln" id="L181">    <span class="tok-com">// depends on a git setting is a test somebody will trip over.</span></span>
-<span class="ln" id="L182">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L182">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
 <span class="ln" id="L183"></span>
 <span class="ln" id="L184">    <span class="tok-com">// What is allowed to print unconditionally, and why.</span></span>
 <span class="ln" id="L185">    <span class="tok-com">//</span></span>
@@ -299,7 +299,7 @@
 <span class="ln" id="L229">        <span class="tok-kw">if</span> asked_for_directly.<span class="tok-fn">contains</span>(&amp;trimmed) {</span>
 <span class="ln" id="L230">            continue;</span>
 <span class="ln" id="L231">        }</span>
-<span class="ln" id="L232">        ungated.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;main.rs:{}: {trimmed}&quot;</span>, number + <span class="tok-num">1</span>));</span>
+<span class="ln" id="L232">        ungated.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;lib.rs:{}: {trimmed}&quot;</span>, number + <span class="tok-num">1</span>));</span>
 <span class="ln" id="L233">    }</span>
 <span class="ln" id="L234"></span>
 <span class="ln" id="L235">    assert!(</span>
@@ -318,7 +318,7 @@
 <span class="ln" id="L246"><span class="tok-com">/// leftover `FAILURE` would report a bad signature as a typing mistake.</span></span>
 <span class="ln" id="L247"><span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L248"><span class="tok-kw">fn</span> <span class="tok-fn">nothing_exits_with_an_undocumented_status</span>() {</span>
-<span class="ln" id="L249">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L249">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
 <span class="ln" id="L250">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stray = Vec::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L251">    <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> source.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
 <span class="ln" id="L252">        <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim</span>();</span>
@@ -326,7 +326,7 @@
 <span class="ln" id="L254">            continue;</span>
 <span class="ln" id="L255">        }</span>
 <span class="ln" id="L256">        <span class="tok-kw">if</span> trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ExitCode::FAILURE&quot;</span>) {</span>
-<span class="ln" id="L257">            stray.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;main.rs:{}: {trimmed}&quot;</span>, number + <span class="tok-num">1</span>));</span>
+<span class="ln" id="L257">            stray.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;lib.rs:{}: {trimmed}&quot;</span>, number + <span class="tok-num">1</span>));</span>
 <span class="ln" id="L258">        }</span>
 <span class="ln" id="L259">    }</span>
 <span class="ln" id="L260">    assert!(</span>
@@ -447,7 +447,7 @@
 <span class="ln" id="L367"><span class="tok-com">/// one.</span></span>
 <span class="ln" id="L368"><span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L369"><span class="tok-kw">fn</span> <span class="tok-fn">the_contents_list_is_verified_before_it_is_parsed</span>() {</span>
-<span class="ln" id="L370">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L370">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
 <span class="ln" id="L371">    <span class="tok-kw">let</span> body = source</span>
 <span class="ln" id="L372">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn manifest(&quot;</span>)</span>
 <span class="ln" id="L373">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
@@ -522,7 +522,7 @@
 <span class="ln" id="L434"><span class="tok-com">/// from GnuPG counts, and only a bad answer counts against.</span></span>
 <span class="ln" id="L435"><span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L436"><span class="tok-kw">fn</span> <span class="tok-fn">a_gnupg_that_cannot_run_is_never_counted_against_the_release</span>() {</span>
-<span class="ln" id="L437">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L437">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
 <span class="ln" id="L438">    <span class="tok-kw">let</span> body = source</span>
 <span class="ln" id="L439">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn report_gnupg(&quot;</span>)</span>
 <span class="ln" id="L440">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
@@ -560,7 +560,7 @@
 <span class="ln" id="L470"><span class="tok-com">/// to stay true is that `command_auto` refuses before it searches.</span></span>
 <span class="ln" id="L471"><span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L472"><span class="tok-kw">fn</span> <span class="tok-fn">a_named_directory_that_is_not_there_is_refused_before_anything_is_searched</span>() {</span>
-<span class="ln" id="L473">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L473">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
 <span class="ln" id="L474">    <span class="tok-kw">let</span> body = source</span>
 <span class="ln" id="L475">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn command_auto(&quot;</span>)</span>
 <span class="ln" id="L476">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>

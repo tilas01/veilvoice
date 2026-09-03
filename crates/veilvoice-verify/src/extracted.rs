@@ -20,7 +20,7 @@
 //! be lifted **from this side**. It was lifted from the other one. A release
 //! now also publishes `CONTENTS.sha256`, listing every file inside every
 //! archive with its SHA-256, staged before `SHA256SUMS` is computed so that the
-//! signature covers it too. `veilvoice_check::contents` reads it and `main.rs`
+//! signature covers it too. `veilvoice_check::contents` reads it and `lib.rs`
 //! checks the extracted folder against it, file by file, and reports anything
 //! in that folder the release never published.
 //!
@@ -263,7 +263,7 @@ mod tests {
     /// from it.
     #[test]
     fn a_failed_archive_stops_before_the_extracted_report() {
-        let source = include_str!("main.rs").replace("\r\n", "\n");
+        let source = include_str!("lib.rs").replace("\r\n", "\n");
         let start = source
             .find("fn command_auto(")
             .expect("command_auto exists");

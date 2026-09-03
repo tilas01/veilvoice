@@ -1,0 +1,85 @@
+# Maintainer: tilas01 <https://github.com/tilas01>
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The live branch, built from the repository as it stands. This is the package
+# for somebody who wants what is in main rather than what was last tagged; for
+# a release, use the PKGBUILD beside this file.
+#
+# `pkgver()` derives a version from the tags, so `makepkg` on two different
+# days produces two comparably ordered packages rather than two called the
+# same thing.
+
+pkgname=veilvoice-git
+_pkgname=veilvoice
+pkgver=0.1.17.r0.g0000000
+pkgrel=1
+pkgdesc="Irreversible voice de-identification, fully offline (git)"
+arch=('x86_64' 'aarch64')
+url="https://tilas01.github.io/veilvoice/"
+license=('GPL-3.0-or-later')
+
+depends=('alsa-lib' 'gtk3' 'libxkbcommon' 'libglvnd')
+makedepends=('cargo' 'git')
+optdepends=(
+  'gnupg: check a release with your own GnuPG rather than the key built in'
+  'ffmpeg: import audio from a video container, and write video out'
+  'pipewire: a loopback device for live mode'
+)
+provides=("$_pkgname=$pkgver")
+conflicts=("$_pkgname")
+
+source=("$_pkgname::git+https://github.com/tilas01/veilvoice.git")
+# A git source is pinned by the commit makepkg checked out, which is recorded
+# in the built package. There is no tarball to hash.
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  git describe --long --tags --abbrev=7 2>/dev/null \
+    | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' \
+    || printf "0.r%s.g%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+prepare() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release -p veilvoice-cli -p veilvoice-gui
+}
+
+check() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo test --frozen --release --workspace
+}
+
+package() {
+  cd "$_pkgname"
+
+  install -Dm0755 target/release/veilvoice     "$pkgdir/usr/bin/veilvoice"
+  install -Dm0755 target/release/veilvoice-gui "$pkgdir/usr/bin/veilvoice-gui"
+
+  install -Dm0644 assets/icon.png \
+    "$pkgdir/usr/share/icons/hicolor/256x256/apps/veilvoice.png"
+  install -Dm0644 packaging/veilvoice.desktop \
+    "$pkgdir/usr/share/applications/veilvoice.desktop"
+
+  install -Dm0644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm0644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+  for doc in docs/*.md; do
+    install -Dm0644 "$doc" "$pkgdir/usr/share/doc/$pkgname/$(basename "$doc")"
+  done
+
+  python3 tools/release/manpage.py target/release/veilvoice \
+    "$pkgdir/usr/share/man/man1/veilvoice.1"
+  python3 tools/release/manpage.py target/release/veilvoice-gui \
+    "$pkgdir/usr/share/man/man1/veilvoice-gui.1" \
+    --summary "the VeilVoice desktop application"
+}

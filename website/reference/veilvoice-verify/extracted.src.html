@@ -63,7 +63,7 @@
 <span class="ln" id="L20"><span class="tok-com">//! be lifted **from this side**. It was lifted from the other one. A release</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! now also publishes `CONTENTS.sha256`, listing every file inside every</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! archive with its SHA-256, staged before `SHA256SUMS` is computed so that the</span></span>
-<span class="ln" id="L23"><span class="tok-com">//! signature covers it too. `veilvoice_check::contents` reads it and `main.rs`</span></span>
+<span class="ln" id="L23"><span class="tok-com">//! signature covers it too. `veilvoice_check::contents` reads it and `lib.rs`</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! checks the extracted folder against it, file by file, and reports anything</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! in that folder the release never published.</span></span>
 <span class="ln" id="L26"><span class="tok-com">//!</span></span>
@@ -322,7 +322,7 @@
 <span class="ln" id="L263">    <span class="tok-com">/// from it.</span></span>
 <span class="ln" id="L264">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L265">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_archive_stops_before_the_extracted_report</span>() {</span>
-<span class="ln" id="L266">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L266">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
 <span class="ln" id="L267">        <span class="tok-kw">let</span> start = source</span>
 <span class="ln" id="L268">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn command_auto(&quot;</span>)</span>
 <span class="ln" id="L269">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_auto exists&quot;</span>);</span>

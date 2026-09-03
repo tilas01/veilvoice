@@ -30,9 +30,8 @@ class Veilvoice < Formula
     # that Homebrew is a poor fit for; macOS users who want the GUI should take
     # the signed release archive, which is a real app bundle.
     system "cargo", "build", "--release", "--locked",
-           "-p", "veilvoice-cli", "-p", "veilvoice-verify"
+           "-p", "veilvoice-cli"
     bin.install "target/release/veilvoice"
-    bin.install "target/release/veilvoice-verify"
     doc.install "README.md"
     doc.install Dir["docs/*"]
   end
@@ -60,6 +59,6 @@ class Veilvoice < Formula
     # The verifier must carry the right key. If a packaging step ever mangled
     # the embedded key, this is where it shows up.
     assert_match "8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A",
-                 shell_output("#{bin}/veilvoice-verify key")
+                 shell_output("#{bin}/veilvoice verify key")
   end
 end

@@ -25,9 +25,6 @@ override_dh_auto_install:
 	# for that arrangement once (F-71).
 	python3 tools/release/manpage.py target/release/veilvoice \
 		debian/veilvoice/usr/share/man/man1/veilvoice.1
-	python3 tools/release/manpage.py target/release/veilvoice-verify \
-		debian/veilvoice/usr/share/man/man1/veilvoice-verify.1 \
-		--summary "check a VeilVoice release against its signature"
 	python3 tools/release/manpage.py target/release/veilvoice-gui \
 		debian/veilvoice-gui/usr/share/man/man1/veilvoice-gui.1 \
 		--summary "the VeilVoice desktop application"
@@ -35,8 +32,6 @@ override_dh_auto_install:
 	gzip -9n debian/veilvoice-gui/usr/share/man/man1/*.1
 	install -Dpm 0755 target/release/veilvoice \
 		debian/veilvoice/usr/bin/veilvoice
-	install -Dpm 0755 target/release/veilvoice-verify \
-		debian/veilvoice/usr/bin/veilvoice-verify
 	install -Dpm 0755 target/release/veilvoice-gui \
 		debian/veilvoice-gui/usr/bin/veilvoice-gui
 	install -Dpm 0644 assets/icon.png \
