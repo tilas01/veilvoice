@@ -18,6 +18,9 @@ live = ["dep:cpal", "dep:ringbuf"]
 
 [dependencies]
 veilvoice-core = { path = "../veilvoice-core" }
+# Locked, zeroizing memory for a recording that must never reach the page
+# file or a plaintext temporary. See `record`.
+veilvoice-crypto = { path = "../veilvoice-crypto" }
 # Cross-platform audio I/O: WASAPI, CoreAudio, ALSA/JACK.
 cpal = { version = "0.15", optional = true }
 # Lock-free SPSC ring buffer between the audio callbacks and the DSP thread.

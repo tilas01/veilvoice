@@ -48,6 +48,8 @@ pub mod devices;
 pub mod io;
 #[cfg(feature = "live")]
 pub mod live;
+#[cfg(feature = "live")]
+pub mod record;
 // Not behind the `live` feature. The scale is arithmetic over a number, and a
 // front end that only processes files still has a level to draw -- and on the
 // BSDs, where `cpal` has no backend and `live` is off, the alternative would be
@@ -59,6 +61,8 @@ pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
 #[cfg(feature = "live")]
 pub use live::{LiveSession, LiveStats};
+#[cfg(feature = "live")]
+pub use record::{Recorder, Sink};
 
 /// Crate version string, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -81,6 +85,9 @@ pub enum Error {
     Stream(String),
     /// The de-identification engine rejected its configuration.
     Engine(String),
+    /// Protected memory for a recording could not be prepared or filled.
+    #[cfg(feature = "live")]
+    Crypto(veilvoice_crypto::Error),
 }
 
 impl From<std::io::Error> for Error {
@@ -106,6 +113,8 @@ impl std::fmt::Display for Error {
             #[cfg(feature = "live")]
             Self::Stream(m) => write!(f, "audio stream error: {m}"),
             Self::Engine(m) => write!(f, "de-identification engine error: {m}"),
+            #[cfg(feature = "live")]
+            Self::Crypto(e) => write!(f, "protected memory for the recording: {e}"),
         }
     }
 }

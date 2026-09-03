@@ -34,6 +34,7 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 - [[`lib.rs`|File-veilvoice-audio-lib]] &middot; Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path.
 - [[`live.rs`|File-veilvoice-audio-live]] &middot; Live microphone scrambling.
 - [[`meter.rs`|File-veilvoice-audio-meter]] &middot; The scale a level meter is drawn on.
+- [[`record.rs`|File-veilvoice-audio-record]] &middot; Recording the veiled voice without it ever reaching unprotected memory.
 
 ## [[veilvoice-capture|Crate-veilvoice-capture]]
 
@@ -71,6 +72,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`meter.rs`|File-veilvoice-cli-meter]] &middot; Level meters for veilvoice live, on a scale that means something.
 - [[`policy.rs`|File-veilvoice-cli-policy]] &middot; veilvoice policy -- settings that can only be tightened.
 - [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &middot; veilvoice privilege shows what VeilVoice runs with, and what it can see.
+- [[`record.rs`|File-veilvoice-cli-record]] &middot; veilvoice record -- capture the veiled voice straight into an encrypted file.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &middot; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &middot; Tokyo Night colouring for the terminal.
 
@@ -116,6 +118,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`lock.rs`|File-veilvoice-crypto-lock]] &middot; The application lock: an Argon2id password verifier with a rate limit.
 - [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] &middot; Writing a file that only its owner can read.
 - [[`shred.rs`|File-veilvoice-crypto-shred]] &middot; Secure erasure, the self-destruct.
+- [[`tape.rs`|File-veilvoice-crypto-tape]] &middot; A recording held in locked, zeroizing memory while it is still being made.
 - [[`vault.rs`|File-veilvoice-crypto-vault]] &middot; Where the app lock is kept: two copies, unpredictable names, and a restore.
 - [[`weave.rs`|File-veilvoice-crypto-weave]] &middot; Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both.
 - [[`seal_and_open.rs`|File-veilvoice-crypto-examples-seal_and_open]] &middot; no module documentation yet

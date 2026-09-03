@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 214 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 223 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -130,145 +130,154 @@
 <span class="ln" id="L79"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> lock;</span>
 <span class="ln" id="L80"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> privatefile;</span>
 <span class="ln" id="L81"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> shred;</span>
-<span class="ln" id="L82"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> vault;</span>
-<span class="ln" id="L83"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> weave;</span>
-<span class="ln" id="L84"></span>
-<span class="ln" id="L85"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> amnesia::Secret;</span>
-<span class="ln" id="L86"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> lock::{AppLock, LockStore};</span>
-<span class="ln" id="L87"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> shred::{shred_file, Passes, ShredReport};</span>
-<span class="ln" id="L88"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> vault::Vault;</span>
-<span class="ln" id="L89"></span>
+<span class="ln" id="L82"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> tape;</span>
+<span class="ln" id="L83"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> vault;</span>
+<span class="ln" id="L84"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> weave;</span>
+<span class="ln" id="L85"></span>
+<span class="ln" id="L86"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> amnesia::Secret;</span>
+<span class="ln" id="L87"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> lock::{AppLock, LockStore};</span>
+<span class="ln" id="L88"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> shred::{shred_file, Passes, ShredReport};</span>
+<span class="ln" id="L89"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> tape::Tape;</span>
+<span class="ln" id="L90"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> vault::Vault;</span>
+<span class="ln" id="L91"></span>
 <span class="src-item" id="fn-version">
-<span class="ln" id="L90"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
-<span class="ln" id="L91"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
+<span class="ln" id="L92"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
+<span class="ln" id="L93"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
 </span>
-<span class="ln" id="L92"></span>
+<span class="ln" id="L94"></span>
 <span class="src-item" id="fn-error">
-<span class="ln" id="L93"><span class="tok-com">/// Everything that can go wrong in this crate.</span></span>
-<span class="ln" id="L94"><span class="tok-com">///</span></span>
-<span class="ln" id="L95"><span class="tok-com">/// Decryption failures are deliberately coarse: [`Error::Decrypt`] does not say</span></span>
-<span class="ln" id="L96"><span class="tok-com">/// *why* authentication failed, because distinguishing a wrong password from a</span></span>
-<span class="ln" id="L97"><span class="tok-com">/// corrupt tag would hand an attacker an oracle.</span></span>
-<span class="ln" id="L98"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L99"><span class="tok-attr">#[non_exhaustive</span>]</span>
-<span class="ln" id="L100"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
-<span class="ln" id="L101">    <span class="tok-com">/// The OS random number generator was unavailable.</span></span>
-<span class="ln" id="L102">    Random,</span>
-<span class="ln" id="L103">    <span class="tok-com">/// Argon2 rejected the cost parameters, or the salt was too short.</span></span>
-<span class="ln" id="L104">    KdfParams,</span>
-<span class="ln" id="L105">    <span class="tok-com">/// The declared memory cost is legal but above the ceiling this caller set.</span></span>
-<span class="ln" id="L106">    <span class="tok-com">/// See [`kdf::KdfParams::within`].</span></span>
-<span class="ln" id="L107">    KdfCostRefused {</span>
-<span class="ln" id="L108">        <span class="tok-com">/// The memory cost the file asked for, in KiB.</span></span>
-<span class="ln" id="L109">        requested: u32,</span>
-<span class="ln" id="L110">        <span class="tok-com">/// The ceiling the caller allowed, in KiB.</span></span>
-<span class="ln" id="L111">        ceiling: u32,</span>
-<span class="ln" id="L112">    },</span>
-<span class="ln" id="L113">    <span class="tok-com">/// Key derivation failed.</span></span>
-<span class="ln" id="L114">    Kdf,</span>
-<span class="ln" id="L115">    <span class="tok-com">/// A key was not the expected length.</span></span>
-<span class="ln" id="L116">    KeyLength,</span>
-<span class="ln" id="L117">    <span class="tok-com">/// Encryption failed.</span></span>
-<span class="ln" id="L118">    Encrypt,</span>
-<span class="ln" id="L119">    <span class="tok-com">/// Decryption or authentication failed.</span></span>
-<span class="ln" id="L120">    Decrypt,</span>
-<span class="ln" id="L121">    <span class="tok-com">/// KEM encapsulation failed.</span></span>
-<span class="ln" id="L122">    Encapsulate,</span>
-<span class="ln" id="L123">    <span class="tok-com">/// KEM decapsulation failed.</span></span>
-<span class="ln" id="L124">    Decapsulate,</span>
-<span class="ln" id="L125">    <span class="tok-com">/// A public key or encapsulation was malformed.</span></span>
-<span class="ln" id="L126">    BadKeyEncoding,</span>
-<span class="ln" id="L127">    <span class="tok-com">/// The data does not start with the container magic.</span></span>
-<span class="ln" id="L128">    BadMagic,</span>
-<span class="ln" id="L129">    <span class="tok-com">/// The container header is structurally invalid.</span></span>
-<span class="ln" id="L130">    BadHeader,</span>
-<span class="ln" id="L131">    <span class="tok-com">/// The container ended sooner than its header promised.</span></span>
-<span class="ln" id="L132">    Truncated,</span>
-<span class="ln" id="L133">    <span class="tok-com">/// The container uses a format version this build does not support.</span></span>
-<span class="ln" id="L134">    <span class="tok-fn">UnsupportedVersion</span>(u8),</span>
-<span class="ln" id="L135">    <span class="tok-com">/// The container uses an unknown locking mode.</span></span>
-<span class="ln" id="L136">    <span class="tok-fn">UnsupportedMode</span>(u8),</span>
-<span class="ln" id="L137">    <span class="tok-com">/// The container is locked a different way than the call assumed.</span></span>
-<span class="ln" id="L138">    WrongMode,</span>
-<span class="ln" id="L139">    <span class="tok-com">/// A file could not be securely erased.</span></span>
-<span class="ln" id="L140">    Shred,</span>
-<span class="ln" id="L141">    <span class="tok-com">/// The path named for erasure is a symbolic link. Following it would</span></span>
-<span class="ln" id="L142">    <span class="tok-com">/// overwrite whatever it points at while deleting only the link, so it is</span></span>
-<span class="ln" id="L143">    <span class="tok-com">/// refused rather than obeyed.</span></span>
-<span class="ln" id="L144">    ShredSymlink,</span>
-<span class="ln" id="L145">    <span class="tok-com">/// The app-lock password was wrong.</span></span>
-<span class="ln" id="L146">    AppLockRejected,</span>
-<span class="ln" id="L147">    <span class="tok-com">/// Too many wrong app-lock attempts. The payload is the number of seconds</span></span>
-<span class="ln" id="L148">    <span class="tok-com">/// still to wait before another attempt will be considered.</span></span>
-<span class="ln" id="L149">    <span class="tok-fn">AppLockCooldown</span>(u64),</span>
-<span class="ln" id="L150">    <span class="tok-com">/// The app-lock file could not be read, written or removed.</span></span>
-<span class="ln" id="L151">    AppLockStore,</span>
-<span class="ln" id="L152">    <span class="tok-com">/// A lock is already set here, so creating one was refused.</span></span>
-<span class="ln" id="L153">    <span class="tok-com">///</span></span>
-<span class="ln" id="L154">    <span class="tok-com">/// Its own variant because it was reported as [`Self::AppLockStore`], and</span></span>
-<span class="ln" id="L155">    <span class="tok-com">/// that message -- &quot;could not read or write the app-lock file&quot; -- reads as</span></span>
-<span class="ln" id="L156">    <span class="tok-com">/// a broken installation rather than as &quot;you already have one of these&quot;.</span></span>
-<span class="ln" id="L157">    <span class="tok-com">/// A user who saw it had no way to tell a refusal from a failure, which is</span></span>
-<span class="ln" id="L158">    <span class="tok-com">/// half of what made F-141 so confusing to hit.</span></span>
-<span class="ln" id="L159">    AppLockExists,</span>
-<span class="ln" id="L160">    <span class="tok-com">/// The password was changed, but the second copy of the lock could not be</span></span>
-<span class="ln" id="L161">    <span class="tok-com">/// updated, so it still holds the previous one.</span></span>
-<span class="ln" id="L162">    AppLockSpareStale,</span>
-<span class="ln" id="L163">}</span>
+<span class="ln" id="L95"><span class="tok-com">/// Everything that can go wrong in this crate.</span></span>
+<span class="ln" id="L96"><span class="tok-com">///</span></span>
+<span class="ln" id="L97"><span class="tok-com">/// Decryption failures are deliberately coarse: [`Error::Decrypt`] does not say</span></span>
+<span class="ln" id="L98"><span class="tok-com">/// *why* authentication failed, because distinguishing a wrong password from a</span></span>
+<span class="ln" id="L99"><span class="tok-com">/// corrupt tag would hand an attacker an oracle.</span></span>
+<span class="ln" id="L100"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L101"><span class="tok-attr">#[non_exhaustive</span>]</span>
+<span class="ln" id="L102"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
+<span class="ln" id="L103">    <span class="tok-com">/// The OS random number generator was unavailable.</span></span>
+<span class="ln" id="L104">    Random,</span>
+<span class="ln" id="L105">    <span class="tok-com">/// Argon2 rejected the cost parameters, or the salt was too short.</span></span>
+<span class="ln" id="L106">    KdfParams,</span>
+<span class="ln" id="L107">    <span class="tok-com">/// The declared memory cost is legal but above the ceiling this caller set.</span></span>
+<span class="ln" id="L108">    <span class="tok-com">/// See [`kdf::KdfParams::within`].</span></span>
+<span class="ln" id="L109">    KdfCostRefused {</span>
+<span class="ln" id="L110">        <span class="tok-com">/// The memory cost the file asked for, in KiB.</span></span>
+<span class="ln" id="L111">        requested: u32,</span>
+<span class="ln" id="L112">        <span class="tok-com">/// The ceiling the caller allowed, in KiB.</span></span>
+<span class="ln" id="L113">        ceiling: u32,</span>
+<span class="ln" id="L114">    },</span>
+<span class="ln" id="L115">    <span class="tok-com">/// Key derivation failed.</span></span>
+<span class="ln" id="L116">    Kdf,</span>
+<span class="ln" id="L117">    <span class="tok-com">/// A key was not the expected length.</span></span>
+<span class="ln" id="L118">    KeyLength,</span>
+<span class="ln" id="L119">    <span class="tok-com">/// Encryption failed.</span></span>
+<span class="ln" id="L120">    Encrypt,</span>
+<span class="ln" id="L121">    <span class="tok-com">/// Decryption or authentication failed.</span></span>
+<span class="ln" id="L122">    Decrypt,</span>
+<span class="ln" id="L123">    <span class="tok-com">/// KEM encapsulation failed.</span></span>
+<span class="ln" id="L124">    Encapsulate,</span>
+<span class="ln" id="L125">    <span class="tok-com">/// KEM decapsulation failed.</span></span>
+<span class="ln" id="L126">    Decapsulate,</span>
+<span class="ln" id="L127">    <span class="tok-com">/// A public key or encapsulation was malformed.</span></span>
+<span class="ln" id="L128">    BadKeyEncoding,</span>
+<span class="ln" id="L129">    <span class="tok-com">/// The data does not start with the container magic.</span></span>
+<span class="ln" id="L130">    BadMagic,</span>
+<span class="ln" id="L131">    <span class="tok-com">/// The container header is structurally invalid.</span></span>
+<span class="ln" id="L132">    BadHeader,</span>
+<span class="ln" id="L133">    <span class="tok-com">/// The container ended sooner than its header promised.</span></span>
+<span class="ln" id="L134">    Truncated,</span>
+<span class="ln" id="L135">    <span class="tok-com">/// The container uses a format version this build does not support.</span></span>
+<span class="ln" id="L136">    <span class="tok-fn">UnsupportedVersion</span>(u8),</span>
+<span class="ln" id="L137">    <span class="tok-com">/// The container uses an unknown locking mode.</span></span>
+<span class="ln" id="L138">    <span class="tok-fn">UnsupportedMode</span>(u8),</span>
+<span class="ln" id="L139">    <span class="tok-com">/// The container is locked a different way than the call assumed.</span></span>
+<span class="ln" id="L140">    WrongMode,</span>
+<span class="ln" id="L141">    <span class="tok-com">/// A file could not be securely erased.</span></span>
+<span class="ln" id="L142">    Shred,</span>
+<span class="ln" id="L143">    <span class="tok-com">/// The path named for erasure is a symbolic link. Following it would</span></span>
+<span class="ln" id="L144">    <span class="tok-com">/// overwrite whatever it points at while deleting only the link, so it is</span></span>
+<span class="ln" id="L145">    <span class="tok-com">/// refused rather than obeyed.</span></span>
+<span class="ln" id="L146">    ShredSymlink,</span>
+<span class="ln" id="L147">    <span class="tok-com">/// The app-lock password was wrong.</span></span>
+<span class="ln" id="L148">    AppLockRejected,</span>
+<span class="ln" id="L149">    <span class="tok-com">/// Too many wrong app-lock attempts. The payload is the number of seconds</span></span>
+<span class="ln" id="L150">    <span class="tok-com">/// still to wait before another attempt will be considered.</span></span>
+<span class="ln" id="L151">    <span class="tok-fn">AppLockCooldown</span>(u64),</span>
+<span class="ln" id="L152">    <span class="tok-com">/// The app-lock file could not be read, written or removed.</span></span>
+<span class="ln" id="L153">    AppLockStore,</span>
+<span class="ln" id="L154">    <span class="tok-com">/// A lock is already set here, so creating one was refused.</span></span>
+<span class="ln" id="L155">    <span class="tok-com">///</span></span>
+<span class="ln" id="L156">    <span class="tok-com">/// Its own variant because it was reported as [`Self::AppLockStore`], and</span></span>
+<span class="ln" id="L157">    <span class="tok-com">/// that message -- &quot;could not read or write the app-lock file&quot; -- reads as</span></span>
+<span class="ln" id="L158">    <span class="tok-com">/// a broken installation rather than as &quot;you already have one of these&quot;.</span></span>
+<span class="ln" id="L159">    <span class="tok-com">/// A user who saw it had no way to tell a refusal from a failure, which is</span></span>
+<span class="ln" id="L160">    <span class="tok-com">/// half of what made F-141 so confusing to hit.</span></span>
+<span class="ln" id="L161">    AppLockExists,</span>
+<span class="ln" id="L162">    <span class="tok-com">/// The password was changed, but the second copy of the lock could not be</span></span>
+<span class="ln" id="L163">    <span class="tok-com">/// updated, so it still holds the previous one.</span></span>
+<span class="ln" id="L164">    AppLockSpareStale,</span>
+<span class="ln" id="L165">    <span class="tok-com">/// A [`tape::Tape`] was asked to copy itself into a buffer that is not its</span></span>
+<span class="ln" id="L166">    <span class="tok-com">/// own length. Refused rather than part-filled: a recording written into a</span></span>
+<span class="ln" id="L167">    <span class="tok-com">/// buffer sized for a different one is a truncated file nothing would flag.</span></span>
+<span class="ln" id="L168">    TapeLength,</span>
+<span class="ln" id="L169">}</span>
 </span>
-<span class="ln" id="L164"></span>
-<span class="ln" id="L165"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L170"></span>
+<span class="ln" id="L171"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-fmt">
-<span class="ln" id="L166">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L167">        <span class="tok-kw">let</span> msg = <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L168">            Self::Random =&gt; <span class="tok-str">&quot;the operating system random number generator is unavailable&quot;</span>,</span>
-<span class="ln" id="L169">            Self::KdfParams =&gt; <span class="tok-str">&quot;invalid key-derivation parameters&quot;</span>,</span>
-<span class="ln" id="L170">            Self::KdfCostRefused { requested, ceiling } =&gt; {</span>
-<span class="ln" id="L171">                <span class="tok-kw">return</span> write!(</span>
-<span class="ln" id="L172">                    f,</span>
-<span class="ln" id="L173">                    <span class="tok-str">&quot;this file asks for {requested} KiB of memory to open, above the \</span></span>
-<span class="ln" id="L174"><span class="tok-str">                     {ceiling} KiB ceiling this caller allows&quot;</span></span>
-<span class="ln" id="L175">                )</span>
-<span class="ln" id="L176">            }</span>
-<span class="ln" id="L177">            Self::Kdf =&gt; <span class="tok-str">&quot;key derivation failed&quot;</span>,</span>
-<span class="ln" id="L178">            Self::KeyLength =&gt; <span class="tok-str">&quot;key has the wrong length&quot;</span>,</span>
-<span class="ln" id="L179">            Self::Encrypt =&gt; <span class="tok-str">&quot;encryption failed&quot;</span>,</span>
-<span class="ln" id="L180">            Self::Decrypt =&gt; <span class="tok-str">&quot;decryption failed: wrong key, or the data was altered&quot;</span>,</span>
-<span class="ln" id="L181">            Self::Encapsulate =&gt; <span class="tok-str">&quot;key encapsulation failed&quot;</span>,</span>
-<span class="ln" id="L182">            Self::Decapsulate =&gt; <span class="tok-str">&quot;key decapsulation failed&quot;</span>,</span>
-<span class="ln" id="L183">            Self::BadKeyEncoding =&gt; <span class="tok-str">&quot;malformed key or encapsulation&quot;</span>,</span>
-<span class="ln" id="L184">            Self::BadMagic =&gt; <span class="tok-str">&quot;not a VeilVoice container&quot;</span>,</span>
-<span class="ln" id="L185">            Self::BadHeader =&gt; <span class="tok-str">&quot;malformed container header&quot;</span>,</span>
-<span class="ln" id="L186">            Self::Truncated =&gt; <span class="tok-str">&quot;container is truncated&quot;</span>,</span>
-<span class="ln" id="L187">            Self::<span class="tok-fn">UnsupportedVersion</span>(v) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container version {v}&quot;</span>),</span>
-<span class="ln" id="L188">            Self::<span class="tok-fn">UnsupportedMode</span>(m) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container mode {m}&quot;</span>),</span>
-<span class="ln" id="L189">            Self::WrongMode =&gt; <span class="tok-str">&quot;container is locked with a different method&quot;</span>,</span>
-<span class="ln" id="L190">            Self::Shred =&gt; <span class="tok-str">&quot;could not securely erase the file&quot;</span>,</span>
-<span class="ln" id="L191">            Self::ShredSymlink =&gt; {</span>
-<span class="ln" id="L192">                <span class="tok-str">&quot;that path is a symbolic link, so erasing it would destroy whatever it \</span></span>
-<span class="ln" id="L193"><span class="tok-str">                 points at and delete only the link; name the real file instead&quot;</span></span>
-<span class="ln" id="L194">            }</span>
-<span class="ln" id="L195">            Self::AppLockRejected =&gt; <span class="tok-str">&quot;wrong app-lock password&quot;</span>,</span>
-<span class="ln" id="L196">            Self::<span class="tok-fn">AppLockCooldown</span>(secs) =&gt; {</span>
-<span class="ln" id="L197">                <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;too many attempts, so wait {secs}s before trying again&quot;</span>)</span>
-<span class="ln" id="L198">            }</span>
-<span class="ln" id="L199">            Self::AppLockStore =&gt; <span class="tok-str">&quot;could not read or write the app-lock file&quot;</span>,</span>
-<span class="ln" id="L200">            Self::AppLockExists =&gt; {</span>
-<span class="ln" id="L201">                <span class="tok-str">&quot;an app lock is already set on this machine. Change its password \</span></span>
-<span class="ln" id="L202"><span class="tok-str">                 from the security tab, or remove it there first&quot;</span></span>
-<span class="ln" id="L203">            }</span>
-<span class="ln" id="L204">            Self::AppLockSpareStale =&gt; {</span>
-<span class="ln" id="L205">                <span class="tok-str">&quot;the password was changed here, but the administrator-owned copy of the lock \</span></span>
-<span class="ln" id="L206"><span class="tok-str">                 still holds the previous one. Run VeilVoice as an administrator once to \</span></span>
-<span class="ln" id="L207"><span class="tok-str">                 finish the change.&quot;</span></span>
-<span class="ln" id="L208">            }</span>
-<span class="ln" id="L209">        };</span>
-<span class="ln" id="L210">        f.<span class="tok-fn">write_str</span>(msg)</span>
-<span class="ln" id="L211">    }</span>
+<span class="ln" id="L172">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L173">        <span class="tok-kw">let</span> msg = <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L174">            Self::Random =&gt; <span class="tok-str">&quot;the operating system random number generator is unavailable&quot;</span>,</span>
+<span class="ln" id="L175">            Self::KdfParams =&gt; <span class="tok-str">&quot;invalid key-derivation parameters&quot;</span>,</span>
+<span class="ln" id="L176">            Self::KdfCostRefused { requested, ceiling } =&gt; {</span>
+<span class="ln" id="L177">                <span class="tok-kw">return</span> write!(</span>
+<span class="ln" id="L178">                    f,</span>
+<span class="ln" id="L179">                    <span class="tok-str">&quot;this file asks for {requested} KiB of memory to open, above the \</span></span>
+<span class="ln" id="L180"><span class="tok-str">                     {ceiling} KiB ceiling this caller allows&quot;</span></span>
+<span class="ln" id="L181">                )</span>
+<span class="ln" id="L182">            }</span>
+<span class="ln" id="L183">            Self::Kdf =&gt; <span class="tok-str">&quot;key derivation failed&quot;</span>,</span>
+<span class="ln" id="L184">            Self::KeyLength =&gt; <span class="tok-str">&quot;key has the wrong length&quot;</span>,</span>
+<span class="ln" id="L185">            Self::Encrypt =&gt; <span class="tok-str">&quot;encryption failed&quot;</span>,</span>
+<span class="ln" id="L186">            Self::Decrypt =&gt; <span class="tok-str">&quot;decryption failed: wrong key, or the data was altered&quot;</span>,</span>
+<span class="ln" id="L187">            Self::Encapsulate =&gt; <span class="tok-str">&quot;key encapsulation failed&quot;</span>,</span>
+<span class="ln" id="L188">            Self::Decapsulate =&gt; <span class="tok-str">&quot;key decapsulation failed&quot;</span>,</span>
+<span class="ln" id="L189">            Self::BadKeyEncoding =&gt; <span class="tok-str">&quot;malformed key or encapsulation&quot;</span>,</span>
+<span class="ln" id="L190">            Self::BadMagic =&gt; <span class="tok-str">&quot;not a VeilVoice container&quot;</span>,</span>
+<span class="ln" id="L191">            Self::BadHeader =&gt; <span class="tok-str">&quot;malformed container header&quot;</span>,</span>
+<span class="ln" id="L192">            Self::Truncated =&gt; <span class="tok-str">&quot;container is truncated&quot;</span>,</span>
+<span class="ln" id="L193">            Self::<span class="tok-fn">UnsupportedVersion</span>(v) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container version {v}&quot;</span>),</span>
+<span class="ln" id="L194">            Self::<span class="tok-fn">UnsupportedMode</span>(m) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container mode {m}&quot;</span>),</span>
+<span class="ln" id="L195">            Self::WrongMode =&gt; <span class="tok-str">&quot;container is locked with a different method&quot;</span>,</span>
+<span class="ln" id="L196">            Self::Shred =&gt; <span class="tok-str">&quot;could not securely erase the file&quot;</span>,</span>
+<span class="ln" id="L197">            Self::ShredSymlink =&gt; {</span>
+<span class="ln" id="L198">                <span class="tok-str">&quot;that path is a symbolic link, so erasing it would destroy whatever it \</span></span>
+<span class="ln" id="L199"><span class="tok-str">                 points at and delete only the link; name the real file instead&quot;</span></span>
+<span class="ln" id="L200">            }</span>
+<span class="ln" id="L201">            Self::AppLockRejected =&gt; <span class="tok-str">&quot;wrong app-lock password&quot;</span>,</span>
+<span class="ln" id="L202">            Self::<span class="tok-fn">AppLockCooldown</span>(secs) =&gt; {</span>
+<span class="ln" id="L203">                <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;too many attempts, so wait {secs}s before trying again&quot;</span>)</span>
+<span class="ln" id="L204">            }</span>
+<span class="ln" id="L205">            Self::AppLockStore =&gt; <span class="tok-str">&quot;could not read or write the app-lock file&quot;</span>,</span>
+<span class="ln" id="L206">            Self::AppLockExists =&gt; {</span>
+<span class="ln" id="L207">                <span class="tok-str">&quot;an app lock is already set on this machine. Change its password \</span></span>
+<span class="ln" id="L208"><span class="tok-str">                 from the security tab, or remove it there first&quot;</span></span>
+<span class="ln" id="L209">            }</span>
+<span class="ln" id="L210">            Self::AppLockSpareStale =&gt; {</span>
+<span class="ln" id="L211">                <span class="tok-str">&quot;the password was changed here, but the administrator-owned copy of the lock \</span></span>
+<span class="ln" id="L212"><span class="tok-str">                 still holds the previous one. Run VeilVoice as an administrator once to \</span></span>
+<span class="ln" id="L213"><span class="tok-str">                 finish the change.&quot;</span></span>
+<span class="ln" id="L214">            }</span>
+<span class="ln" id="L215">            Self::TapeLength =&gt; {</span>
+<span class="ln" id="L216">                <span class="tok-str">&quot;the buffer offered for the recording is not the length of the recording&quot;</span></span>
+<span class="ln" id="L217">            }</span>
+<span class="ln" id="L218">        };</span>
+<span class="ln" id="L219">        f.<span class="tok-fn">write_str</span>(msg)</span>
+<span class="ln" id="L220">    }</span>
 </span>
-<span class="ln" id="L212">}</span>
-<span class="ln" id="L213"></span>
-<span class="ln" id="L214"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
+<span class="ln" id="L221">}</span>
+<span class="ln" id="L222"></span>
+<span class="ln" id="L223"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -81,6 +81,8 @@ mod input;
 mod lock;
 mod mandate;
 mod priv_mode;
+#[cfg(feature = "live")]
+mod record;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
 #[cfg(feature = "live")]
@@ -225,6 +227,55 @@ enum Command {
         #[arg(long)]
         no_monitor: bool,
     },
+    /// Record yourself already veiled, straight into an encrypted file.
+    ///
+    /// The third case beside `live` and `anonymise`. `live` veils and keeps
+    /// nothing; `anonymise` veils a recording that already exists, in the
+    /// clear, on your disk. This keeps the result and never creates the
+    /// original: the only file it ever writes is the encrypted one.
+    ///
+    /// Stops when you press Enter, or after `--seconds`. Ctrl-C abandons the
+    /// recording and keeps nothing, which is how you throw one away.
+    #[cfg(feature = "live")]
+    Record {
+        /// Input device name. Defaults to the system default.
+        #[arg(short, long)]
+        input: Option<String>,
+        /// Device to monitor on. Defaults to the system default output.
+        #[arg(short, long)]
+        output: Option<String>,
+        /// Stop after this many seconds instead of waiting for Enter.
+        #[arg(long)]
+        seconds: Option<f32>,
+        /// Where to write it. Defaults to a timestamped name here.
+        #[arg(long)]
+        to: Option<PathBuf>,
+        /// Seal to a recipient's public key instead of a passphrase.
+        #[arg(long, value_name = "KEY")]
+        to_public_key: Option<PathBuf>,
+        /// Write it unencrypted. Asks first.
+        #[arg(long)]
+        plaintext: bool,
+        /// Answer that question with yes.
+        #[arg(long)]
+        yes: bool,
+        /// How far pitch and formants are pushed from the original, 0.0-1.0.
+        #[arg(long, default_value_t = 1.0)]
+        intensity: f32,
+        /// Keep the speaker's accent and intonation intact.
+        #[arg(long)]
+        keep_accent: bool,
+        /// Seconds between rolls of the modulation seed.
+        #[arg(long, default_value_t = 2.0)]
+        reseed_secs: f32,
+        /// Draw each gap from a range instead, in milliseconds: `250,1800`.
+        #[arg(long)]
+        reseed_range: Option<String>,
+        /// Do not draw the level meters.
+        #[arg(long)]
+        no_monitor: bool,
+    },
+
     /// List the audio devices this machine offers.
     #[cfg(feature = "live")]
     Devices,
@@ -1193,6 +1244,38 @@ fn run(command: Command) -> Result<(), String> {
             output,
             preview,
             !no_monitor,
+            Tuning {
+                intensity,
+                keep_accent,
+                reseed_secs,
+                reseed_range: reseed_range_from(reseed_range.as_deref())?,
+            },
+        ),
+        #[cfg(feature = "live")]
+        Command::Record {
+            input,
+            output,
+            seconds,
+            to,
+            to_public_key,
+            plaintext,
+            yes,
+            intensity,
+            keep_accent,
+            reseed_secs,
+            reseed_range,
+            no_monitor,
+        } => record::run(
+            input,
+            output,
+            seconds,
+            to,
+            !no_monitor,
+            record::Sealing {
+                public_key: to_public_key,
+                plaintext,
+                yes,
+            },
             Tuning {
                 intensity,
                 keep_accent,
