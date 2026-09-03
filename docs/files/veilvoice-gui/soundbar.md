@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/soundbar.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 722 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 766 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
 
 ## Contents
 
@@ -97,12 +97,12 @@ ignores it is animation that makes an application unusable for them.
 
 ## What this file contains
 
-722 lines defining **5 functions** (1 public), **0 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+766 lines defining **6 functions** (2 public), **0 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `draw` (line 190) -- Draw the mark at size, returning the response so it can carry a tooltip.
-  - reaches: `animation_clock`, `colour_for`, `height_fraction`, `window_is_settled`
+- `badge` (line 202) -- Draw the mark at size, returning the response so it can carry a tooltip.
+  - reaches: `draw`, `animation_clock`, `colour_for`, `height_fraction`, `window_is_settled`
 
 ## What calls what
 
@@ -112,7 +112,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 <p align="center">
   <img src="../../../assets/diagrams/veilvoice-gui/soundbar.svg" alt="what calls what in soundbar.rs" width="640">
@@ -127,8 +127,10 @@ flowchart TD
     n_height_fraction["height_fraction<br/>line 109"]
     n_window_is_settled["window_is_settled<br/>line 136"]
     n_animation_clock["animation_clock<br/>line 174"]
-    n_draw(["draw<br/>line 190"])
-    n_colour_for["colour_for<br/>line 244"]
+    n_badge(["badge<br/>line 202"])
+    n_draw["draw<br/>line 234"]
+    n_colour_for["colour_for<br/>line 288"]
+    n_badge --> n_draw
     n_draw --> n_animation_clock
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
@@ -136,10 +138,13 @@ flowchart TD
     click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109" "open the source"
     click n_window_is_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136" "open the source"
     click n_animation_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174" "open the source"
-    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L190" "open the source"
-    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L244" "open the source"
+    click n_badge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L202" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L234" "open the source"
+    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L288" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_draw entry
+    class n_badge entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_draw api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_height_fraction,n_window_is_settled,n_animation_clock,n_colour_for helper
 ```
@@ -159,8 +164,9 @@ flowchart TD
 | `height_fraction` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
 | `window_is_settled` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136) | Whether the window is holding still enough for the mark to move. |
 | `animation_clock` <sub>fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174) | The clock the bars are drawn against, which is not always the real one. |
-| `draw` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L190) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `colour_for` <sub>fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L244) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
+| `badge` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L202) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `draw` <sub>pub fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L234) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `colour_for` <sub>fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L288) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
 
 ---
 

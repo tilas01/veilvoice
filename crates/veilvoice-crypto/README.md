@@ -108,14 +108,14 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>201 lines"])
+    n_lib(["lib.rs<br/>213 lines"])
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>535 lines"]
     n_hoard["hoard.rs<br/>691 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1534 lines"]
+    n_lock["lock.rs<br/>1821 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_vault["vault.rs<br/>615 lines"]
@@ -152,8 +152,8 @@ flowchart TD
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 691 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 201 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1534 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 213 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1821 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 308 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure, the self-destruct. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
@@ -212,7 +212,9 @@ flowchart TD
 | `struct AppLock` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | A password verifier plus its attempt history. |
 | `struct LockStore` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | An AppLock bound to a file, which is persisted after every attempt. |
 | `fn open_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Open the lock at the default location, wherever this platform keeps it. |
+| `fn open_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Open a vault-backed lock under base, adopting a pre-vault file if one is there. |
 | `fn create_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a lock at the default location, refusing to replace one already there. |
+| `fn create_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a vault-backed lock under base. |
 | `fn default_dir` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | The configuration directory the vault keeps its files in, if the environment says where one is. |
 | `fn default_path` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Where the lock file lives on this platform, if the environment says. |
 | `fn write_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Create path containing bytes, readable only by the current user. |

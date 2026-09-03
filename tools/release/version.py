@@ -88,6 +88,17 @@ PLACES: list[tuple[str, str, str]] = [
     ("packaging/flatpak/io.github.tilas01.VeilVoice.yml", r"^        tag: v([0-9]+\.[0-9]+\.[0-9]+)$", "the git tag built from"),
     ("packaging/rpm/veilvoice.spec", r'"vv_version ([0-9]+\.[0-9]+\.[0-9]+)"', "the rpmbuild example in the header"),
     ("packaging/rpm/veilvoice.spec", r"%\{!\?vv_version:([0-9]+\.[0-9]+\.[0-9]+)\}", "the default when none is passed"),
+    # **F-144.** The worked example a nervous user copies to verify their
+    # download. It said v0.1.9 while the workspace said 0.1.17 -- eight
+    # releases, naming a real old tarball rather than an obvious placeholder,
+    # so following the instructions verbatim downloaded and verified the wrong
+    # release perfectly. The surrounding text does say "replace this with the
+    # release you want", which is exactly the sentence people skip.
+    ("docs/INSTALL.md", r"^V=v([0-9]+\.[0-9]+\.[0-9]+)$", "the by-hand verification example"),
+    ("docs/INSTALL.md", r"veilvoice-v([0-9]+\.[0-9]+\.[0-9]+)-windows-x86_64\.zip", "the PowerShell hash example"),
+    ("docs/INSTALL.md", r"veilvoice-v([0-9]+\.[0-9]+\.[0-9]+)-linux-x86_64\.tar\.gz", "the verifier examples"),
+    ("docs/INSTALL.md", r"`--version v([0-9]+\.[0-9]+\.[0-9]+)`", "the install-script option table"),
+    ("docs/INSTALL.md", r"`-Version v([0-9]+\.[0-9]+\.[0-9]+)`", "the PowerShell option table"),
 ]
 
 # The three files that keep a history. Only the newest entry is checked, and
