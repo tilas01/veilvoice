@@ -115,7 +115,7 @@ flowchart TD
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
     n_lock["lock.rs<br/>1437 lines"]
-    n_privatefile["privatefile.rs<br/>251 lines"]
+    n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_vault["vault.rs<br/>615 lines"]
     n_lock --> n_aead
@@ -148,7 +148,7 @@ flowchart TD
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 200 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1437 | The application lock: an Argon2id password verifier with a rate limit. |
-| [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 251 | Writing a file that only its owner can read. |
+| [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 308 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure, the self-destruct. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
@@ -209,6 +209,7 @@ flowchart TD
 | `fn write_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Create path containing bytes, readable only by the current user. |
 | `fn write_owner_only_new` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As write_owner_only, but fail if anything is already at path. |
 | `fn replace_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Replace path with bytes in one step, or leave what was there. |
+| `fn tighten` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Make an existing file readable only by its owner. |
 | `enum Passes` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | How thoroughly to overwrite before unlinking. |
 | `struct ShredReport` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | What actually happened, so the caller can tell the user the truth. |
 | `fn shred_file` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | Overwrite a file's contents, then delete it. |

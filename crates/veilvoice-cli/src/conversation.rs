@@ -304,14 +304,31 @@ pub fn run(
         samples: rendered.samples,
         sample_rate: audio.sample_rate,
     };
-    audio_io::save_wav(&out_path, &veiled).map_err(|error| error.to_string())?;
+    // Owner-only, all four of them.
+    //
+    // `anonymise` writes its result 0600 even on the path where somebody has
+    // explicitly turned encryption off, and says so while doing it. These four
+    // were written 0644, by the ordinary `fs::write`, readable by every other
+    // account on the machine.
+    //
+    // That is the wrong way round. A conversation's output carries strictly
+    // more than a single speaker's: the subtitles hold the names somebody
+    // typed and the words they typed, in plain text, and the plan's shape says
+    // who spoke when and for how long. The file with more in it had the weaker
+    // permission, and the difference was not a decision anybody took -- one
+    // path used the hardened write and the other used the default.
+    //
+    // Not disk encryption, and the note below still says so. It is the same
+    // file permission the rest of this program applies, applied here too.
+    write_private(
+        &out_path,
+        &audio_io::wav_bytes(&veiled).map_err(|e| e.to_string())?,
+    )?;
 
     let vtt = with_extension(&out_path, Format::WebVtt.extension());
     let srt = with_extension(&out_path, Format::SubRip.extension());
-    std::fs::write(&vtt, subtitles::write(&plan, Format::WebVtt))
-        .map_err(|error| format!("{}: {error}", vtt.display()))?;
-    std::fs::write(&srt, subtitles::write(&plan, Format::SubRip))
-        .map_err(|error| format!("{}: {error}", srt.display()))?;
+    write_private(&vtt, subtitles::write(&plan, Format::WebVtt).as_bytes())?;
+    write_private(&srt, subtitles::write(&plan, Format::SubRip).as_bytes())?;
 
     // The page is written from the *veiled* audio, so its waveform is the
     // waveform of what somebody will actually hear. Drawing the input's would
@@ -329,8 +346,7 @@ pub fn run(
         )
         .map_err(|error| error.to_string())?;
         let html = with_extension(&out_path, "html");
-        std::fs::write(&html, drawn.markup)
-            .map_err(|error| format!("{}: {error}", html.display()))?;
+        write_private(&html, drawn.markup.as_bytes())?;
         for note in &drawn.notes {
             println!("{}", warn(note));
         }
@@ -351,7 +367,10 @@ pub fn run(
         "{}",
         warn(
             "These files are not encrypted. `veilvoice encrypt` seals the audio. The \
-             subtitles hold whatever names you typed, and nothing veils a name."
+             subtitles hold whatever names you typed, and nothing veils a name. They \
+             are written readable only by your account, which is a file permission \
+             and nothing more: it does not survive a copy, a backup, or anyone who \
+             has the disk."
         )
     );
     Ok(())
@@ -396,8 +415,7 @@ pub fn preview(
 
     let drawn = page::still(&plan, &envelope, &look, at_secs).map_err(|e| e.to_string())?;
     let out_path = output.unwrap_or_else(|| with_extension(plan_path, "preview.svg"));
-    std::fs::write(&out_path, drawn.markup)
-        .map_err(|error| format!("{}: {error}", out_path.display()))?;
+    write_private(&out_path, drawn.markup.as_bytes())?;
 
     println!("{}", heading("Preview"));
     println!("{}", field("plan", &plan_path.display().to_string()));
@@ -488,6 +506,22 @@ fn load_plan(path: &Path) -> Result<Conversation, String> {
 }
 
 /// Replace the last extension, keeping any `.veiled` before it.
+/// Write a file only this account can read, naming it if that fails.
+///
+/// Everything a conversation produces goes through here. The audio, both
+/// subtitle tracks and the page all used the ordinary `fs::write`, which is
+/// 0644, while `anonymise` wrote its result 0600 even when somebody had turned
+/// encryption off on purpose.
+///
+/// The conversation output is the one carrying more: the subtitles hold the
+/// names and the words as typed, and the timings say who spoke when. It had
+/// the weaker permission because one path called the hardened write and the
+/// other called the default, not because anybody decided it should.
+fn write_private(path: &Path, bytes: &[u8]) -> Result<(), String> {
+    veilvoice_crypto::privatefile::write_owner_only(path, bytes)
+        .map_err(|error| format!("{}: {error}", path.display()))
+}
+
 fn with_extension(path: &Path, extension: &str) -> PathBuf {
     let mut out = path.to_path_buf();
     out.set_extension(extension);
@@ -591,6 +625,43 @@ mod tests {
         assert_eq!(veiled.sample_rate, original.sample_rate);
         assert_eq!(veiled.samples.len(), original.samples.len());
         assert!(veiled.samples.iter().all(|s| s.is_finite()));
+    }
+
+    /// Nothing a render writes is readable by another account.
+    ///
+    /// All four files used the ordinary `fs::write`, which is 0644, while
+    /// `anonymise` wrote its result 0600 even where somebody had turned
+    /// encryption off on purpose. The conversation output is the one carrying
+    /// the names and the words as typed, so it had the weaker permission on
+    /// the more revealing file, and nobody had decided that: one path called
+    /// the hardened write and the other called the default.
+    #[cfg(unix)]
+    #[test]
+    fn everything_a_render_writes_is_readable_only_by_this_account() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let plan = plan_file(dir.path());
+        let input = wav_file(dir.path(), 1.0);
+        let output = dir.path().join("out.wav");
+        run(
+            &plan,
+            &input,
+            Some(output.clone()),
+            DeidConfig::default(),
+            Some(Look::default()),
+            false,
+        )
+        .expect("the render should succeed");
+
+        for name in ["out.wav", "out.vtt", "out.srt", "out.html"] {
+            let path = dir.path().join(name);
+            assert!(path.exists(), "{name} was not written");
+            let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+            assert_eq!(
+                mode, 0o600,
+                "{name} is {mode:o}, so another account on this machine can read it"
+            );
+        }
     }
 
     /// The output name is derived from the input when none is given.

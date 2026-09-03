@@ -138,7 +138,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="veilvoice-crypto/privatefile.src.html">
 <rect x="142.5" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">privatefile.rs</text>
-<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">251 lines</text>
+<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">308 lines</text>
 </a>
 <a href="veilvoice-crypto/shred.src.html">
 <rect x="419.8" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -165,7 +165,7 @@ flowchart TD
     n_hybrid[&quot;hybrid.rs&lt;br/&gt;448 lines&quot;]
     n_kdf[&quot;kdf.rs&lt;br/&gt;525 lines&quot;]
     n_lock[&quot;lock.rs&lt;br/&gt;1437 lines&quot;]
-    n_privatefile[&quot;privatefile.rs&lt;br/&gt;251 lines&quot;]
+    n_privatefile[&quot;privatefile.rs&lt;br/&gt;308 lines&quot;]
     n_shred[&quot;shred.rs&lt;br/&gt;415 lines&quot;]
     n_vault[&quot;vault.rs&lt;br/&gt;615 lines&quot;]
     n_lock --&gt; n_aead
@@ -196,7 +196,7 @@ flowchart TD
 <tr><td><a href="veilvoice-crypto/kdf.html"><code>kdf.rs</code></a></td><td>525</td><td>Password-based key derivation with Argon2id.</td></tr>
 <tr><td><a href="veilvoice-crypto/lib.html"><code>lib.rs</code></a></td><td>200</td><td>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</td></tr>
 <tr><td><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a></td><td>1437</td><td>The application lock: an Argon2id password verifier with a rate limit.</td></tr>
-<tr><td><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a></td><td>251</td><td>Writing a file that only its owner can read.</td></tr>
+<tr><td><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a></td><td>308</td><td>Writing a file that only its owner can read.</td></tr>
 <tr><td><a href="veilvoice-crypto/shred.html"><code>shred.rs</code></a></td><td>415</td><td>Secure erasure, the self-destruct.</td></tr>
 <tr><td><a href="veilvoice-crypto/vault.html"><code>vault.rs</code></a></td><td>615</td><td>Where the app lock is kept: two copies, unpredictable names, and a restore.</td></tr>
 <tr><td><a href="veilvoice-crypto/examples-seal_and_open.html"><code>seal_and_open.rs</code></a></td><td>80</td><td><span style="color:var(--muted)">no module documentation yet</span></td></tr>

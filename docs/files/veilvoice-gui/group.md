@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/group.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1673 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1745 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
 
 ## Contents
 
@@ -80,7 +80,7 @@ restart is a mode somebody eventually forgets is on.
 
 ## What this file contains
 
-1673 lines defining **39 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1745 lines defining **40 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -110,7 +110,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_22 of 38 functions are drawn; the diagram is bounded at 22 so it
+_22 of 39 functions are drawn; the diagram is bounded at 22 so it
 stays readable. The full list is in the table below._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
@@ -146,7 +146,7 @@ flowchart TD
     n_to_workspace["Group::to_workspace<br/>line 838"]
     n_from_workspace["Group::from_workspace<br/>line 864"]
     n_is_busy["Group::is_busy<br/>line 916"]
-    n_assigned_colour["assigned_colour<br/>line 1260"]
+    n_assigned_colour["assigned_colour<br/>line 1273"]
     n_add --> n_at
     n_body --> n_collect_dialogs
     n_body --> n_mode_controls
@@ -187,7 +187,7 @@ flowchart TD
     click n_to_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L838" "open the source"
     click n_from_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864" "open the source"
     click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916" "open the source"
-    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1260" "open the source"
+    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1273" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -243,8 +243,9 @@ flowchart TD
 | `file_name` <sub>fn</sub> | [1118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1118) | The last component of a path, for showing beside a button. |
 | `Job` <sub>struct</sub> | [1130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1130) | Everything one render needs, taken from the panel at the moment the button was pressed. |
 | `render_now` <sub>fn</sub> | [1150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1150) | Do the render. |
-| `with_extension` <sub>fn</sub> | [1248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1248) | Replace the last extension, keeping any .veiled before it. |
-| `assigned_colour` <sub>pub fn</sub> | [1260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1260) | The colour a slot is given, as an egui colour. |
+| `write_private` <sub>fn</sub> | [1256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1256) | Replace the last extension, keeping any .veiled before it. |
+| `with_extension` <sub>fn</sub> | [1261](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1261) |  |
+| `assigned_colour` <sub>pub fn</sub> | [1273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1273) | The colour a slot is given, as an egui colour. |
 
 ---
 

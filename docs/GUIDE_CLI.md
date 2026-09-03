@@ -333,6 +333,14 @@ including the interviewee's. Subtitles are written beside the audio in both
 formats, and a self-contained player page comes with it that needs nothing
 installed.
 
+**None of it is encrypted, unlike `anonymise`.** Seal the audio afterwards with
+`veilvoice encrypt` if it matters. Everything a render writes is created
+readable only by your account, which is a file permission and nothing more: it
+does not survive a copy, a backup, or anyone who has the disk.
+
+And read the subtitles before sending them anywhere. They carry the names you
+typed and the words you typed, in plain text, and nothing veils a name.
+
 ### Step 4: a video, if you need one
 
 Somewhere that will not accept an audio file:

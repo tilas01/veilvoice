@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/group.rs</code></h1>
-<p style="color:var(--muted)"><a href="group.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1673 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="group.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1745 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1335,33 +1335,33 @@
 <span class="ln" id="L1211">        <span class="tok-com">// The page plays the audio, so it is written whenever the page is --</span></span>
 <span class="ln" id="L1212">        <span class="tok-com">// a player pointing at a file that was never written is worse than no</span></span>
 <span class="ln" id="L1213">        <span class="tok-com">// player.</span></span>
-<span class="ln" id="L1214">        veilvoice_audio::io::<span class="tok-fn">save_wav</span>(&amp;base, &amp;veiled).<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1215">        written.<span class="tok-fn">push</span>(base.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L1216">    }</span>
-<span class="ln" id="L1217"></span>
-<span class="ln" id="L1218">    <span class="tok-kw">let</span> vtt = <span class="tok-fn">with_extension</span>(&amp;base, <span class="tok-str">&quot;vtt&quot;</span>);</span>
-<span class="ln" id="L1219">    <span class="tok-kw">if</span> outputs.subtitles || outputs.page {</span>
-<span class="ln" id="L1220">        std::fs::<span class="tok-fn">write</span>(&amp;vtt, subtitles::<span class="tok-fn">write</span>(&amp;plan, Format::WebVtt))</span>
-<span class="ln" id="L1221">            .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, vtt.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L1222">        written.<span class="tok-fn">push</span>(vtt.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L1223">        <span class="tok-kw">let</span> srt = <span class="tok-fn">with_extension</span>(&amp;base, <span class="tok-str">&quot;srt&quot;</span>);</span>
-<span class="ln" id="L1224">        std::fs::<span class="tok-fn">write</span>(&amp;srt, subtitles::<span class="tok-fn">write</span>(&amp;plan, Format::SubRip))</span>
-<span class="ln" id="L1225">            .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, srt.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L1226">        written.<span class="tok-fn">push</span>(srt);</span>
-<span class="ln" id="L1227">    }</span>
-<span class="ln" id="L1228"></span>
-<span class="ln" id="L1229">    <span class="tok-kw">if</span> outputs.page {</span>
-<span class="ln" id="L1230">        <span class="tok-kw">use</span> veilvoice_video::{page, waveform};</span>
-<span class="ln" id="L1231">        <span class="tok-kw">let</span> look = page::Look::<span class="tok-fn">default</span>().<span class="tok-fn">themed</span>(theme);</span>
-<span class="ln" id="L1232">        <span class="tok-com">// The veiled audio&#x27;s waveform, not the input&#x27;s: a picture of the</span></span>
-<span class="ln" id="L1233">        <span class="tok-com">// original signal beside a file whose point is that the original is</span></span>
-<span class="ln" id="L1234">        <span class="tok-com">// gone would be the wrong picture.</span></span>
-<span class="ln" id="L1235">        <span class="tok-kw">let</span> envelope = waveform::<span class="tok-fn">envelope</span>(&amp;veiled.samples, <span class="tok-num">640</span>);</span>
-<span class="ln" id="L1236">        <span class="tok-kw">let</span> drawn = page::<span class="tok-fn">player</span>(&amp;plan, &amp;envelope, &amp;look, &amp;<span class="tok-fn">file_name</span>(&amp;base), &amp;<span class="tok-fn">file_name</span>(&amp;vtt))</span>
-<span class="ln" id="L1237">            .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1238">        <span class="tok-kw">let</span> html = <span class="tok-fn">with_extension</span>(&amp;base, <span class="tok-str">&quot;html&quot;</span>);</span>
-<span class="ln" id="L1239">        std::fs::<span class="tok-fn">write</span>(&amp;html, drawn.markup)</span>
-<span class="ln" id="L1240">            .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, html.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L1214">        <span class="tok-fn">write_private</span>(</span>
+<span class="ln" id="L1215">            &amp;base,</span>
+<span class="ln" id="L1216">            &amp;veilvoice_audio::io::<span class="tok-fn">wav_bytes</span>(&amp;veiled).<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?,</span>
+<span class="ln" id="L1217">        )?;</span>
+<span class="ln" id="L1218">        written.<span class="tok-fn">push</span>(base.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L1219">    }</span>
+<span class="ln" id="L1220"></span>
+<span class="ln" id="L1221">    <span class="tok-kw">let</span> vtt = <span class="tok-fn">with_extension</span>(&amp;base, <span class="tok-str">&quot;vtt&quot;</span>);</span>
+<span class="ln" id="L1222">    <span class="tok-kw">if</span> outputs.subtitles || outputs.page {</span>
+<span class="ln" id="L1223">        <span class="tok-fn">write_private</span>(&amp;vtt, subtitles::<span class="tok-fn">write</span>(&amp;plan, Format::WebVtt).<span class="tok-fn">as_bytes</span>())?;</span>
+<span class="ln" id="L1224">        written.<span class="tok-fn">push</span>(vtt.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L1225">        <span class="tok-kw">let</span> srt = <span class="tok-fn">with_extension</span>(&amp;base, <span class="tok-str">&quot;srt&quot;</span>);</span>
+<span class="ln" id="L1226">        <span class="tok-fn">write_private</span>(&amp;srt, subtitles::<span class="tok-fn">write</span>(&amp;plan, Format::SubRip).<span class="tok-fn">as_bytes</span>())?;</span>
+<span class="ln" id="L1227">        written.<span class="tok-fn">push</span>(srt);</span>
+<span class="ln" id="L1228">    }</span>
+<span class="ln" id="L1229"></span>
+<span class="ln" id="L1230">    <span class="tok-kw">if</span> outputs.page {</span>
+<span class="ln" id="L1231">        <span class="tok-kw">use</span> veilvoice_video::{page, waveform};</span>
+<span class="ln" id="L1232">        <span class="tok-kw">let</span> look = page::Look::<span class="tok-fn">default</span>().<span class="tok-fn">themed</span>(theme);</span>
+<span class="ln" id="L1233">        <span class="tok-com">// The veiled audio&#x27;s waveform, not the input&#x27;s: a picture of the</span></span>
+<span class="ln" id="L1234">        <span class="tok-com">// original signal beside a file whose point is that the original is</span></span>
+<span class="ln" id="L1235">        <span class="tok-com">// gone would be the wrong picture.</span></span>
+<span class="ln" id="L1236">        <span class="tok-kw">let</span> envelope = waveform::<span class="tok-fn">envelope</span>(&amp;veiled.samples, <span class="tok-num">640</span>);</span>
+<span class="ln" id="L1237">        <span class="tok-kw">let</span> drawn = page::<span class="tok-fn">player</span>(&amp;plan, &amp;envelope, &amp;look, &amp;<span class="tok-fn">file_name</span>(&amp;base), &amp;<span class="tok-fn">file_name</span>(&amp;vtt))</span>
+<span class="ln" id="L1238">            .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1239">        <span class="tok-kw">let</span> html = <span class="tok-fn">with_extension</span>(&amp;base, <span class="tok-str">&quot;html&quot;</span>);</span>
+<span class="ln" id="L1240">        <span class="tok-fn">write_private</span>(&amp;html, drawn.markup.<span class="tok-fn">as_bytes</span>())?;</span>
 <span class="ln" id="L1241">        written.<span class="tok-fn">push</span>(html);</span>
 <span class="ln" id="L1242">    }</span>
 <span class="ln" id="L1243"></span>
@@ -1369,437 +1369,511 @@
 <span class="ln" id="L1245">}</span>
 </span>
 <span class="ln" id="L1246"></span>
-<span class="src-item" id="fn-with_extension">
+<span class="src-item" id="fn-write_private">
 <span class="ln" id="L1247"><span class="tok-com">/// Replace the last extension, keeping any `.veiled` before it.</span></span>
-<span class="ln" id="L1248"><span class="tok-kw">fn</span> <span class="tok-fn">with_extension</span>(path: &amp;std::path::Path, extension: &amp;str) -&gt; PathBuf {</span>
-<span class="ln" id="L1249">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = path.<span class="tok-fn">to_path_buf</span>();</span>
-<span class="ln" id="L1250">    out.<span class="tok-fn">set_extension</span>(extension);</span>
-<span class="ln" id="L1251">    out</span>
-<span class="ln" id="L1252">}</span>
+<span class="ln" id="L1248"><span class="tok-com">/// Write a file only this account can read, naming it if that fails.</span></span>
+<span class="ln" id="L1249"><span class="tok-com">///</span></span>
+<span class="ln" id="L1250"><span class="tok-com">/// The same fix as the command line&#x27;s, in the other half of the program. All</span></span>
+<span class="ln" id="L1251"><span class="tok-com">/// four of these used the ordinary `fs::write`, which is 0644, while the file</span></span>
+<span class="ln" id="L1252"><span class="tok-com">/// tab wrote its result 0600 even where somebody had turned encryption off on</span></span>
+<span class="ln" id="L1253"><span class="tok-com">/// purpose. The group output is the one holding the names and the words as</span></span>
+<span class="ln" id="L1254"><span class="tok-com">/// typed, so the more revealing file had the weaker permission, and that was</span></span>
+<span class="ln" id="L1255"><span class="tok-com">/// not a decision: one path called the hardened write, the other the default.</span></span>
+<span class="ln" id="L1256"><span class="tok-kw">fn</span> <span class="tok-fn">write_private</span>(path: &amp;std::path::Path, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L1257">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, bytes)</span>
+<span class="ln" id="L1258">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, path.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L1259">}</span>
 </span>
-<span class="ln" id="L1253"></span>
+<span class="ln" id="L1260"></span>
+<span class="src-item" id="fn-with_extension">
+<span class="ln" id="L1261"><span class="tok-kw">fn</span> <span class="tok-fn">with_extension</span>(path: &amp;std::path::Path, extension: &amp;str) -&gt; PathBuf {</span>
+<span class="ln" id="L1262">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = path.<span class="tok-fn">to_path_buf</span>();</span>
+<span class="ln" id="L1263">    out.<span class="tok-fn">set_extension</span>(extension);</span>
+<span class="ln" id="L1264">    out</span>
+<span class="ln" id="L1265">}</span>
+</span>
+<span class="ln" id="L1266"></span>
 <span class="src-item" id="fn-assigned_colour">
-<span class="ln" id="L1254"><span class="tok-com">/// The colour a slot is given, as an egui colour.</span></span>
-<span class="ln" id="L1255"><span class="tok-com">///</span></span>
-<span class="ln" id="L1256"><span class="tok-com">/// One table, shared with the video crate rather than copied here, so a circle</span></span>
-<span class="ln" id="L1257"><span class="tok-com">/// in this panel and the same speaker&#x27;s circle in a rendered page cannot drift</span></span>
-<span class="ln" id="L1258"><span class="tok-com">/// apart. `unwrap_or` rather than `expect`: a malformed entry would be a bug in</span></span>
-<span class="ln" id="L1259"><span class="tok-com">/// that table, and a panel is the wrong place to find out about it.</span></span>
-<span class="ln" id="L1260"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">assigned_colour</span>(slot: usize) -&gt; Color32 {</span>
-<span class="ln" id="L1261">    <span class="tok-kw">let</span> hex = veilvoice_video::palette::<span class="tok-fn">speaker</span>(slot);</span>
-<span class="ln" id="L1262">    <span class="tok-kw">match</span> veilvoice_video::palette::<span class="tok-fn">rgb</span>(hex) {</span>
-<span class="ln" id="L1263">        <span class="tok-fn">Some</span>((r, g, b)) =&gt; Color32::<span class="tok-fn">from_rgb</span>(r, g, b),</span>
-<span class="ln" id="L1264">        None =&gt; Color32::GRAY,</span>
-<span class="ln" id="L1265">    }</span>
-<span class="ln" id="L1266">}</span>
+<span class="ln" id="L1267"><span class="tok-com">/// The colour a slot is given, as an egui colour.</span></span>
+<span class="ln" id="L1268"><span class="tok-com">///</span></span>
+<span class="ln" id="L1269"><span class="tok-com">/// One table, shared with the video crate rather than copied here, so a circle</span></span>
+<span class="ln" id="L1270"><span class="tok-com">/// in this panel and the same speaker&#x27;s circle in a rendered page cannot drift</span></span>
+<span class="ln" id="L1271"><span class="tok-com">/// apart. `unwrap_or` rather than `expect`: a malformed entry would be a bug in</span></span>
+<span class="ln" id="L1272"><span class="tok-com">/// that table, and a panel is the wrong place to find out about it.</span></span>
+<span class="ln" id="L1273"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">assigned_colour</span>(slot: usize) -&gt; Color32 {</span>
+<span class="ln" id="L1274">    <span class="tok-kw">let</span> hex = veilvoice_video::palette::<span class="tok-fn">speaker</span>(slot);</span>
+<span class="ln" id="L1275">    <span class="tok-kw">match</span> veilvoice_video::palette::<span class="tok-fn">rgb</span>(hex) {</span>
+<span class="ln" id="L1276">        <span class="tok-fn">Some</span>((r, g, b)) =&gt; Color32::<span class="tok-fn">from_rgb</span>(r, g, b),</span>
+<span class="ln" id="L1277">        None =&gt; Color32::GRAY,</span>
+<span class="ln" id="L1278">    }</span>
+<span class="ln" id="L1279">}</span>
 </span>
-<span class="ln" id="L1267"></span>
-<span class="ln" id="L1268"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1269"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L1270">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L1271"></span>
-<span class="ln" id="L1272">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1273">    <span class="tok-kw">fn</span> <span class="tok-fn">group_mode_is_off_unless_the_saved_preference_says_otherwise</span>() {</span>
-<span class="ln" id="L1274">        assert!(!Group::<span class="tok-fn">default</span>().enabled);</span>
-<span class="ln" id="L1275">        assert!(!Group::<span class="tok-fn">start_from</span>(false).enabled);</span>
-<span class="ln" id="L1276">        assert!(Group::<span class="tok-fn">start_from</span>(true).enabled);</span>
-<span class="ln" id="L1277">    }</span>
-<span class="ln" id="L1278"></span>
-<span class="ln" id="L1279">    <span class="tok-com">/// The whole reason the mode is not persisted: it must not survive a</span></span>
-<span class="ln" id="L1280">    <span class="tok-com">/// restart on its own. This is the test that would fail if somebody added</span></span>
-<span class="ln" id="L1281">    <span class="tok-com">/// `enabled` to `Prefs`.</span></span>
-<span class="ln" id="L1282">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1283">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_panel_never_opens_in_group_mode</span>() {</span>
-<span class="ln" id="L1284">        <span class="tok-kw">let</span> turned_on = Group {</span>
-<span class="ln" id="L1285">            enabled: true,</span>
-<span class="ln" id="L1286">            ..Group::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1287">        };</span>
-<span class="ln" id="L1288">        assert!(turned_on.enabled, <span class="tok-str">&quot;turning it on works within a run&quot;</span>);</span>
-<span class="ln" id="L1289">        <span class="tok-com">// A fresh panel, as a restart produces.</span></span>
-<span class="ln" id="L1290">        assert!(!Group::<span class="tok-fn">default</span>().enabled);</span>
-<span class="ln" id="L1291">    }</span>
-<span class="ln" id="L1292"></span>
-<span class="ln" id="L1293">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1294">    <span class="tok-kw">fn</span> <span class="tok-fn">a_slot_gets_the_colour_its_slot_is_given_until_one_is_chosen</span>() {</span>
-<span class="ln" id="L1295">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1296">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">0</span>), <span class="tok-fn">assigned_colour</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L1297">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">1</span>), <span class="tok-fn">assigned_colour</span>(<span class="tok-num">1</span>));</span>
-<span class="ln" id="L1298">        group.people[<span class="tok-num">0</span>].colour = <span class="tok-fn">Some</span>(Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>));</span>
-<span class="ln" id="L1299">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">0</span>), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>));</span>
-<span class="ln" id="L1300">        <span class="tok-com">// The override is one speaker&#x27;s, not everybody&#x27;s.</span></span>
-<span class="ln" id="L1301">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">1</span>), <span class="tok-fn">assigned_colour</span>(<span class="tok-num">1</span>));</span>
-<span class="ln" id="L1302">    }</span>
-<span class="ln" id="L1303"></span>
-<span class="ln" id="L1304">    <span class="tok-com">/// Two speakers is the common case, and slots 0 and 1 are the furthest</span></span>
-<span class="ln" id="L1305">    <span class="tok-com">/// apart pair in the table. If that ever stops being true the panel is</span></span>
-<span class="ln" id="L1306">    <span class="tok-com">/// drawing two people in two colours somebody cannot tell apart.</span></span>
-<span class="ln" id="L1307">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1308">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_two_colours_are_the_furthest_apart_pair</span>() {</span>
-<span class="ln" id="L1309">        <span class="tok-kw">let</span> table = veilvoice_video::palette::SPEAKERS;</span>
-<span class="ln" id="L1310">        <span class="tok-kw">let</span> first = veilvoice_video::palette::<span class="tok-fn">distance</span>(table[<span class="tok-num">0</span>], table[<span class="tok-num">1</span>]);</span>
-<span class="ln" id="L1311">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> table.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1312">            <span class="tok-kw">for</span> b <span class="tok-kw">in</span> table.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(i + <span class="tok-num">1</span>) {</span>
-<span class="ln" id="L1313">                assert!(</span>
-<span class="ln" id="L1314">                    veilvoice_video::palette::<span class="tok-fn">distance</span>(a, b) &lt;= first,</span>
-<span class="ln" id="L1315">                    <span class="tok-str">&quot;{a} and {b} are further apart than slots 0 and 1&quot;</span></span>
-<span class="ln" id="L1316">                );</span>
-<span class="ln" id="L1317">            }</span>
-<span class="ln" id="L1318">        }</span>
-<span class="ln" id="L1319">    }</span>
-<span class="ln" id="L1320"></span>
-<span class="ln" id="L1321">    <span class="tok-com">/// The limit is the *measured* one -- how many voices can be told apart --</span></span>
-<span class="ln" id="L1322">    <span class="tok-com">/// not the ten the table holds.</span></span>
-<span class="ln" id="L1323">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1324">    <span class="tok-com">/// Written as a bounded loop rather than `while len &lt; MAX_VOICES`, which is</span></span>
-<span class="ln" id="L1325">    <span class="tok-com">/// what it was: `add` now refuses at nine, so that loop never terminated</span></span>
-<span class="ln" id="L1326">    <span class="tok-com">/// and the test suite hung rather than failed. A test that cannot fail</span></span>
-<span class="ln" id="L1327">    <span class="tok-com">/// cannot pass either.</span></span>
-<span class="ln" id="L1328">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1329">    <span class="tok-kw">fn</span> <span class="tok-fn">a_ninth_speaker_is_refused_and_the_refusal_names_the_way_out</span>() {</span>
-<span class="ln" id="L1330">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1331">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES + <span class="tok-num">4</span> {</span>
-<span class="ln" id="L1332">            group.<span class="tok-fn">add</span>();</span>
-<span class="ln" id="L1333">        }</span>
-<span class="ln" id="L1334">        <span class="tok-kw">let</span> clear = voices::<span class="tok-fn">clear_voices</span>(&amp;DeidConfig::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L1335">        assert_eq!(clear, <span class="tok-num">8</span>, <span class="tok-str">&quot;the measured clear limit&quot;</span>);</span>
-<span class="ln" id="L1336">        assert_eq!(group.<span class="tok-fn">len</span>(), clear, <span class="tok-str">&quot;the panel stops where the voices do&quot;</span>);</span>
-<span class="ln" id="L1337"></span>
-<span class="ln" id="L1338">        <span class="tok-kw">let</span> notice = group.notice.<span class="tok-fn">clone</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the refusal must be explained&quot;</span>);</span>
-<span class="ln" id="L1339">        assert!(notice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
-<span class="ln" id="L1340">    }</span>
-<span class="ln" id="L1341"></span>
-<span class="ln" id="L1342">    <span class="tok-com">/// And switching to one voice lifts it, which is the point of the refusal</span></span>
-<span class="ln" id="L1343">    <span class="tok-com">/// naming that mode.</span></span>
-<span class="ln" id="L1344">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1345">    <span class="tok-kw">fn</span> <span class="tok-fn">one_voice_for_everybody_carries_more_people</span>() {</span>
-<span class="ln" id="L1346">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
-<span class="ln" id="L1347">            voices: VoiceMode::Uniform,</span>
-<span class="ln" id="L1348">            ..Group::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1349">        };</span>
-<span class="ln" id="L1350">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES + <span class="tok-num">4</span> {</span>
-<span class="ln" id="L1351">            group.<span class="tok-fn">add</span>();</span>
-<span class="ln" id="L1352">        }</span>
-<span class="ln" id="L1353">        assert_eq!(group.<span class="tok-fn">len</span>(), MAX_VOICES, <span class="tok-str">&quot;up to what a plan can hold&quot;</span>);</span>
-<span class="ln" id="L1354">        assert_eq!(group.<span class="tok-fn">limit</span>(), MAX_VOICES);</span>
-<span class="ln" id="L1355">    }</span>
-<span class="ln" id="L1356"></span>
-<span class="ln" id="L1357">    <span class="tok-com">/// Switching *back* with too many people is refused rather than silently</span></span>
-<span class="ln" id="L1358">    <span class="tok-com">/// dropping somebody or handing two people one voice.</span></span>
-<span class="ln" id="L1359">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1360">    <span class="tok-kw">fn</span> <span class="tok-fn">switching_back_to_a_voice_each_is_refused_when_there_are_too_many</span>() {</span>
-<span class="ln" id="L1361">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1362">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
-<span class="ln" id="L1363">            voices: VoiceMode::Uniform,</span>
-<span class="ln" id="L1364">            ..Group::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1365">        };</span>
-<span class="ln" id="L1366">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES + <span class="tok-num">4</span> {</span>
-<span class="ln" id="L1367">            group.<span class="tok-fn">add</span>();</span>
-<span class="ln" id="L1368">        }</span>
-<span class="ln" id="L1369">        assert!(voice_mode::<span class="tok-fn">check</span>(group.<span class="tok-fn">len</span>(), VoiceMode::Distinct, &amp;config).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L1370">    }</span>
-<span class="ln" id="L1371"></span>
-<span class="ln" id="L1372">    <span class="tok-com">/// One speaker is not a group. Removing past two would leave the mode on</span></span>
-<span class="ln" id="L1373">    <span class="tok-com">/// with nothing for it to do.</span></span>
-<span class="ln" id="L1374">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1375">    <span class="tok-kw">fn</span> <span class="tok-fn">removing_stops_at_two</span>() {</span>
-<span class="ln" id="L1376">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1377">        group.<span class="tok-fn">add</span>();</span>
-<span class="ln" id="L1378">        assert_eq!(group.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>);</span>
-<span class="ln" id="L1379">        group.<span class="tok-fn">remove</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L1380">        assert_eq!(group.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L1381">        group.<span class="tok-fn">remove</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L1382">        assert_eq!(group.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;two is the floor&quot;</span>);</span>
+<span class="ln" id="L1280"></span>
+<span class="ln" id="L1281"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1282"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L1283">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1284"></span>
+<span class="ln" id="L1285">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1286">    <span class="tok-kw">fn</span> <span class="tok-fn">group_mode_is_off_unless_the_saved_preference_says_otherwise</span>() {</span>
+<span class="ln" id="L1287">        assert!(!Group::<span class="tok-fn">default</span>().enabled);</span>
+<span class="ln" id="L1288">        assert!(!Group::<span class="tok-fn">start_from</span>(false).enabled);</span>
+<span class="ln" id="L1289">        assert!(Group::<span class="tok-fn">start_from</span>(true).enabled);</span>
+<span class="ln" id="L1290">    }</span>
+<span class="ln" id="L1291"></span>
+<span class="ln" id="L1292">    <span class="tok-com">/// The whole reason the mode is not persisted: it must not survive a</span></span>
+<span class="ln" id="L1293">    <span class="tok-com">/// restart on its own. This is the test that would fail if somebody added</span></span>
+<span class="ln" id="L1294">    <span class="tok-com">/// `enabled` to `Prefs`.</span></span>
+<span class="ln" id="L1295">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1296">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_panel_never_opens_in_group_mode</span>() {</span>
+<span class="ln" id="L1297">        <span class="tok-kw">let</span> turned_on = Group {</span>
+<span class="ln" id="L1298">            enabled: true,</span>
+<span class="ln" id="L1299">            ..Group::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1300">        };</span>
+<span class="ln" id="L1301">        assert!(turned_on.enabled, <span class="tok-str">&quot;turning it on works within a run&quot;</span>);</span>
+<span class="ln" id="L1302">        <span class="tok-com">// A fresh panel, as a restart produces.</span></span>
+<span class="ln" id="L1303">        assert!(!Group::<span class="tok-fn">default</span>().enabled);</span>
+<span class="ln" id="L1304">    }</span>
+<span class="ln" id="L1305"></span>
+<span class="ln" id="L1306">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1307">    <span class="tok-kw">fn</span> <span class="tok-fn">a_slot_gets_the_colour_its_slot_is_given_until_one_is_chosen</span>() {</span>
+<span class="ln" id="L1308">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1309">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">0</span>), <span class="tok-fn">assigned_colour</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L1310">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">1</span>), <span class="tok-fn">assigned_colour</span>(<span class="tok-num">1</span>));</span>
+<span class="ln" id="L1311">        group.people[<span class="tok-num">0</span>].colour = <span class="tok-fn">Some</span>(Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>));</span>
+<span class="ln" id="L1312">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">0</span>), Color32::<span class="tok-fn">from_rgb</span>(<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>));</span>
+<span class="ln" id="L1313">        <span class="tok-com">// The override is one speaker&#x27;s, not everybody&#x27;s.</span></span>
+<span class="ln" id="L1314">        assert_eq!(group.<span class="tok-fn">colour</span>(<span class="tok-num">1</span>), <span class="tok-fn">assigned_colour</span>(<span class="tok-num">1</span>));</span>
+<span class="ln" id="L1315">    }</span>
+<span class="ln" id="L1316"></span>
+<span class="ln" id="L1317">    <span class="tok-com">/// Two speakers is the common case, and slots 0 and 1 are the furthest</span></span>
+<span class="ln" id="L1318">    <span class="tok-com">/// apart pair in the table. If that ever stops being true the panel is</span></span>
+<span class="ln" id="L1319">    <span class="tok-com">/// drawing two people in two colours somebody cannot tell apart.</span></span>
+<span class="ln" id="L1320">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1321">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_two_colours_are_the_furthest_apart_pair</span>() {</span>
+<span class="ln" id="L1322">        <span class="tok-kw">let</span> table = veilvoice_video::palette::SPEAKERS;</span>
+<span class="ln" id="L1323">        <span class="tok-kw">let</span> first = veilvoice_video::palette::<span class="tok-fn">distance</span>(table[<span class="tok-num">0</span>], table[<span class="tok-num">1</span>]);</span>
+<span class="ln" id="L1324">        <span class="tok-kw">for</span> (i, a) <span class="tok-kw">in</span> table.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1325">            <span class="tok-kw">for</span> b <span class="tok-kw">in</span> table.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(i + <span class="tok-num">1</span>) {</span>
+<span class="ln" id="L1326">                assert!(</span>
+<span class="ln" id="L1327">                    veilvoice_video::palette::<span class="tok-fn">distance</span>(a, b) &lt;= first,</span>
+<span class="ln" id="L1328">                    <span class="tok-str">&quot;{a} and {b} are further apart than slots 0 and 1&quot;</span></span>
+<span class="ln" id="L1329">                );</span>
+<span class="ln" id="L1330">            }</span>
+<span class="ln" id="L1331">        }</span>
+<span class="ln" id="L1332">    }</span>
+<span class="ln" id="L1333"></span>
+<span class="ln" id="L1334">    <span class="tok-com">/// The limit is the *measured* one -- how many voices can be told apart --</span></span>
+<span class="ln" id="L1335">    <span class="tok-com">/// not the ten the table holds.</span></span>
+<span class="ln" id="L1336">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1337">    <span class="tok-com">/// Written as a bounded loop rather than `while len &lt; MAX_VOICES`, which is</span></span>
+<span class="ln" id="L1338">    <span class="tok-com">/// what it was: `add` now refuses at nine, so that loop never terminated</span></span>
+<span class="ln" id="L1339">    <span class="tok-com">/// and the test suite hung rather than failed. A test that cannot fail</span></span>
+<span class="ln" id="L1340">    <span class="tok-com">/// cannot pass either.</span></span>
+<span class="ln" id="L1341">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1342">    <span class="tok-kw">fn</span> <span class="tok-fn">a_ninth_speaker_is_refused_and_the_refusal_names_the_way_out</span>() {</span>
+<span class="ln" id="L1343">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1344">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES + <span class="tok-num">4</span> {</span>
+<span class="ln" id="L1345">            group.<span class="tok-fn">add</span>();</span>
+<span class="ln" id="L1346">        }</span>
+<span class="ln" id="L1347">        <span class="tok-kw">let</span> clear = voices::<span class="tok-fn">clear_voices</span>(&amp;DeidConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L1348">        assert_eq!(clear, <span class="tok-num">8</span>, <span class="tok-str">&quot;the measured clear limit&quot;</span>);</span>
+<span class="ln" id="L1349">        assert_eq!(group.<span class="tok-fn">len</span>(), clear, <span class="tok-str">&quot;the panel stops where the voices do&quot;</span>);</span>
+<span class="ln" id="L1350"></span>
+<span class="ln" id="L1351">        <span class="tok-kw">let</span> notice = group.notice.<span class="tok-fn">clone</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the refusal must be explained&quot;</span>);</span>
+<span class="ln" id="L1352">        assert!(notice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
+<span class="ln" id="L1353">    }</span>
+<span class="ln" id="L1354"></span>
+<span class="ln" id="L1355">    <span class="tok-com">/// And switching to one voice lifts it, which is the point of the refusal</span></span>
+<span class="ln" id="L1356">    <span class="tok-com">/// naming that mode.</span></span>
+<span class="ln" id="L1357">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1358">    <span class="tok-kw">fn</span> <span class="tok-fn">one_voice_for_everybody_carries_more_people</span>() {</span>
+<span class="ln" id="L1359">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
+<span class="ln" id="L1360">            voices: VoiceMode::Uniform,</span>
+<span class="ln" id="L1361">            ..Group::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1362">        };</span>
+<span class="ln" id="L1363">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES + <span class="tok-num">4</span> {</span>
+<span class="ln" id="L1364">            group.<span class="tok-fn">add</span>();</span>
+<span class="ln" id="L1365">        }</span>
+<span class="ln" id="L1366">        assert_eq!(group.<span class="tok-fn">len</span>(), MAX_VOICES, <span class="tok-str">&quot;up to what a plan can hold&quot;</span>);</span>
+<span class="ln" id="L1367">        assert_eq!(group.<span class="tok-fn">limit</span>(), MAX_VOICES);</span>
+<span class="ln" id="L1368">    }</span>
+<span class="ln" id="L1369"></span>
+<span class="ln" id="L1370">    <span class="tok-com">/// Switching *back* with too many people is refused rather than silently</span></span>
+<span class="ln" id="L1371">    <span class="tok-com">/// dropping somebody or handing two people one voice.</span></span>
+<span class="ln" id="L1372">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1373">    <span class="tok-kw">fn</span> <span class="tok-fn">switching_back_to_a_voice_each_is_refused_when_there_are_too_many</span>() {</span>
+<span class="ln" id="L1374">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1375">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
+<span class="ln" id="L1376">            voices: VoiceMode::Uniform,</span>
+<span class="ln" id="L1377">            ..Group::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1378">        };</span>
+<span class="ln" id="L1379">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES + <span class="tok-num">4</span> {</span>
+<span class="ln" id="L1380">            group.<span class="tok-fn">add</span>();</span>
+<span class="ln" id="L1381">        }</span>
+<span class="ln" id="L1382">        assert!(voice_mode::<span class="tok-fn">check</span>(group.<span class="tok-fn">len</span>(), VoiceMode::Distinct, &amp;config).<span class="tok-fn">is_err</span>());</span>
 <span class="ln" id="L1383">    }</span>
 <span class="ln" id="L1384"></span>
-<span class="ln" id="L1385">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1386">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_carries_the_names_in_slot_order</span>() {</span>
-<span class="ln" id="L1387">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1388">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1389">        group.people[<span class="tok-num">1</span>].name = <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1390">        <span class="tok-kw">let</span> plan = group.<span class="tok-fn">to_plan</span>(<span class="tok-fn">Some</span>(<span class="tok-str">&quot;A chat&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1391">        assert_eq!(plan.title.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;A chat&quot;</span>));</span>
-<span class="ln" id="L1392">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>);</span>
-<span class="ln" id="L1393">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Sam&quot;</span>);</span>
-<span class="ln" id="L1394">    }</span>
-<span class="ln" id="L1395"></span>
-<span class="ln" id="L1396">    <span class="tok-com">/// A name with a line break in it could forge a record in the plan file.</span></span>
-<span class="ln" id="L1397">    <span class="tok-com">/// The conversation crate refuses it; this checks the panel surfaces that</span></span>
-<span class="ln" id="L1398">    <span class="tok-com">/// rather than producing a plan with a hole in it.</span></span>
-<span class="ln" id="L1399">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1400">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_with_a_line_break_is_refused_by_the_plan_rather_than_written</span>() {</span>
-<span class="ln" id="L1401">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1402">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex\nspeaker  9  Mallory&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1403">        <span class="tok-kw">let</span> error = group.<span class="tok-fn">to_plan</span>(None).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a line break is refused&quot;</span>);</span>
-<span class="ln" id="L1404">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;line break&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L1405">    }</span>
-<span class="ln" id="L1406"></span>
-<span class="ln" id="L1407">    <span class="tok-com">/// A render cannot start without both files and something to write. This</span></span>
-<span class="ln" id="L1408">    <span class="tok-com">/// is the state the button is disabled in, asserted rather than trusted to</span></span>
-<span class="ln" id="L1409">    <span class="tok-com">/// the interface.</span></span>
-<span class="ln" id="L1410">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1411">    <span class="tok-kw">fn</span> <span class="tok-fn">a_render_needs_a_recording_a_plan_and_an_output</span>() {</span>
-<span class="ln" id="L1412">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1413">        assert!(group.input.<span class="tok-fn">is_none</span>() &amp;&amp; group.plan.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L1414">        group.<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L1415">        assert!(!group.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;nothing to render&quot;</span>);</span>
-<span class="ln" id="L1416"></span>
-<span class="ln" id="L1417">        group.input = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;talk.wav&quot;</span>));</span>
-<span class="ln" id="L1418">        group.<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L1419">        assert!(!group.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;still no plan&quot;</span>);</span>
-<span class="ln" id="L1420">    }</span>
-<span class="ln" id="L1421"></span>
-<span class="ln" id="L1422">    <span class="tok-com">/// A worker that dies without answering must not leave the panel saying</span></span>
-<span class="ln" id="L1423">    <span class="tok-com">/// &quot;rendering&quot; forever.</span></span>
-<span class="ln" id="L1424">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1425">    <span class="tok-kw">fn</span> <span class="tok-fn">a_render_that_stops_without_finishing_is_reported</span>() {</span>
-<span class="ln" id="L1426">        <span class="tok-kw">let</span> (tx, rx) = mpsc::channel::&lt;Result&lt;Vec&lt;PathBuf&gt;, String&gt;&gt;();</span>
-<span class="ln" id="L1427">        <span class="tok-fn">drop</span>(tx);</span>
-<span class="ln" id="L1428">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
-<span class="ln" id="L1429">            job: <span class="tok-fn">Some</span>(rx),</span>
-<span class="ln" id="L1430">            ..Group::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1431">        };</span>
-<span class="ln" id="L1432">        group.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L1433">        assert!(!group.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L1434">        <span class="tok-kw">match</span> group.report {</span>
-<span class="ln" id="L1435">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(<span class="tok-kw">ref</span> why)) =&gt; assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;without finishing&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>),</span>
-<span class="ln" id="L1436">            other =&gt; panic!(<span class="tok-str">&quot;expected a reported failure, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L1437">        }</span>
-<span class="ln" id="L1438">    }</span>
-<span class="ln" id="L1439"></span>
-<span class="ln" id="L1440">    <span class="tok-com">/// The palette is Tokyo Night unless changed, and is not persisted -- the</span></span>
-<span class="ln" id="L1441">    <span class="tok-com">/// same shape as the mode toggle above it.</span></span>
-<span class="ln" id="L1442">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1443">    <span class="tok-kw">fn</span> <span class="tok-fn">the_page_palette_starts_at_tokyo_night_every_time</span>() {</span>
-<span class="ln" id="L1444">        assert_eq!(Group::<span class="tok-fn">default</span>().theme.id, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1445">        assert_eq!(Group::<span class="tok-fn">start_from</span>(true).theme.id, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1446">    }</span>
-<span class="ln" id="L1447"></span>
-<span class="ln" id="L1448">    <span class="tok-com">/// A plan and a panel that disagree about how many people there are is</span></span>
-<span class="ln" id="L1449">    <span class="tok-com">/// refused, because the result would be somebody&#x27;s audio in the wrong</span></span>
-<span class="ln" id="L1450">    <span class="tok-com">/// voice and nobody could hear it.</span></span>
-<span class="ln" id="L1451">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1452">    <span class="tok-kw">fn</span> <span class="tok-fn">rendering_against_a_plan_with_a_different_count_is_refused</span>() {</span>
-<span class="ln" id="L1453">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1454">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
-<span class="ln" id="L1455">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1456">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;A&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1457">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;B&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1458">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;C&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1459">        plan.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1460"></span>
-<span class="ln" id="L1461">        <span class="tok-kw">let</span> error = <span class="tok-fn">render_now</span>(&amp;Job {</span>
-<span class="ln" id="L1462">            input: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;nothing.wav&quot;</span>),</span>
-<span class="ln" id="L1463">            plan_path: path.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L1464">            names: vec![<span class="tok-str">&quot;one&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;two&quot;</span>.<span class="tok-fn">to_string</span>()],</span>
-<span class="ln" id="L1465">            title: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1466">            outputs: Outputs::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1467">            theme: veilvoice_video::palette::<span class="tok-fn">default_palette</span>(),</span>
-<span class="ln" id="L1468">            voices: VoiceMode::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1469">            config: DeidConfig::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1470">        })</span>
-<span class="ln" id="L1471">        .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;three against two&quot;</span>);</span>
-<span class="ln" id="L1472">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;wrong voice&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L1473">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;3&#x27;</span>) &amp;&amp; error.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;2&#x27;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L1474">    }</span>
-<span class="ln" id="L1475"></span>
-<span class="ln" id="L1476">    <span class="tok-com">/// F-67. The panel&#x27;s answers have to come from the application&#x27;s settings,</span></span>
-<span class="ln" id="L1477">    <span class="tok-com">/// not from the defaults, because the controls that change them are on</span></span>
-<span class="ln" id="L1478">    <span class="tok-com">/// another tab and nothing here would say otherwise.</span></span>
-<span class="ln" id="L1479">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1480">    <span class="tok-com">/// Checked by moving the configuration to something that changes the</span></span>
-<span class="ln" id="L1481">    <span class="tok-com">/// answer: a coarser frame puts the destination pitches on a wider grid,</span></span>
-<span class="ln" id="L1482">    <span class="tok-com">/// registers collapse onto each other, and fewer voices stay clearly</span></span>
-<span class="ln" id="L1483">    <span class="tok-com">/// apart. If the panel were still reading the defaults, the limit would not</span></span>
-<span class="ln" id="L1484">    <span class="tok-com">/// move.</span></span>
-<span class="ln" id="L1485">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1486">    <span class="tok-kw">fn</span> <span class="tok-fn">the_limit_follows_the_settings_rather_than_the_defaults</span>() {</span>
-<span class="ln" id="L1487">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
-<span class="ln" id="L1488">            frame_size: <span class="tok-num">256</span>,</span>
-<span class="ln" id="L1489">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1490">        };</span>
-<span class="ln" id="L1491">        <span class="tok-kw">let</span> fewer = voices::<span class="tok-fn">clear_voices</span>(&amp;coarse);</span>
-<span class="ln" id="L1492">        <span class="tok-kw">let</span> usual = voices::<span class="tok-fn">clear_voices</span>(&amp;DeidConfig::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L1493">        assert!(</span>
-<span class="ln" id="L1494">            fewer &lt; usual,</span>
-<span class="ln" id="L1495">            <span class="tok-str">&quot;a coarser grid should separate fewer voices, not {fewer} against {usual}&quot;</span></span>
-<span class="ln" id="L1496">        );</span>
-<span class="ln" id="L1497"></span>
-<span class="ln" id="L1498">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> panel = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1499">        assert_eq!(panel.<span class="tok-fn">limit</span>(), usual, <span class="tok-str">&quot;the default panel&quot;</span>);</span>
-<span class="ln" id="L1500">        panel.config = coarse;</span>
-<span class="ln" id="L1501">        assert_eq!(</span>
-<span class="ln" id="L1502">            panel.<span class="tok-fn">limit</span>(),</span>
-<span class="ln" id="L1503">            fewer,</span>
-<span class="ln" id="L1504">            <span class="tok-str">&quot;the panel must answer from the settings in force&quot;</span></span>
-<span class="ln" id="L1505">        );</span>
-<span class="ln" id="L1506"></span>
-<span class="ln" id="L1507">        <span class="tok-com">// And it stops adding people at the number it is now showing, rather</span></span>
-<span class="ln" id="L1508">        <span class="tok-com">// than at the one it used to show.</span></span>
-<span class="ln" id="L1509">        while panel.people.<span class="tok-fn">len</span>() &lt; fewer {</span>
-<span class="ln" id="L1510">            panel.<span class="tok-fn">add</span>();</span>
-<span class="ln" id="L1511">        }</span>
-<span class="ln" id="L1512">        assert_eq!(panel.people.<span class="tok-fn">len</span>(), fewer);</span>
-<span class="ln" id="L1513">        panel.<span class="tok-fn">add</span>();</span>
-<span class="ln" id="L1514">        assert_eq!(panel.people.<span class="tok-fn">len</span>(), fewer, <span class="tok-str">&quot;past the limit it printed&quot;</span>);</span>
-<span class="ln" id="L1515">        <span class="tok-kw">let</span> notice = panel.notice.<span class="tok-fn">clone</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a refusal, not silence&quot;</span>);</span>
-<span class="ln" id="L1516">        assert!(notice.<span class="tok-fn">contains</span>(&amp;fewer.<span class="tok-fn">to_string</span>()), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
-<span class="ln" id="L1517">    }</span>
-<span class="ln" id="L1518"></span>
-<span class="ln" id="L1519">    <span class="tok-com">/// The whole point of a project file: what you had is what you get back.</span></span>
-<span class="ln" id="L1520">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1521">    <span class="tok-kw">fn</span> <span class="tok-fn">a_panel_round_trips_through_a_project_file</span>() {</span>
-<span class="ln" id="L1522">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
-<span class="ln" id="L1523">            enabled: true,</span>
-<span class="ln" id="L1524">            title: <span class="tok-str">&quot;Two people&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1525">            input: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;talk.wav&quot;</span>)),</span>
-<span class="ln" id="L1526">            plan: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;plan.txt&quot;</span>)),</span>
-<span class="ln" id="L1527">            theme: veilvoice_video::palette::<span class="tok-fn">by_id</span>(<span class="tok-str">&quot;gruvbox&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1528">            voices: VoiceMode::Uniform,</span>
-<span class="ln" id="L1529">            profile: veilvoice_workspace::GROUP_ONE_VOICE.id.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L1530">            outputs: Outputs {</span>
-<span class="ln" id="L1531">                audio: true,</span>
-<span class="ln" id="L1532">                subtitles: false,</span>
-<span class="ln" id="L1533">                page: true,</span>
-<span class="ln" id="L1534">            },</span>
-<span class="ln" id="L1535">            ..Group::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1536">        };</span>
-<span class="ln" id="L1537">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1538">        group.people[<span class="tok-num">1</span>].name = <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1539">        group.people[<span class="tok-num">1</span>].colour = <span class="tok-fn">Some</span>(Color32::<span class="tok-fn">from_rgb</span>(0x73, 0xda, 0xca));</span>
-<span class="ln" id="L1540"></span>
-<span class="ln" id="L1541">        <span class="tok-kw">let</span> text = group.<span class="tok-fn">to_workspace</span>().<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L1542">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should parse&quot;</span>);</span>
-<span class="ln" id="L1543"></span>
-<span class="ln" id="L1544">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> restored = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1545">        restored.<span class="tok-fn">from_workspace</span>(&amp;read_back);</span>
-<span class="ln" id="L1546"></span>
-<span class="ln" id="L1547">        assert_eq!(restored.title, <span class="tok-str">&quot;Two people&quot;</span>);</span>
-<span class="ln" id="L1548">        assert_eq!(restored.input, group.input);</span>
-<span class="ln" id="L1549">        assert_eq!(restored.plan, group.plan);</span>
-<span class="ln" id="L1550">        assert_eq!(restored.theme.id, <span class="tok-str">&quot;gruvbox&quot;</span>);</span>
-<span class="ln" id="L1551">        assert_eq!(restored.voices, VoiceMode::Uniform);</span>
-<span class="ln" id="L1552">        assert_eq!(restored.profile, group.profile);</span>
-<span class="ln" id="L1553">        assert_eq!(restored.outputs, group.outputs);</span>
-<span class="ln" id="L1554">        assert_eq!(restored.people.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L1555">        assert_eq!(restored.people[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>);</span>
-<span class="ln" id="L1556">        assert_eq!(restored.people[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Sam&quot;</span>);</span>
-<span class="ln" id="L1557">        assert_eq!(restored.people[<span class="tok-num">1</span>].colour, group.people[<span class="tok-num">1</span>].colour);</span>
-<span class="ln" id="L1558">        assert!(restored.enabled, <span class="tok-str">&quot;a group profile opens in group mode&quot;</span>);</span>
-<span class="ln" id="L1559">    }</span>
-<span class="ln" id="L1560"></span>
-<span class="ln" id="L1561">    <span class="tok-com">/// A colour chosen by hand survives; one left automatic stays automatic</span></span>
-<span class="ln" id="L1562">    <span class="tok-com">/// rather than being frozen into whatever it happened to look like.</span></span>
-<span class="ln" id="L1563">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1564">    <span class="tok-kw">fn</span> <span class="tok-fn">an_automatic_colour_is_saved_as_automatic</span>() {</span>
-<span class="ln" id="L1565">        <span class="tok-kw">let</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1566">        assert!(group.people[<span class="tok-num">0</span>].colour.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L1567">        <span class="tok-kw">let</span> work = group.<span class="tok-fn">to_workspace</span>();</span>
-<span class="ln" id="L1568">        assert!(work.members[<span class="tok-num">0</span>].colour.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L1385">    <span class="tok-com">/// One speaker is not a group. Removing past two would leave the mode on</span></span>
+<span class="ln" id="L1386">    <span class="tok-com">/// with nothing for it to do.</span></span>
+<span class="ln" id="L1387">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1388">    <span class="tok-kw">fn</span> <span class="tok-fn">removing_stops_at_two</span>() {</span>
+<span class="ln" id="L1389">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1390">        group.<span class="tok-fn">add</span>();</span>
+<span class="ln" id="L1391">        assert_eq!(group.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>);</span>
+<span class="ln" id="L1392">        group.<span class="tok-fn">remove</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L1393">        assert_eq!(group.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L1394">        group.<span class="tok-fn">remove</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L1395">        assert_eq!(group.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;two is the floor&quot;</span>);</span>
+<span class="ln" id="L1396">    }</span>
+<span class="ln" id="L1397"></span>
+<span class="ln" id="L1398">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1399">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_carries_the_names_in_slot_order</span>() {</span>
+<span class="ln" id="L1400">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1401">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1402">        group.people[<span class="tok-num">1</span>].name = <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1403">        <span class="tok-kw">let</span> plan = group.<span class="tok-fn">to_plan</span>(<span class="tok-fn">Some</span>(<span class="tok-str">&quot;A chat&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1404">        assert_eq!(plan.title.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;A chat&quot;</span>));</span>
+<span class="ln" id="L1405">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>);</span>
+<span class="ln" id="L1406">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Sam&quot;</span>);</span>
+<span class="ln" id="L1407">    }</span>
+<span class="ln" id="L1408"></span>
+<span class="ln" id="L1409">    <span class="tok-com">/// A name with a line break in it could forge a record in the plan file.</span></span>
+<span class="ln" id="L1410">    <span class="tok-com">/// The conversation crate refuses it; this checks the panel surfaces that</span></span>
+<span class="ln" id="L1411">    <span class="tok-com">/// rather than producing a plan with a hole in it.</span></span>
+<span class="ln" id="L1412">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1413">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_with_a_line_break_is_refused_by_the_plan_rather_than_written</span>() {</span>
+<span class="ln" id="L1414">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1415">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex\nspeaker  9  Mallory&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1416">        <span class="tok-kw">let</span> error = group.<span class="tok-fn">to_plan</span>(None).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a line break is refused&quot;</span>);</span>
+<span class="ln" id="L1417">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;line break&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L1418">    }</span>
+<span class="ln" id="L1419"></span>
+<span class="ln" id="L1420">    <span class="tok-com">/// Nothing a group render writes is readable by another account.</span></span>
+<span class="ln" id="L1421">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1422">    <span class="tok-com">/// The same check as the command line&#x27;s, on the other half of the program,</span></span>
+<span class="ln" id="L1423">    <span class="tok-com">/// because the same defect was in both and a fix to one would not have</span></span>
+<span class="ln" id="L1424">    <span class="tok-com">/// found the other.</span></span>
+<span class="ln" id="L1425">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L1426">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1427">    <span class="tok-kw">fn</span> <span class="tok-fn">everything_a_group_render_writes_is_readable_only_by_this_account</span>() {</span>
+<span class="ln" id="L1428">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L1429">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1430">        <span class="tok-kw">let</span> input = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;talk.wav&quot;</span>);</span>
+<span class="ln" id="L1431">        veilvoice_audio::io::<span class="tok-fn">save_wav</span>(</span>
+<span class="ln" id="L1432">            &amp;input,</span>
+<span class="ln" id="L1433">            &amp;veilvoice_audio::io::Audio {</span>
+<span class="ln" id="L1434">                samples: (<span class="tok-num">0</span>..<span class="tok-num">16000</span>).<span class="tok-fn">map</span>(|n| (n <span class="tok-kw">as</span> f32 / <span class="tok-num">200.0</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.4</span>).<span class="tok-fn">collect</span>(),</span>
+<span class="ln" id="L1435">                sample_rate: <span class="tok-num">16000</span>,</span>
+<span class="ln" id="L1436">            },</span>
+<span class="ln" id="L1437">        )</span>
+<span class="ln" id="L1438">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1439">        <span class="tok-kw">let</span> plan_path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
+<span class="ln" id="L1440">        std::fs::<span class="tok-fn">write</span>(</span>
+<span class="ln" id="L1441">            &amp;plan_path,</span>
+<span class="ln" id="L1442">            concat!(</span>
+<span class="ln" id="L1443">                <span class="tok-str">&quot;VEILCONV1\n&quot;</span>,</span>
+<span class="ln" id="L1444">                <span class="tok-str">&quot;speaker  0  Ada\n&quot;</span>,</span>
+<span class="ln" id="L1445">                <span class="tok-str">&quot;speaker  1  Bram\n&quot;</span>,</span>
+<span class="ln" id="L1446">                <span class="tok-str">&quot;turn  0.000  0.500  0  hello\n&quot;</span>,</span>
+<span class="ln" id="L1447">                <span class="tok-str">&quot;turn  0.500  1.000  1  hello back\n&quot;</span>,</span>
+<span class="ln" id="L1448">            ),</span>
+<span class="ln" id="L1449">        )</span>
+<span class="ln" id="L1450">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1451"></span>
+<span class="ln" id="L1452">        <span class="tok-kw">let</span> job = Job {</span>
+<span class="ln" id="L1453">            input,</span>
+<span class="ln" id="L1454">            plan_path,</span>
+<span class="ln" id="L1455">            names: vec![<span class="tok-str">&quot;Ada&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;Bram&quot;</span>.<span class="tok-fn">into</span>()],</span>
+<span class="ln" id="L1456">            title: <span class="tok-str">&quot;A test&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1457">            outputs: Outputs {</span>
+<span class="ln" id="L1458">                audio: true,</span>
+<span class="ln" id="L1459">                subtitles: true,</span>
+<span class="ln" id="L1460">                page: true,</span>
+<span class="ln" id="L1461">            },</span>
+<span class="ln" id="L1462">            theme: veilvoice_video::palette::<span class="tok-fn">default_palette</span>(),</span>
+<span class="ln" id="L1463">            voices: VoiceMode::Distinct,</span>
+<span class="ln" id="L1464">            config: DeidConfig::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1465">        };</span>
+<span class="ln" id="L1466">        <span class="tok-kw">let</span> written = <span class="tok-fn">render_now</span>(&amp;job).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the render should succeed&quot;</span>);</span>
+<span class="ln" id="L1467">        assert!(!written.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;a render that wrote nothing&quot;</span>);</span>
+<span class="ln" id="L1468">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;written {</span>
+<span class="ln" id="L1469">            <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L1470">            assert_eq!(</span>
+<span class="ln" id="L1471">                mode,</span>
+<span class="ln" id="L1472">                0o600,</span>
+<span class="ln" id="L1473">                <span class="tok-str">&quot;{} is {mode:o}, so another account on this machine can read it&quot;</span>,</span>
+<span class="ln" id="L1474">                path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L1475">            );</span>
+<span class="ln" id="L1476">        }</span>
+<span class="ln" id="L1477">    }</span>
+<span class="ln" id="L1478"></span>
+<span class="ln" id="L1479">    <span class="tok-com">/// A render cannot start without both files and something to write. This</span></span>
+<span class="ln" id="L1480">    <span class="tok-com">/// is the state the button is disabled in, asserted rather than trusted to</span></span>
+<span class="ln" id="L1481">    <span class="tok-com">/// the interface.</span></span>
+<span class="ln" id="L1482">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1483">    <span class="tok-kw">fn</span> <span class="tok-fn">a_render_needs_a_recording_a_plan_and_an_output</span>() {</span>
+<span class="ln" id="L1484">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1485">        assert!(group.input.<span class="tok-fn">is_none</span>() &amp;&amp; group.plan.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L1486">        group.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L1487">        assert!(!group.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;nothing to render&quot;</span>);</span>
+<span class="ln" id="L1488"></span>
+<span class="ln" id="L1489">        group.input = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;talk.wav&quot;</span>));</span>
+<span class="ln" id="L1490">        group.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L1491">        assert!(!group.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;still no plan&quot;</span>);</span>
+<span class="ln" id="L1492">    }</span>
+<span class="ln" id="L1493"></span>
+<span class="ln" id="L1494">    <span class="tok-com">/// A worker that dies without answering must not leave the panel saying</span></span>
+<span class="ln" id="L1495">    <span class="tok-com">/// &quot;rendering&quot; forever.</span></span>
+<span class="ln" id="L1496">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1497">    <span class="tok-kw">fn</span> <span class="tok-fn">a_render_that_stops_without_finishing_is_reported</span>() {</span>
+<span class="ln" id="L1498">        <span class="tok-kw">let</span> (tx, rx) = mpsc::channel::&lt;Result&lt;Vec&lt;PathBuf&gt;, String&gt;&gt;();</span>
+<span class="ln" id="L1499">        <span class="tok-fn">drop</span>(tx);</span>
+<span class="ln" id="L1500">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
+<span class="ln" id="L1501">            job: <span class="tok-fn">Some</span>(rx),</span>
+<span class="ln" id="L1502">            ..Group::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1503">        };</span>
+<span class="ln" id="L1504">        group.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L1505">        assert!(!group.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L1506">        <span class="tok-kw">match</span> group.report {</span>
+<span class="ln" id="L1507">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(<span class="tok-kw">ref</span> why)) =&gt; assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;without finishing&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>),</span>
+<span class="ln" id="L1508">            other =&gt; panic!(<span class="tok-str">&quot;expected a reported failure, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L1509">        }</span>
+<span class="ln" id="L1510">    }</span>
+<span class="ln" id="L1511"></span>
+<span class="ln" id="L1512">    <span class="tok-com">/// The palette is Tokyo Night unless changed, and is not persisted -- the</span></span>
+<span class="ln" id="L1513">    <span class="tok-com">/// same shape as the mode toggle above it.</span></span>
+<span class="ln" id="L1514">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1515">    <span class="tok-kw">fn</span> <span class="tok-fn">the_page_palette_starts_at_tokyo_night_every_time</span>() {</span>
+<span class="ln" id="L1516">        assert_eq!(Group::<span class="tok-fn">default</span>().theme.id, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1517">        assert_eq!(Group::<span class="tok-fn">start_from</span>(true).theme.id, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1518">    }</span>
+<span class="ln" id="L1519"></span>
+<span class="ln" id="L1520">    <span class="tok-com">/// A plan and a panel that disagree about how many people there are is</span></span>
+<span class="ln" id="L1521">    <span class="tok-com">/// refused, because the result would be somebody&#x27;s audio in the wrong</span></span>
+<span class="ln" id="L1522">    <span class="tok-com">/// voice and nobody could hear it.</span></span>
+<span class="ln" id="L1523">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1524">    <span class="tok-kw">fn</span> <span class="tok-fn">rendering_against_a_plan_with_a_different_count_is_refused</span>() {</span>
+<span class="ln" id="L1525">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1526">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
+<span class="ln" id="L1527">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1528">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;A&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1529">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;B&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1530">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;C&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1531">        plan.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1532"></span>
+<span class="ln" id="L1533">        <span class="tok-kw">let</span> error = <span class="tok-fn">render_now</span>(&amp;Job {</span>
+<span class="ln" id="L1534">            input: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;nothing.wav&quot;</span>),</span>
+<span class="ln" id="L1535">            plan_path: path.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L1536">            names: vec![<span class="tok-str">&quot;one&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;two&quot;</span>.<span class="tok-fn">to_string</span>()],</span>
+<span class="ln" id="L1537">            title: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1538">            outputs: Outputs::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1539">            theme: veilvoice_video::palette::<span class="tok-fn">default_palette</span>(),</span>
+<span class="ln" id="L1540">            voices: VoiceMode::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1541">            config: DeidConfig::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1542">        })</span>
+<span class="ln" id="L1543">        .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;three against two&quot;</span>);</span>
+<span class="ln" id="L1544">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;wrong voice&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L1545">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;3&#x27;</span>) &amp;&amp; error.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;2&#x27;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L1546">    }</span>
+<span class="ln" id="L1547"></span>
+<span class="ln" id="L1548">    <span class="tok-com">/// F-67. The panel&#x27;s answers have to come from the application&#x27;s settings,</span></span>
+<span class="ln" id="L1549">    <span class="tok-com">/// not from the defaults, because the controls that change them are on</span></span>
+<span class="ln" id="L1550">    <span class="tok-com">/// another tab and nothing here would say otherwise.</span></span>
+<span class="ln" id="L1551">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1552">    <span class="tok-com">/// Checked by moving the configuration to something that changes the</span></span>
+<span class="ln" id="L1553">    <span class="tok-com">/// answer: a coarser frame puts the destination pitches on a wider grid,</span></span>
+<span class="ln" id="L1554">    <span class="tok-com">/// registers collapse onto each other, and fewer voices stay clearly</span></span>
+<span class="ln" id="L1555">    <span class="tok-com">/// apart. If the panel were still reading the defaults, the limit would not</span></span>
+<span class="ln" id="L1556">    <span class="tok-com">/// move.</span></span>
+<span class="ln" id="L1557">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1558">    <span class="tok-kw">fn</span> <span class="tok-fn">the_limit_follows_the_settings_rather_than_the_defaults</span>() {</span>
+<span class="ln" id="L1559">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
+<span class="ln" id="L1560">            frame_size: <span class="tok-num">256</span>,</span>
+<span class="ln" id="L1561">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1562">        };</span>
+<span class="ln" id="L1563">        <span class="tok-kw">let</span> fewer = voices::<span class="tok-fn">clear_voices</span>(&amp;coarse);</span>
+<span class="ln" id="L1564">        <span class="tok-kw">let</span> usual = voices::<span class="tok-fn">clear_voices</span>(&amp;DeidConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L1565">        assert!(</span>
+<span class="ln" id="L1566">            fewer &lt; usual,</span>
+<span class="ln" id="L1567">            <span class="tok-str">&quot;a coarser grid should separate fewer voices, not {fewer} against {usual}&quot;</span></span>
+<span class="ln" id="L1568">        );</span>
 <span class="ln" id="L1569"></span>
-<span class="ln" id="L1570">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> restored = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1571">        restored.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
-<span class="ln" id="L1572">        assert!(</span>
-<span class="ln" id="L1573">            restored.people[<span class="tok-num">0</span>].colour.<span class="tok-fn">is_none</span>(),</span>
-<span class="ln" id="L1574">            <span class="tok-str">&quot;it must come back automatic, not pinned to today&#x27;s table&quot;</span></span>
-<span class="ln" id="L1575">        );</span>
-<span class="ln" id="L1576">    }</span>
-<span class="ln" id="L1577"></span>
-<span class="ln" id="L1578">    <span class="tok-com">/// A profile this build does not have is reported and the settings left</span></span>
-<span class="ln" id="L1579">    <span class="tok-com">/// alone. Silently opening under different settings is the failure worth</span></span>
-<span class="ln" id="L1580">    <span class="tok-com">/// avoiding: the point of the file is that it puts things back.</span></span>
-<span class="ln" id="L1581">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1582">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_profile_is_reported_rather_than_silently_replaced</span>() {</span>
-<span class="ln" id="L1583">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1584">        work.profile = <span class="tok-str">&quot;from-a-newer-build&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1585">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1586">        <span class="tok-kw">let</span> before = group.voices;</span>
-<span class="ln" id="L1587">        group.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
-<span class="ln" id="L1588">        assert_eq!(group.voices, before, <span class="tok-str">&quot;nothing may have changed&quot;</span>);</span>
-<span class="ln" id="L1589">        <span class="tok-kw">let</span> notice = group.notice.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it has to say so&quot;</span>);</span>
-<span class="ln" id="L1590">        assert!(notice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;from-a-newer-build&quot;</span>), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
-<span class="ln" id="L1591">    }</span>
-<span class="ln" id="L1592"></span>
-<span class="ln" id="L1593">    <span class="tok-com">/// And an unknown palette likewise.</span></span>
-<span class="ln" id="L1594">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1595">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_palette_is_reported_rather_than_silently_replaced</span>() {</span>
-<span class="ln" id="L1596">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1597">        work.theme = <span class="tok-str">&quot;solarised&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1598">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1599">        group.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
-<span class="ln" id="L1600">        assert_eq!(group.theme.id, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1601">        assert!(group.notice.<span class="tok-fn">unwrap</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;solarised&quot;</span>));</span>
-<span class="ln" id="L1602">    }</span>
-<span class="ln" id="L1603"></span>
-<span class="ln" id="L1604">    <span class="tok-com">/// A project saved with more people than the current mode can carry is</span></span>
-<span class="ln" id="L1605">    <span class="tok-com">/// loaded and *reported*, not trimmed. Dropping somebody out of a group to</span></span>
-<span class="ln" id="L1606">    <span class="tok-com">/// make a preset fit is a thing nobody would notice until the render.</span></span>
-<span class="ln" id="L1607">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1608">    <span class="tok-kw">fn</span> <span class="tok-fn">a_project_with_too_many_people_for_the_mode_is_reported_not_trimmed</span>() {</span>
-<span class="ln" id="L1609">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1610">        work.profile = veilvoice_workspace::GROUP_VOICES.id.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1611">        work.members = (<span class="tok-num">0</span>..<span class="tok-num">9</span>)</span>
-<span class="ln" id="L1612">            .<span class="tok-fn">map</span>(|n| veilvoice_workspace::Member {</span>
-<span class="ln" id="L1613">                name: format!(<span class="tok-str">&quot;P{n}&quot;</span>),</span>
-<span class="ln" id="L1614">                colour: None,</span>
-<span class="ln" id="L1615">            })</span>
-<span class="ln" id="L1616">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1617"></span>
-<span class="ln" id="L1618">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1619">        group.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
-<span class="ln" id="L1620">        assert_eq!(group.people.<span class="tok-fn">len</span>(), <span class="tok-num">9</span>, <span class="tok-str">&quot;everybody is still here&quot;</span>);</span>
-<span class="ln" id="L1621">        <span class="tok-kw">let</span> notice = group.notice.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it has to say so&quot;</span>);</span>
-<span class="ln" id="L1622">        assert!(notice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
-<span class="ln" id="L1623">    }</span>
-<span class="ln" id="L1624"></span>
-<span class="ln" id="L1625">    <span class="tok-com">/// Picking a profile sets what it names and leaves everything else. A</span></span>
-<span class="ln" id="L1626">    <span class="tok-com">/// preset that overrode a later choice would be found out in the output.</span></span>
-<span class="ln" id="L1627">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1628">    <span class="tok-kw">fn</span> <span class="tok-fn">a_profile_sets_what_it_names_and_nothing_else</span>() {</span>
-<span class="ln" id="L1629">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
-<span class="ln" id="L1630">            title: <span class="tok-str">&quot;kept&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1631">            ..Group::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1632">        };</span>
-<span class="ln" id="L1633">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1634"></span>
-<span class="ln" id="L1635">        group.<span class="tok-fn">apply_profile</span>(&amp;veilvoice_workspace::GROUP_ONE_VOICE);</span>
-<span class="ln" id="L1636">        assert_eq!(group.voices, VoiceMode::Uniform);</span>
-<span class="ln" id="L1637">        assert!(group.enabled);</span>
-<span class="ln" id="L1638">        assert_eq!(group.title, <span class="tok-str">&quot;kept&quot;</span>, <span class="tok-str">&quot;a profile is not a reset&quot;</span>);</span>
-<span class="ln" id="L1639">        assert_eq!(group.people[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>);</span>
-<span class="ln" id="L1640">    }</span>
+<span class="ln" id="L1570">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> panel = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1571">        assert_eq!(panel.<span class="tok-fn">limit</span>(), usual, <span class="tok-str">&quot;the default panel&quot;</span>);</span>
+<span class="ln" id="L1572">        panel.config = coarse;</span>
+<span class="ln" id="L1573">        assert_eq!(</span>
+<span class="ln" id="L1574">            panel.<span class="tok-fn">limit</span>(),</span>
+<span class="ln" id="L1575">            fewer,</span>
+<span class="ln" id="L1576">            <span class="tok-str">&quot;the panel must answer from the settings in force&quot;</span></span>
+<span class="ln" id="L1577">        );</span>
+<span class="ln" id="L1578"></span>
+<span class="ln" id="L1579">        <span class="tok-com">// And it stops adding people at the number it is now showing, rather</span></span>
+<span class="ln" id="L1580">        <span class="tok-com">// than at the one it used to show.</span></span>
+<span class="ln" id="L1581">        while panel.people.<span class="tok-fn">len</span>() &lt; fewer {</span>
+<span class="ln" id="L1582">            panel.<span class="tok-fn">add</span>();</span>
+<span class="ln" id="L1583">        }</span>
+<span class="ln" id="L1584">        assert_eq!(panel.people.<span class="tok-fn">len</span>(), fewer);</span>
+<span class="ln" id="L1585">        panel.<span class="tok-fn">add</span>();</span>
+<span class="ln" id="L1586">        assert_eq!(panel.people.<span class="tok-fn">len</span>(), fewer, <span class="tok-str">&quot;past the limit it printed&quot;</span>);</span>
+<span class="ln" id="L1587">        <span class="tok-kw">let</span> notice = panel.notice.<span class="tok-fn">clone</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a refusal, not silence&quot;</span>);</span>
+<span class="ln" id="L1588">        assert!(notice.<span class="tok-fn">contains</span>(&amp;fewer.<span class="tok-fn">to_string</span>()), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
+<span class="ln" id="L1589">    }</span>
+<span class="ln" id="L1590"></span>
+<span class="ln" id="L1591">    <span class="tok-com">/// The whole point of a project file: what you had is what you get back.</span></span>
+<span class="ln" id="L1592">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1593">    <span class="tok-kw">fn</span> <span class="tok-fn">a_panel_round_trips_through_a_project_file</span>() {</span>
+<span class="ln" id="L1594">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
+<span class="ln" id="L1595">            enabled: true,</span>
+<span class="ln" id="L1596">            title: <span class="tok-str">&quot;Two people&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1597">            input: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;talk.wav&quot;</span>)),</span>
+<span class="ln" id="L1598">            plan: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;plan.txt&quot;</span>)),</span>
+<span class="ln" id="L1599">            theme: veilvoice_video::palette::<span class="tok-fn">by_id</span>(<span class="tok-str">&quot;gruvbox&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1600">            voices: VoiceMode::Uniform,</span>
+<span class="ln" id="L1601">            profile: veilvoice_workspace::GROUP_ONE_VOICE.id.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L1602">            outputs: Outputs {</span>
+<span class="ln" id="L1603">                audio: true,</span>
+<span class="ln" id="L1604">                subtitles: false,</span>
+<span class="ln" id="L1605">                page: true,</span>
+<span class="ln" id="L1606">            },</span>
+<span class="ln" id="L1607">            ..Group::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1608">        };</span>
+<span class="ln" id="L1609">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1610">        group.people[<span class="tok-num">1</span>].name = <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1611">        group.people[<span class="tok-num">1</span>].colour = <span class="tok-fn">Some</span>(Color32::<span class="tok-fn">from_rgb</span>(0x73, 0xda, 0xca));</span>
+<span class="ln" id="L1612"></span>
+<span class="ln" id="L1613">        <span class="tok-kw">let</span> text = group.<span class="tok-fn">to_workspace</span>().<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L1614">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should parse&quot;</span>);</span>
+<span class="ln" id="L1615"></span>
+<span class="ln" id="L1616">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> restored = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1617">        restored.<span class="tok-fn">from_workspace</span>(&amp;read_back);</span>
+<span class="ln" id="L1618"></span>
+<span class="ln" id="L1619">        assert_eq!(restored.title, <span class="tok-str">&quot;Two people&quot;</span>);</span>
+<span class="ln" id="L1620">        assert_eq!(restored.input, group.input);</span>
+<span class="ln" id="L1621">        assert_eq!(restored.plan, group.plan);</span>
+<span class="ln" id="L1622">        assert_eq!(restored.theme.id, <span class="tok-str">&quot;gruvbox&quot;</span>);</span>
+<span class="ln" id="L1623">        assert_eq!(restored.voices, VoiceMode::Uniform);</span>
+<span class="ln" id="L1624">        assert_eq!(restored.profile, group.profile);</span>
+<span class="ln" id="L1625">        assert_eq!(restored.outputs, group.outputs);</span>
+<span class="ln" id="L1626">        assert_eq!(restored.people.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L1627">        assert_eq!(restored.people[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>);</span>
+<span class="ln" id="L1628">        assert_eq!(restored.people[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Sam&quot;</span>);</span>
+<span class="ln" id="L1629">        assert_eq!(restored.people[<span class="tok-num">1</span>].colour, group.people[<span class="tok-num">1</span>].colour);</span>
+<span class="ln" id="L1630">        assert!(restored.enabled, <span class="tok-str">&quot;a group profile opens in group mode&quot;</span>);</span>
+<span class="ln" id="L1631">    }</span>
+<span class="ln" id="L1632"></span>
+<span class="ln" id="L1633">    <span class="tok-com">/// A colour chosen by hand survives; one left automatic stays automatic</span></span>
+<span class="ln" id="L1634">    <span class="tok-com">/// rather than being frozen into whatever it happened to look like.</span></span>
+<span class="ln" id="L1635">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1636">    <span class="tok-kw">fn</span> <span class="tok-fn">an_automatic_colour_is_saved_as_automatic</span>() {</span>
+<span class="ln" id="L1637">        <span class="tok-kw">let</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1638">        assert!(group.people[<span class="tok-num">0</span>].colour.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L1639">        <span class="tok-kw">let</span> work = group.<span class="tok-fn">to_workspace</span>();</span>
+<span class="ln" id="L1640">        assert!(work.members[<span class="tok-num">0</span>].colour.<span class="tok-fn">is_none</span>());</span>
 <span class="ln" id="L1641"></span>
-<span class="ln" id="L1642">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1643">    <span class="tok-kw">fn</span> <span class="tok-fn">outputs_survive_being_named_and_read_back</span>() {</span>
-<span class="ln" id="L1644">        <span class="tok-kw">for</span> outputs <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1645">            Outputs::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1646">            Outputs {</span>
-<span class="ln" id="L1647">                audio: true,</span>
-<span class="ln" id="L1648">                subtitles: false,</span>
-<span class="ln" id="L1649">                page: false,</span>
-<span class="ln" id="L1650">            },</span>
-<span class="ln" id="L1651">            Outputs {</span>
-<span class="ln" id="L1652">                audio: false,</span>
-<span class="ln" id="L1653">                subtitles: false,</span>
-<span class="ln" id="L1654">                page: false,</span>
-<span class="ln" id="L1655">            },</span>
-<span class="ln" id="L1656">        ] {</span>
-<span class="ln" id="L1657">            assert_eq!(Outputs::<span class="tok-fn">from_names</span>(&amp;outputs.<span class="tok-fn">names</span>()), outputs);</span>
-<span class="ln" id="L1658">        }</span>
-<span class="ln" id="L1659">    }</span>
-<span class="ln" id="L1660"></span>
-<span class="ln" id="L1661">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1662">    <span class="tok-kw">fn</span> <span class="tok-fn">every_output_is_on_by_default</span>() {</span>
-<span class="ln" id="L1663">        <span class="tok-kw">let</span> outputs = Outputs::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1664">        assert!(outputs.audio &amp;&amp; outputs.subtitles &amp;&amp; outputs.page);</span>
-<span class="ln" id="L1665">        assert!(outputs.<span class="tok-fn">any</span>());</span>
-<span class="ln" id="L1666">        assert!(!Outputs {</span>
-<span class="ln" id="L1667">            audio: false,</span>
-<span class="ln" id="L1668">            subtitles: false,</span>
-<span class="ln" id="L1669">            page: false</span>
-<span class="ln" id="L1670">        }</span>
-<span class="ln" id="L1671">        .<span class="tok-fn">any</span>());</span>
-<span class="ln" id="L1672">    }</span>
-<span class="ln" id="L1673">}</span>
+<span class="ln" id="L1642">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> restored = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1643">        restored.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
+<span class="ln" id="L1644">        assert!(</span>
+<span class="ln" id="L1645">            restored.people[<span class="tok-num">0</span>].colour.<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L1646">            <span class="tok-str">&quot;it must come back automatic, not pinned to today&#x27;s table&quot;</span></span>
+<span class="ln" id="L1647">        );</span>
+<span class="ln" id="L1648">    }</span>
+<span class="ln" id="L1649"></span>
+<span class="ln" id="L1650">    <span class="tok-com">/// A profile this build does not have is reported and the settings left</span></span>
+<span class="ln" id="L1651">    <span class="tok-com">/// alone. Silently opening under different settings is the failure worth</span></span>
+<span class="ln" id="L1652">    <span class="tok-com">/// avoiding: the point of the file is that it puts things back.</span></span>
+<span class="ln" id="L1653">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1654">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_profile_is_reported_rather_than_silently_replaced</span>() {</span>
+<span class="ln" id="L1655">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1656">        work.profile = <span class="tok-str">&quot;from-a-newer-build&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1657">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1658">        <span class="tok-kw">let</span> before = group.voices;</span>
+<span class="ln" id="L1659">        group.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
+<span class="ln" id="L1660">        assert_eq!(group.voices, before, <span class="tok-str">&quot;nothing may have changed&quot;</span>);</span>
+<span class="ln" id="L1661">        <span class="tok-kw">let</span> notice = group.notice.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it has to say so&quot;</span>);</span>
+<span class="ln" id="L1662">        assert!(notice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;from-a-newer-build&quot;</span>), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
+<span class="ln" id="L1663">    }</span>
+<span class="ln" id="L1664"></span>
+<span class="ln" id="L1665">    <span class="tok-com">/// And an unknown palette likewise.</span></span>
+<span class="ln" id="L1666">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1667">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_palette_is_reported_rather_than_silently_replaced</span>() {</span>
+<span class="ln" id="L1668">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1669">        work.theme = <span class="tok-str">&quot;solarised&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1670">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1671">        group.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
+<span class="ln" id="L1672">        assert_eq!(group.theme.id, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1673">        assert!(group.notice.<span class="tok-fn">unwrap</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;solarised&quot;</span>));</span>
+<span class="ln" id="L1674">    }</span>
+<span class="ln" id="L1675"></span>
+<span class="ln" id="L1676">    <span class="tok-com">/// A project saved with more people than the current mode can carry is</span></span>
+<span class="ln" id="L1677">    <span class="tok-com">/// loaded and *reported*, not trimmed. Dropping somebody out of a group to</span></span>
+<span class="ln" id="L1678">    <span class="tok-com">/// make a preset fit is a thing nobody would notice until the render.</span></span>
+<span class="ln" id="L1679">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1680">    <span class="tok-kw">fn</span> <span class="tok-fn">a_project_with_too_many_people_for_the_mode_is_reported_not_trimmed</span>() {</span>
+<span class="ln" id="L1681">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1682">        work.profile = veilvoice_workspace::GROUP_VOICES.id.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1683">        work.members = (<span class="tok-num">0</span>..<span class="tok-num">9</span>)</span>
+<span class="ln" id="L1684">            .<span class="tok-fn">map</span>(|n| veilvoice_workspace::Member {</span>
+<span class="ln" id="L1685">                name: format!(<span class="tok-str">&quot;P{n}&quot;</span>),</span>
+<span class="ln" id="L1686">                colour: None,</span>
+<span class="ln" id="L1687">            })</span>
+<span class="ln" id="L1688">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1689"></span>
+<span class="ln" id="L1690">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1691">        group.<span class="tok-fn">from_workspace</span>(&amp;work);</span>
+<span class="ln" id="L1692">        assert_eq!(group.people.<span class="tok-fn">len</span>(), <span class="tok-num">9</span>, <span class="tok-str">&quot;everybody is still here&quot;</span>);</span>
+<span class="ln" id="L1693">        <span class="tok-kw">let</span> notice = group.notice.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it has to say so&quot;</span>);</span>
+<span class="ln" id="L1694">        assert!(notice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>), <span class="tok-str">&quot;{notice}&quot;</span>);</span>
+<span class="ln" id="L1695">    }</span>
+<span class="ln" id="L1696"></span>
+<span class="ln" id="L1697">    <span class="tok-com">/// Picking a profile sets what it names and leaves everything else. A</span></span>
+<span class="ln" id="L1698">    <span class="tok-com">/// preset that overrode a later choice would be found out in the output.</span></span>
+<span class="ln" id="L1699">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1700">    <span class="tok-kw">fn</span> <span class="tok-fn">a_profile_sets_what_it_names_and_nothing_else</span>() {</span>
+<span class="ln" id="L1701">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = Group {</span>
+<span class="ln" id="L1702">            title: <span class="tok-str">&quot;kept&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1703">            ..Group::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1704">        };</span>
+<span class="ln" id="L1705">        group.people[<span class="tok-num">0</span>].name = <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1706"></span>
+<span class="ln" id="L1707">        group.<span class="tok-fn">apply_profile</span>(&amp;veilvoice_workspace::GROUP_ONE_VOICE);</span>
+<span class="ln" id="L1708">        assert_eq!(group.voices, VoiceMode::Uniform);</span>
+<span class="ln" id="L1709">        assert!(group.enabled);</span>
+<span class="ln" id="L1710">        assert_eq!(group.title, <span class="tok-str">&quot;kept&quot;</span>, <span class="tok-str">&quot;a profile is not a reset&quot;</span>);</span>
+<span class="ln" id="L1711">        assert_eq!(group.people[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>);</span>
+<span class="ln" id="L1712">    }</span>
+<span class="ln" id="L1713"></span>
+<span class="ln" id="L1714">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1715">    <span class="tok-kw">fn</span> <span class="tok-fn">outputs_survive_being_named_and_read_back</span>() {</span>
+<span class="ln" id="L1716">        <span class="tok-kw">for</span> outputs <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1717">            Outputs::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1718">            Outputs {</span>
+<span class="ln" id="L1719">                audio: true,</span>
+<span class="ln" id="L1720">                subtitles: false,</span>
+<span class="ln" id="L1721">                page: false,</span>
+<span class="ln" id="L1722">            },</span>
+<span class="ln" id="L1723">            Outputs {</span>
+<span class="ln" id="L1724">                audio: false,</span>
+<span class="ln" id="L1725">                subtitles: false,</span>
+<span class="ln" id="L1726">                page: false,</span>
+<span class="ln" id="L1727">            },</span>
+<span class="ln" id="L1728">        ] {</span>
+<span class="ln" id="L1729">            assert_eq!(Outputs::<span class="tok-fn">from_names</span>(&amp;outputs.<span class="tok-fn">names</span>()), outputs);</span>
+<span class="ln" id="L1730">        }</span>
+<span class="ln" id="L1731">    }</span>
+<span class="ln" id="L1732"></span>
+<span class="ln" id="L1733">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1734">    <span class="tok-kw">fn</span> <span class="tok-fn">every_output_is_on_by_default</span>() {</span>
+<span class="ln" id="L1735">        <span class="tok-kw">let</span> outputs = Outputs::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1736">        assert!(outputs.audio &amp;&amp; outputs.subtitles &amp;&amp; outputs.page);</span>
+<span class="ln" id="L1737">        assert!(outputs.<span class="tok-fn">any</span>());</span>
+<span class="ln" id="L1738">        assert!(!Outputs {</span>
+<span class="ln" id="L1739">            audio: false,</span>
+<span class="ln" id="L1740">            subtitles: false,</span>
+<span class="ln" id="L1741">            page: false</span>
+<span class="ln" id="L1742">        }</span>
+<span class="ln" id="L1743">        .<span class="tok-fn">any</span>());</span>
+<span class="ln" id="L1744">    }</span>
+<span class="ln" id="L1745">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

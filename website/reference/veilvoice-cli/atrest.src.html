@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/atrest.rs</code></h1>
-<p style="color:var(--muted)"><a href="atrest.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 456 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="atrest.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 455 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -123,399 +123,398 @@
 <span class="ln" id="L75">) -&gt; Result&lt;PathBuf, String&gt; {</span>
 <span class="ln" id="L76">    <span class="tok-kw">let</span> sealed = <span class="tok-kw">match</span> recipient {</span>
 <span class="ln" id="L77">        Recipient::<span class="tok-fn">PublicKey</span>(key_path) =&gt; {</span>
-<span class="ln" id="L78">            <span class="tok-kw">let</span> encoded =</span>
-<span class="ln" id="L79">                std::fs::<span class="tok-fn">read</span>(key_path).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, key_path.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L80">            <span class="tok-kw">let</span> pk = hybrid::PublicKey::<span class="tok-fn">from_bytes</span>(&amp;encoded).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L81">            container::<span class="tok-fn">seal_to_public_key</span>(&amp;pk, plaintext).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L82">        }</span>
-<span class="ln" id="L83">        Recipient::Password =&gt; {</span>
-<span class="ln" id="L84">            println!(</span>
-<span class="ln" id="L85">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L86">                <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L87">                    colour::MUTED,</span>
-<span class="ln" id="L88">                    <span class="tok-str">&quot;  Choose a passphrase for this recording. It is separate from&quot;</span>,</span>
-<span class="ln" id="L89">                )</span>
-<span class="ln" id="L90">            );</span>
-<span class="ln" id="L91">            println!(</span>
-<span class="ln" id="L92">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L93">                <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L94">                    colour::MUTED,</span>
-<span class="ln" id="L95">                    <span class="tok-str">&quot;  the app lock, and there is no way to recover it.&quot;</span></span>
-<span class="ln" id="L96">                )</span>
-<span class="ln" id="L97">            );</span>
-<span class="ln" id="L98">            <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
-<span class="ln" id="L99">            println!(</span>
-<span class="ln" id="L100">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L101">                <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L102">                    colour::MUTED,</span>
-<span class="ln" id="L103">                    <span class="tok-str">&quot;  Deriving key (Argon2id, this is meant to be slow)...&quot;</span></span>
-<span class="ln" id="L104">                )</span>
-<span class="ln" id="L105">            );</span>
-<span class="ln" id="L106">            container::<span class="tok-fn">seal_with_password</span>(password.<span class="tok-fn">expose</span>(), plaintext, kdf::KdfParams::<span class="tok-fn">default</span>())</span>
-<span class="ln" id="L107">                .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L108">        }</span>
-<span class="ln" id="L109">    };</span>
-<span class="ln" id="L110"></span>
-<span class="ln" id="L111">    <span class="tok-kw">let</span> out = container::<span class="tok-fn">veil_path</span>(path);</span>
-<span class="ln" id="L112">    std::fs::<span class="tok-fn">write</span>(&amp;out, &amp;sealed).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, out.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L113">    <span class="tok-fn">Ok</span>(out)</span>
-<span class="ln" id="L114">}</span>
+<span class="ln" id="L78">            <span class="tok-kw">let</span> encoded = <span class="tok-kw">crate</span>::<span class="tok-fn">read_named</span>(key_path)?;</span>
+<span class="ln" id="L79">            <span class="tok-kw">let</span> pk = hybrid::PublicKey::<span class="tok-fn">from_bytes</span>(&amp;encoded).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L80">            container::<span class="tok-fn">seal_to_public_key</span>(&amp;pk, plaintext).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L81">        }</span>
+<span class="ln" id="L82">        Recipient::Password =&gt; {</span>
+<span class="ln" id="L83">            println!(</span>
+<span class="ln" id="L84">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L85">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L86">                    colour::MUTED,</span>
+<span class="ln" id="L87">                    <span class="tok-str">&quot;  Choose a passphrase for this recording. It is separate from&quot;</span>,</span>
+<span class="ln" id="L88">                )</span>
+<span class="ln" id="L89">            );</span>
+<span class="ln" id="L90">            println!(</span>
+<span class="ln" id="L91">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L92">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L93">                    colour::MUTED,</span>
+<span class="ln" id="L94">                    <span class="tok-str">&quot;  the app lock, and there is no way to recover it.&quot;</span></span>
+<span class="ln" id="L95">                )</span>
+<span class="ln" id="L96">            );</span>
+<span class="ln" id="L97">            <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
+<span class="ln" id="L98">            println!(</span>
+<span class="ln" id="L99">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L100">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L101">                    colour::MUTED,</span>
+<span class="ln" id="L102">                    <span class="tok-str">&quot;  Deriving key (Argon2id, this is meant to be slow)...&quot;</span></span>
+<span class="ln" id="L103">                )</span>
+<span class="ln" id="L104">            );</span>
+<span class="ln" id="L105">            container::<span class="tok-fn">seal_with_password</span>(password.<span class="tok-fn">expose</span>(), plaintext, kdf::KdfParams::<span class="tok-fn">default</span>())</span>
+<span class="ln" id="L106">                .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L107">        }</span>
+<span class="ln" id="L108">    };</span>
+<span class="ln" id="L109"></span>
+<span class="ln" id="L110">    <span class="tok-kw">let</span> out = container::<span class="tok-fn">veil_path</span>(path);</span>
+<span class="ln" id="L111">    std::fs::<span class="tok-fn">write</span>(&amp;out, &amp;sealed).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, out.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L112">    <span class="tok-fn">Ok</span>(out)</span>
+<span class="ln" id="L113">}</span>
 </span>
-<span class="ln" id="L115"></span>
+<span class="ln" id="L114"></span>
 <span class="src-item" id="fn-confirm_plaintext">
-<span class="ln" id="L116"><span class="tok-com">/// Print the plaintext warning and, on an interactive terminal, require an</span></span>
-<span class="ln" id="L117"><span class="tok-com">/// explicit answer before continuing.</span></span>
-<span class="ln" id="L118"><span class="tok-com">///</span></span>
-<span class="ln" id="L119"><span class="tok-com">/// Non-interactive callers, meaning scripts, pipelines and CI, still see it on</span></span>
-<span class="ln" id="L120"><span class="tok-com">/// stderr but are not blocked on a prompt nobody is there to answer. They asked</span></span>
-<span class="ln" id="L121"><span class="tok-com">/// for plaintext on the command line, which is as explicit as it gets.</span></span>
-<span class="ln" id="L122"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">confirm_plaintext</span>(assume_yes: bool) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L123">    println!();</span>
-<span class="ln" id="L124">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">err</span>(<span class="tok-str">&quot;WRITING THIS RECORDING UNENCRYPTED&quot;</span>));</span>
-<span class="ln" id="L125">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> PLAINTEXT_WARNING {</span>
-<span class="ln" id="L126">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;  {line}&quot;</span>)));</span>
-<span class="ln" id="L127">    }</span>
-<span class="ln" id="L128">    println!();</span>
-<span class="ln" id="L129"></span>
-<span class="ln" id="L130">    <span class="tok-kw">if</span> assume_yes || !std::io::<span class="tok-fn">stdin</span>().<span class="tok-fn">is_terminal</span>() {</span>
-<span class="ln" id="L131">        eprintln!(</span>
-<span class="ln" id="L132">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L133">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;continuing without at-rest encryption, as asked&quot;</span>)</span>
-<span class="ln" id="L134">        );</span>
-<span class="ln" id="L135">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L136">    }</span>
-<span class="ln" id="L137"></span>
-<span class="ln" id="L138">    print!(<span class="tok-str">&quot;  Type UNENCRYPTED to continue: &quot;</span>);</span>
-<span class="ln" id="L139">    <span class="tok-kw">use</span> std::io::Write;</span>
-<span class="ln" id="L140">    std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>().<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L141">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L142">    std::io::<span class="tok-fn">stdin</span>()</span>
-<span class="ln" id="L143">        .<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> answer)</span>
-<span class="ln" id="L144">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L145">    <span class="tok-kw">if</span> answer.<span class="tok-fn">trim</span>() != <span class="tok-str">&quot;UNENCRYPTED&quot;</span> {</span>
-<span class="ln" id="L146">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled, and nothing was written&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L147">    }</span>
-<span class="ln" id="L148">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L149">}</span>
+<span class="ln" id="L115"><span class="tok-com">/// Print the plaintext warning and, on an interactive terminal, require an</span></span>
+<span class="ln" id="L116"><span class="tok-com">/// explicit answer before continuing.</span></span>
+<span class="ln" id="L117"><span class="tok-com">///</span></span>
+<span class="ln" id="L118"><span class="tok-com">/// Non-interactive callers, meaning scripts, pipelines and CI, still see it on</span></span>
+<span class="ln" id="L119"><span class="tok-com">/// stderr but are not blocked on a prompt nobody is there to answer. They asked</span></span>
+<span class="ln" id="L120"><span class="tok-com">/// for plaintext on the command line, which is as explicit as it gets.</span></span>
+<span class="ln" id="L121"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">confirm_plaintext</span>(assume_yes: bool) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L122">    println!();</span>
+<span class="ln" id="L123">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">err</span>(<span class="tok-str">&quot;WRITING THIS RECORDING UNENCRYPTED&quot;</span>));</span>
+<span class="ln" id="L124">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> PLAINTEXT_WARNING {</span>
+<span class="ln" id="L125">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;  {line}&quot;</span>)));</span>
+<span class="ln" id="L126">    }</span>
+<span class="ln" id="L127">    println!();</span>
+<span class="ln" id="L128"></span>
+<span class="ln" id="L129">    <span class="tok-kw">if</span> assume_yes || !std::io::<span class="tok-fn">stdin</span>().<span class="tok-fn">is_terminal</span>() {</span>
+<span class="ln" id="L130">        eprintln!(</span>
+<span class="ln" id="L131">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L132">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;continuing without at-rest encryption, as asked&quot;</span>)</span>
+<span class="ln" id="L133">        );</span>
+<span class="ln" id="L134">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L135">    }</span>
+<span class="ln" id="L136"></span>
+<span class="ln" id="L137">    print!(<span class="tok-str">&quot;  Type UNENCRYPTED to continue: &quot;</span>);</span>
+<span class="ln" id="L138">    <span class="tok-kw">use</span> std::io::Write;</span>
+<span class="ln" id="L139">    std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>().<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L140">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L141">    std::io::<span class="tok-fn">stdin</span>()</span>
+<span class="ln" id="L142">        .<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> answer)</span>
+<span class="ln" id="L143">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L144">    <span class="tok-kw">if</span> answer.<span class="tok-fn">trim</span>() != <span class="tok-str">&quot;UNENCRYPTED&quot;</span> {</span>
+<span class="ln" id="L145">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled, and nothing was written&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L146">    }</span>
+<span class="ln" id="L147">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L148">}</span>
 </span>
-<span class="ln" id="L150"></span>
+<span class="ln" id="L149"></span>
 <span class="src-item" id="fn-into_secret">
-<span class="ln" id="L151"><span class="tok-com">/// Move a typed password into page-locked, zeroizing storage, wiping the</span></span>
-<span class="ln" id="L152"><span class="tok-com">/// `String` it arrived in.</span></span>
-<span class="ln" id="L153"><span class="tok-com">///</span></span>
-<span class="ln" id="L154"><span class="tok-com">/// `rpassword` hands back an ordinary `String`, which is an ordinary heap</span></span>
-<span class="ln" id="L155"><span class="tok-com">/// allocation that can be paged out and is not wiped when it is dropped. That</span></span>
-<span class="ln" id="L156"><span class="tok-com">/// is a window this crate cannot remove, because something has to receive the</span></span>
-<span class="ln" id="L157"><span class="tok-com">/// keystrokes. It can be made as short as possible, which is what this</span></span>
-<span class="ln" id="L158"><span class="tok-com">/// does: copy into a [`Secret`], wipe the copy, wipe the original, and hand</span></span>
-<span class="ln" id="L159"><span class="tok-com">/// back the only remaining version.</span></span>
-<span class="ln" id="L160"><span class="tok-com">///</span></span>
-<span class="ln" id="L161"><span class="tok-com">/// No `unsafe`, so the intermediate `Vec` is a real second copy for a moment.</span></span>
-<span class="ln" id="L162"><span class="tok-com">/// It is wiped by `Secret::new` before this returns. Writing through</span></span>
-<span class="ln" id="L163"><span class="tok-com">/// `String::as_bytes_mut` would avoid it and is not worth an `unsafe` block in</span></span>
-<span class="ln" id="L164"><span class="tok-com">/// a crate that has none.</span></span>
-<span class="ln" id="L165"><span class="tok-kw">fn</span> <span class="tok-fn">into_secret</span>(<span class="tok-kw">mut</span> typed: String) -&gt; Secret {</span>
-<span class="ln" id="L166">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = typed.<span class="tok-fn">as_bytes</span>().<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L167">    <span class="tok-kw">let</span> secret = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> bytes);</span>
-<span class="ln" id="L168">    typed.<span class="tok-fn">zeroize</span>();</span>
-<span class="ln" id="L169">    secret</span>
-<span class="ln" id="L170">}</span>
+<span class="ln" id="L150"><span class="tok-com">/// Move a typed password into page-locked, zeroizing storage, wiping the</span></span>
+<span class="ln" id="L151"><span class="tok-com">/// `String` it arrived in.</span></span>
+<span class="ln" id="L152"><span class="tok-com">///</span></span>
+<span class="ln" id="L153"><span class="tok-com">/// `rpassword` hands back an ordinary `String`, which is an ordinary heap</span></span>
+<span class="ln" id="L154"><span class="tok-com">/// allocation that can be paged out and is not wiped when it is dropped. That</span></span>
+<span class="ln" id="L155"><span class="tok-com">/// is a window this crate cannot remove, because something has to receive the</span></span>
+<span class="ln" id="L156"><span class="tok-com">/// keystrokes. It can be made as short as possible, which is what this</span></span>
+<span class="ln" id="L157"><span class="tok-com">/// does: copy into a [`Secret`], wipe the copy, wipe the original, and hand</span></span>
+<span class="ln" id="L158"><span class="tok-com">/// back the only remaining version.</span></span>
+<span class="ln" id="L159"><span class="tok-com">///</span></span>
+<span class="ln" id="L160"><span class="tok-com">/// No `unsafe`, so the intermediate `Vec` is a real second copy for a moment.</span></span>
+<span class="ln" id="L161"><span class="tok-com">/// It is wiped by `Secret::new` before this returns. Writing through</span></span>
+<span class="ln" id="L162"><span class="tok-com">/// `String::as_bytes_mut` would avoid it and is not worth an `unsafe` block in</span></span>
+<span class="ln" id="L163"><span class="tok-com">/// a crate that has none.</span></span>
+<span class="ln" id="L164"><span class="tok-kw">fn</span> <span class="tok-fn">into_secret</span>(<span class="tok-kw">mut</span> typed: String) -&gt; Secret {</span>
+<span class="ln" id="L165">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = typed.<span class="tok-fn">as_bytes</span>().<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L166">    <span class="tok-kw">let</span> secret = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> bytes);</span>
+<span class="ln" id="L167">    typed.<span class="tok-fn">zeroize</span>();</span>
+<span class="ln" id="L168">    secret</span>
+<span class="ln" id="L169">}</span>
 </span>
-<span class="ln" id="L171"></span>
+<span class="ln" id="L170"></span>
 <span class="src-item" id="fn-no_terminal">
-<span class="ln" id="L172"><span class="tok-com">/// What to say when there is no terminal to ask on.</span></span>
-<span class="ln" id="L173"><span class="tok-com">///</span></span>
-<span class="ln" id="L174"><span class="tok-com">/// **F-109.** Every one of these prompts used to surface the operating</span></span>
-<span class="ln" id="L175"><span class="tok-com">/// system&#x27;s own error, so `veilvoice anonymise recording.wav` run from a</span></span>
-<span class="ln" id="L176"><span class="tok-com">/// script, a cron job, a CI step or anything with its input redirected failed</span></span>
-<span class="ln" id="L177"><span class="tok-com">/// with:</span></span>
-<span class="ln" id="L178"><span class="tok-com">///</span></span>
-<span class="ln" id="L179"><span class="tok-com">/// ```text</span></span>
-<span class="ln" id="L180"><span class="tok-com">/// &#10007; No such device or address (os error 6)</span></span>
-<span class="ln" id="L181"><span class="tok-com">/// ```</span></span>
-<span class="ln" id="L182"><span class="tok-com">///</span></span>
-<span class="ln" id="L183"><span class="tok-com">/// That is `ENXIO` from opening the console, and it says nothing: not what was</span></span>
-<span class="ln" id="L184"><span class="tok-com">/// being asked for, not why it failed, and not one of the three ways to</span></span>
-<span class="ln" id="L185"><span class="tok-com">/// proceed. The message is also different on Windows, so nobody could search</span></span>
-<span class="ln" id="L186"><span class="tok-com">/// for it and find the same answer twice.</span></span>
-<span class="ln" id="L187"><span class="tok-com">///</span></span>
-<span class="ln" id="L188"><span class="tok-com">/// `confirm_plaintext` in this same file already got this right, checking for</span></span>
-<span class="ln" id="L189"><span class="tok-com">/// a terminal before asking anything. The prompts did not, which is the same</span></span>
-<span class="ln" id="L190"><span class="tok-com">/// defect in the same file with a different door, and is the shape this</span></span>
-<span class="ln" id="L191"><span class="tok-com">/// project has recorded most often.</span></span>
-<span class="ln" id="L192"><span class="tok-kw">fn</span> <span class="tok-fn">no_terminal</span>(asked_for: &amp;str) -&gt; String {</span>
-<span class="ln" id="L193">    <span class="tok-com">// Built line by line rather than as one continued literal, so the</span></span>
-<span class="ln" id="L194">    <span class="tok-com">// indentation in this file is not the indentation on the reader&#x27;s screen.</span></span>
-<span class="ln" id="L195">    <span class="tok-com">//</span></span>
-<span class="ln" id="L196">    <span class="tok-com">// Every flag named here is attributed to the command that has it, and that</span></span>
-<span class="ln" id="L197">    <span class="tok-com">// is not tidiness. The first version of this message offered</span></span>
-<span class="ln" id="L198">    <span class="tok-com">// `--encrypt-to` and `--encrypt false --yes` to everybody, because it was</span></span>
-<span class="ln" id="L199">    <span class="tok-com">// written while fixing `anonymise`. `veilvoice encrypt` spells the same</span></span>
-<span class="ln" id="L200">    <span class="tok-com">// idea `--to` and has no `--encrypt` at all, and `lock`, `guard` and</span></span>
-<span class="ln" id="L201">    <span class="tok-com">// `policy` have none of them: a dozen callers share these prompts, and a</span></span>
-<span class="ln" id="L202">    <span class="tok-com">// message that names flags the command in front of the reader does not</span></span>
-<span class="ln" id="L203">    <span class="tok-com">// have is worse than one that names none. Caught by running `veilvoice</span></span>
-<span class="ln" id="L204">    <span class="tok-com">// encrypt` with no terminal and reading what it suggested.</span></span>
-<span class="ln" id="L205">    <span class="tok-kw">let</span> lines = [</span>
-<span class="ln" id="L206">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L207">        <span class="tok-str">&quot;  This is what happens in a script, a scheduled job, or anything with&quot;</span>,</span>
-<span class="ln" id="L208">        <span class="tok-str">&quot;  its input redirected.&quot;</span>,</span>
-<span class="ln" id="L209">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L210">        <span class="tok-str">&quot;  Run it in a terminal, if somebody is there to type.&quot;</span>,</span>
-<span class="ln" id="L211">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L212">        <span class="tok-str">&quot;  Or, for the two commands that write a recording, seal it to a public&quot;</span>,</span>
-<span class="ln" id="L213">        <span class="tok-str">&quot;  key instead, which types nothing and is what works in a script:&quot;</span>,</span>
-<span class="ln" id="L214">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L215">        <span class="tok-str">&quot;    veilvoice anonymise &lt;FILE&gt; --encrypt-to &lt;PUBKEY&gt;&quot;</span>,</span>
-<span class="ln" id="L216">        <span class="tok-str">&quot;    veilvoice encrypt   &lt;FILE&gt; --to &lt;PUBKEY&gt;&quot;</span>,</span>
-<span class="ln" id="L217">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L218">        <span class="tok-str">&quot;  Make the key once, in a terminal, with veilvoice keygen.&quot;</span>,</span>
-<span class="ln" id="L219">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L220">        <span class="tok-str">&quot;  veilvoice anonymise can also write a recording with no encryption at&quot;</span>,</span>
-<span class="ln" id="L221">        <span class="tok-str">&quot;  all, using --encrypt false --yes. That leaves every word that was&quot;</span>,</span>
-<span class="ln" id="L222">        <span class="tok-str">&quot;  said readable by anyone who gets the file.&quot;</span>,</span>
-<span class="ln" id="L223">        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L224">        <span class="tok-str">&quot;  Nothing was written.&quot;</span>,</span>
-<span class="ln" id="L225">    ];</span>
-<span class="ln" id="L226">    format!(</span>
-<span class="ln" id="L227">        <span class="tok-str">&quot;there is no terminal here to ask for {asked_for}.\n{}&quot;</span>,</span>
-<span class="ln" id="L228">        lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L229">    )</span>
-<span class="ln" id="L230">}</span>
+<span class="ln" id="L171"><span class="tok-com">/// What to say when there is no terminal to ask on.</span></span>
+<span class="ln" id="L172"><span class="tok-com">///</span></span>
+<span class="ln" id="L173"><span class="tok-com">/// **F-109.** Every one of these prompts used to surface the operating</span></span>
+<span class="ln" id="L174"><span class="tok-com">/// system&#x27;s own error, so `veilvoice anonymise recording.wav` run from a</span></span>
+<span class="ln" id="L175"><span class="tok-com">/// script, a cron job, a CI step or anything with its input redirected failed</span></span>
+<span class="ln" id="L176"><span class="tok-com">/// with:</span></span>
+<span class="ln" id="L177"><span class="tok-com">///</span></span>
+<span class="ln" id="L178"><span class="tok-com">/// ```text</span></span>
+<span class="ln" id="L179"><span class="tok-com">/// &#10007; No such device or address (os error 6)</span></span>
+<span class="ln" id="L180"><span class="tok-com">/// ```</span></span>
+<span class="ln" id="L181"><span class="tok-com">///</span></span>
+<span class="ln" id="L182"><span class="tok-com">/// That is `ENXIO` from opening the console, and it says nothing: not what was</span></span>
+<span class="ln" id="L183"><span class="tok-com">/// being asked for, not why it failed, and not one of the three ways to</span></span>
+<span class="ln" id="L184"><span class="tok-com">/// proceed. The message is also different on Windows, so nobody could search</span></span>
+<span class="ln" id="L185"><span class="tok-com">/// for it and find the same answer twice.</span></span>
+<span class="ln" id="L186"><span class="tok-com">///</span></span>
+<span class="ln" id="L187"><span class="tok-com">/// `confirm_plaintext` in this same file already got this right, checking for</span></span>
+<span class="ln" id="L188"><span class="tok-com">/// a terminal before asking anything. The prompts did not, which is the same</span></span>
+<span class="ln" id="L189"><span class="tok-com">/// defect in the same file with a different door, and is the shape this</span></span>
+<span class="ln" id="L190"><span class="tok-com">/// project has recorded most often.</span></span>
+<span class="ln" id="L191"><span class="tok-kw">fn</span> <span class="tok-fn">no_terminal</span>(asked_for: &amp;str) -&gt; String {</span>
+<span class="ln" id="L192">    <span class="tok-com">// Built line by line rather than as one continued literal, so the</span></span>
+<span class="ln" id="L193">    <span class="tok-com">// indentation in this file is not the indentation on the reader&#x27;s screen.</span></span>
+<span class="ln" id="L194">    <span class="tok-com">//</span></span>
+<span class="ln" id="L195">    <span class="tok-com">// Every flag named here is attributed to the command that has it, and that</span></span>
+<span class="ln" id="L196">    <span class="tok-com">// is not tidiness. The first version of this message offered</span></span>
+<span class="ln" id="L197">    <span class="tok-com">// `--encrypt-to` and `--encrypt false --yes` to everybody, because it was</span></span>
+<span class="ln" id="L198">    <span class="tok-com">// written while fixing `anonymise`. `veilvoice encrypt` spells the same</span></span>
+<span class="ln" id="L199">    <span class="tok-com">// idea `--to` and has no `--encrypt` at all, and `lock`, `guard` and</span></span>
+<span class="ln" id="L200">    <span class="tok-com">// `policy` have none of them: a dozen callers share these prompts, and a</span></span>
+<span class="ln" id="L201">    <span class="tok-com">// message that names flags the command in front of the reader does not</span></span>
+<span class="ln" id="L202">    <span class="tok-com">// have is worse than one that names none. Caught by running `veilvoice</span></span>
+<span class="ln" id="L203">    <span class="tok-com">// encrypt` with no terminal and reading what it suggested.</span></span>
+<span class="ln" id="L204">    <span class="tok-kw">let</span> lines = [</span>
+<span class="ln" id="L205">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L206">        <span class="tok-str">&quot;  This is what happens in a script, a scheduled job, or anything with&quot;</span>,</span>
+<span class="ln" id="L207">        <span class="tok-str">&quot;  its input redirected.&quot;</span>,</span>
+<span class="ln" id="L208">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L209">        <span class="tok-str">&quot;  Run it in a terminal, if somebody is there to type.&quot;</span>,</span>
+<span class="ln" id="L210">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L211">        <span class="tok-str">&quot;  Or, for the two commands that write a recording, seal it to a public&quot;</span>,</span>
+<span class="ln" id="L212">        <span class="tok-str">&quot;  key instead, which types nothing and is what works in a script:&quot;</span>,</span>
+<span class="ln" id="L213">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L214">        <span class="tok-str">&quot;    veilvoice anonymise &lt;FILE&gt; --encrypt-to &lt;PUBKEY&gt;&quot;</span>,</span>
+<span class="ln" id="L215">        <span class="tok-str">&quot;    veilvoice encrypt   &lt;FILE&gt; --to &lt;PUBKEY&gt;&quot;</span>,</span>
+<span class="ln" id="L216">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L217">        <span class="tok-str">&quot;  Make the key once, in a terminal, with veilvoice keygen.&quot;</span>,</span>
+<span class="ln" id="L218">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L219">        <span class="tok-str">&quot;  veilvoice anonymise can also write a recording with no encryption at&quot;</span>,</span>
+<span class="ln" id="L220">        <span class="tok-str">&quot;  all, using --encrypt false --yes. That leaves every word that was&quot;</span>,</span>
+<span class="ln" id="L221">        <span class="tok-str">&quot;  said readable by anyone who gets the file.&quot;</span>,</span>
+<span class="ln" id="L222">        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L223">        <span class="tok-str">&quot;  Nothing was written.&quot;</span>,</span>
+<span class="ln" id="L224">    ];</span>
+<span class="ln" id="L225">    format!(</span>
+<span class="ln" id="L226">        <span class="tok-str">&quot;there is no terminal here to ask for {asked_for}.\n{}&quot;</span>,</span>
+<span class="ln" id="L227">        lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L228">    )</span>
+<span class="ln" id="L229">}</span>
 </span>
-<span class="ln" id="L231"></span>
+<span class="ln" id="L230"></span>
 <span class="src-item" id="fn-can_prompt">
-<span class="ln" id="L232"><span class="tok-com">/// Whether a passphrase can be asked for at all.</span></span>
-<span class="ln" id="L233"><span class="tok-com">///</span></span>
-<span class="ln" id="L234"><span class="tok-com">/// Checked before prompting rather than after failing, so the answer is the</span></span>
-<span class="ln" id="L235"><span class="tok-com">/// same on every platform. `rpassword` reports a missing console differently</span></span>
-<span class="ln" id="L236"><span class="tok-com">/// on Windows and Unix, and a message a reader can search for should not</span></span>
-<span class="ln" id="L237"><span class="tok-com">/// depend on which.</span></span>
-<span class="ln" id="L238"><span class="tok-kw">fn</span> <span class="tok-fn">can_prompt</span>() -&gt; bool {</span>
-<span class="ln" id="L239">    std::io::<span class="tok-fn">stdin</span>().<span class="tok-fn">is_terminal</span>()</span>
-<span class="ln" id="L240">}</span>
+<span class="ln" id="L231"><span class="tok-com">/// Whether a passphrase can be asked for at all.</span></span>
+<span class="ln" id="L232"><span class="tok-com">///</span></span>
+<span class="ln" id="L233"><span class="tok-com">/// Checked before prompting rather than after failing, so the answer is the</span></span>
+<span class="ln" id="L234"><span class="tok-com">/// same on every platform. `rpassword` reports a missing console differently</span></span>
+<span class="ln" id="L235"><span class="tok-com">/// on Windows and Unix, and a message a reader can search for should not</span></span>
+<span class="ln" id="L236"><span class="tok-com">/// depend on which.</span></span>
+<span class="ln" id="L237"><span class="tok-kw">fn</span> <span class="tok-fn">can_prompt</span>() -&gt; bool {</span>
+<span class="ln" id="L238">    std::io::<span class="tok-fn">stdin</span>().<span class="tok-fn">is_terminal</span>()</span>
+<span class="ln" id="L239">}</span>
 </span>
-<span class="ln" id="L241"></span>
+<span class="ln" id="L240"></span>
 <span class="src-item" id="fn-prompt_secret">
-<span class="ln" id="L242"><span class="tok-com">/// Prompt once, without echoing, and keep the answer in a [`Secret`].</span></span>
-<span class="ln" id="L243"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">prompt_secret</span>(prompt: &amp;str) -&gt; Result&lt;Secret, String&gt; {</span>
-<span class="ln" id="L244">    <span class="tok-kw">if</span> !<span class="tok-fn">can_prompt</span>() {</span>
-<span class="ln" id="L245">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-fn">no_terminal</span>(<span class="tok-str">&quot;a passphrase&quot;</span>));</span>
-<span class="ln" id="L246">    }</span>
-<span class="ln" id="L247">    <span class="tok-kw">let</span> typed = rpassword::<span class="tok-fn">prompt_password</span>(prompt).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L248">    <span class="tok-fn">Ok</span>(<span class="tok-fn">into_secret</span>(typed))</span>
-<span class="ln" id="L249">}</span>
+<span class="ln" id="L241"><span class="tok-com">/// Prompt once, without echoing, and keep the answer in a [`Secret`].</span></span>
+<span class="ln" id="L242"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">prompt_secret</span>(prompt: &amp;str) -&gt; Result&lt;Secret, String&gt; {</span>
+<span class="ln" id="L243">    <span class="tok-kw">if</span> !<span class="tok-fn">can_prompt</span>() {</span>
+<span class="ln" id="L244">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-fn">no_terminal</span>(<span class="tok-str">&quot;a passphrase&quot;</span>));</span>
+<span class="ln" id="L245">    }</span>
+<span class="ln" id="L246">    <span class="tok-kw">let</span> typed = rpassword::<span class="tok-fn">prompt_password</span>(prompt).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L247">    <span class="tok-fn">Ok</span>(<span class="tok-fn">into_secret</span>(typed))</span>
+<span class="ln" id="L248">}</span>
 </span>
-<span class="ln" id="L250"></span>
+<span class="ln" id="L249"></span>
 <span class="src-item" id="fn-read_new_password">
-<span class="ln" id="L251"><span class="tok-com">/// Read a password twice, without echoing it, and check the two agree.</span></span>
-<span class="ln" id="L252"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">read_new_password</span>() -&gt; Result&lt;Secret, String&gt; {</span>
-<span class="ln" id="L253">    <span class="tok-kw">if</span> !<span class="tok-fn">can_prompt</span>() {</span>
-<span class="ln" id="L254">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-fn">no_terminal</span>(<span class="tok-str">&quot;a passphrase&quot;</span>));</span>
-<span class="ln" id="L255">    }</span>
-<span class="ln" id="L256">    <span class="tok-kw">let</span> first = rpassword::<span class="tok-fn">prompt_password</span>(<span class="tok-str">&quot;Passphrase: &quot;</span>).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L257">    <span class="tok-kw">if</span> first.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L258">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;passphrase must not be empty&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L259">    }</span>
-<span class="ln" id="L260">    <span class="tok-kw">let</span> again = rpassword::<span class="tok-fn">prompt_password</span>(<span class="tok-str">&quot;Repeat: &quot;</span>).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L261">    <span class="tok-com">// Compared before either is moved into a `Secret`, then both are wiped</span></span>
-<span class="ln" id="L262">    <span class="tok-com">// whichever way the comparison went.</span></span>
-<span class="ln" id="L263">    <span class="tok-kw">let</span> matched = first == again;</span>
-<span class="ln" id="L264">    <span class="tok-kw">let</span> first = <span class="tok-fn">into_secret</span>(first);</span>
-<span class="ln" id="L265">    <span class="tok-kw">let</span> _ = <span class="tok-fn">into_secret</span>(again);</span>
-<span class="ln" id="L266">    <span class="tok-kw">if</span> !matched {</span>
-<span class="ln" id="L267">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;passphrases do not match&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L268">    }</span>
-<span class="ln" id="L269">    <span class="tok-fn">Ok</span>(first)</span>
-<span class="ln" id="L270">}</span>
+<span class="ln" id="L250"><span class="tok-com">/// Read a password twice, without echoing it, and check the two agree.</span></span>
+<span class="ln" id="L251"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">read_new_password</span>() -&gt; Result&lt;Secret, String&gt; {</span>
+<span class="ln" id="L252">    <span class="tok-kw">if</span> !<span class="tok-fn">can_prompt</span>() {</span>
+<span class="ln" id="L253">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-fn">no_terminal</span>(<span class="tok-str">&quot;a passphrase&quot;</span>));</span>
+<span class="ln" id="L254">    }</span>
+<span class="ln" id="L255">    <span class="tok-kw">let</span> first = rpassword::<span class="tok-fn">prompt_password</span>(<span class="tok-str">&quot;Passphrase: &quot;</span>).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L256">    <span class="tok-kw">if</span> first.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L257">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;passphrase must not be empty&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L258">    }</span>
+<span class="ln" id="L259">    <span class="tok-kw">let</span> again = rpassword::<span class="tok-fn">prompt_password</span>(<span class="tok-str">&quot;Repeat: &quot;</span>).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L260">    <span class="tok-com">// Compared before either is moved into a `Secret`, then both are wiped</span></span>
+<span class="ln" id="L261">    <span class="tok-com">// whichever way the comparison went.</span></span>
+<span class="ln" id="L262">    <span class="tok-kw">let</span> matched = first == again;</span>
+<span class="ln" id="L263">    <span class="tok-kw">let</span> first = <span class="tok-fn">into_secret</span>(first);</span>
+<span class="ln" id="L264">    <span class="tok-kw">let</span> _ = <span class="tok-fn">into_secret</span>(again);</span>
+<span class="ln" id="L265">    <span class="tok-kw">if</span> !matched {</span>
+<span class="ln" id="L266">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;passphrases do not match&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L267">    }</span>
+<span class="ln" id="L268">    <span class="tok-fn">Ok</span>(first)</span>
+<span class="ln" id="L269">}</span>
 </span>
-<span class="ln" id="L271"></span>
-<span class="ln" id="L272"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L273"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L274">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L275"></span>
-<span class="ln" id="L276">    <span class="tok-com">/// The warning has one job. If it is ever softened into reassurance, this</span></span>
-<span class="ln" id="L277">    <span class="tok-com">/// is what stops it shipping.</span></span>
-<span class="ln" id="L278">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L279">    <span class="tok-kw">fn</span> <span class="tok-fn">the_warning_states_the_actual_consequence</span>() {</span>
-<span class="ln" id="L280">        <span class="tok-kw">let</span> text = PLAINTEXT_WARNING.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L281">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;unencrypted&quot;</span>));</span>
-<span class="ln" id="L282">        assert!(</span>
-<span class="ln" id="L283">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;everything that was said&quot;</span>),</span>
-<span class="ln" id="L284">            <span class="tok-str">&quot;the words surviving must be spelled out&quot;</span></span>
-<span class="ln" id="L285">        );</span>
-<span class="ln" id="L286">        assert!(</span>
-<span class="ln" id="L287">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;deleting it afterwards is not a fix&quot;</span>),</span>
-<span class="ln" id="L288">            <span class="tok-str">&quot;the flash-retention trap must be stated&quot;</span></span>
-<span class="ln" id="L289">        );</span>
-<span class="ln" id="L290">        <span class="tok-kw">for</span> reassurance <span class="tok-kw">in</span> [<span class="tok-str">&quot;safe&quot;</span>, <span class="tok-str">&quot;secure&quot;</span>, <span class="tok-str">&quot;protected&quot;</span>] {</span>
-<span class="ln" id="L291">            assert!(</span>
-<span class="ln" id="L292">                !text.<span class="tok-fn">contains</span>(reassurance),</span>
-<span class="ln" id="L293">                <span class="tok-str">&quot;reassuring word: {reassurance}&quot;</span></span>
-<span class="ln" id="L294">            );</span>
-<span class="ln" id="L295">        }</span>
-<span class="ln" id="L296">        <span class="tok-com">// The owner-only permission the plaintext now gets must be described as</span></span>
-<span class="ln" id="L297">        <span class="tok-com">// the small thing it is. If it ever reads as a substitute for the</span></span>
-<span class="ln" id="L298">        <span class="tok-com">// encryption being declined, this is what stops it shipping.</span></span>
-<span class="ln" id="L299">        assert!(</span>
-<span class="ln" id="L300">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;a file permission and nothing more&quot;</span>),</span>
-<span class="ln" id="L301">            <span class="tok-str">&quot;the permission must be belittled, not offered as consolation&quot;</span></span>
-<span class="ln" id="L302">        );</span>
-<span class="ln" id="L303">        assert!(</span>
-<span class="ln" id="L304">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;anyone who has the disk&quot;</span>),</span>
-<span class="ln" id="L305">            <span class="tok-str">&quot;the limit of a file permission must be stated&quot;</span></span>
-<span class="ln" id="L306">        );</span>
-<span class="ln" id="L307">    }</span>
-<span class="ln" id="L308"></span>
-<span class="ln" id="L309">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L310">    <span class="tok-kw">fn</span> <span class="tok-fn">sealed_output_goes_beside_the_recording_with_a_veil_suffix</span>() {</span>
-<span class="ln" id="L311">        assert_eq!(</span>
-<span class="ln" id="L312">            container::<span class="tok-fn">veil_path</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>)),</span>
-<span class="ln" id="L313">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;clip.veiled.wav.veil&quot;</span>)</span>
-<span class="ln" id="L314">        );</span>
-<span class="ln" id="L315">    }</span>
-<span class="ln" id="L316"></span>
-<span class="ln" id="L317">    <span class="tok-com">/// A sealed recording must not contain its own audio in the clear. This is</span></span>
-<span class="ln" id="L318">    <span class="tok-com">/// the property the whole default exists for.</span></span>
-<span class="ln" id="L319">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L320">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sealed_recording_does_not_contain_its_plaintext</span>() {</span>
-<span class="ln" id="L321">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>);</span>
-<span class="ln" id="L323">        <span class="tok-kw">let</span> audio = veilvoice_audio::io::<span class="tok-fn">wav_bytes</span>(&amp;veilvoice_audio::io::Audio {</span>
-<span class="ln" id="L324">            samples: vec![<span class="tok-num">0.25</span>; <span class="tok-num">4_000</span>],</span>
-<span class="ln" id="L325">            sample_rate: <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L326">        })</span>
-<span class="ln" id="L327">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L328"></span>
-<span class="ln" id="L329">        <span class="tok-com">// Public-key mode needs no prompt, so it is the one that can be tested</span></span>
-<span class="ln" id="L330">        <span class="tok-com">// end to end here; both modes share `finish` inside the container.</span></span>
-<span class="ln" id="L331">        <span class="tok-kw">let</span> (sk, pk) = hybrid::SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L332">        <span class="tok-kw">let</span> key_path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice.pub&quot;</span>);</span>
-<span class="ln" id="L333">        std::fs::<span class="tok-fn">write</span>(&amp;key_path, pk.<span class="tok-fn">to_bytes</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L334"></span>
-<span class="ln" id="L335">        <span class="tok-kw">let</span> out = <span class="tok-fn">seal_to_disk</span>(&amp;path, &amp;audio, Recipient::<span class="tok-fn">PublicKey</span>(&amp;key_path)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L336">        assert_eq!(out, container::<span class="tok-fn">veil_path</span>(&amp;path));</span>
-<span class="ln" id="L337">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the plaintext must never reach the disk&quot;</span>);</span>
-<span class="ln" id="L338"></span>
-<span class="ln" id="L339">        <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;out).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L340">        assert_eq!(&amp;sealed[..<span class="tok-num">8</span>], container::MAGIC);</span>
-<span class="ln" id="L341">        assert!(</span>
-<span class="ln" id="L342">            !sealed.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;RIFF&quot;</span>),</span>
-<span class="ln" id="L343">            <span class="tok-str">&quot;the WAV header is visible in the container&quot;</span></span>
-<span class="ln" id="L344">        );</span>
-<span class="ln" id="L345">        assert_eq!(</span>
-<span class="ln" id="L346">            container::<span class="tok-fn">open_with_secret_key</span>(&amp;sk, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L347">            audio</span>
-<span class="ln" id="L348">        );</span>
-<span class="ln" id="L349">    }</span>
-<span class="ln" id="L350"></span>
-<span class="ln" id="L351">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L352">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_public_key_is_reported_rather_than_panicking</span>() {</span>
-<span class="ln" id="L353">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L354">        <span class="tok-kw">let</span> missing = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nowhere.pub&quot;</span>);</span>
-<span class="ln" id="L355">        <span class="tok-kw">let</span> result = <span class="tok-fn">seal_to_disk</span>(</span>
-<span class="ln" id="L356">            &amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>),</span>
-<span class="ln" id="L357">            b<span class="tok-str">&quot;audio&quot;</span>,</span>
-<span class="ln" id="L358">            Recipient::<span class="tok-fn">PublicKey</span>(&amp;missing),</span>
-<span class="ln" id="L359">        );</span>
-<span class="ln" id="L360">        assert!(result.<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L361">    }</span>
-<span class="ln" id="L362">}</span>
-<span class="ln" id="L363"></span>
+<span class="ln" id="L270"></span>
+<span class="ln" id="L271"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L272"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L273">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L274"></span>
+<span class="ln" id="L275">    <span class="tok-com">/// The warning has one job. If it is ever softened into reassurance, this</span></span>
+<span class="ln" id="L276">    <span class="tok-com">/// is what stops it shipping.</span></span>
+<span class="ln" id="L277">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L278">    <span class="tok-kw">fn</span> <span class="tok-fn">the_warning_states_the_actual_consequence</span>() {</span>
+<span class="ln" id="L279">        <span class="tok-kw">let</span> text = PLAINTEXT_WARNING.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L280">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;unencrypted&quot;</span>));</span>
+<span class="ln" id="L281">        assert!(</span>
+<span class="ln" id="L282">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;everything that was said&quot;</span>),</span>
+<span class="ln" id="L283">            <span class="tok-str">&quot;the words surviving must be spelled out&quot;</span></span>
+<span class="ln" id="L284">        );</span>
+<span class="ln" id="L285">        assert!(</span>
+<span class="ln" id="L286">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;deleting it afterwards is not a fix&quot;</span>),</span>
+<span class="ln" id="L287">            <span class="tok-str">&quot;the flash-retention trap must be stated&quot;</span></span>
+<span class="ln" id="L288">        );</span>
+<span class="ln" id="L289">        <span class="tok-kw">for</span> reassurance <span class="tok-kw">in</span> [<span class="tok-str">&quot;safe&quot;</span>, <span class="tok-str">&quot;secure&quot;</span>, <span class="tok-str">&quot;protected&quot;</span>] {</span>
+<span class="ln" id="L290">            assert!(</span>
+<span class="ln" id="L291">                !text.<span class="tok-fn">contains</span>(reassurance),</span>
+<span class="ln" id="L292">                <span class="tok-str">&quot;reassuring word: {reassurance}&quot;</span></span>
+<span class="ln" id="L293">            );</span>
+<span class="ln" id="L294">        }</span>
+<span class="ln" id="L295">        <span class="tok-com">// The owner-only permission the plaintext now gets must be described as</span></span>
+<span class="ln" id="L296">        <span class="tok-com">// the small thing it is. If it ever reads as a substitute for the</span></span>
+<span class="ln" id="L297">        <span class="tok-com">// encryption being declined, this is what stops it shipping.</span></span>
+<span class="ln" id="L298">        assert!(</span>
+<span class="ln" id="L299">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;a file permission and nothing more&quot;</span>),</span>
+<span class="ln" id="L300">            <span class="tok-str">&quot;the permission must be belittled, not offered as consolation&quot;</span></span>
+<span class="ln" id="L301">        );</span>
+<span class="ln" id="L302">        assert!(</span>
+<span class="ln" id="L303">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;anyone who has the disk&quot;</span>),</span>
+<span class="ln" id="L304">            <span class="tok-str">&quot;the limit of a file permission must be stated&quot;</span></span>
+<span class="ln" id="L305">        );</span>
+<span class="ln" id="L306">    }</span>
+<span class="ln" id="L307"></span>
+<span class="ln" id="L308">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L309">    <span class="tok-kw">fn</span> <span class="tok-fn">sealed_output_goes_beside_the_recording_with_a_veil_suffix</span>() {</span>
+<span class="ln" id="L310">        assert_eq!(</span>
+<span class="ln" id="L311">            container::<span class="tok-fn">veil_path</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>)),</span>
+<span class="ln" id="L312">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;clip.veiled.wav.veil&quot;</span>)</span>
+<span class="ln" id="L313">        );</span>
+<span class="ln" id="L314">    }</span>
+<span class="ln" id="L315"></span>
+<span class="ln" id="L316">    <span class="tok-com">/// A sealed recording must not contain its own audio in the clear. This is</span></span>
+<span class="ln" id="L317">    <span class="tok-com">/// the property the whole default exists for.</span></span>
+<span class="ln" id="L318">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L319">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sealed_recording_does_not_contain_its_plaintext</span>() {</span>
+<span class="ln" id="L320">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L321">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>);</span>
+<span class="ln" id="L322">        <span class="tok-kw">let</span> audio = veilvoice_audio::io::<span class="tok-fn">wav_bytes</span>(&amp;veilvoice_audio::io::Audio {</span>
+<span class="ln" id="L323">            samples: vec![<span class="tok-num">0.25</span>; <span class="tok-num">4_000</span>],</span>
+<span class="ln" id="L324">            sample_rate: <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L325">        })</span>
+<span class="ln" id="L326">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L327"></span>
+<span class="ln" id="L328">        <span class="tok-com">// Public-key mode needs no prompt, so it is the one that can be tested</span></span>
+<span class="ln" id="L329">        <span class="tok-com">// end to end here; both modes share `finish` inside the container.</span></span>
+<span class="ln" id="L330">        <span class="tok-kw">let</span> (sk, pk) = hybrid::SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L331">        <span class="tok-kw">let</span> key_path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice.pub&quot;</span>);</span>
+<span class="ln" id="L332">        std::fs::<span class="tok-fn">write</span>(&amp;key_path, pk.<span class="tok-fn">to_bytes</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L333"></span>
+<span class="ln" id="L334">        <span class="tok-kw">let</span> out = <span class="tok-fn">seal_to_disk</span>(&amp;path, &amp;audio, Recipient::<span class="tok-fn">PublicKey</span>(&amp;key_path)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L335">        assert_eq!(out, container::<span class="tok-fn">veil_path</span>(&amp;path));</span>
+<span class="ln" id="L336">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the plaintext must never reach the disk&quot;</span>);</span>
+<span class="ln" id="L337"></span>
+<span class="ln" id="L338">        <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;out).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L339">        assert_eq!(&amp;sealed[..<span class="tok-num">8</span>], container::MAGIC);</span>
+<span class="ln" id="L340">        assert!(</span>
+<span class="ln" id="L341">            !sealed.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;RIFF&quot;</span>),</span>
+<span class="ln" id="L342">            <span class="tok-str">&quot;the WAV header is visible in the container&quot;</span></span>
+<span class="ln" id="L343">        );</span>
+<span class="ln" id="L344">        assert_eq!(</span>
+<span class="ln" id="L345">            container::<span class="tok-fn">open_with_secret_key</span>(&amp;sk, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L346">            audio</span>
+<span class="ln" id="L347">        );</span>
+<span class="ln" id="L348">    }</span>
+<span class="ln" id="L349"></span>
+<span class="ln" id="L350">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_public_key_is_reported_rather_than_panicking</span>() {</span>
+<span class="ln" id="L352">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L353">        <span class="tok-kw">let</span> missing = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nowhere.pub&quot;</span>);</span>
+<span class="ln" id="L354">        <span class="tok-kw">let</span> result = <span class="tok-fn">seal_to_disk</span>(</span>
+<span class="ln" id="L355">            &amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>),</span>
+<span class="ln" id="L356">            b<span class="tok-str">&quot;audio&quot;</span>,</span>
+<span class="ln" id="L357">            Recipient::<span class="tok-fn">PublicKey</span>(&amp;missing),</span>
+<span class="ln" id="L358">        );</span>
+<span class="ln" id="L359">        assert!(result.<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L360">    }</span>
+<span class="ln" id="L361">}</span>
+<span class="ln" id="L362"></span>
 <span class="src-item" id="fn-no_terminal_tests">
-<span class="ln" id="L364"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L365"><span class="tok-kw">mod</span> no_terminal_tests {</span>
-<span class="ln" id="L366">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L367"></span>
-<span class="ln" id="L368">    <span class="tok-com">/// **F-109.** No terminal is explained, not reported as an errno.</span></span>
-<span class="ln" id="L369">    <span class="tok-com">///</span></span>
-<span class="ln" id="L370">    <span class="tok-com">/// `veilvoice anonymise recording.wav` from a script, a scheduled job or</span></span>
-<span class="ln" id="L371">    <span class="tok-com">/// anything with its input redirected used to fail with</span></span>
-<span class="ln" id="L372">    <span class="tok-com">/// `No such device or address (os error 6)`, which is `ENXIO` from opening</span></span>
-<span class="ln" id="L373">    <span class="tok-com">/// the console. It names nothing that was being asked for, nothing about</span></span>
-<span class="ln" id="L374">    <span class="tok-com">/// why, and none of the ways on. It is also a different string on Windows,</span></span>
-<span class="ln" id="L375">    <span class="tok-com">/// so nobody could search for it and get the same answer twice.</span></span>
-<span class="ln" id="L376">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L377">    <span class="tok-kw">fn</span> <span class="tok-fn">the_no_terminal_message_says_what_was_wanted_and_how_to_proceed</span>() {</span>
-<span class="ln" id="L378">        <span class="tok-kw">let</span> message = <span class="tok-fn">no_terminal</span>(<span class="tok-str">&quot;a passphrase&quot;</span>);</span>
-<span class="ln" id="L379"></span>
-<span class="ln" id="L380">        assert!(</span>
-<span class="ln" id="L381">            message.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;there is no terminal here to ask for a passphrase.&quot;</span>),</span>
-<span class="ln" id="L382">            <span class="tok-str">&quot;the first line has to say what could not be asked for: {message}&quot;</span></span>
-<span class="ln" id="L383">        );</span>
-<span class="ln" id="L384"></span>
-<span class="ln" id="L385">        <span class="tok-com">// Every flag is named beside the command that has it.</span></span>
-<span class="ln" id="L386">        <span class="tok-com">//</span></span>
-<span class="ln" id="L387">        <span class="tok-com">// The first version of this message offered `--encrypt-to` and</span></span>
-<span class="ln" id="L388">        <span class="tok-com">// `--encrypt false --yes` to every caller, because it was written</span></span>
-<span class="ln" id="L389">        <span class="tok-com">// while fixing `anonymise`. `veilvoice encrypt` spells that `--to`</span></span>
-<span class="ln" id="L390">        <span class="tok-com">// and has no `--encrypt`; `lock`, `guard` and `policy` have none of</span></span>
-<span class="ln" id="L391">        <span class="tok-com">// them. A dozen callers share these prompts, so an unattributed flag</span></span>
-<span class="ln" id="L392">        <span class="tok-com">// is a flag the reader&#x27;s command probably does not have.</span></span>
-<span class="ln" id="L393">        <span class="tok-kw">for</span> (flag, command) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L394">            (<span class="tok-str">&quot;--encrypt-to&quot;</span>, <span class="tok-str">&quot;veilvoice anonymise&quot;</span>),</span>
-<span class="ln" id="L395">            (<span class="tok-str">&quot;--encrypt false --yes&quot;</span>, <span class="tok-str">&quot;veilvoice anonymise&quot;</span>),</span>
-<span class="ln" id="L396">            (<span class="tok-str">&quot;--to &lt;PUBKEY&gt;&quot;</span>, <span class="tok-str">&quot;veilvoice encrypt&quot;</span>),</span>
-<span class="ln" id="L397">        ] {</span>
-<span class="ln" id="L398">            <span class="tok-kw">let</span> at = message</span>
-<span class="ln" id="L399">                .<span class="tok-fn">find</span>(flag)</span>
-<span class="ln" id="L400">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;the message no longer mentions {flag}: {message}&quot;</span>));</span>
-<span class="ln" id="L401">            <span class="tok-kw">let</span> before = &amp;message[..at];</span>
-<span class="ln" id="L402">            <span class="tok-kw">let</span> line_start = before.<span class="tok-fn">rfind</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">map</span>(|n| n + <span class="tok-num">1</span>).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L403">            <span class="tok-kw">let</span> context = &amp;message[line_start..];</span>
-<span class="ln" id="L404">            <span class="tok-kw">let</span> context = &amp;context[..context.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">unwrap_or</span>(context.<span class="tok-fn">len</span>())];</span>
-<span class="ln" id="L405">            assert!(</span>
-<span class="ln" id="L406">                context.<span class="tok-fn">contains</span>(command)</span>
-<span class="ln" id="L407">                    || before.<span class="tok-fn">rfind</span>(command).<span class="tok-fn">is_some_and</span>(|c| {</span>
-<span class="ln" id="L408">                        <span class="tok-com">// Named earlier in the same paragraph is fine; named</span></span>
-<span class="ln" id="L409">                        <span class="tok-com">// nowhere is not.</span></span>
-<span class="ln" id="L410">                        message[c..at].<span class="tok-fn">matches</span>(<span class="tok-str">&quot;\n\n&quot;</span>).<span class="tok-fn">count</span>() == <span class="tok-num">0</span></span>
-<span class="ln" id="L411">                    }),</span>
-<span class="ln" id="L412">                <span class="tok-str">&quot;{flag} is offered without saying it belongs to {command}, and \</span></span>
-<span class="ln" id="L413"><span class="tok-str">                 most callers of this message are not that command: {message}&quot;</span></span>
-<span class="ln" id="L414">            );</span>
-<span class="ln" id="L415">        }</span>
-<span class="ln" id="L416"></span>
-<span class="ln" id="L417">        assert!(</span>
-<span class="ln" id="L418">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice keygen&quot;</span>),</span>
-<span class="ln" id="L419">            <span class="tok-str">&quot;the message has to say where the public key comes from: {message}&quot;</span></span>
-<span class="ln" id="L420">        );</span>
-<span class="ln" id="L421"></span>
-<span class="ln" id="L422">        assert!(</span>
-<span class="ln" id="L423">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Nothing was written.&quot;</span>),</span>
-<span class="ln" id="L424">            <span class="tok-str">&quot;a refusal has to say that nothing was written, or the reader \</span></span>
-<span class="ln" id="L425"><span class="tok-str">             cannot tell whether a half-finished file is lying around&quot;</span></span>
-<span class="ln" id="L426">        );</span>
-<span class="ln" id="L427"></span>
-<span class="ln" id="L428">        <span class="tok-com">// The operating system&#x27;s own words are what this replaced.</span></span>
-<span class="ln" id="L429">        assert!(</span>
-<span class="ln" id="L430">            !message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;os error&quot;</span>),</span>
-<span class="ln" id="L431">            <span class="tok-str">&quot;the errno is back in the message: {message}&quot;</span></span>
-<span class="ln" id="L432">        );</span>
-<span class="ln" id="L433">    }</span>
-<span class="ln" id="L434"></span>
-<span class="ln" id="L435">    <span class="tok-com">/// The same guidance whichever prompt could not run.</span></span>
-<span class="ln" id="L436">    <span class="tok-com">///</span></span>
-<span class="ln" id="L437">    <span class="tok-com">/// Two functions prompt, and both refuse through here. A reader who hits</span></span>
-<span class="ln" id="L438">    <span class="tok-com">/// one and then the other should not get two different accounts of the</span></span>
-<span class="ln" id="L439">    <span class="tok-com">/// same situation.</span></span>
-<span class="ln" id="L440">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">both_prompts_refuse_with_the_same_explanation</span>() {</span>
-<span class="ln" id="L442">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;atrest.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L443">        <span class="tok-kw">for</span> function <span class="tok-kw">in</span> [<span class="tok-str">&quot;pub fn prompt_secret(&quot;</span>, <span class="tok-str">&quot;pub fn read_new_password(&quot;</span>] {</span>
-<span class="ln" id="L444">            <span class="tok-kw">let</span> body = source</span>
-<span class="ln" id="L445">                .<span class="tok-fn">split</span>(function)</span>
-<span class="ln" id="L446">                .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
-<span class="ln" id="L447">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{function} has to be findable&quot;</span>));</span>
-<span class="ln" id="L448">            <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\npub fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L449">            assert!(</span>
-<span class="ln" id="L450">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;can_prompt()&quot;</span>) &amp;&amp; body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no_terminal(&quot;</span>),</span>
-<span class="ln" id="L451">                <span class="tok-str">&quot;{function} does not check for a terminal before prompting, so \</span></span>
-<span class="ln" id="L452"><span class="tok-str">                 it will surface the operating system&#x27;s error instead&quot;</span></span>
-<span class="ln" id="L453">            );</span>
-<span class="ln" id="L454">        }</span>
-<span class="ln" id="L455">    }</span>
-<span class="ln" id="L456">}</span>
+<span class="ln" id="L363"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L364"><span class="tok-kw">mod</span> no_terminal_tests {</span>
+<span class="ln" id="L365">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L366"></span>
+<span class="ln" id="L367">    <span class="tok-com">/// **F-109.** No terminal is explained, not reported as an errno.</span></span>
+<span class="ln" id="L368">    <span class="tok-com">///</span></span>
+<span class="ln" id="L369">    <span class="tok-com">/// `veilvoice anonymise recording.wav` from a script, a scheduled job or</span></span>
+<span class="ln" id="L370">    <span class="tok-com">/// anything with its input redirected used to fail with</span></span>
+<span class="ln" id="L371">    <span class="tok-com">/// `No such device or address (os error 6)`, which is `ENXIO` from opening</span></span>
+<span class="ln" id="L372">    <span class="tok-com">/// the console. It names nothing that was being asked for, nothing about</span></span>
+<span class="ln" id="L373">    <span class="tok-com">/// why, and none of the ways on. It is also a different string on Windows,</span></span>
+<span class="ln" id="L374">    <span class="tok-com">/// so nobody could search for it and get the same answer twice.</span></span>
+<span class="ln" id="L375">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L376">    <span class="tok-kw">fn</span> <span class="tok-fn">the_no_terminal_message_says_what_was_wanted_and_how_to_proceed</span>() {</span>
+<span class="ln" id="L377">        <span class="tok-kw">let</span> message = <span class="tok-fn">no_terminal</span>(<span class="tok-str">&quot;a passphrase&quot;</span>);</span>
+<span class="ln" id="L378"></span>
+<span class="ln" id="L379">        assert!(</span>
+<span class="ln" id="L380">            message.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;there is no terminal here to ask for a passphrase.&quot;</span>),</span>
+<span class="ln" id="L381">            <span class="tok-str">&quot;the first line has to say what could not be asked for: {message}&quot;</span></span>
+<span class="ln" id="L382">        );</span>
+<span class="ln" id="L383"></span>
+<span class="ln" id="L384">        <span class="tok-com">// Every flag is named beside the command that has it.</span></span>
+<span class="ln" id="L385">        <span class="tok-com">//</span></span>
+<span class="ln" id="L386">        <span class="tok-com">// The first version of this message offered `--encrypt-to` and</span></span>
+<span class="ln" id="L387">        <span class="tok-com">// `--encrypt false --yes` to every caller, because it was written</span></span>
+<span class="ln" id="L388">        <span class="tok-com">// while fixing `anonymise`. `veilvoice encrypt` spells that `--to`</span></span>
+<span class="ln" id="L389">        <span class="tok-com">// and has no `--encrypt`; `lock`, `guard` and `policy` have none of</span></span>
+<span class="ln" id="L390">        <span class="tok-com">// them. A dozen callers share these prompts, so an unattributed flag</span></span>
+<span class="ln" id="L391">        <span class="tok-com">// is a flag the reader&#x27;s command probably does not have.</span></span>
+<span class="ln" id="L392">        <span class="tok-kw">for</span> (flag, command) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L393">            (<span class="tok-str">&quot;--encrypt-to&quot;</span>, <span class="tok-str">&quot;veilvoice anonymise&quot;</span>),</span>
+<span class="ln" id="L394">            (<span class="tok-str">&quot;--encrypt false --yes&quot;</span>, <span class="tok-str">&quot;veilvoice anonymise&quot;</span>),</span>
+<span class="ln" id="L395">            (<span class="tok-str">&quot;--to &lt;PUBKEY&gt;&quot;</span>, <span class="tok-str">&quot;veilvoice encrypt&quot;</span>),</span>
+<span class="ln" id="L396">        ] {</span>
+<span class="ln" id="L397">            <span class="tok-kw">let</span> at = message</span>
+<span class="ln" id="L398">                .<span class="tok-fn">find</span>(flag)</span>
+<span class="ln" id="L399">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;the message no longer mentions {flag}: {message}&quot;</span>));</span>
+<span class="ln" id="L400">            <span class="tok-kw">let</span> before = &amp;message[..at];</span>
+<span class="ln" id="L401">            <span class="tok-kw">let</span> line_start = before.<span class="tok-fn">rfind</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">map</span>(|n| n + <span class="tok-num">1</span>).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L402">            <span class="tok-kw">let</span> context = &amp;message[line_start..];</span>
+<span class="ln" id="L403">            <span class="tok-kw">let</span> context = &amp;context[..context.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">unwrap_or</span>(context.<span class="tok-fn">len</span>())];</span>
+<span class="ln" id="L404">            assert!(</span>
+<span class="ln" id="L405">                context.<span class="tok-fn">contains</span>(command)</span>
+<span class="ln" id="L406">                    || before.<span class="tok-fn">rfind</span>(command).<span class="tok-fn">is_some_and</span>(|c| {</span>
+<span class="ln" id="L407">                        <span class="tok-com">// Named earlier in the same paragraph is fine; named</span></span>
+<span class="ln" id="L408">                        <span class="tok-com">// nowhere is not.</span></span>
+<span class="ln" id="L409">                        message[c..at].<span class="tok-fn">matches</span>(<span class="tok-str">&quot;\n\n&quot;</span>).<span class="tok-fn">count</span>() == <span class="tok-num">0</span></span>
+<span class="ln" id="L410">                    }),</span>
+<span class="ln" id="L411">                <span class="tok-str">&quot;{flag} is offered without saying it belongs to {command}, and \</span></span>
+<span class="ln" id="L412"><span class="tok-str">                 most callers of this message are not that command: {message}&quot;</span></span>
+<span class="ln" id="L413">            );</span>
+<span class="ln" id="L414">        }</span>
+<span class="ln" id="L415"></span>
+<span class="ln" id="L416">        assert!(</span>
+<span class="ln" id="L417">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice keygen&quot;</span>),</span>
+<span class="ln" id="L418">            <span class="tok-str">&quot;the message has to say where the public key comes from: {message}&quot;</span></span>
+<span class="ln" id="L419">        );</span>
+<span class="ln" id="L420"></span>
+<span class="ln" id="L421">        assert!(</span>
+<span class="ln" id="L422">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Nothing was written.&quot;</span>),</span>
+<span class="ln" id="L423">            <span class="tok-str">&quot;a refusal has to say that nothing was written, or the reader \</span></span>
+<span class="ln" id="L424"><span class="tok-str">             cannot tell whether a half-finished file is lying around&quot;</span></span>
+<span class="ln" id="L425">        );</span>
+<span class="ln" id="L426"></span>
+<span class="ln" id="L427">        <span class="tok-com">// The operating system&#x27;s own words are what this replaced.</span></span>
+<span class="ln" id="L428">        assert!(</span>
+<span class="ln" id="L429">            !message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;os error&quot;</span>),</span>
+<span class="ln" id="L430">            <span class="tok-str">&quot;the errno is back in the message: {message}&quot;</span></span>
+<span class="ln" id="L431">        );</span>
+<span class="ln" id="L432">    }</span>
+<span class="ln" id="L433"></span>
+<span class="ln" id="L434">    <span class="tok-com">/// The same guidance whichever prompt could not run.</span></span>
+<span class="ln" id="L435">    <span class="tok-com">///</span></span>
+<span class="ln" id="L436">    <span class="tok-com">/// Two functions prompt, and both refuse through here. A reader who hits</span></span>
+<span class="ln" id="L437">    <span class="tok-com">/// one and then the other should not get two different accounts of the</span></span>
+<span class="ln" id="L438">    <span class="tok-com">/// same situation.</span></span>
+<span class="ln" id="L439">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L440">    <span class="tok-kw">fn</span> <span class="tok-fn">both_prompts_refuse_with_the_same_explanation</span>() {</span>
+<span class="ln" id="L441">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;atrest.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L442">        <span class="tok-kw">for</span> function <span class="tok-kw">in</span> [<span class="tok-str">&quot;pub fn prompt_secret(&quot;</span>, <span class="tok-str">&quot;pub fn read_new_password(&quot;</span>] {</span>
+<span class="ln" id="L443">            <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L444">                .<span class="tok-fn">split</span>(function)</span>
+<span class="ln" id="L445">                .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L446">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{function} has to be findable&quot;</span>));</span>
+<span class="ln" id="L447">            <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\npub fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L448">            assert!(</span>
+<span class="ln" id="L449">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;can_prompt()&quot;</span>) &amp;&amp; body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no_terminal(&quot;</span>),</span>
+<span class="ln" id="L450">                <span class="tok-str">&quot;{function} does not check for a terminal before prompting, so \</span></span>
+<span class="ln" id="L451"><span class="tok-str">                 it will surface the operating system&#x27;s error instead&quot;</span></span>
+<span class="ln" id="L452">            );</span>
+<span class="ln" id="L453">        }</span>
+<span class="ln" id="L454">    }</span>
+<span class="ln" id="L455">}</span>
 </span>
 </code></pre>
 </main>

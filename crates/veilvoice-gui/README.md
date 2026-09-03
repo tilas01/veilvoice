@@ -102,7 +102,7 @@ flowchart TD
     n_crashreport["crashreport.rs<br/>268 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
     n_graphics["graphics.rs<br/>158 lines"]
-    n_group["group.rs<br/>1673 lines"]
+    n_group["group.rs<br/>1745 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
     n_layout["layout.rs<br/>280 lines"]
     n_monitor["monitor.rs<br/>419 lines"]
@@ -111,7 +111,7 @@ flowchart TD
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>616 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
-    n_security["security.rs<br/>1717 lines"]
+    n_security["security.rs<br/>1755 lines"]
     n_settings["settings.rs<br/>1264 lines"]
     n_setup["setup.rs<br/>758 lines"]
     n_soundbar["soundbar.rs<br/>722 lines"]
@@ -226,7 +226,7 @@ flowchart TD
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 268 | Offering the report from the last crash, on the run after it. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 158 | What the window is drawn with, asked for explicitly and then reported. |
-| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1673 | Group mode: several people in one recording, each with a name and a colour. |
+| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1745 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 90 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
@@ -237,7 +237,7 @@ flowchart TD
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 616 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
-| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1717 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1755 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1264 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 758 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 722 | The animated mark: a row of bars that rise and fall. |
