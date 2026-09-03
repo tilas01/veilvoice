@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/main.svg" alt="main.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 3145 lines &middot; <a href="main.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 3228 lines &middot; <a href="main.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-here">What is here</a>
@@ -87,20 +87,20 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>3145 lines defining <strong>26 functions</strong> (0 public), <strong>12 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>3228 lines defining <strong>26 functions</strong> (0 public), <strong>12 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Cli</code> <span style="color:var(--muted)">line 116</span></li>
-<li><code>enum Command</code> <span style="color:var(--muted)">line 122</span></li>
-<li><code>enum ConversationCommand</code> <span style="color:var(--muted)">line 651</span> &middot; What veilvoice conversation can do.</li>
-<li><code>enum AppctlCommand</code> <span style="color:var(--muted)">line 787</span> &middot; What veilvoice capture can do.</li>
-<li><code>enum InputCommand</code> <span style="color:var(--muted)">line 814</span></li>
-<li><code>enum CaptureCommand</code> <span style="color:var(--muted)">line 827</span></li>
-<li><code>enum MandateCommand</code> <span style="color:var(--muted)">line 867</span> &middot; What veilvoice mandate can do.</li>
-<li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 903</span> &middot; What veilvoice policy can do.</li>
-<li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 956</span> &middot; What veilvoice sentry can do.</li>
-<li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 1017</span></li>
-<li><code>struct Tuning</code> <span style="color:var(--muted)">line 1932</span> &middot; The engine settings a user can reach from the command line.</li>
-<li><code>struct AtRest</code> <span style="color:var(--muted)">line 2004</span> &middot; What to do with the result once it exists.</li>
+<li><code>struct Cli</code> <span style="color:var(--muted)">line 118</span></li>
+<li><code>enum Command</code> <span style="color:var(--muted)">line 124</span></li>
+<li><code>enum ConversationCommand</code> <span style="color:var(--muted)">line 702</span> &middot; What veilvoice conversation can do.</li>
+<li><code>enum AppctlCommand</code> <span style="color:var(--muted)">line 838</span> &middot; What veilvoice capture can do.</li>
+<li><code>enum InputCommand</code> <span style="color:var(--muted)">line 865</span></li>
+<li><code>enum CaptureCommand</code> <span style="color:var(--muted)">line 878</span></li>
+<li><code>enum MandateCommand</code> <span style="color:var(--muted)">line 918</span> &middot; What veilvoice mandate can do.</li>
+<li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 954</span> &middot; What veilvoice policy can do.</li>
+<li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 1007</span> &middot; What veilvoice sentry can do.</li>
+<li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 1068</span></li>
+<li><code>struct Tuning</code> <span style="color:var(--muted)">line 2015</span> &middot; The engine settings a user can reach from the command line.</li>
+<li><code>struct AtRest</code> <span style="color:var(--muted)">line 2087</span> &middot; What to do with the result once it exists.</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -147,112 +147,112 @@
 <a href="main.src.html#fn-explain_verification">
 <rect x="28.0" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="122.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">explain_verification</text>
-<text x="122.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1038</text>
+<text x="122.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1089</text>
 </a>
 <a href="main.src.html#fn-main">
 <rect x="243.2" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="293.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main</text>
-<text x="293.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1115</text>
+<text x="293.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1166</text>
 </a>
 <a href="main.src.html#fn-run">
 <rect x="159.8" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="210.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="210.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1152</text>
+<text x="210.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1203</text>
 </a>
 <a href="main.src.html#fn-run_ffmpeg">
 <rect x="80.4" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="134.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run_ffmpeg</text>
-<text x="134.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1669</text>
+<text x="134.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1752</text>
 </a>
 <a href="main.src.html#fn-list_volumes">
 <rect x="215.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="277.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_volumes</text>
-<text x="277.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1744</text>
+<text x="277.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1827</text>
 </a>
 <a href="main.src.html#fn-list_companions">
 <rect x="365.7" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_companions</text>
-<text x="440.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1792</text>
+<text x="440.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1875</text>
 </a>
 <a href="main.src.html#fn-offer_line">
 <rect x="155.8" y="720.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="210.1" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">offer_line</text>
-<text x="210.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1825</text>
+<text x="210.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1908</text>
 </a>
 <a href="main.src.html#fn-install_companion">
 <rect x="56.2" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="138.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_companion</text>
-<text x="138.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1849</text>
+<text x="138.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1932</text>
 </a>
 <a href="main.src.html#fn-reseed_range_from">
 <rect x="247.2" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="329.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
-<text x="329.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1951</text>
+<text x="329.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2034</text>
 </a>
 <a href="main.src.html#fn-config">
 <rect x="438.2" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="488.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
-<text x="488.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1966</text>
+<text x="488.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2049</text>
 </a>
 <a href="main.src.html#fn-describe_reseed_range">
 <rect x="369.7" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="468.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed_range</text>
-<text x="468.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1985</text>
+<text x="468.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2068</text>
 </a>
 <a href="main.src.html#fn-describe_reseed">
 <rect x="286.3" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="360.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
-<text x="360.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1995</text>
+<text x="360.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2078</text>
 </a>
 <a href="main.src.html#fn-anonymise">
 <rect x="45.3" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="95.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">anonymise</text>
-<text x="95.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2013</text>
+<text x="95.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2096</text>
 </a>
 <a href="main.src.html#fn-live">
 <rect x="171.9" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="222.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live</text>
-<text x="222.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2152</text>
+<text x="222.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2235</text>
 </a>
 <a href="main.src.html#fn-list_devices">
 <rect x="298.4" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="360.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_devices</text>
-<text x="360.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2372</text>
+<text x="360.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2455</text>
 </a>
 <a href="main.src.html#fn-read_named">
 <rect x="171.9" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="226.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_named</text>
-<text x="226.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2423</text>
+<text x="226.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2506</text>
 </a>
 <a href="main.src.html#fn-write_named">
 <rect x="306.5" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="364.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_named</text>
-<text x="364.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2432</text>
+<text x="364.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2515</text>
 </a>
 <a href="main.src.html#fn-clean">
 <rect x="449.1" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="499.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean</text>
-<text x="499.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2436</text>
+<text x="499.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2519</text>
 </a>
 <a href="main.src.html#fn-encrypt">
 <rect x="120.7" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="171.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">encrypt</text>
-<text x="171.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2453</text>
+<text x="171.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2536</text>
 </a>
 <a href="main.src.html#fn-decrypt">
 <rect x="247.2" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="297.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decrypt</text>
-<text x="297.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2482</text>
+<text x="297.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2565</text>
 </a>
 <a href="main.src.html#fn-load_secret_key">
 <rect x="290.4" y="720.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="364.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_secret_key</text>
-<text x="364.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2514</text>
+<text x="364.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2597</text>
 </a>
 <a href="main.src.html#fn-keygen">
 <rect x="373.8" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="424.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keygen</text>
-<text x="424.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2522</text>
+<text x="424.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2605</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
@@ -268,28 +268,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_explain_verification[&quot;explain_verification&lt;br/&gt;line 1038&quot;]
-    n_main[&quot;main&lt;br/&gt;line 1115&quot;]
-    n_run[&quot;run&lt;br/&gt;line 1152&quot;]
-    n_run_ffmpeg[&quot;run_ffmpeg&lt;br/&gt;line 1669&quot;]
-    n_list_volumes[&quot;list_volumes&lt;br/&gt;line 1744&quot;]
-    n_list_companions[&quot;list_companions&lt;br/&gt;line 1792&quot;]
-    n_offer_line[&quot;offer_line&lt;br/&gt;line 1825&quot;]
-    n_install_companion[&quot;install_companion&lt;br/&gt;line 1849&quot;]
-    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 1951&quot;]
-    n_config[&quot;config&lt;br/&gt;line 1966&quot;]
-    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 1985&quot;]
-    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 1995&quot;]
-    n_anonymise[&quot;anonymise&lt;br/&gt;line 2013&quot;]
-    n_live[&quot;live&lt;br/&gt;line 2152&quot;]
-    n_list_devices[&quot;list_devices&lt;br/&gt;line 2372&quot;]
-    n_read_named[&quot;read_named&lt;br/&gt;line 2423&quot;]
-    n_write_named[&quot;write_named&lt;br/&gt;line 2432&quot;]
-    n_clean[&quot;clean&lt;br/&gt;line 2436&quot;]
-    n_encrypt[&quot;encrypt&lt;br/&gt;line 2453&quot;]
-    n_decrypt[&quot;decrypt&lt;br/&gt;line 2482&quot;]
-    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 2514&quot;]
-    n_keygen[&quot;keygen&lt;br/&gt;line 2522&quot;]
+    n_explain_verification[&quot;explain_verification&lt;br/&gt;line 1089&quot;]
+    n_main[&quot;main&lt;br/&gt;line 1166&quot;]
+    n_run[&quot;run&lt;br/&gt;line 1203&quot;]
+    n_run_ffmpeg[&quot;run_ffmpeg&lt;br/&gt;line 1752&quot;]
+    n_list_volumes[&quot;list_volumes&lt;br/&gt;line 1827&quot;]
+    n_list_companions[&quot;list_companions&lt;br/&gt;line 1875&quot;]
+    n_offer_line[&quot;offer_line&lt;br/&gt;line 1908&quot;]
+    n_install_companion[&quot;install_companion&lt;br/&gt;line 1932&quot;]
+    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 2034&quot;]
+    n_config[&quot;config&lt;br/&gt;line 2049&quot;]
+    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 2068&quot;]
+    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 2078&quot;]
+    n_anonymise[&quot;anonymise&lt;br/&gt;line 2096&quot;]
+    n_live[&quot;live&lt;br/&gt;line 2235&quot;]
+    n_list_devices[&quot;list_devices&lt;br/&gt;line 2455&quot;]
+    n_read_named[&quot;read_named&lt;br/&gt;line 2506&quot;]
+    n_write_named[&quot;write_named&lt;br/&gt;line 2515&quot;]
+    n_clean[&quot;clean&lt;br/&gt;line 2519&quot;]
+    n_encrypt[&quot;encrypt&lt;br/&gt;line 2536&quot;]
+    n_decrypt[&quot;decrypt&lt;br/&gt;line 2565&quot;]
+    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 2597&quot;]
+    n_keygen[&quot;keygen&lt;br/&gt;line 2605&quot;]
     n_anonymise --&gt; n_config
     n_anonymise --&gt; n_describe_reseed_range
     n_clean --&gt; n_read_named
@@ -318,28 +318,28 @@ flowchart TD
     n_run --&gt; n_live
     n_run --&gt; n_reseed_range_from
     n_run --&gt; n_run_ffmpeg
-    click n_explain_verification href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1038&quot; &quot;open the source&quot;
-    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1115&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1152&quot; &quot;open the source&quot;
-    click n_run_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1669&quot; &quot;open the source&quot;
-    click n_list_volumes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1744&quot; &quot;open the source&quot;
-    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1792&quot; &quot;open the source&quot;
-    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1825&quot; &quot;open the source&quot;
-    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1849&quot; &quot;open the source&quot;
-    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1951&quot; &quot;open the source&quot;
-    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1966&quot; &quot;open the source&quot;
-    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1985&quot; &quot;open the source&quot;
-    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1995&quot; &quot;open the source&quot;
-    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2013&quot; &quot;open the source&quot;
-    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2152&quot; &quot;open the source&quot;
-    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2372&quot; &quot;open the source&quot;
-    click n_read_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2423&quot; &quot;open the source&quot;
-    click n_write_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2432&quot; &quot;open the source&quot;
-    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2436&quot; &quot;open the source&quot;
-    click n_encrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2453&quot; &quot;open the source&quot;
-    click n_decrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2482&quot; &quot;open the source&quot;
-    click n_load_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2514&quot; &quot;open the source&quot;
-    click n_keygen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2522&quot; &quot;open the source&quot;
+    click n_explain_verification href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1089&quot; &quot;open the source&quot;
+    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1166&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1203&quot; &quot;open the source&quot;
+    click n_run_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1752&quot; &quot;open the source&quot;
+    click n_list_volumes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1827&quot; &quot;open the source&quot;
+    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1875&quot; &quot;open the source&quot;
+    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1908&quot; &quot;open the source&quot;
+    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1932&quot; &quot;open the source&quot;
+    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2034&quot; &quot;open the source&quot;
+    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2049&quot; &quot;open the source&quot;
+    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2068&quot; &quot;open the source&quot;
+    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2078&quot; &quot;open the source&quot;
+    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2096&quot; &quot;open the source&quot;
+    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2235&quot; &quot;open the source&quot;
+    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2455&quot; &quot;open the source&quot;
+    click n_read_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2506&quot; &quot;open the source&quot;
+    click n_write_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2515&quot; &quot;open the source&quot;
+    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2519&quot; &quot;open the source&quot;
+    click n_encrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2536&quot; &quot;open the source&quot;
+    click n_decrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2565&quot; &quot;open the source&quot;
+    click n_load_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2597&quot; &quot;open the source&quot;
+    click n_keygen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2605&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_explain_verification,n_main,n_run,n_run_ffmpeg,n_list_volumes,n_list_companions,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_read_named,n_write_named,n_clean,n_encrypt,n_decrypt,n_load_secret_key,n_keygen helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -348,44 +348,44 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="main.src.html#fn-cli">116</a></td><td></td></tr>
-<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="main.src.html#fn-command">122</a></td><td></td></tr>
-<tr><td><code>ConversationCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-conversationcommand">651</a></td><td>What veilvoice conversation can do.</td></tr>
-<tr><td><code>AppctlCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-appctlcommand">787</a></td><td>What veilvoice capture can do.</td></tr>
-<tr><td><code>InputCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-inputcommand">814</a></td><td></td></tr>
-<tr><td><code>CaptureCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-capturecommand">827</a></td><td></td></tr>
-<tr><td><code>MandateCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-mandatecommand">867</a></td><td>What veilvoice mandate can do.</td></tr>
-<tr><td><code>PolicyCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-policycommand">903</a></td><td>What veilvoice policy can do.</td></tr>
-<tr><td><code>SentryCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-sentrycommand">956</a></td><td>What veilvoice sentry can do.</td></tr>
-<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="main.src.html#fn-cleanpolicy">1017</a></td><td></td></tr>
-<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-policy-from">1025</a></td><td></td></tr>
-<tr><td><code>explain_verification</code> <sub>fn</sub></td><td><a href="main.src.html#fn-explain_verification">1038</a></td><td>What checking a release actually involves, and who does which part.</td></tr>
-<tr><td><code>main</code> <sub>fn</sub></td><td><a href="main.src.html#fn-main">1115</a></td><td></td></tr>
-<tr><td><code>run</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run">1152</a></td><td></td></tr>
-<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run_ffmpeg">1669</a></td><td>Markers 87 and 88.</td></tr>
-<tr><td><code>list_volumes</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_volumes">1744</a></td><td>Report the encrypted volumes this machine is offering.</td></tr>
-<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_companions">1792</a></td><td>Report every companion that means anything on this platform.</td></tr>
-<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="main.src.html#fn-offer_line">1825</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
-<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="main.src.html#fn-install_companion">1849</a></td><td>Act on one named companion.</td></tr>
-<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="main.src.html#fn-tuning">1932</a></td><td>The engine settings a user can reach from the command line.</td></tr>
-<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-reseed_range_from">1951</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
-<tr><td><code>config</code> <sub>fn</sub></td><td><a href="main.src.html#fn-config">1966</a></td><td></td></tr>
-<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed_range">1985</a></td><td>How a randomised roll range reads in the output.</td></tr>
-<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed">1995</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
-<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="main.src.html#fn-atrest">2004</a></td><td>What to do with the result once it exists.</td></tr>
-<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="main.src.html#fn-anonymise">2013</a></td><td></td></tr>
-<tr><td><code>live</code> <sub>fn</sub></td><td><a href="main.src.html#fn-live">2152</a></td><td></td></tr>
-<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_devices">2372</a></td><td></td></tr>
-<tr><td><code>read_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-read_named">2423</a></td><td>Read a file, naming it if that fails.</td></tr>
-<tr><td><code>write_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-write_named">2432</a></td><td>Write a file, naming it if that fails.</td></tr>
-<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="main.src.html#fn-clean">2436</a></td><td></td></tr>
-<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-encrypt">2453</a></td><td></td></tr>
-<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-decrypt">2482</a></td><td></td></tr>
-<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="main.src.html#fn-load_secret_key">2514</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
-<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="main.src.html#fn-keygen">2522</a></td><td></td></tr>
-<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="main.src.html#fn-watch">2598</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
-<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="main.src.html#fn-shred">2688</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>info</code> <sub>fn</sub></td><td><a href="main.src.html#fn-info">2756</a></td><td></td></tr>
+<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="main.src.html#fn-cli">118</a></td><td></td></tr>
+<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="main.src.html#fn-command">124</a></td><td></td></tr>
+<tr><td><code>ConversationCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-conversationcommand">702</a></td><td>What veilvoice conversation can do.</td></tr>
+<tr><td><code>AppctlCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-appctlcommand">838</a></td><td>What veilvoice capture can do.</td></tr>
+<tr><td><code>InputCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-inputcommand">865</a></td><td></td></tr>
+<tr><td><code>CaptureCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-capturecommand">878</a></td><td></td></tr>
+<tr><td><code>MandateCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-mandatecommand">918</a></td><td>What veilvoice mandate can do.</td></tr>
+<tr><td><code>PolicyCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-policycommand">954</a></td><td>What veilvoice policy can do.</td></tr>
+<tr><td><code>SentryCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-sentrycommand">1007</a></td><td>What veilvoice sentry can do.</td></tr>
+<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="main.src.html#fn-cleanpolicy">1068</a></td><td></td></tr>
+<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-policy-from">1076</a></td><td></td></tr>
+<tr><td><code>explain_verification</code> <sub>fn</sub></td><td><a href="main.src.html#fn-explain_verification">1089</a></td><td>What checking a release actually involves, and who does which part.</td></tr>
+<tr><td><code>main</code> <sub>fn</sub></td><td><a href="main.src.html#fn-main">1166</a></td><td></td></tr>
+<tr><td><code>run</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run">1203</a></td><td></td></tr>
+<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run_ffmpeg">1752</a></td><td>Markers 87 and 88.</td></tr>
+<tr><td><code>list_volumes</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_volumes">1827</a></td><td>Report the encrypted volumes this machine is offering.</td></tr>
+<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_companions">1875</a></td><td>Report every companion that means anything on this platform.</td></tr>
+<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="main.src.html#fn-offer_line">1908</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
+<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="main.src.html#fn-install_companion">1932</a></td><td>Act on one named companion.</td></tr>
+<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="main.src.html#fn-tuning">2015</a></td><td>The engine settings a user can reach from the command line.</td></tr>
+<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-reseed_range_from">2034</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
+<tr><td><code>config</code> <sub>fn</sub></td><td><a href="main.src.html#fn-config">2049</a></td><td></td></tr>
+<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed_range">2068</a></td><td>How a randomised roll range reads in the output.</td></tr>
+<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed">2078</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
+<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="main.src.html#fn-atrest">2087</a></td><td>What to do with the result once it exists.</td></tr>
+<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="main.src.html#fn-anonymise">2096</a></td><td></td></tr>
+<tr><td><code>live</code> <sub>fn</sub></td><td><a href="main.src.html#fn-live">2235</a></td><td></td></tr>
+<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_devices">2455</a></td><td></td></tr>
+<tr><td><code>read_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-read_named">2506</a></td><td>Read a file, naming it if that fails.</td></tr>
+<tr><td><code>write_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-write_named">2515</a></td><td>Write a file, naming it if that fails.</td></tr>
+<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="main.src.html#fn-clean">2519</a></td><td></td></tr>
+<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-encrypt">2536</a></td><td></td></tr>
+<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-decrypt">2565</a></td><td></td></tr>
+<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="main.src.html#fn-load_secret_key">2597</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
+<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="main.src.html#fn-keygen">2605</a></td><td></td></tr>
+<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="main.src.html#fn-watch">2681</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
+<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="main.src.html#fn-shred">2771</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>info</code> <sub>fn</sub></td><td><a href="main.src.html#fn-info">2839</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
