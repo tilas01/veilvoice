@@ -2349,8 +2349,24 @@ def html_page(colours, depth, title, description, body, fingerprint):
     add('      <img src="%sassets/icon-32.png" alt="">' % up)
     add('      <a href="%sindex.html">VEILVOICE</a>' % up)
     add('    </div>')
+    # The same thirteen links every hand-written page carries, in the same
+    # order. They used to be five: a reader who clicked `reference` landed on a
+    # page whose header had quietly dropped `download`, `guide`, `verify`,
+    # `security`, `faq`, `roadmap`, `releases` and `what`, with no way back to
+    # any of them except home. A header that changes shape as you move through
+    # the site is worse than a long one, so this is the whole set, prefixed for
+    # the page's depth. `tools/site-tests/links.test.js` compares it against
+    # `index.html` and fails if the two drift apart again.
     add('    <nav class="links">')
-    add('      <a href="%sindex.html">home</a>' % up)
+    add('      <a href="%sindex.html#what">what</a>' % up)
+    add('      <a href="%sindex.html#download">download</a>' % up)
+    add('      <a href="%sindex.html#demo">demo</a>' % up)
+    add('      <a href="%sindex.html#guide">guide</a>' % up)
+    add('      <a href="%sindex.html#verify">verify</a>' % up)
+    add('      <a href="%sindex.html#crypto">security</a>' % up)
+    add('      <a href="%sfaq.html">faq</a>' % up)
+    add('      <a href="%sroadmap.html">roadmap</a>' % up)
+    add('      <a href="%sreleases.html">releases</a>' % up)
     add('      <a href="%swiki.html">wiki</a>' % up)
     add('      <a href="%sreference/index.html">reference</a>' % up)
     add('      <a href="%ssearch.html">index</a>' % up)
@@ -2368,6 +2384,10 @@ def html_page(colours, depth, title, description, body, fingerprint):
     add('<footer class="wrap" style="padding:40px 20px;color:var(--muted)">')
     add('<p>Generated from the source by <code>tools/docs/generate.py</code>. '
         'Releases are signed with key <code>%s</code>.</p>' % esc(fingerprint))
+    add('<p class="credit">Written and maintained by '
+        '<a href="https://github.com/tilas01" rel="noopener noreferrer">tilas01</a>, '
+        'who holds the copyright. Drafted with help from Claude, '
+        "Anthropic's assistant, and reviewed, built and tested before release.</p>")
     add('</footer>')
     add('</body>')
     add('</html>')
