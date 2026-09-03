@@ -134,6 +134,16 @@ const DOMAIN: &[u8] = b"veilvoice/app-lock/v1\0";
 const INFO_VERIFIER: &[u8] = b"veilvoice/app-lock/verifier";
 /// HKDF label for the half that is not, and that authenticates the record.
 const INFO_TAG: &[u8] = b"veilvoice/app-lock/tag";
+/// HKDF label for the obfuscated store key. A third branch of the same
+/// Argon2id run, independent of the other two: publishing the verifier, which
+/// the file does by existing, says nothing about this.
+///
+/// This is the branch that gives the lock something to hold. Before it, the
+/// lock verified a passphrase and nothing else depended on it; now
+/// [`crate::hoard`] names and opens every record in the program folder with
+/// this key, so the passphrase is what makes those files readable rather than
+/// merely what makes the window open.
+const INFO_STORE: &[u8] = b"veilvoice/app-lock/store";
 /// Length of the record tag. Sixteen bytes of Poly1305, as everywhere else.
 const TAG_LEN: usize = crate::aead::TAG_LEN;
 /// Length of the tagged part of a record, which is also the offset of the
@@ -229,6 +239,22 @@ impl AppLock {
         // version 1 file, and would go one more unlock before it was covered.
         lock.retag(password)?;
         Ok(lock)
+    }
+
+    /// Derive the key that names and opens the obfuscated program folder.
+    ///
+    /// Separate from [`Self::verify`] rather than returned by it, because most
+    /// unlocks do not need it and the ones that do want it at a different
+    /// moment. It costs a full Argon2id run, so callers hold the result for as
+    /// long as the session is unlocked rather than deriving it per record.
+    ///
+    /// The password is **not** checked here: a wrong one yields a key that
+    /// derives names nothing is stored under, which reads as an empty folder
+    /// rather than an error. Call [`Self::verify`] first, and act on what it
+    /// says.
+    pub fn store_key(&self, password: &[u8]) -> Result<crate::hoard::StoreKey, Error> {
+        let (_, _, store) = derive_keys(password, &self.salt, self.params)?;
+        Ok(crate::hoard::StoreKey::from_secret(store))
     }
 
     /// Check `password`, recording the outcome.
@@ -584,6 +610,21 @@ fn derive_pair(
     salt: &[u8],
     params: kdf::KdfParams,
 ) -> Result<(Secret, Secret), Error> {
+    let (verifier, tag_key, _) = derive_keys(password, salt, params)?;
+    Ok((verifier, tag_key))
+}
+
+/// As [`derive_pair`], and the store key with it.
+///
+/// One Argon2id run produces all three. Callers that need the store key must
+/// use this rather than deriving it separately: a second run would double the
+/// cost of every unlock for no gain, and the whole point of the HKDF split is
+/// that one expensive step can feed as many independent labels as are wanted.
+fn derive_keys(
+    password: &[u8],
+    salt: &[u8],
+    params: kdf::KdfParams,
+) -> Result<(Secret, Secret, Secret), Error> {
     let mut bound = Vec::with_capacity(DOMAIN.len() + password.len());
     bound.extend_from_slice(DOMAIN);
     bound.extend_from_slice(password);
@@ -597,7 +638,10 @@ fn derive_pair(
         .map_err(|_| Error::Kdf)?;
     hk.expand(INFO_TAG, tag_key.expose_mut())
         .map_err(|_| Error::Kdf)?;
-    Ok((verifier, tag_key))
+    let mut store_key = Secret::zeroed(kdf::KEY_LEN);
+    hk.expand(INFO_STORE, store_key.expose_mut())
+        .map_err(|_| Error::Kdf)?;
+    Ok((verifier, tag_key, store_key))
 }
 
 /// An [`AppLock`] bound to a file, which is persisted after every attempt.
@@ -1111,6 +1155,59 @@ mod tests {
         let salt = [5u8; kdf::SALT_LEN];
         let (verifier, tag_key) = derive_pair(b"same passphrase", &salt, weak()).unwrap();
         assert_ne!(verifier, tag_key);
+    }
+
+    #[test]
+    fn all_three_branches_of_one_run_are_independent() {
+        let salt = [5u8; kdf::SALT_LEN];
+        let (verifier, tag_key, store) = derive_keys(b"same passphrase", &salt, weak()).unwrap();
+        assert_ne!(verifier, tag_key);
+        assert_ne!(verifier, store);
+        assert_ne!(tag_key, store);
+    }
+
+    #[test]
+    fn the_store_key_does_not_follow_from_the_verifier_on_disk() {
+        // The verifier is published by the lock file simply existing. If the
+        // store key could be recovered from it, the obfuscated folder would be
+        // readable by anybody holding the disk, and the whole scheme would be
+        // decoration. Distinct HKDF labels are what prevent that; this is the
+        // test that says so.
+        let salt = [5u8; kdf::SALT_LEN];
+        let (verifier, _, store) = derive_keys(b"passphrase", &salt, weak()).unwrap();
+        assert_ne!(verifier.expose(), store.expose());
+    }
+
+    #[test]
+    fn the_store_key_is_the_same_every_time_for_one_passphrase() {
+        // Names are derived from it, so an unstable key would lose every
+        // record on the next unlock.
+        let lock = AppLock::create(b"steady", weak()).unwrap();
+        let a = lock.store_key(b"steady").unwrap();
+        let b = lock.store_key(b"steady").unwrap();
+        let hoard_a = crate::hoard::Hoard::open(std::path::Path::new("/tmp"), a);
+        let hoard_b = crate::hoard::Hoard::open(std::path::Path::new("/tmp"), b);
+        assert_eq!(
+            hoard_a.name_for("settings").unwrap(),
+            hoard_b.name_for("settings").unwrap()
+        );
+    }
+
+    #[test]
+    fn a_different_passphrase_derives_a_different_store_key() {
+        let lock = AppLock::create(b"right", weak()).unwrap();
+        let right = crate::hoard::Hoard::open(
+            std::path::Path::new("/tmp"),
+            lock.store_key(b"right").unwrap(),
+        );
+        let wrong = crate::hoard::Hoard::open(
+            std::path::Path::new("/tmp"),
+            lock.store_key(b"wrong").unwrap(),
+        );
+        assert_ne!(
+            right.name_for("settings").unwrap(),
+            wrong.name_for("settings").unwrap()
+        );
     }
 
     #[test]
