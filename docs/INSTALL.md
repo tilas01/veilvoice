@@ -120,6 +120,32 @@ the check that failed**, rather than continuing past anything it could not
 verify. None of them has a flag to skip verification, because an installer with
 one is an installer whose verification is decorative.
 
+Since the archive is checked against the signed list, the installed programs are
+then made to check themselves one more way: the script runs `veilvoice verify`
+on the freshly installed binary, which re-checks the signature and every file in
+the archive through an independent implementation and the signed per-file
+manifest. If that disagrees with what was installed, the script removes it and
+stops.
+
+### The one command, if you want it
+
+For people who would rather paste one line than download, read and run, here it
+is per platform. It does everything above and refuses on any failure. Reading
+the script first, as shown below the one-liners, is safer and recommended, since
+piping a script straight into a shell means trusting it before you have seen it.
+
+Linux and macOS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tilas01/veilvoice/main/install/install.sh | sh
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/tilas01/veilvoice/main/install/install.ps1 | iex
+```
+
 ### Linux and macOS
 
 ```bash

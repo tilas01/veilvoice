@@ -241,6 +241,11 @@ try {
     }
     Write-Good "SHA256SUMS"
 
+    # The per-file manifest, so the installed program can check every file and
+    # not just the archive. Best effort: older releases do not publish it, and
+    # it is covered by SHA256SUMS so it cannot be swapped undetected.
+    $HaveContents = Get-File "$BASE/CONTENTS.sha256" "$WORK\CONTENTS.sha256"
+
     if (-not (Get-File "$BASE/SHA256SUMS.asc" "$WORK\SHA256SUMS.asc")) {
         Deny "this release has no signature (SHA256SUMS.asc)" @(
             "Every signed release publishes one. Its absence means either that",
@@ -431,6 +436,31 @@ try {
     New-Item -ItemType Directory -Path $Prefix -Force | Out-Null
     Copy-Item -Path (Join-Path $src.FullName "*") -Destination $Prefix -Recurse -Force
     Write-Good "installed to $Prefix"
+
+    # 6. Have the installed program check every file, one more way. The archive
+    # verified against the signed list, so the binary is trustworthy; now use it
+    # to run the full per-file check through its own independent code path. If
+    # it disagrees, remove what was installed and stop.
+    $vv = Join-Path $Prefix "veilvoice.exe"
+    if ($HaveContents -and (Test-Path $vv)) {
+        Write-Step "Verifying every file with the installed program"
+        & $vv verify auto "$WORK" *> $null
+        # Exit 2 means a check ran and failed; 3 means it could not complete,
+        # which is not a disagreement. Only 2 undoes the install.
+        if ($LASTEXITCODE -eq 0) {
+            Write-Good "every file checks out"
+        } elseif ($LASTEXITCODE -eq 2) {
+            Remove-Item -Path (Join-Path $Prefix "veilvoice.exe") -ErrorAction SilentlyContinue
+            Remove-Item -Path (Join-Path $Prefix "veilvoice-gui.exe") -ErrorAction SilentlyContinue
+            Deny "the installed program's own check disagreed with the download" @(
+                "The archive matched the signed list, but the per-file check",
+                "failed. The installed programs have been removed. Do not use this copy."
+            )
+        } else {
+            Write-Say "  the extra per-file check could not complete; the archive"
+            Write-Say "  itself already verified against the signed list, so this is fine."
+        }
+    }
 
     # On the *user's* PATH, not the machine's: this needs no administrator and
     # affects nobody else's account.

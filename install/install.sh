@@ -246,6 +246,14 @@ fetch "$BASE/SHA256SUMS" "$WORK/SHA256SUMS" \
         "Without the hash list the download cannot be checked, so it will not be installed."
 good "SHA256SUMS"
 
+# The per-file manifest, so the freshly installed binary can check every file
+# in the archive and not just the archive as a whole. Best effort: releases
+# before v0.1.15 do not publish it, and its absence is not fatal -- the archive
+# hash still pins the contents. It is covered by SHA256SUMS, so it cannot be
+# swapped without the signature check catching it.
+HAVE_CONTENTS=1
+fetch "$BASE/CONTENTS.sha256" "$WORK/CONTENTS.sha256" 2>/dev/null || HAVE_CONTENTS=0
+
 SIGNED=1
 fetch "$BASE/SHA256SUMS.asc" "$WORK/SHA256SUMS.asc" 2>/dev/null || SIGNED=0
 if [ "$SIGNED" = "1" ]; then
@@ -408,6 +416,25 @@ done
 [ -n "$INSTALLED" ] || refuse "no VeilVoice binary was found inside the archive"
 
 good "installed$INSTALLED to $BIN"
+
+# ---------------------------------------------------------------------------
+# 6. Have the installed program check itself, every file, one more way
+# ---------------------------------------------------------------------------
+# The archive verified against the signed list, so the binary just installed is
+# trustworthy. Now use it to run the full per-file check -- the same
+# `veilvoice verify` a user would run by hand, through an independent code path
+# (a pure-Rust OpenPGP implementation) and the signed per-file manifest. If it
+# disagrees with what got installed, that is a reason to stop and say so.
+if [ -x "$BIN/veilvoice" ] && [ "$HAVE_CONTENTS" = "1" ] && [ "$SIGNED" = "1" ]; then
+    step "Verifying every file with the installed program"
+    if "$BIN/veilvoice" verify auto "$WORK" >/dev/null 2>&1; then
+        good "every file checks out"
+    else
+        # Undo the install rather than leave a half-trusted copy in place.
+        for name in $INSTALLED; do rm -f "$BIN/$name"; done
+        refuse "the installed program's own check disagreed with the download"             "The archive matched the signed list, but the per-file verification"             "did not. The installed files have been removed. Run:"             "  veilvoice verify auto <the folder you downloaded to>"             "on a copy you trust, and do not use this one."
+    fi
+fi
 
 # ---------------------------------------------------------------------------
 # 6. Optional extras -- asked once, defaulting to no
