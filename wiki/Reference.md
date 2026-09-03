@@ -216,6 +216,7 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 Settings that can only be tightened, sealed with the project's own post-quantum cryptography.
 
 - [[`lib.rs`|File-veilvoice-policy-lib]] &middot; Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having.
+- [[`mandate.rs`|File-veilvoice-policy-mandate]] &middot; The two things VeilVoice insists on unless you say otherwise.
 - [[`policy.rs`|File-veilvoice-policy-policy]] &middot; The policy itself: what can be required, and what requiring it does.
 
 ## [[veilvoice-priv|Crate-veilvoice-priv]]

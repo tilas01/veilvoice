@@ -71,6 +71,11 @@
     The version is compared against the workspace version by the site suite.
   -->
   <releases>
+    <release version="0.1.18" date="2026-09-03">
+      <description>
+        <p>See the release notes for what changed.</p>
+      </description>
+    </release>
     <release version="0.1.17" date="2026-09-02">
       <description>
         <p>See the release notes for what changed.</p>

@@ -77,8 +77,41 @@
 <p class="muted">
 Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
-<details class="release">
-<summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<details class="release" id="v0.1.18" open>
+<summary><strong>v0.1.18</strong> <span class="muted">The app lock now protects your files, not just the window</span></summary>
+<p><strong>The app lock now protects your files, not just the window</strong></p>
+<ul>
+<li>Setting an app-lock password derives a third key beside the verifier, and VeilVoice&#x27;s own files (settings, measurements, the integrity record) are encrypted under it, stored under meaningless base64 names, padded to a few fixed sizes, with decoy files sown among them. Without the passphrase the folder says nothing about what you have done. The module states plainly what this buys and what it does not: it is not protection from someone with your passphrase or while the app is open, and it does not hide that VeilVoice is installed.</li>
+<li>Before encryption, each record is put through one of thirty-one reversible encodings drawn at random, and the sealed result through another, so a plaintext buffer that escaped by some route other than the cipher does not read as anything. This adds no cryptographic strength and says so; the encryption is what keeps the file secret.</li>
+</ul>
+<p><strong>The app lock finally works from the window (F-141)</strong></p>
+<ul>
+<li>Reported from Windows 11 as &quot;could not write or read app lock file&quot;, it reproduced everywhere: the window created locks in one file and read them from another, so a lock set in the window vanished on the next launch and the second attempt failed. The app lock had never worked from the desktop application. Creation and loading now use the same store, a pre-0.1.18 lock is adopted rather than orphaned, and &quot;already set&quot; has its own clear message.</li>
+</ul>
+<p><strong>The verifier is part of <code>veilvoice</code> now</strong></p>
+<ul>
+<li><code>veilvoice-verify</code> is no longer a separate binary. It is <code>veilvoice verify</code>, with every command, message and exit status unchanged, and the desktop app&#x27;s Verify tab runs the same check. A release ships two programs instead of three.</li>
+</ul>
+<p><strong>A first run that sets up your protection</strong></p>
+<ul>
+<li>The first run now offers, in four skippable cards, the app lock (which also encrypts VeilVoice&#x27;s own files), a recording passphrase, and a window autolock that defaults to on at thirty minutes. A default nobody is shown is an answer, and the answer this used to give was no protection at all.</li>
+</ul>
+<p><strong>A locked window that shows the logo and says why it locked</strong></p>
+<ul>
+<li>The lock screen is centred on the VeilVoice mark and, when the autolock engaged, says so until you start typing, so a window you did not lock yourself is not a mystery.</li>
+</ul>
+<p><strong>When antivirus closes VeilVoice, it says so next time</strong></p>
+<ul>
+<li>A low-reputation new application is sometimes stopped by Windows antivirus. If a run ends without a clean shutdown and did not crash, and an antivirus is installed, the next launch explains what likely happened, names the product, and says an exclusion is worth adding only if the problem is real. Nothing is hidden and nothing on the system is changed.</li>
+</ul>
+<p><strong>Host the site yourself, verify more ways</strong></p>
+<ul>
+<li><code>tools/site/serve.py</code> and <code>deploy/nginx.conf</code> serve the website locally, exactly as GitHub Pages does, so it survives the repository or Pages going down. The install scripts now verify every file with the freshly installed program, and there is a one-liner per platform. A self-signed code certificate and signed app manifest are published beside the OpenPGP key as an optional second identity; <code>docs/SELF_SIGNING.md</code> is the tutorial. Arch packaging (PKGBUILD and a <code>-git</code> variant) joins the existing deb, RPM and Gentoo.</li>
+</ul>
+<p><strong>More defects found and fixed (F-140 to F-145)</strong></p>
+<ul>
+<li>A CI guard narrower than the claim it enforced; a record migrated but never read back, which would have destroyed the integrity baseline; an empty <code>APPDATA</code> that put the lock file in the working directory; verification instructions naming a release eight versions stale; and a documented policy file that did not parse. Each has a regression test verified against the old code, and detectors for two of the classes are wired into CI.</li>
+</ul>
 <p><strong>The file with more in it had the weaker permission</strong></p>
 <ul>
 <li>Everything group mode wrote was readable by every other account on the machine. <code>veilvoice conversation render</code> wrote its audio, both subtitle tracks and the page as 0644; so did the desktop application&#x27;s group panel; and so did the file tab whenever somebody turned encryption off there.</li>
@@ -171,8 +204,29 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <li>The roadmap said &quot;v0.1.14 is released&quot; while three releases went out past it. That line is now checked against <code>Cargo.toml</code> like every other copy of the version.</li>
 <li>One row, numbered <code>63b</code>, had never appeared on the website, in the picture, or in any count, because the generator requires a plain integer and silently skipped what it could not read. The generator now refuses such a row instead of dropping it, which is the fix whether or not that row exists.</li>
 </ul>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.18-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.18-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.18-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.18-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.18-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.18-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.18-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.18" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
 </details>
-<details class="release" id="v0.1.17" open>
+<details class="release" id="v0.1.17">
 <summary><strong>v0.1.17</strong> <span class="muted">In short</span></summary>
 <p><strong>In short</strong></p>
 <ul>

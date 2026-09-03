@@ -11,7 +11,7 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project, such as a platform's rules or a decision that
 has not been taken, that is written down rather than absorbed into a number.
 
-**Where we are now:** **v0.1.17 is released**, signed and published for
+**Where we are now:** **v0.1.18 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
