@@ -990,6 +990,54 @@ fn write_private(path: &Path, bytes: &[u8], exclusive: bool) -> Result<(), Error
     result.map_err(|_| Error::AppLockStore)
 }
 
+/// Where the lock file lives, given a platform and an environment.
+///
+/// Separated from [`default_path`] so every branch can be tested from any
+/// machine. The Windows answer is the one that mattered here and the one that
+/// could not previously be checked outside Windows, which is a large part of
+/// why **F-143** survived.
+///
+/// # F-143: an empty variable is not a directory
+///
+/// `var_os` returns `Some("")` for a variable that is set to nothing, and
+/// `PathBuf::from("")` joined with anything is a *relative* path. An empty
+/// `HOME` produced `.config/veilvoice/applock.bin`; an empty `APPDATA`
+/// produced `veilvoice\applock.bin`. Either scatters the lock into whatever
+/// directory the program was started in, and then silently fails to find it on
+/// the next launch from anywhere else -- the same disappearing lock as F-141,
+/// from an unrelated cause.
+///
+/// `XDG_CONFIG_HOME` was filtered for exactly this. The other two were not.
+///
+/// An environment with an empty `APPDATA` is not exotic: services, stripped
+/// sandboxes and some installer contexts all produce one.
+fn config_path(
+    windows: bool,
+    macos: bool,
+    appdata: Option<std::ffi::OsString>,
+    home: Option<std::ffi::OsString>,
+    xdg: Option<std::ffi::OsString>,
+) -> Option<PathBuf> {
+    let set = |v: Option<std::ffi::OsString>| v.filter(|s| !s.is_empty());
+    let base = if windows {
+        PathBuf::from(set(appdata)?)
+    } else if macos {
+        let mut p = PathBuf::from(set(home)?);
+        p.push("Library/Application Support");
+        p
+    } else {
+        match set(xdg) {
+            Some(v) => PathBuf::from(v),
+            None => {
+                let mut p = PathBuf::from(set(home)?);
+                p.push(".config");
+                p
+            }
+        }
+    };
+    Some(base.join("veilvoice").join("applock.bin"))
+}
+
 /// The configuration directory the vault keeps its files in, if the
 /// environment says where one is.
 pub fn default_dir() -> Option<PathBuf> {
@@ -1010,23 +1058,23 @@ pub fn default_dir() -> Option<PathBuf> {
 /// [`crate::vault`], whose files sit in the same directory under names derived
 /// from its index.
 pub fn default_path() -> Option<PathBuf> {
-    let base = if cfg!(windows) {
-        PathBuf::from(std::env::var_os("APPDATA")?)
-    } else if cfg!(target_os = "macos") {
-        let mut p = PathBuf::from(std::env::var_os("HOME")?);
-        p.push("Library/Application Support");
-        p
-    } else {
-        match std::env::var_os("XDG_CONFIG_HOME").filter(|v| !v.is_empty()) {
-            Some(v) => PathBuf::from(v),
-            None => {
-                let mut p = PathBuf::from(std::env::var_os("HOME")?);
-                p.push(".config");
-                p
-            }
-        }
-    };
-    Some(base.join("veilvoice").join("applock.bin"))
+    let path = config_path(
+        cfg!(windows),
+        cfg!(target_os = "macos"),
+        std::env::var_os("APPDATA"),
+        std::env::var_os("HOME"),
+        std::env::var_os("XDG_CONFIG_HOME"),
+    )?;
+    // The invariant the whole function exists for, checked rather than
+    // reasoned about: a relative answer is no answer, because it means a lock
+    // file in whatever directory the program was started in.
+    //
+    // Here rather than inside `config_path` because `Path::is_absolute` judges
+    // by the rules of the machine it runs on, and `config_path` is called with
+    // a *simulated* platform by the tests -- a Windows path is not absolute to
+    // Linux, so checking it in there would fail every cross-platform test
+    // while proving nothing. Here, the platform is real.
+    path.is_absolute().then_some(path)
 }
 
 #[cfg(test)]
@@ -1230,6 +1278,94 @@ mod tests {
     /// nothing noticed they were using different files: the lock appeared to
     /// be set, was gone on the next launch, and the second attempt failed with
     /// `AppLockStore` because `applock.bin` was already there.
+    /// **F-143.** An empty environment variable must read as absent.
+    ///
+    /// Every branch, from any machine: the Windows answer is the one that
+    /// mattered and the one that could not previously be checked off Windows.
+    #[test]
+    fn an_empty_config_variable_is_never_a_relative_path() {
+        let empty = Some(std::ffi::OsString::from(""));
+        for (windows, macos, appdata, home, xdg) in [
+            (true, false, empty.clone(), None, None),
+            (false, true, None, empty.clone(), None),
+            (false, false, None, empty.clone(), None),
+            (false, false, None, empty.clone(), empty.clone()),
+            (false, false, None, None, empty.clone()),
+        ] {
+            let answer = config_path(windows, macos, appdata, home, xdg);
+            assert_eq!(
+                answer, None,
+                "an empty variable produced {answer:?}. A relative answer \
+                 scatters the lock into the working directory, which is the \
+                 outcome this function exists to prevent."
+            );
+        }
+    }
+
+    #[test]
+    fn a_missing_config_variable_is_also_absent() {
+        assert_eq!(config_path(true, false, None, None, None), None);
+        assert_eq!(config_path(false, true, None, None, None), None);
+        assert_eq!(config_path(false, false, None, None, None), None);
+    }
+
+    #[test]
+    fn each_platform_puts_the_lock_where_that_platform_keeps_configuration() {
+        let os = std::ffi::OsString::from;
+        assert_eq!(
+            config_path(
+                true,
+                false,
+                Some(os("C:\\Users\\a\\AppData\\Roaming")),
+                None,
+                None
+            ),
+            Some(PathBuf::from(
+                "C:\\Users\\a\\AppData\\Roaming/veilvoice/applock.bin"
+            ))
+        );
+        assert_eq!(
+            config_path(false, true, None, Some(os("/Users/a")), None),
+            Some(PathBuf::from(
+                "/Users/a/Library/Application Support/veilvoice/applock.bin"
+            ))
+        );
+        assert_eq!(
+            config_path(false, false, None, Some(os("/home/a")), None),
+            Some(PathBuf::from("/home/a/.config/veilvoice/applock.bin"))
+        );
+        assert_eq!(
+            config_path(false, false, None, Some(os("/home/a")), Some(os("/cfg"))),
+            Some(PathBuf::from("/cfg/veilvoice/applock.bin")),
+            "XDG_CONFIG_HOME wins over HOME when it is set to something"
+        );
+    }
+
+    #[test]
+    fn a_relative_config_directory_is_refused_on_the_real_platform() {
+        // `config_path` builds what it is given; `default_path` is where the
+        // answer is judged, because only there is the platform the real one.
+        // Somebody with `XDG_CONFIG_HOME=cfg` gets no answer rather than a
+        // lock file relative to wherever they happened to be standing.
+        let relative = config_path(
+            false,
+            false,
+            None,
+            None,
+            Some(std::ffi::OsString::from("cfg")),
+        );
+        assert!(
+            relative.is_some_and(|p| !p.is_absolute()),
+            "the pure function builds it; judging it is default_path's job"
+        );
+        if let Some(real) = default_path() {
+            assert!(
+                real.is_absolute(),
+                "default_path must never return a relative path"
+            );
+        }
+    }
+
     #[test]
     fn a_lock_that_was_created_can_be_opened_again() {
         let dir = tempfile::tempdir().unwrap();
