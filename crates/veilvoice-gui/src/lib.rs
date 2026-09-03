@@ -59,6 +59,7 @@
 
 mod app;
 pub mod autolock;
+pub mod avnotice;
 pub mod crashlog;
 pub mod crashreport;
 pub mod dialog;
