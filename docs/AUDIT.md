@@ -147,6 +147,22 @@ unsealed manifest are records of what this machine does rather than of who
 anybody is, and they live in the user's own configuration directory. Left as
 they are, deliberately, rather than tightened for the look of it.
 
+**Tamper detection, run rather than read.** `veilvoice guard` was exercised end
+to end for the first time from here, on a copy of the binary so a real file
+could be modified:
+
+* An unsealed record detects a single appended byte, names the file, prints the
+  hash it expected and the one it found, and exits 1.
+* A sealed record does the same, and refuses a wrong passphrase with the same
+  message every other container failure gives.
+* Where it cannot answer, it says so rather than guessing: with `ausearch`
+  absent it reports `by: unknown - the audit tools are not installed` and
+  prints the two commands that would let it answer next time.
+
+Nothing was found. The honesty of the last point is the part worth recording:
+the obvious failure mode for a feature like this is to name a plausible culprit
+rather than admit the system cannot tell, and it does not.
+
 ### F-134 -- three commands reported a missing file without naming it
 
 `veilvoice-cli/src/main.rs`.
