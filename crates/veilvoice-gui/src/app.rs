@@ -261,6 +261,13 @@ pub struct VeilVoiceApp {
     /// It used to be one line on the About tab, which is the tab somebody who
     /// has just had a crash is least likely to open.
     crash: crate::crashreport::Offer,
+    /// The clean-shutdown session marker, and any antivirus notice it produced.
+    ///
+    /// Held for the life of the window: dropped means the window closed. A
+    /// clean close calls `end`; a kill leaves the marker for the next launch
+    /// to notice. See `crate::avnotice`.
+    av_session: Option<crate::avnotice::Session>,
+    av_notice: Option<crate::avnotice::Notice>,
 
     // File mode.
     input: Option<PathBuf>,
@@ -437,6 +444,8 @@ impl VeilVoiceApp {
                 .reseed_range_ms,
             notice: None,
             crash: crate::crashreport::Offer::default(),
+            av_session: None,
+            av_notice: None,
             tour: crate::tour::Tour::default(),
             tour_considered: false,
             choosing_input: crate::dialog::Pending::new(),
@@ -682,6 +691,19 @@ impl VeilVoiceApp {
         if !app.security.has_lock() {
             app.integrity.start(None);
         }
+        // The clean-shutdown marker for this session, and -- if the last one
+        // was killed and an antivirus is installed -- a notice explaining it.
+        // Done here rather than in `launch` so a test can reach the decision;
+        // the probe itself is best effort and returns nothing off Windows.
+        let session = crate::avnotice::Session::begin();
+        let had_crash_report = crate::crashlog::previous().is_some();
+        app.av_notice = crate::avnotice::diagnose(
+            session.prior_was_unclean(),
+            had_crash_report,
+            &crate::avnotice::detect(),
+        );
+        app.av_session = Some(session);
+
         app.apply_policy();
         // After the policy, so a named tab is what the window opens on rather
         // than something the policy pass happened to leave selected.
@@ -783,6 +805,16 @@ impl VeilVoiceApp {
 }
 
 impl eframe::App for VeilVoiceApp {
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        // A clean close removes the session marker, so the next launch does not
+        // mistake this for a kill. A process terminated from outside never
+        // reaches here, which is exactly what leaves the marker for
+        // `crate::avnotice` to find.
+        if let Some(session) = self.av_session.take() {
+            session.end();
+        }
+    }
+
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.fit_to_the_screen(ctx);
         self.count_frames(ctx);
@@ -1075,6 +1107,16 @@ impl eframe::App for VeilVoiceApp {
             self.notice = Some(crate::notify::Notice::note(
                 "The live monitor is off. Settings brings it back, and the live                  tab still has the full meters.",
             ));
+        }
+
+        // The antivirus notice, promoted into the ordinary notice slot once the
+        // first-run setup is out of the way and nothing else is showing. Once:
+        // `take` leaves it `None`, so dismissing it is the end of it.
+        if self.av_notice.is_some() && self.notice.is_none() && !self.preferences.needs_first_run()
+        {
+            if let Some(av) = self.av_notice.take() {
+                self.notice = Some(crate::notify::Notice::warn(av.message()));
+            }
         }
 
         // Above the panel content and below the tab strip, so it is seen

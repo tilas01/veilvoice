@@ -960,6 +960,27 @@ walks through an interview from the raw file to a finished render.
 
 ---
 
+## 5.12 If VeilVoice keeps closing on Windows
+
+A brand-new application that few people have run yet has, in antivirus terms, a
+low reputation, and a low-reputation program that reads a microphone and writes
+encrypted files is the shape some scanners are built to be wary of. Occasionally
+one closes VeilVoice by mistake.
+
+VeilVoice notices this itself. If a run ends without a clean shutdown and it did
+not crash on its own, and an antivirus product is installed, the next launch
+shows a plain notice: which product was found, that a new app is sometimes
+stopped as a precaution, that you would normally have seen an alert from that
+product too, and that adding an exclusion is worth doing only if you actually
+keep seeing the problem. Nothing is hidden from your antivirus and nothing on
+your system is changed; it is one paragraph of context so a vanished window is
+not a mystery.
+
+Because VeilVoice is offline, reproducible and signed, you can establish that it
+is genuine before excluding anything: the Verify tab, or `veilvoice verify`,
+walk through it. An exclusion is your decision to make, and only worth making
+once you have checked.
+
 ## 6. Things VeilVoice will not do
 
 Read this twice. Misunderstanding it is the only way this software gets someone
