@@ -92,6 +92,22 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <li>ffmpeg does the writing, so the fix is the step after it: the output of <code>import</code> and <code>video</code> is set owner-only once ffmpeg has finished.</li>
 <li>There is a window between ffmpeg creating the file and that happening, and it is not closed by this. That is inherent to handing the write to another program; the exposure goes from permanent to the length of one transcode, and the note the program prints says only what it actually did.</li>
 </ul>
+<p><strong>A test bound that was a round number, and Windows was outside it</strong></p>
+<ul>
+<li>The engine&#x27;s hostile-audio test asserts the output does not run away, with a bound of 4.0. It failed on Windows, and only Windows, at 4.0456.</li>
+<li>Nothing was wrong with the engine. Measured over twenty runs here: DC 1.38, square 2.13, impulses 0.09, alternating 3.58. The bound sat about ten percent above the worst of those, and a different libm moves the last few percent.</li>
+<li>The bound is 8.0 now, with the measurements written into the test so the next person can see where the number came from. Runaway in this engine has always meant thousands or a non-finite value, and the non-finite case is asserted separately.</li>
+<li>That the engine exceeds unity on a Nyquist square wave is expected and is contained: the WAV writer clamps to full scale rather than wrapping, and has had its own test for that.</li>
+<li>Found by CI on a commit that changed none of this, which is what made it clear the cause was not in the diff.</li>
+</ul>
+<p><strong>A CI job whose name was broader than its check</strong></p>
+<ul>
+<li>The job called &quot;no network dependencies&quot; greps for seven HTTP and WebSocket clients, finds none, and prints &quot;no networking crates found&quot;. Five socket-capable crates are in the graph and always have been, and none of them was documented anywhere.</li>
+<li>All five arrive through the window: the file dialog reaches the desktop portal over D-Bus on a Unix socket, and the Wayland event loop and display connection account for the rest. The command line links no window and reaches none of them. VeilVoice&#x27;s own code names no network API at all.</li>
+<li>Nothing was actually wrong, and that is the point: a reader doing the obvious check finds <code>socket2</code> next to a green job called &quot;no network dependencies&quot; and has no way to tell whether anybody looked.</li>
+<li>The job now pins the set rather than allowlisting it. A new socket-capable crate fails it, and so does one of these five disappearing, because either is a change worth a person&#x27;s attention. Each is named with what it is for and what it talks to, and the success message says what was checked.</li>
+<li>Both halves were run against a tree with <code>smol</code> and <code>reqwest</code> planted in it. The first version of the pinned set was wrong, naming three of the five, and running it caught that before it reached CI.</li>
+</ul>
 <p><strong>A promise the crash panel could not keep</strong></p>
 <ul>
 <li>The panel listing what a crash report holds said flatly that it contains no file names. Most of a report is written in advance; the error message is not, and the hook catches panics from the whole process, dependencies included.</li>

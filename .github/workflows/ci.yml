@@ -291,13 +291,56 @@ jobs:
         run: |
           cargo tree --workspace --edges normal --prefix none --format '{p}' \
             | sort -u > /tmp/deps.txt
-          # reqwest/hyper/curl/tungstenite have no business in this project.
-          if grep -Eiq '^(reqwest|hyper|curl|ureq|tungstenite|isahc|surf) ' /tmp/deps.txt; then
+
+          # 1. HTTP and WebSocket clients. No exceptions, ever: this is the
+          #    claim the front page makes and the one a reader checks first.
+          if grep -Eiq '^(reqwest|hyper|curl|ureq|tungstenite|isahc|surf|attohttpc) ' /tmp/deps.txt; then
             echo "::error::an HTTP or WebSocket client entered the dependency graph"
-            grep -Ei '^(reqwest|hyper|curl|ureq|tungstenite|isahc|surf) ' /tmp/deps.txt
+            grep -Ei '^(reqwest|hyper|curl|ureq|tungstenite|isahc|surf|attohttpc) ' /tmp/deps.txt
             exit 1
           fi
-          echo "no networking crates found"
+
+          # 2. Crates that can open a socket at all.
+          #
+          #    This step used to check only the list above and then print "no
+          #    networking crates found", which is a broader sentence than the
+          #    check behind it. Five socket-capable crates are in the graph and
+          #    always have been, all of them reached through the *window*:
+          #
+          #      tokio, mio, socket2   the file dialog (`rfd`) reaches the XDG
+          #                            desktop portal through `ashpd` and
+          #                            `zbus`, which speak D-Bus over a Unix
+          #                            socket; `tokio` brings its socket
+          #                            primitives whether or not a TCP one is
+          #                            ever opened
+          #      polling               `calloop`'s epoll/kqueue wrapper, under
+          #                            `winit`'s Wayland event loop
+          #      calloop-wayland-source  the Wayland display connection itself,
+          #                            also a Unix socket
+          #
+          #    None of them is reachable from the command line, which links no
+          #    window. VeilVoice's own code names no network API anywhere --
+          #    `std::net`, `TcpStream`, `UdpSocket` and `SocketAddr` appear
+          #    nowhere in `crates/`. But a reader checking the claim the way
+          #    this project invites them to would find these five and read
+          #    nothing about them, which is the defect this fixes.
+          #
+          #    The set is pinned rather than allowlisted. A *new* socket-capable
+          #    crate, or one of these disappearing, fails this job and a person
+          #    looks at why. A list that grows silently is not a check.
+          expected=$(printf '%s\n' calloop-wayland-source mio polling socket2 tokio)
+          found=$(grep -Eio '^(mio|socket2|tokio|async-std|smol|polling|calloop-wayland-source) ' /tmp/deps.txt \
+            | tr -d ' ' | sort -u)
+          if [ "$found" != "$expected" ]; then
+            echo "::error::the set of socket-capable crates changed"
+            echo "expected:"; printf '%s\n' "$expected"
+            echo "found:"; printf '%s\n' "$found"
+            echo "If this is deliberate, update this list and say in docs/AUDIT.md what"
+            echo "the new crate is for and what it talks to."
+            exit 1
+          fi
+
+          echo "no HTTP or WebSocket client; the five socket-capable crates are the expected ones"
 
   # `rsa` is in the dependency graph through `pgp`, and it carries
   # RUSTSEC-2023-0071 -- the Marvin attack, key recovery through a timing side
