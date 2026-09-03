@@ -9,17 +9,18 @@
 </defs>
 <rect x="0" y="0" width="552" height="461" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M132.6 147.0 C 403.7 147.0, 403.7 47.0, 384.7 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M82.4 174.0 C 82.4 194.0, 212.9 300.0, 212.9 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M82.4 174.0 C 82.4 194.0, 145.6 300.0, 145.6 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M82.4 174.0 C 82.4 194.0, 422.9 300.0, 422.9 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M520.3 147.0 C 542.3 147.0, 542.3 47.0, 250.1 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M520.3 147.0 C 542.3 147.0, 542.3 147.0, 135.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M466.0 174.0 C 466.0 194.0, 212.9 300.0, 212.9 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
-<path d="M466.0 174.0 C 466.0 194.0, 359.6 300.0, 359.6 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
-<path d="M409.9 347.0 C 431.9 347.0, 431.9 147.0, 388.7 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M409.9 347.0 C 431.9 347.0, 431.9 347.0, 286.4 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M466.0 174.0 C 466.0 194.0, 145.6 300.0, 145.6 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M466.0 174.0 C 466.0 194.0, 292.3 300.0, 292.3 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M342.6 347.0 C 407.7 347.0, 407.7 147.0, 388.7 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M342.6 347.0 C 364.6 347.0, 364.6 347.0, 219.1 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="70.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="70.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">213 lines</text>
+<text x="70.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">214 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" target="_blank" rel="noopener noreferrer">
 <rect x="146.5" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -39,7 +40,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs" target="_blank" rel="noopener noreferrer">
 <rect x="32.1" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="82.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hoard.rs</text>
-<text x="82.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">691 lines</text>
+<text x="82.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">929 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" target="_blank" rel="noopener noreferrer">
 <rect x="158.6" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -57,9 +58,9 @@
 <text x="466.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1821 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" target="_blank" rel="noopener noreferrer">
-<rect x="142.5" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
-<text x="212.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">privatefile.rs</text>
-<text x="212.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">308 lines</text>
+<rect x="75.2" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="145.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">privatefile.rs</text>
+<text x="145.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">308 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" target="_blank" rel="noopener noreferrer">
 <rect x="225.9" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -67,9 +68,14 @@
 <text x="276.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">415 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" target="_blank" rel="noopener noreferrer">
-<rect x="309.4" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
-<text x="359.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">vault.rs</text>
-<text x="359.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">615 lines</text>
+<rect x="242.1" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="292.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">vault.rs</text>
+<text x="292.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">615 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs" target="_blank" rel="noopener noreferrer">
+<rect x="368.6" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="422.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">weave.rs</text>
+<text x="422.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1166 lines</text>
 </a>
 <text x="20.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The files in veilvoice-crypto, and which of them names which. An edge means</text>
 <text x="20.0" y="428.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the name appears in the other file, which is a reading of the source rather</text>
