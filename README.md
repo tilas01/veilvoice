@@ -35,6 +35,13 @@ server there is [`deploy/nginx.conf`](deploy/nginx.conf). The one number on the
 site that must never be stale, the signing-key fingerprint, lives in the HTML,
 so a local copy shows exactly what the source says.
 
+Releases also carry a **self-signed code certificate** as a second, optional
+identity beside the OpenPGP key. It is trust-on-first-use, not a certificate
+authority, and it does not replace the OpenPGP check; what it adds is a
+publisher an organisation can import once to reduce low-reputation false
+positives, and an independent second signature. See
+[docs/SELF_SIGNING.md](docs/SELF_SIGNING.md).
+
 VeilVoice destroys the *biometric voiceprint* of a speaker, meaning pitch,
 formants, timbre, micro-timing and the melody of an accent, so that neither software nor
 a human listener can re-identify the speaker or reconstruct the original voice,
