@@ -62,6 +62,7 @@ pub mod autolock;
 pub mod crashlog;
 pub mod crashreport;
 pub mod dialog;
+pub mod firstrun;
 pub mod graphics;
 pub mod group;
 pub mod integrity;
