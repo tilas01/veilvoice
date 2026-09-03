@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/lib.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1893 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1888 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ Give it arguments and it does exactly what you asked.
 
 ## What this file contains
 
-1893 lines defining **34 functions** (2 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1888 lines defining **34 functions** (2 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -77,7 +77,7 @@ Give it arguments and it does exactly what you asked.
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `help_text` (line 162) -- The verifier's own help, with its verbosity and exit-status tables.
-- `run` (line 1664) -- Run the verifier over args, which are the words after veilvoice verify.
+- `run` (line 1659) -- Run the verifier over args, which are the words after veilvoice verify.
   - reaches: `asked_for`, `command_auto`, `command_build`, `command_deps`, `command_file_against_hash`, `command_file_against_sums`, `command_gnupg`, `command_hash`, `command_install`, `command_key`, `command_release`, `command_reproduce`
 
 ## What calls what
@@ -117,7 +117,7 @@ flowchart TD
     n_report_extracted["report_extracted<br/>line 882"]
     n_manifest["manifest<br/>line 962"]
     n_report_against_manifest["report_against_manifest<br/>line 993"]
-    n_run(["run<br/>line 1664"])
+    n_run(["run<br/>line 1659"])
     n_command_auto --> n_command_file_against_sums
     n_command_auto --> n_incomplete_deny
     n_command_auto --> n_report_extracted
@@ -181,7 +181,7 @@ flowchart TD
     click n_report_extracted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L882" "open the source"
     click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L962" "open the source"
     click n_report_against_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L993" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1664" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1659" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -224,10 +224,10 @@ flowchart TD
 | `report_presence_only` <sub>fn</sub> | [1106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1106) | The old report, for a release that published no contents list. |
 | `report_gnupg` <sub>fn</sub> | [1149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1149) | Marker 97. |
 | `command_gnupg` <sub>fn</sub> | [1234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1234) | Marker 91. |
-| `command_deps` <sub>fn</sub> | [1284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1284) | What this machine needs before it can build VeilVoice. |
-| `command_build` <sub>fn</sub> | [1356](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1356) | Build the workspace from source and hash what came out. |
-| `do_build` <sub>fn</sub> | [1374](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1374) | Everything both build commands do before they differ. |
-| `command_reproduce` <sub>fn</sub> | [1443](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1443) | Build here, and compare against the published hashes for this platform. |
-| `command_install` <sub>fn</sub> | [1552](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1552) | Put binaries where a shell will find them. |
-| `asked_for` <sub>fn</sub> | [1641](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1641) | Print something the reader asked for by name, at any level. |
-| `run` <sub>pub fn</sub> | [1664](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1664) | Run the verifier over args, which are the words after veilvoice verify. |
+| `command_deps` <sub>fn</sub> | [1279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1279) | What this machine needs before it can build VeilVoice. |
+| `command_build` <sub>fn</sub> | [1351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1351) | Build the workspace from source and hash what came out. |
+| `do_build` <sub>fn</sub> | [1369](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1369) | Everything both build commands do before they differ. |
+| `command_reproduce` <sub>fn</sub> | [1438](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1438) | Build here, and compare against the published hashes for this platform. |
+| `command_install` <sub>fn</sub> | [1547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1547) | Put binaries where a shell will find them. |
+| `asked_for` <sub>fn</sub> | [1636](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1636) | Print something the reader asked for by name, at any level. |
+| `run` <sub>pub fn</sub> | [1659](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1659) | Run the verifier over args, which are the words after veilvoice verify. |
