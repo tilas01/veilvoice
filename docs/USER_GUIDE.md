@@ -833,6 +833,133 @@ If your recording already has one channel per person, the split is exact and
 there is no plan to write. That is the better arrangement whenever you can
 manage it: no times to type, and no chance of typing them wrong.
 
+## 5.10 Policies: settings somebody else decided
+
+For a newsroom, a clinic, a legal team: one person writes down what VeilVoice
+must do on every machine, and the machines hold to it.
+
+### The one idea worth understanding first
+
+**A policy can only make VeilVoice stricter.** There is no requirement that
+turns encryption off, none that lowers the de-identification floor, none that
+disables the app lock, and there is nowhere in the file to write one.
+
+That is what makes the whole thing work without a privileged service or a key
+hidden in the program. A policy has to be readable at every launch to be
+applied at every launch; if reading it needed a password, you would type one
+every time. So the file is plain, and the protection is in its *shape*:
+somebody who edits it without the passphrase can do exactly one thing, which
+is make that machine stricter than its owner asked for. A nuisance, not a
+privacy failure.
+
+The sealed copy beside it is what proves the policy in force is the one that
+was written.
+
+### Writing one
+
+The file is `policy` in VeilVoice's own folder, and it is plain text:
+
+```
+VEILPOLICY1
+note  Newsroom standard, agreed 2026-03
+require  encrypt-recordings
+require  clean-metadata
+require  app-lock
+require  minimum-intensity  60
+```
+
+Two details the file is strict about, because it refuses rather than guesses:
+
+- **`VEILPOLICY1` on the first line.** A file without it is rejected.
+- **Two spaces** between a keyword and its value, not one and not an `=`. The
+  same between `minimum-intensity` and its number.
+
+`veilvoice policy status` prints the policy in force in exactly this form, so
+the quickest way to get the syntax right is to write one requirement, run it,
+and copy what it prints back.
+
+The five requirements, and each one only tightens:
+
+| `require` | What it insists on |
+| --- | --- |
+| `encrypt-recordings` | Every veiled recording is encrypted before it is written. No plaintext output. |
+| `clean-metadata` | Metadata is stripped from what VeilVoice writes. |
+| `neutralise-accent` | Accent neutralisation is on, not optional. |
+| `app-lock` | An app lock must be set. VeilVoice will not run without one. |
+| `minimum-intensity  N` | The de-identification floor, as a whole number from 0 to 100. A user may go higher, never lower. |
+
+### Sealing it, so it cannot be quietly rewritten
+
+```bash
+veilvoice policy status          # what is in force, and whether it is sealed
+veilvoice policy seal            # asks for a passphrase, writes the sealed copy
+veilvoice policy verify          # does the plain file still match the seal?
+```
+
+`verify` exits non-zero if the two disagree, which is what a scheduled check
+should look at. Removing a policy is `veilvoice policy remove`, and it asks.
+
+### What a sealed policy is not
+
+It is **not enforcement**, and the distinction matters:
+
+- Anything that can write VeilVoice's own executable can replace VeilVoice, and
+  no file it reads can stop that.
+- Anything running as the user can delete the policy outright.
+
+What a seal buys is that a policy cannot be *quietly rewritten into something
+weaker*. Deletion is a different question, and it has a different answer: put
+the policy files into a tamper manifest with `veilvoice guard`, and their
+removal shows up there.
+
+### The honest deployment shape
+
+1. Write the policy on one machine and seal it.
+2. Copy both files, the plain one and the sealed one, to each machine.
+3. Add them to that machine's tamper manifest.
+4. Have something run `veilvoice policy verify` on a schedule and report
+   non-zero.
+
+None of that needs a server, and none of it needs VeilVoice to run as anything
+but the person using it.
+
+---
+
+## 5.11 A whole session in the desktop app, start to finish
+
+The path most people actually want, in the window rather than the terminal.
+
+**1. Check what you downloaded.** Verify tab. Drop the archive on it, or point
+it at the folder. It checks the signature over the hash list first, then the
+archive against that list, then every file you extracted. Green all the way
+down before anything else. Section 6.5 says what each step proves.
+
+**2. Answer the setup.** On a first run VeilVoice asks four things: how it
+should look, a password for the application, a password for your recordings,
+and whether the window locks itself when you walk away. Every one can be
+skipped and changed later, and the second one is worth reading rather than
+clicking past: it is also what encrypts VeilVoice's own files.
+
+**3. Pick where output goes.** Settings, or the Anonymise tab. If you keep a
+Cryptomator vault or a VeraCrypt volume, point VeilVoice at it now and answer
+the hidden-volume question, because it will not write anything until you have
+(section 5.7).
+
+**4. Veil the recording.** Anonymise tab: choose the file, choose an intensity,
+render. With a recording password set, what lands on disk is encrypted.
+
+**5. Listen to it.** Not optional. Play the result and satisfy yourself the
+voice is not recognisable to somebody who knows the speaker. No measurement
+substitutes for this.
+
+**6. Check it back.** Verify tab again if you are sending it somewhere, and
+`veilvoice guard` if you want VeilVoice to notice its own files changing.
+
+For several speakers at once, that is the Group tab and section 5.9, which
+walks through an interview from the raw file to a finished render.
+
+---
+
 ## 6. Things VeilVoice will not do
 
 Read this twice. Misunderstanding it is the only way this software gets someone

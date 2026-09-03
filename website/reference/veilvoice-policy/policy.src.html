@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-policy/src/policy.rs</code></h1>
-<p style="color:var(--muted)"><a href="policy.html">what this file is for</a> &middot; <a href="../veilvoice-policy.html">veilvoice-policy</a> &middot; 922 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="policy.html">what this file is for</a> &middot; <a href="../veilvoice-policy.html">veilvoice-policy</a> &middot; 984 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -662,371 +662,433 @@
 <span class="ln" id="L555"></span>
 <span class="ln" id="L556"><span class="tok-attr">#[cfg</span>(test)]</span>
 <span class="ln" id="L557"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L558">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L559"></span>
-<span class="ln" id="L560">    <span class="tok-com">/// A cheap KDF for the tests. The default is 256 MiB and three passes,</span></span>
-<span class="ln" id="L561">    <span class="tok-com">/// deliberately, and running it in twenty tests would make the suite take</span></span>
-<span class="ln" id="L562">    <span class="tok-com">/// minutes for no extra coverage of anything in this crate.</span></span>
-<span class="ln" id="L563">    <span class="tok-kw">fn</span> <span class="tok-fn">sealed_with</span>(policy: &amp;Policy, password: &amp;[u8]) -&gt; Vec&lt;u8&gt; {</span>
-<span class="ln" id="L564">        veilvoice_crypto::container::<span class="tok-fn">seal_with_password</span>(</span>
-<span class="ln" id="L565">            password,</span>
-<span class="ln" id="L566">            policy.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>(),</span>
-<span class="ln" id="L567">            veilvoice_crypto::kdf::KdfParams {</span>
-<span class="ln" id="L568">                m_cost: <span class="tok-num">8</span>,</span>
-<span class="ln" id="L569">                t_cost: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L570">                p_cost: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L571">            },</span>
-<span class="ln" id="L572">        )</span>
-<span class="ln" id="L573">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;sealing should work&quot;</span>)</span>
-<span class="ln" id="L574">    }</span>
-<span class="ln" id="L575"></span>
-<span class="ln" id="L576">    <span class="tok-kw">fn</span> <span class="tok-fn">every_requirement</span>() -&gt; Vec&lt;Requirement&gt; {</span>
-<span class="ln" id="L577">        vec![</span>
-<span class="ln" id="L578">            Requirement::EncryptRecordings,</span>
-<span class="ln" id="L579">            Requirement::CleanMetadata,</span>
-<span class="ln" id="L580">            Requirement::NeutraliseAccent,</span>
-<span class="ln" id="L581">            Requirement::AppLock,</span>
-<span class="ln" id="L582">            Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>),</span>
-<span class="ln" id="L583">        ]</span>
-<span class="ln" id="L584">    }</span>
-<span class="ln" id="L585"></span>
-<span class="ln" id="L586">    <span class="tok-com">/// **The property the crate rests on.** Every subset of every requirement,</span></span>
-<span class="ln" id="L587">    <span class="tok-com">/// against a range of postures: applying a policy must never loosen one.</span></span>
-<span class="ln" id="L588">    <span class="tok-com">///</span></span>
-<span class="ln" id="L589">    <span class="tok-com">/// Written as an exhaustive check rather than an example, because the</span></span>
-<span class="ln" id="L590">    <span class="tok-com">/// interesting failure is a variant somebody adds later that goes the</span></span>
-<span class="ln" id="L591">    <span class="tok-com">/// other way, and no example test would catch it.</span></span>
-<span class="ln" id="L592">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L593">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_can_only_ever_tighten</span>() {</span>
-<span class="ln" id="L594">        <span class="tok-kw">let</span> all = <span class="tok-fn">every_requirement</span>();</span>
-<span class="ln" id="L595">        <span class="tok-kw">let</span> postures = [</span>
-<span class="ln" id="L596">            Posture::<span class="tok-fn">most_permissive</span>(),</span>
-<span class="ln" id="L597">            Posture::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L598">            Posture {</span>
-<span class="ln" id="L599">                encrypt_recordings: false,</span>
-<span class="ln" id="L600">                clean_metadata: true,</span>
-<span class="ln" id="L601">                neutralise_accent: false,</span>
-<span class="ln" id="L602">                app_lock: true,</span>
-<span class="ln" id="L603">                intensity: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L604">            },</span>
-<span class="ln" id="L605">            Posture {</span>
-<span class="ln" id="L606">                intensity: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L607">                ..Posture::<span class="tok-fn">most_permissive</span>()</span>
-<span class="ln" id="L608">            },</span>
-<span class="ln" id="L609">        ];</span>
-<span class="ln" id="L610">        <span class="tok-kw">for</span> mask <span class="tok-kw">in</span> <span class="tok-num">0</span>..(1u32 &lt;&lt; all.<span class="tok-fn">len</span>()) {</span>
-<span class="ln" id="L611">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L612">            <span class="tok-kw">for</span> (index, requirement) <span class="tok-kw">in</span> all.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L613">                <span class="tok-kw">if</span> mask &amp; (<span class="tok-num">1</span> &lt;&lt; index) != <span class="tok-num">0</span> {</span>
-<span class="ln" id="L614">                    policy.<span class="tok-fn">require</span>(*requirement);</span>
-<span class="ln" id="L615">                }</span>
-<span class="ln" id="L616">            }</span>
-<span class="ln" id="L617">            <span class="tok-kw">for</span> posture <span class="tok-kw">in</span> postures {</span>
-<span class="ln" id="L618">                <span class="tok-kw">let</span> after = policy.<span class="tok-fn">constrain</span>(posture);</span>
-<span class="ln" id="L619">                assert!(</span>
-<span class="ln" id="L620">                    after.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;posture),</span>
-<span class="ln" id="L621">                    <span class="tok-str">&quot;mask {mask:b} loosened {posture:?} into {after:?}&quot;</span></span>
-<span class="ln" id="L622">                );</span>
-<span class="ln" id="L623">            }</span>
-<span class="ln" id="L624">        }</span>
-<span class="ln" id="L625">    }</span>
-<span class="ln" id="L626"></span>
-<span class="ln" id="L627">    <span class="tok-com">/// Applying a policy twice must give the same answer as applying it once,</span></span>
-<span class="ln" id="L628">    <span class="tok-com">/// or a front end that constrains on every frame drifts.</span></span>
-<span class="ln" id="L629">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L630">    <span class="tok-kw">fn</span> <span class="tok-fn">constraining_is_idempotent</span>() {</span>
-<span class="ln" id="L631">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L632">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> <span class="tok-fn">every_requirement</span>() {</span>
-<span class="ln" id="L633">            policy.<span class="tok-fn">require</span>(requirement);</span>
-<span class="ln" id="L634">        }</span>
-<span class="ln" id="L635">        <span class="tok-kw">let</span> once = policy.<span class="tok-fn">constrain</span>(Posture::<span class="tok-fn">most_permissive</span>());</span>
-<span class="ln" id="L636">        assert_eq!(policy.<span class="tok-fn">constrain</span>(once), once);</span>
-<span class="ln" id="L637">    }</span>
-<span class="ln" id="L638"></span>
-<span class="ln" id="L639">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L640">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_policy_changes_nothing</span>() {</span>
-<span class="ln" id="L641">        <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L642">        assert!(policy.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L643">        assert_eq!(policy.<span class="tok-fn">len</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L644">        <span class="tok-kw">let</span> posture = Posture::<span class="tok-fn">most_permissive</span>();</span>
-<span class="ln" id="L645">        assert_eq!(policy.<span class="tok-fn">constrain</span>(posture), posture);</span>
-<span class="ln" id="L646">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L647">    }</span>
-<span class="ln" id="L648"></span>
-<span class="ln" id="L649">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L650">    <span class="tok-kw">fn</span> <span class="tok-fn">a_floor_raises_a_low_intensity_and_leaves_a_high_one</span>() {</span>
-<span class="ln" id="L651">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L652">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>));</span>
-<span class="ln" id="L653">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.8</span>);</span>
-<span class="ln" id="L654">        <span class="tok-kw">let</span> raised = policy.<span class="tok-fn">constrain</span>(Posture {</span>
-<span class="ln" id="L655">            intensity: <span class="tok-num">0.1</span>,</span>
-<span class="ln" id="L656">            ..Posture::<span class="tok-fn">most_permissive</span>()</span>
-<span class="ln" id="L657">        });</span>
-<span class="ln" id="L658">        assert!((raised.intensity - <span class="tok-num">0.8</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>);</span>
-<span class="ln" id="L659">        <span class="tok-kw">let</span> untouched = policy.<span class="tok-fn">constrain</span>(Posture {</span>
-<span class="ln" id="L660">            intensity: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L661">            ..Posture::<span class="tok-fn">most_permissive</span>()</span>
-<span class="ln" id="L662">        });</span>
-<span class="ln" id="L663">        assert_eq!(untouched.intensity, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L664">    }</span>
-<span class="ln" id="L665"></span>
-<span class="ln" id="L666">    <span class="tok-com">/// Two floors in one policy would serialise as two lines and the higher</span></span>
-<span class="ln" id="L667">    <span class="tok-com">/// would silently win, which is a file that does not say what it does.</span></span>
-<span class="ln" id="L668">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L669">    <span class="tok-kw">fn</span> <span class="tok-fn">a_second_floor_replaces_the_first</span>() {</span>
-<span class="ln" id="L670">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L671">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">50</span>));</span>
-<span class="ln" id="L672">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">90</span>));</span>
-<span class="ln" id="L673">        assert_eq!(policy.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L674">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.9</span>);</span>
-<span class="ln" id="L675">        assert_eq!(policy.<span class="tok-fn">to_text</span>().<span class="tok-fn">matches</span>(<span class="tok-str">&quot;minimum-intensity&quot;</span>).<span class="tok-fn">count</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L676"></span>
-<span class="ln" id="L677">        <span class="tok-com">// And lowering it is possible for whoever writes the policy -- the</span></span>
-<span class="ln" id="L678">        <span class="tok-com">// one-way property is about the *user&#x27;s* controls, not about the</span></span>
-<span class="ln" id="L679">        <span class="tok-com">// administrator&#x27;s ability to write a weaker policy on purpose.</span></span>
-<span class="ln" id="L680">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">10</span>));</span>
-<span class="ln" id="L681">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.1</span>);</span>
-<span class="ln" id="L682">    }</span>
-<span class="ln" id="L683"></span>
-<span class="ln" id="L684">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L685">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_survives_a_round_trip_through_text</span>() {</span>
-<span class="ln" id="L686">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L687">        policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
-<span class="ln" id="L688">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">75</span>));</span>
-<span class="ln" id="L689">        <span class="tok-kw">let</span> policy = policy</span>
-<span class="ln" id="L690">            .<span class="tok-fn">clone</span>()</span>
-<span class="ln" id="L691">            .<span class="tok-fn">with_note</span>(<span class="tok-str">&quot;Set by whoever set it. Ask before changing.&quot;</span>)</span>
-<span class="ln" id="L692">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L693">        <span class="tok-kw">let</span> text = policy.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L694">        <span class="tok-kw">let</span> read_back = Policy::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its own output must parse&quot;</span>);</span>
-<span class="ln" id="L695">        assert_eq!(policy, read_back);</span>
-<span class="ln" id="L696">        assert_eq!(read_back.<span class="tok-fn">to_text</span>(), text, <span class="tok-str">&quot;and byte for byte&quot;</span>);</span>
-<span class="ln" id="L697">        assert_eq!(read_back.<span class="tok-fn">note</span>(), policy.<span class="tok-fn">note</span>());</span>
-<span class="ln" id="L698">    }</span>
-<span class="ln" id="L699"></span>
-<span class="ln" id="L700">    <span class="tok-com">/// The floor must come back exactly, or a policy can never equal its own</span></span>
-<span class="ln" id="L701">    <span class="tok-com">/// sealed copy and `verify` says `Differs` for ever.</span></span>
-<span class="ln" id="L702">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L703">    <span class="tok-kw">fn</span> <span class="tok-fn">every_floor_round_trips_exactly</span>() {</span>
-<span class="ln" id="L704">        <span class="tok-kw">for</span> hundredths <span class="tok-kw">in</span> <span class="tok-num">0</span>..=100u8 {</span>
-<span class="ln" id="L705">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L706">            policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(hundredths));</span>
-<span class="ln" id="L707">            <span class="tok-kw">let</span> read_back = Policy::<span class="tok-fn">parse</span>(&amp;policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L708">            assert_eq!(policy, read_back, <span class="tok-str">&quot;{hundredths} did not survive&quot;</span>);</span>
-<span class="ln" id="L709">        }</span>
-<span class="ln" id="L710">    }</span>
-<span class="ln" id="L711"></span>
-<span class="ln" id="L712">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L713">    <span class="tok-kw">fn</span> <span class="tok-fn">a_note_may_not_contain_a_line_break</span>() {</span>
-<span class="ln" id="L714">        <span class="tok-kw">let</span> error = Policy::<span class="tok-fn">new</span>()</span>
-<span class="ln" id="L715">            .<span class="tok-fn">with_note</span>(<span class="tok-str">&quot;harmless\nrequire  app-lock&quot;</span>)</span>
-<span class="ln" id="L716">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a note that can forge a line must be refused&quot;</span>);</span>
-<span class="ln" id="L717">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;line break&quot;</span>));</span>
-<span class="ln" id="L718">        <span class="tok-com">// An empty note is simply no note.</span></span>
-<span class="ln" id="L719">        assert_eq!(Policy::<span class="tok-fn">new</span>().<span class="tok-fn">with_note</span>(<span class="tok-str">&quot;   &quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">note</span>(), None);</span>
-<span class="ln" id="L720">    }</span>
-<span class="ln" id="L721"></span>
-<span class="ln" id="L722">    <span class="tok-com">/// A policy this build only half understands would leave the machine less</span></span>
-<span class="ln" id="L723">    <span class="tok-com">/// restricted than whoever wrote it believes.</span></span>
-<span class="ln" id="L724">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L725">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_requirement_refuses_the_whole_policy</span>() {</span>
-<span class="ln" id="L726">        <span class="tok-kw">let</span> text =</span>
-<span class="ln" id="L727">            format!(<span class="tok-str">&quot;{MAGIC}\nrequire  encrypt-recordings\nrequire  something-from-the-future\n&quot;</span>);</span>
-<span class="ln" id="L728">        <span class="tok-kw">let</span> error = Policy::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;must refuse&quot;</span>);</span>
-<span class="ln" id="L729">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not understand&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L730">        assert!(</span>
-<span class="ln" id="L731">            error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;rather than honouring part&quot;</span>),</span>
-<span class="ln" id="L732">            <span class="tok-str">&quot;the reason must be in the message: {error}&quot;</span></span>
-<span class="ln" id="L733">        );</span>
-<span class="ln" id="L734">    }</span>
-<span class="ln" id="L735"></span>
-<span class="ln" id="L736">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L737">    <span class="tok-kw">fn</span> <span class="tok-fn">a_malformed_policy_is_refused_rather_than_half_read</span>() {</span>
-<span class="ln" id="L738">        assert!(Policy::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;empty&quot;</span>);</span>
-<span class="ln" id="L739">        assert!(Policy::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;NOT-THE-MAGIC\n&quot;</span>).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;wrong magic&quot;</span>);</span>
-<span class="ln" id="L740">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L741">            <span class="tok-str">&quot;require  minimum-intensity&quot;</span>,</span>
-<span class="ln" id="L742">            <span class="tok-str">&quot;require  minimum-intensity  ten&quot;</span>,</span>
-<span class="ln" id="L743">            <span class="tok-str">&quot;require  minimum-intensity  101&quot;</span>,</span>
-<span class="ln" id="L744">            <span class="tok-str">&quot;require  minimum-intensity  -1&quot;</span>,</span>
-<span class="ln" id="L745">            <span class="tok-str">&quot;whatever  1&quot;</span>,</span>
-<span class="ln" id="L746">            <span class="tok-str">&quot;nokeyword&quot;</span>,</span>
-<span class="ln" id="L747">        ] {</span>
-<span class="ln" id="L748">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\n{bad}\n&quot;</span>);</span>
-<span class="ln" id="L749">            assert!(Policy::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;should refuse: {bad:?}&quot;</span>);</span>
-<span class="ln" id="L750">        }</span>
-<span class="ln" id="L751">    }</span>
-<span class="ln" id="L752"></span>
-<span class="ln" id="L753">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L754">    <span class="tok-kw">fn</span> <span class="tok-fn">blank_lines_are_tolerated</span>() {</span>
-<span class="ln" id="L755">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L756">        policy.<span class="tok-fn">require</span>(Requirement::AppLock);</span>
-<span class="ln" id="L757">        <span class="tok-kw">let</span> padded = policy.<span class="tok-fn">to_text</span>().<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&quot;\n\n&quot;</span>);</span>
-<span class="ln" id="L758">        assert_eq!(Policy::<span class="tok-fn">parse</span>(&amp;padded).<span class="tok-fn">unwrap</span>(), policy);</span>
-<span class="ln" id="L759">    }</span>
-<span class="ln" id="L760"></span>
-<span class="ln" id="L761">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L762">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sealed_policy_opens_with_the_right_passphrase_and_not_the_wrong_one</span>() {</span>
-<span class="ln" id="L763">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L764">        policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
-<span class="ln" id="L765">        <span class="tok-kw">let</span> container = <span class="tok-fn">sealed_with</span>(&amp;policy, b<span class="tok-str">&quot;correct horse&quot;</span>);</span>
-<span class="ln" id="L766">        assert_eq!(</span>
-<span class="ln" id="L767">            Policy::<span class="tok-fn">open_sealed</span>(&amp;container, b<span class="tok-str">&quot;correct horse&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L768">            policy</span>
-<span class="ln" id="L769">        );</span>
-<span class="ln" id="L770">        assert!(Policy::<span class="tok-fn">open_sealed</span>(&amp;container, b<span class="tok-str">&quot;wrong horse&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L771">    }</span>
-<span class="ln" id="L772"></span>
-<span class="ln" id="L773">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L774">    <span class="tok-kw">fn</span> <span class="tok-fn">verification_reports_a_match</span>() {</span>
-<span class="ln" id="L775">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L776">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L777">        policy.<span class="tok-fn">require</span>(Requirement::CleanMetadata);</span>
-<span class="ln" id="L778">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE), <span class="tok-fn">sealed_with</span>(&amp;policy, b<span class="tok-str">&quot;pw&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L779">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE), policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L780">        assert_eq!(<span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>(), Verification::Matches);</span>
-<span class="ln" id="L781">        assert!(!Verification::Matches.<span class="tok-fn">wants_attention</span>());</span>
+<span class="ln" id="L558"></span>
+<span class="ln" id="L559">    <span class="tok-com">/// The policy file printed in `docs/USER_GUIDE.md` has to parse.</span></span>
+<span class="ln" id="L560">    <span class="tok-com">///</span></span>
+<span class="ln" id="L561">    <span class="tok-com">/// It did not. The first version of that section documented `key = value`</span></span>
+<span class="ln" id="L562">    <span class="tok-com">/// with a single space, because that is what a policy file *looks* like it</span></span>
+<span class="ln" id="L563">    <span class="tok-com">/// should be; the format is two spaces and no equals sign, and it also</span></span>
+<span class="ln" id="L564">    <span class="tok-com">/// wants `VEILPOLICY1` on the first line and an intensity from 0 to 100</span></span>
+<span class="ln" id="L565">    <span class="tok-com">/// rather than 1 to 5. Three mistakes in six lines, none of which a reader</span></span>
+<span class="ln" id="L566">    <span class="tok-com">/// could have diagnosed from the documentation, all of which the parser</span></span>
+<span class="ln" id="L567">    <span class="tok-com">/// rejects with a clear message the moment anybody runs it.</span></span>
+<span class="ln" id="L568">    <span class="tok-com">///</span></span>
+<span class="ln" id="L569">    <span class="tok-com">/// So the documented example is extracted from the guide and parsed here.</span></span>
+<span class="ln" id="L570">    <span class="tok-com">/// A file format described in prose beside a parser that disagrees is a</span></span>
+<span class="ln" id="L571">    <span class="tok-com">/// documentation defect with a working reproduction, and this is it.</span></span>
+<span class="ln" id="L572">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L573">    <span class="tok-kw">fn</span> <span class="tok-fn">the_example_in_the_user_guide_parses</span>() {</span>
+<span class="ln" id="L574">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L575">        <span class="tok-kw">let</span> at = guide</span>
+<span class="ln" id="L576">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;VEILPOLICY1&quot;</span>)</span>
+<span class="ln" id="L577">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the guide has to show a policy file&quot;</span>);</span>
+<span class="ln" id="L578">        <span class="tok-kw">let</span> start = guide[..at].<span class="tok-fn">rfind</span>(<span class="tok-str">&quot;```&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;inside a fenced block&quot;</span>) + <span class="tok-num">3</span>;</span>
+<span class="ln" id="L579">        <span class="tok-kw">let</span> end = at + guide[at..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;```&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the block has to close&quot;</span>);</span>
+<span class="ln" id="L580">        <span class="tok-kw">let</span> example = guide[start..end].<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
+<span class="ln" id="L581"></span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">parse</span>(example).<span class="tok-fn">unwrap_or_else</span>(|why| {</span>
+<span class="ln" id="L583">            panic!(<span class="tok-str">&quot;the policy file in docs/USER_GUIDE.md does not parse: {why}&quot;</span>)</span>
+<span class="ln" id="L584">        });</span>
+<span class="ln" id="L585">        assert!(</span>
+<span class="ln" id="L586">            policy.<span class="tok-fn">requirements</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">3</span>,</span>
+<span class="ln" id="L587">            <span class="tok-str">&quot;an example with nothing in it teaches nothing&quot;</span></span>
+<span class="ln" id="L588">        );</span>
+<span class="ln" id="L589">        assert!(policy.note.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the example shows a note; keep it&quot;</span>);</span>
+<span class="ln" id="L590">    }</span>
+<span class="ln" id="L591"></span>
+<span class="ln" id="L592">    <span class="tok-com">/// And the guide&#x27;s table of requirements has to name real ones.</span></span>
+<span class="ln" id="L593">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L594">    <span class="tok-kw">fn</span> <span class="tok-fn">every_requirement_the_guide_lists_is_a_real_one</span>() {</span>
+<span class="ln" id="L595">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> at = guide</span>
+<span class="ln" id="L597">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;| `require` | What it insists on |&quot;</span>)</span>
+<span class="ln" id="L598">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the guide has to have the requirements table&quot;</span>);</span>
+<span class="ln" id="L599">        <span class="tok-kw">let</span> table = &amp;guide[at..at + <span class="tok-num">1200</span>];</span>
+<span class="ln" id="L600">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> table.<span class="tok-fn">lines</span>().<span class="tok-fn">skip</span>(<span class="tok-num">2</span>) {</span>
+<span class="ln" id="L601">            <span class="tok-kw">if</span> !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;|&#x27;</span>) {</span>
+<span class="ln" id="L602">                break;</span>
+<span class="ln" id="L603">            }</span>
+<span class="ln" id="L604">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(cell) = line.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;|&#x27;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L605">                continue;</span>
+<span class="ln" id="L606">            };</span>
+<span class="ln" id="L607">            <span class="tok-kw">let</span> name = cell.<span class="tok-fn">trim</span>().<span class="tok-fn">trim_matches</span>(<span class="tok-str">&#x27;`&#x27;</span>);</span>
+<span class="ln" id="L608">            <span class="tok-kw">let</span> name = name.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L609">            <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() || name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;---&quot;</span>) {</span>
+<span class="ln" id="L610">                continue;</span>
+<span class="ln" id="L611">            }</span>
+<span class="ln" id="L612">            <span class="tok-kw">let</span> argument = (name == <span class="tok-str">&quot;minimum-intensity&quot;</span>).<span class="tok-fn">then_some</span>(<span class="tok-str">&quot;60&quot;</span>);</span>
+<span class="ln" id="L613">            assert!(</span>
+<span class="ln" id="L614">                <span class="tok-fn">requirement_from</span>(name, argument, <span class="tok-num">0</span>).<span class="tok-fn">is_ok</span>(),</span>
+<span class="ln" id="L615">                <span class="tok-str">&quot;the guide lists {name:?}, which is not a requirement this \</span></span>
+<span class="ln" id="L616"><span class="tok-str">                 parser accepts&quot;</span></span>
+<span class="ln" id="L617">            );</span>
+<span class="ln" id="L618">        }</span>
+<span class="ln" id="L619">    }</span>
+<span class="ln" id="L620">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L621"></span>
+<span class="ln" id="L622">    <span class="tok-com">/// A cheap KDF for the tests. The default is 256 MiB and three passes,</span></span>
+<span class="ln" id="L623">    <span class="tok-com">/// deliberately, and running it in twenty tests would make the suite take</span></span>
+<span class="ln" id="L624">    <span class="tok-com">/// minutes for no extra coverage of anything in this crate.</span></span>
+<span class="ln" id="L625">    <span class="tok-kw">fn</span> <span class="tok-fn">sealed_with</span>(policy: &amp;Policy, password: &amp;[u8]) -&gt; Vec&lt;u8&gt; {</span>
+<span class="ln" id="L626">        veilvoice_crypto::container::<span class="tok-fn">seal_with_password</span>(</span>
+<span class="ln" id="L627">            password,</span>
+<span class="ln" id="L628">            policy.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>(),</span>
+<span class="ln" id="L629">            veilvoice_crypto::kdf::KdfParams {</span>
+<span class="ln" id="L630">                m_cost: <span class="tok-num">8</span>,</span>
+<span class="ln" id="L631">                t_cost: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L632">                p_cost: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L633">            },</span>
+<span class="ln" id="L634">        )</span>
+<span class="ln" id="L635">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;sealing should work&quot;</span>)</span>
+<span class="ln" id="L636">    }</span>
+<span class="ln" id="L637"></span>
+<span class="ln" id="L638">    <span class="tok-kw">fn</span> <span class="tok-fn">every_requirement</span>() -&gt; Vec&lt;Requirement&gt; {</span>
+<span class="ln" id="L639">        vec![</span>
+<span class="ln" id="L640">            Requirement::EncryptRecordings,</span>
+<span class="ln" id="L641">            Requirement::CleanMetadata,</span>
+<span class="ln" id="L642">            Requirement::NeutraliseAccent,</span>
+<span class="ln" id="L643">            Requirement::AppLock,</span>
+<span class="ln" id="L644">            Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>),</span>
+<span class="ln" id="L645">        ]</span>
+<span class="ln" id="L646">    }</span>
+<span class="ln" id="L647"></span>
+<span class="ln" id="L648">    <span class="tok-com">/// **The property the crate rests on.** Every subset of every requirement,</span></span>
+<span class="ln" id="L649">    <span class="tok-com">/// against a range of postures: applying a policy must never loosen one.</span></span>
+<span class="ln" id="L650">    <span class="tok-com">///</span></span>
+<span class="ln" id="L651">    <span class="tok-com">/// Written as an exhaustive check rather than an example, because the</span></span>
+<span class="ln" id="L652">    <span class="tok-com">/// interesting failure is a variant somebody adds later that goes the</span></span>
+<span class="ln" id="L653">    <span class="tok-com">/// other way, and no example test would catch it.</span></span>
+<span class="ln" id="L654">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L655">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_can_only_ever_tighten</span>() {</span>
+<span class="ln" id="L656">        <span class="tok-kw">let</span> all = <span class="tok-fn">every_requirement</span>();</span>
+<span class="ln" id="L657">        <span class="tok-kw">let</span> postures = [</span>
+<span class="ln" id="L658">            Posture::<span class="tok-fn">most_permissive</span>(),</span>
+<span class="ln" id="L659">            Posture::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L660">            Posture {</span>
+<span class="ln" id="L661">                encrypt_recordings: false,</span>
+<span class="ln" id="L662">                clean_metadata: true,</span>
+<span class="ln" id="L663">                neutralise_accent: false,</span>
+<span class="ln" id="L664">                app_lock: true,</span>
+<span class="ln" id="L665">                intensity: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L666">            },</span>
+<span class="ln" id="L667">            Posture {</span>
+<span class="ln" id="L668">                intensity: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L669">                ..Posture::<span class="tok-fn">most_permissive</span>()</span>
+<span class="ln" id="L670">            },</span>
+<span class="ln" id="L671">        ];</span>
+<span class="ln" id="L672">        <span class="tok-kw">for</span> mask <span class="tok-kw">in</span> <span class="tok-num">0</span>..(1u32 &lt;&lt; all.<span class="tok-fn">len</span>()) {</span>
+<span class="ln" id="L673">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L674">            <span class="tok-kw">for</span> (index, requirement) <span class="tok-kw">in</span> all.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L675">                <span class="tok-kw">if</span> mask &amp; (<span class="tok-num">1</span> &lt;&lt; index) != <span class="tok-num">0</span> {</span>
+<span class="ln" id="L676">                    policy.<span class="tok-fn">require</span>(*requirement);</span>
+<span class="ln" id="L677">                }</span>
+<span class="ln" id="L678">            }</span>
+<span class="ln" id="L679">            <span class="tok-kw">for</span> posture <span class="tok-kw">in</span> postures {</span>
+<span class="ln" id="L680">                <span class="tok-kw">let</span> after = policy.<span class="tok-fn">constrain</span>(posture);</span>
+<span class="ln" id="L681">                assert!(</span>
+<span class="ln" id="L682">                    after.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;posture),</span>
+<span class="ln" id="L683">                    <span class="tok-str">&quot;mask {mask:b} loosened {posture:?} into {after:?}&quot;</span></span>
+<span class="ln" id="L684">                );</span>
+<span class="ln" id="L685">            }</span>
+<span class="ln" id="L686">        }</span>
+<span class="ln" id="L687">    }</span>
+<span class="ln" id="L688"></span>
+<span class="ln" id="L689">    <span class="tok-com">/// Applying a policy twice must give the same answer as applying it once,</span></span>
+<span class="ln" id="L690">    <span class="tok-com">/// or a front end that constrains on every frame drifts.</span></span>
+<span class="ln" id="L691">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L692">    <span class="tok-kw">fn</span> <span class="tok-fn">constraining_is_idempotent</span>() {</span>
+<span class="ln" id="L693">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L694">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> <span class="tok-fn">every_requirement</span>() {</span>
+<span class="ln" id="L695">            policy.<span class="tok-fn">require</span>(requirement);</span>
+<span class="ln" id="L696">        }</span>
+<span class="ln" id="L697">        <span class="tok-kw">let</span> once = policy.<span class="tok-fn">constrain</span>(Posture::<span class="tok-fn">most_permissive</span>());</span>
+<span class="ln" id="L698">        assert_eq!(policy.<span class="tok-fn">constrain</span>(once), once);</span>
+<span class="ln" id="L699">    }</span>
+<span class="ln" id="L700"></span>
+<span class="ln" id="L701">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L702">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_policy_changes_nothing</span>() {</span>
+<span class="ln" id="L703">        <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L704">        assert!(policy.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L705">        assert_eq!(policy.<span class="tok-fn">len</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L706">        <span class="tok-kw">let</span> posture = Posture::<span class="tok-fn">most_permissive</span>();</span>
+<span class="ln" id="L707">        assert_eq!(policy.<span class="tok-fn">constrain</span>(posture), posture);</span>
+<span class="ln" id="L708">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L709">    }</span>
+<span class="ln" id="L710"></span>
+<span class="ln" id="L711">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L712">    <span class="tok-kw">fn</span> <span class="tok-fn">a_floor_raises_a_low_intensity_and_leaves_a_high_one</span>() {</span>
+<span class="ln" id="L713">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L714">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>));</span>
+<span class="ln" id="L715">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.8</span>);</span>
+<span class="ln" id="L716">        <span class="tok-kw">let</span> raised = policy.<span class="tok-fn">constrain</span>(Posture {</span>
+<span class="ln" id="L717">            intensity: <span class="tok-num">0.1</span>,</span>
+<span class="ln" id="L718">            ..Posture::<span class="tok-fn">most_permissive</span>()</span>
+<span class="ln" id="L719">        });</span>
+<span class="ln" id="L720">        assert!((raised.intensity - <span class="tok-num">0.8</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>);</span>
+<span class="ln" id="L721">        <span class="tok-kw">let</span> untouched = policy.<span class="tok-fn">constrain</span>(Posture {</span>
+<span class="ln" id="L722">            intensity: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L723">            ..Posture::<span class="tok-fn">most_permissive</span>()</span>
+<span class="ln" id="L724">        });</span>
+<span class="ln" id="L725">        assert_eq!(untouched.intensity, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L726">    }</span>
+<span class="ln" id="L727"></span>
+<span class="ln" id="L728">    <span class="tok-com">/// Two floors in one policy would serialise as two lines and the higher</span></span>
+<span class="ln" id="L729">    <span class="tok-com">/// would silently win, which is a file that does not say what it does.</span></span>
+<span class="ln" id="L730">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L731">    <span class="tok-kw">fn</span> <span class="tok-fn">a_second_floor_replaces_the_first</span>() {</span>
+<span class="ln" id="L732">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L733">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">50</span>));</span>
+<span class="ln" id="L734">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">90</span>));</span>
+<span class="ln" id="L735">        assert_eq!(policy.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L736">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.9</span>);</span>
+<span class="ln" id="L737">        assert_eq!(policy.<span class="tok-fn">to_text</span>().<span class="tok-fn">matches</span>(<span class="tok-str">&quot;minimum-intensity&quot;</span>).<span class="tok-fn">count</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L738"></span>
+<span class="ln" id="L739">        <span class="tok-com">// And lowering it is possible for whoever writes the policy -- the</span></span>
+<span class="ln" id="L740">        <span class="tok-com">// one-way property is about the *user&#x27;s* controls, not about the</span></span>
+<span class="ln" id="L741">        <span class="tok-com">// administrator&#x27;s ability to write a weaker policy on purpose.</span></span>
+<span class="ln" id="L742">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">10</span>));</span>
+<span class="ln" id="L743">        assert_eq!(policy.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.1</span>);</span>
+<span class="ln" id="L744">    }</span>
+<span class="ln" id="L745"></span>
+<span class="ln" id="L746">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L747">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_survives_a_round_trip_through_text</span>() {</span>
+<span class="ln" id="L748">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L749">        policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
+<span class="ln" id="L750">        policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">75</span>));</span>
+<span class="ln" id="L751">        <span class="tok-kw">let</span> policy = policy</span>
+<span class="ln" id="L752">            .<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L753">            .<span class="tok-fn">with_note</span>(<span class="tok-str">&quot;Set by whoever set it. Ask before changing.&quot;</span>)</span>
+<span class="ln" id="L754">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L755">        <span class="tok-kw">let</span> text = policy.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L756">        <span class="tok-kw">let</span> read_back = Policy::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its own output must parse&quot;</span>);</span>
+<span class="ln" id="L757">        assert_eq!(policy, read_back);</span>
+<span class="ln" id="L758">        assert_eq!(read_back.<span class="tok-fn">to_text</span>(), text, <span class="tok-str">&quot;and byte for byte&quot;</span>);</span>
+<span class="ln" id="L759">        assert_eq!(read_back.<span class="tok-fn">note</span>(), policy.<span class="tok-fn">note</span>());</span>
+<span class="ln" id="L760">    }</span>
+<span class="ln" id="L761"></span>
+<span class="ln" id="L762">    <span class="tok-com">/// The floor must come back exactly, or a policy can never equal its own</span></span>
+<span class="ln" id="L763">    <span class="tok-com">/// sealed copy and `verify` says `Differs` for ever.</span></span>
+<span class="ln" id="L764">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L765">    <span class="tok-kw">fn</span> <span class="tok-fn">every_floor_round_trips_exactly</span>() {</span>
+<span class="ln" id="L766">        <span class="tok-kw">for</span> hundredths <span class="tok-kw">in</span> <span class="tok-num">0</span>..=100u8 {</span>
+<span class="ln" id="L767">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L768">            policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(hundredths));</span>
+<span class="ln" id="L769">            <span class="tok-kw">let</span> read_back = Policy::<span class="tok-fn">parse</span>(&amp;policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L770">            assert_eq!(policy, read_back, <span class="tok-str">&quot;{hundredths} did not survive&quot;</span>);</span>
+<span class="ln" id="L771">        }</span>
+<span class="ln" id="L772">    }</span>
+<span class="ln" id="L773"></span>
+<span class="ln" id="L774">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L775">    <span class="tok-kw">fn</span> <span class="tok-fn">a_note_may_not_contain_a_line_break</span>() {</span>
+<span class="ln" id="L776">        <span class="tok-kw">let</span> error = Policy::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L777">            .<span class="tok-fn">with_note</span>(<span class="tok-str">&quot;harmless\nrequire  app-lock&quot;</span>)</span>
+<span class="ln" id="L778">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a note that can forge a line must be refused&quot;</span>);</span>
+<span class="ln" id="L779">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;line break&quot;</span>));</span>
+<span class="ln" id="L780">        <span class="tok-com">// An empty note is simply no note.</span></span>
+<span class="ln" id="L781">        assert_eq!(Policy::<span class="tok-fn">new</span>().<span class="tok-fn">with_note</span>(<span class="tok-str">&quot;   &quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">note</span>(), None);</span>
 <span class="ln" id="L782">    }</span>
 <span class="ln" id="L783"></span>
-<span class="ln" id="L784">    <span class="tok-com">/// The case the seal exists for: somebody edited the plain file.</span></span>
-<span class="ln" id="L785">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L786">    <span class="tok-kw">fn</span> <span class="tok-fn">verification_reports_an_edited_plain_file_and_says_what_was_sealed</span>() {</span>
-<span class="ln" id="L787">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L788">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sealed_policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L789">        sealed_policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
-<span class="ln" id="L790">        sealed_policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">90</span>));</span>
-<span class="ln" id="L791">        std::fs::<span class="tok-fn">write</span>(</span>
-<span class="ln" id="L792">            dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE),</span>
-<span class="ln" id="L793">            <span class="tok-fn">sealed_with</span>(&amp;sealed_policy, b<span class="tok-str">&quot;pw&quot;</span>),</span>
-<span class="ln" id="L794">        )</span>
-<span class="ln" id="L795">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L796"></span>
-<span class="ln" id="L797">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> edited = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L798">        edited.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
-<span class="ln" id="L799">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE), edited.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L800"></span>
-<span class="ln" id="L801">        <span class="tok-kw">match</span> <span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>() {</span>
-<span class="ln" id="L802">            Verification::Differs { sealed } =&gt; {</span>
-<span class="ln" id="L803">                assert_eq!(*sealed, sealed_policy);</span>
-<span class="ln" id="L804">                assert_eq!(sealed.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.9</span>);</span>
-<span class="ln" id="L805">            }</span>
-<span class="ln" id="L806">            other =&gt; panic!(<span class="tok-str">&quot;expected Differs, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L807">        }</span>
-<span class="ln" id="L808">        assert!(Verification::Differs {</span>
-<span class="ln" id="L809">            sealed: Box::<span class="tok-fn">new</span>(sealed_policy)</span>
-<span class="ln" id="L810">        }</span>
-<span class="ln" id="L811">        .<span class="tok-fn">wants_attention</span>());</span>
-<span class="ln" id="L812">    }</span>
-<span class="ln" id="L813"></span>
-<span class="ln" id="L814">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L815">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plain_policy_with_no_seal_is_reported_as_unsealed</span>() {</span>
-<span class="ln" id="L816">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L784">    <span class="tok-com">/// A policy this build only half understands would leave the machine less</span></span>
+<span class="ln" id="L785">    <span class="tok-com">/// restricted than whoever wrote it believes.</span></span>
+<span class="ln" id="L786">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L787">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_requirement_refuses_the_whole_policy</span>() {</span>
+<span class="ln" id="L788">        <span class="tok-kw">let</span> text =</span>
+<span class="ln" id="L789">            format!(<span class="tok-str">&quot;{MAGIC}\nrequire  encrypt-recordings\nrequire  something-from-the-future\n&quot;</span>);</span>
+<span class="ln" id="L790">        <span class="tok-kw">let</span> error = Policy::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;must refuse&quot;</span>);</span>
+<span class="ln" id="L791">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not understand&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L792">        assert!(</span>
+<span class="ln" id="L793">            error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;rather than honouring part&quot;</span>),</span>
+<span class="ln" id="L794">            <span class="tok-str">&quot;the reason must be in the message: {error}&quot;</span></span>
+<span class="ln" id="L795">        );</span>
+<span class="ln" id="L796">    }</span>
+<span class="ln" id="L797"></span>
+<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">a_malformed_policy_is_refused_rather_than_half_read</span>() {</span>
+<span class="ln" id="L800">        assert!(Policy::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;empty&quot;</span>);</span>
+<span class="ln" id="L801">        assert!(Policy::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;NOT-THE-MAGIC\n&quot;</span>).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;wrong magic&quot;</span>);</span>
+<span class="ln" id="L802">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L803">            <span class="tok-str">&quot;require  minimum-intensity&quot;</span>,</span>
+<span class="ln" id="L804">            <span class="tok-str">&quot;require  minimum-intensity  ten&quot;</span>,</span>
+<span class="ln" id="L805">            <span class="tok-str">&quot;require  minimum-intensity  101&quot;</span>,</span>
+<span class="ln" id="L806">            <span class="tok-str">&quot;require  minimum-intensity  -1&quot;</span>,</span>
+<span class="ln" id="L807">            <span class="tok-str">&quot;whatever  1&quot;</span>,</span>
+<span class="ln" id="L808">            <span class="tok-str">&quot;nokeyword&quot;</span>,</span>
+<span class="ln" id="L809">        ] {</span>
+<span class="ln" id="L810">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\n{bad}\n&quot;</span>);</span>
+<span class="ln" id="L811">            assert!(Policy::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;should refuse: {bad:?}&quot;</span>);</span>
+<span class="ln" id="L812">        }</span>
+<span class="ln" id="L813">    }</span>
+<span class="ln" id="L814"></span>
+<span class="ln" id="L815">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L816">    <span class="tok-kw">fn</span> <span class="tok-fn">blank_lines_are_tolerated</span>() {</span>
 <span class="ln" id="L817">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L818">        policy.<span class="tok-fn">require</span>(Requirement::AppLock);</span>
-<span class="ln" id="L819">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE), policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L820">        <span class="tok-kw">let</span> checked = <span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L821">        assert_eq!(checked, Verification::NotSealed);</span>
-<span class="ln" id="L822">        assert!(checked.<span class="tok-fn">wants_attention</span>());</span>
-<span class="ln" id="L823">    }</span>
-<span class="ln" id="L824"></span>
-<span class="ln" id="L825">    <span class="tok-com">/// A sealed copy with the plain file deleted means nothing is applied, and</span></span>
-<span class="ln" id="L826">    <span class="tok-com">/// that is a different state from &quot;no policy here&quot;.</span></span>
-<span class="ln" id="L827">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L828">    <span class="tok-kw">fn</span> <span class="tok-fn">a_seal_with_no_plain_file_says_nothing_is_being_applied</span>() {</span>
-<span class="ln" id="L829">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L830">        <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L831">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE), <span class="tok-fn">sealed_with</span>(&amp;policy, b<span class="tok-str">&quot;pw&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L832">        <span class="tok-kw">let</span> checked = <span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L833">        assert_eq!(checked, Verification::NotApplied);</span>
-<span class="ln" id="L834">        assert!(checked.<span class="tok-fn">wants_attention</span>());</span>
-<span class="ln" id="L835">        assert!(checked.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing is being applied&quot;</span>));</span>
-<span class="ln" id="L836">    }</span>
-<span class="ln" id="L837"></span>
-<span class="ln" id="L838">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L839">    <span class="tok-kw">fn</span> <span class="tok-fn">no_policy_at_all_is_not_an_error</span>() {</span>
-<span class="ln" id="L840">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L841">        assert_eq!(Policy::<span class="tok-fn">load</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>(), None);</span>
-<span class="ln" id="L842">    }</span>
-<span class="ln" id="L843"></span>
-<span class="ln" id="L844">    <span class="tok-com">/// `save` writes both files, always.</span></span>
-<span class="ln" id="L845">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L846">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_writes_both_the_plain_and_the_sealed_copy</span>() {</span>
-<span class="ln" id="L847">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L848">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L849">        policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
-<span class="ln" id="L850">        <span class="tok-com">// The real `save` uses the default 256 MiB KDF, which is the right</span></span>
-<span class="ln" id="L851">        <span class="tok-com">// cost for a file somebody seals once. It is exercised here exactly</span></span>
-<span class="ln" id="L852">        <span class="tok-com">// once rather than in every test.</span></span>
-<span class="ln" id="L853">        policy.<span class="tok-fn">save</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L854">        assert!(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE).<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L855">        assert!(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE).<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L856">        assert_eq!(Policy::<span class="tok-fn">load</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(), policy);</span>
-<span class="ln" id="L857">        assert_eq!(<span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>(), Verification::Matches);</span>
-<span class="ln" id="L858">    }</span>
-<span class="ln" id="L859"></span>
-<span class="ln" id="L860">    <span class="tok-com">/// Loading never asks for a passphrase, so what it can say about the seal</span></span>
-<span class="ln" id="L861">    <span class="tok-com">/// is nothing -- and it says exactly that.</span></span>
-<span class="ln" id="L862">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L863">    <span class="tok-kw">fn</span> <span class="tok-fn">the_unchecked_state_explains_why_it_is_still_applied</span>() {</span>
-<span class="ln" id="L864">        <span class="tok-kw">let</span> text = Verification::Unchecked.<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L865">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;seal not checked&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L866">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only make VeilVoice stricter&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L867">        assert!(</span>
-<span class="ln" id="L868">            !Verification::Unchecked.<span class="tok-fn">wants_attention</span>(),</span>
-<span class="ln" id="L869">            <span class="tok-str">&quot;an unchecked seal is the ordinary state, not a complaint&quot;</span></span>
-<span class="ln" id="L870">        );</span>
-<span class="ln" id="L871">    }</span>
-<span class="ln" id="L872"></span>
-<span class="ln" id="L873">    <span class="tok-com">/// Every requirement explains itself beside the control it disables, and</span></span>
-<span class="ln" id="L874">    <span class="tok-com">/// none of them overstates what VeilVoice does.</span></span>
-<span class="ln" id="L875">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L876">    <span class="tok-kw">fn</span> <span class="tok-fn">every_requirement_explains_itself_without_overclaiming</span>() {</span>
-<span class="ln" id="L877">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> <span class="tok-fn">every_requirement</span>() {</span>
-<span class="ln" id="L878">            <span class="tok-kw">let</span> text = requirement.<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L879">            assert!(!text.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{requirement:?}&quot;</span>);</span>
-<span class="ln" id="L880">            assert!(!requirement.<span class="tok-fn">keyword</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L881">            <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;tamper-proof&quot;</span>, <span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;cannot be bypassed&quot;</span>] {</span>
-<span class="ln" id="L882">                assert!(!text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L883">            }</span>
-<span class="ln" id="L884">        }</span>
-<span class="ln" id="L885">        <span class="tok-com">// The two requirements over things with documented limits must repeat</span></span>
-<span class="ln" id="L886">        <span class="tok-com">// those limits rather than implying the requirement removes them.</span></span>
-<span class="ln" id="L887">        assert!(Requirement::NeutraliseAccent</span>
-<span class="ln" id="L888">            .<span class="tok-fn">describe</span>()</span>
-<span class="ln" id="L889">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;may still be audible&quot;</span>));</span>
-<span class="ln" id="L890">        assert!(Requirement::AppLock</span>
-<span class="ln" id="L891">            .<span class="tok-fn">describe</span>()</span>
-<span class="ln" id="L892">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not disk encryption&quot;</span>));</span>
-<span class="ln" id="L893">    }</span>
-<span class="ln" id="L894"></span>
-<span class="ln" id="L895">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L896">    <span class="tok-kw">fn</span> <span class="tok-fn">keywords_are_unique_and_match_what_parses</span>() {</span>
-<span class="ln" id="L897">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> <span class="tok-fn">every_requirement</span>() {</span>
-<span class="ln" id="L898">            <span class="tok-kw">let</span> argument = <span class="tok-kw">match</span> requirement {</span>
-<span class="ln" id="L899">                Requirement::<span class="tok-fn">MinimumIntensity</span>(hundredths) =&gt; <span class="tok-fn">Some</span>(hundredths.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L900">                _ =&gt; None,</span>
-<span class="ln" id="L901">            };</span>
-<span class="ln" id="L902">            <span class="tok-kw">let</span> parsed = <span class="tok-fn">requirement_from</span>(requirement.<span class="tok-fn">keyword</span>(), argument.<span class="tok-fn">as_deref</span>(), <span class="tok-num">1</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L903">            assert_eq!(parsed, requirement);</span>
-<span class="ln" id="L904">        }</span>
-<span class="ln" id="L905">    }</span>
-<span class="ln" id="L906"></span>
+<span class="ln" id="L819">        <span class="tok-kw">let</span> padded = policy.<span class="tok-fn">to_text</span>().<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&quot;\n\n&quot;</span>);</span>
+<span class="ln" id="L820">        assert_eq!(Policy::<span class="tok-fn">parse</span>(&amp;padded).<span class="tok-fn">unwrap</span>(), policy);</span>
+<span class="ln" id="L821">    }</span>
+<span class="ln" id="L822"></span>
+<span class="ln" id="L823">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L824">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sealed_policy_opens_with_the_right_passphrase_and_not_the_wrong_one</span>() {</span>
+<span class="ln" id="L825">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L826">        policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
+<span class="ln" id="L827">        <span class="tok-kw">let</span> container = <span class="tok-fn">sealed_with</span>(&amp;policy, b<span class="tok-str">&quot;correct horse&quot;</span>);</span>
+<span class="ln" id="L828">        assert_eq!(</span>
+<span class="ln" id="L829">            Policy::<span class="tok-fn">open_sealed</span>(&amp;container, b<span class="tok-str">&quot;correct horse&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L830">            policy</span>
+<span class="ln" id="L831">        );</span>
+<span class="ln" id="L832">        assert!(Policy::<span class="tok-fn">open_sealed</span>(&amp;container, b<span class="tok-str">&quot;wrong horse&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L833">    }</span>
+<span class="ln" id="L834"></span>
+<span class="ln" id="L835">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L836">    <span class="tok-kw">fn</span> <span class="tok-fn">verification_reports_a_match</span>() {</span>
+<span class="ln" id="L837">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L838">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L839">        policy.<span class="tok-fn">require</span>(Requirement::CleanMetadata);</span>
+<span class="ln" id="L840">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE), <span class="tok-fn">sealed_with</span>(&amp;policy, b<span class="tok-str">&quot;pw&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L841">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE), policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L842">        assert_eq!(<span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>(), Verification::Matches);</span>
+<span class="ln" id="L843">        assert!(!Verification::Matches.<span class="tok-fn">wants_attention</span>());</span>
+<span class="ln" id="L844">    }</span>
+<span class="ln" id="L845"></span>
+<span class="ln" id="L846">    <span class="tok-com">/// The case the seal exists for: somebody edited the plain file.</span></span>
+<span class="ln" id="L847">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L848">    <span class="tok-kw">fn</span> <span class="tok-fn">verification_reports_an_edited_plain_file_and_says_what_was_sealed</span>() {</span>
+<span class="ln" id="L849">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L850">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sealed_policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L851">        sealed_policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
+<span class="ln" id="L852">        sealed_policy.<span class="tok-fn">require</span>(Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">90</span>));</span>
+<span class="ln" id="L853">        std::fs::<span class="tok-fn">write</span>(</span>
+<span class="ln" id="L854">            dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE),</span>
+<span class="ln" id="L855">            <span class="tok-fn">sealed_with</span>(&amp;sealed_policy, b<span class="tok-str">&quot;pw&quot;</span>),</span>
+<span class="ln" id="L856">        )</span>
+<span class="ln" id="L857">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L858"></span>
+<span class="ln" id="L859">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> edited = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L860">        edited.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
+<span class="ln" id="L861">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE), edited.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L862"></span>
+<span class="ln" id="L863">        <span class="tok-kw">match</span> <span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>() {</span>
+<span class="ln" id="L864">            Verification::Differs { sealed } =&gt; {</span>
+<span class="ln" id="L865">                assert_eq!(*sealed, sealed_policy);</span>
+<span class="ln" id="L866">                assert_eq!(sealed.<span class="tok-fn">minimum_intensity</span>(), <span class="tok-num">0.9</span>);</span>
+<span class="ln" id="L867">            }</span>
+<span class="ln" id="L868">            other =&gt; panic!(<span class="tok-str">&quot;expected Differs, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L869">        }</span>
+<span class="ln" id="L870">        assert!(Verification::Differs {</span>
+<span class="ln" id="L871">            sealed: Box::<span class="tok-fn">new</span>(sealed_policy)</span>
+<span class="ln" id="L872">        }</span>
+<span class="ln" id="L873">        .<span class="tok-fn">wants_attention</span>());</span>
+<span class="ln" id="L874">    }</span>
+<span class="ln" id="L875"></span>
+<span class="ln" id="L876">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L877">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plain_policy_with_no_seal_is_reported_as_unsealed</span>() {</span>
+<span class="ln" id="L878">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L879">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L880">        policy.<span class="tok-fn">require</span>(Requirement::AppLock);</span>
+<span class="ln" id="L881">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE), policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L882">        <span class="tok-kw">let</span> checked = <span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L883">        assert_eq!(checked, Verification::NotSealed);</span>
+<span class="ln" id="L884">        assert!(checked.<span class="tok-fn">wants_attention</span>());</span>
+<span class="ln" id="L885">    }</span>
+<span class="ln" id="L886"></span>
+<span class="ln" id="L887">    <span class="tok-com">/// A sealed copy with the plain file deleted means nothing is applied, and</span></span>
+<span class="ln" id="L888">    <span class="tok-com">/// that is a different state from &quot;no policy here&quot;.</span></span>
+<span class="ln" id="L889">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L890">    <span class="tok-kw">fn</span> <span class="tok-fn">a_seal_with_no_plain_file_says_nothing_is_being_applied</span>() {</span>
+<span class="ln" id="L891">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L892">        <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L893">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE), <span class="tok-fn">sealed_with</span>(&amp;policy, b<span class="tok-str">&quot;pw&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L894">        <span class="tok-kw">let</span> checked = <span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L895">        assert_eq!(checked, Verification::NotApplied);</span>
+<span class="ln" id="L896">        assert!(checked.<span class="tok-fn">wants_attention</span>());</span>
+<span class="ln" id="L897">        assert!(checked.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing is being applied&quot;</span>));</span>
+<span class="ln" id="L898">    }</span>
+<span class="ln" id="L899"></span>
+<span class="ln" id="L900">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L901">    <span class="tok-kw">fn</span> <span class="tok-fn">no_policy_at_all_is_not_an_error</span>() {</span>
+<span class="ln" id="L902">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L903">        assert_eq!(Policy::<span class="tok-fn">load</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>(), None);</span>
+<span class="ln" id="L904">    }</span>
+<span class="ln" id="L905"></span>
+<span class="ln" id="L906">    <span class="tok-com">/// `save` writes both files, always.</span></span>
 <span class="ln" id="L907">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L908">    <span class="tok-kw">fn</span> <span class="tok-fn">the_strictness_comparison_is_honest_in_both_directions</span>() {</span>
-<span class="ln" id="L909">        <span class="tok-kw">let</span> loose = Posture::<span class="tok-fn">most_permissive</span>();</span>
-<span class="ln" id="L910">        <span class="tok-kw">let</span> strict = Posture {</span>
-<span class="ln" id="L911">            encrypt_recordings: true,</span>
-<span class="ln" id="L912">            clean_metadata: true,</span>
-<span class="ln" id="L913">            neutralise_accent: true,</span>
-<span class="ln" id="L914">            app_lock: true,</span>
-<span class="ln" id="L915">            intensity: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L916">        };</span>
-<span class="ln" id="L917">        assert!(strict.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;loose));</span>
-<span class="ln" id="L918">        assert!(!loose.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;strict));</span>
-<span class="ln" id="L919">        assert!(loose.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;loose));</span>
-<span class="ln" id="L920">        assert!(strict.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;strict));</span>
-<span class="ln" id="L921">    }</span>
-<span class="ln" id="L922">}</span>
+<span class="ln" id="L908">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_writes_both_the_plain_and_the_sealed_copy</span>() {</span>
+<span class="ln" id="L909">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L910">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L911">        policy.<span class="tok-fn">require</span>(Requirement::EncryptRecordings);</span>
+<span class="ln" id="L912">        <span class="tok-com">// The real `save` uses the default 256 MiB KDF, which is the right</span></span>
+<span class="ln" id="L913">        <span class="tok-com">// cost for a file somebody seals once. It is exercised here exactly</span></span>
+<span class="ln" id="L914">        <span class="tok-com">// once rather than in every test.</span></span>
+<span class="ln" id="L915">        policy.<span class="tok-fn">save</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L916">        assert!(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(PLAIN_FILE).<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L917">        assert!(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(SEALED_FILE).<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L918">        assert_eq!(Policy::<span class="tok-fn">load</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(), policy);</span>
+<span class="ln" id="L919">        assert_eq!(<span class="tok-fn">verify</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>(), Verification::Matches);</span>
+<span class="ln" id="L920">    }</span>
+<span class="ln" id="L921"></span>
+<span class="ln" id="L922">    <span class="tok-com">/// Loading never asks for a passphrase, so what it can say about the seal</span></span>
+<span class="ln" id="L923">    <span class="tok-com">/// is nothing -- and it says exactly that.</span></span>
+<span class="ln" id="L924">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L925">    <span class="tok-kw">fn</span> <span class="tok-fn">the_unchecked_state_explains_why_it_is_still_applied</span>() {</span>
+<span class="ln" id="L926">        <span class="tok-kw">let</span> text = Verification::Unchecked.<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L927">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;seal not checked&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L928">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only make VeilVoice stricter&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L929">        assert!(</span>
+<span class="ln" id="L930">            !Verification::Unchecked.<span class="tok-fn">wants_attention</span>(),</span>
+<span class="ln" id="L931">            <span class="tok-str">&quot;an unchecked seal is the ordinary state, not a complaint&quot;</span></span>
+<span class="ln" id="L932">        );</span>
+<span class="ln" id="L933">    }</span>
+<span class="ln" id="L934"></span>
+<span class="ln" id="L935">    <span class="tok-com">/// Every requirement explains itself beside the control it disables, and</span></span>
+<span class="ln" id="L936">    <span class="tok-com">/// none of them overstates what VeilVoice does.</span></span>
+<span class="ln" id="L937">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L938">    <span class="tok-kw">fn</span> <span class="tok-fn">every_requirement_explains_itself_without_overclaiming</span>() {</span>
+<span class="ln" id="L939">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> <span class="tok-fn">every_requirement</span>() {</span>
+<span class="ln" id="L940">            <span class="tok-kw">let</span> text = requirement.<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L941">            assert!(!text.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{requirement:?}&quot;</span>);</span>
+<span class="ln" id="L942">            assert!(!requirement.<span class="tok-fn">keyword</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L943">            <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;tamper-proof&quot;</span>, <span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;cannot be bypassed&quot;</span>] {</span>
+<span class="ln" id="L944">                assert!(!text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L945">            }</span>
+<span class="ln" id="L946">        }</span>
+<span class="ln" id="L947">        <span class="tok-com">// The two requirements over things with documented limits must repeat</span></span>
+<span class="ln" id="L948">        <span class="tok-com">// those limits rather than implying the requirement removes them.</span></span>
+<span class="ln" id="L949">        assert!(Requirement::NeutraliseAccent</span>
+<span class="ln" id="L950">            .<span class="tok-fn">describe</span>()</span>
+<span class="ln" id="L951">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;may still be audible&quot;</span>));</span>
+<span class="ln" id="L952">        assert!(Requirement::AppLock</span>
+<span class="ln" id="L953">            .<span class="tok-fn">describe</span>()</span>
+<span class="ln" id="L954">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not disk encryption&quot;</span>));</span>
+<span class="ln" id="L955">    }</span>
+<span class="ln" id="L956"></span>
+<span class="ln" id="L957">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L958">    <span class="tok-kw">fn</span> <span class="tok-fn">keywords_are_unique_and_match_what_parses</span>() {</span>
+<span class="ln" id="L959">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> <span class="tok-fn">every_requirement</span>() {</span>
+<span class="ln" id="L960">            <span class="tok-kw">let</span> argument = <span class="tok-kw">match</span> requirement {</span>
+<span class="ln" id="L961">                Requirement::<span class="tok-fn">MinimumIntensity</span>(hundredths) =&gt; <span class="tok-fn">Some</span>(hundredths.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L962">                _ =&gt; None,</span>
+<span class="ln" id="L963">            };</span>
+<span class="ln" id="L964">            <span class="tok-kw">let</span> parsed = <span class="tok-fn">requirement_from</span>(requirement.<span class="tok-fn">keyword</span>(), argument.<span class="tok-fn">as_deref</span>(), <span class="tok-num">1</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L965">            assert_eq!(parsed, requirement);</span>
+<span class="ln" id="L966">        }</span>
+<span class="ln" id="L967">    }</span>
+<span class="ln" id="L968"></span>
+<span class="ln" id="L969">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L970">    <span class="tok-kw">fn</span> <span class="tok-fn">the_strictness_comparison_is_honest_in_both_directions</span>() {</span>
+<span class="ln" id="L971">        <span class="tok-kw">let</span> loose = Posture::<span class="tok-fn">most_permissive</span>();</span>
+<span class="ln" id="L972">        <span class="tok-kw">let</span> strict = Posture {</span>
+<span class="ln" id="L973">            encrypt_recordings: true,</span>
+<span class="ln" id="L974">            clean_metadata: true,</span>
+<span class="ln" id="L975">            neutralise_accent: true,</span>
+<span class="ln" id="L976">            app_lock: true,</span>
+<span class="ln" id="L977">            intensity: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L978">        };</span>
+<span class="ln" id="L979">        assert!(strict.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;loose));</span>
+<span class="ln" id="L980">        assert!(!loose.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;strict));</span>
+<span class="ln" id="L981">        assert!(loose.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;loose));</span>
+<span class="ln" id="L982">        assert!(strict.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;strict));</span>
+<span class="ln" id="L983">    }</span>
+<span class="ln" id="L984">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

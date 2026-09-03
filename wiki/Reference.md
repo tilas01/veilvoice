@@ -173,6 +173,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`crashlog.rs`|File-veilvoice-gui-crashlog]] &middot; Make a failure that produces no output produce some.
 - [[`crashreport.rs`|File-veilvoice-gui-crashreport]] &middot; Offering the report from the last crash, on the run after it.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &middot; Asking for a file without stopping the window.
+- [[`firstrun.rs`|File-veilvoice-gui-firstrun]] &middot; The first run: the four things worth deciding before anything else.
 - [[`graphics.rs`|File-veilvoice-gui-graphics]] &middot; What the window is drawn with, asked for explicitly and then reported.
 - [[`group.rs`|File-veilvoice-gui-group]] &middot; Group mode: several people in one recording, each with a name and a colour.
 - [[`integrity.rs`|File-veilvoice-gui-integrity]] &middot; The integrity record, taken and checked by the window rather than by hand.
@@ -193,6 +194,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &middot; Colour schemes for the desktop app.
 - [[`tour.rs`|File-veilvoice-gui-tour]] &middot; The short tour on a first run, and after an upgrade.
 - [[`updates.rs`|File-veilvoice-gui-updates]] &middot; The manual update check, as the window shows it.
+- [[`vault_store.rs`|File-veilvoice-gui-vault_store]] &middot; Where the desktop application keeps its own files, and what the app lock buys for them.
 - [[`verify.rs`|File-veilvoice-gui-verify]] &middot; The verify tab: drop a download on the window and be told what it is.
 - [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] &middot; The device monitor, moved off the thread that paints.
 - [[`window.rs`|File-veilvoice-gui-window]] &middot; How big the window opens, and why it is not a constant.

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/lock.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1534 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1821 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
 
 ## Contents
 
@@ -121,7 +121,7 @@ protects them; this protects the session.
 
 ## What this file contains
 
-1534 lines defining **41 functions** (30 public), **3 types** and **14 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1821 lines defining **46 functions** (33 public), **3 types** and **15 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -162,19 +162,21 @@ protects them; this protects the session.
   - reaches: `unlock`, `save`, `write_private`
 - `LockStore::cooldown` (line 815) -- Seconds still to wait before another attempt is accepted.
   - reaches: `cooldown_at`, `unix_now`, `delay_secs`
-- `LockStore::failures` (line 820) -- Consecutive failed attempts recorded so far.
-- `LockStore::path` (line 826) -- Where this lock is stored.
-- `LockStore::every_copy_current` (line 853) -- Whether the last write reached every copy.
-- `open_default` (line 870) -- Open the lock at the default location, wherever this platform keeps it.
-  - reaches: `default_dir`, `default_path`
-- `create_default` (line 892) -- Create a lock at the default location, refusing to replace one already there.
-  - reaches: `default_dir`, `default_path`
+- `LockStore::store_key` (line 824) -- Derive the key that names and opens the obfuscated program folder.
+  - reaches: `derive_keys`
+- `LockStore::failures` (line 829) -- Consecutive failed attempts recorded so far.
+- `LockStore::path` (line 835) -- Where this lock is stored.
+- `LockStore::every_copy_current` (line 862) -- Whether the last write reached every copy.
+- `open_default` (line 879) -- Open the lock at the default location, wherever this platform keeps it.
+  - reaches: `default_dir`, `open_in`, `default_path`, `read_legacy`, `config_path`, `parse`
+- `create_default` (line 948) -- Create a lock at the default location, refusing to replace one already there.
+  - reaches: `create_in`, `default_dir`, `read_legacy`, `default_path`, `parse`, `config_path`
 
 ## What calls what
 
-_22 of 36 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 40 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file._
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-crypto/lock.svg" alt="what calls what in lock.rs" width="640">
@@ -187,11 +189,9 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_delay_secs["delay_secs<br/>line 166"]
-    n_unix_now["unix_now<br/>line 179"]
     n_create(["AppLock::create<br/>line 223"])
     n_store_key(["AppLock::store_key<br/>line 255"])
     n_verify["AppLock::verify<br/>line 265"]
-    n_verify_at["AppLock::verify_at<br/>line 269"]
     n_acknowledge(["AppLock::acknowledge<br/>line 327"])
     n_cooldown(["AppLock::cooldown<br/>line 367"])
     n_retag(["AppLock::retag<br/>line 427"])
@@ -204,26 +204,24 @@ flowchart TD
     n_change_password(["LockStore::change_password<br/>line 782"])
     n_remove(["LockStore::remove<br/>line 806"])
     n_cooldown(["LockStore::cooldown<br/>line 815"])
-    n_open_default(["open_default<br/>line 870"])
-    n_create_default(["create_default<br/>line 892"])
-    n_default_dir["default_dir<br/>line 930"]
-    n_default_path["default_path<br/>line 947"]
+    n_store_key(["LockStore::store_key<br/>line 824"])
+    n_open_default(["open_default<br/>line 879"])
+    n_open_in["open_in<br/>line 892"]
+    n_create_default(["create_default<br/>line 948"])
+    n_create_in["create_in<br/>line 958"]
+    n_default_dir["default_dir<br/>line 1043"]
     n_acknowledge --> n_verify
     n_change_password --> n_unlock
-    n_cooldown --> n_unix_now
+    n_create_default --> n_create_in
     n_create_default --> n_default_dir
-    n_default_dir --> n_default_path
     n_open --> n_parse
     n_open_default --> n_default_dir
+    n_open_default --> n_open_in
     n_remove --> n_unlock
-    n_verify --> n_unix_now
-    n_verify --> n_verify_at
     click n_delay_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L166" "open the source"
-    click n_unix_now href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L179" "open the source"
     click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L223" "open the source"
     click n_store_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L255" "open the source"
     click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L265" "open the source"
-    click n_verify_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L269" "open the source"
     click n_acknowledge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L327" "open the source"
     click n_cooldown href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L367" "open the source"
     click n_retag href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L427" "open the source"
@@ -236,16 +234,16 @@ flowchart TD
     click n_change_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L782" "open the source"
     click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L806" "open the source"
     click n_cooldown href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L815" "open the source"
-    click n_open_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L870" "open the source"
-    click n_create_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L892" "open the source"
-    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L930" "open the source"
-    click n_default_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L947" "open the source"
+    click n_store_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L824" "open the source"
+    click n_open_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L879" "open the source"
+    click n_open_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L892" "open the source"
+    click n_create_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L948" "open the source"
+    click n_create_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L958" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1043" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_create,n_store_key,n_acknowledge,n_cooldown,n_retag,n_to_bytes,n_open,n_create,n_acknowledge,n_change_password,n_remove,n_cooldown,n_open_default,n_create_default entry
+    class n_create,n_store_key,n_acknowledge,n_cooldown,n_retag,n_to_bytes,n_open,n_create,n_acknowledge,n_change_password,n_remove,n_cooldown,n_store_key,n_open_default,n_create_default entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_delay_secs,n_verify,n_parse,n_unlock,n_default_dir,n_default_path api
-    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_unix_now,n_verify_at helper
+    class n_delay_secs,n_verify,n_parse,n_unlock,n_open_in,n_create_in,n_default_dir api
 ```
 
 </details>
@@ -303,12 +301,18 @@ flowchart TD
 | `LockStore::change_password` <sub>pub fn</sub> | [782](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L782) | Replace the password, after proving the current one. |
 | `LockStore::remove` <sub>pub fn</sub> | [806](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L806) | Remove the lock, after proving the password. |
 | `LockStore::cooldown` <sub>pub fn</sub> | [815](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L815) | Seconds still to wait before another attempt is accepted. |
-| `LockStore::failures` <sub>pub fn</sub> | [820](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L820) | Consecutive failed attempts recorded so far. |
-| `LockStore::path` <sub>pub fn</sub> | [826](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L826) | Where this lock is stored. |
-| `LockStore::save` <sub>fn</sub> | [834](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L834) | Write the record, and say whether every copy of it is now current. |
-| `LockStore::every_copy_current` <sub>pub fn</sub> | [853](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L853) | Whether the last write reached every copy. |
-| `open_default` <sub>pub fn</sub> | [870](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L870) | Open the lock at the default location, wherever this platform keeps it. |
-| `create_default` <sub>pub fn</sub> | [892](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L892) | Create a lock at the default location, refusing to replace one already there. |
-| `write_private` <sub>fn</sub> | [919](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L919) | Write the lock file so it is owner-only from the moment it exists. |
-| `default_dir` <sub>pub fn</sub> | [930](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L930) | The configuration directory the vault keeps its files in, if the environment says where one is. |
-| `default_path` <sub>pub fn</sub> | [947](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L947) | Where the lock file lives on this platform, if the environment says. |
+| `LockStore::store_key` <sub>pub fn</sub> | [824](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L824) | Derive the key that names and opens the obfuscated program folder. |
+| `LockStore::failures` <sub>pub fn</sub> | [829](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L829) | Consecutive failed attempts recorded so far. |
+| `LockStore::path` <sub>pub fn</sub> | [835](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L835) | Where this lock is stored. |
+| `LockStore::save` <sub>fn</sub> | [843](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L843) | Write the record, and say whether every copy of it is now current. |
+| `LockStore::every_copy_current` <sub>pub fn</sub> | [862](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L862) | Whether the last write reached every copy. |
+| `open_default` <sub>pub fn</sub> | [879](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L879) | Open the lock at the default location, wherever this platform keeps it. |
+| `LEGACY_NAME` <sub>const</sub> | [885](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L885) | The name the lock had before the vault: one file, under the obvious name. |
+| `open_in` <sub>pub fn</sub> | [892](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L892) | Open a vault-backed lock under base, adopting a pre-vault file if one is there. |
+| `read_legacy` <sub>fn</sub> | [938](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L938) | Read a pre-vault lock file, if one is there. |
+| `create_default` <sub>pub fn</sub> | [948](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L948) | Create a lock at the default location, refusing to replace one already there. |
+| `create_in` <sub>pub fn</sub> | [958](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L958) | Create a vault-backed lock under base. |
+| `write_private` <sub>fn</sub> | [984](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L984) | Write the lock file so it is owner-only from the moment it exists. |
+| `config_path` <sub>fn</sub> | [1014](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1014) | Where the lock file lives, given a platform and an environment. |
+| `default_dir` <sub>pub fn</sub> | [1043](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1043) | The configuration directory the vault keeps its files in, if the environment says where one is. |
+| `default_path` <sub>pub fn</sub> | [1060](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1060) | Where the lock file lives on this platform, if the environment says. |

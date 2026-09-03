@@ -95,14 +95,14 @@ your machine and the key is made from your password each time.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>201 lines"])
+    n_lib(["lib.rs<br/>213 lines"])
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>535 lines"]
     n_hoard["hoard.rs<br/>691 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1534 lines"]
+    n_lock["lock.rs<br/>1821 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_vault["vault.rs<br/>615 lines"]
@@ -139,8 +139,8 @@ flowchart TD
 | [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 691 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 525 | Password-based key derivation with Argon2id. |
-| [[`lib.rs`|File-veilvoice-crypto-lib]] | 201 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [[`lock.rs`|File-veilvoice-crypto-lock]] | 1534 | The application lock: an Argon2id password verifier with a rate limit. |
+| [[`lib.rs`|File-veilvoice-crypto-lib]] | 213 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [[`lock.rs`|File-veilvoice-crypto-lock]] | 1821 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
 | [[`vault.rs`|File-veilvoice-crypto-vault]] | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |

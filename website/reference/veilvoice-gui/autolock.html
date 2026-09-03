@@ -39,10 +39,10 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/autolock.svg" alt="autolock.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/autolock.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 326 lines &middot; <a href="autolock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 369 lines &middot; <a href="autolock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
-  <a href="#why-it-is-off-by-default">Why it is off by default</a>
+  <a href="#why-it-is-on-by-default-having-been-off">Why it is on by default, having been off</a>
   <a href="#what-counts-as-use">What counts as use</a>
   <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
@@ -52,32 +52,34 @@
 <div>
 <section id="s-about">
 <p>Locking the window again after a period of no use.</p>
-<p><strong>Marker 92.</strong> Off unless somebody turns it on, and when it is on the delay is theirs to choose: anything from five minutes to forty eight hours from a list, a number typed in if none of those fit, and the ends of that range movable by anybody who wants a shorter or longer one.</p>
-<h2 id="why-it-is-off-by-default">Why it is off by default</h2>
-<p>Because a lock that engages while somebody is part way through a recording is a lock that gets removed. This project&#x27;s app lock already carries the honest note that it protects a session rather than a disk, and an autolock is the same bargain in miniature: it helps the person who walks away from their machine and it costs the person who leaves a job running. Which of those a user is, VeilVoice cannot know, so it asks rather than assuming.</p>
+<p><strong>Marker 92.</strong> On at half an hour, and the delay is the user&#x27;s to choose: anything from five minutes to forty eight hours from a list, a number typed in if none of those fit, and the ends of that range movable by anybody who wants a shorter or longer one.</p>
+<h2 id="why-it-is-on-by-default-having-been-off">Why it is on by default, having been off</h2>
+<p>It was off, on the argument that a lock engaging part way through a recording is a lock that gets removed, and that VeilVoice cannot know whether a given user is the one who walks away or the one who leaves a job running -- so it should ask rather than assume.</p>
+<p>The asking is the part that was wrong. A default nobody is shown is not a question, it is an answer, and the answer it gave was &quot;no protection&quot; to everybody who never opened the settings tab. The people most helped by an autolock are the least likely to go looking for one.</p>
+<p>So it is on, and the first-run setup shows it rather than leaving it to be discovered: half an hour, with the choice and the off switch right there. The original concern is answered by the delay rather than by the default -- thirty minutes of an untouched window is not somebody part way through anything -- and by the fact that this has never counted a running job as use, which is deliberate and explained below.</p>
 <h2 id="what-counts-as-use">What counts as use</h2>
 <p>Any keystroke, click, scroll or pointer movement over the window, which is what egui reports as input. Deliberately <strong>not</strong> the passage of a job: somebody who starts a long render and leaves the room has left the room, and the recording they are producing is the thing worth locking away.</p>
 <p>The clock is egui&#x27;s own frame time rather than the system clock, so moving the machine&#x27;s clock does not bring the lock forward or push it back. It also means the countdown only advances while the window is being drawn, which is the honest limit of this: a window nobody is drawing is a window nobody is looking at, and it locks the moment it is looked at again.</p>
 <h2 id="in-plain-words">In plain words</h2>
-<p>Locks the window again if you have not touched it for a while.</p>
-<p>Off until you switch it on. When you do, you pick how long, from five minutes up to two days, or type your own. Starting a long job does not count as using it: if you walk away while something is rendering, that is exactly when you would want it locked.</p>
+<p>Locks the window again if you have not touched it for half an hour.</p>
+<p>On to begin with, and setup shows you the switch. You pick how long, from five minutes up to two days, or type your own, and you can turn it off. Starting a long job does not count as using it: if you walk away while something is rendering, that is exactly when you would want it locked.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>326 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>369 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Autolock</code> <span style="color:var(--muted)">line 66</span> &middot; How the autolock is configured.</li>
+<li><code>struct Autolock</code> <span style="color:var(--muted)">line 83</span> &middot; How the autolock is configured.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Autolock::sane</code> <span style="color:var(--muted)">line 97</span> &middot; Bring every field into a state that can be offered and obeyed.
+<li><code>Autolock::sane</code> <span style="color:var(--muted)">line 114</span> &middot; Bring every field into a state that can be offered and obeyed.
 </li>
-<li><code>Autolock::expired</code> <span style="color:var(--muted)">line 122</span> &middot; Whether idle has reached the delay.
+<li><code>Autolock::expired</code> <span style="color:var(--muted)">line 139</span> &middot; Whether idle has reached the delay.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>after</code></span>
 </li>
-<li><code>Autolock::describe</code> <span style="color:var(--muted)">line 127</span> &middot; The delay in the words a person uses for it.
+<li><code>Autolock::describe</code> <span style="color:var(--muted)">line 144</span> &middot; The delay in the words a person uses for it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>describe_secs</code></span>
 </li>
-<li><code>parse</code> <span style="color:var(--muted)">line 159</span> &middot; Read a delay somebody typed.
+<li><code>parse</code> <span style="color:var(--muted)">line 176</span> &middot; Read a delay somebody typed.
 </li>
 </ul>
 </section>
@@ -99,37 +101,37 @@
 <a href="autolock.src.html#fn-autolock-default">
 <rect x="28.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="110.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Autolock::default</text>
-<text x="110.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 78</text>
+<text x="110.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
 </a>
 <a href="autolock.src.html#fn-autolock-sane">
 <rect x="219.0" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="289.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Autolock::sane</text>
-<text x="289.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
+<text x="289.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
 </a>
 <a href="autolock.src.html#fn-autolock-after">
 <rect x="385.9" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="460.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Autolock::after</text>
-<text x="460.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 113</text>
+<text x="460.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
 </a>
 <a href="autolock.src.html#fn-autolock-expired">
 <rect x="40.1" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="122.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Autolock::expired</text>
-<text x="122.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+<text x="122.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
 </a>
 <a href="autolock.src.html#fn-autolock-describe">
 <rect x="231.1" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="317.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Autolock::describe</text>
-<text x="317.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
+<text x="317.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
 </a>
 <a href="autolock.src.html#fn-describe_secs">
 <rect x="215.0" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="281.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_secs</text>
-<text x="281.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
+<text x="281.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 153</text>
 </a>
 <a href="autolock.src.html#fn-parse">
 <rect x="430.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="476.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
-<text x="476.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
+<text x="476.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 176</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -148,22 +150,22 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Autolock::default&lt;br/&gt;line 78&quot;]
-    n_sane([&quot;Autolock::sane&lt;br/&gt;line 97&quot;])
-    n_after[&quot;Autolock::after&lt;br/&gt;line 113&quot;]
-    n_expired([&quot;Autolock::expired&lt;br/&gt;line 122&quot;])
-    n_describe([&quot;Autolock::describe&lt;br/&gt;line 127&quot;])
-    n_describe_secs[&quot;describe_secs&lt;br/&gt;line 136&quot;]
-    n_parse([&quot;parse&lt;br/&gt;line 159&quot;])
+    n_default[&quot;Autolock::default&lt;br/&gt;line 95&quot;]
+    n_sane([&quot;Autolock::sane&lt;br/&gt;line 114&quot;])
+    n_after[&quot;Autolock::after&lt;br/&gt;line 130&quot;]
+    n_expired([&quot;Autolock::expired&lt;br/&gt;line 139&quot;])
+    n_describe([&quot;Autolock::describe&lt;br/&gt;line 144&quot;])
+    n_describe_secs[&quot;describe_secs&lt;br/&gt;line 153&quot;]
+    n_parse([&quot;parse&lt;br/&gt;line 176&quot;])
     n_describe --&gt; n_describe_secs
     n_expired --&gt; n_after
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L78&quot; &quot;open the source&quot;
-    click n_sane href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L97&quot; &quot;open the source&quot;
-    click n_after href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L113&quot; &quot;open the source&quot;
-    click n_expired href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L122&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L127&quot; &quot;open the source&quot;
-    click n_describe_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L136&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L159&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L95&quot; &quot;open the source&quot;
+    click n_sane href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L114&quot; &quot;open the source&quot;
+    click n_after href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L130&quot; &quot;open the source&quot;
+    click n_expired href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L139&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L144&quot; &quot;open the source&quot;
+    click n_describe_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L153&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L176&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_sane,n_expired,n_describe,n_parse entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -176,17 +178,18 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>FLOOR_SECS</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-floor_secs">43</a></td><td>The shortest delay the list offers, in seconds.</td></tr>
-<tr><td><code>CEILING_SECS</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-ceiling_secs">45</a></td><td>The longest, in seconds.</td></tr>
-<tr><td><code>CHOICES</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-choices">51</a></td><td>The delays offered without typing anything, in seconds.</td></tr>
-<tr><td><code>Autolock</code> <sub>pub struct</sub></td><td><a href="autolock.src.html#fn-autolock">66</a></td><td>How the autolock is configured.</td></tr>
-<tr><td><code>Autolock::default</code> <sub>fn</sub></td><td><a href="autolock.src.html#fn-autolock-default">78</a></td><td></td></tr>
-<tr><td><code>Autolock::sane</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-sane">97</a></td><td>Bring every field into a state that can be offered and obeyed.</td></tr>
-<tr><td><code>Autolock::after</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-after">113</a></td><td>The delay as a Duration.</td></tr>
-<tr><td><code>Autolock::expired</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-expired">122</a></td><td>Whether idle has reached the delay.</td></tr>
-<tr><td><code>Autolock::describe</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-describe">127</a></td><td>The delay in the words a person uses for it.</td></tr>
-<tr><td><code>describe_secs</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-describe_secs">136</a></td><td>A number of seconds as a phrase.</td></tr>
-<tr><td><code>parse</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-parse">159</a></td><td>Read a delay somebody typed.</td></tr>
+<tr><td><code>DEFAULT_SECS</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-default_secs">57</a></td><td>The delay a fresh installation uses: half an hour.</td></tr>
+<tr><td><code>FLOOR_SECS</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-floor_secs">60</a></td><td>The shortest delay the list offers, in seconds.</td></tr>
+<tr><td><code>CEILING_SECS</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-ceiling_secs">62</a></td><td>The longest, in seconds.</td></tr>
+<tr><td><code>CHOICES</code> <sub>pub const</sub></td><td><a href="autolock.src.html#fn-choices">68</a></td><td>The delays offered without typing anything, in seconds.</td></tr>
+<tr><td><code>Autolock</code> <sub>pub struct</sub></td><td><a href="autolock.src.html#fn-autolock">83</a></td><td>How the autolock is configured.</td></tr>
+<tr><td><code>Autolock::default</code> <sub>fn</sub></td><td><a href="autolock.src.html#fn-autolock-default">95</a></td><td></td></tr>
+<tr><td><code>Autolock::sane</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-sane">114</a></td><td>Bring every field into a state that can be offered and obeyed.</td></tr>
+<tr><td><code>Autolock::after</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-after">130</a></td><td>The delay as a Duration.</td></tr>
+<tr><td><code>Autolock::expired</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-expired">139</a></td><td>Whether idle has reached the delay.</td></tr>
+<tr><td><code>Autolock::describe</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-autolock-describe">144</a></td><td>The delay in the words a person uses for it.</td></tr>
+<tr><td><code>describe_secs</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-describe_secs">153</a></td><td>A number of seconds as a phrase.</td></tr>
+<tr><td><code>parse</code> <sub>pub fn</sub></td><td><a href="autolock.src.html#fn-parse">176</a></td><td>Read a delay somebody typed.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -555,6 +555,68 @@ pub fn verify(dir: &Path, password: &[u8]) -> Result<Verification, Error> {
 
 #[cfg(test)]
 mod tests {
+
+    /// The policy file printed in `docs/USER_GUIDE.md` has to parse.
+    ///
+    /// It did not. The first version of that section documented `key = value`
+    /// with a single space, because that is what a policy file *looks* like it
+    /// should be; the format is two spaces and no equals sign, and it also
+    /// wants `VEILPOLICY1` on the first line and an intensity from 0 to 100
+    /// rather than 1 to 5. Three mistakes in six lines, none of which a reader
+    /// could have diagnosed from the documentation, all of which the parser
+    /// rejects with a clear message the moment anybody runs it.
+    ///
+    /// So the documented example is extracted from the guide and parsed here.
+    /// A file format described in prose beside a parser that disagrees is a
+    /// documentation defect with a working reproduction, and this is it.
+    #[test]
+    fn the_example_in_the_user_guide_parses() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        let at = guide
+            .find("VEILPOLICY1")
+            .expect("the guide has to show a policy file");
+        let start = guide[..at].rfind("```").expect("inside a fenced block") + 3;
+        let end = at + guide[at..].find("```").expect("the block has to close");
+        let example = guide[start..end].trim_start_matches('\n');
+
+        let policy = Policy::parse(example).unwrap_or_else(|why| {
+            panic!("the policy file in docs/USER_GUIDE.md does not parse: {why}")
+        });
+        assert!(
+            policy.requirements().count() >= 3,
+            "an example with nothing in it teaches nothing"
+        );
+        assert!(policy.note.is_some(), "the example shows a note; keep it");
+    }
+
+    /// And the guide's table of requirements has to name real ones.
+    #[test]
+    fn every_requirement_the_guide_lists_is_a_real_one() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        let at = guide
+            .find("| `require` | What it insists on |")
+            .expect("the guide has to have the requirements table");
+        let table = &guide[at..at + 1200];
+        for line in table.lines().skip(2) {
+            if !line.starts_with('|') {
+                break;
+            }
+            let Some(cell) = line.split('|').nth(1) else {
+                continue;
+            };
+            let name = cell.trim().trim_matches('`');
+            let name = name.split_whitespace().next().unwrap_or("");
+            if name.is_empty() || name.starts_with("---") {
+                continue;
+            }
+            let argument = (name == "minimum-intensity").then_some("60");
+            assert!(
+                requirement_from(name, argument, 0).is_ok(),
+                "the guide lists {name:?}, which is not a requirement this \
+                 parser accepts"
+            );
+        }
+    }
     use super::*;
 
     /// A cheap KDF for the tests. The default is 256 MiB and three passes,
