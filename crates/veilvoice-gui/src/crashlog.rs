@@ -235,6 +235,84 @@ pub fn clear() {
 mod tests {
     use super::*;
 
+    /// No panic VeilVoice writes itself puts a path in its message.
+    ///
+    /// The crash panel invites somebody to paste this report into a public
+    /// issue tracker, and says VeilVoice puts no file names in it. The panic
+    /// message is the one part not written in advance, so that claim has to be
+    /// checked against the source rather than asserted.
+    ///
+    /// A dependency's panic could still carry a path, which this cannot see
+    /// and does not pretend to. That is exactly why the panel names the error
+    /// message as the variable part and puts the whole text on screen instead
+    /// of promising on a library's behalf.
+    #[test]
+    fn no_panic_in_this_program_formats_a_path_into_its_message() {
+        use std::path::Path;
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("crates/")
+            .to_path_buf();
+
+        let mut offenders = Vec::new();
+        let mut stack = vec![root.clone()];
+        while let Some(dir) = stack.pop() {
+            let Ok(entries) = std::fs::read_dir(&dir) else {
+                continue;
+            };
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    // Only code that ends up in a shipped binary.
+                    //
+                    // `tests/`, `benches/` and `examples/` are excluded, and
+                    // not as a convenience: a panic in an integration test is
+                    // read by whoever ran it, never written to a crash report,
+                    // and never pasted into an issue tracker. The first run of
+                    // this test flagged one in `veilvoice-verify/tests`, which
+                    // is a true negative rather than a finding. `target` and
+                    // dotted directories are not this project's source at all.
+                    let name = path.file_name().unwrap_or_default().to_string_lossy();
+                    let shipped =
+                        !matches!(name.as_ref(), "target" | "tests" | "benches" | "examples")
+                            && !name.starts_with('.');
+                    if shipped {
+                        stack.push(path);
+                    }
+                    continue;
+                }
+                if path.extension().and_then(|e| e.to_str()) != Some("rs") {
+                    continue;
+                }
+                let Ok(text) = std::fs::read_to_string(&path) else {
+                    continue;
+                };
+                // Tests may say whatever they like: their panics are read by
+                // whoever ran them, not pasted into an issue tracker.
+                let body = text.split("\n#[cfg(test)]").next().unwrap_or(&text);
+                for (n, line) in body.lines().enumerate() {
+                    let trimmed = line.trim_start();
+                    if trimmed.starts_with("//") {
+                        continue;
+                    }
+                    let panics = trimmed.contains(".expect(")
+                        || trimmed.contains("panic!(")
+                        || trimmed.contains("assert!(")
+                        || trimmed.contains("assert_eq!(");
+                    if panics && (trimmed.contains("display()") || trimmed.contains(".path(")) {
+                        offenders.push(format!("{}:{}: {}", path.display(), n + 1, trimmed));
+                    }
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "these panics would put a path into a crash report a person is \
+             invited to paste in public:\n{}",
+            offenders.join("\n")
+        );
+    }
+
     fn scratch(tag: &str) -> PathBuf {
         let dir =
             std::env::temp_dir().join(format!("veilvoice-crashlog-{}-{}", std::process::id(), tag));

@@ -41,6 +41,21 @@ than a summary written afterwards.
   program; the exposure goes from permanent to the length of one transcode, and
   the note the program prints says only what it actually did.
 
+**A promise the crash panel could not keep**
+
+- The panel listing what a crash report holds said flatly that it contains no
+  file names. Most of a report is written in advance; the error message is not,
+  and the hook catches panics from the whole process, dependencies included.
+- Checked rather than assumed, and the check is now a test: no panic in any
+  code that reaches a shipped binary formats a path into its message. It walks
+  every source file, skips test and benchmark code, and was run against a
+  planted offender to confirm it catches one.
+- So the claim is true of VeilVoice and is not something VeilVoice can promise
+  on a decoder's behalf. The panel now says which four things VeilVoice puts
+  in, names the error message as the part not written in advance, and points at
+  the button showing the whole text. This is a panel whose whole job is helping
+  somebody decide what to publish.
+
 **And the same slip in three more files, found by sweeping for it**
 
 - Finding the first one by running a command is a bad way to find a class of
