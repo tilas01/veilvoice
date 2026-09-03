@@ -141,6 +141,8 @@ CHECKS = [
      [sys.executable, "tools/release/packaging.py"]),
     ("no state file is written one place and read another",
      [sys.executable, "tools/audit/state_paths.py"]),
+    ("the app-manifest tooling works",
+     [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     ("no screenshot has a capture border",
      [sys.executable, "tools/shots/crop.py", "--check"]),

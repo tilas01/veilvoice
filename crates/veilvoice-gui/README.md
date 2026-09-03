@@ -94,10 +94,11 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>92 lines"])
+    n_lib(["lib.rs<br/>93 lines"])
     n_main(["main.rs<br/>190 lines"])
-    n_app["app.rs<br/>2815 lines"]
+    n_app["app.rs<br/>2857 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
+    n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>443 lines"]
     n_crashreport["crashreport.rs<br/>289 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
@@ -124,6 +125,8 @@ flowchart TD
     n_verify["verify.rs<br/>1592 lines"]
     n_watchfeed["watchfeed.rs<br/>417 lines"]
     n_window["window.rs<br/>244 lines"]
+    n_app --> n_avnotice
+    n_app --> n_crashlog
     n_app --> n_crashreport
     n_app --> n_dialog
     n_app --> n_firstrun
@@ -197,6 +200,7 @@ flowchart TD
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" "open the source"
     click n_app href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" "open the source"
     click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" "open the source"
+    click n_avnotice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs" "open the source"
     click n_crashlog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" "open the source"
     click n_crashreport href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" "open the source"
     click n_dialog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" "open the source"
@@ -231,8 +235,9 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2815 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2857 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
+| [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 443 | Make a failure that produces no output produce some. |
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 289 | Offering the report from the last crash, on the run after it. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
@@ -241,7 +246,7 @@ flowchart TD
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1745 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 92 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 93 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 190 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 419 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
@@ -274,6 +279,12 @@ flowchart TD
 | `struct Autolock` | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | How the autolock is configured. |
 | `fn describe_secs` | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | A number of seconds as a phrase. |
 | `fn parse` | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | Read a delay somebody typed. |
+| `struct Product` | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | An antivirus product recognised on this machine. |
+| `struct Notice` | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | The notice to put in front of the user, once. |
+| `fn diagnose` | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | Decide whether to show the notice. |
+| `fn marker_path` | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | The marker whose presence on startup means the last run did not exit cleanly. |
+| `struct Session` | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | A session's clean-shutdown marker. |
+| `fn detect` | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | Look for antivirus products on this machine. |
 | `fn default_path` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | The file a failure is written to, beside the preferences. |
 | `fn write` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | Write one failure report. |
 | `fn install` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | Install the panic hook. |
