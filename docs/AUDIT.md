@@ -40,10 +40,11 @@ longer offered as the explanation for anything.
 
 ## The twenty-sixth round: the file with more in it had the weaker permission
 
-Five defects (F-133 to F-137), found by running commands nobody had run here
+Seven defects (F-133 to F-139), found by running commands nobody had run here
 before, looking at what landed on disk, sweeping for the rest of the class
-rather than waiting to stumble on it, and then checking the claims this round's
-own new interface text was making.
+rather than waiting to stumble on it, checking the claims this round's own new
+interface text -- and one of CI's own job names -- were making, and reading a
+Windows failure on a commit that changed none of the code it broke.
 
 The round is short and the first finding is the most serious thing this audit
 has recorded in several rounds, so it goes first and without preamble.
@@ -154,6 +155,90 @@ written in advance, and points at the button that shows the whole text.
 A promise that cannot be kept is worse than an accurate description with a
 button next to it, and this is a panel whose entire job is helping somebody
 decide what to publish.
+
+### F-138 -- the network guard's name was broader than its check
+
+`.github/workflows/ci.yml`.
+
+The job is called **no network dependencies**. It greps the dependency tree for
+seven HTTP and WebSocket clients, finds none, and prints `no networking crates
+found`.
+
+Five socket-capable crates are in the graph and always have been: `tokio`,
+`mio`, `socket2`, `polling` and `calloop-wayland-source`. None of them is
+documented anywhere in this repository.
+
+Every one arrives through the window rather than through anything VeilVoice
+does. The file dialog reaches the XDG desktop portal through `ashpd` and
+`zbus`, which speak D-Bus over a **Unix** socket, and `tokio` brings its socket
+primitives whether or not a TCP one is ever opened. `polling` is `calloop`'s
+epoll wrapper under `winit`'s Wayland event loop, and
+`calloop-wayland-source` is the Wayland display connection, also a Unix socket.
+The command line links no window and reaches none of them.
+
+Nothing here is a network connection, and VeilVoice's own code names no network
+API at all: `std::net`, `TcpStream`, `UdpSocket` and `SocketAddr` appear nowhere
+under `crates/`. The README's careful sentence, *there is still no HTTP client
+in the dependency graph*, is true.
+
+The defect is the gap between that and what the job's name and success message
+say. This project's argument is that a reader can check its claims in ten
+seconds. A reader who does the obvious thing here -- `cargo tree | grep -i
+socket` -- finds `socket2`, and finds a green job called "no network
+dependencies" next to it, and has no way to tell whether anybody looked.
+
+The job now checks two things. HTTP and WebSocket clients, as before, with no
+exceptions. And the set of socket-capable crates, **pinned rather than
+allowlisted**: a new one arriving fails the job, and so does one of these five
+disappearing, because either is a change somebody should look at. The five are
+named in the job with what each is for and what it talks to, and the success
+message says what was actually checked.
+
+Both halves were run against a tree with `smol` and `reqwest` planted in it,
+and both catch them. The first version of the pinned set was wrong -- it named
+three of the five, because two were found by reading rather than by running --
+and the check caught that too, before it ever reached CI.
+
+### F-139 -- a bound that was a round number, and Windows was outside it
+
+`veilvoice-core/tests/hostile_audio.rs`.
+
+`pathological_but_legal_audio_is_handled` feeds the engine DC, a square wave,
+impulses and a Nyquist-rate alternating signal, and asserts the output does not
+run away. The bound was `4.0`.
+
+It failed on Windows, and only Windows, at `4.0456023`.
+
+Nothing was wrong with the engine. Measured here over twenty runs each on
+x86-64 Linux:
+
+    DC           1.38
+    square       2.13
+    impulses     0.09
+    alternating  3.58
+
+`4.0` is about ten percent above the worst of those. A different libm and
+different floating-point contraction move the last few percent, and the round
+number sat inside that margin. The bound was not chosen from a measurement; it
+was chosen because it is a round number, and nothing recorded which.
+
+That the engine exceeds unity on a Nyquist square wave is expected and is
+contained where it matters: `veilvoice_audio::io` clamps to full scale rather
+than letting a sample wrap, and has had its own test for that for some time.
+
+The bound is `8.0` now, with the measurements written into the test beside it
+so the next person can see where the number came from. That is more than twice
+the worst observed and still orders of magnitude below anything that has
+actually diverged in this engine, where runaway has always meant thousands or a
+non-finite value -- and the non-finite case is asserted separately on the line
+above.
+
+**Found by CI on a commit that changed none of this.** The failure arrived on a
+push that touched interface text, a test and some documentation, which is what
+made it obvious the cause was not in the diff. A bound with ten percent of
+headroom on one platform is a test that will eventually fail on another for
+reasons that have nothing to do with the code, and the useful version of it
+says how much room it has and why.
 
 ### What the sweep decided to leave
 
@@ -4857,7 +4942,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and thirty-seven defects found and fixed (F-1 to F-137), across
+**One hundred and thirty-nine defects found and fixed (F-1 to F-139), across
 twenty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

@@ -41,6 +41,44 @@ than a summary written afterwards.
   program; the exposure goes from permanent to the length of one transcode, and
   the note the program prints says only what it actually did.
 
+**A test bound that was a round number, and Windows was outside it**
+
+- The engine's hostile-audio test asserts the output does not run away, with a
+  bound of 4.0. It failed on Windows, and only Windows, at 4.0456.
+- Nothing was wrong with the engine. Measured over twenty runs here: DC 1.38,
+  square 2.13, impulses 0.09, alternating 3.58. The bound sat about ten percent
+  above the worst of those, and a different libm moves the last few percent.
+- The bound is 8.0 now, with the measurements written into the test so the next
+  person can see where the number came from. Runaway in this engine has always
+  meant thousands or a non-finite value, and the non-finite case is asserted
+  separately.
+- That the engine exceeds unity on a Nyquist square wave is expected and is
+  contained: the WAV writer clamps to full scale rather than wrapping, and has
+  had its own test for that.
+- Found by CI on a commit that changed none of this, which is what made it
+  clear the cause was not in the diff.
+
+**A CI job whose name was broader than its check**
+
+- The job called "no network dependencies" greps for seven HTTP and WebSocket
+  clients, finds none, and prints "no networking crates found". Five
+  socket-capable crates are in the graph and always have been, and none of them
+  was documented anywhere.
+- All five arrive through the window: the file dialog reaches the desktop
+  portal over D-Bus on a Unix socket, and the Wayland event loop and display
+  connection account for the rest. The command line links no window and reaches
+  none of them. VeilVoice's own code names no network API at all.
+- Nothing was actually wrong, and that is the point: a reader doing the obvious
+  check finds `socket2` next to a green job called "no network dependencies"
+  and has no way to tell whether anybody looked.
+- The job now pins the set rather than allowlisting it. A new socket-capable
+  crate fails it, and so does one of these five disappearing, because either is
+  a change worth a person's attention. Each is named with what it is for and
+  what it talks to, and the success message says what was checked.
+- Both halves were run against a tree with `smol` and `reqwest` planted in it.
+  The first version of the pinned set was wrong, naming three of the five, and
+  running it caught that before it reached CI.
+
 **A promise the crash panel could not keep**
 
 - The panel listing what a crash report holds said flatly that it contains no
