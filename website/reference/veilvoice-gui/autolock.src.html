@@ -38,357 +38,402 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/autolock.rs</code></h1>
-<p style="color:var(--muted)"><a href="autolock.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 326 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="autolock.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 369 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
 <span class="ln" id="L2"><span class="tok-com">//! Locking the window again after a period of no use.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
-<span class="ln" id="L4"><span class="tok-com">//! **Marker 92.** Off unless somebody turns it on, and when it is on the delay</span></span>
-<span class="ln" id="L5"><span class="tok-com">//! is theirs to choose: anything from five minutes to forty eight hours from a</span></span>
-<span class="ln" id="L6"><span class="tok-com">//! list, a number typed in if none of those fit, and the ends of that range</span></span>
-<span class="ln" id="L7"><span class="tok-com">//! movable by anybody who wants a shorter or longer one.</span></span>
+<span class="ln" id="L4"><span class="tok-com">//! **Marker 92.** On at half an hour, and the delay is the user&#x27;s to choose:</span></span>
+<span class="ln" id="L5"><span class="tok-com">//! anything from five minutes to forty eight hours from a list, a number typed</span></span>
+<span class="ln" id="L6"><span class="tok-com">//! in if none of those fit, and the ends of that range movable by anybody who</span></span>
+<span class="ln" id="L7"><span class="tok-com">//! wants a shorter or longer one.</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! # Why it is off by default</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! # Why it is on by default, having been off</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! Because a lock that engages while somebody is part way through a recording</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! is a lock that gets removed. This project&#x27;s app lock already carries the</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! honest note that it protects a session rather than a disk, and an autolock</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! is the same bargain in miniature: it helps the person who walks away from</span></span>
-<span class="ln" id="L15"><span class="tok-com">//! their machine and it costs the person who leaves a job running. Which of</span></span>
-<span class="ln" id="L16"><span class="tok-com">//! those a user is, VeilVoice cannot know, so it asks rather than assuming.</span></span>
-<span class="ln" id="L17"><span class="tok-com">//!</span></span>
-<span class="ln" id="L18"><span class="tok-com">//! # What counts as use</span></span>
-<span class="ln" id="L19"><span class="tok-com">//!</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! Any keystroke, click, scroll or pointer movement over the window, which is</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! what egui reports as input. Deliberately **not** the passage of a job:</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! somebody who starts a long render and leaves the room has left the room,</span></span>
-<span class="ln" id="L23"><span class="tok-com">//! and the recording they are producing is the thing worth locking away.</span></span>
-<span class="ln" id="L24"><span class="tok-com">//!</span></span>
-<span class="ln" id="L25"><span class="tok-com">//! The clock is egui&#x27;s own frame time rather than the system clock, so moving</span></span>
-<span class="ln" id="L26"><span class="tok-com">//! the machine&#x27;s clock does not bring the lock forward or push it back. It also</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! means the countdown only advances while the window is being drawn, which is</span></span>
-<span class="ln" id="L28"><span class="tok-com">//! the honest limit of this: a window nobody is drawing is a window nobody is</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! looking at, and it locks the moment it is looked at again.</span></span>
-<span class="ln" id="L30"><span class="tok-com">//!</span></span>
-<span class="ln" id="L31"><span class="tok-com">//! # In plain words</span></span>
-<span class="ln" id="L32"><span class="tok-com">//!</span></span>
-<span class="ln" id="L33"><span class="tok-com">//! Locks the window again if you have not touched it for a while.</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! It was off, on the argument that a lock engaging part way through a</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! recording is a lock that gets removed, and that VeilVoice cannot know</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! whether a given user is the one who walks away or the one who leaves a job</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! running -- so it should ask rather than assume.</span></span>
+<span class="ln" id="L15"><span class="tok-com">//!</span></span>
+<span class="ln" id="L16"><span class="tok-com">//! The asking is the part that was wrong. A default nobody is shown is not a</span></span>
+<span class="ln" id="L17"><span class="tok-com">//! question, it is an answer, and the answer it gave was &quot;no protection&quot; to</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! everybody who never opened the settings tab. The people most helped by an</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! autolock are the least likely to go looking for one.</span></span>
+<span class="ln" id="L20"><span class="tok-com">//!</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! So it is on, and the first-run setup shows it rather than leaving it to be</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! discovered: half an hour, with the choice and the off switch right there.</span></span>
+<span class="ln" id="L23"><span class="tok-com">//! The original concern is answered by the delay rather than by the default --</span></span>
+<span class="ln" id="L24"><span class="tok-com">//! thirty minutes of an untouched window is not somebody part way through</span></span>
+<span class="ln" id="L25"><span class="tok-com">//! anything -- and by the fact that this has never counted a running job as</span></span>
+<span class="ln" id="L26"><span class="tok-com">//! use, which is deliberate and explained below.</span></span>
+<span class="ln" id="L27"><span class="tok-com">//!</span></span>
+<span class="ln" id="L28"><span class="tok-com">//! # What counts as use</span></span>
+<span class="ln" id="L29"><span class="tok-com">//!</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! Any keystroke, click, scroll or pointer movement over the window, which is</span></span>
+<span class="ln" id="L31"><span class="tok-com">//! what egui reports as input. Deliberately **not** the passage of a job:</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! somebody who starts a long render and leaves the room has left the room,</span></span>
+<span class="ln" id="L33"><span class="tok-com">//! and the recording they are producing is the thing worth locking away.</span></span>
 <span class="ln" id="L34"><span class="tok-com">//!</span></span>
-<span class="ln" id="L35"><span class="tok-com">//! Off until you switch it on. When you do, you pick how long, from five</span></span>
-<span class="ln" id="L36"><span class="tok-com">//! minutes up to two days, or type your own. Starting a long job does not count</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! as using it: if you walk away while something is rendering, that is exactly</span></span>
-<span class="ln" id="L38"><span class="tok-com">//! when you would want it locked.</span></span>
-<span class="ln" id="L39"></span>
-<span class="ln" id="L40"><span class="tok-kw">use</span> std::time::Duration;</span>
-<span class="ln" id="L41"></span>
+<span class="ln" id="L35"><span class="tok-com">//! The clock is egui&#x27;s own frame time rather than the system clock, so moving</span></span>
+<span class="ln" id="L36"><span class="tok-com">//! the machine&#x27;s clock does not bring the lock forward or push it back. It also</span></span>
+<span class="ln" id="L37"><span class="tok-com">//! means the countdown only advances while the window is being drawn, which is</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! the honest limit of this: a window nobody is drawing is a window nobody is</span></span>
+<span class="ln" id="L39"><span class="tok-com">//! looking at, and it locks the moment it is looked at again.</span></span>
+<span class="ln" id="L40"><span class="tok-com">//!</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! # In plain words</span></span>
+<span class="ln" id="L42"><span class="tok-com">//!</span></span>
+<span class="ln" id="L43"><span class="tok-com">//! Locks the window again if you have not touched it for half an hour.</span></span>
+<span class="ln" id="L44"><span class="tok-com">//!</span></span>
+<span class="ln" id="L45"><span class="tok-com">//! On to begin with, and setup shows you the switch. You pick how long, from</span></span>
+<span class="ln" id="L46"><span class="tok-com">//! five minutes up to two days, or type your own, and you can turn it off.</span></span>
+<span class="ln" id="L47"><span class="tok-com">//! Starting a long job does not count as using it: if you walk away while</span></span>
+<span class="ln" id="L48"><span class="tok-com">//! something is rendering, that is exactly when you would want it locked.</span></span>
+<span class="ln" id="L49"></span>
+<span class="ln" id="L50"><span class="tok-kw">use</span> std::time::Duration;</span>
+<span class="ln" id="L51"></span>
+<span class="src-item" id="fn-default_secs">
+<span class="ln" id="L52"><span class="tok-com">/// The delay a fresh installation uses: half an hour.</span></span>
+<span class="ln" id="L53"><span class="tok-com">///</span></span>
+<span class="ln" id="L54"><span class="tok-com">/// Long enough that it does not interrupt somebody working, short enough to</span></span>
+<span class="ln" id="L55"><span class="tok-com">/// matter if they walk out. It is the setup screen&#x27;s suggestion as well as the</span></span>
+<span class="ln" id="L56"><span class="tok-com">/// code&#x27;s default, so the number a user is shown is the number they get.</span></span>
+<span class="ln" id="L57"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> DEFAULT_SECS: u64 = <span class="tok-num">30</span> * <span class="tok-num">60</span>;</span>
+</span>
+<span class="ln" id="L58"></span>
 <span class="src-item" id="fn-floor_secs">
-<span class="ln" id="L42"><span class="tok-com">/// The shortest delay the list offers, in seconds.</span></span>
-<span class="ln" id="L43"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FLOOR_SECS: u64 = <span class="tok-num">5</span> * <span class="tok-num">60</span>;</span>
+<span class="ln" id="L59"><span class="tok-com">/// The shortest delay the list offers, in seconds.</span></span>
+<span class="ln" id="L60"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> FLOOR_SECS: u64 = <span class="tok-num">5</span> * <span class="tok-num">60</span>;</span>
 </span>
 <span class="src-item" id="fn-ceiling_secs">
-<span class="ln" id="L44"><span class="tok-com">/// The longest, in seconds. Forty eight hours.</span></span>
-<span class="ln" id="L45"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CEILING_SECS: u64 = <span class="tok-num">48</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>;</span>
-</span>
-<span class="ln" id="L46"></span>
-<span class="src-item" id="fn-choices">
-<span class="ln" id="L47"><span class="tok-com">/// The delays offered without typing anything, in seconds.</span></span>
-<span class="ln" id="L48"><span class="tok-com">///</span></span>
-<span class="ln" id="L49"><span class="tok-com">/// Chosen to be the ones people actually mean: a coffee, a lunch, an afternoon,</span></span>
-<span class="ln" id="L50"><span class="tok-com">/// overnight, a weekend away. Anything else is typed.</span></span>
-<span class="ln" id="L51"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CHOICES: &amp;[u64] = &amp;[</span>
-<span class="ln" id="L52">    <span class="tok-num">5</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L53">    <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L54">    <span class="tok-num">30</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L55">    <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L56">    <span class="tok-num">2</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L57">    <span class="tok-num">4</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L58">    <span class="tok-num">8</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L59">    <span class="tok-num">12</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L60">    <span class="tok-num">24</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L61">    <span class="tok-num">48</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L62">];</span>
+<span class="ln" id="L61"><span class="tok-com">/// The longest, in seconds. Forty eight hours.</span></span>
+<span class="ln" id="L62"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CEILING_SECS: u64 = <span class="tok-num">48</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>;</span>
 </span>
 <span class="ln" id="L63"></span>
+<span class="src-item" id="fn-choices">
+<span class="ln" id="L64"><span class="tok-com">/// The delays offered without typing anything, in seconds.</span></span>
+<span class="ln" id="L65"><span class="tok-com">///</span></span>
+<span class="ln" id="L66"><span class="tok-com">/// Chosen to be the ones people actually mean: a coffee, a lunch, an afternoon,</span></span>
+<span class="ln" id="L67"><span class="tok-com">/// overnight, a weekend away. Anything else is typed.</span></span>
+<span class="ln" id="L68"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CHOICES: &amp;[u64] = &amp;[</span>
+<span class="ln" id="L69">    <span class="tok-num">5</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L70">    <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L71">    <span class="tok-num">30</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L72">    <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L73">    <span class="tok-num">2</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L74">    <span class="tok-num">4</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L75">    <span class="tok-num">8</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L76">    <span class="tok-num">12</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L77">    <span class="tok-num">24</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L78">    <span class="tok-num">48</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L79">];</span>
+</span>
+<span class="ln" id="L80"></span>
 <span class="src-item" id="fn-autolock">
-<span class="ln" id="L64"><span class="tok-com">/// How the autolock is configured.</span></span>
-<span class="ln" id="L65"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
-<span class="ln" id="L66"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Autolock {</span>
-<span class="ln" id="L67">    <span class="tok-com">/// Whether it engages at all.</span></span>
-<span class="ln" id="L68">    <span class="tok-kw">pub</span> enabled: bool,</span>
-<span class="ln" id="L69">    <span class="tok-com">/// The delay, in seconds.</span></span>
-<span class="ln" id="L70">    <span class="tok-kw">pub</span> after_secs: u64,</span>
-<span class="ln" id="L71">    <span class="tok-com">/// The bottom of the range the user is offered.</span></span>
-<span class="ln" id="L72">    <span class="tok-kw">pub</span> floor_secs: u64,</span>
-<span class="ln" id="L73">    <span class="tok-com">/// The top of it.</span></span>
-<span class="ln" id="L74">    <span class="tok-kw">pub</span> ceiling_secs: u64,</span>
-<span class="ln" id="L75">}</span>
+<span class="ln" id="L81"><span class="tok-com">/// How the autolock is configured.</span></span>
+<span class="ln" id="L82"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
+<span class="ln" id="L83"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Autolock {</span>
+<span class="ln" id="L84">    <span class="tok-com">/// Whether it engages at all.</span></span>
+<span class="ln" id="L85">    <span class="tok-kw">pub</span> enabled: bool,</span>
+<span class="ln" id="L86">    <span class="tok-com">/// The delay, in seconds.</span></span>
+<span class="ln" id="L87">    <span class="tok-kw">pub</span> after_secs: u64,</span>
+<span class="ln" id="L88">    <span class="tok-com">/// The bottom of the range the user is offered.</span></span>
+<span class="ln" id="L89">    <span class="tok-kw">pub</span> floor_secs: u64,</span>
+<span class="ln" id="L90">    <span class="tok-com">/// The top of it.</span></span>
+<span class="ln" id="L91">    <span class="tok-kw">pub</span> ceiling_secs: u64,</span>
+<span class="ln" id="L92">}</span>
 </span>
-<span class="ln" id="L76"></span>
-<span class="ln" id="L77"><span class="tok-kw">impl</span> Default <span class="tok-kw">for</span> Autolock {</span>
+<span class="ln" id="L93"></span>
+<span class="ln" id="L94"><span class="tok-kw">impl</span> Default <span class="tok-kw">for</span> Autolock {</span>
 <span class="src-item" id="fn-autolock-default">
-<span class="ln" id="L78">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
-<span class="ln" id="L79">        Self {</span>
-<span class="ln" id="L80">            <span class="tok-com">// Off. See the module note.</span></span>
-<span class="ln" id="L81">            enabled: false,</span>
-<span class="ln" id="L82">            after_secs: <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L83">            floor_secs: FLOOR_SECS,</span>
-<span class="ln" id="L84">            ceiling_secs: CEILING_SECS,</span>
-<span class="ln" id="L85">        }</span>
-<span class="ln" id="L86">    }</span>
+<span class="ln" id="L95">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
+<span class="ln" id="L96">        Self {</span>
+<span class="ln" id="L97">            <span class="tok-com">// On, at half an hour. See the module note for what changed.</span></span>
+<span class="ln" id="L98">            enabled: true,</span>
+<span class="ln" id="L99">            after_secs: DEFAULT_SECS,</span>
+<span class="ln" id="L100">            floor_secs: FLOOR_SECS,</span>
+<span class="ln" id="L101">            ceiling_secs: CEILING_SECS,</span>
+<span class="ln" id="L102">        }</span>
+<span class="ln" id="L103">    }</span>
 </span>
-<span class="ln" id="L87">}</span>
-<span class="ln" id="L88"></span>
-<span class="ln" id="L89"><span class="tok-kw">impl</span> Autolock {</span>
+<span class="ln" id="L104">}</span>
+<span class="ln" id="L105"></span>
+<span class="ln" id="L106"><span class="tok-kw">impl</span> Autolock {</span>
 <span class="src-item" id="fn-autolock-sane">
-<span class="ln" id="L90">    <span class="tok-com">/// Bring every field into a state that can be offered and obeyed.</span></span>
-<span class="ln" id="L91">    <span class="tok-com">///</span></span>
-<span class="ln" id="L92">    <span class="tok-com">/// A settings file is editable, so every number that reaches here has been</span></span>
-<span class="ln" id="L93">    <span class="tok-com">/// through somebody&#x27;s text editor as far as this code knows. Rather than</span></span>
-<span class="ln" id="L94">    <span class="tok-com">/// refuse, which would leave a user with an autolock they cannot fix from</span></span>
-<span class="ln" id="L95">    <span class="tok-com">/// the interface, each value is brought back into range and the result is</span></span>
-<span class="ln" id="L96">    <span class="tok-com">/// always something the interface can show.</span></span>
-<span class="ln" id="L97">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">sane</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Self {</span>
-<span class="ln" id="L98">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.floor_secs == <span class="tok-num">0</span> {</span>
-<span class="ln" id="L99">            <span class="tok-kw">self</span>.floor_secs = FLOOR_SECS;</span>
-<span class="ln" id="L100">        }</span>
-<span class="ln" id="L101">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.ceiling_secs == <span class="tok-num">0</span> {</span>
-<span class="ln" id="L102">            <span class="tok-kw">self</span>.ceiling_secs = CEILING_SECS;</span>
-<span class="ln" id="L103">        }</span>
-<span class="ln" id="L104">        <span class="tok-com">// A range with its ends the wrong way round is a range with one end.</span></span>
-<span class="ln" id="L105">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.floor_secs &gt; <span class="tok-kw">self</span>.ceiling_secs {</span>
-<span class="ln" id="L106">            std::mem::<span class="tok-fn">swap</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.floor_secs, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.ceiling_secs);</span>
-<span class="ln" id="L107">        }</span>
-<span class="ln" id="L108">        <span class="tok-kw">self</span>.after_secs = <span class="tok-kw">self</span>.after_secs.<span class="tok-fn">clamp</span>(<span class="tok-kw">self</span>.floor_secs, <span class="tok-kw">self</span>.ceiling_secs);</span>
-<span class="ln" id="L109">        <span class="tok-kw">self</span></span>
-<span class="ln" id="L110">    }</span>
+<span class="ln" id="L107">    <span class="tok-com">/// Bring every field into a state that can be offered and obeyed.</span></span>
+<span class="ln" id="L108">    <span class="tok-com">///</span></span>
+<span class="ln" id="L109">    <span class="tok-com">/// A settings file is editable, so every number that reaches here has been</span></span>
+<span class="ln" id="L110">    <span class="tok-com">/// through somebody&#x27;s text editor as far as this code knows. Rather than</span></span>
+<span class="ln" id="L111">    <span class="tok-com">/// refuse, which would leave a user with an autolock they cannot fix from</span></span>
+<span class="ln" id="L112">    <span class="tok-com">/// the interface, each value is brought back into range and the result is</span></span>
+<span class="ln" id="L113">    <span class="tok-com">/// always something the interface can show.</span></span>
+<span class="ln" id="L114">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">sane</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Self {</span>
+<span class="ln" id="L115">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.floor_secs == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L116">            <span class="tok-kw">self</span>.floor_secs = FLOOR_SECS;</span>
+<span class="ln" id="L117">        }</span>
+<span class="ln" id="L118">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.ceiling_secs == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L119">            <span class="tok-kw">self</span>.ceiling_secs = CEILING_SECS;</span>
+<span class="ln" id="L120">        }</span>
+<span class="ln" id="L121">        <span class="tok-com">// A range with its ends the wrong way round is a range with one end.</span></span>
+<span class="ln" id="L122">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.floor_secs &gt; <span class="tok-kw">self</span>.ceiling_secs {</span>
+<span class="ln" id="L123">            std::mem::<span class="tok-fn">swap</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.floor_secs, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.ceiling_secs);</span>
+<span class="ln" id="L124">        }</span>
+<span class="ln" id="L125">        <span class="tok-kw">self</span>.after_secs = <span class="tok-kw">self</span>.after_secs.<span class="tok-fn">clamp</span>(<span class="tok-kw">self</span>.floor_secs, <span class="tok-kw">self</span>.ceiling_secs);</span>
+<span class="ln" id="L126">        <span class="tok-kw">self</span></span>
+<span class="ln" id="L127">    }</span>
 </span>
-<span class="ln" id="L111"></span>
+<span class="ln" id="L128"></span>
 <span class="src-item" id="fn-autolock-after">
-<span class="ln" id="L112">    <span class="tok-com">/// The delay as a `Duration`.</span></span>
-<span class="ln" id="L113">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">after</span>(<span class="tok-kw">self</span>) -&gt; Duration {</span>
-<span class="ln" id="L114">        Duration::<span class="tok-fn">from_secs</span>(<span class="tok-kw">self</span>.after_secs)</span>
-<span class="ln" id="L115">    }</span>
+<span class="ln" id="L129">    <span class="tok-com">/// The delay as a `Duration`.</span></span>
+<span class="ln" id="L130">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">after</span>(<span class="tok-kw">self</span>) -&gt; Duration {</span>
+<span class="ln" id="L131">        Duration::<span class="tok-fn">from_secs</span>(<span class="tok-kw">self</span>.after_secs)</span>
+<span class="ln" id="L132">    }</span>
 </span>
-<span class="ln" id="L116"></span>
+<span class="ln" id="L133"></span>
 <span class="src-item" id="fn-autolock-expired">
-<span class="ln" id="L117">    <span class="tok-com">/// Whether `idle` has reached the delay.</span></span>
-<span class="ln" id="L118">    <span class="tok-com">///</span></span>
-<span class="ln" id="L119">    <span class="tok-com">/// False when the autolock is off, whatever `idle` says, so a caller cannot</span></span>
-<span class="ln" id="L120">    <span class="tok-com">/// lock a window the user asked to leave unlocked by getting the condition</span></span>
-<span class="ln" id="L121">    <span class="tok-com">/// the wrong way round.</span></span>
-<span class="ln" id="L122">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">expired</span>(<span class="tok-kw">self</span>, idle: Duration) -&gt; bool {</span>
-<span class="ln" id="L123">        <span class="tok-kw">self</span>.enabled &amp;&amp; idle &gt;= <span class="tok-kw">self</span>.<span class="tok-fn">after</span>()</span>
-<span class="ln" id="L124">    }</span>
+<span class="ln" id="L134">    <span class="tok-com">/// Whether `idle` has reached the delay.</span></span>
+<span class="ln" id="L135">    <span class="tok-com">///</span></span>
+<span class="ln" id="L136">    <span class="tok-com">/// False when the autolock is off, whatever `idle` says, so a caller cannot</span></span>
+<span class="ln" id="L137">    <span class="tok-com">/// lock a window the user asked to leave unlocked by getting the condition</span></span>
+<span class="ln" id="L138">    <span class="tok-com">/// the wrong way round.</span></span>
+<span class="ln" id="L139">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">expired</span>(<span class="tok-kw">self</span>, idle: Duration) -&gt; bool {</span>
+<span class="ln" id="L140">        <span class="tok-kw">self</span>.enabled &amp;&amp; idle &gt;= <span class="tok-kw">self</span>.<span class="tok-fn">after</span>()</span>
+<span class="ln" id="L141">    }</span>
 </span>
-<span class="ln" id="L125"></span>
+<span class="ln" id="L142"></span>
 <span class="src-item" id="fn-autolock-describe">
-<span class="ln" id="L126">    <span class="tok-com">/// The delay in the words a person uses for it.</span></span>
-<span class="ln" id="L127">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L128">        <span class="tok-fn">describe_secs</span>(<span class="tok-kw">self</span>.after_secs)</span>
-<span class="ln" id="L129">    }</span>
+<span class="ln" id="L143">    <span class="tok-com">/// The delay in the words a person uses for it.</span></span>
+<span class="ln" id="L144">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L145">        <span class="tok-fn">describe_secs</span>(<span class="tok-kw">self</span>.after_secs)</span>
+<span class="ln" id="L146">    }</span>
 </span>
-<span class="ln" id="L130">}</span>
-<span class="ln" id="L131"></span>
+<span class="ln" id="L147">}</span>
+<span class="ln" id="L148"></span>
 <span class="src-item" id="fn-describe_secs">
-<span class="ln" id="L132"><span class="tok-com">/// A number of seconds as a phrase.</span></span>
-<span class="ln" id="L133"><span class="tok-com">///</span></span>
-<span class="ln" id="L134"><span class="tok-com">/// Whole units only, because every value this offers is a whole number of</span></span>
-<span class="ln" id="L135"><span class="tok-com">/// minutes or hours and &quot;1 hour 0 minutes&quot; reads like a machine talking.</span></span>
-<span class="ln" id="L136"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe_secs</span>(secs: u64) -&gt; String {</span>
-<span class="ln" id="L137">    <span class="tok-kw">let</span> plural = |n: u64, unit: &amp;str| {</span>
-<span class="ln" id="L138">        <span class="tok-kw">if</span> n == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L139">            format!(<span class="tok-str">&quot;1 {unit}&quot;</span>)</span>
-<span class="ln" id="L140">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L141">            format!(<span class="tok-str">&quot;{n} {unit}s&quot;</span>)</span>
-<span class="ln" id="L142">        }</span>
-<span class="ln" id="L143">    };</span>
-<span class="ln" id="L144">    <span class="tok-kw">match</span> secs {</span>
-<span class="ln" id="L145">        <span class="tok-num">0</span> =&gt; <span class="tok-str">&quot;immediately&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L146">        s <span class="tok-kw">if</span> s % <span class="tok-num">86_400</span> == <span class="tok-num">0</span> =&gt; <span class="tok-fn">plural</span>(s / <span class="tok-num">86_400</span>, <span class="tok-str">&quot;day&quot;</span>),</span>
-<span class="ln" id="L147">        s <span class="tok-kw">if</span> s % <span class="tok-num">3_600</span> == <span class="tok-num">0</span> =&gt; <span class="tok-fn">plural</span>(s / <span class="tok-num">3_600</span>, <span class="tok-str">&quot;hour&quot;</span>),</span>
-<span class="ln" id="L148">        s <span class="tok-kw">if</span> s % <span class="tok-num">60</span> == <span class="tok-num">0</span> =&gt; <span class="tok-fn">plural</span>(s / <span class="tok-num">60</span>, <span class="tok-str">&quot;minute&quot;</span>),</span>
-<span class="ln" id="L149">        s =&gt; <span class="tok-fn">plural</span>(s, <span class="tok-str">&quot;second&quot;</span>),</span>
-<span class="ln" id="L150">    }</span>
-<span class="ln" id="L151">}</span>
+<span class="ln" id="L149"><span class="tok-com">/// A number of seconds as a phrase.</span></span>
+<span class="ln" id="L150"><span class="tok-com">///</span></span>
+<span class="ln" id="L151"><span class="tok-com">/// Whole units only, because every value this offers is a whole number of</span></span>
+<span class="ln" id="L152"><span class="tok-com">/// minutes or hours and &quot;1 hour 0 minutes&quot; reads like a machine talking.</span></span>
+<span class="ln" id="L153"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe_secs</span>(secs: u64) -&gt; String {</span>
+<span class="ln" id="L154">    <span class="tok-kw">let</span> plural = |n: u64, unit: &amp;str| {</span>
+<span class="ln" id="L155">        <span class="tok-kw">if</span> n == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L156">            format!(<span class="tok-str">&quot;1 {unit}&quot;</span>)</span>
+<span class="ln" id="L157">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L158">            format!(<span class="tok-str">&quot;{n} {unit}s&quot;</span>)</span>
+<span class="ln" id="L159">        }</span>
+<span class="ln" id="L160">    };</span>
+<span class="ln" id="L161">    <span class="tok-kw">match</span> secs {</span>
+<span class="ln" id="L162">        <span class="tok-num">0</span> =&gt; <span class="tok-str">&quot;immediately&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L163">        s <span class="tok-kw">if</span> s % <span class="tok-num">86_400</span> == <span class="tok-num">0</span> =&gt; <span class="tok-fn">plural</span>(s / <span class="tok-num">86_400</span>, <span class="tok-str">&quot;day&quot;</span>),</span>
+<span class="ln" id="L164">        s <span class="tok-kw">if</span> s % <span class="tok-num">3_600</span> == <span class="tok-num">0</span> =&gt; <span class="tok-fn">plural</span>(s / <span class="tok-num">3_600</span>, <span class="tok-str">&quot;hour&quot;</span>),</span>
+<span class="ln" id="L165">        s <span class="tok-kw">if</span> s % <span class="tok-num">60</span> == <span class="tok-num">0</span> =&gt; <span class="tok-fn">plural</span>(s / <span class="tok-num">60</span>, <span class="tok-str">&quot;minute&quot;</span>),</span>
+<span class="ln" id="L166">        s =&gt; <span class="tok-fn">plural</span>(s, <span class="tok-str">&quot;second&quot;</span>),</span>
+<span class="ln" id="L167">    }</span>
+<span class="ln" id="L168">}</span>
 </span>
-<span class="ln" id="L152"></span>
+<span class="ln" id="L169"></span>
 <span class="src-item" id="fn-parse">
-<span class="ln" id="L153"><span class="tok-com">/// Read a delay somebody typed.</span></span>
-<span class="ln" id="L154"><span class="tok-com">///</span></span>
-<span class="ln" id="L155"><span class="tok-com">/// Accepts a bare number of minutes, or a number with a unit: `90`, `90m`,</span></span>
-<span class="ln" id="L156"><span class="tok-com">/// `90 min`, `2h`, `2 hours`, `1d`. Returns `None` rather than guessing when it</span></span>
-<span class="ln" id="L157"><span class="tok-com">/// cannot tell, so the interface can say it did not understand instead of</span></span>
-<span class="ln" id="L158"><span class="tok-com">/// silently applying a number the user did not mean.</span></span>
-<span class="ln" id="L159"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(typed: &amp;str) -&gt; Option&lt;u64&gt; {</span>
-<span class="ln" id="L160">    <span class="tok-kw">let</span> typed = typed.<span class="tok-fn">trim</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L161">    <span class="tok-kw">if</span> typed.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L162">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L163">    }</span>
-<span class="ln" id="L164">    <span class="tok-kw">let</span> split = typed</span>
-<span class="ln" id="L165">        .<span class="tok-fn">find</span>(|c: char| !c.<span class="tok-fn">is_ascii_digit</span>() &amp;&amp; c != <span class="tok-str">&#x27;.&#x27;</span>)</span>
-<span class="ln" id="L166">        .<span class="tok-fn">unwrap_or</span>(typed.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L167">    <span class="tok-kw">let</span> (number, unit) = typed.<span class="tok-fn">split_at</span>(split);</span>
-<span class="ln" id="L168">    <span class="tok-kw">let</span> value: f64 = number.<span class="tok-fn">parse</span>().<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L169">    <span class="tok-kw">if</span> !value.<span class="tok-fn">is_finite</span>() || value &lt;= <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L170">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L171">    }</span>
-<span class="ln" id="L172">    <span class="tok-kw">let</span> unit = unit.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L173">    <span class="tok-kw">let</span> multiplier = <span class="tok-kw">match</span> unit {</span>
-<span class="ln" id="L174">        <span class="tok-com">// A bare number is minutes, because that is the unit somebody reaches</span></span>
-<span class="ln" id="L175">        <span class="tok-com">// for when they say &quot;lock after 20&quot;.</span></span>
-<span class="ln" id="L176">        <span class="tok-str">&quot;&quot;</span> | <span class="tok-str">&quot;m&quot;</span> | <span class="tok-str">&quot;min&quot;</span> | <span class="tok-str">&quot;mins&quot;</span> | <span class="tok-str">&quot;minute&quot;</span> | <span class="tok-str">&quot;minutes&quot;</span> =&gt; <span class="tok-num">60.0</span>,</span>
-<span class="ln" id="L177">        <span class="tok-str">&quot;s&quot;</span> | <span class="tok-str">&quot;sec&quot;</span> | <span class="tok-str">&quot;secs&quot;</span> | <span class="tok-str">&quot;second&quot;</span> | <span class="tok-str">&quot;seconds&quot;</span> =&gt; <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L178">        <span class="tok-str">&quot;h&quot;</span> | <span class="tok-str">&quot;hr&quot;</span> | <span class="tok-str">&quot;hrs&quot;</span> | <span class="tok-str">&quot;hour&quot;</span> | <span class="tok-str">&quot;hours&quot;</span> =&gt; <span class="tok-num">3_600.0</span>,</span>
-<span class="ln" id="L179">        <span class="tok-str">&quot;d&quot;</span> | <span class="tok-str">&quot;day&quot;</span> | <span class="tok-str">&quot;days&quot;</span> =&gt; <span class="tok-num">86_400.0</span>,</span>
-<span class="ln" id="L180">        _ =&gt; <span class="tok-kw">return</span> None,</span>
-<span class="ln" id="L181">    };</span>
-<span class="ln" id="L182">    <span class="tok-kw">let</span> secs = value * multiplier;</span>
-<span class="ln" id="L183">    <span class="tok-com">// Guard the cast: a typed `99999999999999d` must not wrap into something</span></span>
-<span class="ln" id="L184">    <span class="tok-com">// small and lock the window immediately.</span></span>
-<span class="ln" id="L185">    <span class="tok-kw">if</span> !secs.<span class="tok-fn">is_finite</span>() || secs &lt; <span class="tok-num">1.0</span> || secs &gt; u64::MAX <span class="tok-kw">as</span> f64 {</span>
-<span class="ln" id="L186">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L187">    }</span>
-<span class="ln" id="L188">    <span class="tok-fn">Some</span>(secs <span class="tok-kw">as</span> u64)</span>
-<span class="ln" id="L189">}</span>
+<span class="ln" id="L170"><span class="tok-com">/// Read a delay somebody typed.</span></span>
+<span class="ln" id="L171"><span class="tok-com">///</span></span>
+<span class="ln" id="L172"><span class="tok-com">/// Accepts a bare number of minutes, or a number with a unit: `90`, `90m`,</span></span>
+<span class="ln" id="L173"><span class="tok-com">/// `90 min`, `2h`, `2 hours`, `1d`. Returns `None` rather than guessing when it</span></span>
+<span class="ln" id="L174"><span class="tok-com">/// cannot tell, so the interface can say it did not understand instead of</span></span>
+<span class="ln" id="L175"><span class="tok-com">/// silently applying a number the user did not mean.</span></span>
+<span class="ln" id="L176"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(typed: &amp;str) -&gt; Option&lt;u64&gt; {</span>
+<span class="ln" id="L177">    <span class="tok-kw">let</span> typed = typed.<span class="tok-fn">trim</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L178">    <span class="tok-kw">if</span> typed.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L179">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L180">    }</span>
+<span class="ln" id="L181">    <span class="tok-kw">let</span> split = typed</span>
+<span class="ln" id="L182">        .<span class="tok-fn">find</span>(|c: char| !c.<span class="tok-fn">is_ascii_digit</span>() &amp;&amp; c != <span class="tok-str">&#x27;.&#x27;</span>)</span>
+<span class="ln" id="L183">        .<span class="tok-fn">unwrap_or</span>(typed.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L184">    <span class="tok-kw">let</span> (number, unit) = typed.<span class="tok-fn">split_at</span>(split);</span>
+<span class="ln" id="L185">    <span class="tok-kw">let</span> value: f64 = number.<span class="tok-fn">parse</span>().<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L186">    <span class="tok-kw">if</span> !value.<span class="tok-fn">is_finite</span>() || value &lt;= <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L187">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L188">    }</span>
+<span class="ln" id="L189">    <span class="tok-kw">let</span> unit = unit.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L190">    <span class="tok-kw">let</span> multiplier = <span class="tok-kw">match</span> unit {</span>
+<span class="ln" id="L191">        <span class="tok-com">// A bare number is minutes, because that is the unit somebody reaches</span></span>
+<span class="ln" id="L192">        <span class="tok-com">// for when they say &quot;lock after 20&quot;.</span></span>
+<span class="ln" id="L193">        <span class="tok-str">&quot;&quot;</span> | <span class="tok-str">&quot;m&quot;</span> | <span class="tok-str">&quot;min&quot;</span> | <span class="tok-str">&quot;mins&quot;</span> | <span class="tok-str">&quot;minute&quot;</span> | <span class="tok-str">&quot;minutes&quot;</span> =&gt; <span class="tok-num">60.0</span>,</span>
+<span class="ln" id="L194">        <span class="tok-str">&quot;s&quot;</span> | <span class="tok-str">&quot;sec&quot;</span> | <span class="tok-str">&quot;secs&quot;</span> | <span class="tok-str">&quot;second&quot;</span> | <span class="tok-str">&quot;seconds&quot;</span> =&gt; <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L195">        <span class="tok-str">&quot;h&quot;</span> | <span class="tok-str">&quot;hr&quot;</span> | <span class="tok-str">&quot;hrs&quot;</span> | <span class="tok-str">&quot;hour&quot;</span> | <span class="tok-str">&quot;hours&quot;</span> =&gt; <span class="tok-num">3_600.0</span>,</span>
+<span class="ln" id="L196">        <span class="tok-str">&quot;d&quot;</span> | <span class="tok-str">&quot;day&quot;</span> | <span class="tok-str">&quot;days&quot;</span> =&gt; <span class="tok-num">86_400.0</span>,</span>
+<span class="ln" id="L197">        _ =&gt; <span class="tok-kw">return</span> None,</span>
+<span class="ln" id="L198">    };</span>
+<span class="ln" id="L199">    <span class="tok-kw">let</span> secs = value * multiplier;</span>
+<span class="ln" id="L200">    <span class="tok-com">// Guard the cast: a typed `99999999999999d` must not wrap into something</span></span>
+<span class="ln" id="L201">    <span class="tok-com">// small and lock the window immediately.</span></span>
+<span class="ln" id="L202">    <span class="tok-kw">if</span> !secs.<span class="tok-fn">is_finite</span>() || secs &lt; <span class="tok-num">1.0</span> || secs &gt; u64::MAX <span class="tok-kw">as</span> f64 {</span>
+<span class="ln" id="L203">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L204">    }</span>
+<span class="ln" id="L205">    <span class="tok-fn">Some</span>(secs <span class="tok-kw">as</span> u64)</span>
+<span class="ln" id="L206">}</span>
 </span>
-<span class="ln" id="L190"></span>
-<span class="ln" id="L191"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L192"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L193">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L194"></span>
-<span class="ln" id="L195">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L196">    <span class="tok-kw">fn</span> <span class="tok-fn">it_is_off_until_somebody_turns_it_on</span>() {</span>
-<span class="ln" id="L197">        <span class="tok-kw">let</span> auto = Autolock::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L198">        assert!(!auto.enabled);</span>
-<span class="ln" id="L199">        assert!(</span>
-<span class="ln" id="L200">            !auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(u64::MAX / <span class="tok-num">2</span>)),</span>
-<span class="ln" id="L201">            <span class="tok-str">&quot;a window must not lock itself when nobody asked it to&quot;</span></span>
-<span class="ln" id="L202">        );</span>
-<span class="ln" id="L203">    }</span>
-<span class="ln" id="L204"></span>
-<span class="ln" id="L205">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L206">    <span class="tok-kw">fn</span> <span class="tok-fn">it_locks_once_the_delay_has_passed_and_not_before</span>() {</span>
-<span class="ln" id="L207">        <span class="tok-kw">let</span> auto = Autolock {</span>
-<span class="ln" id="L208">            enabled: true,</span>
-<span class="ln" id="L209">            after_secs: <span class="tok-num">900</span>,</span>
-<span class="ln" id="L210">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L211">        };</span>
-<span class="ln" id="L212">        assert!(!auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">899</span>)));</span>
-<span class="ln" id="L213">        assert!(auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">900</span>)));</span>
-<span class="ln" id="L214">        assert!(auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">901</span>)));</span>
-<span class="ln" id="L215">    }</span>
-<span class="ln" id="L216"></span>
-<span class="ln" id="L217">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L218">    <span class="tok-kw">fn</span> <span class="tok-fn">every_offered_choice_is_inside_the_range_it_is_offered_from</span>() {</span>
-<span class="ln" id="L219">        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> CHOICES {</span>
-<span class="ln" id="L220">            assert!(*choice &gt;= FLOOR_SECS, <span class="tok-str">&quot;{choice} is below the floor&quot;</span>);</span>
-<span class="ln" id="L221">            assert!(*choice &lt;= CEILING_SECS, <span class="tok-str">&quot;{choice} is above the ceiling&quot;</span>);</span>
-<span class="ln" id="L222">        }</span>
-<span class="ln" id="L223">        assert_eq!(CHOICES.<span class="tok-fn">first</span>(), <span class="tok-fn">Some</span>(&amp;FLOOR_SECS));</span>
-<span class="ln" id="L224">        assert_eq!(CHOICES.<span class="tok-fn">last</span>(), <span class="tok-fn">Some</span>(&amp;CEILING_SECS));</span>
-<span class="ln" id="L225">    }</span>
-<span class="ln" id="L226"></span>
-<span class="ln" id="L227">    <span class="tok-com">/// The settings file is editable, so every number here has been through a</span></span>
-<span class="ln" id="L228">    <span class="tok-com">/// text editor as far as this code knows.</span></span>
-<span class="ln" id="L229">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L230">    <span class="tok-kw">fn</span> <span class="tok-fn">a_hand_edited_settings_file_is_brought_back_into_range</span>() {</span>
-<span class="ln" id="L231">        <span class="tok-kw">let</span> mad = Autolock {</span>
-<span class="ln" id="L232">            enabled: true,</span>
-<span class="ln" id="L233">            after_secs: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L234">            floor_secs: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L235">            ceiling_secs: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L236">        }</span>
-<span class="ln" id="L237">        .<span class="tok-fn">sane</span>();</span>
-<span class="ln" id="L238">        assert_eq!(mad.floor_secs, FLOOR_SECS);</span>
-<span class="ln" id="L239">        assert_eq!(mad.ceiling_secs, CEILING_SECS);</span>
-<span class="ln" id="L240">        assert_eq!(mad.after_secs, FLOOR_SECS, <span class="tok-str">&quot;clamped up to the floor&quot;</span>);</span>
-<span class="ln" id="L241"></span>
-<span class="ln" id="L242">        <span class="tok-kw">let</span> backwards = Autolock {</span>
-<span class="ln" id="L243">            enabled: true,</span>
-<span class="ln" id="L244">            after_secs: <span class="tok-num">3_600</span>,</span>
-<span class="ln" id="L245">            floor_secs: <span class="tok-num">48</span> * <span class="tok-num">3_600</span>,</span>
-<span class="ln" id="L246">            ceiling_secs: <span class="tok-num">300</span>,</span>
-<span class="ln" id="L247">        }</span>
-<span class="ln" id="L248">        .<span class="tok-fn">sane</span>();</span>
-<span class="ln" id="L249">        assert!(</span>
-<span class="ln" id="L250">            backwards.floor_secs &lt; backwards.ceiling_secs,</span>
-<span class="ln" id="L251">            <span class="tok-str">&quot;ends swapped&quot;</span></span>
-<span class="ln" id="L252">        );</span>
-<span class="ln" id="L253">        assert!(backwards.after_secs &gt;= backwards.floor_secs);</span>
-<span class="ln" id="L254">    }</span>
-<span class="ln" id="L255"></span>
-<span class="ln" id="L256">    <span class="tok-com">/// The user may move the ends of the range, so a delay outside the default</span></span>
-<span class="ln" id="L257">    <span class="tok-com">/// one is not an error.</span></span>
-<span class="ln" id="L258">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L259">    <span class="tok-kw">fn</span> <span class="tok-fn">a_range_the_user_widened_is_kept</span>() {</span>
-<span class="ln" id="L260">        <span class="tok-kw">let</span> wide = Autolock {</span>
-<span class="ln" id="L261">            enabled: true,</span>
-<span class="ln" id="L262">            after_secs: <span class="tok-num">60</span>,</span>
-<span class="ln" id="L263">            floor_secs: <span class="tok-num">30</span>,</span>
-<span class="ln" id="L264">            ceiling_secs: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
+<span class="ln" id="L207"></span>
+<span class="ln" id="L208"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L209"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L210">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L211"></span>
+<span class="ln" id="L212">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L213">    <span class="tok-kw">fn</span> <span class="tok-fn">it_is_on_at_half_an_hour_out_of_the_box</span>() {</span>
+<span class="ln" id="L214">        <span class="tok-kw">let</span> auto = Autolock::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L215">        assert!(</span>
+<span class="ln" id="L216">            auto.enabled,</span>
+<span class="ln" id="L217">            <span class="tok-str">&quot;the default is protection, not the absence of it&quot;</span></span>
+<span class="ln" id="L218">        );</span>
+<span class="ln" id="L219">        assert_eq!(auto.after_secs, DEFAULT_SECS);</span>
+<span class="ln" id="L220">        assert_eq!(auto.after_secs, <span class="tok-num">30</span> * <span class="tok-num">60</span>);</span>
+<span class="ln" id="L221">        assert!(</span>
+<span class="ln" id="L222">            !auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">29</span> * <span class="tok-num">60</span>)),</span>
+<span class="ln" id="L223">            <span class="tok-str">&quot;half an hour means half an hour&quot;</span></span>
+<span class="ln" id="L224">        );</span>
+<span class="ln" id="L225">        assert!(auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">31</span> * <span class="tok-num">60</span>)));</span>
+<span class="ln" id="L226">    }</span>
+<span class="ln" id="L227"></span>
+<span class="ln" id="L228">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L229">    <span class="tok-kw">fn</span> <span class="tok-fn">switching_it_off_switches_it_off</span>() {</span>
+<span class="ln" id="L230">        <span class="tok-com">// The default changed; the ability to refuse it must not have.</span></span>
+<span class="ln" id="L231">        <span class="tok-kw">let</span> auto = Autolock {</span>
+<span class="ln" id="L232">            enabled: false,</span>
+<span class="ln" id="L233">            ..Autolock::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L234">        };</span>
+<span class="ln" id="L235">        assert!(</span>
+<span class="ln" id="L236">            !auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(u64::MAX / <span class="tok-num">2</span>)),</span>
+<span class="ln" id="L237">            <span class="tok-str">&quot;a window must not lock itself when somebody has said not to&quot;</span></span>
+<span class="ln" id="L238">        );</span>
+<span class="ln" id="L239">    }</span>
+<span class="ln" id="L240"></span>
+<span class="ln" id="L241">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L242">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_delay_is_one_of_the_offered_choices</span>() {</span>
+<span class="ln" id="L243">        <span class="tok-com">// Otherwise the settings tab opens showing a custom value nobody</span></span>
+<span class="ln" id="L244">        <span class="tok-com">// typed, which reads as a setting that has been meddled with.</span></span>
+<span class="ln" id="L245">        assert!(CHOICES.<span class="tok-fn">contains</span>(&amp;DEFAULT_SECS));</span>
+<span class="ln" id="L246">    }</span>
+<span class="ln" id="L247"></span>
+<span class="ln" id="L248">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L249">    <span class="tok-kw">fn</span> <span class="tok-fn">it_locks_once_the_delay_has_passed_and_not_before</span>() {</span>
+<span class="ln" id="L250">        <span class="tok-kw">let</span> auto = Autolock {</span>
+<span class="ln" id="L251">            enabled: true,</span>
+<span class="ln" id="L252">            after_secs: <span class="tok-num">900</span>,</span>
+<span class="ln" id="L253">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L254">        };</span>
+<span class="ln" id="L255">        assert!(!auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">899</span>)));</span>
+<span class="ln" id="L256">        assert!(auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">900</span>)));</span>
+<span class="ln" id="L257">        assert!(auto.<span class="tok-fn">expired</span>(Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">901</span>)));</span>
+<span class="ln" id="L258">    }</span>
+<span class="ln" id="L259"></span>
+<span class="ln" id="L260">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L261">    <span class="tok-kw">fn</span> <span class="tok-fn">every_offered_choice_is_inside_the_range_it_is_offered_from</span>() {</span>
+<span class="ln" id="L262">        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> CHOICES {</span>
+<span class="ln" id="L263">            assert!(*choice &gt;= FLOOR_SECS, <span class="tok-str">&quot;{choice} is below the floor&quot;</span>);</span>
+<span class="ln" id="L264">            assert!(*choice &lt;= CEILING_SECS, <span class="tok-str">&quot;{choice} is above the ceiling&quot;</span>);</span>
 <span class="ln" id="L265">        }</span>
-<span class="ln" id="L266">        .<span class="tok-fn">sane</span>();</span>
-<span class="ln" id="L267">        assert_eq!(wide.after_secs, <span class="tok-num">60</span>, <span class="tok-str">&quot;a minute is inside the widened range&quot;</span>);</span>
-<span class="ln" id="L268">        assert_eq!(wide.floor_secs, <span class="tok-num">30</span>);</span>
-<span class="ln" id="L269">        assert_eq!(wide.ceiling_secs, <span class="tok-num">7</span> * <span class="tok-num">86_400</span>);</span>
-<span class="ln" id="L270">    }</span>
-<span class="ln" id="L271"></span>
+<span class="ln" id="L266">        assert_eq!(CHOICES.<span class="tok-fn">first</span>(), <span class="tok-fn">Some</span>(&amp;FLOOR_SECS));</span>
+<span class="ln" id="L267">        assert_eq!(CHOICES.<span class="tok-fn">last</span>(), <span class="tok-fn">Some</span>(&amp;CEILING_SECS));</span>
+<span class="ln" id="L268">    }</span>
+<span class="ln" id="L269"></span>
+<span class="ln" id="L270">    <span class="tok-com">/// The settings file is editable, so every number here has been through a</span></span>
+<span class="ln" id="L271">    <span class="tok-com">/// text editor as far as this code knows.</span></span>
 <span class="ln" id="L272">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L273">    <span class="tok-kw">fn</span> <span class="tok-fn">typed_delays_are_read_the_way_they_are_written</span>() {</span>
-<span class="ln" id="L274">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;20&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">20</span> * <span class="tok-num">60</span>), <span class="tok-str">&quot;a bare number is minutes&quot;</span>);</span>
-<span class="ln" id="L275">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;20m&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">20</span> * <span class="tok-num">60</span>));</span>
-<span class="ln" id="L276">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;20 minutes&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">20</span> * <span class="tok-num">60</span>));</span>
-<span class="ln" id="L277">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;2h&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">2</span> * <span class="tok-num">3_600</span>));</span>
-<span class="ln" id="L278">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;2 hours&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">2</span> * <span class="tok-num">3_600</span>));</span>
-<span class="ln" id="L279">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1d&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">86_400</span>));</span>
-<span class="ln" id="L280">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;90 sec&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">90</span>));</span>
-<span class="ln" id="L281">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;  3 HRS &quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">3</span> * <span class="tok-num">3_600</span>));</span>
-<span class="ln" id="L282">    }</span>
-<span class="ln" id="L283"></span>
-<span class="ln" id="L284">    <span class="tok-com">/// Refusing beats guessing: a number nobody meant, silently applied, is a</span></span>
-<span class="ln" id="L285">    <span class="tok-com">/// window that locks at a time its owner cannot explain.</span></span>
-<span class="ln" id="L286">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L287">    <span class="tok-kw">fn</span> <span class="tok-fn">nonsense_is_refused_rather_than_guessed_at</span>() {</span>
-<span class="ln" id="L288">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;soon&quot;</span>, <span class="tok-str">&quot;-5&quot;</span>, <span class="tok-str">&quot;0&quot;</span>, <span class="tok-str">&quot;5 fortnights&quot;</span>, <span class="tok-str">&quot;m&quot;</span>, <span class="tok-str">&quot;1e999d&quot;</span>] {</span>
-<span class="ln" id="L289">            assert_eq!(<span class="tok-fn">parse</span>(bad), None, <span class="tok-str">&quot;{bad:?} should not parse&quot;</span>);</span>
+<span class="ln" id="L273">    <span class="tok-kw">fn</span> <span class="tok-fn">a_hand_edited_settings_file_is_brought_back_into_range</span>() {</span>
+<span class="ln" id="L274">        <span class="tok-kw">let</span> mad = Autolock {</span>
+<span class="ln" id="L275">            enabled: true,</span>
+<span class="ln" id="L276">            after_secs: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L277">            floor_secs: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L278">            ceiling_secs: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L279">        }</span>
+<span class="ln" id="L280">        .<span class="tok-fn">sane</span>();</span>
+<span class="ln" id="L281">        assert_eq!(mad.floor_secs, FLOOR_SECS);</span>
+<span class="ln" id="L282">        assert_eq!(mad.ceiling_secs, CEILING_SECS);</span>
+<span class="ln" id="L283">        assert_eq!(mad.after_secs, FLOOR_SECS, <span class="tok-str">&quot;clamped up to the floor&quot;</span>);</span>
+<span class="ln" id="L284"></span>
+<span class="ln" id="L285">        <span class="tok-kw">let</span> backwards = Autolock {</span>
+<span class="ln" id="L286">            enabled: true,</span>
+<span class="ln" id="L287">            after_secs: <span class="tok-num">3_600</span>,</span>
+<span class="ln" id="L288">            floor_secs: <span class="tok-num">48</span> * <span class="tok-num">3_600</span>,</span>
+<span class="ln" id="L289">            ceiling_secs: <span class="tok-num">300</span>,</span>
 <span class="ln" id="L290">        }</span>
-<span class="ln" id="L291">    }</span>
-<span class="ln" id="L292"></span>
-<span class="ln" id="L293">    <span class="tok-com">/// A huge typed number must not wrap into a small one and lock the window</span></span>
-<span class="ln" id="L294">    <span class="tok-com">/// immediately, which is the opposite of what was asked for.</span></span>
-<span class="ln" id="L295">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L296">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_number_does_not_wrap_into_a_tiny_delay</span>() {</span>
-<span class="ln" id="L297">        <span class="tok-kw">for</span> absurd <span class="tok-kw">in</span> [<span class="tok-str">&quot;99999999999999999999d&quot;</span>, <span class="tok-str">&quot;1e30h&quot;</span>] {</span>
-<span class="ln" id="L298">            <span class="tok-kw">match</span> <span class="tok-fn">parse</span>(absurd) {</span>
-<span class="ln" id="L299">                None =&gt; {}</span>
-<span class="ln" id="L300">                <span class="tok-fn">Some</span>(secs) =&gt; assert!(</span>
-<span class="ln" id="L301">                    secs &gt; CEILING_SECS,</span>
-<span class="ln" id="L302">                    <span class="tok-str">&quot;{absurd:?} parsed as {secs}s, which is shorter than the ceiling&quot;</span></span>
-<span class="ln" id="L303">                ),</span>
-<span class="ln" id="L304">            }</span>
-<span class="ln" id="L305">        }</span>
-<span class="ln" id="L306">    }</span>
-<span class="ln" id="L307"></span>
-<span class="ln" id="L308">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L309">    <span class="tok-kw">fn</span> <span class="tok-fn">a_delay_is_described_the_way_a_person_would_say_it</span>() {</span>
-<span class="ln" id="L310">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">300</span>), <span class="tok-str">&quot;5 minutes&quot;</span>);</span>
-<span class="ln" id="L311">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">3_600</span>), <span class="tok-str">&quot;1 hour&quot;</span>);</span>
-<span class="ln" id="L312">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">2</span> * <span class="tok-num">3_600</span>), <span class="tok-str">&quot;2 hours&quot;</span>);</span>
-<span class="ln" id="L313">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">86_400</span>), <span class="tok-str">&quot;1 day&quot;</span>);</span>
-<span class="ln" id="L314">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">48</span> * <span class="tok-num">3_600</span>), <span class="tok-str">&quot;2 days&quot;</span>);</span>
-<span class="ln" id="L315">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">90</span>), <span class="tok-str">&quot;90 seconds&quot;</span>);</span>
-<span class="ln" id="L316">    }</span>
-<span class="ln" id="L317"></span>
-<span class="ln" id="L318">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L319">    <span class="tok-kw">fn</span> <span class="tok-fn">every_choice_has_a_readable_name</span>() {</span>
-<span class="ln" id="L320">        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> CHOICES {</span>
-<span class="ln" id="L321">            <span class="tok-kw">let</span> text = <span class="tok-fn">describe_secs</span>(*choice);</span>
-<span class="ln" id="L322">            assert!(!text.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L323">            assert!(!text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;second&quot;</span>), <span class="tok-str">&quot;{text} should be minutes or more&quot;</span>);</span>
-<span class="ln" id="L324">        }</span>
+<span class="ln" id="L291">        .<span class="tok-fn">sane</span>();</span>
+<span class="ln" id="L292">        assert!(</span>
+<span class="ln" id="L293">            backwards.floor_secs &lt; backwards.ceiling_secs,</span>
+<span class="ln" id="L294">            <span class="tok-str">&quot;ends swapped&quot;</span></span>
+<span class="ln" id="L295">        );</span>
+<span class="ln" id="L296">        assert!(backwards.after_secs &gt;= backwards.floor_secs);</span>
+<span class="ln" id="L297">    }</span>
+<span class="ln" id="L298"></span>
+<span class="ln" id="L299">    <span class="tok-com">/// The user may move the ends of the range, so a delay outside the default</span></span>
+<span class="ln" id="L300">    <span class="tok-com">/// one is not an error.</span></span>
+<span class="ln" id="L301">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L302">    <span class="tok-kw">fn</span> <span class="tok-fn">a_range_the_user_widened_is_kept</span>() {</span>
+<span class="ln" id="L303">        <span class="tok-kw">let</span> wide = Autolock {</span>
+<span class="ln" id="L304">            enabled: true,</span>
+<span class="ln" id="L305">            after_secs: <span class="tok-num">60</span>,</span>
+<span class="ln" id="L306">            floor_secs: <span class="tok-num">30</span>,</span>
+<span class="ln" id="L307">            ceiling_secs: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
+<span class="ln" id="L308">        }</span>
+<span class="ln" id="L309">        .<span class="tok-fn">sane</span>();</span>
+<span class="ln" id="L310">        assert_eq!(wide.after_secs, <span class="tok-num">60</span>, <span class="tok-str">&quot;a minute is inside the widened range&quot;</span>);</span>
+<span class="ln" id="L311">        assert_eq!(wide.floor_secs, <span class="tok-num">30</span>);</span>
+<span class="ln" id="L312">        assert_eq!(wide.ceiling_secs, <span class="tok-num">7</span> * <span class="tok-num">86_400</span>);</span>
+<span class="ln" id="L313">    }</span>
+<span class="ln" id="L314"></span>
+<span class="ln" id="L315">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L316">    <span class="tok-kw">fn</span> <span class="tok-fn">typed_delays_are_read_the_way_they_are_written</span>() {</span>
+<span class="ln" id="L317">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;20&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">20</span> * <span class="tok-num">60</span>), <span class="tok-str">&quot;a bare number is minutes&quot;</span>);</span>
+<span class="ln" id="L318">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;20m&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">20</span> * <span class="tok-num">60</span>));</span>
+<span class="ln" id="L319">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;20 minutes&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">20</span> * <span class="tok-num">60</span>));</span>
+<span class="ln" id="L320">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;2h&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">2</span> * <span class="tok-num">3_600</span>));</span>
+<span class="ln" id="L321">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;2 hours&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">2</span> * <span class="tok-num">3_600</span>));</span>
+<span class="ln" id="L322">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1d&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">86_400</span>));</span>
+<span class="ln" id="L323">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;90 sec&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">90</span>));</span>
+<span class="ln" id="L324">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;  3 HRS &quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-num">3</span> * <span class="tok-num">3_600</span>));</span>
 <span class="ln" id="L325">    }</span>
-<span class="ln" id="L326">}</span>
+<span class="ln" id="L326"></span>
+<span class="ln" id="L327">    <span class="tok-com">/// Refusing beats guessing: a number nobody meant, silently applied, is a</span></span>
+<span class="ln" id="L328">    <span class="tok-com">/// window that locks at a time its owner cannot explain.</span></span>
+<span class="ln" id="L329">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L330">    <span class="tok-kw">fn</span> <span class="tok-fn">nonsense_is_refused_rather_than_guessed_at</span>() {</span>
+<span class="ln" id="L331">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;soon&quot;</span>, <span class="tok-str">&quot;-5&quot;</span>, <span class="tok-str">&quot;0&quot;</span>, <span class="tok-str">&quot;5 fortnights&quot;</span>, <span class="tok-str">&quot;m&quot;</span>, <span class="tok-str">&quot;1e999d&quot;</span>] {</span>
+<span class="ln" id="L332">            assert_eq!(<span class="tok-fn">parse</span>(bad), None, <span class="tok-str">&quot;{bad:?} should not parse&quot;</span>);</span>
+<span class="ln" id="L333">        }</span>
+<span class="ln" id="L334">    }</span>
+<span class="ln" id="L335"></span>
+<span class="ln" id="L336">    <span class="tok-com">/// A huge typed number must not wrap into a small one and lock the window</span></span>
+<span class="ln" id="L337">    <span class="tok-com">/// immediately, which is the opposite of what was asked for.</span></span>
+<span class="ln" id="L338">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L339">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_number_does_not_wrap_into_a_tiny_delay</span>() {</span>
+<span class="ln" id="L340">        <span class="tok-kw">for</span> absurd <span class="tok-kw">in</span> [<span class="tok-str">&quot;99999999999999999999d&quot;</span>, <span class="tok-str">&quot;1e30h&quot;</span>] {</span>
+<span class="ln" id="L341">            <span class="tok-kw">match</span> <span class="tok-fn">parse</span>(absurd) {</span>
+<span class="ln" id="L342">                None =&gt; {}</span>
+<span class="ln" id="L343">                <span class="tok-fn">Some</span>(secs) =&gt; assert!(</span>
+<span class="ln" id="L344">                    secs &gt; CEILING_SECS,</span>
+<span class="ln" id="L345">                    <span class="tok-str">&quot;{absurd:?} parsed as {secs}s, which is shorter than the ceiling&quot;</span></span>
+<span class="ln" id="L346">                ),</span>
+<span class="ln" id="L347">            }</span>
+<span class="ln" id="L348">        }</span>
+<span class="ln" id="L349">    }</span>
+<span class="ln" id="L350"></span>
+<span class="ln" id="L351">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L352">    <span class="tok-kw">fn</span> <span class="tok-fn">a_delay_is_described_the_way_a_person_would_say_it</span>() {</span>
+<span class="ln" id="L353">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">300</span>), <span class="tok-str">&quot;5 minutes&quot;</span>);</span>
+<span class="ln" id="L354">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">3_600</span>), <span class="tok-str">&quot;1 hour&quot;</span>);</span>
+<span class="ln" id="L355">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">2</span> * <span class="tok-num">3_600</span>), <span class="tok-str">&quot;2 hours&quot;</span>);</span>
+<span class="ln" id="L356">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">86_400</span>), <span class="tok-str">&quot;1 day&quot;</span>);</span>
+<span class="ln" id="L357">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">48</span> * <span class="tok-num">3_600</span>), <span class="tok-str">&quot;2 days&quot;</span>);</span>
+<span class="ln" id="L358">        assert_eq!(<span class="tok-fn">describe_secs</span>(<span class="tok-num">90</span>), <span class="tok-str">&quot;90 seconds&quot;</span>);</span>
+<span class="ln" id="L359">    }</span>
+<span class="ln" id="L360"></span>
+<span class="ln" id="L361">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L362">    <span class="tok-kw">fn</span> <span class="tok-fn">every_choice_has_a_readable_name</span>() {</span>
+<span class="ln" id="L363">        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> CHOICES {</span>
+<span class="ln" id="L364">            <span class="tok-kw">let</span> text = <span class="tok-fn">describe_secs</span>(*choice);</span>
+<span class="ln" id="L365">            assert!(!text.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L366">            assert!(!text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;second&quot;</span>), <span class="tok-str">&quot;{text} should be minutes or more&quot;</span>);</span>
+<span class="ln" id="L367">        }</span>
+<span class="ln" id="L368">    }</span>
+<span class="ln" id="L369">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

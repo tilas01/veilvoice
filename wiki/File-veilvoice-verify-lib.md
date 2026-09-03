@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/lib.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1894 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1893 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ Give it arguments and it does exactly what you asked.
 
 ## What this file contains
 
-1894 lines defining **34 functions** (2 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1893 lines defining **34 functions** (2 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
