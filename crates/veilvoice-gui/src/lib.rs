@@ -80,6 +80,7 @@ pub mod storage;
 pub mod theme;
 pub mod tour;
 pub mod updates;
+pub mod vault_store;
 pub mod verify;
 pub mod watchfeed;
 pub mod window;

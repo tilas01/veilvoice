@@ -320,6 +320,11 @@ pub struct VeilVoiceApp {
     // because this type already has a `settings` method, which is the engine's
     // intensity and accent controls -- a different thing entirely.
     preferences: crate::settings::Settings,
+    /// Where VeilVoice keeps its own files, obfuscated once a lock is set.
+    ///
+    /// Opened by the key the unlock derives and closed when the window locks,
+    /// so between those two moments there is no key in the process at all.
+    files: crate::vault_store::VaultStore,
 
     // Settings somebody else fixed. Read once; never asks for a passphrase.
     policy: InForce,
@@ -459,6 +464,9 @@ impl VeilVoiceApp {
             // because of something on this machine's disk.
             group: crate::group::Group::default(),
             preferences: crate::settings::Settings::default(),
+            files: crate::vault_store::VaultStore::new(
+                crate::prefs::default_path().and_then(|p| p.parent().map(|d| d.to_path_buf())),
+            ),
             // No policy here, so `without_devices` and `Default` touch no file
             // that belongs to the user. `VeilVoiceApp::new` loads the real one,
             // exactly as it does for the app lock.
@@ -819,6 +827,36 @@ impl eframe::App for VeilVoiceApp {
         }
         if let Some(passphrase) = self.security.take_unlock_passphrase() {
             self.integrity.start(Some(passphrase));
+        }
+        // The obfuscated program folder, opened with the key the unlock
+        // derived. Everything VeilVoice keeps about itself moves in on the
+        // first unlock after a lock is set, and the audit that comes back says
+        // whether anything in there was edited or removed while the window was
+        // shut. See `crate::vault_store` for what that is worth and, just as
+        // importantly, what it is not.
+        if let Some(key) = self.security.take_unlock_store_key() {
+            match self.files.unlocked(key) {
+                Ok(audit) => {
+                    if !audit.is_clean() {
+                        // Said to somebody who has just proved the passphrase,
+                        // which is the only person it should be said to. The
+                        // count is what is actionable; which record it was is
+                        // on the security tab.
+                        let touched = audit.tampered.len() + audit.missing.len();
+                        self.notice = Some(crate::notify::Notice::warn(format!(
+                            "{touched} of VeilVoice's own files changed while it was                              closed. The security tab says which."
+                        )));
+                    }
+                }
+                Err(why) => {
+                    self.notice = Some(crate::notify::Notice::warn(format!(
+                        "the program folder could not be opened: {why}"
+                    )))
+                }
+            }
+        }
+        if self.security.is_locked() {
+            self.files.locked();
         }
         // Marker 86, kept in step. `set_` is a no-op when nothing changed, so
         // this costs a comparison per frame and never a write.
