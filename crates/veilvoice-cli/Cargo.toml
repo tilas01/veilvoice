@@ -19,6 +19,10 @@ default = ["live"]
 live = ["veilvoice-audio/live"]
 
 [dependencies]
+# The verifier, folded in so a release is checked by the same program it ships
+# beside rather than by a second binary somebody has to find. It was a binary
+# of its own until 0.1.18; `src/lib.rs` there says what that cost.
+veilvoice-verify = { path = "../veilvoice-verify" }
 veilvoice-gnupg = { path = "../veilvoice-gnupg" }
 veilvoice-check = { path = "../veilvoice-check" }
 veilvoice-core = { path = "../veilvoice-core" }

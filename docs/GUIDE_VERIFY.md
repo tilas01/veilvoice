@@ -5,24 +5,23 @@
 
 # VeilVoice: checking a download
 
-**`veilvoice-verify`.** Read this one first. It is about deciding whether the archive you just downloaded is the one that was published, and it is a separate program so that it is usable *before* you trust the other two.
+**`veilvoice verify`.** Read this one first. It is about deciding whether the archive you just downloaded is the one that was published.
 
-The short version: unpack the archive, run `veilvoice-verify` inside the folder, read the verdict.
+The short version: unpack the archive, run `veilvoice verify` inside the folder, read the verdict. If you would rather not use a terminal, the desktop application's Verify tab does the same check with the same code underneath.
 
 The whole story, including the parts about the other two programs, is in [`USER_GUIDE.md`](USER_GUIDE.md). This is the same text, narrowed to one program.
 
 ---
 
-## 1. The three programs, and which one you want
+## 1. The two programs, and which one you want
 
-A release contains three executables. They overlap on purpose, and which one to
+A release contains two executables. They overlap on purpose, and which one to
 reach for depends only on what you have in front of you.
 
 | Program | What it is for |
 |---|---|
-| `veilvoice` | The command line. Everything the application does, over SSH, in a container, in a script, or on a machine with no graphics toolkit at all. |
-| `veilvoice-gui` | The window. The same engine with somewhere to click, plus the things that only make sense with a screen: live level meters, the app lock, the microphone monitor. |
-| `veilvoice-verify` | Checking that the download you just made is the one that was published. It is a separate program so that it is usable before you trust the other two. |
+| `veilvoice` | The command line. Everything the application does, over SSH, in a container, in a script, or on a machine with no graphics toolkit at all. Checking a download is `veilvoice verify`, which was a third binary until 0.1.18. |
+| `veilvoice-gui` | The window. The same engine with somewhere to click, plus the things that only make sense with a screen: live level meters, the app lock, the microphone monitor, and a Verify tab that runs the same check as `veilvoice verify`. |
 
 ### Which parts are built in, and which are not
 
@@ -32,7 +31,7 @@ no service, no plugin directory, and nothing is downloaded on first run.
 That includes the parts people expect to be separate:
 
 - **The signature check.** The signing key is compiled into the programs, and
-  the OpenPGP verification is Rust code in this repository. `veilvoice-verify`
+  the OpenPGP verification is Rust code in this repository. `veilvoice verify`
   needs no GnuPG to do its job.
 - **The audio decoders**, the resampler, the encryption, the key exchange, the
   hashing. All of it is in the binary.
@@ -175,16 +174,26 @@ nothing else.
 
 ---
 
-## 2. The verifier, `veilvoice-verify`
+## 2. The verifier, `veilvoice verify`
 
-A separate program, in the same archive, for one job: deciding whether the
-download you just made is the one that was published. It is separate so that it
-is usable *before* you trust the other two.
+One job: deciding whether the download you just made is the one that was
+published.
+
+Until 0.1.18 this was a third binary, `veilvoice verify`, shipped beside the
+other two so it was usable *before* you trusted them. That argument was always
+thinner than it looked -- the separate program came out of the same archive as
+everything else, so trusting it was the same act of trust -- and it cost every
+user a second file to find and a third name to learn. It is part of `veilvoice`
+now. The check is identical: the same code, in `veilvoice-check`, that the
+desktop application's Verify tab has always called.
+
+If you would rather not use a terminal at all, the Verify tab does the whole of
+this with the same code underneath.
 
 ### Just run it
 
 ```bash
-veilvoice-verify
+veilvoice verify
 ```
 
 With no arguments it looks for a release around it: the folder you are in, the
@@ -192,8 +201,8 @@ folder above, the one the program itself is in, and Downloads and Desktop. If
 it finds an archive with a `SHA256SUMS` and a signature beside it, it checks
 everything without being told anything.
 
-That is the intended way to use it. Unpack the archive, run the program inside
-the folder, read the verdict.
+That is the intended way to use it. Unpack the archive, run it inside the
+folder, read the verdict.
 
 ### What one press actually checks
 
@@ -213,8 +222,8 @@ Four things, in the order that makes each one worth checking:
 ### Pointing it at something specific
 
 ```bash
-veilvoice-verify auto ~/Downloads          # look here, not wherever I am
-veilvoice-verify file veilvoice.tar.gz     # this file, against SHA256SUMS
+veilvoice verify auto ~/Downloads          # look here, not wherever I am
+veilvoice verify file veilvoice.tar.gz     # this file, against SHA256SUMS
 ```
 
 A folder you name that does not exist is an error, not an invitation to go and
@@ -240,7 +249,7 @@ veilvoice verify --script       # a shell script that uses gpg and nothing of ou
 ```
 
 The script is about sixty lines. Read it before running it: the entire reason
-to use it rather than `veilvoice-verify` is that it is not this project's code.
+to use it rather than `veilvoice verify` is that it is not this project's code.
 
 ### The strongest check, which no program here can do for you
 

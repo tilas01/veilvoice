@@ -4756,6 +4756,7 @@ dependencies = [
  "veilvoice-proc",
  "veilvoice-sentry",
  "veilvoice-setup",
+ "veilvoice-verify",
  "veilvoice-video",
  "veilvoice-watch",
  "winresource",

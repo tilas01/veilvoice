@@ -84,9 +84,9 @@ rather than describing them as future work.
 
 ## How do I know the download is the one that was published?
 
-Put `veilvoice-verify` in the folder you downloaded to and run it, or drop the
-archive on the desktop application's verify tab. That is the whole instruction,
-and it does every check below in the right order.
+Run `veilvoice verify` in the folder you downloaded to, or drop the archive on
+the desktop application's verify tab. That is the whole instruction, and it
+does every check below in the right order.
 
 The checks, and the order is the point:
 
@@ -100,7 +100,7 @@ The checks, and the order is the point:
    the zip was.
 
 Checking the hash first and the signature afterwards proves only that the file
-matches a list that might itself have been replaced. `veilvoice-verify` does it
+matches a list that might itself have been replaced. `veilvoice verify` does it
 in the right order, needs no GnuPG installed, and has no flag that skips a
 step, because a verification with a skip switch is decorative.
 

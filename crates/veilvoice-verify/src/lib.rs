@@ -154,20 +154,32 @@ fn verify_detached(key: &SignedPublicKey, signature: &str, data: &[u8]) -> Resul
     veilvoice_check::verify_detached(key, signature, data).map_err(|error| error.to_string())
 }
 
+/// The verifier's own help, with its verbosity and exit-status tables.
+///
+/// Exposed so `veilvoice verify --help` can print it. clap knows the flags
+/// this command adds; it does not know the verifier's subcommands, and a help
+/// page that lists half the commands is worse than one that lists none.
+pub fn help_text() -> String {
+    format!("{USAGE}\n{}\n{}", Loudness::table(), Status::table())
+}
+
 const USAGE: &str = "\
-veilvoice-verify -- check a VeilVoice download, with or without GnuPG
+veilvoice verify -- check a VeilVoice download, with or without GnuPG
 
 IF YOU ONLY READ ONE LINE
-  Put this program in the folder you downloaded to and run it. That is all.
-  It finds the release, checks the signature, checks the archive, and checks
-  every file you extracted out of it, one by one.
+  Open a terminal in the folder you downloaded to and run `veilvoice verify`.
+  That is all. It finds the release, checks the signature, checks the archive,
+  and checks every file you extracted out of it, one by one.
+
+  If you would rather not use a terminal, the desktop application does the
+  same check in its Verify tab, with the same code underneath.
 
 USAGE
   veilvoice-verify
-  veilvoice-verify auto [DIRECTORY]
+  veilvoice verify auto [DIRECTORY]
       Find a downloaded release near you and check all of it, with nothing
       else to type. Looks in the directory given, then the current one, then
-      beside this program, then your Downloads and Desktop.
+      beside the VeilVoice program, then your Downloads and Desktop.
 
       In order, and each step only if the one before it passed:
         1. the signature over SHA256SUMS
@@ -181,60 +193,60 @@ USAGE
       v0.1.15 carry no CONTENTS.sha256 and are checked as far as step 2,
       which it says at the time.
 
-      Entirely offline. This is also what double-clicking the program does.
+      Entirely offline.
 
-  veilvoice-verify gnupg [DIRECTORY]
+  veilvoice verify gnupg [DIRECTORY]
       The same check through the GnuPG on this machine rather than the key
-      built into this program. It adds the VeilVoice public key to your
+      built into VeilVoice. It adds the VeilVoice public key to your
       keyring, tells you it did and how to remove it, runs gpg, and prints
       what gpg said. It also prints the commands so you can run them
       yourself, which is the part no program can do for you: the one telling
       you a download is genuine came out of that download.
 
-  veilvoice-verify key
-      Print the signing key this binary carries, and its fingerprint.
+  veilvoice verify key
+      Print the signing key VeilVoice carries, and its fingerprint.
       Compare it against README.md and https://tilas01.github.io/veilvoice/
 
-  veilvoice-verify sums <SHA256SUMS> <SHA256SUMS.asc>
+  veilvoice verify sums <SHA256SUMS> <SHA256SUMS.asc>
       Check the signature over a hash list.
 
-  veilvoice-verify file <FILE> --sums <SHA256SUMS> --sig <SHA256SUMS.asc>
+  veilvoice verify file <FILE> --sums <SHA256SUMS> --sig <SHA256SUMS.asc>
       Check the signature over the hash list, then check FILE against it.
       Proves the download is INTACT.
 
-  veilvoice-verify file <FILE> --sha256 <HEX>
+  veilvoice verify file <FILE> --sha256 <HEX>
       Check FILE against a hash you supply. If that hash came from somebody
       else's independent build of the same tagged source, this proves the
       release is REPRODUCIBLE -- a stronger claim. See --explain.
 
-  veilvoice-verify hash <FILE>
+  veilvoice verify hash <FILE>
       Print the SHA-256 of a file. Nothing is verified.
 
-  veilvoice-verify release <TAG> [ASSET]
+  veilvoice verify release <TAG> [ASSET]
       Fetch a release and check it, in one step. With no ASSET, downloads and
       verifies the hash list itself; with one, downloads that file too and
       checks it against the signed list.
 
-        veilvoice-verify release v0.1.11
-        veilvoice-verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz
+        veilvoice verify release v0.1.11
+        veilvoice verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz
 
-  veilvoice-verify --explain
+  veilvoice verify --explain
       What 'intact' and 'reproducible' each mean, and why they differ.
 
 BUILDING IT YOURSELF
   A signature says who made a file. Only a build says what it is made of.
 
-  veilvoice-verify deps
+  veilvoice verify deps
       What a build needs on this machine, and which of it is already here.
       Add --install to be offered the missing pieces one at a time, with the
       exact command shown before each question. --yes answers them all in
       advance, which is the same explicit yes given in writing.
 
-  veilvoice-verify build [DIR]
+  veilvoice verify build [DIR]
       Build the workspace from source and print the hash of everything a
       release ships. DIR defaults to the current directory.
 
-  veilvoice-verify reproduce [DIR] --sums SHA256SUMS --sig SHA256SUMS.asc
+  veilvoice verify reproduce [DIR] --sums SHA256SUMS --sig SHA256SUMS.asc
       Build here, then compare against the published hashes for this
       platform. The signature is verified before any hash from the list is
       read.
@@ -249,7 +261,7 @@ BUILDING IT YOURSELF
       and the exit status is 5, which is deliberately not the status that
       means tampering.
 
-  veilvoice-verify install --from DIR --cli --gui
+  veilvoice verify install --from DIR --cli --gui
       Copy the binaries in DIR to where a shell will find them. This command
       copies; it does not verify. Check DIR first with `file` or `reproduce`,
       so the yes you give is to one thing rather than two.
@@ -258,8 +270,8 @@ THE NETWORK
   Every command above except `release` is entirely offline.
 
   `release` downloads, and it does so through the tool your operating system
-  already ships -- curl on Windows and macOS, curl or wget elsewhere. This
-  binary contains no HTTP client: VeilVoice has no networking crate anywhere in
+  already ships -- curl on Windows and macOS, curl or wget elsewhere. VeilVoice
+  contains no HTTP client: VeilVoice has no networking crate anywhere in
   its dependency graph, which you can check yourself with `cargo tree`.
 
   Only one host is ever contacted and it is compiled in. There is no way to
@@ -423,7 +435,7 @@ fn read_text(path: &Path) -> Result<String, String> {
 
 fn command_key() -> ExitCode {
     match embedded_key() {
-        Err(why) => deny("the key compiled into this binary is not usable", &[&why]),
+        Err(why) => deny("the key compiled into VeilVoice is not usable", &[&why]),
         Ok(key) => {
             out!();
             verdict!("  fingerprint  {}", fingerprint_of(&key));
@@ -443,7 +455,7 @@ fn command_key() -> ExitCode {
 fn command_sums(sums_path: &Path, sig_path: &Path) -> ExitCode {
     let key = match embedded_key() {
         Ok(key) => key,
-        Err(why) => return deny("the key compiled into this binary is not usable", &[&why]),
+        Err(why) => return deny("the key compiled into VeilVoice is not usable", &[&why]),
     };
     good(&format!("embedded key fingerprint {FINGERPRINT}"));
 
@@ -462,7 +474,7 @@ fn command_sums(sums_path: &Path, sig_path: &Path) -> ExitCode {
             out!();
             verdict!("  That hash list is genuinely the one signed by {FINGERPRINT}.");
             out!("  It does not yet say anything about any particular file --");
-            out!("  use `veilvoice-verify file` for that.");
+            out!("  use `veilvoice verify file` for that.");
             out!();
             ExitCode::SUCCESS
         }
@@ -481,7 +493,7 @@ fn command_sums(sums_path: &Path, sig_path: &Path) -> ExitCode {
 fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> ExitCode {
     let key = match embedded_key() {
         Ok(key) => key,
-        Err(why) => return deny("the key compiled into this binary is not usable", &[&why]),
+        Err(why) => return deny("the key compiled into VeilVoice is not usable", &[&why]),
     };
     good(&format!("embedded key fingerprint {FINGERPRINT}"));
 
@@ -563,7 +575,7 @@ fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> 
     out!("  That is not the same as knowing it was built from the published");
     out!("  source -- the same person produced the binary and the list. For");
     out!("  that, compare against a hash somebody else produced from their own");
-    out!("  build:  veilvoice-verify --explain");
+    out!("  build:  veilvoice verify --explain");
     out!();
     ExitCode::SUCCESS
 }
@@ -615,7 +627,7 @@ fn command_file_against_hash(file: &Path, expected: &str) -> ExitCode {
     out!("      release is REPRODUCIBLE, which is the stronger claim.");
     out!();
     out!("  This tool cannot tell which, so it does not guess.");
-    out!("  veilvoice-verify --explain");
+    out!("  veilvoice verify --explain");
     out!();
     ExitCode::SUCCESS
 }
@@ -657,14 +669,14 @@ fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
     if !fetch::valid_tag(tag) {
         return usage(
             "that does not look like a release tag",
-            &["veilvoice-verify release v0.1.11"],
+            &["veilvoice verify release v0.1.11"],
         );
     }
     if let Some(name) = asset {
         if !fetch::valid_asset(name) {
             return usage(
                 "that does not look like a release file name",
-                &["veilvoice-verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz"],
+                &["veilvoice verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz"],
             );
         }
     }
@@ -745,7 +757,7 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
     // person typed appearing anywhere in the output.
     //
     // So somebody who mistypes a path is told a release is genuine, about a
-    // folder they did not ask about, and `veilvoice-verify auto "$DIR" ||
+    // folder they did not ask about, and `veilvoice verify auto "$DIR" ||
     // exit 1` in a script passes. A verifier answering a question it was not
     // asked is the one thing this program must not do.
     if let Some(named) = explicit {
@@ -777,7 +789,7 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
                 "Put the archive, SHA256SUMS and SHA256SUMS.asc in one folder and run this",
                 "again from there -- or name the folder:",
                 "",
-                "  veilvoice-verify auto <DIRECTORY>",
+                "  veilvoice verify auto <DIRECTORY>",
             ],
         );
     }
@@ -1230,7 +1242,7 @@ fn command_gnupg(explicit: Option<&Path>) -> ExitCode {
                 "Looked in: the directory given, the current directory, the folder this",
                 "program is in, and your Downloads and Desktop.",
                 "",
-                "  veilvoice-verify gnupg <DIRECTORY>",
+                "  veilvoice verify gnupg <DIRECTORY>",
             ],
         );
     };
@@ -1239,7 +1251,7 @@ fn command_gnupg(explicit: Option<&Path>) -> ExitCode {
     out!();
     let wrong = report_gnupg(&found);
     out!("  The fingerprint to compare against is on the release page and in");
-    out!("  README.md. `veilvoice-verify key` prints the one this binary carries.");
+    out!("  README.md. `veilvoice verify key` prints the one this binary carries.");
     if wrong > 0 {
         return Status::Refused.into();
     }
@@ -1259,13 +1271,6 @@ fn command_gnupg(explicit: Option<&Path>) -> ExitCode {
 /// `#![forbid(unsafe_code)]`. **No arguments** is the safe stand-in: somebody
 /// running this from a terminal almost always types a subcommand, and somebody
 /// who types the bare name gets one extra keypress.
-fn wait_before_the_window_closes() {
-    out!();
-    out!("Press Enter to close.");
-    let mut discard = String::new();
-    let _ = std::io::stdin().read_line(&mut discard);
-}
-
 // ---------------------------------------------------------------------------
 // Building it yourself
 // ---------------------------------------------------------------------------
@@ -1289,7 +1294,7 @@ fn command_deps(offer_to_install: bool, always_yes: bool) -> ExitCode {
 
     if !offer_to_install {
         out!();
-        out!("Nothing has been installed. `veilvoice-verify deps --install` offers to.");
+        out!("Nothing has been installed. `veilvoice verify deps --install` offers to.");
         return if satisfied {
             // Only optional things are missing, so a build will still work --
             // with less in it. That is not a failure.
@@ -1377,7 +1382,7 @@ fn do_build(
     let (satisfied, _) = builder::report_dependencies();
     if !satisfied {
         out!();
-        out!("`veilvoice-verify deps --install` offers to install them.");
+        out!("`veilvoice verify deps --install` offers to install them.");
         return Err(Status::DependenciesMissing.into());
     }
 
@@ -1443,7 +1448,7 @@ fn command_reproduce(
 ) -> ExitCode {
     let key = match embedded_key() {
         Ok(key) => key,
-        Err(why) => return deny("the key compiled into this binary is not usable", &[&why]),
+        Err(why) => return deny("the key compiled into VeilVoice is not usable", &[&why]),
     };
     let sums_bytes = match std::fs::read(sums_path) {
         Ok(bytes) => bytes,
@@ -1568,7 +1573,7 @@ fn command_install(from: &Path, cli: bool, gui: bool) -> ExitCode {
     if wanted.is_empty() {
         return usage(
             "nothing was selected to install",
-            &["veilvoice-verify install --from <DIR> --cli --gui"],
+            &["veilvoice verify install --from <DIR> --cli --gui"],
         );
     }
 
@@ -1637,9 +1642,26 @@ fn asked_for(text: &str) {
     print!("{text}");
 }
 
-fn main() -> ExitCode {
-    let mut args: Vec<String> = std::env::args().skip(1).collect();
-
+/// Run the verifier over `args`, which are the words after `veilvoice verify`.
+///
+/// This was `fn main` in a binary of its own until the verifier was folded
+/// into `veilvoice`. The body is unchanged: the same commands, the same
+/// output, the same exit statuses. What changed is who calls it.
+///
+/// # The double-click that used to work
+///
+/// The standalone binary did the useful thing when run with no arguments --
+/// looked for a release nearby, checked it, and waited so the window did not
+/// vanish -- because a person who has just downloaded a zip and is nervous
+/// about it will double-click the small program next to it. That flow is gone
+/// with the binary, and it is worth naming rather than quietly dropping.
+///
+/// What replaces it is the desktop application's verify tab, which does the
+/// same check with the same code in `veilvoice-check`, and `veilvoice verify`
+/// with no arguments, which still runs `auto`. The waiting-for-Enter is not
+/// kept: a subcommand of a command-line tool is being run from a shell that
+/// is not about to close.
+pub fn run(mut args: Vec<String>) -> ExitCode {
     // Before a single line is printed, and before the arguments are read for
     // anything else: `--quiet` has to mean quiet from the first word, and the
     // verbosity flags are not positional.
@@ -1649,9 +1671,7 @@ fn main() -> ExitCode {
     // look for a release nearby and check it -- and then wait, so the window
     // does not vanish before it has been read.
     if args.is_empty() {
-        let outcome = command_auto(None);
-        wait_before_the_window_closes();
-        return outcome;
+        return command_auto(None);
     }
 
     if args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
@@ -1671,7 +1691,7 @@ fn main() -> ExitCode {
         return ExitCode::SUCCESS;
     }
     if args[0] == "--version" {
-        asked_for(&format!("veilvoice-verify {}\n", env!("CARGO_PKG_VERSION")));
+        asked_for(&format!("veilvoice verify {}\n", env!("CARGO_PKG_VERSION")));
         return ExitCode::SUCCESS;
     }
     if args[0] == "--exit-status" {
@@ -1718,7 +1738,7 @@ fn main() -> ExitCode {
                     _ => Ok(()),
                 };
                 if let Err(why) = result {
-                    return usage(&why, &["veilvoice-verify --help"]);
+                    return usage(&why, &["veilvoice verify --help"]);
                 }
                 index += if args[index].starts_with("--") { 2 } else { 1 };
             }
@@ -1729,7 +1749,7 @@ fn main() -> ExitCode {
                 _ => usage(
                     "`reproduce` needs the published hash list and its signature",
                     &[
-                        "veilvoice-verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc",
+                        "veilvoice verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc",
                         "",
                         "Both are on the release page. Without the signature there is",
                         "nothing to check the list against, and an unverified list is a",
@@ -1749,7 +1769,7 @@ fn main() -> ExitCode {
                     other => Err(format!("unknown option: {other}")),
                 };
                 if let Err(why) = result {
-                    return usage(&why, &["veilvoice-verify --help"]);
+                    return usage(&why, &["veilvoice verify --help"]);
                 }
                 index += if args[index] == "--from" { 2 } else { 1 };
             }
@@ -1760,7 +1780,7 @@ fn main() -> ExitCode {
                 None => usage(
                     "`install` needs a directory to install from",
                     &[
-                        "veilvoice-verify install --from target/release --cli --gui",
+                        "veilvoice verify install --from target/release --cli --gui",
                         "",
                         "Check that directory first, with `file` or `reproduce`.",
                         "This command copies; it does not verify.",
@@ -1773,20 +1793,20 @@ fn main() -> ExitCode {
             Some(tag) => command_release(tag, args.get(2).map(String::as_str)),
             None => usage(
                 "`release` needs a tag",
-                &["veilvoice-verify release v0.1.11"],
+                &["veilvoice verify release v0.1.11"],
             ),
         },
 
         "hash" => match args.get(1) {
             Some(path) => command_hash(Path::new(path)),
-            None => usage("`hash` needs a file", &["veilvoice-verify hash <FILE>"]),
+            None => usage("`hash` needs a file", &["veilvoice verify hash <FILE>"]),
         },
 
         "sums" => {
             if args.len() < 3 {
                 return usage(
                     "`sums` needs a hash list and a signature",
-                    &["veilvoice-verify sums <SHA256SUMS> <SHA256SUMS.asc>"],
+                    &["veilvoice verify sums <SHA256SUMS> <SHA256SUMS.asc>"],
                 );
             }
             command_sums(Path::new(&args[1]), Path::new(&args[2]))
@@ -1798,7 +1818,7 @@ fn main() -> ExitCode {
                 None => {
                     return usage(
                         "`file` needs a file to check",
-                        &["veilvoice-verify file <FILE> --sums <SHA256SUMS> --sig <SIG>"],
+                        &["veilvoice verify file <FILE> --sums <SHA256SUMS> --sig <SIG>"],
                     )
                 }
             };
@@ -1815,7 +1835,7 @@ fn main() -> ExitCode {
                     other => Err(format!("unknown option: {other}")),
                 };
                 if let Err(why) = result {
-                    return usage(&why, &["veilvoice-verify --help"]);
+                    return usage(&why, &["veilvoice verify --help"]);
                 }
                 index += 2;
             }
@@ -1830,7 +1850,7 @@ fn main() -> ExitCode {
                         "  --sums/--sig  proves the download is INTACT",
                         "  --sha256      can prove it is REPRODUCIBLE",
                         "",
-                        "veilvoice-verify --explain",
+                        "veilvoice verify --explain",
                     ],
                 ),
                 (Some(hash), None, None) => command_file_against_hash(&file, &hash),
@@ -1856,7 +1876,7 @@ fn main() -> ExitCode {
                         "  --sums SHA256SUMS --sig SHA256SUMS.asc",
                         "  --sha256 <64 hex characters>",
                         "",
-                        "veilvoice-verify --explain",
+                        "veilvoice verify --explain",
                     ],
                 ),
             }
@@ -1864,7 +1884,7 @@ fn main() -> ExitCode {
 
         other => usage(
             &format!("unknown command: {other}"),
-            &["veilvoice-verify --help"],
+            &["veilvoice verify --help"],
         ),
     }
 }

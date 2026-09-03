@@ -61,7 +61,7 @@ argument is that you can check what you are running.
 | `veilvoice-drivers` | the loaded kernel drivers, and what changed since you last looked |
 | `veilvoice-capture` | which screen recorders are running, with an allowlist so they stop nagging |
 | `veilvoice-conversation` | several speakers in one recording, a voice each, and subtitles |
-| `veilvoice-verify` | a binary, not a library: see [INSTALL.md](INSTALL.md) |
+| `veilvoice-verify` | the verifier behind `veilvoice verify`; a library since 0.1.18, when it stopped being a binary of its own |
 
 ---
 

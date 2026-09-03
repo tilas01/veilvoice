@@ -35,16 +35,15 @@ folder and it is gone.
 
 ---
 
-## 2. The three programs, and which one you want
+## 2. The two programs, and which one you want
 
-A release contains three executables. They overlap on purpose, and which one to
+A release contains two executables. They overlap on purpose, and which one to
 reach for depends only on what you have in front of you.
 
 | Program | What it is for |
 |---|---|
-| `veilvoice` | The command line. Everything the application does, over SSH, in a container, in a script, or on a machine with no graphics toolkit at all. |
-| `veilvoice-gui` | The window. The same engine with somewhere to click, plus the things that only make sense with a screen: live level meters, the app lock, the microphone monitor. |
-| `veilvoice-verify` | Checking that the download you just made is the one that was published. It is a separate program so that it is usable before you trust the other two. |
+| `veilvoice` | The command line. Everything the application does, over SSH, in a container, in a script, or on a machine with no graphics toolkit at all. Checking a download is `veilvoice verify`, which was a third binary until 0.1.18. |
+| `veilvoice-gui` | The window. The same engine with somewhere to click, plus the things that only make sense with a screen: live level meters, the app lock, the microphone monitor, and a Verify tab that runs the same check as `veilvoice verify`. |
 
 ### Which parts are built in, and which are not
 
@@ -54,7 +53,7 @@ no service, no plugin directory, and nothing is downloaded on first run.
 That includes the parts people expect to be separate:
 
 - **The signature check.** The signing key is compiled into the programs, and
-  the OpenPGP verification is Rust code in this repository. `veilvoice-verify`
+  the OpenPGP verification is Rust code in this repository. `veilvoice verify`
   needs no GnuPG to do its job.
 - **The audio decoders**, the resampler, the encryption, the key exchange, the
   hashing. All of it is in the binary.
@@ -311,7 +310,7 @@ would put one person's words under another person's name.
 ### verify
 
 Check that a download is the one that was published, without leaving the
-window. This is the same check `veilvoice-verify` does, and §7 walks through
+window. This is the same check `veilvoice verify` does, and §7 walks through
 it in full.
 
 Drop the archive on the window and the hash list and signature beside it are

@@ -93,7 +93,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1873 lines"])
+    n_lib(["lib.rs<br/>1894 lines"])
     n_builder["builder.rs<br/>1148 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>460 lines"]
@@ -103,8 +103,8 @@ flowchart TD
     n_tests["tests.rs<br/>497 lines"]
     n_builder --> n_deps
     n_builder --> n_report
-    n_main --> n_report
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs" "open the source"
+    n_lib --> n_report
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" "open the source"
     click n_builder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" "open the source"
     click n_deps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs" "open the source"
     click n_discover href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" "open the source"
@@ -125,7 +125,7 @@ flowchart TD
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 312 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1873 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 1894 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 497 | The verifier's own tests. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Marker 97. |
@@ -184,6 +184,8 @@ flowchart TD
 | `const SIGNATURE` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) |  |
 | `fn valid_tag` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | A release tag, rejected unless it looks like one. |
 | `fn valid_asset` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | An asset filename, rejected unless it looks like one. |
+| `fn help_text` | [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | The verifier's own help, with its verbosity and exit-status tables. |
+| `fn run` | [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | Run the verifier over args, which are the words after veilvoice verify. |
 | `fn set_level` | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | Set the level. |
 | `fn level` | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | The level in force. |
 | `enum Status` | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | What happened, as a number a script can read. |

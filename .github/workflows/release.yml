@@ -177,15 +177,16 @@ jobs:
             # anyway. File processing, encryption and metadata cleaning are
             # pure Rust and work fine, so the feature is switched off rather
             # than the build failing.
-            # The verifier ships everywhere, including here. It has no audio,
-            # windowing or platform dependencies -- it reads two files and
-            # checks a signature -- and it is most useful precisely on the
-            # stripped-down targets, where GnuPG is least likely to be present.
-            echo "CARGO_ARGS=-p veilvoice-cli -p veilvoice-verify --no-default-features" >> "$GITHUB_ENV"
-            echo "BINARIES=veilvoice veilvoice-verify" >> "$GITHUB_ENV"
+            # The verifier ships everywhere, including here, and since 0.1.18
+            # it does so as part of `veilvoice` rather than as a binary of its
+            # own. It is most useful precisely on the stripped-down targets,
+            # where GnuPG is least likely to be present, which is why the
+            # command line is built even where the window is not.
+            echo "CARGO_ARGS=-p veilvoice-cli --no-default-features" >> "$GITHUB_ENV"
+            echo "BINARIES=veilvoice" >> "$GITHUB_ENV"
           else
             echo "CARGO_ARGS=--workspace" >> "$GITHUB_ENV"
-            echo "BINARIES=veilvoice veilvoice-gui veilvoice-verify" >> "$GITHUB_ENV"
+            echo "BINARIES=veilvoice veilvoice-gui" >> "$GITHUB_ENV"
           fi
           case "${{ matrix.target }}" in
             armv7-unknown-linux-gnueabihf)
@@ -399,14 +400,13 @@ jobs:
           prepare: pkg_add rust
           run: |
             set -e
-            cargo build --release --locked -p veilvoice-cli -p veilvoice-verify --no-default-features
+            cargo build --release --locked -p veilvoice-cli --no-default-features
             ./target/release/veilvoice info
       - name: Stage the archive
         run: |
           out="veilvoice-${{ env.VERSION_TAG }}-openbsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
-          cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
           cp README.md LICENSE "dist/$out/"
           cp -r docs "dist/$out/docs"
           # The per-file documentation references a generated SVG banner for
@@ -456,14 +456,13 @@ jobs:
           prepare: /usr/sbin/pkg_add rust
           run: |
             set -e
-            cargo build --release --locked -p veilvoice-cli -p veilvoice-verify --no-default-features
+            cargo build --release --locked -p veilvoice-cli --no-default-features
             ./target/release/veilvoice info
       - name: Stage the archive
         run: |
           out="veilvoice-${{ env.VERSION_TAG }}-netbsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
-          cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
           cp README.md LICENSE "dist/$out/"
           cp -r docs "dist/$out/docs"
           # The per-file documentation references a generated SVG banner for
