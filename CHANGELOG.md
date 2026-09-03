@@ -8,6 +8,80 @@ than a summary written afterwards.
 
 ## Unreleased
 
+## v0.1.18
+
+**The app lock now protects your files, not just the window**
+
+- Setting an app-lock password derives a third key beside the verifier, and
+  VeilVoice's own files (settings, measurements, the integrity record) are
+  encrypted under it, stored under meaningless base64 names, padded to a few
+  fixed sizes, with decoy files sown among them. Without the passphrase the
+  folder says nothing about what you have done. The module states plainly what
+  this buys and what it does not: it is not protection from someone with your
+  passphrase or while the app is open, and it does not hide that VeilVoice is
+  installed.
+- Before encryption, each record is put through one of thirty-one reversible
+  encodings drawn at random, and the sealed result through another, so a
+  plaintext buffer that escaped by some route other than the cipher does not
+  read as anything. This adds no cryptographic strength and says so; the
+  encryption is what keeps the file secret.
+
+**The app lock finally works from the window (F-141)**
+
+- Reported from Windows 11 as "could not write or read app lock file", it
+  reproduced everywhere: the window created locks in one file and read them from
+  another, so a lock set in the window vanished on the next launch and the
+  second attempt failed. The app lock had never worked from the desktop
+  application. Creation and loading now use the same store, a pre-0.1.18 lock is
+  adopted rather than orphaned, and "already set" has its own clear message.
+
+**The verifier is part of `veilvoice` now**
+
+- `veilvoice-verify` is no longer a separate binary. It is `veilvoice verify`,
+  with every command, message and exit status unchanged, and the desktop app's
+  Verify tab runs the same check. A release ships two programs instead of three.
+
+**A first run that sets up your protection**
+
+- The first run now offers, in four skippable cards, the app lock (which also
+  encrypts VeilVoice's own files), a recording passphrase, and a window autolock
+  that defaults to on at thirty minutes. A default nobody is shown is an answer,
+  and the answer this used to give was no protection at all.
+
+**A locked window that shows the logo and says why it locked**
+
+- The lock screen is centred on the VeilVoice mark and, when the autolock
+  engaged, says so until you start typing, so a window you did not lock yourself
+  is not a mystery.
+
+**When antivirus closes VeilVoice, it says so next time**
+
+- A low-reputation new application is sometimes stopped by Windows antivirus. If
+  a run ends without a clean shutdown and did not crash, and an antivirus is
+  installed, the next launch explains what likely happened, names the product,
+  and says an exclusion is worth adding only if the problem is real. Nothing is
+  hidden and nothing on the system is changed.
+
+**Host the site yourself, verify more ways**
+
+- `tools/site/serve.py` and `deploy/nginx.conf` serve the website locally,
+  exactly as GitHub Pages does, so it survives the repository or Pages going
+  down. The install scripts now verify every file with the freshly installed
+  program, and there is a one-liner per platform. A self-signed code certificate
+  and signed app manifest are published beside the OpenPGP key as an optional
+  second identity; `docs/SELF_SIGNING.md` is the tutorial. Arch packaging
+  (PKGBUILD and a `-git` variant) joins the existing deb, RPM and Gentoo.
+
+**More defects found and fixed (F-140 to F-145)**
+
+- A CI guard narrower than the claim it enforced; a record migrated but never
+  read back, which would have destroyed the integrity baseline; an empty
+  `APPDATA` that put the lock file in the working directory; verification
+  instructions naming a release eight versions stale; and a documented policy
+  file that did not parse. Each has a regression test verified against the old
+  code, and detectors for two of the classes are wired into CI.
+
+
 **The file with more in it had the weaker permission**
 
 - Everything group mode wrote was readable by every other account on the

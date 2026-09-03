@@ -1,6 +1,6 @@
 pkgbase = veilvoice
 	pkgdesc = Irreversible voice de-identification, fully offline
-	pkgver = 0.1.17
+	pkgver = 0.1.18
 	pkgrel = 1
 	url = https://tilas01.github.io/veilvoice/
 	arch = x86_64
@@ -15,7 +15,7 @@ pkgbase = veilvoice
 	optdepends = gnupg: check a release with your own GnuPG rather than the key built in
 	optdepends = ffmpeg: import audio from a video container, and write video out
 	optdepends = pipewire: a loopback device for live mode
-	source = veilvoice-0.1.17.tar.gz::https://github.com/tilas01/veilvoice/archive/refs/tags/v0.1.17.tar.gz
+	source = veilvoice-0.1.18.tar.gz::https://github.com/tilas01/veilvoice/archive/refs/tags/v0.1.18.tar.gz
 	sha256sums = 0000000000000000000000000000000000000000000000000000000000000000
 
 pkgname = veilvoice

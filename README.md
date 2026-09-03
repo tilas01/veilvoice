@@ -202,7 +202,7 @@ on faith.
 
 ```bash
 # 1. Download the archive, the hash list and the signature.
-V=v0.1.17
+V=v0.1.18
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
 curl -fsSLO $B/SHA256SUMS
@@ -243,7 +243,7 @@ the `musl-static` archive: it needs no system libraries at all.
 <summary><b>macOS</b> (Intel and Apple Silicon)</summary>
 
 ```bash
-V=v0.1.17
+V=v0.1.18
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 # arm64 for Apple Silicon, x86_64 for Intel.
 curl -fsSLO $B/veilvoice-$V-macos-arm64.tar.gz
@@ -266,7 +266,7 @@ and choose Open, rather than turning Gatekeeper off.
 <summary><b>Windows</b> (10 and 11)</summary>
 
 ```powershell
-$V = "v0.1.17"
+$V = "v0.1.18"
 $B = "https://github.com/tilas01/veilvoice/releases/download/$V"
 curl.exe -fsSLO "$B/veilvoice-$V-windows-x86_64.zip"
 curl.exe -fsSLO "$B/SHA256SUMS"
@@ -304,7 +304,7 @@ cannot work and the window is not shipped. Everything that operates on a file
 runs exactly as it does elsewhere.
 
 ```sh
-V=v0.1.17
+V=v0.1.18
 fetch https://github.com/tilas01/veilvoice/releases/download/$V/veilvoice-$V-freebsd-x86_64.tar.gz
 tar xzf veilvoice-$V-freebsd-x86_64.tar.gz
 cd veilvoice-$V-freebsd-x86_64
@@ -327,7 +327,7 @@ To prove your build is the published one, byte for byte:
 
 ```bash
 veilvoice verify --build-script > reproduce-veilvoice.sh
-sh reproduce-veilvoice.sh v0.1.17
+sh reproduce-veilvoice.sh v0.1.18
 ```
 
 That clones the tag, builds it with the committed lockfile and the commit's own
@@ -564,7 +564,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 ## Status
 
-**v0.1.17: early but real.** The engine, cryptography, audio path, metadata
+**v0.1.18: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
 destinations, CLI and GUI are implemented and tested (1,215 tests across 27
 crates plus doctests, and 17 website suites, clippy clean, no `unsafe`), with

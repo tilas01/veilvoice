@@ -88,6 +88,8 @@ PLACES: list[tuple[str, str, str]] = [
     ("packaging/flatpak/io.github.tilas01.VeilVoice.yml", r"^        tag: v([0-9]+\.[0-9]+\.[0-9]+)$", "the git tag built from"),
     ("packaging/rpm/veilvoice.spec", r'"vv_version ([0-9]+\.[0-9]+\.[0-9]+)"', "the rpmbuild example in the header"),
     ("packaging/rpm/veilvoice.spec", r"%\{!\?vv_version:([0-9]+\.[0-9]+\.[0-9]+)\}", "the default when none is passed"),
+    ("packaging/aur/PKGBUILD", r"^pkgver=([0-9]+\.[0-9]+\.[0-9]+)$", "the Arch package version"),
+    ("packaging/aur/.SRCINFO", r"^\tpkgver = ([0-9]+\.[0-9]+\.[0-9]+)$", "the Arch .SRCINFO version"),
     # **F-144.** The worked example a nervous user copies to verify their
     # download. It said v0.1.9 while the workspace said 0.1.17 -- eight
     # releases, naming a real old tarball rather than an obvious placeholder,
