@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-policy/src/policy.rs`
 
-[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 922 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
+[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 984 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ press the button.
 
 ## What this file contains
 
-922 lines defining **25 functions** (23 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+984 lines defining **25 functions** (23 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

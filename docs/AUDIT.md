@@ -40,7 +40,7 @@ longer offered as the explanation for anything.
 
 ## The twenty-sixth round: the file with more in it had the weaker permission
 
-Seven defects (F-133 to F-139), found by running commands nobody had run here
+Thirteen defects (F-133 to F-145), found by running commands nobody had run here
 before, looking at what landed on disk, sweeping for the rest of the class
 rather than waiting to stumble on it, checking the claims this round's own new
 interface text -- and one of CI's own job names -- were making, and reading a
@@ -239,6 +239,190 @@ made it obvious the cause was not in the diff. A bound with ten percent of
 headroom on one platform is a test that will eventually fail on another for
 reasons that have nothing to do with the code, and the useful version of it
 says how much room it has and why.
+
+### F-140 -- a guard whose scope was narrower than the claim it enforced
+
+`.github/workflows/ci.yml`.
+
+CI's `no RSA private-key operations` job accepts RUSTSEC-2023-0071 on one
+ground: VeilVoice only ever verifies a signature against a public key compiled
+into it, so there is no secret for a timing oracle to leak. That is an argument
+about how a crate is used rather than about the crate, so the job enforces it
+by grepping for secret-key APIs.
+
+It grepped `crates/veilvoice-verify/src/`.
+
+The signature arithmetic moved into `veilvoice-check` some releases ago, so the
+desktop application's verify tab and the command line could share one
+implementation. The job never followed. Two crates reach `pgp`; one was
+checked.
+
+It now derives the crate list from which manifests name `pgp`, checks every one
+of them, and fails if that list is ever empty -- a job that checks nothing must
+not be able to pass. Planting `SignedSecretKey` in `veilvoice-check` is caught;
+before, it was not.
+
+A guard whose scope is narrower than the claim it enforces is worse than no
+guard, because it is green.
+
+### F-141 -- a lock set in the window was written where the window never looked
+
+`veilvoice-crypto/src/lock.rs`, reported from Windows 11 as "could not write or
+read app lock file" when setting an app-lock password.
+
+It reproduces on Linux in three lines, so it was never local to that machine,
+and it is not really a Windows defect at all:
+
+    1st set: ok, wrote .../applock.bin
+    reload:  NO LOCK FOUND (the one just set is invisible)
+    2nd set: FAILED -> could not read or write the app-lock file
+
+The desktop application created locks with `LockStore::create`, which writes the
+single pre-vault file. It loads them with `open_default`, which reads the vault.
+Those are different files. The lock appears to be set, is gone on the next
+launch because nothing reads the file it went into, and the second attempt fails
+because `create_new` refuses -- `applock.bin` is already there from the first.
+
+**So the app lock had never worked from the window** in any release that shipped
+this pairing. The Windows report was where it surfaced, not what caused it.
+
+Three things were wrong and all three are fixed. Creation goes through the vault
+that loading reads. A pre-vault `applock.bin` is adopted on open rather than
+orphaned, because every user who set a lock in 0.1.17 has one under a passphrase
+they expect to keep working. And "a lock is already set" has its own error: it
+was reported as `AppLockStore`, whose message is "could not read or write the
+app-lock file", which is a refusal dressed in the words of a failure and is half
+of what made this so confusing to hit.
+
+**What the test had to be.** A round trip through create and open passes *even
+with the defect present*, now that open adopts a pre-vault file -- the adoption
+papers over exactly the mistake that caused this. So the test that matters pins
+where creation writes, and was verified by putting the defect back.
+
+`create_in` and `open_in` are split out of the `_default` pair so both halves
+can be driven against one directory a test owns. That missing half is precisely
+why this shipped: nothing could test creation and loading against each other.
+
+### F-142 -- three files migrated, one read back
+
+`veilvoice-gui/src/vault_store.rs`. Self-inflicted, in this round's own new
+code, caught before release by looking for F-141's shape.
+
+The obfuscated store listed three records to move into itself:
+`measured.dat`, `integrity.manifest` and `last-crash.txt`. Migration reads each
+plain file, stores it, and **shreds the original**. Only one of the three is
+ever read back out of the store.
+
+So the first unlock after somebody set an app lock would have securely erased
+the integrity baseline `veilvoice guard` compares against and the crash log the
+next launch offers to report, with nothing reading either back. Both are still
+read by their plain paths, and the manifest is read from the *command line*,
+which has no unlocked session and therefore no key at all.
+
+`records::ALL` is one entry now, and the reason the other two are not in it is
+written down rather than left looking like an oversight: moving the manifest in
+properly means prompting for the app-lock passphrase on every `veilvoice guard`
+run, which is a different feature with a different argument.
+
+The finding that matters is not the list. It is that **the same shape appeared
+twice in one round** -- two spellings of where something lives, both correct
+alone, nothing comparing them -- and the second one would have destroyed data
+silently.
+
+### F-143 -- an empty APPDATA put the lock file in the working directory
+
+`veilvoice-crypto/src/lock.rs`. Found by auditing the function F-141 was
+reported against, for the class F-141 belonged to.
+
+`default_path` read three environment variables and filtered exactly one of them
+for emptiness. `var_os` returns `Some("")` for a variable set to nothing, and
+`PathBuf::from("")` joined with anything is a *relative* path:
+
+    HOME=""     ->  .config/veilvoice/applock.bin
+    APPDATA=""  ->  veilvoice\applock.bin
+
+Either scatters the lock into whatever directory the program was started in, and
+then silently fails to find it on the next launch from anywhere else. The same
+disappearing lock as F-141, from an unrelated cause -- and this function's own
+documentation already said it exists to prevent exactly that.
+
+`XDG_CONFIG_HOME` was filtered for precisely this reason. The other two were
+not. An environment with an empty `APPDATA` is not exotic: services, stripped
+sandboxes and some installer contexts all produce one.
+
+The path building is a pure function now, taking the platform and the three
+variables, so **every branch is tested from any machine**. That is the more
+useful half of the fix: the Windows answer is the one that went wrong, and until
+now it could not be checked anywhere except on Windows.
+
+### F-144 -- the verification instructions told you to download v0.1.9
+
+`docs/INSTALL.md`.
+
+The worked example a nervous user copies to check their download said
+
+    V=v0.1.9
+
+while the workspace said 0.1.17. Eight releases stale, naming a real old
+tarball rather than an obvious placeholder, so following the instructions
+verbatim downloads and verifies the wrong release perfectly.
+
+The surrounding prose does say "replace this with the release you want". That
+is exactly the sentence somebody in a hurry skips, and it is not much of a
+defence for a page whose entire job is to be followed literally.
+
+`tools/release/version.py` already checks that every copy of the version
+agrees, across READMEs, packaging manifests and the roadmap. It did not cover
+this file. Five patterns in `docs/INSTALL.md` are on that list now, and putting
+the stale version back is caught.
+
+### F-145 -- the documented policy file did not parse
+
+`docs/USER_GUIDE.md`, in this round's own new documentation.
+
+The policy section written for 0.1.18 showed a file in the shape a
+configuration file *looks* like it should be:
+
+    note = Newsroom standard
+    require = minimum-intensity 3
+
+Three things wrong in six lines. The format wants two spaces rather than an
+equals sign, `VEILPOLICY1` on the first line, and an intensity from 0 to 100
+rather than 1 to 5. A reader following it would have had their policy rejected
+three times over, with no way to diagnose any of it from what they had been
+given.
+
+Caught by running the parser against the example before committing it, which
+took one command and is the only reason it is a finding rather than a bug
+report.
+
+The example is now extracted from the guide by a test and parsed, and a second
+test checks that every requirement the guide's table names is one the parser
+accepts. Restoring the `=` is caught with the parser's own error message.
+
+A file format described in prose beside a parser that disagrees is a
+documentation defect with a working reproduction available at all times. There
+was no reason for this class to survive as long as it did.
+
+### A detector for the class, and what it cannot do
+
+`tools/audit/state_paths.py`, in `tools/verify.py`.
+
+F-141 and F-142 are one shape: **two spellings of where something lives.** So
+the sweep is now a check rather than a memory. It reads every crate, collects
+each state filename that more than one crate builds a path to, and fails when
+they are built different ways.
+
+Its own first run reported `integrity.manifest` as built two ways, because it
+read line by line and `rustfmt` had wrapped one of the two across four lines.
+Both build it identically. It reads whole functions now, and the false positive
+is recorded in its docstring: a detector whose first finding is its own
+formatting is a detector nobody keeps.
+
+What it cannot do is stated beside it. It reads text, so it sees spellings
+rather than behaviour: derivations that differ textually but agree at runtime
+are reported, and ones that agree textually while something underneath them
+disagrees are not. A net with a known mesh size, not a proof.
 
 ### What the sweep decided to leave
 
@@ -4958,8 +5142,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and thirty-nine defects found and fixed (F-1 to F-139), across
-twenty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and forty-five defects found and fixed (F-1 to F-145), across
+twenty-seven rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

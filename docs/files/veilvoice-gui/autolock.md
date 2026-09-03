@@ -11,11 +11,11 @@
 
 # `crates/veilvoice-gui/src/autolock.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 326 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 369 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs)
 
 ## Contents
 
-- [Why it is off by default](#why-it-is-off-by-default)
+- [Why it is on by default, having been off](#why-it-is-on-by-default-having-been-off)
 - [What counts as use](#what-counts-as-use)
 - [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
@@ -24,19 +24,29 @@
 
 Locking the window again after a period of no use.
 
-**Marker 92.** Off unless somebody turns it on, and when it is on the delay
-is theirs to choose: anything from five minutes to forty eight hours from a
-list, a number typed in if none of those fit, and the ends of that range
-movable by anybody who wants a shorter or longer one.
+**Marker 92.** On at half an hour, and the delay is the user's to choose:
+anything from five minutes to forty eight hours from a list, a number typed
+in if none of those fit, and the ends of that range movable by anybody who
+wants a shorter or longer one.
 
-# Why it is off by default
+# Why it is on by default, having been off
 
-Because a lock that engages while somebody is part way through a recording
-is a lock that gets removed. This project's app lock already carries the
-honest note that it protects a session rather than a disk, and an autolock
-is the same bargain in miniature: it helps the person who walks away from
-their machine and it costs the person who leaves a job running. Which of
-those a user is, VeilVoice cannot know, so it asks rather than assuming.
+It was off, on the argument that a lock engaging part way through a
+recording is a lock that gets removed, and that VeilVoice cannot know
+whether a given user is the one who walks away or the one who leaves a job
+running -- so it should ask rather than assume.
+
+The asking is the part that was wrong. A default nobody is shown is not a
+question, it is an answer, and the answer it gave was "no protection" to
+everybody who never opened the settings tab. The people most helped by an
+autolock are the least likely to go looking for one.
+
+So it is on, and the first-run setup shows it rather than leaving it to be
+discovered: half an hour, with the choice and the off switch right there.
+The original concern is answered by the delay rather than by the default --
+thirty minutes of an untouched window is not somebody part way through
+anything -- and by the fact that this has never counted a running job as
+use, which is deliberate and explained below.
 
 # What counts as use
 
@@ -53,29 +63,29 @@ looking at, and it locks the moment it is looked at again.
 
 # In plain words
 
-Locks the window again if you have not touched it for a while.
+Locks the window again if you have not touched it for half an hour.
 
-Off until you switch it on. When you do, you pick how long, from five
-minutes up to two days, or type your own. Starting a long job does not count
-as using it: if you walk away while something is rendering, that is exactly
-when you would want it locked.
+On to begin with, and setup shows you the switch. You pick how long, from
+five minutes up to two days, or type your own, and you can turn it off.
+Starting a long job does not count as using it: if you walk away while
+something is rendering, that is exactly when you would want it locked.
 
 ## What this file contains
 
-326 lines defining **7 functions** (6 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+369 lines defining **7 functions** (6 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Autolock` (line 66) -- How the autolock is configured.
+- `struct Autolock` (line 83) -- How the autolock is configured.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Autolock::sane` (line 97) -- Bring every field into a state that can be offered and obeyed.
-- `Autolock::expired` (line 122) -- Whether idle has reached the delay.
+- `Autolock::sane` (line 114) -- Bring every field into a state that can be offered and obeyed.
+- `Autolock::expired` (line 139) -- Whether idle has reached the delay.
   - reaches: `after`
-- `Autolock::describe` (line 127) -- The delay in the words a person uses for it.
+- `Autolock::describe` (line 144) -- The delay in the words a person uses for it.
   - reaches: `describe_secs`
-- `parse` (line 159) -- Read a delay somebody typed.
+- `parse` (line 176) -- Read a delay somebody typed.
 
 ## What calls what
 
@@ -97,22 +107,22 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Autolock::default<br/>line 78"]
-    n_sane(["Autolock::sane<br/>line 97"])
-    n_after["Autolock::after<br/>line 113"]
-    n_expired(["Autolock::expired<br/>line 122"])
-    n_describe(["Autolock::describe<br/>line 127"])
-    n_describe_secs["describe_secs<br/>line 136"]
-    n_parse(["parse<br/>line 159"])
+    n_default["Autolock::default<br/>line 95"]
+    n_sane(["Autolock::sane<br/>line 114"])
+    n_after["Autolock::after<br/>line 130"]
+    n_expired(["Autolock::expired<br/>line 139"])
+    n_describe(["Autolock::describe<br/>line 144"])
+    n_describe_secs["describe_secs<br/>line 153"]
+    n_parse(["parse<br/>line 176"])
     n_describe --> n_describe_secs
     n_expired --> n_after
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L78" "open the source"
-    click n_sane href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L97" "open the source"
-    click n_after href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L113" "open the source"
-    click n_expired href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L122" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L127" "open the source"
-    click n_describe_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L136" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L159" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L95" "open the source"
+    click n_sane href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L114" "open the source"
+    click n_after href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L130" "open the source"
+    click n_expired href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L139" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L144" "open the source"
+    click n_describe_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L153" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L176" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_sane,n_expired,n_describe,n_parse entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -127,17 +137,18 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `FLOOR_SECS` <sub>pub const</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L43) | The shortest delay the list offers, in seconds. |
-| `CEILING_SECS` <sub>pub const</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L45) | The longest, in seconds. |
-| `CHOICES` <sub>pub const</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L51) | The delays offered without typing anything, in seconds. |
-| `Autolock` <sub>pub struct</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L66) | How the autolock is configured. |
-| `Autolock::default` <sub>fn</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L78) |  |
-| `Autolock::sane` <sub>pub fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L97) | Bring every field into a state that can be offered and obeyed. |
-| `Autolock::after` <sub>pub fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L113) | The delay as a Duration. |
-| `Autolock::expired` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L122) | Whether idle has reached the delay. |
-| `Autolock::describe` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L127) | The delay in the words a person uses for it. |
-| `describe_secs` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L136) | A number of seconds as a phrase. |
-| `parse` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L159) | Read a delay somebody typed. |
+| `DEFAULT_SECS` <sub>pub const</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L57) | The delay a fresh installation uses: half an hour. |
+| `FLOOR_SECS` <sub>pub const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L60) | The shortest delay the list offers, in seconds. |
+| `CEILING_SECS` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L62) | The longest, in seconds. |
+| `CHOICES` <sub>pub const</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L68) | The delays offered without typing anything, in seconds. |
+| `Autolock` <sub>pub struct</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L83) | How the autolock is configured. |
+| `Autolock::default` <sub>fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L95) |  |
+| `Autolock::sane` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L114) | Bring every field into a state that can be offered and obeyed. |
+| `Autolock::after` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L130) | The delay as a Duration. |
+| `Autolock::expired` <sub>pub fn</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L139) | Whether idle has reached the delay. |
+| `Autolock::describe` <sub>pub fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L144) | The delay in the words a person uses for it. |
+| `describe_secs` <sub>pub fn</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L153) | A number of seconds as a phrase. |
+| `parse` <sub>pub fn</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs#L176) | Read a delay somebody typed. |
 
 ---
 

@@ -51,7 +51,7 @@ If the fingerprint you see anywhere disagrees with the one above, stop.
 ## 1. By hand
 
 Four commands, on any platform with GnuPG and a SHA-256 tool. Replace
-`v0.1.9` and the archive name with the release and build you want; the
+`v0.1.17` and the archive name with the release and build you want; the
 [releases page](https://github.com/tilas01/veilvoice/releases) lists them.
 
 ```bash
@@ -67,7 +67,7 @@ the one step nothing can do for you.
 
 ```bash
 # 2. Get the release, the hash list, and the signature over it.
-V=v0.1.9
+V=v0.1.17
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
 curl -fsSLO $B/SHA256SUMS
@@ -84,7 +84,7 @@ On macOS use `shasum -a 256 -c SHA256SUMS --ignore-missing`. On Windows, in
 PowerShell:
 
 ```powershell
-Get-FileHash -Algorithm SHA256 .\veilvoice-v0.1.9-windows-x86_64.zip
+Get-FileHash -Algorithm SHA256 .\veilvoice-v0.1.17-windows-x86_64.zip
 # then compare that hash against the matching line in SHA256SUMS
 ```
 
@@ -131,7 +131,7 @@ sh install.sh
 | Option | Effect |
 |---|---|
 | `--yes` | no prompts, and **no** optional components |
-| `--version v0.1.9` | a specific release rather than the latest |
+| `--version v0.1.17` | a specific release rather than the latest |
 | `--prefix ~/.local` | where to install (default `~/.local`) |
 | `--with-audacity` | install Audacity too |
 | `--with-gpg` | install GnuPG if it is missing |
@@ -153,7 +153,7 @@ it matters.
 | Option | Effect |
 |---|---|
 | `-Yes` | no prompts, and **no** optional components |
-| `-Version v0.1.9` | a specific release |
+| `-Version v0.1.17` | a specific release |
 | `-Prefix "D:\Tools\VeilVoice"` | where to install |
 | `-WithVBCable` | open the VB-CABLE download page |
 | `-WithAudacity` | install Audacity through winget |
@@ -257,7 +257,7 @@ independent and only you typing them makes the *invocation* independent.
 veilvoice verify key
     # prints the fingerprint it carries. Compare it against the one above.
 
-veilvoice verify file veilvoice-v0.1.9-linux-x86_64.tar.gz     --sums SHA256SUMS --sig SHA256SUMS.asc
+veilvoice verify file veilvoice-v0.1.17-linux-x86_64.tar.gz     --sums SHA256SUMS --sig SHA256SUMS.asc
 ```
 
 ### The one thing it cannot carry
@@ -280,7 +280,7 @@ why this project cannot perform it for you.
 
 ```bash
 # the stronger check, once somebody else has published a hash from their build
-veilvoice verify file veilvoice-v0.1.9-linux-x86_64.tar.gz --sha256 <their hash>
+veilvoice verify file veilvoice-v0.1.17-linux-x86_64.tar.gz --sha256 <their hash>
 
 veilvoice verify --explain     # the difference, at length
 ```
