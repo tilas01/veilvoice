@@ -23,6 +23,7 @@ const SUITES = [
   require("./reveal.test.js"),
   require("./search.test.js"),
   require("./links.test.js"),
+  require("./nav.test.js"),
   require("./diagrams.test.js"),
   require("./source.test.js"),
   require("./packaging.test.js"),
