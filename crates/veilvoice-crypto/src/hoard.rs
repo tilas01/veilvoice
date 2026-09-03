@@ -151,16 +151,30 @@ const LEN_PREFIX: usize = 4;
 
 /// The most any encoding in [`crate::weave`] can grow its input.
 ///
-/// Percent-encoding and quoted-printable are the widest at three bytes out per
-/// byte in. Used to size the padding from the *original* length, so a file's
-/// size never depends on which encoding was drawn.
-const MAX_EXPANSION: usize = 3;
+/// Morse is the widest, at eight bytes out per byte in -- each byte spelled as
+/// eight dots and dashes. Used to size the padding from the *original* length,
+/// so a file's on-disk size never depends on which encoding was drawn.
+///
+/// The cost is real and small: a record is padded for the worst-case
+/// expansion even when a compact encoding was chosen, so these files reserve
+/// more room than they use. They are settings and measurements -- kilobytes --
+/// and a size that gives nothing away is worth more than a tight one.
+/// `no_encoding_expands_past_the_allowance` measures every encoding against
+/// this so it cannot quietly become a lie.
+const MAX_EXPANSION: usize = 8;
 
-/// The encoding marker, which sits before the length.
+/// The inner encoding marker, which sits before the length.
 ///
 /// Inside the sealed region rather than beside it, so which of the encodings
-/// in [`crate::weave`] was used is not visible from outside either.
+/// in [`crate::weave`] was used before encryption is not visible from outside.
 const MARKER: usize = 2;
+
+/// The outer encoding marker, the first two bytes of the file.
+///
+/// Outside the seal, because the outer encoding is applied after encryption
+/// and has to be undone before the seal can be opened. It says nothing secret:
+/// which length-preserving transform was applied to already-random ciphertext.
+const OUTER_MARKER: usize = 2;
 
 /// The sizes a record is padded up to, in bytes of plaintext.
 ///
@@ -310,15 +324,10 @@ impl Hoard {
     fn write_raw(&self, logical: &str, data: &[u8]) -> Result<(), Error> {
         let name = self.name_for(logical)?;
 
-        // One of twenty-seven encodings, drawn fresh on every write, applied
-        // before any of this is encrypted. `crate::weave` says at length what
-        // that does and does not buy: it is not a second cipher, and what it
-        // is for is that a plaintext buffer escaping by some route other than
-        // the AEAD -- a core dump, a swap file, a future framing bug -- does
-        // not read as anything.
-        //
-        // The marker rides inside the sealed region, so which encoding was
-        // used is itself not visible from outside.
+        // The *inner* encoding, applied to the plaintext before it is sealed.
+        // One of `weave::ALL`, drawn fresh on every write, its marker inside
+        // the sealed region so which one was used is not visible from outside.
+        // `crate::weave` says what this does and does not buy.
         let (chosen, body) = crate::weave::encode(data)?;
         let marker = chosen.id();
 
@@ -361,9 +370,30 @@ impl Hoard {
         let nonce = aead::random_nonce()?;
         let sealed = aead::seal(&record_key, &nonce, name.as_bytes(), &plain)?;
 
-        let mut bytes = Vec::with_capacity(nonce.len() + sealed.len());
-        bytes.extend_from_slice(&nonce);
-        bytes.extend_from_slice(&sealed);
+        let mut blob = Vec::with_capacity(nonce.len() + sealed.len());
+        blob.extend_from_slice(&nonce);
+        blob.extend_from_slice(&sealed);
+
+        // The *outer* encoding, applied to the sealed blob after encryption.
+        // Together with the inner one this is the "before or after" the user
+        // asked for, and more: the inner weave can be the identity and the
+        // outer one non-trivial (encoding purely after the cipher), or the
+        // reverse, or both, or neither -- every combination, chosen at random.
+        //
+        // Restricted to the length-preserving set, and its marker sits in two
+        // bytes on the outside because it has to be undone before the blob can
+        // even be decrypted. Outside the seal means unauthenticated, which is
+        // harmless: tampering with it corrupts the unweave and the AEAD then
+        // refuses to open, so it fails closed.
+        //
+        // Length preserving so the file's size stays a function of the data
+        // length alone -- an outer encoding that grew the blob would reopen
+        // the size leak the padding exists to close.
+        let outer = crate::weave::Weave::random_length_preserving()?;
+        let woven = outer.apply(&blob);
+        let mut bytes = Vec::with_capacity(OUTER_MARKER + woven.len());
+        bytes.extend_from_slice(&outer.id());
+        bytes.extend_from_slice(&woven);
 
         std::fs::create_dir_all(&self.dir).map_err(|_| Error::AppLockStore)?;
         crate::privatefile::write_owner_only(&self.dir.join(&name), &bytes)
@@ -386,12 +416,21 @@ impl Hoard {
     }
 
     fn open_bytes(&self, logical: &str, bytes: &[u8]) -> Result<Vec<u8>, Error> {
-        if bytes.len() < aead::NONCE_LEN + aead::TAG_LEN + MARKER + LEN_PREFIX {
+        if bytes.len() < OUTER_MARKER + aead::NONCE_LEN + aead::TAG_LEN + MARKER + LEN_PREFIX {
             return Err(Error::Truncated);
         }
+        // Undo the outer encoding first: it was applied after the seal, so it
+        // has to come off before the seal can be opened. Its marker is the
+        // first two bytes, on the outside.
+        let outer = crate::weave::Weave::from_id([bytes[0], bytes[1]])?;
+        let blob = outer.undo(&bytes[OUTER_MARKER..])?;
+        if blob.len() < aead::NONCE_LEN + aead::TAG_LEN {
+            return Err(Error::Truncated);
+        }
+
         let name = self.name_for(logical)?;
         let mut nonce = [0u8; aead::NONCE_LEN];
-        nonce.copy_from_slice(&bytes[..aead::NONCE_LEN]);
+        nonce.copy_from_slice(&blob[..aead::NONCE_LEN]);
 
         let mut record_key = Secret::zeroed(kdf::KEY_LEN);
         self.key
@@ -400,7 +439,7 @@ impl Hoard {
             &record_key,
             &nonce,
             name.as_bytes(),
-            &bytes[aead::NONCE_LEN..],
+            &blob[aead::NONCE_LEN..],
         )?;
 
         if plain.len() < MARKER + LEN_PREFIX {
@@ -477,8 +516,13 @@ impl Hoard {
             if path.exists() {
                 continue;
             }
+            // The same on-disk shape as a real record: the two-byte outer
+            // marker, the nonce, a bucket of body, and the tag. A decoy that
+            // was two bytes shorter than every real record would be a decoy an
+            // observer could sort out at a glance, which is the one thing the
+            // decoys exist to prevent.
             let bucket = BUCKETS[(raw[0] as usize) % 3];
-            let mut body = vec![0u8; aead::NONCE_LEN + bucket + aead::TAG_LEN];
+            let mut body = vec![0u8; OUTER_MARKER + aead::NONCE_LEN + bucket + aead::TAG_LEN];
             fill_random(&mut body)?;
             crate::privatefile::write_owner_only(&path, &body).map_err(|_| Error::AppLockStore)?;
             written += 1;
@@ -612,10 +656,10 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         h.write("a", b"x").unwrap();
-        h.write("b", &[0u8; 60]).unwrap();
+        h.write("b", &[0u8; 20]).unwrap();
         let a = std::fs::metadata(h.path_for("a").unwrap()).unwrap().len();
         let b = std::fs::metadata(h.path_for("b").unwrap()).unwrap().len();
-        assert_eq!(a, b, "one byte and sixty fall in the same bucket");
+        assert_eq!(a, b, "one byte and twenty fall in the same bucket");
     }
 
     /// A file's size must depend on the data's length and nothing else.
@@ -881,6 +925,70 @@ mod tests {
             .collect();
         assert!(names.iter().all(|n| n.len() == 24 && is_hoard_shaped(n)));
         assert!(h.audit().unwrap().is_clean());
+    }
+
+    /// The outer encoding varies, and the record still comes back.
+    ///
+    /// The whole "before or after the cipher" ask: an outer length-preserving
+    /// weave is applied after sealing, drawn fresh each time, and the record
+    /// round trips whichever one was drawn.
+    #[test]
+    fn a_record_survives_whatever_outer_encoding_was_drawn() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        // Enough writes that many different outer encodings are exercised.
+        for i in 0..80 {
+            let payload = format!("run {i}: theme=dark, sessions={i}");
+            h.write("settings", payload.as_bytes()).unwrap();
+            assert_eq!(
+                h.read("settings").unwrap().unwrap(),
+                payload.as_bytes(),
+                "a record did not survive its outer encoding"
+            );
+        }
+    }
+
+    #[test]
+    fn the_outer_marker_is_the_first_two_bytes_and_varies() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        let mut markers = std::collections::BTreeSet::new();
+        for _ in 0..120 {
+            h.write("settings", b"some bytes to encode and seal")
+                .unwrap();
+            let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
+            markers.insert(raw[0]);
+        }
+        assert!(
+            markers.len() > 1,
+            "the outer encoding never changed across 120 writes"
+        );
+    }
+
+    #[test]
+    fn nothing_on_disk_is_a_long_run_of_one_byte() {
+        // A well-formed record is sealed ciphertext with a fixed-size frame:
+        // no long constant runs, even from all-zero input. This checks the
+        // padding and the outer transform do not accidentally introduce one,
+        // which would be a framing bug worth catching regardless.
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        h.write("settings", &[0u8; 300]).unwrap();
+        let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
+        let mut longest = 1;
+        let mut run = 1;
+        for w in raw.windows(2) {
+            if w[0] == w[1] {
+                run += 1;
+                longest = longest.max(run);
+            } else {
+                run = 1;
+            }
+        }
+        assert!(
+            longest < 16,
+            "a run of {longest} identical bytes reached the disk from all-zero input"
+        );
     }
 
     #[test]

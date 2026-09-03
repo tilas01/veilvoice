@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Twenty-seven reversible encodings, chosen at random, applied underneath the
-//! encryption.
+//! Thirty-one reversible encodings, chosen at random, applied around the
+//! encryption -- before it, after it, or both.
 //!
 //! # What this buys, and it is not what it looks like
 //!
@@ -33,6 +33,19 @@
 //!
 //! That is the whole claim. It is defence in depth against exposure that does
 //! not go through the cipher, not a second cipher.
+//!
+//! # It is nowhere near the live path, and adds no lag
+//!
+//! These run only when VeilVoice writes one of its own small files -- settings,
+//! measurements, the integrity record. They never touch a sample of audio. The
+//! DSP and capture crates do not name this module, and cannot, because it is
+//! not in their dependency graph. So "does the encoding slow down the live
+//! scramble" has a structural answer rather than a benchmarked one: the code
+//! that would slow it down is not reachable from it.
+//!
+//! Even where they do run, the input is kilobytes and the transforms are a
+//! single linear pass, so the cost is lost in the Argon2id run the same unlock
+//! already pays for.
 //!
 //! # Names are different, and the difference matters
 //!
@@ -132,6 +145,20 @@ pub enum Weave {
     YEnc,
     /// Run-length encoding.
     RunLength,
+
+    // --- added in 0.1.18, second pass ----------------------------------
+    /// Exclusive-or against a fixed mask. Length preserving.
+    XorMask,
+    /// Every byte's bits rotated left by three. Length preserving.
+    BitRotate,
+    /// Adjacent bytes exchanged in pairs. Length preserving.
+    WordSwap,
+    /// Each byte spelled out as eight dots and dashes, most significant first.
+    ///
+    /// Genuinely Morse-shaped -- dot for a zero bit, dash for a one -- and the
+    /// widest encoding here at eight bytes out per byte in, which is why
+    /// [`crate::hoard`] sizes its padding for it.
+    Morse,
 }
 
 /// Every encoding that leaves the byte count alone.
@@ -152,6 +179,9 @@ pub const LENGTH_PRESERVING: &[Weave] = &[
     Weave::Complement,
     Weave::Riffle,
     Weave::Substitute,
+    Weave::XorMask,
+    Weave::BitRotate,
+    Weave::WordSwap,
 ];
 
 /// Every encoding, for contents.
@@ -183,6 +213,10 @@ pub const ALL: &[Weave] = &[
     Weave::Percent,
     Weave::YEnc,
     Weave::RunLength,
+    Weave::XorMask,
+    Weave::BitRotate,
+    Weave::WordSwap,
+    Weave::Morse,
 ];
 
 impl Weave {
@@ -219,6 +253,10 @@ impl Weave {
             Self::Percent => [24, 0],
             Self::YEnc => [25, 0],
             Self::RunLength => [26, 0],
+            Self::XorMask => [27, 0],
+            Self::BitRotate => [28, 0],
+            Self::WordSwap => [29, 0],
+            Self::Morse => [30, 0],
         }
     }
 
@@ -252,6 +290,10 @@ impl Weave {
             24 => Self::Percent,
             25 => Self::YEnc,
             26 => Self::RunLength,
+            27 => Self::XorMask,
+            28 => Self::BitRotate,
+            29 => Self::WordSwap,
+            30 => Self::Morse,
             _ => return Err(Error::BadHeader),
         })
     }
@@ -272,6 +314,27 @@ impl Weave {
                 | Self::Complement
                 | Self::Riffle
                 | Self::Substitute
+                | Self::XorMask
+                | Self::BitRotate
+                | Self::WordSwap
+        )
+    }
+
+    /// Pick one at random from the length-preserving set.
+    ///
+    /// This is what the *outer* layer uses -- the encoding applied to a record
+    /// after it is sealed. It must not change the length, because the sealed
+    /// blob is already bucket-padded and an outer encoding that grew it would
+    /// make a file's size depend on the draw, handing back the length the
+    /// padding exists to hide.
+    pub fn random_length_preserving() -> Result<Self, Error> {
+        let mut pick = [0u8; 2];
+        getrandom::getrandom(&mut pick).map_err(|_| Error::Random)?;
+        Ok(
+            match LENGTH_PRESERVING[pick[0] as usize % LENGTH_PRESERVING.len()] {
+                Self::Rotate(_) => Self::Rotate(pick[1] | 1),
+                other => other,
+            },
         )
     }
 
@@ -445,6 +508,26 @@ impl Weave {
                 }
                 out
             }
+            Self::XorMask => input.iter().map(|b| b ^ 0x5a).collect(),
+            Self::BitRotate => input.iter().map(|b| b.rotate_left(3)).collect(),
+            Self::WordSwap => {
+                let mut out = input.to_vec();
+                let mut i = 0;
+                while i + 1 < out.len() {
+                    out.swap(i, i + 1);
+                    i += 2;
+                }
+                out
+            }
+            Self::Morse => {
+                let mut out = Vec::with_capacity(input.len() * 8);
+                for byte in input {
+                    for bit in (0..8).rev() {
+                        out.push(if byte >> bit & 1 == 1 { b'-' } else { b'.' });
+                    }
+                }
+                out
+            }
         }
     }
 
@@ -583,6 +666,28 @@ impl Weave {
                         out.extend_from_slice(&input[i..i + run]);
                         i += run;
                     }
+                }
+                out
+            }
+            Self::XorMask => input.iter().map(|b| b ^ 0x5a).collect(),
+            Self::BitRotate => input.iter().map(|b| b.rotate_right(3)).collect(),
+            Self::WordSwap => Self::WordSwap.apply(input),
+            Self::Morse => {
+                if !input.len().is_multiple_of(8) {
+                    return Err(Error::BadHeader);
+                }
+                let mut out = Vec::with_capacity(input.len() / 8);
+                for group in input.chunks(8) {
+                    let mut byte = 0u8;
+                    for c in group {
+                        byte <<= 1;
+                        match c {
+                            b'-' => byte |= 1,
+                            b'.' => {}
+                            _ => return Err(Error::BadHeader),
+                        }
+                    }
+                    out.push(byte);
                 }
                 out
             }
@@ -990,7 +1095,7 @@ mod tests {
     #[test]
     fn there_are_at_least_twenty_of_them() {
         assert!(ALL.len() >= 20, "only {} encodings", ALL.len());
-        assert_eq!(ALL.len(), 27);
+        assert_eq!(ALL.len(), 31);
     }
 
     #[test]
@@ -1114,6 +1219,49 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn morse_looks_like_morse_and_comes_back() {
+        let out = Weave::Morse.apply(b"Hi");
+        assert!(out.iter().all(|b| *b == b'.' || *b == b'-'));
+        assert_eq!(out.len(), 16, "eight symbols a byte");
+        assert_eq!(Weave::Morse.undo(&out).unwrap(), b"Hi");
+    }
+
+    #[test]
+    fn morse_refuses_anything_that_is_not_dots_and_dashes() {
+        assert!(Weave::Morse.undo(b"....").is_err(), "not a whole byte");
+        assert!(Weave::Morse.undo(b"....xxxx").is_err(), "x is not a bit");
+    }
+
+    #[test]
+    fn the_new_length_preserving_ones_keep_the_length() {
+        for weave in [Weave::XorMask, Weave::BitRotate, Weave::WordSwap] {
+            assert!(weave.preserves_length());
+            for input in corpus() {
+                assert_eq!(weave.apply(&input).len(), input.len());
+            }
+        }
+    }
+
+    #[test]
+    fn random_length_preserving_never_leaves_the_safe_set() {
+        // The outer layer must only draw from encodings that keep the length,
+        // or a file's size would start depending on the draw.
+        for _ in 0..2000 {
+            let w = Weave::random_length_preserving().unwrap();
+            assert!(w.preserves_length(), "{w:?} is not length preserving");
+        }
+    }
+
+    #[test]
+    fn random_length_preserving_reaches_the_whole_safe_set() {
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..3000 {
+            seen.insert(Weave::random_length_preserving().unwrap().id()[0]);
+        }
+        assert_eq!(seen.len(), LENGTH_PRESERVING.len());
     }
 
     #[test]
