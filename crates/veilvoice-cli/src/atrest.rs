@@ -75,8 +75,7 @@ pub fn seal_to_disk(
 ) -> Result<PathBuf, String> {
     let sealed = match recipient {
         Recipient::PublicKey(key_path) => {
-            let encoded =
-                std::fs::read(key_path).map_err(|e| format!("{}: {e}", key_path.display()))?;
+            let encoded = crate::read_named(key_path)?;
             let pk = hybrid::PublicKey::from_bytes(&encoded).map_err(|e| e.to_string())?;
             container::seal_to_public_key(&pk, plaintext).map_err(|e| e.to_string())?
         }

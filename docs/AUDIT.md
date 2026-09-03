@@ -38,6 +38,127 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-sixth round: the file with more in it had the weaker permission
+
+Three defects (F-133 to F-135), all found by running commands nobody had run
+here before and looking at what landed on disk.
+
+The round is short and the first finding is the most serious thing this audit
+has recorded in several rounds, so it goes first and without preamble.
+
+### F-133 -- everything group mode wrote was readable by every account on the machine
+
+`veilvoice-cli/src/conversation.rs`, `veilvoice-gui/src/group.rs`, and
+`veilvoice-gui/src/security.rs`.
+
+`veilvoice anonymise` writes its result readable only by the person who ran it.
+It does that even on the path where they have explicitly turned encryption off,
+and the warning printed there says so in as many words: *the file will be
+created readable only by your account*.
+
+`veilvoice conversation render` wrote all four of its outputs `0644`. So did
+the desktop application's group panel. So did the desktop application's *file*
+tab whenever somebody turned encryption off in the interface, which is the same
+decision the command line hardens.
+
+Measured rather than reasoned about:
+
+    single speaker, encryption forced off:
+      600  solo.veiled.wav
+    conversation render, no encryption available:
+      644  talk.veiled.wav
+      644  talk.veiled.vtt
+      644  talk.veiled.srt
+      644  talk.veiled.html
+
+The direction is what makes this bad. A conversation's output carries strictly
+more than a single speaker's: the subtitle tracks hold the names somebody typed
+and the words they typed, in plain text, and the timings say who spoke when and
+for how long. The files with the most identifying material in them had the
+weakest protection, and the ones with the least had the strongest.
+
+Nobody decided that. One path called `write_owner_only` and the other called
+`std::fs::write`, and there was nothing that would notice the difference. Three
+places, in two programs, all of them the same slip.
+
+All of them go through one helper per front end now, and both front ends have a
+test that renders and asserts the mode on every file produced. Both tests were
+run against the old code first, and both fail on it, which is the only way to
+know a regression test regresses anything.
+
+The user-facing text moved with the code rather than after it. The command
+line's note now says the files are owner-only and what that is worth; the
+window's warning said "another account on this machine" could read the file,
+which was true when it was written and would have become a lie the moment this
+was fixed.
+
+**What this is not.** A file permission is a much weaker thing than encryption,
+and both programs say so where they say it. It does not survive a copy, a
+backup, or anyone who has the disk. The fix closes the gap between the two
+halves of the program; it does not turn the unencrypted path into a safe one,
+and nothing here pretends otherwise.
+
+### F-134 -- three commands reported a missing file without naming it
+
+`veilvoice-cli/src/main.rs`.
+
+    $ veilvoice encrypt clip.wav --to nokey.pub
+    ✗ No such file or directory (os error 2)
+
+Which file? The command names two of them. `veilvoice decrypt` and
+`veilvoice clean` did the same.
+
+`std::io::Error` carries no path, so `e.to_string()` on a missing file is that
+bare sentence. `anonymise` answered the question because `atrest.rs` formats the
+path in by hand, and these did not because they did not. The same defect as the
+verifier's unnamed verdict in the previous round, in a place where the person
+can at least re-read their own command line, which is the only reason it is
+smaller.
+
+Two helpers, `read_named` and `write_named`, rather than a fourth hand-written
+copy of the format string. The copies getting out of step is how this happened.
+
+### F-135 -- the un-veiled original was left readable by everyone
+
+`veilvoice-cli/src/main.rs`, `veilvoice-crypto/src/privatefile.rs`.
+
+`veilvoice import` pulls the audio out of a video container. What it writes is
+the **original** recording: the voiceprint intact, untouched, exactly as it was
+spoken. It is the single most revealing file this program ever puts on a disk,
+and it is the file this program exists to make unnecessary.
+
+It was left at whatever `ffmpeg`'s umask produced, which is `0644` on a normal
+Linux account.
+
+The writing genuinely is ffmpeg's job, so this is not the same slip as F-133:
+nothing here could have used `write_owner_only`, because nothing here does the
+writing. What was missing is the step after it. `privatefile::tighten` sets the
+mode on a file another program created, and `run_ffmpeg` calls it for both
+`import` and `video`.
+
+**What that does not fix, stated where the function is defined rather than
+implied away.** There is a window between ffmpeg creating the file and this
+tightening it, and during that window the file is whatever the umask made it.
+That is inherent to handing the write to another program. Narrowing the
+exposure from permanent to the length of one transcode is worth having; calling
+it airtight would not be true, and the line the program prints afterwards says
+only what it did.
+
+### What was examined and found nothing
+
+**The encryption itself.** A full round trip was run: key generation under a
+real terminal, sealing to that key, and opening it again. The result is byte
+for byte the input. The wrong passphrase and a container with one byte flipped
+in the middle both fail with `decryption failed: wrong key, or the data was
+altered`, which is the honest message: an AEAD cannot tell those two apart, and
+claiming to would be worse than saying so.
+
+**Partial output on failure.** A decryption that fails writes nothing. The
+output path does not exist afterwards.
+
+**Key file modes.** The private key is `0600` and the public key is `0644`,
+which is correct for both.
+
 ## The twenty-fifth round: what running the programs found
 
 Five defects (F-128 to F-132), three of them from one change: the website's
@@ -2994,7 +3115,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1208 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1212 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4641,8 +4762,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and thirty-two defects found and fixed (F-1 to F-132), across
-twenty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and thirty-five defects found and fixed (F-1 to F-135), across
+twenty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

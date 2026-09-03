@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/privatefile.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 251 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 308 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs)
 
 ## Contents
 
@@ -62,7 +62,7 @@ When it cannot manage that, it says exactly why rather than just failing, since
 
 ## What this file contains
 
-251 lines defining **4 functions** (3 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+308 lines defining **5 functions** (4 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -72,6 +72,7 @@ When it cannot manage that, it says exactly why rather than just failing, since
   - reaches: `write_inner`
 - `replace_owner_only` (line 86) -- Replace path with bytes in one step, or leave what was there.
   - reaches: `write_inner`
+- `tighten` (line 130) -- Make an existing file readable only by its owner.
 
 ## What calls what
 
@@ -90,16 +91,18 @@ flowchart TD
     n_write_owner_only(["write_owner_only<br/>line 56"])
     n_write_owner_only_new(["write_owner_only_new<br/>line 67"])
     n_replace_owner_only(["replace_owner_only<br/>line 86"])
-    n_write_inner["write_inner<br/>line 110"]
+    n_tighten(["tighten<br/>line 130"])
+    n_write_inner["write_inner<br/>line 143"]
     n_replace_owner_only --> n_write_inner
     n_write_owner_only --> n_write_inner
     n_write_owner_only_new --> n_write_inner
     click n_write_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56" "open the source"
     click n_write_owner_only_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67" "open the source"
     click n_replace_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L86" "open the source"
-    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L110" "open the source"
+    click n_tighten href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L130" "open the source"
+    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L143" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only entry
+    class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only,n_tighten entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_write_inner helper
 ```
@@ -113,4 +116,5 @@ flowchart TD
 | `write_owner_only` <sub>pub fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56) | Create path containing bytes, readable only by the current user. |
 | `write_owner_only_new` <sub>pub fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67) | As write_owner_only, but fail if anything is already at path. |
 | `replace_owner_only` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L86) | Replace path with bytes in one step, or leave what was there. |
-| `write_inner` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L110) |  |
+| `tighten` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L130) | Make an existing file readable only by its owner. |
+| `write_inner` <sub>fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L143) |  |

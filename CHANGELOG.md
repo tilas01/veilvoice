@@ -8,6 +8,47 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The file with more in it had the weaker permission**
+
+- Everything group mode wrote was readable by every other account on the
+  machine. `veilvoice conversation render` wrote its audio, both subtitle
+  tracks and the page as 0644; so did the desktop application's group panel;
+  and so did the file tab whenever somebody turned encryption off there.
+- `veilvoice anonymise` has always written its result owner-only, including on
+  the path where encryption is explicitly declined. So the output carrying the
+  *most* identifying material had the weakest protection: the subtitles hold
+  the names and the words as typed, and the timings say who spoke when.
+- Nobody decided that. One path called the hardened write and the other called
+  the default, in three places across two programs, with nothing to notice.
+  All of them go through one helper per front end now, and both front ends have
+  a test that renders and checks the mode on every file. Both tests were run
+  against the old code first and fail on it.
+- A file permission is still a much weaker thing than encryption and both
+  programs say so. The window's warning used to say another account could read
+  the file, which was true when written and would have become a lie the moment
+  this was fixed, so it moved with the code.
+
+**The un-veiled original, left readable by everyone**
+
+- `veilvoice import` pulls the audio out of a video container, and what it
+  writes is the *original* recording with the voiceprint intact. It is the most
+  revealing file this program ever writes, and it was left at whatever ffmpeg's
+  umask produced, which is world-readable on a normal account.
+- ffmpeg does the writing, so the fix is the step after it: the output of
+  `import` and `video` is set owner-only once ffmpeg has finished.
+- There is a window between ffmpeg creating the file and that happening, and it
+  is not closed by this. That is inherent to handing the write to another
+  program; the exposure goes from permanent to the length of one transcode, and
+  the note the program prints says only what it actually did.
+
+**Three commands that would not say which file**
+
+- `veilvoice encrypt`, `decrypt` and `clean` reported a missing file as "No
+  such file or directory" with no name, on commands that take two paths.
+  `anonymise` named it, because its code formatted the path in by hand and
+  theirs did not. Two helpers now, rather than a fourth copy of the format
+  string.
+
 **VeilVoice on a phone, checked rather than guessed**
 
 - The Android target was installed and the workspace compiled against it before

@@ -1568,7 +1568,27 @@ fn run_ffmpeg(
             "ffmpeg stopped with {status}. The command above is what it was asked to do."
         ));
     }
+    // ffmpeg created the file, so it carries ffmpeg's umask, and for `import`
+    // that file is the *original* audio pulled out of a container: the
+    // untouched voiceprint, which is the most revealing thing this program
+    // ever writes. It was being left readable by every account on the machine.
+    //
+    // Tightened rather than written by us, because the writing is ffmpeg's
+    // job. The window between its creation and this line is real and is not
+    // closed here; `privatefile::tighten` says so where it is defined, and the
+    // line printed below does not overstate what happened.
+    let tightened = veilvoice_crypto::privatefile::tighten(output).is_ok();
     println!("{}", ok(&format!("wrote {}", output.display())));
+    if tightened && cfg!(unix) {
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  Set readable only by your account, after ffmpeg wrote it. That is a \n\
+                 file permission and nothing more."
+            )
+        );
+    }
     Ok(())
 }
 
@@ -2239,8 +2259,40 @@ fn list_devices() -> Result<(), String> {
     Ok(())
 }
 
+/// Read a file, naming it if that fails.
+///
+/// `std::io::Error` carries no path. `e.to_string()` on a missing file is the
+/// bare sentence "No such file or directory (os error 2)", and that is what
+/// three of these commands printed:
+///
+/// ```text
+/// $ veilvoice encrypt clip.wav --to nokey.pub
+/// ✗ No such file or directory (os error 2)
+/// ```
+///
+/// Which file? The command names two. `anonymise` answered that question,
+/// because `atrest.rs` formats the path in, and `encrypt` and `decrypt` did
+/// not, because they did not. The same bug as the verifier's unnamed verdict,
+/// in a place where the person can at least see their own command line, which
+/// is the only reason it is smaller.
+///
+/// A function rather than a fourth copy of the format string, because that is
+/// how the copies got out of step in the first place.
+pub(crate) fn read_named(path: &std::path::Path) -> Result<Vec<u8>, String> {
+    std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))
+}
+
+/// Write a file, naming it if that fails.
+///
+/// The failures here are the ones a person can act on: a directory that does
+/// not exist, a read-only disk, a name they cannot write to. All of them need
+/// the path to be actionable at all.
+pub(crate) fn write_named(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
+    std::fs::write(path, bytes).map_err(|e| format!("{}: {e}", path.display()))
+}
+
 fn clean(file: PathBuf, policy: Policy) -> Result<(), String> {
-    let bytes = std::fs::read(&file).map_err(|e| e.to_string())?;
+    let bytes = read_named(&file)?;
     let report = if veilvoice_meta::ImageKind::sniff(&bytes).is_some() {
         veilvoice_meta::clean_image_file(&file, policy).map_err(|e| e.to_string())?
     } else {
@@ -2258,11 +2310,11 @@ fn clean(file: PathBuf, policy: Policy) -> Result<(), String> {
 
 fn encrypt(input: PathBuf, output: Option<PathBuf>, to: Option<PathBuf>) -> Result<(), String> {
     let out_path = output.unwrap_or_else(|| container::veil_path(&input));
-    let plaintext = std::fs::read(&input).map_err(|e| e.to_string())?;
+    let plaintext = read_named(&input)?;
 
     let sealed = match to {
         Some(key_path) => {
-            let encoded = std::fs::read(&key_path).map_err(|e| e.to_string())?;
+            let encoded = read_named(&key_path)?;
             let pk = hybrid::PublicKey::from_bytes(&encoded).map_err(|e| e.to_string())?;
             container::seal_to_public_key(&pk, &plaintext).map_err(|e| e.to_string())?
         }
@@ -2280,13 +2332,13 @@ fn encrypt(input: PathBuf, output: Option<PathBuf>, to: Option<PathBuf>) -> Resu
         }
     };
 
-    std::fs::write(&out_path, &sealed).map_err(|e| e.to_string())?;
+    write_named(&out_path, &sealed)?;
     println!("{}", ok(&format!("encrypted to {}", out_path.display())));
     Ok(())
 }
 
 fn decrypt(input: PathBuf, output: PathBuf, key: Option<PathBuf>) -> Result<(), String> {
-    let sealed = std::fs::read(&input).map_err(|e| e.to_string())?;
+    let sealed = read_named(&input)?;
 
     let plaintext = match key {
         Some(key_path) => {
@@ -2318,7 +2370,7 @@ fn decrypt(input: PathBuf, output: PathBuf, key: Option<PathBuf>) -> Result<(), 
 
 /// Load a private key file, which is itself a password-locked container.
 fn load_secret_key(path: &std::path::Path) -> Result<hybrid::SecretKey, String> {
-    let sealed = std::fs::read(path).map_err(|e| e.to_string())?;
+    let sealed = read_named(path)?;
     let password = prompt_secret("Key passphrase: ")?;
     let encoded =
         container::open_with_password(password.expose(), &sealed).map_err(|e| e.to_string())?;
