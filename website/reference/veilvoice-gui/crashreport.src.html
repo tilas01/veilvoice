@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/crashreport.rs</code></h1>
-<p style="color:var(--muted)"><a href="crashreport.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 268 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="crashreport.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 289 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -75,254 +75,275 @@
 <span class="ln" id="L32"><span class="tok-com">//! open the issue tracker in a browser. What happens after that is the</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! person&#x27;s decision and their clipboard.</span></span>
 <span class="ln" id="L34"><span class="tok-com">//!</span></span>
-<span class="ln" id="L35"><span class="tok-com">//! # And it says what is in it</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! # And it says what is in it, without overpromising</span></span>
 <span class="ln" id="L36"><span class="tok-com">//!</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! The report carries the version, the operating system and processor, the</span></span>
-<span class="ln" id="L38"><span class="tok-com">//! panic message and the source location. It carries no file names, no</span></span>
-<span class="ln" id="L39"><span class="tok-com">//! settings, no passphrase and nothing about the audio. That list is in the</span></span>
-<span class="ln" id="L40"><span class="tok-com">//! panel rather than in this comment, because somebody deciding whether to</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! paste it into a public issue tracker needs it in front of them.</span></span>
-<span class="ln" id="L42"></span>
-<span class="ln" id="L43"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L44"><span class="tok-kw">use</span> egui::{RichText, Ui};</span>
-<span class="ln" id="L45"></span>
+<span class="ln" id="L37"><span class="tok-com">//! The report carries the version, the operating system and processor, when it</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! happened, the panic message and the source location. VeilVoice puts in no</span></span>
+<span class="ln" id="L39"><span class="tok-com">//! file names, no settings, no passphrase and nothing about the audio.</span></span>
+<span class="ln" id="L40"><span class="tok-com">//!</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! The panel used to say flatly that the report *contains* no file names. That</span></span>
+<span class="ln" id="L42"><span class="tok-com">//! is a promise about the panic message, and the panic message is the one part</span></span>
+<span class="ln" id="L43"><span class="tok-com">//! nobody writes in advance. No panic in VeilVoice&#x27;s own code formats a path --</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! there is a test for that, in `crashlog`, and it reads the source rather than</span></span>
+<span class="ln" id="L45"><span class="tok-com">//! trusting the claim -- but a decoder or a toolkit it depends on could put one</span></span>
+<span class="ln" id="L46"><span class="tok-com">//! there, and this program cannot promise on their behalf.</span></span>
+<span class="ln" id="L47"><span class="tok-com">//!</span></span>
+<span class="ln" id="L48"><span class="tok-com">//! So the panel says what VeilVoice puts in, names the error message as the</span></span>
+<span class="ln" id="L49"><span class="tok-com">//! part that is not written in advance, and offers the whole text to read. A</span></span>
+<span class="ln" id="L50"><span class="tok-com">//! promise that cannot be kept is worse than an accurate description with a</span></span>
+<span class="ln" id="L51"><span class="tok-com">//! button next to it.</span></span>
+<span class="ln" id="L52"></span>
+<span class="ln" id="L53"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L54"><span class="tok-kw">use</span> egui::{RichText, Ui};</span>
+<span class="ln" id="L55"></span>
 <span class="src-item" id="fn-new_issue">
-<span class="ln" id="L46"><span class="tok-com">/// Where a report goes, if the person wants to file one.</span></span>
-<span class="ln" id="L47"><span class="tok-com">///</span></span>
-<span class="ln" id="L48"><span class="tok-com">/// A new issue rather than the issue list: somebody arriving from a crash has</span></span>
-<span class="ln" id="L49"><span class="tok-com">/// a report in their clipboard and wants a box to put it in, not a search.</span></span>
-<span class="ln" id="L50"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NEW_ISSUE: &amp;str = <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/issues/new&quot;</span>;</span>
+<span class="ln" id="L56"><span class="tok-com">/// Where a report goes, if the person wants to file one.</span></span>
+<span class="ln" id="L57"><span class="tok-com">///</span></span>
+<span class="ln" id="L58"><span class="tok-com">/// A new issue rather than the issue list: somebody arriving from a crash has</span></span>
+<span class="ln" id="L59"><span class="tok-com">/// a report in their clipboard and wants a box to put it in, not a search.</span></span>
+<span class="ln" id="L60"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NEW_ISSUE: &amp;str = <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/issues/new&quot;</span>;</span>
 </span>
-<span class="ln" id="L51"></span>
+<span class="ln" id="L61"></span>
 <span class="src-item" id="fn-issues">
-<span class="ln" id="L52"><span class="tok-com">/// The issue tracker itself, linked from About whether or not anything crashed.</span></span>
-<span class="ln" id="L53"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ISSUES: &amp;str = <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/issues&quot;</span>;</span>
+<span class="ln" id="L62"><span class="tok-com">/// The issue tracker itself, linked from About whether or not anything crashed.</span></span>
+<span class="ln" id="L63"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ISSUES: &amp;str = <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/issues&quot;</span>;</span>
 </span>
-<span class="ln" id="L54"></span>
+<span class="ln" id="L64"></span>
 <span class="src-item" id="fn-copied_for">
-<span class="ln" id="L55"><span class="tok-com">/// How long the copy button says it copied, in seconds.</span></span>
-<span class="ln" id="L56"><span class="tok-kw">const</span> COPIED_FOR: f64 = <span class="tok-num">2.5</span>;</span>
+<span class="ln" id="L65"><span class="tok-com">/// How long the copy button says it copied, in seconds.</span></span>
+<span class="ln" id="L66"><span class="tok-kw">const</span> COPIED_FOR: f64 = <span class="tok-num">2.5</span>;</span>
 </span>
-<span class="ln" id="L57"></span>
+<span class="ln" id="L67"></span>
 <span class="src-item" id="fn-offer">
-<span class="ln" id="L58"><span class="tok-com">/// What the panel is showing, kept across frames.</span></span>
-<span class="ln" id="L59"><span class="tok-attr">#[derive</span>(Default)]</span>
-<span class="ln" id="L60"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Offer {</span>
-<span class="ln" id="L61">    <span class="tok-com">/// The report, read once. `None` means there was none, or it was dismissed.</span></span>
-<span class="ln" id="L62">    report: Option&lt;(String, String)&gt;,</span>
-<span class="ln" id="L63">    <span class="tok-com">/// Whether the file&#x27;s whole contents are open.</span></span>
-<span class="ln" id="L64">    reading: bool,</span>
-<span class="ln" id="L65">    <span class="tok-com">/// When the copy button was last pressed.</span></span>
-<span class="ln" id="L66">    copied: Option&lt;f64&gt;,</span>
-<span class="ln" id="L67">    <span class="tok-com">/// Set once the file has been looked for, so a missing report is not</span></span>
-<span class="ln" id="L68">    <span class="tok-com">/// re-read from disk on every frame of every launch.</span></span>
-<span class="ln" id="L69">    looked: bool,</span>
-<span class="ln" id="L70">}</span>
+<span class="ln" id="L68"><span class="tok-com">/// What the panel is showing, kept across frames.</span></span>
+<span class="ln" id="L69"><span class="tok-attr">#[derive</span>(Default)]</span>
+<span class="ln" id="L70"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Offer {</span>
+<span class="ln" id="L71">    <span class="tok-com">/// The report, read once. `None` means there was none, or it was dismissed.</span></span>
+<span class="ln" id="L72">    report: Option&lt;(String, String)&gt;,</span>
+<span class="ln" id="L73">    <span class="tok-com">/// Whether the file&#x27;s whole contents are open.</span></span>
+<span class="ln" id="L74">    reading: bool,</span>
+<span class="ln" id="L75">    <span class="tok-com">/// When the copy button was last pressed.</span></span>
+<span class="ln" id="L76">    copied: Option&lt;f64&gt;,</span>
+<span class="ln" id="L77">    <span class="tok-com">/// Set once the file has been looked for, so a missing report is not</span></span>
+<span class="ln" id="L78">    <span class="tok-com">/// re-read from disk on every frame of every launch.</span></span>
+<span class="ln" id="L79">    looked: bool,</span>
+<span class="ln" id="L80">}</span>
 </span>
-<span class="ln" id="L71"></span>
-<span class="ln" id="L72"><span class="tok-kw">impl</span> Offer {</span>
+<span class="ln" id="L81"></span>
+<span class="ln" id="L82"><span class="tok-kw">impl</span> Offer {</span>
 <span class="src-item" id="fn-offer-look">
-<span class="ln" id="L73">    <span class="tok-com">/// Read the previous report, if there is one. Cheap after the first call.</span></span>
-<span class="ln" id="L74">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L75">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.looked {</span>
-<span class="ln" id="L76">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L77">        }</span>
-<span class="ln" id="L78">        <span class="tok-kw">self</span>.looked = true;</span>
-<span class="ln" id="L79">        <span class="tok-kw">self</span>.report =</span>
-<span class="ln" id="L80">            <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">previous</span>().<span class="tok-fn">map</span>(|(path, text)| (path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(), text));</span>
-<span class="ln" id="L81">    }</span>
+<span class="ln" id="L83">    <span class="tok-com">/// Read the previous report, if there is one. Cheap after the first call.</span></span>
+<span class="ln" id="L84">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L85">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.looked {</span>
+<span class="ln" id="L86">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L87">        }</span>
+<span class="ln" id="L88">        <span class="tok-kw">self</span>.looked = true;</span>
+<span class="ln" id="L89">        <span class="tok-kw">self</span>.report =</span>
+<span class="ln" id="L90">            <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">previous</span>().<span class="tok-fn">map</span>(|(path, text)| (path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(), text));</span>
+<span class="ln" id="L91">    }</span>
 </span>
-<span class="ln" id="L82"></span>
+<span class="ln" id="L92"></span>
 <span class="src-item" id="fn-offer-waiting">
-<span class="ln" id="L83">    <span class="tok-com">/// Whether there is anything to show.</span></span>
-<span class="ln" id="L84">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">waiting</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L85">        <span class="tok-kw">self</span>.report.<span class="tok-fn">is_some</span>()</span>
-<span class="ln" id="L86">    }</span>
+<span class="ln" id="L93">    <span class="tok-com">/// Whether there is anything to show.</span></span>
+<span class="ln" id="L94">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">waiting</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L95">        <span class="tok-kw">self</span>.report.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L96">    }</span>
 </span>
-<span class="ln" id="L87"></span>
+<span class="ln" id="L97"></span>
 <span class="src-item" id="fn-offer-panel">
-<span class="ln" id="L88">    <span class="tok-com">/// Draw the offer. Returns true when it has been dealt with and the panel</span></span>
-<span class="ln" id="L89">    <span class="tok-com">/// should go away.</span></span>
-<span class="ln" id="L90">    <span class="tok-com">///</span></span>
-<span class="ln" id="L91">    <span class="tok-com">/// Dismissing deletes the file. That is deliberate and it is the reason</span></span>
-<span class="ln" id="L92">    <span class="tok-com">/// the whole text is on screen first: a notice that keeps coming back is a</span></span>
-<span class="ln" id="L93">    <span class="tok-com">/// notice people learn to close without reading, and the report is of no</span></span>
-<span class="ln" id="L94">    <span class="tok-com">/// use to anybody once its owner has decided not to file it.</span></span>
-<span class="ln" id="L95">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">panel</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) -&gt; bool {</span>
-<span class="ln" id="L96">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((path, text)) = <span class="tok-kw">self</span>.report.<span class="tok-fn">clone</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L97">            <span class="tok-kw">return</span> false;</span>
-<span class="ln" id="L98">        };</span>
-<span class="ln" id="L99">        <span class="tok-kw">let</span> now = ui.<span class="tok-fn">input</span>(|i| i.time);</span>
-<span class="ln" id="L100">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> finished = false;</span>
-<span class="ln" id="L101"></span>
-<span class="ln" id="L102">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L103">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The previous run ended unexpectedly.&quot;</span>)</span>
-<span class="ln" id="L104">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L105">                .<span class="tok-fn">strong</span>(),</span>
-<span class="ln" id="L106">        );</span>
-<span class="ln" id="L107">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L108">            RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L109">                <span class="tok-str">&quot;A report was written to {path}. It was written on this machine and \</span></span>
-<span class="ln" id="L110"><span class="tok-str">                 has been sent nowhere: VeilVoice has no network code at all, and \</span></span>
-<span class="ln" id="L111"><span class="tok-str">                 nothing here can send it. If you would like the fault fixed, the \</span></span>
-<span class="ln" id="L112"><span class="tok-str">                 whole of it is below to copy into an issue.&quot;</span></span>
-<span class="ln" id="L113">            ))</span>
-<span class="ln" id="L114">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L115">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L98">    <span class="tok-com">/// Draw the offer. Returns true when it has been dealt with and the panel</span></span>
+<span class="ln" id="L99">    <span class="tok-com">/// should go away.</span></span>
+<span class="ln" id="L100">    <span class="tok-com">///</span></span>
+<span class="ln" id="L101">    <span class="tok-com">/// Dismissing deletes the file. That is deliberate and it is the reason</span></span>
+<span class="ln" id="L102">    <span class="tok-com">/// the whole text is on screen first: a notice that keeps coming back is a</span></span>
+<span class="ln" id="L103">    <span class="tok-com">/// notice people learn to close without reading, and the report is of no</span></span>
+<span class="ln" id="L104">    <span class="tok-com">/// use to anybody once its owner has decided not to file it.</span></span>
+<span class="ln" id="L105">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">panel</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) -&gt; bool {</span>
+<span class="ln" id="L106">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((path, text)) = <span class="tok-kw">self</span>.report.<span class="tok-fn">clone</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L107">            <span class="tok-kw">return</span> false;</span>
+<span class="ln" id="L108">        };</span>
+<span class="ln" id="L109">        <span class="tok-kw">let</span> now = ui.<span class="tok-fn">input</span>(|i| i.time);</span>
+<span class="ln" id="L110">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> finished = false;</span>
+<span class="ln" id="L111"></span>
+<span class="ln" id="L112">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L113">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The previous run ended unexpectedly.&quot;</span>)</span>
+<span class="ln" id="L114">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L115">                .<span class="tok-fn">strong</span>(),</span>
 <span class="ln" id="L116">        );</span>
-<span class="ln" id="L117">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L118">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L119">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L120">                <span class="tok-str">&quot;It contains the version, this operating system and processor, and \</span></span>
-<span class="ln" id="L121"><span class="tok-str">                 the error. It contains no file names, no settings, no passphrase \</span></span>
-<span class="ln" id="L122"><span class="tok-str">                 and nothing about any audio.&quot;</span>,</span>
-<span class="ln" id="L123">            )</span>
-<span class="ln" id="L124">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>())</span>
+<span class="ln" id="L117">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L118">            RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L119">                <span class="tok-str">&quot;A report was written to {path}. It was written on this machine and \</span></span>
+<span class="ln" id="L120"><span class="tok-str">                 has been sent nowhere: VeilVoice has no network code at all, and \</span></span>
+<span class="ln" id="L121"><span class="tok-str">                 nothing here can send it. If you would like the fault fixed, the \</span></span>
+<span class="ln" id="L122"><span class="tok-str">                 whole of it is below to copy into an issue.&quot;</span></span>
+<span class="ln" id="L123">            ))</span>
+<span class="ln" id="L124">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
 <span class="ln" id="L125">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
 <span class="ln" id="L126">        );</span>
-<span class="ln" id="L127">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L128"></span>
-<span class="ln" id="L129">        <span class="tok-kw">let</span> just_copied = <span class="tok-kw">self</span>.copied.<span class="tok-fn">is_some_and</span>(|at| now - at &lt; COPIED_FOR);</span>
-<span class="ln" id="L130">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L131">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;copy the report&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L132">                ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">copy_text</span>(text.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L133">                <span class="tok-kw">self</span>.copied = <span class="tok-fn">Some</span>(now);</span>
-<span class="ln" id="L134">            }</span>
-<span class="ln" id="L135">            ui.<span class="tok-fn">hyperlink_to</span>(<span class="tok-str">&quot;open a new issue&quot;</span>, NEW_ISSUE);</span>
-<span class="ln" id="L136">            <span class="tok-kw">let</span> label = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.reading {</span>
-<span class="ln" id="L137">                <span class="tok-str">&quot;hide what it says&quot;</span></span>
-<span class="ln" id="L138">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L139">                <span class="tok-str">&quot;read what it says&quot;</span></span>
-<span class="ln" id="L140">            };</span>
-<span class="ln" id="L141">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(label).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L142">                <span class="tok-kw">self</span>.reading = !<span class="tok-kw">self</span>.reading;</span>
-<span class="ln" id="L143">            }</span>
-<span class="ln" id="L144">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;dismiss and delete it&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L145">                <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L146">                <span class="tok-kw">self</span>.report = None;</span>
-<span class="ln" id="L147">                finished = true;</span>
-<span class="ln" id="L148">            }</span>
-<span class="ln" id="L149">            <span class="tok-kw">if</span> just_copied {</span>
-<span class="ln" id="L150">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L151">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;copied, ready to paste&quot;</span>)</span>
-<span class="ln" id="L152">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>())</span>
-<span class="ln" id="L153">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L154">                );</span>
+<span class="ln" id="L127">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L128">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L129">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L130">                <span class="tok-str">&quot;VeilVoice puts four things in it: the version, this operating \</span></span>
+<span class="ln" id="L131"><span class="tok-str">                 system and processor, when it happened, and the error. It puts in \</span></span>
+<span class="ln" id="L132"><span class="tok-str">                 no file names, no settings, no passphrase and nothing about any \</span></span>
+<span class="ln" id="L133"><span class="tok-str">                 audio.&quot;</span>,</span>
+<span class="ln" id="L134">            )</span>
+<span class="ln" id="L135">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>())</span>
+<span class="ln" id="L136">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L137">        );</span>
+<span class="ln" id="L138">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L139">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L140">                <span class="tok-str">&quot;The error message is the one part not written in advance. \</span></span>
+<span class="ln" id="L141"><span class="tok-str">                 VeilVoice&#x27;s own never carry a file name, and a library it uses \</span></span>
+<span class="ln" id="L142"><span class="tok-str">                 could still put one there. That is why the whole thing is here to \</span></span>
+<span class="ln" id="L143"><span class="tok-str">                 read before you send it anywhere.&quot;</span>,</span>
+<span class="ln" id="L144">            )</span>
+<span class="ln" id="L145">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L146">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L147">        );</span>
+<span class="ln" id="L148">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L149"></span>
+<span class="ln" id="L150">        <span class="tok-kw">let</span> just_copied = <span class="tok-kw">self</span>.copied.<span class="tok-fn">is_some_and</span>(|at| now - at &lt; COPIED_FOR);</span>
+<span class="ln" id="L151">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L152">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;copy the report&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L153">                ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">copy_text</span>(text.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L154">                <span class="tok-kw">self</span>.copied = <span class="tok-fn">Some</span>(now);</span>
 <span class="ln" id="L155">            }</span>
-<span class="ln" id="L156">        });</span>
-<span class="ln" id="L157"></span>
-<span class="ln" id="L158">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.reading {</span>
-<span class="ln" id="L159">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L160">            <span class="tok-com">// Scrolled and bounded: a panic message can carry a formatted</span></span>
-<span class="ln" id="L161">            <span class="tok-com">// value of any size, and this sits above the tab somebody is</span></span>
-<span class="ln" id="L162">            <span class="tok-com">// trying to use.</span></span>
-<span class="ln" id="L163">            egui::ScrollArea::<span class="tok-fn">vertical</span>()</span>
-<span class="ln" id="L164">                .<span class="tok-fn">max_height</span>(<span class="tok-num">220.0</span>)</span>
-<span class="ln" id="L165">                .<span class="tok-fn">show</span>(ui, |ui| {</span>
-<span class="ln" id="L166">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">monospace</span>().<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>));</span>
-<span class="ln" id="L167">                });</span>
-<span class="ln" id="L168">        }</span>
-<span class="ln" id="L169"></span>
-<span class="ln" id="L170">        <span class="tok-kw">if</span> just_copied {</span>
-<span class="ln" id="L171">            ui.<span class="tok-fn">ctx</span>()</span>
-<span class="ln" id="L172">                .<span class="tok-fn">request_repaint_after</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">250</span>));</span>
-<span class="ln" id="L173">        }</span>
-<span class="ln" id="L174">        finished</span>
-<span class="ln" id="L175">    }</span>
+<span class="ln" id="L156">            ui.<span class="tok-fn">hyperlink_to</span>(<span class="tok-str">&quot;open a new issue&quot;</span>, NEW_ISSUE);</span>
+<span class="ln" id="L157">            <span class="tok-kw">let</span> label = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.reading {</span>
+<span class="ln" id="L158">                <span class="tok-str">&quot;hide what it says&quot;</span></span>
+<span class="ln" id="L159">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L160">                <span class="tok-str">&quot;read what it says&quot;</span></span>
+<span class="ln" id="L161">            };</span>
+<span class="ln" id="L162">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(label).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L163">                <span class="tok-kw">self</span>.reading = !<span class="tok-kw">self</span>.reading;</span>
+<span class="ln" id="L164">            }</span>
+<span class="ln" id="L165">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;dismiss and delete it&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L166">                <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L167">                <span class="tok-kw">self</span>.report = None;</span>
+<span class="ln" id="L168">                finished = true;</span>
+<span class="ln" id="L169">            }</span>
+<span class="ln" id="L170">            <span class="tok-kw">if</span> just_copied {</span>
+<span class="ln" id="L171">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L172">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;copied, ready to paste&quot;</span>)</span>
+<span class="ln" id="L173">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>())</span>
+<span class="ln" id="L174">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L175">                );</span>
+<span class="ln" id="L176">            }</span>
+<span class="ln" id="L177">        });</span>
+<span class="ln" id="L178"></span>
+<span class="ln" id="L179">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.reading {</span>
+<span class="ln" id="L180">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L181">            <span class="tok-com">// Scrolled and bounded: a panic message can carry a formatted</span></span>
+<span class="ln" id="L182">            <span class="tok-com">// value of any size, and this sits above the tab somebody is</span></span>
+<span class="ln" id="L183">            <span class="tok-com">// trying to use.</span></span>
+<span class="ln" id="L184">            egui::ScrollArea::<span class="tok-fn">vertical</span>()</span>
+<span class="ln" id="L185">                .<span class="tok-fn">max_height</span>(<span class="tok-num">220.0</span>)</span>
+<span class="ln" id="L186">                .<span class="tok-fn">show</span>(ui, |ui| {</span>
+<span class="ln" id="L187">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">monospace</span>().<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>));</span>
+<span class="ln" id="L188">                });</span>
+<span class="ln" id="L189">        }</span>
+<span class="ln" id="L190"></span>
+<span class="ln" id="L191">        <span class="tok-kw">if</span> just_copied {</span>
+<span class="ln" id="L192">            ui.<span class="tok-fn">ctx</span>()</span>
+<span class="ln" id="L193">                .<span class="tok-fn">request_repaint_after</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">250</span>));</span>
+<span class="ln" id="L194">        }</span>
+<span class="ln" id="L195">        finished</span>
+<span class="ln" id="L196">    }</span>
 </span>
-<span class="ln" id="L176">}</span>
-<span class="ln" id="L177"></span>
-<span class="ln" id="L178"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L179"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L180">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L181"></span>
-<span class="ln" id="L182">    <span class="tok-com">/// The source of this file, up to its tests, so a test can check the code</span></span>
-<span class="ln" id="L183">    <span class="tok-com">/// rather than matching its own string literals.</span></span>
-<span class="ln" id="L184">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>() -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
-<span class="ln" id="L185">        <span class="tok-kw">let</span> whole = include_str!(<span class="tok-str">&quot;crashreport.rs&quot;</span>);</span>
-<span class="ln" id="L186">        whole.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(whole)</span>
-<span class="ln" id="L187">    }</span>
-<span class="ln" id="L188"></span>
-<span class="ln" id="L189">    <span class="tok-com">/// The same, with comments removed.</span></span>
-<span class="ln" id="L190">    <span class="tok-com">///</span></span>
-<span class="ln" id="L191">    <span class="tok-com">/// The scan below looks for the machinery of sending something. The</span></span>
-<span class="ln" id="L192">    <span class="tok-com">/// comments at the top of this file explain at length why there is none,</span></span>
-<span class="ln" id="L193">    <span class="tok-com">/// and to do that they have to use the words: the first run of that test</span></span>
-<span class="ln" id="L194">    <span class="tok-com">/// failed on the sentence &quot;a crash reporter that uploads&quot;. A check that</span></span>
-<span class="ln" id="L195">    <span class="tok-com">/// forbids describing the thing it forbids is a check that punishes</span></span>
-<span class="ln" id="L196">    <span class="tok-com">/// writing the explanation down.</span></span>
-<span class="ln" id="L197">    <span class="tok-kw">fn</span> <span class="tok-fn">code</span>() -&gt; String {</span>
-<span class="ln" id="L198">        <span class="tok-fn">source</span>()</span>
-<span class="ln" id="L199">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L200">            .<span class="tok-fn">filter</span>(|line| {</span>
-<span class="ln" id="L201">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L202">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
-<span class="ln" id="L203">            })</span>
-<span class="ln" id="L204">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L205">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L206">    }</span>
-<span class="ln" id="L207"></span>
-<span class="ln" id="L208">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L209">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_is_offered_when_nothing_crashed</span>() {</span>
-<span class="ln" id="L210">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offer = Offer::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L211">        assert!(!offer.<span class="tok-fn">waiting</span>(), <span class="tok-str">&quot;a fresh offer has nothing to show&quot;</span>);</span>
-<span class="ln" id="L212">        <span class="tok-com">// `look` is what reads the disk; before it, `waiting` must still be</span></span>
-<span class="ln" id="L213">        <span class="tok-com">// honest rather than optimistic.</span></span>
-<span class="ln" id="L214">        offer.looked = true;</span>
-<span class="ln" id="L215">        assert!(!offer.<span class="tok-fn">waiting</span>());</span>
-<span class="ln" id="L216">    }</span>
-<span class="ln" id="L217"></span>
-<span class="ln" id="L218">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L219">    <span class="tok-kw">fn</span> <span class="tok-fn">the_disk_is_read_once_and_not_every_frame</span>() {</span>
-<span class="ln" id="L220">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offer = Offer::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L221">        offer.<span class="tok-fn">look</span>();</span>
-<span class="ln" id="L222">        assert!(offer.looked, <span class="tok-str">&quot;the first look must record that it looked&quot;</span>);</span>
-<span class="ln" id="L223">        <span class="tok-com">// A second look changes nothing, which is what stops a launch with no</span></span>
-<span class="ln" id="L224">        <span class="tok-com">// report from stat-ing a file sixty times a second.</span></span>
-<span class="ln" id="L225">        <span class="tok-kw">let</span> before = offer.report.<span class="tok-fn">is_some</span>();</span>
-<span class="ln" id="L226">        offer.<span class="tok-fn">look</span>();</span>
-<span class="ln" id="L227">        assert_eq!(offer.report.<span class="tok-fn">is_some</span>(), before);</span>
-<span class="ln" id="L228">    }</span>
-<span class="ln" id="L229"></span>
-<span class="ln" id="L230">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L231">    <span class="tok-kw">fn</span> <span class="tok-fn">the_offer_names_the_project_and_not_a_third_party</span>() {</span>
-<span class="ln" id="L232">        <span class="tok-com">// A crash reporter that points somewhere other than this repository is</span></span>
-<span class="ln" id="L233">        <span class="tok-com">// sending somebody&#x27;s report to a stranger.</span></span>
-<span class="ln" id="L234">        assert!(NEW_ISSUE.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://github.com/tilas01/veilvoice/&quot;</span>));</span>
-<span class="ln" id="L235">        assert!(ISSUES.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://github.com/tilas01/veilvoice/&quot;</span>));</span>
-<span class="ln" id="L236">    }</span>
-<span class="ln" id="L237"></span>
-<span class="ln" id="L238">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L239">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_transmits_anything</span>() {</span>
-<span class="ln" id="L240">        <span class="tok-com">// The panel offers a clipboard and a browser link. If a request ever</span></span>
-<span class="ln" id="L241">        <span class="tok-com">// appears in this file it is a change to what the project claims about</span></span>
-<span class="ln" id="L242">        <span class="tok-com">// itself, and it should fail here first.</span></span>
-<span class="ln" id="L243">        <span class="tok-kw">let</span> text = <span class="tok-fn">code</span>();</span>
-<span class="ln" id="L244">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;reqwest&quot;</span>, <span class="tok-str">&quot;ureq&quot;</span>, <span class="tok-str">&quot;TcpStream&quot;</span>, <span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;post(&quot;</span>, <span class="tok-str">&quot;upload&quot;</span>] {</span>
-<span class="ln" id="L245">            assert!(</span>
-<span class="ln" id="L246">                !text.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L247">                <span class="tok-str">&quot;this file must not learn to send anything: found {forbidden}&quot;</span></span>
-<span class="ln" id="L248">            );</span>
-<span class="ln" id="L249">        }</span>
-<span class="ln" id="L250">    }</span>
-<span class="ln" id="L251"></span>
-<span class="ln" id="L252">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L253">    <span class="tok-kw">fn</span> <span class="tok-fn">the_panel_says_what_the_report_holds_before_offering_it</span>() {</span>
-<span class="ln" id="L254">        <span class="tok-com">// &quot;Would you like to send this&quot; is only a real question if the person</span></span>
-<span class="ln" id="L255">        <span class="tok-com">// can see what &quot;this&quot; is, so the list of contents and the way to read</span></span>
-<span class="ln" id="L256">        <span class="tok-com">// the whole file are both required.</span></span>
-<span class="ln" id="L257">        <span class="tok-kw">let</span> text = <span class="tok-fn">source</span>();</span>
-<span class="ln" id="L258">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no passphrase&quot;</span>), <span class="tok-str">&quot;must say what is not in it&quot;</span>);</span>
-<span class="ln" id="L259">        assert!(</span>
-<span class="ln" id="L260">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;read what it says&quot;</span>),</span>
-<span class="ln" id="L261">            <span class="tok-str">&quot;must offer the whole text&quot;</span></span>
-<span class="ln" id="L262">        );</span>
-<span class="ln" id="L263">        assert!(</span>
-<span class="ln" id="L264">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;has been sent nowhere&quot;</span>),</span>
-<span class="ln" id="L265">            <span class="tok-str">&quot;must say it was not sent&quot;</span></span>
-<span class="ln" id="L266">        );</span>
-<span class="ln" id="L267">    }</span>
-<span class="ln" id="L268">}</span>
+<span class="ln" id="L197">}</span>
+<span class="ln" id="L198"></span>
+<span class="ln" id="L199"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L200"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L201">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L202"></span>
+<span class="ln" id="L203">    <span class="tok-com">/// The source of this file, up to its tests, so a test can check the code</span></span>
+<span class="ln" id="L204">    <span class="tok-com">/// rather than matching its own string literals.</span></span>
+<span class="ln" id="L205">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>() -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L206">        <span class="tok-kw">let</span> whole = include_str!(<span class="tok-str">&quot;crashreport.rs&quot;</span>);</span>
+<span class="ln" id="L207">        whole.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(whole)</span>
+<span class="ln" id="L208">    }</span>
+<span class="ln" id="L209"></span>
+<span class="ln" id="L210">    <span class="tok-com">/// The same, with comments removed.</span></span>
+<span class="ln" id="L211">    <span class="tok-com">///</span></span>
+<span class="ln" id="L212">    <span class="tok-com">/// The scan below looks for the machinery of sending something. The</span></span>
+<span class="ln" id="L213">    <span class="tok-com">/// comments at the top of this file explain at length why there is none,</span></span>
+<span class="ln" id="L214">    <span class="tok-com">/// and to do that they have to use the words: the first run of that test</span></span>
+<span class="ln" id="L215">    <span class="tok-com">/// failed on the sentence &quot;a crash reporter that uploads&quot;. A check that</span></span>
+<span class="ln" id="L216">    <span class="tok-com">/// forbids describing the thing it forbids is a check that punishes</span></span>
+<span class="ln" id="L217">    <span class="tok-com">/// writing the explanation down.</span></span>
+<span class="ln" id="L218">    <span class="tok-kw">fn</span> <span class="tok-fn">code</span>() -&gt; String {</span>
+<span class="ln" id="L219">        <span class="tok-fn">source</span>()</span>
+<span class="ln" id="L220">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L221">            .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L222">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L223">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
+<span class="ln" id="L224">            })</span>
+<span class="ln" id="L225">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L226">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L227">    }</span>
+<span class="ln" id="L228"></span>
+<span class="ln" id="L229">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L230">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_is_offered_when_nothing_crashed</span>() {</span>
+<span class="ln" id="L231">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offer = Offer::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L232">        assert!(!offer.<span class="tok-fn">waiting</span>(), <span class="tok-str">&quot;a fresh offer has nothing to show&quot;</span>);</span>
+<span class="ln" id="L233">        <span class="tok-com">// `look` is what reads the disk; before it, `waiting` must still be</span></span>
+<span class="ln" id="L234">        <span class="tok-com">// honest rather than optimistic.</span></span>
+<span class="ln" id="L235">        offer.looked = true;</span>
+<span class="ln" id="L236">        assert!(!offer.<span class="tok-fn">waiting</span>());</span>
+<span class="ln" id="L237">    }</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L240">    <span class="tok-kw">fn</span> <span class="tok-fn">the_disk_is_read_once_and_not_every_frame</span>() {</span>
+<span class="ln" id="L241">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offer = Offer::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L242">        offer.<span class="tok-fn">look</span>();</span>
+<span class="ln" id="L243">        assert!(offer.looked, <span class="tok-str">&quot;the first look must record that it looked&quot;</span>);</span>
+<span class="ln" id="L244">        <span class="tok-com">// A second look changes nothing, which is what stops a launch with no</span></span>
+<span class="ln" id="L245">        <span class="tok-com">// report from stat-ing a file sixty times a second.</span></span>
+<span class="ln" id="L246">        <span class="tok-kw">let</span> before = offer.report.<span class="tok-fn">is_some</span>();</span>
+<span class="ln" id="L247">        offer.<span class="tok-fn">look</span>();</span>
+<span class="ln" id="L248">        assert_eq!(offer.report.<span class="tok-fn">is_some</span>(), before);</span>
+<span class="ln" id="L249">    }</span>
+<span class="ln" id="L250"></span>
+<span class="ln" id="L251">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L252">    <span class="tok-kw">fn</span> <span class="tok-fn">the_offer_names_the_project_and_not_a_third_party</span>() {</span>
+<span class="ln" id="L253">        <span class="tok-com">// A crash reporter that points somewhere other than this repository is</span></span>
+<span class="ln" id="L254">        <span class="tok-com">// sending somebody&#x27;s report to a stranger.</span></span>
+<span class="ln" id="L255">        assert!(NEW_ISSUE.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://github.com/tilas01/veilvoice/&quot;</span>));</span>
+<span class="ln" id="L256">        assert!(ISSUES.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://github.com/tilas01/veilvoice/&quot;</span>));</span>
+<span class="ln" id="L257">    }</span>
+<span class="ln" id="L258"></span>
+<span class="ln" id="L259">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L260">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_transmits_anything</span>() {</span>
+<span class="ln" id="L261">        <span class="tok-com">// The panel offers a clipboard and a browser link. If a request ever</span></span>
+<span class="ln" id="L262">        <span class="tok-com">// appears in this file it is a change to what the project claims about</span></span>
+<span class="ln" id="L263">        <span class="tok-com">// itself, and it should fail here first.</span></span>
+<span class="ln" id="L264">        <span class="tok-kw">let</span> text = <span class="tok-fn">code</span>();</span>
+<span class="ln" id="L265">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;reqwest&quot;</span>, <span class="tok-str">&quot;ureq&quot;</span>, <span class="tok-str">&quot;TcpStream&quot;</span>, <span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;post(&quot;</span>, <span class="tok-str">&quot;upload&quot;</span>] {</span>
+<span class="ln" id="L266">            assert!(</span>
+<span class="ln" id="L267">                !text.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L268">                <span class="tok-str">&quot;this file must not learn to send anything: found {forbidden}&quot;</span></span>
+<span class="ln" id="L269">            );</span>
+<span class="ln" id="L270">        }</span>
+<span class="ln" id="L271">    }</span>
+<span class="ln" id="L272"></span>
+<span class="ln" id="L273">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L274">    <span class="tok-kw">fn</span> <span class="tok-fn">the_panel_says_what_the_report_holds_before_offering_it</span>() {</span>
+<span class="ln" id="L275">        <span class="tok-com">// &quot;Would you like to send this&quot; is only a real question if the person</span></span>
+<span class="ln" id="L276">        <span class="tok-com">// can see what &quot;this&quot; is, so the list of contents and the way to read</span></span>
+<span class="ln" id="L277">        <span class="tok-com">// the whole file are both required.</span></span>
+<span class="ln" id="L278">        <span class="tok-kw">let</span> text = <span class="tok-fn">source</span>();</span>
+<span class="ln" id="L279">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no passphrase&quot;</span>), <span class="tok-str">&quot;must say what is not in it&quot;</span>);</span>
+<span class="ln" id="L280">        assert!(</span>
+<span class="ln" id="L281">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;read what it says&quot;</span>),</span>
+<span class="ln" id="L282">            <span class="tok-str">&quot;must offer the whole text&quot;</span></span>
+<span class="ln" id="L283">        );</span>
+<span class="ln" id="L284">        assert!(</span>
+<span class="ln" id="L285">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;has been sent nowhere&quot;</span>),</span>
+<span class="ln" id="L286">            <span class="tok-str">&quot;must say it was not sent&quot;</span></span>
+<span class="ln" id="L287">        );</span>
+<span class="ln" id="L288">    }</span>
+<span class="ln" id="L289">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

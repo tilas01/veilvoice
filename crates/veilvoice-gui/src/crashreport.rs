@@ -32,13 +32,23 @@
 //! open the issue tracker in a browser. What happens after that is the
 //! person's decision and their clipboard.
 //!
-//! # And it says what is in it
+//! # And it says what is in it, without overpromising
 //!
-//! The report carries the version, the operating system and processor, the
-//! panic message and the source location. It carries no file names, no
-//! settings, no passphrase and nothing about the audio. That list is in the
-//! panel rather than in this comment, because somebody deciding whether to
-//! paste it into a public issue tracker needs it in front of them.
+//! The report carries the version, the operating system and processor, when it
+//! happened, the panic message and the source location. VeilVoice puts in no
+//! file names, no settings, no passphrase and nothing about the audio.
+//!
+//! The panel used to say flatly that the report *contains* no file names. That
+//! is a promise about the panic message, and the panic message is the one part
+//! nobody writes in advance. No panic in VeilVoice's own code formats a path --
+//! there is a test for that, in `crashlog`, and it reads the source rather than
+//! trusting the claim -- but a decoder or a toolkit it depends on could put one
+//! there, and this program cannot promise on their behalf.
+//!
+//! So the panel says what VeilVoice puts in, names the error message as the
+//! part that is not written in advance, and offers the whole text to read. A
+//! promise that cannot be kept is worse than an accurate description with a
+//! button next to it.
 
 use crate::theme::palette as p;
 use egui::{RichText, Ui};
@@ -117,11 +127,22 @@ impl Offer {
         ui.add_space(6.0);
         ui.label(
             RichText::new(
-                "It contains the version, this operating system and processor, and \
-                 the error. It contains no file names, no settings, no passphrase \
-                 and nothing about any audio.",
+                "VeilVoice puts four things in it: the version, this operating \
+                 system and processor, when it happened, and the error. It puts in \
+                 no file names, no settings, no passphrase and nothing about any \
+                 audio.",
             )
             .color(p::fg())
+            .size(12.0),
+        );
+        ui.label(
+            RichText::new(
+                "The error message is the one part not written in advance. \
+                 VeilVoice's own never carry a file name, and a library it uses \
+                 could still put one there. That is why the whole thing is here to \
+                 read before you send it anywhere.",
+            )
+            .color(p::muted())
             .size(12.0),
         );
         ui.add_space(8.0);
