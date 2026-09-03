@@ -83,10 +83,6 @@ use veilvoice_crypto::hoard::{Audit, Hoard, StoreKey};
 /// drawing settings sit in the open, and that is worth doing; it is not worth
 /// pretending is already done.
 pub mod records {
-    /// The integrity manifest `veilvoice guard` and the window share.
-    pub const INTEGRITY: &str = "integrity";
-    /// The last crash, kept to offer a report on the next launch.
-    pub const CRASH: &str = "crash";
     /// What the application measured about its own running.
     pub const MEASURED: &str = "measured";
 
@@ -94,11 +90,24 @@ pub mod records {
     ///
     /// The plain name is what the file was called before there was a lock, and
     /// is what it goes back to being if the lock is removed.
-    pub const ALL: &[(&str, &str)] = &[
-        (INTEGRITY, "integrity.manifest"),
-        (CRASH, "last-crash.txt"),
-        (MEASURED, "measured.dat"),
-    ];
+    ///
+    /// # Adding to this list is not free
+    ///
+    /// A name here is migrated in on the first unlock and the plain file is
+    /// **shredded**. So a file listed here that anything still reads by its
+    /// plain path is a file that gets destroyed, silently, on somebody's next
+    /// unlock. `every_record_is_actually_read_through_the_store` refuses that,
+    /// and it exists because the first version of this module listed three
+    /// records and read one.
+    ///
+    /// `integrity.manifest` and `last-crash.txt` were on this list and are
+    /// deliberately not now. Both are still read elsewhere by their plain
+    /// paths, and the manifest is read by `veilvoice guard` from the *command
+    /// line*, which has no unlocked session and therefore no key. Moving it in
+    /// would mean prompting for the app-lock passphrase on every
+    /// `veilvoice guard` run: a different feature with a different argument,
+    /// not a detail of this one.
+    pub const ALL: &[(&str, &str)] = &[(MEASURED, "measured.dat")];
 }
 
 /// How many decoys a folder is kept stocked with.
@@ -290,7 +299,6 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
         store.write(records::MEASURED, b"theme=dark").unwrap();
-        store.write(records::CRASH, b"3 runs").unwrap();
         store.unlocked(key(7)).unwrap();
         store.write(records::MEASURED, b"4 runs").unwrap();
 
@@ -374,6 +382,46 @@ mod tests {
         let audit = store.unlocked(key(7)).unwrap();
         assert!(!audit.is_clean());
         assert!(audit.tampered.contains(&records::MEASURED.to_string()));
+    }
+
+    /// **F-142.** A record that is migrated but never read is a file destroyed.
+    ///
+    /// The first version of this module listed `integrity.manifest` and
+    /// `last-crash.txt` beside `measured.dat`. Migration reads each plain
+    /// file, stores it, and shreds the original -- so on the first unlock
+    /// after setting an app lock, the integrity baseline `veilvoice guard`
+    /// compares against and the crash log the next launch offers to report
+    /// would both have been erased, with nothing reading them back. Neither is
+    /// read through this store; both are still read by their plain paths, one
+    /// of them from a command line that has no key at all.
+    ///
+    /// The same shape as F-141 -- written through one path, read through
+    /// another -- found by auditing for that shape rather than by somebody
+    /// losing a file. So it is pinned: a name in `ALL` has to be read through
+    /// the store somewhere, or this fails.
+    #[test]
+    fn every_record_is_actually_read_through_the_store() {
+        let sources = [
+            include_str!("vault_store.rs"),
+            include_str!("app.rs"),
+            include_str!("settings.rs"),
+            include_str!("security.rs"),
+            include_str!("integrity.rs"),
+            include_str!("crashlog.rs"),
+        ];
+        for (logical, plain) in records::ALL {
+            let constant = logical.to_uppercase();
+            let read = sources.iter().any(|src| {
+                src.contains(&format!("records::{constant}"))
+                    && (src.contains("store.read") || src.contains("Measured::load"))
+            });
+            assert!(
+                read,
+                "{plain:?} is migrated into the store and shredded, and nothing \
+                 reads it back through the store. That destroys it. Either read \
+                 it through `VaultStore`, or take it out of `records::ALL`."
+            );
+        }
     }
 
     #[test]
