@@ -66,8 +66,10 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod mandate;
 mod policy;
 
+pub use mandate::{default_path as mandate_path, Change, Field, Mandate};
 pub use policy::{verify, Policy, Posture, Requirement, Verification, PLAIN_FILE, SEALED_FILE};
 
 /// Crate version string, surfaced in the About panel.
