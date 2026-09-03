@@ -4711,6 +4711,7 @@ dependencies = [
  "symphonia",
  "tempfile",
  "veilvoice-core",
+ "veilvoice-crypto",
 ]
 
 [[package]]
