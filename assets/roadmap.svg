@@ -3,7 +3,7 @@
 <style>.rm-square{transform-box:fill-box;transform-origin:center;animation:rm-in .45s cubic-bezier(.2,.8,.3,1) both;transition:filter .15s ease}.rm-square:hover{filter:brightness(1.35)}@keyframes rm-in{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.rm-square{animation:none}}</style>
 <rect x="0" y="0" width="640" height="1136" rx="10" fill="var(--bg-inset, #16161e)"/>
 <text x="24.0" y="38.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="var(--fg, #c0caf5)">102 items</text>
-<text x="616.0" y="38.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)" text-anchor="end">100 done, 1 next, 1 planned</text>
+<text x="616.0" y="38.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)" text-anchor="end">101 done, 1 planned</text>
 <text x="24.0" y="74.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">Shipped</text>
 <g opacity="1"><title>DSP engine: phase discard, many-to-one normalisation, CSPRNG modulation (done)</title><rect class="rm-square" style="animation-delay:0ms" x="24.0" y="88.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="1"><title>Accent neutralisation, on by default (done)</title><rect class="rm-square" style="animation-delay:12ms" x="52.0" y="88.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
@@ -115,14 +115,14 @@
 <g opacity="1"><title>One version, in one file: every other copy derived from Cargo.toml or checked against it,  (done)</title><rect class="rm-square" style="animation-delay:48ms" x="136.0" y="924.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="1"><title>v0.1.17 released: the idle window fixed at the cause, the toolkit upgraded, and the releas (done)</title><rect class="rm-square" style="animation-delay:60ms" x="164.0" y="924.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <text x="24.0" y="986.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">Asked for while v0.1.17 was being built</text>
-<g opacity="0.85"><title>A demonstration that is the program: the website&#x27;s demo driven by real recorded sessions o (next)</title><rect class="rm-square" style="animation-delay:0ms" x="24.0" y="1000.0" width="22.0" height="22.0" rx="4" fill="var(--accent, #7aa2f7)"/></g>
+<g opacity="1"><title>A demonstration that is the program: five recorded sessions of the real binaries replayed  (done)</title><rect class="rm-square" style="animation-delay:0ms" x="24.0" y="1000.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="1"><title>A crash report offered rather than buried: the report already written to disk surfaced abo (done)</title><rect class="rm-square" style="animation-delay:12ms" x="52.0" y="1000.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="1"><title>A first run that explains itself: one card per tab saying what it is for, skippable, and a (done)</title><rect class="rm-square" style="animation-delay:24ms" x="80.0" y="1000.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="0.85"><title>VeilVoice on a phone: an Android package a person can install without developer tools, and (planned)</title><rect class="rm-square" style="animation-delay:36ms" x="108.0" y="1000.0" width="22.0" height="22.0" rx="4" fill="var(--warn, #e0af68)"/></g>
 <rect x="24.0" y="1050.0" width="12" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
-<text x="42.0" y="1060.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">done: 100</text>
+<text x="42.0" y="1060.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">done: 101</text>
 <rect x="320.0" y="1050.0" width="12" height="12" rx="3" fill="var(--accent, #7aa2f7)"/>
-<text x="338.0" y="1060.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">next: 1</text>
+<text x="338.0" y="1060.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">next: 0</text>
 <rect x="24.0" y="1070.0" width="12" height="12" rx="3" fill="var(--warn, #e0af68)"/>
 <text x="42.0" y="1080.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">planned: 1</text>
 <rect x="320.0" y="1070.0" width="12" height="12" rx="3" fill="var(--err, #f7768e)"/>

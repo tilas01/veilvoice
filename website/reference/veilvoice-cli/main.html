@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/main.svg" alt="main.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 2887 lines &middot; <a href="main.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 2939 lines &middot; <a href="main.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-here">What is here</a>
@@ -79,7 +79,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>2887 lines defining <strong>24 functions</strong> (0 public), <strong>11 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2939 lines defining <strong>26 functions</strong> (0 public), <strong>11 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Cli</code> <span style="color:var(--muted)">line 115</span></li>
 <li><code>enum Command</code> <span style="color:var(--muted)">line 121</span></li>
@@ -90,8 +90,8 @@
 <li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 827</span> &middot; What veilvoice policy can do.</li>
 <li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 880</span> &middot; What veilvoice sentry can do.</li>
 <li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 941</span></li>
-<li><code>struct Tuning</code> <span style="color:var(--muted)">line 1770</span> &middot; The engine settings a user can reach from the command line.</li>
-<li><code>struct AtRest</code> <span style="color:var(--muted)">line 1842</span> &middot; What to do with the result once it exists.</li>
+<li><code>struct Tuning</code> <span style="color:var(--muted)">line 1790</span> &middot; The engine settings a user can reach from the command line.</li>
+<li><code>struct AtRest</code> <span style="color:var(--muted)">line 1862</span> &middot; What to do with the result once it exists.</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -107,31 +107,34 @@
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
 <rect x="0" y="0" width="595" height="914" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M145.9 447.0 C 560.8 447.0, 560.8 347.0, 541.8 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M145.9 447.0 C 589.0 447.0, 589.0 47.0, 570.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M234.2 574.0 C 234.2 594.0, 364.8 700.0, 364.8 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M468.4 74.0 C 468.4 94.0, 360.8 100.0, 360.8 117.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M138.7 374.0 C 138.7 394.0, 210.1 700.0, 210.1 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M440.2 274.0 C 440.2 294.0, 210.1 700.0, 210.1 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M272.4 447.0 C 560.8 447.0, 560.8 347.0, 541.8 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M272.4 447.0 C 589.0 447.0, 589.0 47.0, 570.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M293.5 74.0 C 293.5 94.0, 210.1 100.0, 210.1 117.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 95.6 400.0, 95.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 499.4 400.0, 499.4 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 488.5 300.0, 488.5 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 234.2 500.0, 234.2 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 107.7 500.0, 107.7 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M260.3 147.0 C 282.3 147.0, 282.3 47.0, 220.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 138.7 300.0, 138.7 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 360.8 500.0, 360.8 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 440.2 200.0, 440.2 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 360.8 400.0, 360.8 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 277.4 200.0, 277.4 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 222.1 400.0, 222.1 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 329.7 300.0, 329.7 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 134.7 200.0, 134.7 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 297.5 600.0, 297.5 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M210.1 174.0 C 210.1 194.0, 487.3 500.0, 487.3 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M145.9 547.0 C 560.8 547.0, 560.8 447.0, 541.8 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M145.9 547.0 C 589.0 547.0, 589.0 47.0, 570.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M549.7 547.0 C 571.7 547.0, 571.7 147.0, 283.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M297.5 674.0 C 297.5 694.0, 364.8 700.0, 364.8 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M347.8 647.0 C 369.8 647.0, 369.8 147.0, 283.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M468.4 74.0 C 468.4 94.0, 360.8 200.0, 360.8 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M221.2 647.0 C 302.5 647.0, 302.5 147.0, 283.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M221.2 647.0 C 445.1 647.0, 445.1 147.0, 426.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M138.7 474.0 C 138.7 494.0, 210.1 700.0, 210.1 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M440.2 374.0 C 440.2 394.0, 210.1 700.0, 210.1 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M272.4 547.0 C 560.8 547.0, 560.8 447.0, 541.8 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M272.4 547.0 C 589.0 547.0, 589.0 47.0, 570.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M439.2 747.0 C 461.2 747.0, 461.2 147.0, 283.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M293.5 74.0 C 293.5 94.0, 210.1 200.0, 210.1 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 95.6 500.0, 95.6 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 499.4 500.0, 499.4 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 488.5 400.0, 488.5 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 297.5 600.0, 297.5 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 171.0 600.0, 171.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M260.3 247.0 C 282.3 247.0, 282.3 47.0, 220.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 138.7 400.0, 138.7 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 424.0 600.0, 424.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 440.2 300.0, 440.2 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 360.8 500.0, 360.8 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 277.4 300.0, 277.4 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 222.1 500.0, 222.1 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 329.7 400.0, 329.7 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M210.1 274.0 C 210.1 294.0, 134.7 300.0, 134.7 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <a href="main.src.html#fn-explain_verification">
 <rect x="28.0" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="122.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">explain_verification</text>
@@ -143,104 +146,104 @@
 <text x="293.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1039</text>
 </a>
 <a href="main.src.html#fn-run">
-<rect x="159.8" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="210.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="210.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1050</text>
+<rect x="159.8" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="210.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
+<text x="210.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1050</text>
 </a>
 <a href="main.src.html#fn-run_ffmpeg">
-<rect x="80.4" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="134.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run_ffmpeg</text>
-<text x="134.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1527</text>
+<rect x="80.4" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="134.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run_ffmpeg</text>
+<text x="134.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1527</text>
 </a>
 <a href="main.src.html#fn-list_volumes">
-<rect x="215.0" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="277.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_volumes</text>
-<text x="277.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1582</text>
+<rect x="215.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="277.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_volumes</text>
+<text x="277.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1602</text>
 </a>
 <a href="main.src.html#fn-list_companions">
-<rect x="365.7" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="440.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_companions</text>
-<text x="440.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1630</text>
+<rect x="365.7" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="440.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_companions</text>
+<text x="440.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1650</text>
 </a>
 <a href="main.src.html#fn-offer_line">
 <rect x="155.8" y="720.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="210.1" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">offer_line</text>
-<text x="210.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1663</text>
+<text x="210.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1683</text>
 </a>
 <a href="main.src.html#fn-install_companion">
-<rect x="56.2" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="138.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_companion</text>
-<text x="138.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1687</text>
+<rect x="56.2" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="138.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_companion</text>
+<text x="138.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1707</text>
 </a>
 <a href="main.src.html#fn-reseed_range_from">
-<rect x="247.2" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="329.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
-<text x="329.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1789</text>
+<rect x="247.2" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="329.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
+<text x="329.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1809</text>
 </a>
 <a href="main.src.html#fn-config">
-<rect x="438.2" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="488.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
-<text x="488.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1804</text>
+<rect x="438.2" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="488.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
+<text x="488.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1824</text>
 </a>
 <a href="main.src.html#fn-describe_reseed_range">
 <rect x="369.7" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="468.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed_range</text>
-<text x="468.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1823</text>
+<text x="468.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1843</text>
 </a>
 <a href="main.src.html#fn-describe_reseed">
-<rect x="286.3" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="360.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
-<text x="360.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1833</text>
+<rect x="286.3" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="360.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
+<text x="360.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1853</text>
 </a>
 <a href="main.src.html#fn-anonymise">
-<rect x="45.3" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="95.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">anonymise</text>
-<text x="95.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1851</text>
+<rect x="45.3" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="95.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">anonymise</text>
+<text x="95.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1871</text>
 </a>
 <a href="main.src.html#fn-live">
-<rect x="171.9" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="222.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live</text>
-<text x="222.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1990</text>
+<rect x="171.9" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="222.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live</text>
+<text x="222.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2010</text>
 </a>
 <a href="main.src.html#fn-list_devices">
-<rect x="298.4" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="360.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_devices</text>
-<text x="360.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2210</text>
+<rect x="298.4" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="360.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_devices</text>
+<text x="360.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2230</text>
+</a>
+<a href="main.src.html#fn-read_named">
+<rect x="171.9" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="226.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_named</text>
+<text x="226.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2281</text>
+</a>
+<a href="main.src.html#fn-write_named">
+<rect x="306.5" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="364.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_named</text>
+<text x="364.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2290</text>
 </a>
 <a href="main.src.html#fn-clean">
-<rect x="449.1" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="499.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean</text>
-<text x="499.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2242</text>
+<rect x="449.1" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="499.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean</text>
+<text x="499.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2294</text>
 </a>
 <a href="main.src.html#fn-encrypt">
-<rect x="57.4" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="107.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">encrypt</text>
-<text x="107.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2259</text>
+<rect x="120.7" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="171.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">encrypt</text>
+<text x="171.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2311</text>
 </a>
 <a href="main.src.html#fn-decrypt">
-<rect x="184.0" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="234.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decrypt</text>
-<text x="234.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2288</text>
+<rect x="247.2" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="297.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decrypt</text>
+<text x="297.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2340</text>
 </a>
 <a href="main.src.html#fn-load_secret_key">
 <rect x="290.4" y="720.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="364.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_secret_key</text>
-<text x="364.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2320</text>
+<text x="364.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2372</text>
 </a>
 <a href="main.src.html#fn-keygen">
-<rect x="310.5" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="360.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keygen</text>
-<text x="360.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2328</text>
-</a>
-<a href="main.src.html#fn-watch">
-<rect x="437.0" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="487.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">watch</text>
-<text x="487.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2404</text>
-</a>
-<a href="main.src.html#fn-shred">
-<rect x="247.2" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="297.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shred</text>
-<text x="297.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2494</text>
+<rect x="373.8" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="424.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keygen</text>
+<text x="424.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2380</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
@@ -248,11 +251,11 @@
 <text x="35.0" y="829.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="851.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
 <text x="20.0" y="866.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="881.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 24 functions are drawn; the diagram is</text>
+<text x="20.0" y="881.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 26 functions are drawn; the diagram is</text>
 <text x="20.0" y="896.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 24 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 26 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
@@ -260,32 +263,37 @@ flowchart TD
     n_main[&quot;main&lt;br/&gt;line 1039&quot;]
     n_run[&quot;run&lt;br/&gt;line 1050&quot;]
     n_run_ffmpeg[&quot;run_ffmpeg&lt;br/&gt;line 1527&quot;]
-    n_list_volumes[&quot;list_volumes&lt;br/&gt;line 1582&quot;]
-    n_list_companions[&quot;list_companions&lt;br/&gt;line 1630&quot;]
-    n_offer_line[&quot;offer_line&lt;br/&gt;line 1663&quot;]
-    n_install_companion[&quot;install_companion&lt;br/&gt;line 1687&quot;]
-    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 1789&quot;]
-    n_config[&quot;config&lt;br/&gt;line 1804&quot;]
-    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 1823&quot;]
-    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 1833&quot;]
-    n_anonymise[&quot;anonymise&lt;br/&gt;line 1851&quot;]
-    n_live[&quot;live&lt;br/&gt;line 1990&quot;]
-    n_list_devices[&quot;list_devices&lt;br/&gt;line 2210&quot;]
-    n_clean[&quot;clean&lt;br/&gt;line 2242&quot;]
-    n_encrypt[&quot;encrypt&lt;br/&gt;line 2259&quot;]
-    n_decrypt[&quot;decrypt&lt;br/&gt;line 2288&quot;]
-    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 2320&quot;]
-    n_keygen[&quot;keygen&lt;br/&gt;line 2328&quot;]
-    n_watch[&quot;watch&lt;br/&gt;line 2404&quot;]
-    n_shred[&quot;shred&lt;br/&gt;line 2494&quot;]
+    n_list_volumes[&quot;list_volumes&lt;br/&gt;line 1602&quot;]
+    n_list_companions[&quot;list_companions&lt;br/&gt;line 1650&quot;]
+    n_offer_line[&quot;offer_line&lt;br/&gt;line 1683&quot;]
+    n_install_companion[&quot;install_companion&lt;br/&gt;line 1707&quot;]
+    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 1809&quot;]
+    n_config[&quot;config&lt;br/&gt;line 1824&quot;]
+    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 1843&quot;]
+    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 1853&quot;]
+    n_anonymise[&quot;anonymise&lt;br/&gt;line 1871&quot;]
+    n_live[&quot;live&lt;br/&gt;line 2010&quot;]
+    n_list_devices[&quot;list_devices&lt;br/&gt;line 2230&quot;]
+    n_read_named[&quot;read_named&lt;br/&gt;line 2281&quot;]
+    n_write_named[&quot;write_named&lt;br/&gt;line 2290&quot;]
+    n_clean[&quot;clean&lt;br/&gt;line 2294&quot;]
+    n_encrypt[&quot;encrypt&lt;br/&gt;line 2311&quot;]
+    n_decrypt[&quot;decrypt&lt;br/&gt;line 2340&quot;]
+    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 2372&quot;]
+    n_keygen[&quot;keygen&lt;br/&gt;line 2380&quot;]
     n_anonymise --&gt; n_config
     n_anonymise --&gt; n_describe_reseed_range
+    n_clean --&gt; n_read_named
     n_decrypt --&gt; n_load_secret_key
+    n_decrypt --&gt; n_read_named
     n_describe_reseed_range --&gt; n_describe_reseed
+    n_encrypt --&gt; n_read_named
+    n_encrypt --&gt; n_write_named
     n_install_companion --&gt; n_offer_line
     n_list_companions --&gt; n_offer_line
     n_live --&gt; n_config
     n_live --&gt; n_describe_reseed_range
+    n_load_secret_key --&gt; n_read_named
     n_main --&gt; n_run
     n_run --&gt; n_anonymise
     n_run --&gt; n_clean
@@ -301,32 +309,30 @@ flowchart TD
     n_run --&gt; n_live
     n_run --&gt; n_reseed_range_from
     n_run --&gt; n_run_ffmpeg
-    n_run --&gt; n_shred
-    n_run --&gt; n_watch
     click n_explain_verification href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L962&quot; &quot;open the source&quot;
     click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1039&quot; &quot;open the source&quot;
     click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1050&quot; &quot;open the source&quot;
     click n_run_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1527&quot; &quot;open the source&quot;
-    click n_list_volumes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1582&quot; &quot;open the source&quot;
-    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1630&quot; &quot;open the source&quot;
-    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1663&quot; &quot;open the source&quot;
-    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1687&quot; &quot;open the source&quot;
-    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1789&quot; &quot;open the source&quot;
-    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1804&quot; &quot;open the source&quot;
-    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1823&quot; &quot;open the source&quot;
-    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1833&quot; &quot;open the source&quot;
-    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1851&quot; &quot;open the source&quot;
-    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1990&quot; &quot;open the source&quot;
-    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2210&quot; &quot;open the source&quot;
-    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2242&quot; &quot;open the source&quot;
-    click n_encrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2259&quot; &quot;open the source&quot;
-    click n_decrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2288&quot; &quot;open the source&quot;
-    click n_load_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2320&quot; &quot;open the source&quot;
-    click n_keygen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2328&quot; &quot;open the source&quot;
-    click n_watch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2404&quot; &quot;open the source&quot;
-    click n_shred href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2494&quot; &quot;open the source&quot;
+    click n_list_volumes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1602&quot; &quot;open the source&quot;
+    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1650&quot; &quot;open the source&quot;
+    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1683&quot; &quot;open the source&quot;
+    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1707&quot; &quot;open the source&quot;
+    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1809&quot; &quot;open the source&quot;
+    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1824&quot; &quot;open the source&quot;
+    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1843&quot; &quot;open the source&quot;
+    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1853&quot; &quot;open the source&quot;
+    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1871&quot; &quot;open the source&quot;
+    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2010&quot; &quot;open the source&quot;
+    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2230&quot; &quot;open the source&quot;
+    click n_read_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2281&quot; &quot;open the source&quot;
+    click n_write_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2290&quot; &quot;open the source&quot;
+    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2294&quot; &quot;open the source&quot;
+    click n_encrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2311&quot; &quot;open the source&quot;
+    click n_decrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2340&quot; &quot;open the source&quot;
+    click n_load_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2372&quot; &quot;open the source&quot;
+    click n_keygen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2380&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_explain_verification,n_main,n_run,n_run_ffmpeg,n_list_volumes,n_list_companions,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_clean,n_encrypt,n_decrypt,n_load_secret_key,n_keygen,n_watch,n_shred helper</code></pre>
+    class n_explain_verification,n_main,n_run,n_run_ffmpeg,n_list_volumes,n_list_companions,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_read_named,n_write_named,n_clean,n_encrypt,n_decrypt,n_load_secret_key,n_keygen helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -347,27 +353,29 @@ flowchart TD
 <tr><td><code>main</code> <sub>fn</sub></td><td><a href="main.src.html#fn-main">1039</a></td><td></td></tr>
 <tr><td><code>run</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run">1050</a></td><td></td></tr>
 <tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run_ffmpeg">1527</a></td><td>Markers 87 and 88.</td></tr>
-<tr><td><code>list_volumes</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_volumes">1582</a></td><td>Report the encrypted volumes this machine is offering.</td></tr>
-<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_companions">1630</a></td><td>Report every companion that means anything on this platform.</td></tr>
-<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="main.src.html#fn-offer_line">1663</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
-<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="main.src.html#fn-install_companion">1687</a></td><td>Act on one named companion.</td></tr>
-<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="main.src.html#fn-tuning">1770</a></td><td>The engine settings a user can reach from the command line.</td></tr>
-<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-reseed_range_from">1789</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
-<tr><td><code>config</code> <sub>fn</sub></td><td><a href="main.src.html#fn-config">1804</a></td><td></td></tr>
-<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed_range">1823</a></td><td>How a randomised roll range reads in the output.</td></tr>
-<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed">1833</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
-<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="main.src.html#fn-atrest">1842</a></td><td>What to do with the result once it exists.</td></tr>
-<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="main.src.html#fn-anonymise">1851</a></td><td></td></tr>
-<tr><td><code>live</code> <sub>fn</sub></td><td><a href="main.src.html#fn-live">1990</a></td><td></td></tr>
-<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_devices">2210</a></td><td></td></tr>
-<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="main.src.html#fn-clean">2242</a></td><td></td></tr>
-<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-encrypt">2259</a></td><td></td></tr>
-<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-decrypt">2288</a></td><td></td></tr>
-<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="main.src.html#fn-load_secret_key">2320</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
-<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="main.src.html#fn-keygen">2328</a></td><td></td></tr>
-<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="main.src.html#fn-watch">2404</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
-<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="main.src.html#fn-shred">2494</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>info</code> <sub>fn</sub></td><td><a href="main.src.html#fn-info">2562</a></td><td></td></tr>
+<tr><td><code>list_volumes</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_volumes">1602</a></td><td>Report the encrypted volumes this machine is offering.</td></tr>
+<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_companions">1650</a></td><td>Report every companion that means anything on this platform.</td></tr>
+<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="main.src.html#fn-offer_line">1683</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
+<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="main.src.html#fn-install_companion">1707</a></td><td>Act on one named companion.</td></tr>
+<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="main.src.html#fn-tuning">1790</a></td><td>The engine settings a user can reach from the command line.</td></tr>
+<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-reseed_range_from">1809</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
+<tr><td><code>config</code> <sub>fn</sub></td><td><a href="main.src.html#fn-config">1824</a></td><td></td></tr>
+<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed_range">1843</a></td><td>How a randomised roll range reads in the output.</td></tr>
+<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed">1853</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
+<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="main.src.html#fn-atrest">1862</a></td><td>What to do with the result once it exists.</td></tr>
+<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="main.src.html#fn-anonymise">1871</a></td><td></td></tr>
+<tr><td><code>live</code> <sub>fn</sub></td><td><a href="main.src.html#fn-live">2010</a></td><td></td></tr>
+<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_devices">2230</a></td><td></td></tr>
+<tr><td><code>read_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-read_named">2281</a></td><td>Read a file, naming it if that fails.</td></tr>
+<tr><td><code>write_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-write_named">2290</a></td><td>Write a file, naming it if that fails.</td></tr>
+<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="main.src.html#fn-clean">2294</a></td><td></td></tr>
+<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-encrypt">2311</a></td><td></td></tr>
+<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-decrypt">2340</a></td><td></td></tr>
+<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="main.src.html#fn-load_secret_key">2372</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
+<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="main.src.html#fn-keygen">2380</a></td><td></td></tr>
+<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="main.src.html#fn-watch">2456</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
+<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="main.src.html#fn-shred">2546</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>info</code> <sub>fn</sub></td><td><a href="main.src.html#fn-info">2614</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

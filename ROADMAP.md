@@ -274,7 +274,7 @@ installing it, and finding their way around it without reading a manual.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 104 | **A demonstration that is the program**: the website's demo driven by real recorded sessions of all three binaries rather than by invented text, in the reader's chosen theme, and sitting with the screenshots rather than away from them | **next** | 3 |
+| 104 | **A demonstration that is the program**: five recorded sessions of the real binaries replayed on the website, re-run and compared on every build, sitting with the screenshots | **done** | - |
 | 105 | **A crash report offered rather than buried**: the report already written to disk surfaced above whatever tab you land on, with what it contains listed and readable in full before anything leaves your machine, and the filing left to the person | **done** | - |
 | 106 | **A first run that explains itself**: one card per tab saying what it is for, skippable, and after an upgrade only the tabs that are new, with portable and installed said plainly on the last card | **done** | - |
 | 107 | **VeilVoice on a phone**: an Android package a person can install without developer tools, and iOS if it can be built and signed under a pseudonym, which is the part that decides it | **planned** | 10 |
