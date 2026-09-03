@@ -125,6 +125,12 @@ pub struct Security {
     load_error: Option<String>,
     /// Whether the app is currently locked. Only ever true with a `store`.
     locked: bool,
+    /// Whether the current lock was the autolock's doing rather than a person's.
+    ///
+    /// Read by the lock screen for one line of text, and cleared on unlock. It
+    /// is not persisted: a lock that survives a restart is a lock whose reason
+    /// nobody can still be wondering about.
+    auto_locked: bool,
     /// Whether the lock reported interference. Shown once the app is open, not
     /// on the lock screen: telling a stranger at the lock screen that their
     /// last attempt was noticed is telling them something they can use.
@@ -202,6 +208,7 @@ impl Default for Security {
             store: None,
             load_error: None,
             locked: false,
+            auto_locked: false,
             tampered: false,
             just_unlocked: None,
             app_secret: None,
@@ -317,9 +324,28 @@ impl Security {
     }
 
     /// Lock the app now, wiping the session passphrase with it.
+    ///
+    /// This is the deliberate one: somebody pressed Lock. The screen says
+    /// nothing about how it got there, because the person reading it already
+    /// knows.
     pub fn lock_now(&mut self) {
+        self.lock_inner(false);
+    }
+
+    /// Lock because nobody has touched the window for a while.
+    ///
+    /// Identical to [`Self::lock_now`] except that the lock screen says so.
+    /// Coming back to a locked window you did not lock is the moment to
+    /// wonder whether somebody else has been at the machine, and answering
+    /// that costs nothing and saves a bad minute.
+    pub fn lock_after_idle(&mut self) {
+        self.lock_inner(true);
+    }
+
+    fn lock_inner(&mut self, by_idle: bool) {
         if self.store.is_some() {
             self.locked = true;
+            self.auto_locked = by_idle;
             self.wipe_secrets();
         }
     }
@@ -447,6 +473,7 @@ impl Security {
         match outcome {
             Ok(Op::Unlock) => {
                 self.locked = false;
+                self.auto_locked = false;
                 // Moved rather than wiped, for one caller and one frame. The
                 // integrity record is sealed under this passphrase and the
                 // unlock is the only moment it exists, so wiping it here would
@@ -500,6 +527,7 @@ impl Security {
             Ok(Op::Remove) => {
                 self.wipe_form();
                 self.locked = false;
+                self.auto_locked = false;
                 self.message = Some(("app lock removed".into(), p::yellow()));
             }
             Err(e) => {
@@ -530,7 +558,15 @@ impl Security {
     pub fn unlock_screen(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
         self.poll();
 
-        ui.add_space(40.0);
+        // Vertically centred rather than pinned near the top. A locked window
+        // has one thing in it, and one thing sitting a fifth of the way down
+        // an empty panel looks like a page that failed to load. The space
+        // above is a third of what is left over, which puts the mark slightly
+        // above centre -- where an eye looks first.
+        let content_height = 260.0;
+        let slack = (ui.available_height() - content_height).max(0.0);
+        ui.add_space((slack / 3.0).clamp(16.0, 120.0));
+
         ui.vertical_centered(|ui| {
             // The mark, moving, in the space the explanation used to take.
             //
@@ -540,20 +576,42 @@ impl Security {
             // is a window somebody is looking at while they remember a
             // passphrase; something alive in it is worth more than a paragraph
             // that helps whoever should not be reading it.
-            crate::soundbar::draw(
-                ui,
-                egui::vec2(120.0, 34.0),
-                motion,
-                ui.input(|i| i.time) as f32,
-            );
-            ui.add_space(10.0);
+            //
+            // In the icon's badge here rather than bare. On the header the
+            // bars alone read as VeilVoice because the header is full of other
+            // VeilVoice furniture; on an empty locked window they read as a
+            // stray animation, and the badge is what makes the window say
+            // whose it is.
+            crate::soundbar::badge(ui, 96.0, motion, ui.input(|i| i.time) as f32);
+            ui.add_space(14.0);
             ui.label(
                 RichText::new("VeilVoice")
-                    .size(24.0)
+                    .size(26.0)
                     .color(p::fg())
                     .strong(),
             );
             ui.label(RichText::new("locked").color(p::yellow()));
+
+            // Whether the window locked itself, said once and then dropped.
+            //
+            // Somebody who comes back to a locked window they did not lock
+            // should not have to wonder whether they left it open or somebody
+            // else closed it. It says which, and then it gets out of the way:
+            // the moment a character is typed the line is gone, because by
+            // then it has been read and the person is busy.
+            //
+            // It tells a stranger nothing the empty room did not already: that
+            // whoever owns this walked away. What it does not say is when, how
+            // long the delay was, or how many attempts have been made, all of
+            // which are about the owner rather than about the lock.
+            if self.auto_locked && self.entry.is_empty() {
+                ui.add_space(6.0);
+                ui.label(
+                    RichText::new("locked itself after a while unused")
+                        .color(p::muted())
+                        .small(),
+                );
+            }
         });
         ui.add_space(24.0);
 
@@ -1735,6 +1793,61 @@ mod tests {
 
     /// Locking must take the session passphrase with it, or "locked" would be
     /// a screen rather than a state.
+    /// A real lock in a temporary directory, at test cost.
+    ///
+    /// `lock_now` refuses to lock when there is nothing to unlock with, which
+    /// is the right behaviour and means these tests need an actual store.
+    fn locked_security() -> (Security, tempfile::TempDir) {
+        let dir = tempfile::tempdir().unwrap();
+        let store =
+            veilvoice_crypto::LockStore::create(&dir.path().join("applock.bin"), b"pw", weak())
+                .unwrap();
+        let mut s = Security::default();
+        s.store = Some(store);
+        (s, dir)
+    }
+
+    #[test]
+    fn a_deliberate_lock_and_an_idle_one_are_told_apart() {
+        let (mut s, _dir) = locked_security();
+        s.lock_now();
+        assert!(s.is_locked());
+        assert!(
+            !s.auto_locked,
+            "somebody pressed Lock; the screen must not claim the window did it"
+        );
+
+        let (mut s, _dir) = locked_security();
+        s.lock_after_idle();
+        assert!(s.is_locked());
+        assert!(s.auto_locked);
+    }
+
+    #[test]
+    fn the_auto_lock_note_is_not_shown_once_typing_starts() {
+        // The note is drawn under `self.auto_locked && self.entry.is_empty()`.
+        // Read from the source rather than by driving egui, which needs a
+        // context this test suite does not build.
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let start = source.find("pub fn unlock_screen").unwrap();
+        let body = &source[start..start + 4000];
+        assert!(
+            body.contains("self.auto_locked && self.entry.is_empty()"),
+            "the note must disappear as soon as a character is typed"
+        );
+    }
+
+    #[test]
+    fn the_lock_screen_shows_the_mark_in_its_badge() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let start = source.find("pub fn unlock_screen").unwrap();
+        let body = &source[start..start + 4000];
+        assert!(
+            body.contains("soundbar::badge"),
+            "a locked window has one thing in it and it should be the logo"
+        );
+    }
+
     #[test]
     fn locking_wipes_the_session_passphrase() {
         let mut s = Security::default();

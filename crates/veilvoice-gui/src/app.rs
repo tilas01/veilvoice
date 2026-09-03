@@ -804,7 +804,7 @@ impl eframe::App for VeilVoiceApp {
         }
         let autolock = self.preferences.autolock();
         if autolock.expired(std::time::Duration::from_secs_f32(self.idle_secs.max(0.0))) {
-            self.security.lock_now();
+            self.security.lock_after_idle();
             self.idle_secs = 0.0;
         }
 
@@ -2360,8 +2360,12 @@ mod tests {
             );
         }
         assert!(
-            body.contains("self.security.lock_now()"),
+            body.contains("self.security.lock_after_idle()"),
             "nothing actually locks the window"
+        );
+        assert!(
+            !body.contains("self.security.lock_now()"),
+            "the idle path must use lock_after_idle, or the lock screen cannot              tell somebody the window locked itself rather than that they left              it locked"
         );
     }
 

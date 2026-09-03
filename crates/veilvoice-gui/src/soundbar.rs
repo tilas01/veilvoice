@@ -187,6 +187,50 @@ fn animation_clock(ctx: &egui::Context, moving: bool, time: f32) -> f32 {
 /// movement every bar is drawn at its resting height and nothing is scheduled.
 /// When motion is allowed but the window is unfocused or being dragged, the
 /// bars hold their last shape and nothing is scheduled either.
+/// The application mark: the bars inside the rounded square the icon uses.
+///
+/// The lock screen drew the bars alone, which is the header's treatment and
+/// reads there because the header is full of other VeilVoice furniture. On an
+/// otherwise empty locked window it read as a stray animation rather than as
+/// the program identifying itself, so this puts them back in the badge the
+/// icon puts them in, and a locked window now shows the logo.
+///
+/// Drawn rather than decoded, like everything else in this module. The icon on
+/// disk is 32x32, and blowing that up to the size wanted here would be visibly
+/// soft; the same shape as vectors is crisp at any size and adds no image
+/// decoder to the application.
+pub fn badge(ui: &mut Ui, side: f32, motion: Motion, time: f32) -> egui::Response {
+    let (rect, response) = ui.allocate_exact_size(Vec2::splat(side), Sense::hover());
+    if !ui.is_rect_visible(rect) {
+        return response;
+    }
+
+    // The icon's proportions: a two-pixel border on a 32-pixel square, corners
+    // cut by one. Kept as fractions so it scales.
+    let radius = CornerRadius::same((side * 0.19).round().min(255.0) as u8);
+    ui.painter()
+        .rect_filled(rect, radius, crate::theme::palette::bg_dark());
+    ui.painter().rect_stroke(
+        rect,
+        radius,
+        egui::Stroke::new((side * 0.055).max(1.0), crate::theme::palette::border()),
+        egui::StrokeKind::Inside,
+    );
+
+    // The bars sit in the middle two thirds, as they do in the icon.
+    let inner = Rect::from_center_size(rect.center(), Vec2::new(side * 0.66, side * 0.52));
+    let mut child = ui.new_child(egui::UiBuilder::new().max_rect(inner));
+    draw(&mut child, inner.size(), motion, time);
+
+    response
+}
+
+/// Draw the mark at `size`, returning the response so it can carry a tooltip.
+///
+/// `time` is the application clock in seconds. When `motion` disallows
+/// movement every bar is drawn at its resting height and nothing is scheduled.
+/// When motion is allowed but the window is unfocused or being dragged, the
+/// bars hold their last shape and nothing is scheduled either.
 pub fn draw(ui: &mut Ui, size: Vec2, motion: Motion, time: f32) -> egui::Response {
     let (rect, response) = ui.allocate_exact_size(size, Sense::hover());
     if !ui.is_rect_visible(rect) {
