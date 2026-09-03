@@ -39,12 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/crashreport.svg" alt="crashreport.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/crashreport.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 268 lines &middot; <a href="crashreport.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 289 lines &middot; <a href="crashreport.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-was-wrong-with-where-this-used-to-be">What was wrong with where this used to be</a>
   <a href="#why-it-is-offered-rather-than-sent">Why it is offered rather than sent</a>
-  <a href="#and-it-says-what-is-in-it">And it says what is in it</a>
+  <a href="#and-it-says-what-is-in-it-without-overpromising">And it says what is in it, without overpromising</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -59,21 +59,23 @@
 <h2 id="why-it-is-offered-rather-than-sent">Why it is offered rather than sent</h2>
 <p>Nothing is transmitted, and nothing here could transmit it: this project contains no network client and CI fails the build if one enters the dependency graph. A crash reporter that uploads is the ordinary shape of this feature and it is the wrong shape for this program, because a report from a tool people use to protect themselves is a report about a person who was being careful.</p>
 <p>So the report is shown, in full, in the window. The whole text, not a summary of it, because &quot;would you like to send this&quot; is only a real question if you can read what &quot;this&quot; is. Then two buttons: copy it, and open the issue tracker in a browser. What happens after that is the person&#x27;s decision and their clipboard.</p>
-<h2 id="and-it-says-what-is-in-it">And it says what is in it</h2>
-<p>The report carries the version, the operating system and processor, the panic message and the source location. It carries no file names, no settings, no passphrase and nothing about the audio. That list is in the panel rather than in this comment, because somebody deciding whether to paste it into a public issue tracker needs it in front of them.</p>
+<h2 id="and-it-says-what-is-in-it-without-overpromising">And it says what is in it, without overpromising</h2>
+<p>The report carries the version, the operating system and processor, when it happened, the panic message and the source location. VeilVoice puts in no file names, no settings, no passphrase and nothing about the audio.</p>
+<p>The panel used to say flatly that the report <em>contains</em> no file names. That is a promise about the panic message, and the panic message is the one part nobody writes in advance. No panic in VeilVoice&#x27;s own code formats a path -- there is a test for that, in <code>crashlog</code>, and it reads the source rather than trusting the claim -- but a decoder or a toolkit it depends on could put one there, and this program cannot promise on their behalf.</p>
+<p>So the panel says what VeilVoice puts in, names the error message as the part that is not written in advance, and offers the whole text to read. A promise that cannot be kept is worse than an accurate description with a button next to it.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>268 lines defining <strong>3 functions</strong> (3 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>289 lines defining <strong>3 functions</strong> (3 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Offer</code> <span style="color:var(--muted)">line 60</span> &middot; What the panel is showing, kept across frames.</li>
+<li><code>struct Offer</code> <span style="color:var(--muted)">line 70</span> &middot; What the panel is showing, kept across frames.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Offer::look</code> <span style="color:var(--muted)">line 74</span> &middot; Read the previous report, if there is one.
+<li><code>Offer::look</code> <span style="color:var(--muted)">line 84</span> &middot; Read the previous report, if there is one.
 </li>
-<li><code>Offer::waiting</code> <span style="color:var(--muted)">line 84</span> &middot; Whether there is anything to show.
+<li><code>Offer::waiting</code> <span style="color:var(--muted)">line 94</span> &middot; Whether there is anything to show.
 </li>
-<li><code>Offer::panel</code> <span style="color:var(--muted)">line 95</span> &middot; Draw the offer.
+<li><code>Offer::panel</code> <span style="color:var(--muted)">line 105</span> &middot; Draw the offer.
 </li>
 </ul>
 </section>
@@ -93,17 +95,17 @@
 <a href="crashreport.src.html#fn-offer-look">
 <rect x="20.0" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="78.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Offer::look</text>
-<text x="78.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
+<text x="78.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 84</text>
 </a>
 <a href="crashreport.src.html#fn-offer-waiting">
 <rect x="162.7" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="233.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Offer::waiting</text>
-<text x="233.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 84</text>
+<text x="233.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
 </a>
 <a href="crashreport.src.html#fn-offer-panel">
 <rect x="329.5" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="391.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Offer::panel</text>
-<text x="391.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
+<text x="391.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -119,12 +121,12 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_look([&quot;Offer::look&lt;br/&gt;line 74&quot;])
-    n_waiting([&quot;Offer::waiting&lt;br/&gt;line 84&quot;])
-    n_panel([&quot;Offer::panel&lt;br/&gt;line 95&quot;])
-    click n_look href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L74&quot; &quot;open the source&quot;
-    click n_waiting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L84&quot; &quot;open the source&quot;
-    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L95&quot; &quot;open the source&quot;
+    n_look([&quot;Offer::look&lt;br/&gt;line 84&quot;])
+    n_waiting([&quot;Offer::waiting&lt;br/&gt;line 94&quot;])
+    n_panel([&quot;Offer::panel&lt;br/&gt;line 105&quot;])
+    click n_look href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L84&quot; &quot;open the source&quot;
+    click n_waiting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L94&quot; &quot;open the source&quot;
+    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L105&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_look,n_waiting,n_panel entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -133,13 +135,13 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>NEW_ISSUE</code> <sub>pub const</sub></td><td><a href="crashreport.src.html#fn-new_issue">50</a></td><td>Where a report goes, if the person wants to file one.</td></tr>
-<tr><td><code>ISSUES</code> <sub>pub const</sub></td><td><a href="crashreport.src.html#fn-issues">53</a></td><td>The issue tracker itself, linked from About whether or not anything crashed.</td></tr>
-<tr><td><code>COPIED_FOR</code> <sub>const</sub></td><td><a href="crashreport.src.html#fn-copied_for">56</a></td><td>How long the copy button says it copied, in seconds.</td></tr>
-<tr><td><code>Offer</code> <sub>pub struct</sub></td><td><a href="crashreport.src.html#fn-offer">60</a></td><td>What the panel is showing, kept across frames.</td></tr>
-<tr><td><code>Offer::look</code> <sub>pub fn</sub></td><td><a href="crashreport.src.html#fn-offer-look">74</a></td><td>Read the previous report, if there is one.</td></tr>
-<tr><td><code>Offer::waiting</code> <sub>pub fn</sub></td><td><a href="crashreport.src.html#fn-offer-waiting">84</a></td><td>Whether there is anything to show.</td></tr>
-<tr><td><code>Offer::panel</code> <sub>pub fn</sub></td><td><a href="crashreport.src.html#fn-offer-panel">95</a></td><td>Draw the offer.</td></tr>
+<tr><td><code>NEW_ISSUE</code> <sub>pub const</sub></td><td><a href="crashreport.src.html#fn-new_issue">60</a></td><td>Where a report goes, if the person wants to file one.</td></tr>
+<tr><td><code>ISSUES</code> <sub>pub const</sub></td><td><a href="crashreport.src.html#fn-issues">63</a></td><td>The issue tracker itself, linked from About whether or not anything crashed.</td></tr>
+<tr><td><code>COPIED_FOR</code> <sub>const</sub></td><td><a href="crashreport.src.html#fn-copied_for">66</a></td><td>How long the copy button says it copied, in seconds.</td></tr>
+<tr><td><code>Offer</code> <sub>pub struct</sub></td><td><a href="crashreport.src.html#fn-offer">70</a></td><td>What the panel is showing, kept across frames.</td></tr>
+<tr><td><code>Offer::look</code> <sub>pub fn</sub></td><td><a href="crashreport.src.html#fn-offer-look">84</a></td><td>Read the previous report, if there is one.</td></tr>
+<tr><td><code>Offer::waiting</code> <sub>pub fn</sub></td><td><a href="crashreport.src.html#fn-offer-waiting">94</a></td><td>Whether there is anything to show.</td></tr>
+<tr><td><code>Offer::panel</code> <sub>pub fn</sub></td><td><a href="crashreport.src.html#fn-offer-panel">105</a></td><td>Draw the offer.</td></tr>
 </tbody></table>
 </section>
 </div></div>

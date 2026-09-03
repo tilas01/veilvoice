@@ -92,6 +92,12 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <li>ffmpeg does the writing, so the fix is the step after it: the output of <code>import</code> and <code>video</code> is set owner-only once ffmpeg has finished.</li>
 <li>There is a window between ffmpeg creating the file and that happening, and it is not closed by this. That is inherent to handing the write to another program; the exposure goes from permanent to the length of one transcode, and the note the program prints says only what it actually did.</li>
 </ul>
+<p><strong>A promise the crash panel could not keep</strong></p>
+<ul>
+<li>The panel listing what a crash report holds said flatly that it contains no file names. Most of a report is written in advance; the error message is not, and the hook catches panics from the whole process, dependencies included.</li>
+<li>Checked rather than assumed, and the check is now a test: no panic in any code that reaches a shipped binary formats a path into its message. It walks every source file, skips test and benchmark code, and was run against a planted offender to confirm it catches one.</li>
+<li>So the claim is true of VeilVoice and is not something VeilVoice can promise on a decoder&#x27;s behalf. The panel now says which four things VeilVoice puts in, names the error message as the part not written in advance, and points at the button showing the whole text. This is a panel whose whole job is helping somebody decide what to publish.</li>
+</ul>
 <p><strong>And the same slip in three more files, found by sweeping for it</strong></p>
 <ul>
 <li>Finding the first one by running a command is a bad way to find a class of defect, so every <code>fs::write</code> in the tree was listed and each asked what it holds. Three more were the same mistake.</li>
