@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1893 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1888 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -69,14 +69,14 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1893 lines defining <strong>34 functions</strong> (2 public), <strong>1 type</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1888 lines defining <strong>34 functions</strong> (2 public), <strong>1 type</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Manifest</code> <span style="color:var(--muted)">line 946</span> &middot; What the release said is inside its archives, if anything usable.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>help_text</code> <span style="color:var(--muted)">line 162</span> &middot; The verifier&#x27;s own help, with its verbosity and exit-status tables.
 </li>
-<li><code>run</code> <span style="color:var(--muted)">line 1664</span> &middot; Run the verifier over args, which are the words after veilvoice verify.
+<li><code>run</code> <span style="color:var(--muted)">line 1659</span> &middot; Run the verifier over args, which are the words after veilvoice verify.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>asked_for</code>, <code>command_auto</code>, <code>command_build</code>, <code>command_deps</code>, <code>command_file_against_hash</code>, <code>command_file_against_sums</code>, <code>command_gnupg</code>, <code>command_hash</code>, <code>command_install</code>, <code>command_key</code>, <code>command_release</code>, <code>command_reproduce</code></span>
 </li>
 </ul>
@@ -244,7 +244,7 @@
 <a href="lib.src.html#fn-run">
 <rect x="270.2" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="320.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1664</text>
+<text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1659</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -283,7 +283,7 @@ flowchart TD
     n_report_extracted[&quot;report_extracted&lt;br/&gt;line 882&quot;]
     n_manifest[&quot;manifest&lt;br/&gt;line 962&quot;]
     n_report_against_manifest[&quot;report_against_manifest&lt;br/&gt;line 993&quot;]
-    n_run([&quot;run&lt;br/&gt;line 1664&quot;])
+    n_run([&quot;run&lt;br/&gt;line 1659&quot;])
     n_command_auto --&gt; n_command_file_against_sums
     n_command_auto --&gt; n_incomplete_deny
     n_command_auto --&gt; n_report_extracted
@@ -347,7 +347,7 @@ flowchart TD
     click n_report_extracted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L882&quot; &quot;open the source&quot;
     click n_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L962&quot; &quot;open the source&quot;
     click n_report_against_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L993&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1664&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1659&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -388,13 +388,13 @@ flowchart TD
 <tr><td><code>report_presence_only</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_presence_only">1106</a></td><td>The old report, for a release that published no contents list.</td></tr>
 <tr><td><code>report_gnupg</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_gnupg">1149</a></td><td>Marker 97.</td></tr>
 <tr><td><code>command_gnupg</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_gnupg">1234</a></td><td>Marker 91.</td></tr>
-<tr><td><code>command_deps</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_deps">1284</a></td><td>What this machine needs before it can build VeilVoice.</td></tr>
-<tr><td><code>command_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_build">1356</a></td><td>Build the workspace from source and hash what came out.</td></tr>
-<tr><td><code>do_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-do_build">1374</a></td><td>Everything both build commands do before they differ.</td></tr>
-<tr><td><code>command_reproduce</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_reproduce">1443</a></td><td>Build here, and compare against the published hashes for this platform.</td></tr>
-<tr><td><code>command_install</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_install">1552</a></td><td>Put binaries where a shell will find them.</td></tr>
-<tr><td><code>asked_for</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-asked_for">1641</a></td><td>Print something the reader asked for by name, at any level.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-run">1664</a></td><td>Run the verifier over args, which are the words after veilvoice verify.</td></tr>
+<tr><td><code>command_deps</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_deps">1279</a></td><td>What this machine needs before it can build VeilVoice.</td></tr>
+<tr><td><code>command_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_build">1351</a></td><td>Build the workspace from source and hash what came out.</td></tr>
+<tr><td><code>do_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-do_build">1369</a></td><td>Everything both build commands do before they differ.</td></tr>
+<tr><td><code>command_reproduce</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_reproduce">1438</a></td><td>Build here, and compare against the published hashes for this platform.</td></tr>
+<tr><td><code>command_install</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_install">1547</a></td><td>Put binaries where a shell will find them.</td></tr>
+<tr><td><code>asked_for</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-asked_for">1636</a></td><td>Print something the reader asked for by name, at any level.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-run">1659</a></td><td>Run the verifier over args, which are the words after veilvoice verify.</td></tr>
 </tbody></table>
 </section>
 </div></div>

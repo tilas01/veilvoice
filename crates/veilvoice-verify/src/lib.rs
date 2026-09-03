@@ -1258,19 +1258,14 @@ fn command_gnupg(explicit: Option<&Path>) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-/// Keep the window open when there was nobody watching a terminal.
-///
-/// A console program started by double-clicking gets a console of its own, and
-/// that console closes the instant the process exits -- so the usage text this
-/// used to print flashed past and vanished. Reported as "veilvoice-verify
-/// crashes on launch", and reasonably so: from the outside a window that
-/// appears and disappears is indistinguishable from one that fell over.
-///
-/// Detecting a double-click properly means asking Windows how many processes
-/// share this console, which is FFI, and every crate here carries
-/// `#![forbid(unsafe_code)]`. **No arguments** is the safe stand-in: somebody
-/// running this from a terminal almost always types a subcommand, and somebody
-/// who types the bare name gets one extra keypress.
+// The wait-for-Enter that used to be here went with the standalone binary.
+// It existed because a console program started by double-clicking gets a
+// console of its own, which closes the instant the process exits, so the
+// verdict flashed past and vanished -- reported, reasonably, as "it crashes on
+// launch". There is nothing to double-click now: `veilvoice verify` is run
+// from a shell that is not about to close, and somebody who would rather not
+// use a terminal has the desktop application's Verify tab.
+
 // ---------------------------------------------------------------------------
 // Building it yourself
 // ---------------------------------------------------------------------------

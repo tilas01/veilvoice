@@ -266,14 +266,18 @@ SESSIONS = [
     },
     {
         "name": "verify",
-        "programme": "veilvoice-verify",
+        # The verifier stopped being a binary of its own in 0.1.18 and became
+        # `veilvoice verify`. The recording follows it rather than being
+        # dropped: this is the session a nervous user most wants to see before
+        # they run anything.
+        "programme": "veilvoice",
         "title": "Checking a download",
         "note": "The published release, its signed hash list, and the same "
                 "question asked again of your own GnuPG.",
         "how": "witnessed",
         "pipe": True,
         "steps": [
-            {"show": "veilvoice-verify auto .", "argv": ["auto", "."]},
+            {"show": "veilvoice verify auto .", "argv": ["verify", "auto", "."]},
         ],
         "files": {},
     },
@@ -294,7 +298,7 @@ def record_one(session, release_dir=None):
     if exe is None:
         raise SystemExit(
             "no `%s` build found. Run:\n"
-            "    cargo build --release -p veilvoice-cli -p veilvoice-verify"
+            "    cargo build --release -p veilvoice-cli"
             % session["programme"])
 
     if session["how"] == "witnessed":
