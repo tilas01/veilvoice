@@ -262,6 +262,22 @@ unsealed manifest are records of what this machine does rather than of who
 anybody is, and they live in the user's own configuration directory. Left as
 they are, deliberately, rather than tightened for the look of it.
 
+**Whether ordinary speech ever clips.** The obvious question after reading
+`output ran away to 4.05` in a CI log, and the one that would matter, since a
+recording that comes out above full scale is clamped by the writer and a person
+hears the distortion. Measured on speech-like input, ten runs at each level:
+
+    input peak 0.30  ->  output peak 0.196, 0 samples over full scale
+    input peak 0.70  ->  output peak 0.466, 0 samples over full scale
+    input peak 0.95  ->  output peak 0.554, 0 samples over full scale
+    input peak 1.00  ->  output peak 0.621, 0 samples over full scale
+
+Not one sample over unity in 1.9 million, and about four decibels of headroom
+at the worst. The overshoot in F-139 is confined to the Nyquist-rate square
+wave it was measured on, which is not a signal any recording contains. Nothing
+to fix, and worth writing down because the number in that failure message
+invites exactly the opposite conclusion.
+
 **Tamper detection, run rather than read.** `veilvoice guard` was exercised end
 to end for the first time from here, on a copy of the binary so a real file
 could be modified:
