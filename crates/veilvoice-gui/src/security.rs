@@ -1089,12 +1089,15 @@ impl Security {
 pub const DISABLE_WARNING: &[&str] = &[
     "VeilVoice destroys the voiceprint, not the words. An unencrypted result is \
      still a recording of everything that was said.",
-    "Anyone who can read the file (another account on this machine, a backup, a \
-     cloud sync client, anyone who later gets the disk) can hear all of it.",
+    "Anyone who can read the file (a backup, a cloud sync client, anyone who \
+     later gets the disk) can hear all of it.",
     "Deleting it afterwards is not a fix. On an SSD, SD card or USB stick the \
      original blocks can survive every overwrite.",
     "That is why at-rest encryption is the default rather than something you \
      have to go and find.",
+    "The file will be created readable only by your account. That is a file \
+     permission and nothing more: it does not survive a copy, a backup, or \
+     anyone who has the disk.",
 ];
 
 /// What a finished job should do with its bytes.
@@ -1132,7 +1135,19 @@ impl Plan {
     ) -> Result<PathBuf, String> {
         let sealed = match self {
             Plan::Plaintext => {
-                std::fs::write(path, wav).map_err(|e| format!("{}: {e}", path.display()))?;
+                // Owner-only, the same as the command line's identical branch.
+                //
+                // An unencrypted recording is still a recording of everything
+                // that was said, so at minimum it is not left readable by every
+                // other account on the machine. `veilvoice anonymise --encrypt
+                // false` had written 0600 since it was written; this, the
+                // window's version of exactly the same decision, wrote 0644.
+                //
+                // A file permission is a much weaker thing than the encryption
+                // being declined here, and the interface says so rather than
+                // letting it read as a consolation.
+                veilvoice_crypto::privatefile::write_owner_only(path, wav)
+                    .map_err(|e| format!("{}: {e}", path.display()))?;
                 return Ok(path.to_path_buf());
             }
             Plan::Missing => {
@@ -1660,6 +1675,29 @@ mod tests {
             .unwrap();
         assert_eq!(out, path);
         assert_eq!(std::fs::read(&path).unwrap(), b"audio bytes");
+    }
+
+    /// An unencrypted recording is still readable only by this account.
+    ///
+    /// `veilvoice anonymise --encrypt false` had written 0600 since it was
+    /// written. This, the window's version of the same decision, wrote 0644,
+    /// so turning encryption off in the interface left the recording readable
+    /// by every other account on the machine and turning it off on the command
+    /// line did not.
+    #[cfg(unix)]
+    #[test]
+    fn a_plaintext_plan_still_writes_owner_only() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("clip.wav");
+        Plan::Plaintext
+            .write(&path, b"audio bytes", weak())
+            .unwrap();
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(
+            mode, 0o600,
+            "an unencrypted recording is {mode:o}, so anyone with an account here can play it"
+        );
     }
 
     /// The confirmed passphrase must not linger as ordinary heap bytes. It used

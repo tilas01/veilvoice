@@ -79,6 +79,23 @@ Every release, newest first. Open one to read what changed in it; its files are 
 </p>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>The file with more in it had the weaker permission</strong></p>
+<ul>
+<li>Everything group mode wrote was readable by every other account on the machine. <code>veilvoice conversation render</code> wrote its audio, both subtitle tracks and the page as 0644; so did the desktop application&#x27;s group panel; and so did the file tab whenever somebody turned encryption off there.</li>
+<li><code>veilvoice anonymise</code> has always written its result owner-only, including on the path where encryption is explicitly declined. So the output carrying the <em>most</em> identifying material had the weakest protection: the subtitles hold the names and the words as typed, and the timings say who spoke when.</li>
+<li>Nobody decided that. One path called the hardened write and the other called the default, in three places across two programs, with nothing to notice. All of them go through one helper per front end now, and both front ends have a test that renders and checks the mode on every file. Both tests were run against the old code first and fail on it.</li>
+<li>A file permission is still a much weaker thing than encryption and both programs say so. The window&#x27;s warning used to say another account could read the file, which was true when written and would have become a lie the moment this was fixed, so it moved with the code.</li>
+</ul>
+<p><strong>The un-veiled original, left readable by everyone</strong></p>
+<ul>
+<li><code>veilvoice import</code> pulls the audio out of a video container, and what it writes is the <em>original</em> recording with the voiceprint intact. It is the most revealing file this program ever writes, and it was left at whatever ffmpeg&#x27;s umask produced, which is world-readable on a normal account.</li>
+<li>ffmpeg does the writing, so the fix is the step after it: the output of <code>import</code> and <code>video</code> is set owner-only once ffmpeg has finished.</li>
+<li>There is a window between ffmpeg creating the file and that happening, and it is not closed by this. That is inherent to handing the write to another program; the exposure goes from permanent to the length of one transcode, and the note the program prints says only what it actually did.</li>
+</ul>
+<p><strong>Three commands that would not say which file</strong></p>
+<ul>
+<li><code>veilvoice encrypt</code>, <code>decrypt</code> and <code>clean</code> reported a missing file as &quot;No such file or directory&quot; with no name, on commands that take two paths. <code>anonymise</code> named it, because its code formatted the path in by hand and theirs did not. Two helpers now, rather than a fourth copy of the format string.</li>
+</ul>
 <p><strong>VeilVoice on a phone, checked rather than guessed</strong></p>
 <ul>
 <li>The Android target was installed and the workspace compiled against it before the estimate was written, which is the rule this project already follows for anything that depends on somebody else&#x27;s platform.</li>

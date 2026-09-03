@@ -107,6 +107,39 @@ pub fn replace_owner_only(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
     }
 }
 
+/// Make an existing file readable only by its owner.
+///
+/// For files this program did not create. `veilvoice import` and
+/// `veilvoice video` hand the writing to `ffmpeg`, which creates the output
+/// under its own umask, and `import`'s output is the *original* audio pulled
+/// out of a container: the untouched voiceprint, which is the single most
+/// revealing thing this program ever puts on a disk. It was being left
+/// world-readable.
+///
+/// # What this cannot do
+///
+/// There is a window between `ffmpeg` creating the file and this tightening
+/// it, and during that window the file is whatever the umask made it. That is
+/// inherent to delegating the write to another program, and it is not closed
+/// by pretending otherwise. Narrowing the exposure from "for ever" to "for the
+/// length of one transcode" is worth having, and the honest description of it
+/// belongs here rather than in a claim that it is airtight.
+///
+/// A no-op on platforms without Unix permissions, where the file's protection
+/// comes from the directory it is in.
+pub fn tighten(path: &Path) -> std::io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))?;
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = path;
+    }
+    Ok(())
+}
+
 fn write_inner(path: &Path, bytes: &[u8], exclusive: bool) -> std::io::Result<()> {
     let mut options = std::fs::OpenOptions::new();
     options.write(true);
@@ -140,6 +173,30 @@ fn write_inner(path: &Path, bytes: &[u8], exclusive: bool) -> std::io::Result<()
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A file another program created is tightened afterwards.
+    #[cfg(unix)]
+    #[test]
+    fn tightening_closes_a_file_somebody_else_left_open() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("from-ffmpeg.wav");
+        // As another program would leave it.
+        std::fs::write(&path, b"the original audio").unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644)).unwrap();
+        assert_eq!(
+            std::fs::metadata(&path).unwrap().permissions().mode() & 0o777,
+            0o644
+        );
+
+        tighten(&path).unwrap();
+        assert_eq!(
+            std::fs::metadata(&path).unwrap().permissions().mode() & 0o777,
+            0o600
+        );
+        // And the contents are untouched: this changes the mode, not the file.
+        assert_eq!(std::fs::read(&path).unwrap(), b"the original audio");
+    }
 
     #[test]
     fn a_replacement_lands_whole_or_not_at_all() {

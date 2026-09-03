@@ -1211,18 +1211,19 @@ fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
         // The page plays the audio, so it is written whenever the page is --
         // a player pointing at a file that was never written is worse than no
         // player.
-        veilvoice_audio::io::save_wav(&base, &veiled).map_err(|error| error.to_string())?;
+        write_private(
+            &base,
+            &veilvoice_audio::io::wav_bytes(&veiled).map_err(|error| error.to_string())?,
+        )?;
         written.push(base.clone());
     }
 
     let vtt = with_extension(&base, "vtt");
     if outputs.subtitles || outputs.page {
-        std::fs::write(&vtt, subtitles::write(&plan, Format::WebVtt))
-            .map_err(|error| format!("{}: {error}", vtt.display()))?;
+        write_private(&vtt, subtitles::write(&plan, Format::WebVtt).as_bytes())?;
         written.push(vtt.clone());
         let srt = with_extension(&base, "srt");
-        std::fs::write(&srt, subtitles::write(&plan, Format::SubRip))
-            .map_err(|error| format!("{}: {error}", srt.display()))?;
+        write_private(&srt, subtitles::write(&plan, Format::SubRip).as_bytes())?;
         written.push(srt);
     }
 
@@ -1236,8 +1237,7 @@ fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
         let drawn = page::player(&plan, &envelope, &look, &file_name(&base), &file_name(&vtt))
             .map_err(|error| error.to_string())?;
         let html = with_extension(&base, "html");
-        std::fs::write(&html, drawn.markup)
-            .map_err(|error| format!("{}: {error}", html.display()))?;
+        write_private(&html, drawn.markup.as_bytes())?;
         written.push(html);
     }
 
@@ -1245,6 +1245,19 @@ fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
 }
 
 /// Replace the last extension, keeping any `.veiled` before it.
+/// Write a file only this account can read, naming it if that fails.
+///
+/// The same fix as the command line's, in the other half of the program. All
+/// four of these used the ordinary `fs::write`, which is 0644, while the file
+/// tab wrote its result 0600 even where somebody had turned encryption off on
+/// purpose. The group output is the one holding the names and the words as
+/// typed, so the more revealing file had the weaker permission, and that was
+/// not a decision: one path called the hardened write, the other the default.
+fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
+    veilvoice_crypto::privatefile::write_owner_only(path, bytes)
+        .map_err(|error| format!("{}: {error}", path.display()))
+}
+
 fn with_extension(path: &std::path::Path, extension: &str) -> PathBuf {
     let mut out = path.to_path_buf();
     out.set_extension(extension);
@@ -1402,6 +1415,65 @@ mod tests {
         group.people[0].name = "Alex\nspeaker  9  Mallory".into();
         let error = group.to_plan(None).expect_err("a line break is refused");
         assert!(error.contains("line break"), "{error}");
+    }
+
+    /// Nothing a group render writes is readable by another account.
+    ///
+    /// The same check as the command line's, on the other half of the program,
+    /// because the same defect was in both and a fix to one would not have
+    /// found the other.
+    #[cfg(unix)]
+    #[test]
+    fn everything_a_group_render_writes_is_readable_only_by_this_account() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let input = dir.path().join("talk.wav");
+        veilvoice_audio::io::save_wav(
+            &input,
+            &veilvoice_audio::io::Audio {
+                samples: (0..16000).map(|n| (n as f32 / 200.0).sin() * 0.4).collect(),
+                sample_rate: 16000,
+            },
+        )
+        .unwrap();
+        let plan_path = dir.path().join("plan.txt");
+        std::fs::write(
+            &plan_path,
+            concat!(
+                "VEILCONV1\n",
+                "speaker  0  Ada\n",
+                "speaker  1  Bram\n",
+                "turn  0.000  0.500  0  hello\n",
+                "turn  0.500  1.000  1  hello back\n",
+            ),
+        )
+        .unwrap();
+
+        let job = Job {
+            input,
+            plan_path,
+            names: vec!["Ada".into(), "Bram".into()],
+            title: "A test".into(),
+            outputs: Outputs {
+                audio: true,
+                subtitles: true,
+                page: true,
+            },
+            theme: veilvoice_video::palette::default_palette(),
+            voices: VoiceMode::Distinct,
+            config: DeidConfig::default(),
+        };
+        let written = render_now(&job).expect("the render should succeed");
+        assert!(!written.is_empty(), "a render that wrote nothing");
+        for path in &written {
+            let mode = std::fs::metadata(path).unwrap().permissions().mode() & 0o777;
+            assert_eq!(
+                mode,
+                0o600,
+                "{} is {mode:o}, so another account on this machine can read it",
+                path.display()
+            );
+        }
     }
 
     /// A render cannot start without both files and something to write. This

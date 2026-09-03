@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-cli/src/atrest.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 456 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 455 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs)
 
 ## Contents
 
@@ -58,7 +58,7 @@ Writing one unencrypted is allowed, and asks first.
 
 ## What this file contains
 
-456 lines defining **7 functions** (4 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+455 lines defining **7 functions** (4 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -68,8 +68,8 @@ Writing one unencrypted is allowed, and asks first.
 
 - `seal_to_disk` (line 71) -- Seal plaintext and write it to <path>.veil, returning where it landed.
   - reaches: `read_new_password`, `can_prompt`, `into_secret`, `no_terminal`
-- `confirm_plaintext` (line 122) -- Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
-- `prompt_secret` (line 243) -- Prompt once, without echoing, and keep the answer in a Secret.
+- `confirm_plaintext` (line 121) -- Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
+- `prompt_secret` (line 242) -- Prompt once, without echoing, and keep the answer in a Secret.
   - reaches: `can_prompt`, `into_secret`, `no_terminal`
 
 ## What calls what
@@ -93,12 +93,12 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_seal_to_disk(["seal_to_disk<br/>line 71"])
-    n_confirm_plaintext(["confirm_plaintext<br/>line 122"])
-    n_into_secret["into_secret<br/>line 165"]
-    n_no_terminal["no_terminal<br/>line 192"]
-    n_can_prompt["can_prompt<br/>line 238"]
-    n_prompt_secret(["prompt_secret<br/>line 243"])
-    n_read_new_password["read_new_password<br/>line 252"]
+    n_confirm_plaintext(["confirm_plaintext<br/>line 121"])
+    n_into_secret["into_secret<br/>line 164"]
+    n_no_terminal["no_terminal<br/>line 191"]
+    n_can_prompt["can_prompt<br/>line 237"]
+    n_prompt_secret(["prompt_secret<br/>line 242"])
+    n_read_new_password["read_new_password<br/>line 251"]
     n_prompt_secret --> n_can_prompt
     n_prompt_secret --> n_into_secret
     n_prompt_secret --> n_no_terminal
@@ -107,12 +107,12 @@ flowchart TD
     n_read_new_password --> n_no_terminal
     n_seal_to_disk --> n_read_new_password
     click n_seal_to_disk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71" "open the source"
-    click n_confirm_plaintext href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122" "open the source"
-    click n_into_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165" "open the source"
-    click n_no_terminal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L192" "open the source"
-    click n_can_prompt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L238" "open the source"
-    click n_prompt_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L243" "open the source"
-    click n_read_new_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L252" "open the source"
+    click n_confirm_plaintext href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L121" "open the source"
+    click n_into_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L164" "open the source"
+    click n_no_terminal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L191" "open the source"
+    click n_can_prompt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L237" "open the source"
+    click n_prompt_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L242" "open the source"
+    click n_read_new_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L251" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -130,13 +130,13 @@ flowchart TD
 | `PLAINTEXT_WARNING` <sub>pub const</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L46) | What the user is told before a recording is written in the clear. |
 | `Recipient` <sub>pub enum</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L63) | How a recording is to be sealed. |
 | `seal_to_disk` <sub>pub fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71) | Seal plaintext and write it to <path>.veil, returning where it landed. |
-| `confirm_plaintext` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122) | Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing. |
-| `into_secret` <sub>fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165) | Move a typed password into page-locked, zeroizing storage, wiping the String it arrived in. |
-| `no_terminal` <sub>fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L192) | What to say when there is no terminal to ask on. |
-| `can_prompt` <sub>fn</sub> | [238](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L238) | Whether a passphrase can be asked for at all. |
-| `prompt_secret` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L243) | Prompt once, without echoing, and keep the answer in a Secret. |
-| `read_new_password` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L252) | Read a password twice, without echoing it, and check the two agree. |
-| `no_terminal_tests` <sub>mod</sub> | [365](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L365) |  |
+| `confirm_plaintext` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L121) | Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing. |
+| `into_secret` <sub>fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L164) | Move a typed password into page-locked, zeroizing storage, wiping the String it arrived in. |
+| `no_terminal` <sub>fn</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L191) | What to say when there is no terminal to ask on. |
+| `can_prompt` <sub>fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L237) | Whether a passphrase can be asked for at all. |
+| `prompt_secret` <sub>pub fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L242) | Prompt once, without echoing, and keep the answer in a Secret. |
+| `read_new_password` <sub>pub fn</sub> | [251](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L251) | Read a password twice, without echoing it, and check the two agree. |
+| `no_terminal_tests` <sub>mod</sub> | [364](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L364) |  |
 
 ---
 
