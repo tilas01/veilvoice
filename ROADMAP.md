@@ -230,7 +230,7 @@ it can honestly be made rather than to keep apologising for it.
 | 89 | **Veil the other person afterwards**: the interviewee given their own voice in post, through the group plan that already exists | **done** | - |
 | 90 | **GnuPG verification inside the window**: in the verify tab, beside the hash check, using the GnuPG somebody already has | **done** | - |
 | 91 | **`veilvoice-verify` finds the release itself**: GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | - |
-| 92 | **An autolock timeout**: off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | - |
+| 92 | **An autolock timeout**: on at half an hour, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable, and offered during first-run setup | **done** | - |
 | 93 | **Group mode explained where it is used**: how to build a plan, what each field does, and what happens without one | **done** | - |
 | 94 | **Release notes people can actually read**: every release listed newest first, its notes opening in place, and every file one click away | **done** | - |
 | 95 | **One version per release, in order, enforced**: the tag, the workspace and every package definition checked against each other before a release can go out | **done** | - |
