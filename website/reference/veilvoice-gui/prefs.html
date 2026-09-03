@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/prefs.svg" alt="prefs.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/prefs.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 616 lines &middot; <a href="prefs.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 637 lines &middot; <a href="prefs.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#nothing-here-is-secret-and-nothing-here-is-required">Nothing here is secret, and nothing here is required</a>
@@ -68,10 +68,10 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>616 lines defining <strong>9 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>637 lines defining <strong>9 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Prefs</code> <span style="color:var(--muted)">line 53</span> &middot; Everything the user can choose about presentation.</li>
-<li><code>struct Motion</code> <span style="color:var(--muted)">line 397</span> &middot; Whether movement is allowed, and how much.</li>
+<li><code>struct Motion</code> <span style="color:var(--muted)">line 404</span> &middot; Whether movement is allowed, and how much.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>default_path</code> <span style="color:var(--muted)">line 180</span> &middot; Where preferences live: beside the app lock, in this platform&#x27;s config directory.
@@ -82,9 +82,9 @@
 <li><code>Prefs::save</code> <span style="color:var(--muted)">line 369</span> &middot; Write preferences to path, creating the directory if needed.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Motion::resolve</code> <span style="color:var(--muted)">line 409</span> &middot; Resolve for this frame.
+<li><code>Motion::resolve</code> <span style="color:var(--muted)">line 416</span> &middot; Resolve for this frame.
 </li>
-<li><code>Motion::secs</code> <span style="color:var(--muted)">line 427</span> &middot; A duration scaled by whether motion is allowed.
+<li><code>Motion::secs</code> <span style="color:var(--muted)">line 434</span> &middot; A duration scaled by whether motion is allowed.
 </li>
 </ul>
 </section>
@@ -139,17 +139,17 @@
 <a href="prefs.src.html#fn-parse_bool">
 <rect x="194.9" y="420.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="249.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_bool</text>
-<text x="249.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 379</text>
+<text x="249.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 386</text>
 </a>
 <a href="prefs.src.html#fn-motion-resolve">
 <rect x="329.5" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="403.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Motion::resolve</text>
-<text x="403.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 409</text>
+<text x="403.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 416</text>
 </a>
 <a href="prefs.src.html#fn-motion-secs">
 <rect x="186.8" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="249.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Motion::secs</text>
-<text x="249.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
+<text x="249.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 434</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -174,9 +174,9 @@ flowchart TD
     n_parse[&quot;Prefs::parse&lt;br/&gt;line 204&quot;]
     n_to_text[&quot;Prefs::to_text&lt;br/&gt;line 336&quot;]
     n_save([&quot;Prefs::save&lt;br/&gt;line 369&quot;])
-    n_parse_bool[&quot;parse_bool&lt;br/&gt;line 379&quot;]
-    n_resolve([&quot;Motion::resolve&lt;br/&gt;line 409&quot;])
-    n_secs([&quot;Motion::secs&lt;br/&gt;line 427&quot;])
+    n_parse_bool[&quot;parse_bool&lt;br/&gt;line 386&quot;]
+    n_resolve([&quot;Motion::resolve&lt;br/&gt;line 416&quot;])
+    n_secs([&quot;Motion::secs&lt;br/&gt;line 434&quot;])
     n_load --&gt; n_default
     n_load --&gt; n_parse
     n_parse --&gt; n_default
@@ -188,9 +188,9 @@ flowchart TD
     click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L204&quot; &quot;open the source&quot;
     click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L336&quot; &quot;open the source&quot;
     click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L369&quot; &quot;open the source&quot;
-    click n_parse_bool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L379&quot; &quot;open the source&quot;
-    click n_resolve href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L409&quot; &quot;open the source&quot;
-    click n_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L427&quot; &quot;open the source&quot;
+    click n_parse_bool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L386&quot; &quot;open the source&quot;
+    click n_resolve href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L416&quot; &quot;open the source&quot;
+    click n_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L434&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_path,n_load,n_save,n_resolve,n_secs entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -210,10 +210,10 @@ flowchart TD
 <tr><td><code>Prefs::parse</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-prefs-parse">204</a></td><td>Parse the key = value format.</td></tr>
 <tr><td><code>Prefs::to_text</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-prefs-to_text">336</a></td><td>Serialise to the text format.</td></tr>
 <tr><td><code>Prefs::save</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-prefs-save">369</a></td><td>Write preferences to path, creating the directory if needed.</td></tr>
-<tr><td><code>parse_bool</code> <sub>fn</sub></td><td><a href="prefs.src.html#fn-parse_bool">379</a></td><td></td></tr>
-<tr><td><code>Motion</code> <sub>pub struct</sub></td><td><a href="prefs.src.html#fn-motion">397</a></td><td>Whether movement is allowed, and how much.</td></tr>
-<tr><td><code>Motion::resolve</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-motion-resolve">409</a></td><td>Resolve for this frame.</td></tr>
-<tr><td><code>Motion::secs</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-motion-secs">427</a></td><td>A duration scaled by whether motion is allowed.</td></tr>
+<tr><td><code>parse_bool</code> <sub>fn</sub></td><td><a href="prefs.src.html#fn-parse_bool">386</a></td><td></td></tr>
+<tr><td><code>Motion</code> <sub>pub struct</sub></td><td><a href="prefs.src.html#fn-motion">404</a></td><td>Whether movement is allowed, and how much.</td></tr>
+<tr><td><code>Motion::resolve</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-motion-resolve">416</a></td><td>Resolve for this frame.</td></tr>
+<tr><td><code>Motion::secs</code> <sub>pub fn</sub></td><td><a href="prefs.src.html#fn-motion-secs">434</a></td><td>A duration scaled by whether motion is allowed.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -40,8 +40,9 @@ longer offered as the explanation for anything.
 
 ## The twenty-sixth round: the file with more in it had the weaker permission
 
-Three defects (F-133 to F-135), all found by running commands nobody had run
-here before and looking at what landed on disk.
+Four defects (F-133 to F-136), found by running commands nobody had run here
+before, looking at what landed on disk, and then sweeping for the rest of the
+class rather than waiting to stumble on it.
 
 The round is short and the first finding is the most serious thing this audit
 has recorded in several rounds, so it goes first and without preamble.
@@ -97,6 +98,54 @@ and both programs say so where they say it. It does not survive a copy, a
 backup, or anyone who has the disk. The fix closes the gap between the two
 halves of the program; it does not turn the unencrypted path into a safe one,
 and nothing here pretends otherwise.
+
+### F-136 -- the same slip in three more files, found by sweeping instead of stumbling
+
+`veilvoice-workspace/src/lib.rs`, `veilvoice-conversation/src/plan.rs`,
+`veilvoice-gui/src/prefs.rs`.
+
+F-133 was found by running one command. That is a bad way to find a class of
+defect, so after fixing it every `fs::write` in the tree was listed and each one
+asked what it holds. Three more were the same mistake:
+
+* **A saved project.** The panel that writes these says what they hold: where
+  your files are, who is in the recording, what you called them. It says it to
+  reassure, and the reassurance is about audio and passwords rather than names.
+  A file listing the names of the people in a recording is worth protecting on
+  its own.
+
+* **A saved plan.** Every speaker's name and every word typed into it, which is
+  precisely the content of the subtitle tracks a render produces from it. Those
+  are now written owner-only. Writing the copy `0600` and the original `0644`
+  would protect the wrong file.
+
+* **The window's settings.** Not merely a theme. It records `vault_dir`, which
+  names an encrypted volume, and `vault_hidden`, the answer to whether that
+  volume has a hidden one inside it. Somebody reading that file learns a hidden
+  volume exists, which is the single thing a hidden volume conceals, and learns
+  where to look.
+
+### What the sweep decided to leave
+
+Recorded because "we looked and it was fine" is a result, and because the next
+person to run this sweep should not have to re-derive it.
+
+**Ciphertext stays `0644`.** The sealed containers in `atrest.rs`,
+`security.rs` and `guard.rs` are encrypted; the permission adds nothing and
+pretending otherwise would be theatre.
+
+**Public keys stay `0644`.** That is what a public key is for.
+
+**Cleaning in place preserves what was there.** `veilvoice clean` rewrites the
+file it is given, and `fs::write` on an existing file keeps its mode. Checked
+by cleaning a file set to `0600`, which came back `0600`. A metadata cleaner
+that loosened a file somebody had deliberately protected would be a bad defect,
+and it is not present.
+
+**Service state files** in `capture`, `drivers`, `sentry` and `guard`'s
+unsealed manifest are records of what this machine does rather than of who
+anybody is, and they live in the user's own configuration directory. Left as
+they are, deliberately, rather than tightened for the look of it.
 
 ### F-134 -- three commands reported a missing file without naming it
 
@@ -3115,7 +3164,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1212 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1214 tests across 27 crates, plus doctests and 17 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -4762,7 +4811,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and thirty-five defects found and fixed (F-1 to F-135), across
+**One hundred and thirty-six defects found and fixed (F-1 to F-136), across
 twenty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

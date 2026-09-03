@@ -425,7 +425,15 @@ impl Workspace {
                     .map_err(|e| Error::Io(format!("cannot create {}: {e}", parent.display())))?;
             }
         }
-        std::fs::write(path, self.to_text())
+        // Owner-only. The panel that saves these says what they hold: where
+        // your files are, who is in the recording, and what you called them.
+        // It says so to reassure -- no audio, no passwords -- and the names
+        // are the part that reassurance does not cover. A file of the names of
+        // the people in a recording is worth protecting on its own, and this
+        // was writing it readable by every account on the machine.
+        //
+        // The same slip as the group render's four files, in a third program.
+        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())
             .map_err(|e| Error::Io(format!("cannot write {}: {e}", path.display())))
     }
 
@@ -591,6 +599,32 @@ mod tests {
         let work = sample();
         work.save(&path).unwrap();
         assert_eq!(Workspace::load(&path).unwrap(), work);
+    }
+
+    /// A saved project is readable only by the account that saved it.
+    ///
+    /// The panel that writes these says what they hold -- where your files
+    /// are, who is in the recording, what you called them -- and says it to
+    /// reassure: no audio, no passwords. The names are the part that
+    /// reassurance does not cover, and this was written 0644, readable by
+    /// every other account on the machine.
+    #[cfg(unix)]
+    #[test]
+    fn a_saved_project_is_readable_only_by_this_account() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("interview.veilproj");
+        sample().save(&path).unwrap();
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(
+            mode, 0o600,
+            "a project is {mode:o}, so anyone with an account here can read the names in it"
+        );
+        // And it still round trips, which is the thing the mode must not break.
+        assert_eq!(
+            Workspace::load(&path).unwrap().to_text(),
+            sample().to_text()
+        );
     }
 
     /// **No passwords and no audio.** A project file is a thing somebody might

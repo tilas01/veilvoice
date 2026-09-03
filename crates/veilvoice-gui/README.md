@@ -109,7 +109,7 @@ flowchart TD
     n_notify["notify.rs<br/>460 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
     n_policy["policy.rs<br/>320 lines"]
-    n_prefs["prefs.rs<br/>616 lines"]
+    n_prefs["prefs.rs<br/>637 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
     n_security["security.rs<br/>1755 lines"]
     n_settings["settings.rs<br/>1264 lines"]
@@ -235,7 +235,7 @@ flowchart TD
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
-| [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 616 | What the user has chosen about how the app looks and moves. |
+| [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 637 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1755 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1264 | The settings panel: a menu of pages, each a titled group of choices. |

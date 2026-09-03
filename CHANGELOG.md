@@ -41,6 +41,25 @@ than a summary written afterwards.
   program; the exposure goes from permanent to the length of one transcode, and
   the note the program prints says only what it actually did.
 
+**And the same slip in three more files, found by sweeping for it**
+
+- Finding the first one by running a command is a bad way to find a class of
+  defect, so every `fs::write` in the tree was listed and each asked what it
+  holds. Three more were the same mistake.
+- **A saved project.** The panel that writes it says it holds where your files
+  are, who is in the recording and what you called them. That reassurance is
+  about audio and passwords; the names are the part it does not cover.
+- **A saved plan.** Every name and every word typed into it, which is exactly
+  the content of the subtitles a render makes from it. Writing the copy 0600
+  and the original 0644 protects the wrong file.
+- **The window's settings.** Not just a theme: it records where an encrypted
+  volume is and whether it has a hidden one inside it. The existence of a
+  hidden volume is the one thing a hidden volume conceals.
+- What the sweep deliberately left alone is written down too: ciphertext and
+  public keys stay 0644, cleaning in place preserves whatever mode the file
+  already had (checked), and service state files are records of what this
+  machine does rather than of who anybody is.
+
 **Three commands that would not say which file**
 
 - `veilvoice encrypt`, `decrypt` and `clean` reported a missing file as "No
