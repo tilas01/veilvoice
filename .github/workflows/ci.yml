@@ -225,6 +225,15 @@ jobs:
       - name: Committed section pages must match the front page
         run: python tools/site/split.py --check
 
+      # The roadmap page and its picture are generated from ROADMAP.md, so a
+      # marker whose status changes without regenerating leaves the published
+      # roadmap disagreeing with the roadmap -- the F-41 shape a sixth time, and
+      # the one place it is a claim about what is finished. `tools/verify.py`
+      # has run this check since the page existed; CI did not, so a stale
+      # roadmap was the one generated output that could pass here.
+      - name: Committed roadmap must match ROADMAP.md
+        run: python tools/site/roadmap.py --check
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a
