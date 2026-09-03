@@ -514,24 +514,11 @@ impl Settings {
     /// Shown as a page rather than a modal because it is not urgent and does
     /// not gate anything -- the legal notice is the thing that gates, and two
     /// blocking dialogues before a user has seen the app is one too many.
-    pub fn first_run_panel(&mut self, ui: &mut Ui) {
-        ui.add_space(18.0);
-        ui.label(
-            RichText::new("A couple of choices")
-                .size(18.0)
-                .color(p::fg())
-                .strong(),
-        );
-        ui.add_space(6.0);
-        ui.label(
-            RichText::new(
-                "Both are on, and both can be changed later in settings. \
-                 Nothing here leaves your machine.",
-            )
-            .color(p::muted()),
-        );
-        ui.add_space(14.0);
-
+    /// The two appearance choices, for the first-run setup to place.
+    ///
+    /// Placed by `crate::firstrun`, which owns the first-run flow, so there is
+    /// one copy of this wording rather than one per caller.
+    pub fn first_run_appearance(&mut self, ui: &mut Ui) {
         let mut changed = false;
         changed |= ui
             .checkbox(&mut self.prefs.animations, "Animate the interface")
@@ -542,7 +529,6 @@ impl Settings {
                 .color(p::muted()),
         );
         ui.add_space(8.0);
-
         ui.add_enabled_ui(self.prefs.animations, |ui| {
             changed |= ui
                 .checkbox(&mut self.prefs.animated_icon, "Animate the mark")
@@ -553,24 +539,44 @@ impl Settings {
                 .small()
                 .color(p::muted()),
         );
-
-        ui.add_space(18.0);
-        if ui.button("continue").clicked() {
-            self.prefs.configured = true;
-            self.first_run = false;
-            changed = true;
-        }
         if changed {
             self.persist();
         }
-        if let Some(error) = &self.save_error {
-            ui.add_space(8.0);
-            ui.label(
-                RichText::new(format!("could not save: {error}"))
-                    .small()
-                    .color(p::yellow()),
-            );
+    }
+
+    /// The autolock switch and delay, for the first-run setup to place.
+    pub fn first_run_autolock(&mut self, ui: &mut Ui) {
+        let mut changed = ui
+            .checkbox(&mut self.prefs.autolock, "Lock the window when unused")
+            .changed();
+        ui.add_enabled_ui(self.prefs.autolock, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("after").color(p::muted()));
+                egui::ComboBox::from_id_salt("first-run-autolock")
+                    .selected_text(crate::autolock::describe_secs(self.prefs.autolock_after))
+                    .show_ui(ui, |ui| {
+                        for choice in crate::autolock::CHOICES {
+                            changed |= ui
+                                .selectable_value(
+                                    &mut self.prefs.autolock_after,
+                                    *choice,
+                                    crate::autolock::describe_secs(*choice),
+                                )
+                                .changed();
+                        }
+                    });
+            });
+        });
+        if changed {
+            self.persist();
         }
+    }
+
+    /// Mark the first run answered.
+    pub fn finish_first_run(&mut self) {
+        self.prefs.configured = true;
+        self.first_run = false;
+        self.persist();
     }
 
     /// The settings tab.
@@ -1055,11 +1061,11 @@ mod tests {
     }
 
     #[test]
-    fn the_first_run_panel_renders() {
+    fn the_first_run_appearance_choices_render() {
         let mut settings = Settings::default();
         let ctx = egui::Context::default();
         let _ = ctx.run(Default::default(), |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| settings.first_run_panel(ui));
+            egui::CentralPanel::default().show(ctx, |ui| settings.first_run_appearance(ui));
         });
     }
 

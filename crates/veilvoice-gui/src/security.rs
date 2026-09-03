@@ -345,6 +345,36 @@ impl Security {
     }
 
     /// Whether a lock is configured at all.
+    /// Set an app lock from the first-run setup.
+    ///
+    /// The same worker and the same `Op::Set` the security tab uses, so there
+    /// is one path that creates a lock rather than two that can disagree --
+    /// which is exactly how F-141 happened.
+    pub fn set_lock_from_setup(&mut self, passphrase: String) {
+        if self.store.is_none() && !passphrase.is_empty() {
+            self.spawn(Op::Set, passphrase, String::new());
+        }
+    }
+
+    /// Whether a recording passphrase is held for this session.
+    pub fn has_recording_passphrase(&self) -> bool {
+        self.passphrase_set
+    }
+
+    /// Take a recording passphrase from the first-run setup.
+    ///
+    /// Moved into page-locked storage immediately, like the one the security
+    /// tab takes: a `String` typed into a text field is ordinary heap memory,
+    /// and the point of `Secret` is that it does not stay that way.
+    pub fn set_recording_passphrase(&mut self, mut passphrase: String) {
+        if passphrase.is_empty() {
+            return;
+        }
+        self.held = Some(into_secret(&mut passphrase));
+        self.passphrase_set = true;
+    }
+
+    /// Whether an app lock is configured on this machine.
     pub fn has_lock(&self) -> bool {
         self.store.is_some()
     }

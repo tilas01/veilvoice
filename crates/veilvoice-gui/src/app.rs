@@ -320,6 +320,8 @@ pub struct VeilVoiceApp {
     // because this type already has a `settings` method, which is the engine's
     // intensity and accent controls -- a different thing entirely.
     preferences: crate::settings::Settings,
+    /// The first-run setup, while it is running.
+    first_run: crate::firstrun::FirstRun,
     /// Where VeilVoice keeps its own files, obfuscated once a lock is set.
     ///
     /// Opened by the key the unlock derives and closed when the window locks,
@@ -464,6 +466,7 @@ impl VeilVoiceApp {
             // because of something on this machine's disk.
             group: crate::group::Group::default(),
             preferences: crate::settings::Settings::default(),
+            first_run: crate::firstrun::FirstRun::default(),
             files: crate::vault_store::VaultStore::new(
                 crate::prefs::default_path().and_then(|p| p.parent().map(|d| d.to_path_buf())),
             ),
@@ -1116,7 +1119,17 @@ impl eframe::App for VeilVoiceApp {
                 // Offered once, and only once: two choices with sensible
                 // defaults, so it is a courtesy rather than a gate.
                 if self.preferences.needs_first_run() {
-                    self.preferences.first_run_panel(ui);
+                    // Four cards rather than two checkboxes: the app lock, the
+                    // recording passphrase and the autolock are offered here
+                    // because a protection nobody is shown is a protection
+                    // nobody has. Every card can be skipped.
+                    if self
+                        .first_run
+                        .panel(ui, &mut self.preferences, &mut self.security)
+                        == crate::firstrun::Outcome::Finished
+                    {
+                        self.preferences.finish_first_run();
+                    }
                     return;
                 }
                 // The tour, once the two choices are made. Considered once per
