@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/crashlog.rs</code></h1>
-<p style="color:var(--muted)"><a href="crashlog.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 443 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="crashlog.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 447 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: CC-BY-NC-SA-4.0</span></span>
@@ -220,296 +220,300 @@
 <span class="ln" id="L162">        );</span>
 <span class="ln" id="L163">    }</span>
 <span class="ln" id="L164"></span>
-<span class="ln" id="L165">    <span class="tok-str">&quot;If the window never appeared, the most likely cause is that this\n     computer could not give the application an OpenGL context. This is common\n     in a virtual machine, over a remote desktop session, or with hybrid\n     graphics. The command-line tool `veilvoice` does the same work and\n     needs no graphics at all.\n&quot;</span></span>
-<span class="ln" id="L166">        .<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L167">}</span>
+<span class="ln" id="L165">    <span class="tok-str">&quot;If the window never appeared, the most likely cause is that this\n\</span></span>
+<span class="ln" id="L166"><span class="tok-str">     computer could not give the application an OpenGL context. This is\n\</span></span>
+<span class="ln" id="L167"><span class="tok-str">     common in a virtual machine, over a remote desktop session, or with\n\</span></span>
+<span class="ln" id="L168"><span class="tok-str">     hybrid graphics. The command-line tool `veilvoice` does the same work\n\</span></span>
+<span class="ln" id="L169"><span class="tok-str">     and needs no graphics at all.\n&quot;</span></span>
+<span class="ln" id="L170">        .<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L171">}</span>
 </span>
-<span class="ln" id="L168"></span>
+<span class="ln" id="L172"></span>
 <span class="src-item" id="fn-missing_library">
-<span class="ln" id="L169"><span class="tok-com">/// The name of the shared library a panic message says could not be loaded.</span></span>
-<span class="ln" id="L170"><span class="tok-com">///</span></span>
-<span class="ln" id="L171"><span class="tok-com">/// Matched on the shape of the message rather than on one library&#x27;s name, so</span></span>
-<span class="ln" id="L172"><span class="tok-com">/// the next toolkit upgrade that adds one is covered without an edit here.</span></span>
-<span class="ln" id="L173"><span class="tok-com">/// `xkbcommon-dl` writes &quot;Library libfoo.so could not be loaded.&quot;; the same</span></span>
-<span class="ln" id="L174"><span class="tok-com">/// shape covers the other dynamic loaders in this dependency graph.</span></span>
-<span class="ln" id="L175"><span class="tok-kw">fn</span> <span class="tok-fn">missing_library</span>(detail: &amp;str) -&gt; Option&lt;&amp;str&gt; {</span>
-<span class="ln" id="L176">    <span class="tok-kw">let</span> lowered = detail.<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L177">    <span class="tok-kw">if</span> !lowered.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be loaded&quot;</span>) &amp;&amp; !lowered.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cannot open shared object&quot;</span>) {</span>
-<span class="ln" id="L178">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L179">    }</span>
-<span class="ln" id="L180">    detail</span>
-<span class="ln" id="L181">        .<span class="tok-fn">split_whitespace</span>()</span>
-<span class="ln" id="L182">        .<span class="tok-fn">find</span>(|word| word.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.so&quot;</span>) || word.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.dll&quot;</span>) || word.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.dylib&quot;</span>))</span>
-<span class="ln" id="L183">        .<span class="tok-fn">map</span>(|word| word.<span class="tok-fn">trim_matches</span>(|c: char| !c.<span class="tok-fn">is_ascii_graphic</span>() || c == <span class="tok-str">&#x27;,&#x27;</span> || c == <span class="tok-str">&#x27;:&#x27;</span>))</span>
-<span class="ln" id="L184">}</span>
+<span class="ln" id="L173"><span class="tok-com">/// The name of the shared library a panic message says could not be loaded.</span></span>
+<span class="ln" id="L174"><span class="tok-com">///</span></span>
+<span class="ln" id="L175"><span class="tok-com">/// Matched on the shape of the message rather than on one library&#x27;s name, so</span></span>
+<span class="ln" id="L176"><span class="tok-com">/// the next toolkit upgrade that adds one is covered without an edit here.</span></span>
+<span class="ln" id="L177"><span class="tok-com">/// `xkbcommon-dl` writes &quot;Library libfoo.so could not be loaded.&quot;; the same</span></span>
+<span class="ln" id="L178"><span class="tok-com">/// shape covers the other dynamic loaders in this dependency graph.</span></span>
+<span class="ln" id="L179"><span class="tok-kw">fn</span> <span class="tok-fn">missing_library</span>(detail: &amp;str) -&gt; Option&lt;&amp;str&gt; {</span>
+<span class="ln" id="L180">    <span class="tok-kw">let</span> lowered = detail.<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L181">    <span class="tok-kw">if</span> !lowered.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be loaded&quot;</span>) &amp;&amp; !lowered.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cannot open shared object&quot;</span>) {</span>
+<span class="ln" id="L182">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L183">    }</span>
+<span class="ln" id="L184">    detail</span>
+<span class="ln" id="L185">        .<span class="tok-fn">split_whitespace</span>()</span>
+<span class="ln" id="L186">        .<span class="tok-fn">find</span>(|word| word.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.so&quot;</span>) || word.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.dll&quot;</span>) || word.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.dylib&quot;</span>))</span>
+<span class="ln" id="L187">        .<span class="tok-fn">map</span>(|word| word.<span class="tok-fn">trim_matches</span>(|c: char| !c.<span class="tok-fn">is_ascii_graphic</span>() || c == <span class="tok-str">&#x27;,&#x27;</span> || c == <span class="tok-str">&#x27;:&#x27;</span>))</span>
+<span class="ln" id="L188">}</span>
 </span>
-<span class="ln" id="L185"></span>
+<span class="ln" id="L189"></span>
 <span class="src-item" id="fn-install">
-<span class="ln" id="L186"><span class="tok-com">/// Install the panic hook. Call once, as early in `main` as possible.</span></span>
-<span class="ln" id="L187"><span class="tok-com">///</span></span>
-<span class="ln" id="L188"><span class="tok-com">/// Chained rather than replacing: the default hook prints to stderr, which is</span></span>
-<span class="ln" id="L189"><span class="tok-com">/// useful when there *is* a console (a debug build, or the binary run from a</span></span>
-<span class="ln" id="L190"><span class="tok-com">/// terminal), and this adds the file for when there is not.</span></span>
-<span class="ln" id="L191"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install</span>() {</span>
-<span class="ln" id="L192">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L193">        <span class="tok-kw">return</span>; <span class="tok-com">// No config directory: nowhere to write, and not worth failing over.</span></span>
-<span class="ln" id="L194">    };</span>
-<span class="ln" id="L195">    <span class="tok-kw">let</span> previous = std::panic::<span class="tok-fn">take_hook</span>();</span>
-<span class="ln" id="L196">    std::panic::<span class="tok-fn">set_hook</span>(Box::<span class="tok-fn">new</span>(<span class="tok-kw">move</span> |info| {</span>
-<span class="ln" id="L197">        <span class="tok-kw">let</span> detail = format!(</span>
-<span class="ln" id="L198">            <span class="tok-str">&quot;{}\n\nlocation: {}&quot;</span>,</span>
-<span class="ln" id="L199">            info.<span class="tok-fn">payload</span>()</span>
-<span class="ln" id="L200">                .downcast_ref::&lt;&amp;str&gt;()</span>
-<span class="ln" id="L201">                .<span class="tok-fn">map</span>(|s| s.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L202">                .<span class="tok-fn">or_else</span>(|| info.<span class="tok-fn">payload</span>().downcast_ref::&lt;String&gt;().<span class="tok-fn">cloned</span>())</span>
-<span class="ln" id="L203">                .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;(no message)&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L204">            info.<span class="tok-fn">location</span>()</span>
-<span class="ln" id="L205">                .<span class="tok-fn">map</span>(|l| format!(<span class="tok-str">&quot;{}:{}:{}&quot;</span>, l.<span class="tok-fn">file</span>(), l.<span class="tok-fn">line</span>(), l.<span class="tok-fn">column</span>()))</span>
-<span class="ln" id="L206">                .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;(unknown)&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L207">        );</span>
-<span class="ln" id="L208">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, &amp;detail);</span>
-<span class="ln" id="L209">        <span class="tok-fn">previous</span>(info);</span>
-<span class="ln" id="L210">    }));</span>
-<span class="ln" id="L211">}</span>
+<span class="ln" id="L190"><span class="tok-com">/// Install the panic hook. Call once, as early in `main` as possible.</span></span>
+<span class="ln" id="L191"><span class="tok-com">///</span></span>
+<span class="ln" id="L192"><span class="tok-com">/// Chained rather than replacing: the default hook prints to stderr, which is</span></span>
+<span class="ln" id="L193"><span class="tok-com">/// useful when there *is* a console (a debug build, or the binary run from a</span></span>
+<span class="ln" id="L194"><span class="tok-com">/// terminal), and this adds the file for when there is not.</span></span>
+<span class="ln" id="L195"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install</span>() {</span>
+<span class="ln" id="L196">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L197">        <span class="tok-kw">return</span>; <span class="tok-com">// No config directory: nowhere to write, and not worth failing over.</span></span>
+<span class="ln" id="L198">    };</span>
+<span class="ln" id="L199">    <span class="tok-kw">let</span> previous = std::panic::<span class="tok-fn">take_hook</span>();</span>
+<span class="ln" id="L200">    std::panic::<span class="tok-fn">set_hook</span>(Box::<span class="tok-fn">new</span>(<span class="tok-kw">move</span> |info| {</span>
+<span class="ln" id="L201">        <span class="tok-kw">let</span> detail = format!(</span>
+<span class="ln" id="L202">            <span class="tok-str">&quot;{}\n\nlocation: {}&quot;</span>,</span>
+<span class="ln" id="L203">            info.<span class="tok-fn">payload</span>()</span>
+<span class="ln" id="L204">                .downcast_ref::&lt;&amp;str&gt;()</span>
+<span class="ln" id="L205">                .<span class="tok-fn">map</span>(|s| s.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L206">                .<span class="tok-fn">or_else</span>(|| info.<span class="tok-fn">payload</span>().downcast_ref::&lt;String&gt;().<span class="tok-fn">cloned</span>())</span>
+<span class="ln" id="L207">                .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;(no message)&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L208">            info.<span class="tok-fn">location</span>()</span>
+<span class="ln" id="L209">                .<span class="tok-fn">map</span>(|l| format!(<span class="tok-str">&quot;{}:{}:{}&quot;</span>, l.<span class="tok-fn">file</span>(), l.<span class="tok-fn">line</span>(), l.<span class="tok-fn">column</span>()))</span>
+<span class="ln" id="L210">                .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;(unknown)&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L211">        );</span>
+<span class="ln" id="L212">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, &amp;detail);</span>
+<span class="ln" id="L213">        <span class="tok-fn">previous</span>(info);</span>
+<span class="ln" id="L214">    }));</span>
+<span class="ln" id="L215">}</span>
 </span>
-<span class="ln" id="L212"></span>
+<span class="ln" id="L216"></span>
 <span class="src-item" id="fn-record_startup_failure">
-<span class="ln" id="L213"><span class="tok-com">/// Record a startup failure that `eframe` returned rather than panicked.</span></span>
-<span class="ln" id="L214"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">record_startup_failure</span>(detail: &amp;str) {</span>
-<span class="ln" id="L215">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() {</span>
-<span class="ln" id="L216">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;the window could not be created&quot;</span>, detail);</span>
-<span class="ln" id="L217">    }</span>
-<span class="ln" id="L218">}</span>
+<span class="ln" id="L217"><span class="tok-com">/// Record a startup failure that `eframe` returned rather than panicked.</span></span>
+<span class="ln" id="L218"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">record_startup_failure</span>(detail: &amp;str) {</span>
+<span class="ln" id="L219">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() {</span>
+<span class="ln" id="L220">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;the window could not be created&quot;</span>, detail);</span>
+<span class="ln" id="L221">    }</span>
+<span class="ln" id="L222">}</span>
 </span>
-<span class="ln" id="L219"></span>
+<span class="ln" id="L223"></span>
 <span class="src-item" id="fn-previous">
-<span class="ln" id="L220"><span class="tok-com">/// Read a previous report, if one is there, so the interface can mention it.</span></span>
-<span class="ln" id="L221"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">previous</span>() -&gt; Option&lt;(PathBuf, String)&gt; {</span>
-<span class="ln" id="L222">    <span class="tok-kw">let</span> path = <span class="tok-fn">default_path</span>()?;</span>
-<span class="ln" id="L223">    <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L224">    <span class="tok-fn">Some</span>((path, text))</span>
-<span class="ln" id="L225">}</span>
+<span class="ln" id="L224"><span class="tok-com">/// Read a previous report, if one is there, so the interface can mention it.</span></span>
+<span class="ln" id="L225"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">previous</span>() -&gt; Option&lt;(PathBuf, String)&gt; {</span>
+<span class="ln" id="L226">    <span class="tok-kw">let</span> path = <span class="tok-fn">default_path</span>()?;</span>
+<span class="ln" id="L227">    <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L228">    <span class="tok-fn">Some</span>((path, text))</span>
+<span class="ln" id="L229">}</span>
 </span>
-<span class="ln" id="L226"></span>
+<span class="ln" id="L230"></span>
 <span class="src-item" id="fn-clear">
-<span class="ln" id="L227"><span class="tok-com">/// Forget a previous report.</span></span>
-<span class="ln" id="L228"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">clear</span>() {</span>
-<span class="ln" id="L229">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() {</span>
-<span class="ln" id="L230">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(path);</span>
-<span class="ln" id="L231">    }</span>
-<span class="ln" id="L232">}</span>
+<span class="ln" id="L231"><span class="tok-com">/// Forget a previous report.</span></span>
+<span class="ln" id="L232"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">clear</span>() {</span>
+<span class="ln" id="L233">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() {</span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(path);</span>
+<span class="ln" id="L235">    }</span>
+<span class="ln" id="L236">}</span>
 </span>
-<span class="ln" id="L233"></span>
-<span class="ln" id="L234"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L235"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L236">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L237"></span>
-<span class="ln" id="L238">    <span class="tok-com">/// No panic VeilVoice writes itself puts a path in its message.</span></span>
-<span class="ln" id="L239">    <span class="tok-com">///</span></span>
-<span class="ln" id="L240">    <span class="tok-com">/// The crash panel invites somebody to paste this report into a public</span></span>
-<span class="ln" id="L241">    <span class="tok-com">/// issue tracker, and says VeilVoice puts no file names in it. The panic</span></span>
-<span class="ln" id="L242">    <span class="tok-com">/// message is the one part not written in advance, so that claim has to be</span></span>
-<span class="ln" id="L243">    <span class="tok-com">/// checked against the source rather than asserted.</span></span>
-<span class="ln" id="L244">    <span class="tok-com">///</span></span>
-<span class="ln" id="L245">    <span class="tok-com">/// A dependency&#x27;s panic could still carry a path, which this cannot see</span></span>
-<span class="ln" id="L246">    <span class="tok-com">/// and does not pretend to. That is exactly why the panel names the error</span></span>
-<span class="ln" id="L247">    <span class="tok-com">/// message as the variable part and puts the whole text on screen instead</span></span>
-<span class="ln" id="L248">    <span class="tok-com">/// of promising on a library&#x27;s behalf.</span></span>
-<span class="ln" id="L249">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L250">    <span class="tok-kw">fn</span> <span class="tok-fn">no_panic_in_this_program_formats_a_path_into_its_message</span>() {</span>
-<span class="ln" id="L251">        <span class="tok-kw">use</span> std::path::Path;</span>
-<span class="ln" id="L252">        <span class="tok-kw">let</span> root = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
-<span class="ln" id="L253">            .<span class="tok-fn">parent</span>()</span>
-<span class="ln" id="L254">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;crates/&quot;</span>)</span>
-<span class="ln" id="L255">            .<span class="tok-fn">to_path_buf</span>();</span>
-<span class="ln" id="L256"></span>
-<span class="ln" id="L257">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L258">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stack = vec![root.<span class="tok-fn">clone</span>()];</span>
-<span class="ln" id="L259">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = stack.<span class="tok-fn">pop</span>() {</span>
-<span class="ln" id="L260">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(&amp;dir) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L261">                continue;</span>
-<span class="ln" id="L262">            };</span>
-<span class="ln" id="L263">            <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L264">                <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L265">                <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L266">                    <span class="tok-com">// Only code that ends up in a shipped binary.</span></span>
-<span class="ln" id="L267">                    <span class="tok-com">//</span></span>
-<span class="ln" id="L268">                    <span class="tok-com">// `tests/`, `benches/` and `examples/` are excluded, and</span></span>
-<span class="ln" id="L269">                    <span class="tok-com">// not as a convenience: a panic in an integration test is</span></span>
-<span class="ln" id="L270">                    <span class="tok-com">// read by whoever ran it, never written to a crash report,</span></span>
-<span class="ln" id="L271">                    <span class="tok-com">// and never pasted into an issue tracker. The first run of</span></span>
-<span class="ln" id="L272">                    <span class="tok-com">// this test flagged one in `veilvoice-verify/tests`, which</span></span>
-<span class="ln" id="L273">                    <span class="tok-com">// is a true negative rather than a finding. `target` and</span></span>
-<span class="ln" id="L274">                    <span class="tok-com">// dotted directories are not this project&#x27;s source at all.</span></span>
-<span class="ln" id="L275">                    <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">to_string_lossy</span>();</span>
-<span class="ln" id="L276">                    <span class="tok-kw">let</span> shipped =</span>
-<span class="ln" id="L277">                        !matches!(name.<span class="tok-fn">as_ref</span>(), <span class="tok-str">&quot;target&quot;</span> | <span class="tok-str">&quot;tests&quot;</span> | <span class="tok-str">&quot;benches&quot;</span> | <span class="tok-str">&quot;examples&quot;</span>)</span>
-<span class="ln" id="L278">                            &amp;&amp; !name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>);</span>
-<span class="ln" id="L279">                    <span class="tok-kw">if</span> shipped {</span>
-<span class="ln" id="L280">                        stack.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L281">                    }</span>
-<span class="ln" id="L282">                    continue;</span>
-<span class="ln" id="L283">                }</span>
-<span class="ln" id="L284">                <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">and_then</span>(|e| e.<span class="tok-fn">to_str</span>()) != <span class="tok-fn">Some</span>(<span class="tok-str">&quot;rs&quot;</span>) {</span>
-<span class="ln" id="L285">                    continue;</span>
-<span class="ln" id="L286">                }</span>
-<span class="ln" id="L287">                <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L288">                    continue;</span>
-<span class="ln" id="L289">                };</span>
-<span class="ln" id="L290">                <span class="tok-com">// Tests may say whatever they like: their panics are read by</span></span>
-<span class="ln" id="L291">                <span class="tok-com">// whoever ran them, not pasted into an issue tracker.</span></span>
-<span class="ln" id="L292">                <span class="tok-kw">let</span> body = text.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(&amp;text);</span>
-<span class="ln" id="L293">                <span class="tok-kw">for</span> (n, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L294">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L295">                    <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
-<span class="ln" id="L296">                        continue;</span>
-<span class="ln" id="L297">                    }</span>
-<span class="ln" id="L298">                    <span class="tok-kw">let</span> panics = trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.expect(&quot;</span>)</span>
-<span class="ln" id="L299">                        || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;panic!(&quot;</span>)</span>
-<span class="ln" id="L300">                        || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;assert!(&quot;</span>)</span>
-<span class="ln" id="L301">                        || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;assert_eq!(&quot;</span>);</span>
-<span class="ln" id="L302">                    <span class="tok-kw">if</span> panics &amp;&amp; (trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;display()&quot;</span>) || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.path(&quot;</span>)) {</span>
-<span class="ln" id="L303">                        offenders.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, path.<span class="tok-fn">display</span>(), n + <span class="tok-num">1</span>, trimmed));</span>
-<span class="ln" id="L304">                    }</span>
-<span class="ln" id="L305">                }</span>
-<span class="ln" id="L306">            }</span>
-<span class="ln" id="L307">        }</span>
-<span class="ln" id="L308">        assert!(</span>
-<span class="ln" id="L309">            offenders.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L310">            <span class="tok-str">&quot;these panics would put a path into a crash report a person is \</span></span>
-<span class="ln" id="L311"><span class="tok-str">             invited to paste in public:\n{}&quot;</span>,</span>
-<span class="ln" id="L312">            offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L313">        );</span>
-<span class="ln" id="L314">    }</span>
-<span class="ln" id="L315"></span>
-<span class="ln" id="L316">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch</span>(tag: &amp;str) -&gt; PathBuf {</span>
-<span class="ln" id="L317">        <span class="tok-kw">let</span> dir =</span>
-<span class="ln" id="L318">            std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;veilvoice-crashlog-{}-{}&quot;</span>, std::process::<span class="tok-fn">id</span>(), tag));</span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;dir);</span>
-<span class="ln" id="L320">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dir).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;scratch&quot;</span>);</span>
-<span class="ln" id="L321">        dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;last-crash.txt&quot;</span>)</span>
-<span class="ln" id="L322">    }</span>
-<span class="ln" id="L323"></span>
-<span class="ln" id="L324">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L325">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_names_the_version_and_the_detail</span>() {</span>
-<span class="ln" id="L326">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;basic&quot;</span>);</span>
-<span class="ln" id="L327">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;something went wrong at the seams&quot;</span>);</span>
-<span class="ln" id="L328">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
-<span class="ln" id="L329">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-kw">crate</span>::VERSION), <span class="tok-str">&quot;no version: {text}&quot;</span>);</span>
-<span class="ln" id="L330">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;a panic&quot;</span>));</span>
-<span class="ln" id="L331">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;something went wrong at the seams&quot;</span>));</span>
-<span class="ln" id="L332">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L333">    }</span>
-<span class="ln" id="L334"></span>
-<span class="ln" id="L335">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L336">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_says_it_was_sent_nowhere</span>() {</span>
-<span class="ln" id="L337">        <span class="tok-com">// The sentence matters as much as the file. Somebody whose privacy tool</span></span>
-<span class="ln" id="L338">        <span class="tok-com">// just crashed is entitled to know instantly that nothing left the</span></span>
-<span class="ln" id="L339">        <span class="tok-com">// machine, and a test keeps that sentence from being edited away.</span></span>
-<span class="ln" id="L340">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;privacy&quot;</span>);</span>
-<span class="ln" id="L341">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;x&quot;</span>);</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
-<span class="ln" id="L343">        assert!(</span>
-<span class="ln" id="L344">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sent nowhere&quot;</span>) &amp;&amp; text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no network code&quot;</span>),</span>
-<span class="ln" id="L345">            <span class="tok-str">&quot;the report must state that nothing was transmitted: {text}&quot;</span></span>
-<span class="ln" id="L346">        );</span>
-<span class="ln" id="L347">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L348">    }</span>
-<span class="ln" id="L349"></span>
-<span class="ln" id="L350">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_points_at_the_command_line_tool</span>() {</span>
-<span class="ln" id="L352">        <span class="tok-com">// The most likely cause of an invisible window is a machine that cannot</span></span>
-<span class="ln" id="L353">        <span class="tok-com">// give the process an OpenGL context, and the useful thing to tell that</span></span>
-<span class="ln" id="L354">        <span class="tok-com">// user is that there is a front-end which needs no graphics at all.</span></span>
-<span class="ln" id="L355">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;advice&quot;</span>);</span>
-<span class="ln" id="L356">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;the window could not be created&quot;</span>, <span class="tok-str">&quot;no GL context&quot;</span>);</span>
-<span class="ln" id="L357">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
-<span class="ln" id="L358">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;OpenGL&quot;</span>), <span class="tok-str">&quot;no cause named: {text}&quot;</span>);</span>
-<span class="ln" id="L359">        assert!(</span>
-<span class="ln" id="L360">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;`veilvoice`&quot;</span>),</span>
-<span class="ln" id="L361">            <span class="tok-str">&quot;no alternative offered: {text}&quot;</span></span>
-<span class="ln" id="L362">        );</span>
-<span class="ln" id="L363">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L364">    }</span>
-<span class="ln" id="L365"></span>
-<span class="ln" id="L366">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L367">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_library_is_named_instead_of_the_graphics_card</span>() {</span>
-<span class="ln" id="L368">        <span class="tok-com">// The failure this was written for: the window toolkit opens</span></span>
-<span class="ln" id="L369">        <span class="tok-com">// libxkbcommon-x11 by name at startup, so nothing that derives</span></span>
-<span class="ln" id="L370">        <span class="tok-com">// dependencies from linkage knows it is needed. The old report sent</span></span>
-<span class="ln" id="L371">        <span class="tok-com">// the reader to look at their GPU.</span></span>
-<span class="ln" id="L372">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;library&quot;</span>);</span>
-<span class="ln" id="L373">        <span class="tok-fn">write</span>(</span>
-<span class="ln" id="L374">            &amp;path,</span>
-<span class="ln" id="L375">            <span class="tok-str">&quot;a panic&quot;</span>,</span>
-<span class="ln" id="L376">            <span class="tok-str">&quot;Library libxkbcommon-x11.so could not be loaded.&quot;</span>,</span>
-<span class="ln" id="L377">        );</span>
-<span class="ln" id="L378">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
-<span class="ln" id="L379">        assert!(</span>
-<span class="ln" id="L380">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;libxkbcommon-x11.so&quot;</span>),</span>
-<span class="ln" id="L381">            <span class="tok-str">&quot;the library was not named: {text}&quot;</span></span>
-<span class="ln" id="L382">        );</span>
+<span class="ln" id="L238"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L239"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L240">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L241"></span>
+<span class="ln" id="L242">    <span class="tok-com">/// No panic VeilVoice writes itself puts a path in its message.</span></span>
+<span class="ln" id="L243">    <span class="tok-com">///</span></span>
+<span class="ln" id="L244">    <span class="tok-com">/// The crash panel invites somebody to paste this report into a public</span></span>
+<span class="ln" id="L245">    <span class="tok-com">/// issue tracker, and says VeilVoice puts no file names in it. The panic</span></span>
+<span class="ln" id="L246">    <span class="tok-com">/// message is the one part not written in advance, so that claim has to be</span></span>
+<span class="ln" id="L247">    <span class="tok-com">/// checked against the source rather than asserted.</span></span>
+<span class="ln" id="L248">    <span class="tok-com">///</span></span>
+<span class="ln" id="L249">    <span class="tok-com">/// A dependency&#x27;s panic could still carry a path, which this cannot see</span></span>
+<span class="ln" id="L250">    <span class="tok-com">/// and does not pretend to. That is exactly why the panel names the error</span></span>
+<span class="ln" id="L251">    <span class="tok-com">/// message as the variable part and puts the whole text on screen instead</span></span>
+<span class="ln" id="L252">    <span class="tok-com">/// of promising on a library&#x27;s behalf.</span></span>
+<span class="ln" id="L253">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L254">    <span class="tok-kw">fn</span> <span class="tok-fn">no_panic_in_this_program_formats_a_path_into_its_message</span>() {</span>
+<span class="ln" id="L255">        <span class="tok-kw">use</span> std::path::Path;</span>
+<span class="ln" id="L256">        <span class="tok-kw">let</span> root = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L257">            .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L258">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;crates/&quot;</span>)</span>
+<span class="ln" id="L259">            .<span class="tok-fn">to_path_buf</span>();</span>
+<span class="ln" id="L260"></span>
+<span class="ln" id="L261">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L262">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stack = vec![root.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L263">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = stack.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L264">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(&amp;dir) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L265">                continue;</span>
+<span class="ln" id="L266">            };</span>
+<span class="ln" id="L267">            <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L268">                <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L269">                <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L270">                    <span class="tok-com">// Only code that ends up in a shipped binary.</span></span>
+<span class="ln" id="L271">                    <span class="tok-com">//</span></span>
+<span class="ln" id="L272">                    <span class="tok-com">// `tests/`, `benches/` and `examples/` are excluded, and</span></span>
+<span class="ln" id="L273">                    <span class="tok-com">// not as a convenience: a panic in an integration test is</span></span>
+<span class="ln" id="L274">                    <span class="tok-com">// read by whoever ran it, never written to a crash report,</span></span>
+<span class="ln" id="L275">                    <span class="tok-com">// and never pasted into an issue tracker. The first run of</span></span>
+<span class="ln" id="L276">                    <span class="tok-com">// this test flagged one in `veilvoice-verify/tests`, which</span></span>
+<span class="ln" id="L277">                    <span class="tok-com">// is a true negative rather than a finding. `target` and</span></span>
+<span class="ln" id="L278">                    <span class="tok-com">// dotted directories are not this project&#x27;s source at all.</span></span>
+<span class="ln" id="L279">                    <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">to_string_lossy</span>();</span>
+<span class="ln" id="L280">                    <span class="tok-kw">let</span> shipped =</span>
+<span class="ln" id="L281">                        !matches!(name.<span class="tok-fn">as_ref</span>(), <span class="tok-str">&quot;target&quot;</span> | <span class="tok-str">&quot;tests&quot;</span> | <span class="tok-str">&quot;benches&quot;</span> | <span class="tok-str">&quot;examples&quot;</span>)</span>
+<span class="ln" id="L282">                            &amp;&amp; !name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>);</span>
+<span class="ln" id="L283">                    <span class="tok-kw">if</span> shipped {</span>
+<span class="ln" id="L284">                        stack.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L285">                    }</span>
+<span class="ln" id="L286">                    continue;</span>
+<span class="ln" id="L287">                }</span>
+<span class="ln" id="L288">                <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">and_then</span>(|e| e.<span class="tok-fn">to_str</span>()) != <span class="tok-fn">Some</span>(<span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L289">                    continue;</span>
+<span class="ln" id="L290">                }</span>
+<span class="ln" id="L291">                <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L292">                    continue;</span>
+<span class="ln" id="L293">                };</span>
+<span class="ln" id="L294">                <span class="tok-com">// Tests may say whatever they like: their panics are read by</span></span>
+<span class="ln" id="L295">                <span class="tok-com">// whoever ran them, not pasted into an issue tracker.</span></span>
+<span class="ln" id="L296">                <span class="tok-kw">let</span> body = text.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(&amp;text);</span>
+<span class="ln" id="L297">                <span class="tok-kw">for</span> (n, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L298">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L299">                    <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L300">                        continue;</span>
+<span class="ln" id="L301">                    }</span>
+<span class="ln" id="L302">                    <span class="tok-kw">let</span> panics = trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.expect(&quot;</span>)</span>
+<span class="ln" id="L303">                        || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;panic!(&quot;</span>)</span>
+<span class="ln" id="L304">                        || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;assert!(&quot;</span>)</span>
+<span class="ln" id="L305">                        || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;assert_eq!(&quot;</span>);</span>
+<span class="ln" id="L306">                    <span class="tok-kw">if</span> panics &amp;&amp; (trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;display()&quot;</span>) || trimmed.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.path(&quot;</span>)) {</span>
+<span class="ln" id="L307">                        offenders.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, path.<span class="tok-fn">display</span>(), n + <span class="tok-num">1</span>, trimmed));</span>
+<span class="ln" id="L308">                    }</span>
+<span class="ln" id="L309">                }</span>
+<span class="ln" id="L310">            }</span>
+<span class="ln" id="L311">        }</span>
+<span class="ln" id="L312">        assert!(</span>
+<span class="ln" id="L313">            offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L314">            <span class="tok-str">&quot;these panics would put a path into a crash report a person is \</span></span>
+<span class="ln" id="L315"><span class="tok-str">             invited to paste in public:\n{}&quot;</span>,</span>
+<span class="ln" id="L316">            offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L317">        );</span>
+<span class="ln" id="L318">    }</span>
+<span class="ln" id="L319"></span>
+<span class="ln" id="L320">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch</span>(tag: &amp;str) -&gt; PathBuf {</span>
+<span class="ln" id="L321">        <span class="tok-kw">let</span> dir =</span>
+<span class="ln" id="L322">            std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;veilvoice-crashlog-{}-{}&quot;</span>, std::process::<span class="tok-fn">id</span>(), tag));</span>
+<span class="ln" id="L323">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;dir);</span>
+<span class="ln" id="L324">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dir).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;scratch&quot;</span>);</span>
+<span class="ln" id="L325">        dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;last-crash.txt&quot;</span>)</span>
+<span class="ln" id="L326">    }</span>
+<span class="ln" id="L327"></span>
+<span class="ln" id="L328">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L329">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_names_the_version_and_the_detail</span>() {</span>
+<span class="ln" id="L330">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;basic&quot;</span>);</span>
+<span class="ln" id="L331">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;something went wrong at the seams&quot;</span>);</span>
+<span class="ln" id="L332">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
+<span class="ln" id="L333">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-kw">crate</span>::VERSION), <span class="tok-str">&quot;no version: {text}&quot;</span>);</span>
+<span class="ln" id="L334">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;a panic&quot;</span>));</span>
+<span class="ln" id="L335">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;something went wrong at the seams&quot;</span>));</span>
+<span class="ln" id="L336">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L337">    }</span>
+<span class="ln" id="L338"></span>
+<span class="ln" id="L339">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L340">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_says_it_was_sent_nowhere</span>() {</span>
+<span class="ln" id="L341">        <span class="tok-com">// The sentence matters as much as the file. Somebody whose privacy tool</span></span>
+<span class="ln" id="L342">        <span class="tok-com">// just crashed is entitled to know instantly that nothing left the</span></span>
+<span class="ln" id="L343">        <span class="tok-com">// machine, and a test keeps that sentence from being edited away.</span></span>
+<span class="ln" id="L344">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;privacy&quot;</span>);</span>
+<span class="ln" id="L345">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;x&quot;</span>);</span>
+<span class="ln" id="L346">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
+<span class="ln" id="L347">        assert!(</span>
+<span class="ln" id="L348">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sent nowhere&quot;</span>) &amp;&amp; text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no network code&quot;</span>),</span>
+<span class="ln" id="L349">            <span class="tok-str">&quot;the report must state that nothing was transmitted: {text}&quot;</span></span>
+<span class="ln" id="L350">        );</span>
+<span class="ln" id="L351">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L352">    }</span>
+<span class="ln" id="L353"></span>
+<span class="ln" id="L354">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L355">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_points_at_the_command_line_tool</span>() {</span>
+<span class="ln" id="L356">        <span class="tok-com">// The most likely cause of an invisible window is a machine that cannot</span></span>
+<span class="ln" id="L357">        <span class="tok-com">// give the process an OpenGL context, and the useful thing to tell that</span></span>
+<span class="ln" id="L358">        <span class="tok-com">// user is that there is a front-end which needs no graphics at all.</span></span>
+<span class="ln" id="L359">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;advice&quot;</span>);</span>
+<span class="ln" id="L360">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;the window could not be created&quot;</span>, <span class="tok-str">&quot;no GL context&quot;</span>);</span>
+<span class="ln" id="L361">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
+<span class="ln" id="L362">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;OpenGL&quot;</span>), <span class="tok-str">&quot;no cause named: {text}&quot;</span>);</span>
+<span class="ln" id="L363">        assert!(</span>
+<span class="ln" id="L364">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;`veilvoice`&quot;</span>),</span>
+<span class="ln" id="L365">            <span class="tok-str">&quot;no alternative offered: {text}&quot;</span></span>
+<span class="ln" id="L366">        );</span>
+<span class="ln" id="L367">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L368">    }</span>
+<span class="ln" id="L369"></span>
+<span class="ln" id="L370">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L371">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_library_is_named_instead_of_the_graphics_card</span>() {</span>
+<span class="ln" id="L372">        <span class="tok-com">// The failure this was written for: the window toolkit opens</span></span>
+<span class="ln" id="L373">        <span class="tok-com">// libxkbcommon-x11 by name at startup, so nothing that derives</span></span>
+<span class="ln" id="L374">        <span class="tok-com">// dependencies from linkage knows it is needed. The old report sent</span></span>
+<span class="ln" id="L375">        <span class="tok-com">// the reader to look at their GPU.</span></span>
+<span class="ln" id="L376">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;library&quot;</span>);</span>
+<span class="ln" id="L377">        <span class="tok-fn">write</span>(</span>
+<span class="ln" id="L378">            &amp;path,</span>
+<span class="ln" id="L379">            <span class="tok-str">&quot;a panic&quot;</span>,</span>
+<span class="ln" id="L380">            <span class="tok-str">&quot;Library libxkbcommon-x11.so could not be loaded.&quot;</span>,</span>
+<span class="ln" id="L381">        );</span>
+<span class="ln" id="L382">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
 <span class="ln" id="L383">        assert!(</span>
-<span class="ln" id="L384">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;apt install&quot;</span>) &amp;&amp; text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;dnf install&quot;</span>),</span>
-<span class="ln" id="L385">            <span class="tok-str">&quot;no way to fix it was offered: {text}&quot;</span></span>
+<span class="ln" id="L384">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;libxkbcommon-x11.so&quot;</span>),</span>
+<span class="ln" id="L385">            <span class="tok-str">&quot;the library was not named: {text}&quot;</span></span>
 <span class="ln" id="L386">        );</span>
 <span class="ln" id="L387">        assert!(</span>
-<span class="ln" id="L388">            !text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;OpenGL&quot;</span>),</span>
-<span class="ln" id="L389">            <span class="tok-str">&quot;still blaming the graphics stack for a missing library: {text}&quot;</span></span>
+<span class="ln" id="L388">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;apt install&quot;</span>) &amp;&amp; text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;dnf install&quot;</span>),</span>
+<span class="ln" id="L389">            <span class="tok-str">&quot;no way to fix it was offered: {text}&quot;</span></span>
 <span class="ln" id="L390">        );</span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L392">    }</span>
-<span class="ln" id="L393"></span>
-<span class="ln" id="L394">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L395">    <span class="tok-kw">fn</span> <span class="tok-fn">the_loader_message_shape_is_matched_not_one_library_name</span>() {</span>
-<span class="ln" id="L396">        <span class="tok-com">// The next toolkit upgrade that adds a loaded-by-name library should</span></span>
-<span class="ln" id="L397">        <span class="tok-com">// be covered without an edit here.</span></span>
-<span class="ln" id="L398">        assert_eq!(</span>
-<span class="ln" id="L399">            <span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;Library libsomething-else.so could not be loaded.&quot;</span>),</span>
-<span class="ln" id="L400">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;libsomething-else.so&quot;</span>)</span>
-<span class="ln" id="L401">        );</span>
+<span class="ln" id="L391">        assert!(</span>
+<span class="ln" id="L392">            !text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;OpenGL&quot;</span>),</span>
+<span class="ln" id="L393">            <span class="tok-str">&quot;still blaming the graphics stack for a missing library: {text}&quot;</span></span>
+<span class="ln" id="L394">        );</span>
+<span class="ln" id="L395">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L396">    }</span>
+<span class="ln" id="L397"></span>
+<span class="ln" id="L398">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L399">    <span class="tok-kw">fn</span> <span class="tok-fn">the_loader_message_shape_is_matched_not_one_library_name</span>() {</span>
+<span class="ln" id="L400">        <span class="tok-com">// The next toolkit upgrade that adds a loaded-by-name library should</span></span>
+<span class="ln" id="L401">        <span class="tok-com">// be covered without an edit here.</span></span>
 <span class="ln" id="L402">        assert_eq!(</span>
-<span class="ln" id="L403">            <span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;libfoo.so.1: cannot open shared object file&quot;</span>),</span>
-<span class="ln" id="L404">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;libfoo.so.1&quot;</span>)</span>
+<span class="ln" id="L403">            <span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;Library libsomething-else.so could not be loaded.&quot;</span>),</span>
+<span class="ln" id="L404">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;libsomething-else.so&quot;</span>)</span>
 <span class="ln" id="L405">        );</span>
-<span class="ln" id="L406">        assert_eq!(<span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;index out of bounds&quot;</span>), None);</span>
-<span class="ln" id="L407">        assert_eq!(<span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;the window could not be created&quot;</span>), None);</span>
-<span class="ln" id="L408">    }</span>
-<span class="ln" id="L409"></span>
-<span class="ln" id="L410">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L411">    <span class="tok-kw">fn</span> <span class="tok-fn">an_enormous_panic_message_is_bounded</span>() {</span>
-<span class="ln" id="L412">        <span class="tok-com">// A panic message can carry a formatted value of any size; this file is</span></span>
-<span class="ln" id="L413">        <span class="tok-com">// read by a person, and by a text editor that has to open it.</span></span>
-<span class="ln" id="L414">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;huge&quot;</span>);</span>
-<span class="ln" id="L415">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, &amp;<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">500_000</span>));</span>
-<span class="ln" id="L416">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
-<span class="ln" id="L417">        assert!(</span>
-<span class="ln" id="L418">            text.<span class="tok-fn">len</span>() &lt; <span class="tok-num">10_000</span>,</span>
-<span class="ln" id="L419">            <span class="tok-str">&quot;the report grew to {} bytes&quot;</span>,</span>
-<span class="ln" id="L420">            text.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L421">        );</span>
-<span class="ln" id="L422">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L423">    }</span>
-<span class="ln" id="L424"></span>
-<span class="ln" id="L425">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L426">    <span class="tok-kw">fn</span> <span class="tok-fn">writing_into_a_directory_that_does_not_exist_creates_it</span>() {</span>
-<span class="ln" id="L427">        <span class="tok-kw">let</span> base =</span>
-<span class="ln" id="L428">            std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;veilvoice-crashlog-{}-deep&quot;</span>, std::process::<span class="tok-fn">id</span>()));</span>
-<span class="ln" id="L429">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;base);</span>
-<span class="ln" id="L430">        <span class="tok-kw">let</span> path = base.<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;last-crash.txt&quot;</span>);</span>
-<span class="ln" id="L431">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;x&quot;</span>);</span>
-<span class="ln" id="L432">        assert!(path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the report was not written&quot;</span>);</span>
+<span class="ln" id="L406">        assert_eq!(</span>
+<span class="ln" id="L407">            <span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;libfoo.so.1: cannot open shared object file&quot;</span>),</span>
+<span class="ln" id="L408">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;libfoo.so.1&quot;</span>)</span>
+<span class="ln" id="L409">        );</span>
+<span class="ln" id="L410">        assert_eq!(<span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;index out of bounds&quot;</span>), None);</span>
+<span class="ln" id="L411">        assert_eq!(<span class="tok-fn">missing_library</span>(<span class="tok-str">&quot;the window could not be created&quot;</span>), None);</span>
+<span class="ln" id="L412">    }</span>
+<span class="ln" id="L413"></span>
+<span class="ln" id="L414">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L415">    <span class="tok-kw">fn</span> <span class="tok-fn">an_enormous_panic_message_is_bounded</span>() {</span>
+<span class="ln" id="L416">        <span class="tok-com">// A panic message can carry a formatted value of any size; this file is</span></span>
+<span class="ln" id="L417">        <span class="tok-com">// read by a person, and by a text editor that has to open it.</span></span>
+<span class="ln" id="L418">        <span class="tok-kw">let</span> path = <span class="tok-fn">scratch</span>(<span class="tok-str">&quot;huge&quot;</span>);</span>
+<span class="ln" id="L419">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, &amp;<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">500_000</span>));</span>
+<span class="ln" id="L420">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;written&quot;</span>);</span>
+<span class="ln" id="L421">        assert!(</span>
+<span class="ln" id="L422">            text.<span class="tok-fn">len</span>() &lt; <span class="tok-num">10_000</span>,</span>
+<span class="ln" id="L423">            <span class="tok-str">&quot;the report grew to {} bytes&quot;</span>,</span>
+<span class="ln" id="L424">            text.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L425">        );</span>
+<span class="ln" id="L426">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(path.<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L427">    }</span>
+<span class="ln" id="L428"></span>
+<span class="ln" id="L429">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L430">    <span class="tok-kw">fn</span> <span class="tok-fn">writing_into_a_directory_that_does_not_exist_creates_it</span>() {</span>
+<span class="ln" id="L431">        <span class="tok-kw">let</span> base =</span>
+<span class="ln" id="L432">            std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;veilvoice-crashlog-{}-deep&quot;</span>, std::process::<span class="tok-fn">id</span>()));</span>
 <span class="ln" id="L433">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;base);</span>
-<span class="ln" id="L434">    }</span>
-<span class="ln" id="L435"></span>
-<span class="ln" id="L436">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L437">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unwritable_destination_is_survived_rather_than_panicked_on</span>() {</span>
-<span class="ln" id="L438">        <span class="tok-com">// This runs inside a panic hook. A panic here is an abort with even</span></span>
-<span class="ln" id="L439">        <span class="tok-com">// less to show for it, so every failure has to be swallowed.</span></span>
-<span class="ln" id="L440">        <span class="tok-kw">let</span> path = Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/this/path/cannot/exist/anywhere/last-crash.txt&quot;</span>);</span>
-<span class="ln" id="L441">        <span class="tok-fn">write</span>(path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;x&quot;</span>); <span class="tok-com">// must simply return</span></span>
-<span class="ln" id="L442">    }</span>
-<span class="ln" id="L443">}</span>
+<span class="ln" id="L434">        <span class="tok-kw">let</span> path = base.<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;last-crash.txt&quot;</span>);</span>
+<span class="ln" id="L435">        <span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;x&quot;</span>);</span>
+<span class="ln" id="L436">        assert!(path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the report was not written&quot;</span>);</span>
+<span class="ln" id="L437">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;base);</span>
+<span class="ln" id="L438">    }</span>
+<span class="ln" id="L439"></span>
+<span class="ln" id="L440">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unwritable_destination_is_survived_rather_than_panicked_on</span>() {</span>
+<span class="ln" id="L442">        <span class="tok-com">// This runs inside a panic hook. A panic here is an abort with even</span></span>
+<span class="ln" id="L443">        <span class="tok-com">// less to show for it, so every failure has to be swallowed.</span></span>
+<span class="ln" id="L444">        <span class="tok-kw">let</span> path = Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/this/path/cannot/exist/anywhere/last-crash.txt&quot;</span>);</span>
+<span class="ln" id="L445">        <span class="tok-fn">write</span>(path, <span class="tok-str">&quot;a panic&quot;</span>, <span class="tok-str">&quot;x&quot;</span>); <span class="tok-com">// must simply return</span></span>
+<span class="ln" id="L446">    }</span>
+<span class="ln" id="L447">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

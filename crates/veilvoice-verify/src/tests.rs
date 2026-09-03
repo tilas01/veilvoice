@@ -495,3 +495,93 @@ fn a_named_directory_that_is_not_there_is_refused_before_anything_is_searched() 
          cannot tell which path was wrong"
     );
 }
+
+/// No interface string carries a run of spaces left behind by its own source
+/// indentation.
+///
+/// A multi-line string literal in Rust joins its lines only if each one ends in
+/// a backslash. Drop the backslashes and the literal still compiles, still
+/// passes every test that looks for a word in it, and renders in the window
+/// with a twenty-space hole in the middle of a sentence, because the source
+/// file's indentation is now part of the text. That is what happened to eleven
+/// strings across the interface, and nothing failed.
+///
+/// The rule below is `rustfmt`'s own width. `rustfmt` reflows code but never
+/// the inside of a string literal, so a source line past 100 characters that
+/// holds a gap inside a literal is a literal that was joined by hand and not
+/// put back together. A deliberate column of help text, meanwhile, is written
+/// short and stays well inside the limit: every one in this repository fits in
+/// 88 characters, so none of them trips this.
+///
+/// Two things are deliberately out of scope. Test modules are skipped, because
+/// a test legitimately holds wide fixtures: `reg query` output is reproduced
+/// space for space, and the tests that read this repository's own source carry
+/// needles with the indentation they are searching for. And an escape is not a
+/// word, so the `n` of a `\n` cannot be the letter that starts a gap.
+#[test]
+fn no_interface_string_has_a_gap_where_a_line_continuation_belongs() {
+    let crates = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let mut sources = Vec::new();
+    let mut pending = vec![crates.to_path_buf()];
+    while let Some(directory) = pending.pop() {
+        for entry in std::fs::read_dir(&directory).expect("the crates live here") {
+            let entry = entry.expect("a readable directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                // `target` is build output, and can be enormous.
+                if path.file_name().is_some_and(|n| n == "target") {
+                    continue;
+                }
+                pending.push(path);
+            } else if path.extension().is_some_and(|e| e == "rs") {
+                sources.push(path);
+            }
+        }
+    }
+    assert!(
+        sources.len() > 50,
+        "the walk found {} files, so it is not looking at the workspace",
+        sources.len()
+    );
+
+    let mut found = Vec::new();
+    for path in &sources {
+        let text = std::fs::read_to_string(path).expect("a readable source file");
+        let text = text.replace("\r\n", "\n");
+        // Everything up to the test module: what a person is shown.
+        let interface = text.split("\n#[cfg(test)]").next().unwrap();
+        for (number, line) in interface.lines().enumerate() {
+            if line.chars().count() <= 100 {
+                continue;
+            }
+            // An escape is not a word. Without this the `n` of a `\n` reads as
+            // the letter before a gap, and a needle that searches this
+            // repository's own indented source looks like broken prose.
+            let line = line.replace("\\n", "..").replace("\\t", "..");
+            // The gap has to sit between two words to be prose rather than a
+            // column: three spaces after a letter or a comma, and a letter
+            // after them.
+            let bytes: Vec<char> = line.chars().collect();
+            let gap = bytes.windows(5).any(|w| {
+                (w[0].is_ascii_alphabetic() || w[0] == ',' || w[0] == '.')
+                    && w[1] == ' '
+                    && w[2] == ' '
+                    && w[3] == ' '
+                    && (w[4] == ' ' || w[4].is_ascii_alphabetic())
+            });
+            if gap {
+                found.push(format!(
+                    "{}:{}",
+                    path.file_name().unwrap().to_string_lossy(),
+                    number + 1
+                ));
+            }
+        }
+    }
+    assert!(
+        found.is_empty(),
+        "these lines join a string literal without the backslash that would \
+         close the gap, so the text renders with the source indentation in the \
+         middle of it: {found:?}"
+    );
+}

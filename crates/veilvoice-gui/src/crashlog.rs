@@ -162,7 +162,11 @@ fn advice(detail: &str) -> String {
         );
     }
 
-    "If the window never appeared, the most likely cause is that this\n     computer could not give the application an OpenGL context. This is common\n     in a virtual machine, over a remote desktop session, or with hybrid\n     graphics. The command-line tool `veilvoice` does the same work and\n     needs no graphics at all.\n"
+    "If the window never appeared, the most likely cause is that this\n\
+     computer could not give the application an OpenGL context. This is\n\
+     common in a virtual machine, over a remote desktop session, or with\n\
+     hybrid graphics. The command-line tool `veilvoice` does the same work\n\
+     and needs no graphics at all.\n"
         .to_string()
 }
 

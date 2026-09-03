@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/crashlog.svg" alt="crashlog.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/crashlog.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 443 lines &middot; <a href="crashlog.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 447 lines &middot; <a href="crashlog.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-problem-this-exists-for">The problem this exists for</a>
@@ -81,15 +81,15 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>443 lines defining <strong>9 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>447 lines defining <strong>9 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>install</code> <span style="color:var(--muted)">line 191</span> &middot; Install the panic hook.
+<li><code>install</code> <span style="color:var(--muted)">line 195</span> &middot; Install the panic hook.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_path</code>, <code>previous</code>, <code>write</code>, <code>advice</code>, <code>stamp</code>, <code>missing_library</code></span>
 </li>
-<li><code>record_startup_failure</code> <span style="color:var(--muted)">line 214</span> &middot; Record a startup failure that eframe returned rather than panicked.
+<li><code>record_startup_failure</code> <span style="color:var(--muted)">line 218</span> &middot; Record a startup failure that eframe returned rather than panicked.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_path</code>, <code>write</code>, <code>advice</code>, <code>stamp</code>, <code>missing_library</code></span>
 </li>
-<li><code>clear</code> <span style="color:var(--muted)">line 228</span> &middot; Forget a previous report.
+<li><code>clear</code> <span style="color:var(--muted)">line 232</span> &middot; Forget a previous report.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_path</code></span>
 </li>
 </ul>
@@ -140,27 +140,27 @@
 <a href="crashlog.src.html#fn-missing_library">
 <rect x="185.6" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="260.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">missing_library</text>
-<text x="260.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 175</text>
+<text x="260.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
 <a href="crashlog.src.html#fn-install">
 <rect x="399.6" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="445.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="445.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
+<text x="445.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
 </a>
 <a href="crashlog.src.html#fn-record_startup_failure">
 <rect x="98.1" y="120.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="200.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">record_startup_failure</text>
-<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
+<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 218</text>
 </a>
 <a href="crashlog.src.html#fn-previous">
 <rect x="273.0" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="319.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">previous</text>
-<text x="319.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 221</text>
+<text x="319.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 225</text>
 </a>
 <a href="crashlog.src.html#fn-clear">
 <rect x="329.4" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="375.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clear</text>
-<text x="375.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<text x="375.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -183,11 +183,11 @@ flowchart TD
     n_stamp[&quot;stamp&lt;br/&gt;line 74&quot;]
     n_write[&quot;write&lt;br/&gt;line 87&quot;]
     n_advice[&quot;advice&lt;br/&gt;line 149&quot;]
-    n_missing_library[&quot;missing_library&lt;br/&gt;line 175&quot;]
-    n_install([&quot;install&lt;br/&gt;line 191&quot;])
-    n_record_startup_failure([&quot;record_startup_failure&lt;br/&gt;line 214&quot;])
-    n_previous[&quot;previous&lt;br/&gt;line 221&quot;]
-    n_clear([&quot;clear&lt;br/&gt;line 228&quot;])
+    n_missing_library[&quot;missing_library&lt;br/&gt;line 179&quot;]
+    n_install([&quot;install&lt;br/&gt;line 195&quot;])
+    n_record_startup_failure([&quot;record_startup_failure&lt;br/&gt;line 218&quot;])
+    n_previous[&quot;previous&lt;br/&gt;line 225&quot;]
+    n_clear([&quot;clear&lt;br/&gt;line 232&quot;])
     n_advice --&gt; n_missing_library
     n_clear --&gt; n_default_path
     n_install --&gt; n_default_path
@@ -202,11 +202,11 @@ flowchart TD
     click n_stamp href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L74&quot; &quot;open the source&quot;
     click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L87&quot; &quot;open the source&quot;
     click n_advice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L149&quot; &quot;open the source&quot;
-    click n_missing_library href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L175&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L191&quot; &quot;open the source&quot;
-    click n_record_startup_failure href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L214&quot; &quot;open the source&quot;
-    click n_previous href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L221&quot; &quot;open the source&quot;
-    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L228&quot; &quot;open the source&quot;
+    click n_missing_library href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L179&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L195&quot; &quot;open the source&quot;
+    click n_record_startup_failure href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L218&quot; &quot;open the source&quot;
+    click n_previous href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L225&quot; &quot;open the source&quot;
+    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L232&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_install,n_record_startup_failure,n_clear entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -223,11 +223,11 @@ flowchart TD
 <tr><td><code>stamp</code> <sub>fn</sub></td><td><a href="crashlog.src.html#fn-stamp">74</a></td><td>Seconds since the Unix epoch, or 0 if the clock is unreadable.</td></tr>
 <tr><td><code>write</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-write">87</a></td><td>Write one failure report.</td></tr>
 <tr><td><code>advice</code> <sub>fn</sub></td><td><a href="crashlog.src.html#fn-advice">149</a></td><td>The paragraph that tries to be useful about <em>this</em> failure.</td></tr>
-<tr><td><code>missing_library</code> <sub>fn</sub></td><td><a href="crashlog.src.html#fn-missing_library">175</a></td><td>The name of the shared library a panic message says could not be loaded.</td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-install">191</a></td><td>Install the panic hook.</td></tr>
-<tr><td><code>record_startup_failure</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-record_startup_failure">214</a></td><td>Record a startup failure that eframe returned rather than panicked.</td></tr>
-<tr><td><code>previous</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-previous">221</a></td><td>Read a previous report, if one is there, so the interface can mention it.</td></tr>
-<tr><td><code>clear</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-clear">228</a></td><td>Forget a previous report.</td></tr>
+<tr><td><code>missing_library</code> <sub>fn</sub></td><td><a href="crashlog.src.html#fn-missing_library">179</a></td><td>The name of the shared library a panic message says could not be loaded.</td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-install">195</a></td><td>Install the panic hook.</td></tr>
+<tr><td><code>record_startup_failure</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-record_startup_failure">218</a></td><td>Record a startup failure that eframe returned rather than panicked.</td></tr>
+<tr><td><code>previous</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-previous">225</a></td><td>Read a previous report, if one is there, so the interface can mention it.</td></tr>
+<tr><td><code>clear</code> <sub>pub fn</sub></td><td><a href="crashlog.src.html#fn-clear">232</a></td><td>Forget a previous report.</td></tr>
 </tbody></table>
 </section>
 </div></div>
