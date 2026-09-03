@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="settings.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1270 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="settings.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1272 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -498,909 +498,911 @@
 <span class="ln" id="L394">        <span class="tok-com">// working meter and a bypassed engine draw the same bar.</span></span>
 <span class="ln" id="L395">        ui.<span class="tok-fn">label</span>(</span>
 <span class="ln" id="L396">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L397">                <span class="tok-str">&quot;  It shows levels, which tells you sound is arriving and sound is                  leaving. It cannot tell you the disguise is working; listening to                  the preview on the live tab is what does that.&quot;</span>,</span>
-<span class="ln" id="L398">            )</span>
-<span class="ln" id="L399">            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L400">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L401">        );</span>
-<span class="ln" id="L402">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L403"></span>
-<span class="ln" id="L404">        <span class="tok-fn">section</span>(</span>
-<span class="ln" id="L405">            ui,</span>
-<span class="ln" id="L406">            <span class="tok-str">&quot;Notifications&quot;</span>,</span>
-<span class="ln" id="L407">            <span class="tok-str">&quot;How VeilVoice tells you something while it is running.&quot;</span>,</span>
-<span class="ln" id="L408">        );</span>
-<span class="ln" id="L409"></span>
-<span class="ln" id="L410">        <span class="tok-kw">let</span> current = <span class="tok-kw">self</span>.<span class="tok-fn">notify_style</span>();</span>
-<span class="ln" id="L411">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L412">            <span class="tok-kw">for</span> style <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::notify::Style::ALL {</span>
-<span class="ln" id="L413">                <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L414">                    .<span class="tok-fn">selectable_label</span>(current == *style, style.<span class="tok-fn">label</span>())</span>
-<span class="ln" id="L415">                    .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L416">                    &amp;&amp; current != *style</span>
-<span class="ln" id="L417">                {</span>
-<span class="ln" id="L418">                    <span class="tok-kw">self</span>.<span class="tok-fn">set_notify_style</span>(*style);</span>
-<span class="ln" id="L419">                }</span>
-<span class="ln" id="L420">            }</span>
-<span class="ln" id="L421">        });</span>
-<span class="ln" id="L422">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L423">            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-kw">self</span>.<span class="tok-fn">notify_style</span>().<span class="tok-fn">note</span>()))</span>
-<span class="ln" id="L424">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L425">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L426">        );</span>
-<span class="ln" id="L427"></span>
-<span class="ln" id="L428">        <span class="tok-com">// The measured contrast, shown rather than asserted. A translucent card</span></span>
-<span class="ln" id="L429">        <span class="tok-com">// is a colour laid over the panel behind it, so whether its text is</span></span>
-<span class="ln" id="L430">        <span class="tok-com">// legible depends on the palette in force -- and a reader choosing a</span></span>
-<span class="ln" id="L431">        <span class="tok-com">// palette should be able to see the number rather than take it on</span></span>
-<span class="ln" id="L432">        <span class="tok-com">// trust, exactly as the palette editor already shows its own ratios.</span></span>
-<span class="ln" id="L433">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-fn">notify_style</span>() != <span class="tok-kw">crate</span>::notify::Style::Off {</span>
-<span class="ln" id="L434">            <span class="tok-kw">let</span> card = <span class="tok-kw">crate</span>::notify::Card::<span class="tok-fn">for_level</span>(<span class="tok-kw">crate</span>::notify::Level::Warn, p::<span class="tok-fn">bg</span>());</span>
-<span class="ln" id="L435">            <span class="tok-kw">let</span> measured = format!(</span>
-<span class="ln" id="L436">                <span class="tok-str">&quot;  warning text measures {:.1}:1 on this palette, against the {:.1}:1 \</span></span>
-<span class="ln" id="L437"><span class="tok-str">                 a notification needs&quot;</span>,</span>
-<span class="ln" id="L438">                card.ratio,</span>
-<span class="ln" id="L439">                <span class="tok-kw">crate</span>::notify::LEAST_CONTRAST</span>
-<span class="ln" id="L440">            );</span>
-<span class="ln" id="L441">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(measured).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L442">            <span class="tok-kw">if</span> card.opaque {</span>
-<span class="ln" id="L443">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L444">                    RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L445">                        <span class="tok-str">&quot;  drawn solid rather than translucent here: nothing in this \</span></span>
-<span class="ln" id="L446"><span class="tok-str">                         palette reads well enough through it, and a warning you \</span></span>
-<span class="ln" id="L447"><span class="tok-str">                         cannot read is not a warning&quot;</span>,</span>
-<span class="ln" id="L448">                    )</span>
-<span class="ln" id="L449">                    .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L450">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L451">                );</span>
-<span class="ln" id="L452">            }</span>
-<span class="ln" id="L453">        }</span>
-<span class="ln" id="L454"></span>
-<span class="ln" id="L455">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L456">            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-kw">crate</span>::notify::SCOPE))</span>
-<span class="ln" id="L457">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L458">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L459">        );</span>
-<span class="ln" id="L460">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L461"></span>
-<span class="ln" id="L462">        <span class="tok-fn">section</span>(</span>
-<span class="ln" id="L463">            ui,</span>
-<span class="ln" id="L464">            <span class="tok-str">&quot;Tabs&quot;</span>,</span>
-<span class="ln" id="L465">            <span class="tok-str">&quot;What the row along the top of the window shows.&quot;</span>,</span>
-<span class="ln" id="L466">        );</span>
-<span class="ln" id="L467"></span>
-<span class="ln" id="L468">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hide = <span class="tok-kw">self</span>.prefs.hide_install_tab;</span>
-<span class="ln" id="L469">        <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L470">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> hide, <span class="tok-str">&quot;Hide the install tab&quot;</span>)</span>
-<span class="ln" id="L471">            .<span class="tok-fn">on_hover_text</span>(<span class="tok-str">&quot;Only affects a portable copy; an installed one never shows it&quot;</span>)</span>
-<span class="ln" id="L472">            .<span class="tok-fn">changed</span>()</span>
-<span class="ln" id="L473">        {</span>
-<span class="ln" id="L474">            <span class="tok-kw">self</span>.<span class="tok-fn">set_hide_install_tab</span>(hide);</span>
-<span class="ln" id="L475">        }</span>
-<span class="ln" id="L476">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L477">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L478">                <span class="tok-str">&quot;  The install tab already disappears by itself once VeilVoice is \</span></span>
-<span class="ln" id="L479"><span class="tok-str">                 installed: a program offering to install itself when it already is \</span></span>
-<span class="ln" id="L480"><span class="tok-str">                 tells you something untrue about what you are running. This covers the \</span></span>
-<span class="ln" id="L481"><span class="tok-str">                 other case: a portable copy, run on purpose, by somebody who does not \</span></span>
-<span class="ln" id="L482"><span class="tok-str">                 want to be asked again. Nothing else changes: `veilvoice install` still \</span></span>
-<span class="ln" id="L483"><span class="tok-str">                 works from the command line.&quot;</span>,</span>
-<span class="ln" id="L484">            )</span>
-<span class="ln" id="L485">            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L486">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L487">        );</span>
-<span class="ln" id="L488"></span>
-<span class="ln" id="L489">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(error) = &amp;<span class="tok-kw">self</span>.save_error {</span>
-<span class="ln" id="L490">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L491">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L492">        }</span>
-<span class="ln" id="L493">    }</span>
+<span class="ln" id="L397">                <span class="tok-str">&quot;  It shows levels, which tells you sound is arriving and sound is leaving. \</span></span>
+<span class="ln" id="L398"><span class="tok-str">                 It cannot tell you the disguise is working; listening to the preview on \</span></span>
+<span class="ln" id="L399"><span class="tok-str">                 the live tab is what does that.&quot;</span>,</span>
+<span class="ln" id="L400">            )</span>
+<span class="ln" id="L401">            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L402">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L403">        );</span>
+<span class="ln" id="L404">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L405"></span>
+<span class="ln" id="L406">        <span class="tok-fn">section</span>(</span>
+<span class="ln" id="L407">            ui,</span>
+<span class="ln" id="L408">            <span class="tok-str">&quot;Notifications&quot;</span>,</span>
+<span class="ln" id="L409">            <span class="tok-str">&quot;How VeilVoice tells you something while it is running.&quot;</span>,</span>
+<span class="ln" id="L410">        );</span>
+<span class="ln" id="L411"></span>
+<span class="ln" id="L412">        <span class="tok-kw">let</span> current = <span class="tok-kw">self</span>.<span class="tok-fn">notify_style</span>();</span>
+<span class="ln" id="L413">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L414">            <span class="tok-kw">for</span> style <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::notify::Style::ALL {</span>
+<span class="ln" id="L415">                <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L416">                    .<span class="tok-fn">selectable_label</span>(current == *style, style.<span class="tok-fn">label</span>())</span>
+<span class="ln" id="L417">                    .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L418">                    &amp;&amp; current != *style</span>
+<span class="ln" id="L419">                {</span>
+<span class="ln" id="L420">                    <span class="tok-kw">self</span>.<span class="tok-fn">set_notify_style</span>(*style);</span>
+<span class="ln" id="L421">                }</span>
+<span class="ln" id="L422">            }</span>
+<span class="ln" id="L423">        });</span>
+<span class="ln" id="L424">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L425">            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-kw">self</span>.<span class="tok-fn">notify_style</span>().<span class="tok-fn">note</span>()))</span>
+<span class="ln" id="L426">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L427">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L428">        );</span>
+<span class="ln" id="L429"></span>
+<span class="ln" id="L430">        <span class="tok-com">// The measured contrast, shown rather than asserted. A translucent card</span></span>
+<span class="ln" id="L431">        <span class="tok-com">// is a colour laid over the panel behind it, so whether its text is</span></span>
+<span class="ln" id="L432">        <span class="tok-com">// legible depends on the palette in force -- and a reader choosing a</span></span>
+<span class="ln" id="L433">        <span class="tok-com">// palette should be able to see the number rather than take it on</span></span>
+<span class="ln" id="L434">        <span class="tok-com">// trust, exactly as the palette editor already shows its own ratios.</span></span>
+<span class="ln" id="L435">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-fn">notify_style</span>() != <span class="tok-kw">crate</span>::notify::Style::Off {</span>
+<span class="ln" id="L436">            <span class="tok-kw">let</span> card = <span class="tok-kw">crate</span>::notify::Card::<span class="tok-fn">for_level</span>(<span class="tok-kw">crate</span>::notify::Level::Warn, p::<span class="tok-fn">bg</span>());</span>
+<span class="ln" id="L437">            <span class="tok-kw">let</span> measured = format!(</span>
+<span class="ln" id="L438">                <span class="tok-str">&quot;  warning text measures {:.1}:1 on this palette, against the {:.1}:1 \</span></span>
+<span class="ln" id="L439"><span class="tok-str">                 a notification needs&quot;</span>,</span>
+<span class="ln" id="L440">                card.ratio,</span>
+<span class="ln" id="L441">                <span class="tok-kw">crate</span>::notify::LEAST_CONTRAST</span>
+<span class="ln" id="L442">            );</span>
+<span class="ln" id="L443">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(measured).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L444">            <span class="tok-kw">if</span> card.opaque {</span>
+<span class="ln" id="L445">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L446">                    RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L447">                        <span class="tok-str">&quot;  drawn solid rather than translucent here: nothing in this \</span></span>
+<span class="ln" id="L448"><span class="tok-str">                         palette reads well enough through it, and a warning you \</span></span>
+<span class="ln" id="L449"><span class="tok-str">                         cannot read is not a warning&quot;</span>,</span>
+<span class="ln" id="L450">                    )</span>
+<span class="ln" id="L451">                    .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L452">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L453">                );</span>
+<span class="ln" id="L454">            }</span>
+<span class="ln" id="L455">        }</span>
+<span class="ln" id="L456"></span>
+<span class="ln" id="L457">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L458">            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-kw">crate</span>::notify::SCOPE))</span>
+<span class="ln" id="L459">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L460">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L461">        );</span>
+<span class="ln" id="L462">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L463"></span>
+<span class="ln" id="L464">        <span class="tok-fn">section</span>(</span>
+<span class="ln" id="L465">            ui,</span>
+<span class="ln" id="L466">            <span class="tok-str">&quot;Tabs&quot;</span>,</span>
+<span class="ln" id="L467">            <span class="tok-str">&quot;What the row along the top of the window shows.&quot;</span>,</span>
+<span class="ln" id="L468">        );</span>
+<span class="ln" id="L469"></span>
+<span class="ln" id="L470">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hide = <span class="tok-kw">self</span>.prefs.hide_install_tab;</span>
+<span class="ln" id="L471">        <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L472">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> hide, <span class="tok-str">&quot;Hide the install tab&quot;</span>)</span>
+<span class="ln" id="L473">            .<span class="tok-fn">on_hover_text</span>(<span class="tok-str">&quot;Only affects a portable copy; an installed one never shows it&quot;</span>)</span>
+<span class="ln" id="L474">            .<span class="tok-fn">changed</span>()</span>
+<span class="ln" id="L475">        {</span>
+<span class="ln" id="L476">            <span class="tok-kw">self</span>.<span class="tok-fn">set_hide_install_tab</span>(hide);</span>
+<span class="ln" id="L477">        }</span>
+<span class="ln" id="L478">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L479">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L480">                <span class="tok-str">&quot;  The install tab already disappears by itself once VeilVoice is \</span></span>
+<span class="ln" id="L481"><span class="tok-str">                 installed: a program offering to install itself when it already is \</span></span>
+<span class="ln" id="L482"><span class="tok-str">                 tells you something untrue about what you are running. This covers the \</span></span>
+<span class="ln" id="L483"><span class="tok-str">                 other case: a portable copy, run on purpose, by somebody who does not \</span></span>
+<span class="ln" id="L484"><span class="tok-str">                 want to be asked again. Nothing else changes: `veilvoice install` still \</span></span>
+<span class="ln" id="L485"><span class="tok-str">                 works from the command line.&quot;</span>,</span>
+<span class="ln" id="L486">            )</span>
+<span class="ln" id="L487">            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L488">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L489">        );</span>
+<span class="ln" id="L490"></span>
+<span class="ln" id="L491">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(error) = &amp;<span class="tok-kw">self</span>.save_error {</span>
+<span class="ln" id="L492">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L493">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L494">        }</span>
+<span class="ln" id="L495">    }</span>
 </span>
-<span class="ln" id="L494"></span>
+<span class="ln" id="L496"></span>
 <span class="src-item" id="fn-settings-toured_tabs">
-<span class="ln" id="L495">    <span class="tok-com">/// The tabs the tour has already covered.</span></span>
-<span class="ln" id="L496">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">toured_tabs</span>(&amp;<span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L497">        <span class="tok-kw">self</span>.prefs</span>
-<span class="ln" id="L498">            .toured_tabs</span>
-<span class="ln" id="L499">            .<span class="tok-fn">split</span>(<span class="tok-str">&#x27;,&#x27;</span>)</span>
-<span class="ln" id="L500">            .<span class="tok-fn">map</span>(str::trim)</span>
-<span class="ln" id="L501">            .<span class="tok-fn">filter</span>(|part| !part.<span class="tok-fn">is_empty</span>())</span>
-<span class="ln" id="L502">            .<span class="tok-fn">map</span>(str::to_string)</span>
-<span class="ln" id="L503">            .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L504">    }</span>
+<span class="ln" id="L497">    <span class="tok-com">/// The tabs the tour has already covered.</span></span>
+<span class="ln" id="L498">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">toured_tabs</span>(&amp;<span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L499">        <span class="tok-kw">self</span>.prefs</span>
+<span class="ln" id="L500">            .toured_tabs</span>
+<span class="ln" id="L501">            .<span class="tok-fn">split</span>(<span class="tok-str">&#x27;,&#x27;</span>)</span>
+<span class="ln" id="L502">            .<span class="tok-fn">map</span>(str::trim)</span>
+<span class="ln" id="L503">            .<span class="tok-fn">filter</span>(|part| !part.<span class="tok-fn">is_empty</span>())</span>
+<span class="ln" id="L504">            .<span class="tok-fn">map</span>(str::to_string)</span>
+<span class="ln" id="L505">            .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L506">    }</span>
 </span>
-<span class="ln" id="L505"></span>
+<span class="ln" id="L507"></span>
 <span class="src-item" id="fn-settings-mark_toured">
-<span class="ln" id="L506">    <span class="tok-com">/// Record that the tour has covered these tabs, and save.</span></span>
-<span class="ln" id="L507">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">mark_toured</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, keys: &amp;[String]) {</span>
-<span class="ln" id="L508">        <span class="tok-kw">self</span>.prefs.toured_tabs = keys.<span class="tok-fn">join</span>(<span class="tok-str">&quot;,&quot;</span>);</span>
-<span class="ln" id="L509">        <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L510">    }</span>
+<span class="ln" id="L508">    <span class="tok-com">/// Record that the tour has covered these tabs, and save.</span></span>
+<span class="ln" id="L509">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">mark_toured</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, keys: &amp;[String]) {</span>
+<span class="ln" id="L510">        <span class="tok-kw">self</span>.prefs.toured_tabs = keys.<span class="tok-fn">join</span>(<span class="tok-str">&quot;,&quot;</span>);</span>
+<span class="ln" id="L511">        <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L512">    }</span>
 </span>
-<span class="ln" id="L511"></span>
+<span class="ln" id="L513"></span>
 <span class="src-item" id="fn-settings-first_run_appearance">
-<span class="ln" id="L512">    <span class="tok-com">/// The first-run panel: offered once, with animation already on.</span></span>
-<span class="ln" id="L513">    <span class="tok-com">///</span></span>
-<span class="ln" id="L514">    <span class="tok-com">/// Shown as a page rather than a modal because it is not urgent and does</span></span>
-<span class="ln" id="L515">    <span class="tok-com">/// not gate anything -- the legal notice is the thing that gates, and two</span></span>
-<span class="ln" id="L516">    <span class="tok-com">/// blocking dialogues before a user has seen the app is one too many.</span></span>
-<span class="ln" id="L517">    <span class="tok-com">/// The two appearance choices, for the first-run setup to place.</span></span>
-<span class="ln" id="L518">    <span class="tok-com">///</span></span>
-<span class="ln" id="L519">    <span class="tok-com">/// Placed by `crate::firstrun`, which owns the first-run flow, so there is</span></span>
-<span class="ln" id="L520">    <span class="tok-com">/// one copy of this wording rather than one per caller.</span></span>
-<span class="ln" id="L521">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">first_run_appearance</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L522">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = false;</span>
-<span class="ln" id="L523">        changed |= ui</span>
-<span class="ln" id="L524">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animations, <span class="tok-str">&quot;Animate the interface&quot;</span>)</span>
-<span class="ln" id="L525">            .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L526">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L527">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;  Transitions and easing. Turning this off makes every change instant.&quot;</span>)</span>
-<span class="ln" id="L528">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L529">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L530">        );</span>
-<span class="ln" id="L531">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L532">        ui.<span class="tok-fn">add_enabled_ui</span>(<span class="tok-kw">self</span>.prefs.animations, |ui| {</span>
-<span class="ln" id="L533">            changed |= ui</span>
-<span class="ln" id="L534">                .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animated_icon, <span class="tok-str">&quot;Animate the mark&quot;</span>)</span>
-<span class="ln" id="L535">                .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L536">        });</span>
-<span class="ln" id="L537">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L538">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;  The soundbar in the header, as on the website.&quot;</span>)</span>
-<span class="ln" id="L539">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L540">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L541">        );</span>
-<span class="ln" id="L542">        <span class="tok-kw">if</span> changed {</span>
-<span class="ln" id="L543">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L544">        }</span>
-<span class="ln" id="L545">    }</span>
+<span class="ln" id="L514">    <span class="tok-com">/// The first-run panel: offered once, with animation already on.</span></span>
+<span class="ln" id="L515">    <span class="tok-com">///</span></span>
+<span class="ln" id="L516">    <span class="tok-com">/// Shown as a page rather than a modal because it is not urgent and does</span></span>
+<span class="ln" id="L517">    <span class="tok-com">/// not gate anything -- the legal notice is the thing that gates, and two</span></span>
+<span class="ln" id="L518">    <span class="tok-com">/// blocking dialogues before a user has seen the app is one too many.</span></span>
+<span class="ln" id="L519">    <span class="tok-com">/// The two appearance choices, for the first-run setup to place.</span></span>
+<span class="ln" id="L520">    <span class="tok-com">///</span></span>
+<span class="ln" id="L521">    <span class="tok-com">/// Placed by `crate::firstrun`, which owns the first-run flow, so there is</span></span>
+<span class="ln" id="L522">    <span class="tok-com">/// one copy of this wording rather than one per caller.</span></span>
+<span class="ln" id="L523">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">first_run_appearance</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L524">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = false;</span>
+<span class="ln" id="L525">        changed |= ui</span>
+<span class="ln" id="L526">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animations, <span class="tok-str">&quot;Animate the interface&quot;</span>)</span>
+<span class="ln" id="L527">            .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L528">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L529">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;  Transitions and easing. Turning this off makes every change instant.&quot;</span>)</span>
+<span class="ln" id="L530">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L531">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L532">        );</span>
+<span class="ln" id="L533">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L534">        ui.<span class="tok-fn">add_enabled_ui</span>(<span class="tok-kw">self</span>.prefs.animations, |ui| {</span>
+<span class="ln" id="L535">            changed |= ui</span>
+<span class="ln" id="L536">                .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animated_icon, <span class="tok-str">&quot;Animate the mark&quot;</span>)</span>
+<span class="ln" id="L537">                .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L538">        });</span>
+<span class="ln" id="L539">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L540">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;  The soundbar in the header, as on the website.&quot;</span>)</span>
+<span class="ln" id="L541">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L542">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L543">        );</span>
+<span class="ln" id="L544">        <span class="tok-kw">if</span> changed {</span>
+<span class="ln" id="L545">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L546">        }</span>
+<span class="ln" id="L547">    }</span>
 </span>
-<span class="ln" id="L546"></span>
+<span class="ln" id="L548"></span>
 <span class="src-item" id="fn-settings-first_run_autolock">
-<span class="ln" id="L547">    <span class="tok-com">/// The autolock switch and delay, for the first-run setup to place.</span></span>
-<span class="ln" id="L548">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">first_run_autolock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L549">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = ui</span>
-<span class="ln" id="L550">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.autolock, <span class="tok-str">&quot;Lock the window when unused&quot;</span>)</span>
-<span class="ln" id="L551">            .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L552">        ui.<span class="tok-fn">add_enabled_ui</span>(<span class="tok-kw">self</span>.prefs.autolock, |ui| {</span>
-<span class="ln" id="L553">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L554">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;after&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L555">                egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;first-run-autolock&quot;</span>)</span>
-<span class="ln" id="L556">                    .<span class="tok-fn">selected_text</span>(<span class="tok-kw">crate</span>::autolock::<span class="tok-fn">describe_secs</span>(<span class="tok-kw">self</span>.prefs.autolock_after))</span>
-<span class="ln" id="L557">                    .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
-<span class="ln" id="L558">                        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::autolock::CHOICES {</span>
-<span class="ln" id="L559">                            changed |= ui</span>
-<span class="ln" id="L560">                                .<span class="tok-fn">selectable_value</span>(</span>
-<span class="ln" id="L561">                                    &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.autolock_after,</span>
-<span class="ln" id="L562">                                    *choice,</span>
-<span class="ln" id="L563">                                    <span class="tok-kw">crate</span>::autolock::<span class="tok-fn">describe_secs</span>(*choice),</span>
-<span class="ln" id="L564">                                )</span>
-<span class="ln" id="L565">                                .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L566">                        }</span>
-<span class="ln" id="L567">                    });</span>
-<span class="ln" id="L568">            });</span>
-<span class="ln" id="L569">        });</span>
-<span class="ln" id="L570">        <span class="tok-kw">if</span> changed {</span>
-<span class="ln" id="L571">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L572">        }</span>
-<span class="ln" id="L573">    }</span>
+<span class="ln" id="L549">    <span class="tok-com">/// The autolock switch and delay, for the first-run setup to place.</span></span>
+<span class="ln" id="L550">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">first_run_autolock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L551">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = ui</span>
+<span class="ln" id="L552">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.autolock, <span class="tok-str">&quot;Lock the window when unused&quot;</span>)</span>
+<span class="ln" id="L553">            .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L554">        ui.<span class="tok-fn">add_enabled_ui</span>(<span class="tok-kw">self</span>.prefs.autolock, |ui| {</span>
+<span class="ln" id="L555">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L556">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;after&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L557">                egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;first-run-autolock&quot;</span>)</span>
+<span class="ln" id="L558">                    .<span class="tok-fn">selected_text</span>(<span class="tok-kw">crate</span>::autolock::<span class="tok-fn">describe_secs</span>(<span class="tok-kw">self</span>.prefs.autolock_after))</span>
+<span class="ln" id="L559">                    .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
+<span class="ln" id="L560">                        <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::autolock::CHOICES {</span>
+<span class="ln" id="L561">                            changed |= ui</span>
+<span class="ln" id="L562">                                .<span class="tok-fn">selectable_value</span>(</span>
+<span class="ln" id="L563">                                    &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.autolock_after,</span>
+<span class="ln" id="L564">                                    *choice,</span>
+<span class="ln" id="L565">                                    <span class="tok-kw">crate</span>::autolock::<span class="tok-fn">describe_secs</span>(*choice),</span>
+<span class="ln" id="L566">                                )</span>
+<span class="ln" id="L567">                                .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L568">                        }</span>
+<span class="ln" id="L569">                    });</span>
+<span class="ln" id="L570">            });</span>
+<span class="ln" id="L571">        });</span>
+<span class="ln" id="L572">        <span class="tok-kw">if</span> changed {</span>
+<span class="ln" id="L573">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L574">        }</span>
+<span class="ln" id="L575">    }</span>
 </span>
-<span class="ln" id="L574"></span>
+<span class="ln" id="L576"></span>
 <span class="src-item" id="fn-settings-finish_first_run">
-<span class="ln" id="L575">    <span class="tok-com">/// Mark the first run answered.</span></span>
-<span class="ln" id="L576">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">finish_first_run</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L577">        <span class="tok-kw">self</span>.prefs.configured = true;</span>
-<span class="ln" id="L578">        <span class="tok-kw">self</span>.first_run = false;</span>
-<span class="ln" id="L579">        <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L580">    }</span>
+<span class="ln" id="L577">    <span class="tok-com">/// Mark the first run answered.</span></span>
+<span class="ln" id="L578">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">finish_first_run</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L579">        <span class="tok-kw">self</span>.prefs.configured = true;</span>
+<span class="ln" id="L580">        <span class="tok-kw">self</span>.first_run = false;</span>
+<span class="ln" id="L581">        <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L582">    }</span>
 </span>
-<span class="ln" id="L581"></span>
+<span class="ln" id="L583"></span>
 <span class="src-item" id="fn-settings-tab">
-<span class="ln" id="L582">    <span class="tok-com">/// The settings tab.</span></span>
-<span class="ln" id="L583">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">tab</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
-<span class="ln" id="L584">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L585">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Settings&quot;</span>).<span class="tok-fn">size</span>(<span class="tok-num">16.0</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L586">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">2.0</span>);</span>
-<span class="ln" id="L587">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L588">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Applies as you change it, and is remembered.&quot;</span>)</span>
-<span class="ln" id="L589">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L590">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L591">        );</span>
-<span class="ln" id="L592">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L593"></span>
-<span class="ln" id="L594">        <span class="tok-com">// The menu, then the page. A row rather than a sidebar: there are three</span></span>
-<span class="ln" id="L595">        <span class="tok-com">// pages, and a sidebar for three items is furniture.</span></span>
-<span class="ln" id="L596">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L597">            <span class="tok-kw">for</span> (page, label, _) <span class="tok-kw">in</span> Page::ALL {</span>
-<span class="ln" id="L598">                <span class="tok-kw">let</span> selected = <span class="tok-kw">self</span>.page == *page;</span>
-<span class="ln" id="L599">                <span class="tok-kw">let</span> text =</span>
-<span class="ln" id="L600">                    RichText::<span class="tok-fn">new</span>(*label).<span class="tok-fn">color</span>(<span class="tok-kw">if</span> selected { p::<span class="tok-fn">blue</span>() } <span class="tok-kw">else</span> { p::<span class="tok-fn">muted</span>() });</span>
-<span class="ln" id="L601">                <span class="tok-kw">if</span> ui.<span class="tok-fn">selectable_label</span>(selected, text).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L602">                    <span class="tok-kw">self</span>.page = *page;</span>
-<span class="ln" id="L603">                }</span>
-<span class="ln" id="L604">            }</span>
-<span class="ln" id="L605">        });</span>
-<span class="ln" id="L606">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L607">        ui.<span class="tok-fn">separator</span>();</span>
-<span class="ln" id="L608">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L609"></span>
-<span class="ln" id="L610">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.page {</span>
-<span class="ln" id="L611">            Page::Appearance =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">appearance_page</span>(ui, ctx),</span>
-<span class="ln" id="L612">            Page::Motion =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">motion_page</span>(ui, ctx),</span>
-<span class="ln" id="L613">            Page::Interface =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">interface_page</span>(ui),</span>
-<span class="ln" id="L614">            Page::Security =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">security_page</span>(ui),</span>
-<span class="ln" id="L615">            Page::Storage =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">storage_page</span>(ui),</span>
-<span class="ln" id="L616">        }</span>
-<span class="ln" id="L617"></span>
-<span class="ln" id="L618">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(error) = &amp;<span class="tok-kw">self</span>.save_error {</span>
-<span class="ln" id="L619">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
-<span class="ln" id="L620">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L621">                RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L622">                    <span class="tok-str">&quot;This choice applies now but could not be saved: {error}&quot;</span></span>
-<span class="ln" id="L623">                ))</span>
-<span class="ln" id="L624">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L625">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L626">            );</span>
-<span class="ln" id="L627">        }</span>
-<span class="ln" id="L628">    }</span>
+<span class="ln" id="L584">    <span class="tok-com">/// The settings tab.</span></span>
+<span class="ln" id="L585">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">tab</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
+<span class="ln" id="L586">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L587">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Settings&quot;</span>).<span class="tok-fn">size</span>(<span class="tok-num">16.0</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L588">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">2.0</span>);</span>
+<span class="ln" id="L589">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L590">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Applies as you change it, and is remembered.&quot;</span>)</span>
+<span class="ln" id="L591">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L592">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L593">        );</span>
+<span class="ln" id="L594">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L595"></span>
+<span class="ln" id="L596">        <span class="tok-com">// The menu, then the page. A row rather than a sidebar: there are three</span></span>
+<span class="ln" id="L597">        <span class="tok-com">// pages, and a sidebar for three items is furniture.</span></span>
+<span class="ln" id="L598">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L599">            <span class="tok-kw">for</span> (page, label, _) <span class="tok-kw">in</span> Page::ALL {</span>
+<span class="ln" id="L600">                <span class="tok-kw">let</span> selected = <span class="tok-kw">self</span>.page == *page;</span>
+<span class="ln" id="L601">                <span class="tok-kw">let</span> text =</span>
+<span class="ln" id="L602">                    RichText::<span class="tok-fn">new</span>(*label).<span class="tok-fn">color</span>(<span class="tok-kw">if</span> selected { p::<span class="tok-fn">blue</span>() } <span class="tok-kw">else</span> { p::<span class="tok-fn">muted</span>() });</span>
+<span class="ln" id="L603">                <span class="tok-kw">if</span> ui.<span class="tok-fn">selectable_label</span>(selected, text).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L604">                    <span class="tok-kw">self</span>.page = *page;</span>
+<span class="ln" id="L605">                }</span>
+<span class="ln" id="L606">            }</span>
+<span class="ln" id="L607">        });</span>
+<span class="ln" id="L608">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L609">        ui.<span class="tok-fn">separator</span>();</span>
+<span class="ln" id="L610">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L611"></span>
+<span class="ln" id="L612">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.page {</span>
+<span class="ln" id="L613">            Page::Appearance =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">appearance_page</span>(ui, ctx),</span>
+<span class="ln" id="L614">            Page::Motion =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">motion_page</span>(ui, ctx),</span>
+<span class="ln" id="L615">            Page::Interface =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">interface_page</span>(ui),</span>
+<span class="ln" id="L616">            Page::Security =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">security_page</span>(ui),</span>
+<span class="ln" id="L617">            Page::Storage =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">storage_page</span>(ui),</span>
+<span class="ln" id="L618">        }</span>
+<span class="ln" id="L619"></span>
+<span class="ln" id="L620">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(error) = &amp;<span class="tok-kw">self</span>.save_error {</span>
+<span class="ln" id="L621">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
+<span class="ln" id="L622">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L623">                RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L624">                    <span class="tok-str">&quot;This choice applies now but could not be saved: {error}&quot;</span></span>
+<span class="ln" id="L625">                ))</span>
+<span class="ln" id="L626">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L627">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L628">            );</span>
+<span class="ln" id="L629">        }</span>
+<span class="ln" id="L630">    }</span>
 </span>
-<span class="ln" id="L629"></span>
+<span class="ln" id="L631"></span>
 <span class="src-item" id="fn-settings-custom_palette_help">
-<span class="ln" id="L630">    <span class="tok-com">/// Explain where custom palettes go, and say what was refused and why.</span></span>
-<span class="ln" id="L631">    <span class="tok-com">///</span></span>
-<span class="ln" id="L632">    <span class="tok-com">/// The refusals are the important half. A user who writes a palette file,</span></span>
-<span class="ln" id="L633">    <span class="tok-com">/// puts it in the right place and sees nothing happen has no way to tell</span></span>
-<span class="ln" id="L634">    <span class="tok-com">/// whether the application never looked, or looked and disliked it. Every</span></span>
-<span class="ln" id="L635">    <span class="tok-com">/// complaint from the loader is shown verbatim, including the measured</span></span>
-<span class="ln" id="L636">    <span class="tok-com">/// contrast ratio, because &quot;muted on bg is 2.4:1 and needs 3.0:1&quot; tells</span></span>
-<span class="ln" id="L637">    <span class="tok-com">/// somebody exactly what to change and by roughly how much.</span></span>
-<span class="ln" id="L638">    <span class="tok-kw">fn</span> <span class="tok-fn">custom_palette_help</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L639">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
-<span class="ln" id="L640">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L641">            egui::RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Your own palettes&quot;</span>)</span>
-<span class="ln" id="L642">                .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">fg</span>())</span>
-<span class="ln" id="L643">                .<span class="tok-fn">strong</span>(),</span>
-<span class="ln" id="L644">        );</span>
-<span class="ln" id="L645"></span>
-<span class="ln" id="L646">        <span class="tok-kw">match</span> <span class="tok-kw">crate</span>::palettes::<span class="tok-fn">default_dir</span>() {</span>
-<span class="ln" id="L647">            <span class="tok-fn">Some</span>(dir) =&gt; {</span>
-<span class="ln" id="L648">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L649">                    egui::RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L650">                        <span class="tok-str">&quot;Drop a .palette file in {} and it appears above.&quot;</span>,</span>
-<span class="ln" id="L651">                        dir.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L652">                    ))</span>
-<span class="ln" id="L653">                    .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L654">                    .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
-<span class="ln" id="L655">                );</span>
-<span class="ln" id="L656">            }</span>
-<span class="ln" id="L657">            None =&gt; {</span>
-<span class="ln" id="L658">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L659">                    egui::RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L660">                        <span class="tok-str">&quot;No writable configuration directory was found, so custom \</span></span>
-<span class="ln" id="L661"><span class="tok-str">                         palettes are unavailable on this machine.&quot;</span>,</span>
-<span class="ln" id="L662">                    )</span>
-<span class="ln" id="L663">                    .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L664">                    .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
-<span class="ln" id="L665">                );</span>
-<span class="ln" id="L666">            }</span>
-<span class="ln" id="L667">        }</span>
-<span class="ln" id="L668"></span>
-<span class="ln" id="L669">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L670">            egui::RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L671">                <span class="tok-str">&quot;Every one of the twelve tokens must be present, and the colours \</span></span>
-<span class="ln" id="L672"><span class="tok-str">                 must be readable against each other. A palette whose text \</span></span>
-<span class="ln" id="L673"><span class="tok-str">                 fails the contrast check is refused rather than applied.&quot;</span>,</span>
-<span class="ln" id="L674">            )</span>
-<span class="ln" id="L675">            .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L676">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
-<span class="ln" id="L677">        );</span>
-<span class="ln" id="L678"></span>
-<span class="ln" id="L679">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.palette_problems.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L680">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L681">        }</span>
-<span class="ln" id="L682"></span>
-<span class="ln" id="L683">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L684">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L685">            egui::RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L686">                <span class="tok-str">&quot;{} palette problem(s):&quot;</span>,</span>
-<span class="ln" id="L687">                <span class="tok-kw">self</span>.palette_problems.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L688">            ))</span>
-<span class="ln" id="L689">            .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L690">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
-<span class="ln" id="L691">        );</span>
-<span class="ln" id="L692">        <span class="tok-kw">for</span> problem <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.palette_problems {</span>
-<span class="ln" id="L693">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L694">                egui::RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {problem}&quot;</span>))</span>
-<span class="ln" id="L695">                    .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L696">                    .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
-<span class="ln" id="L697">            );</span>
-<span class="ln" id="L698">        }</span>
-<span class="ln" id="L699">    }</span>
+<span class="ln" id="L632">    <span class="tok-com">/// Explain where custom palettes go, and say what was refused and why.</span></span>
+<span class="ln" id="L633">    <span class="tok-com">///</span></span>
+<span class="ln" id="L634">    <span class="tok-com">/// The refusals are the important half. A user who writes a palette file,</span></span>
+<span class="ln" id="L635">    <span class="tok-com">/// puts it in the right place and sees nothing happen has no way to tell</span></span>
+<span class="ln" id="L636">    <span class="tok-com">/// whether the application never looked, or looked and disliked it. Every</span></span>
+<span class="ln" id="L637">    <span class="tok-com">/// complaint from the loader is shown verbatim, including the measured</span></span>
+<span class="ln" id="L638">    <span class="tok-com">/// contrast ratio, because &quot;muted on bg is 2.4:1 and needs 3.0:1&quot; tells</span></span>
+<span class="ln" id="L639">    <span class="tok-com">/// somebody exactly what to change and by roughly how much.</span></span>
+<span class="ln" id="L640">    <span class="tok-kw">fn</span> <span class="tok-fn">custom_palette_help</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L641">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
+<span class="ln" id="L642">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L643">            egui::RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Your own palettes&quot;</span>)</span>
+<span class="ln" id="L644">                .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">fg</span>())</span>
+<span class="ln" id="L645">                .<span class="tok-fn">strong</span>(),</span>
+<span class="ln" id="L646">        );</span>
+<span class="ln" id="L647"></span>
+<span class="ln" id="L648">        <span class="tok-kw">match</span> <span class="tok-kw">crate</span>::palettes::<span class="tok-fn">default_dir</span>() {</span>
+<span class="ln" id="L649">            <span class="tok-fn">Some</span>(dir) =&gt; {</span>
+<span class="ln" id="L650">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L651">                    egui::RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L652">                        <span class="tok-str">&quot;Drop a .palette file in {} and it appears above.&quot;</span>,</span>
+<span class="ln" id="L653">                        dir.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L654">                    ))</span>
+<span class="ln" id="L655">                    .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L656">                    .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L657">                );</span>
+<span class="ln" id="L658">            }</span>
+<span class="ln" id="L659">            None =&gt; {</span>
+<span class="ln" id="L660">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L661">                    egui::RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L662">                        <span class="tok-str">&quot;No writable configuration directory was found, so custom \</span></span>
+<span class="ln" id="L663"><span class="tok-str">                         palettes are unavailable on this machine.&quot;</span>,</span>
+<span class="ln" id="L664">                    )</span>
+<span class="ln" id="L665">                    .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L666">                    .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L667">                );</span>
+<span class="ln" id="L668">            }</span>
+<span class="ln" id="L669">        }</span>
+<span class="ln" id="L670"></span>
+<span class="ln" id="L671">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L672">            egui::RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L673">                <span class="tok-str">&quot;Every one of the twelve tokens must be present, and the colours \</span></span>
+<span class="ln" id="L674"><span class="tok-str">                 must be readable against each other. A palette whose text \</span></span>
+<span class="ln" id="L675"><span class="tok-str">                 fails the contrast check is refused rather than applied.&quot;</span>,</span>
+<span class="ln" id="L676">            )</span>
+<span class="ln" id="L677">            .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L678">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L679">        );</span>
+<span class="ln" id="L680"></span>
+<span class="ln" id="L681">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.palette_problems.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L682">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L683">        }</span>
+<span class="ln" id="L684"></span>
+<span class="ln" id="L685">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L686">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L687">            egui::RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L688">                <span class="tok-str">&quot;{} palette problem(s):&quot;</span>,</span>
+<span class="ln" id="L689">                <span class="tok-kw">self</span>.palette_problems.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L690">            ))</span>
+<span class="ln" id="L691">            .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L692">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L693">        );</span>
+<span class="ln" id="L694">        <span class="tok-kw">for</span> problem <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.palette_problems {</span>
+<span class="ln" id="L695">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L696">                egui::RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {problem}&quot;</span>))</span>
+<span class="ln" id="L697">                    .<span class="tok-fn">color</span>(<span class="tok-kw">crate</span>::theme::palette::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L698">                    .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L699">            );</span>
+<span class="ln" id="L700">        }</span>
+<span class="ln" id="L701">    }</span>
 </span>
-<span class="ln" id="L700"></span>
+<span class="ln" id="L702"></span>
 <span class="src-item" id="fn-settings-theme_picker">
-<span class="ln" id="L701">    <span class="tok-com">/// The colour scheme, as a compact control for the window header.</span></span>
-<span class="ln" id="L702">    <span class="tok-com">///</span></span>
-<span class="ln" id="L703">    <span class="tok-com">/// The same list the appearance page offers and the same effect; what it</span></span>
-<span class="ln" id="L704">    <span class="tok-com">/// does not carry is the swatches and the custom-palette help, which need</span></span>
-<span class="ln" id="L705">    <span class="tok-com">/// room and belong on the page. Two controls for one setting is worth it</span></span>
-<span class="ln" id="L706">    <span class="tok-com">/// here: the header is where the website puts this, and a reader who has</span></span>
-<span class="ln" id="L707">    <span class="tok-com">/// used the site looks in the same place.</span></span>
-<span class="ln" id="L708">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">theme_picker</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
-<span class="ln" id="L709">        <span class="tok-kw">let</span> current = <span class="tok-kw">crate</span>::theme::<span class="tok-fn">active</span>();</span>
-<span class="ln" id="L710">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> chosen = None;</span>
-<span class="ln" id="L711">        egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;header-theme&quot;</span>)</span>
-<span class="ln" id="L712">            .<span class="tok-fn">selected_text</span>(RichText::<span class="tok-fn">new</span>(current.name).<span class="tok-fn">small</span>())</span>
-<span class="ln" id="L713">            .<span class="tok-fn">width</span>(<span class="tok-num">132.0</span>)</span>
-<span class="ln" id="L714">            .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
-<span class="ln" id="L715">                <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> <span class="tok-fn">themes</span>() {</span>
-<span class="ln" id="L716">                    <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L717">                        .<span class="tok-fn">selectable_label</span>(theme.id == current.id, theme.name)</span>
-<span class="ln" id="L718">                        .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L719">                    {</span>
-<span class="ln" id="L720">                        chosen = <span class="tok-fn">Some</span>(theme.id);</span>
-<span class="ln" id="L721">                    }</span>
-<span class="ln" id="L722">                }</span>
-<span class="ln" id="L723">            });</span>
-<span class="ln" id="L724">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(id) = chosen {</span>
-<span class="ln" id="L725">            <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(ctx, id) {</span>
-<span class="ln" id="L726">                <span class="tok-kw">self</span>.prefs.theme = id.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L727">                <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L728">            }</span>
-<span class="ln" id="L729">        }</span>
-<span class="ln" id="L730">    }</span>
+<span class="ln" id="L703">    <span class="tok-com">/// The colour scheme, as a compact control for the window header.</span></span>
+<span class="ln" id="L704">    <span class="tok-com">///</span></span>
+<span class="ln" id="L705">    <span class="tok-com">/// The same list the appearance page offers and the same effect; what it</span></span>
+<span class="ln" id="L706">    <span class="tok-com">/// does not carry is the swatches and the custom-palette help, which need</span></span>
+<span class="ln" id="L707">    <span class="tok-com">/// room and belong on the page. Two controls for one setting is worth it</span></span>
+<span class="ln" id="L708">    <span class="tok-com">/// here: the header is where the website puts this, and a reader who has</span></span>
+<span class="ln" id="L709">    <span class="tok-com">/// used the site looks in the same place.</span></span>
+<span class="ln" id="L710">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">theme_picker</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
+<span class="ln" id="L711">        <span class="tok-kw">let</span> current = <span class="tok-kw">crate</span>::theme::<span class="tok-fn">active</span>();</span>
+<span class="ln" id="L712">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> chosen = None;</span>
+<span class="ln" id="L713">        egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;header-theme&quot;</span>)</span>
+<span class="ln" id="L714">            .<span class="tok-fn">selected_text</span>(RichText::<span class="tok-fn">new</span>(current.name).<span class="tok-fn">small</span>())</span>
+<span class="ln" id="L715">            .<span class="tok-fn">width</span>(<span class="tok-num">132.0</span>)</span>
+<span class="ln" id="L716">            .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
+<span class="ln" id="L717">                <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> <span class="tok-fn">themes</span>() {</span>
+<span class="ln" id="L718">                    <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L719">                        .<span class="tok-fn">selectable_label</span>(theme.id == current.id, theme.name)</span>
+<span class="ln" id="L720">                        .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L721">                    {</span>
+<span class="ln" id="L722">                        chosen = <span class="tok-fn">Some</span>(theme.id);</span>
+<span class="ln" id="L723">                    }</span>
+<span class="ln" id="L724">                }</span>
+<span class="ln" id="L725">            });</span>
+<span class="ln" id="L726">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(id) = chosen {</span>
+<span class="ln" id="L727">            <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(ctx, id) {</span>
+<span class="ln" id="L728">                <span class="tok-kw">self</span>.prefs.theme = id.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L729">                <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L730">            }</span>
+<span class="ln" id="L731">        }</span>
+<span class="ln" id="L732">    }</span>
 </span>
-<span class="ln" id="L731"></span>
+<span class="ln" id="L733"></span>
 <span class="src-item" id="fn-settings-appearance_page">
-<span class="ln" id="L732">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
-<span class="ln" id="L733">        <span class="tok-fn">section</span>(</span>
-<span class="ln" id="L734">            ui,</span>
-<span class="ln" id="L735">            <span class="tok-str">&quot;Colour scheme&quot;</span>,</span>
-<span class="ln" id="L736">            <span class="tok-str">&quot;The same schemes the website offers, plus any of your own.&quot;</span>,</span>
-<span class="ln" id="L737">        );</span>
-<span class="ln" id="L738"></span>
-<span class="ln" id="L739">        <span class="tok-kw">let</span> current = <span class="tok-kw">crate</span>::theme::<span class="tok-fn">active</span>();</span>
-<span class="ln" id="L740">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> chosen: Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; = None;</span>
-<span class="ln" id="L741"></span>
-<span class="ln" id="L742">        egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;theme-picker&quot;</span>)</span>
-<span class="ln" id="L743">            .<span class="tok-fn">selected_text</span>(current.name)</span>
-<span class="ln" id="L744">            .<span class="tok-fn">width</span>(<span class="tok-num">220.0</span>)</span>
-<span class="ln" id="L745">            .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
-<span class="ln" id="L746">                <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> <span class="tok-fn">themes</span>() {</span>
-<span class="ln" id="L747">                    <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L748">                        .<span class="tok-fn">selectable_label</span>(theme.id == current.id, theme.name)</span>
-<span class="ln" id="L749">                        .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L750">                    {</span>
-<span class="ln" id="L751">                        chosen = <span class="tok-fn">Some</span>(theme.id);</span>
-<span class="ln" id="L752">                    }</span>
-<span class="ln" id="L753">                }</span>
-<span class="ln" id="L754">            });</span>
-<span class="ln" id="L755"></span>
-<span class="ln" id="L756">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L757">        <span class="tok-fn">swatches</span>(ui);</span>
-<span class="ln" id="L758"></span>
-<span class="ln" id="L759">        <span class="tok-kw">self</span>.<span class="tok-fn">custom_palette_help</span>(ui);</span>
+<span class="ln" id="L734">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
+<span class="ln" id="L735">        <span class="tok-fn">section</span>(</span>
+<span class="ln" id="L736">            ui,</span>
+<span class="ln" id="L737">            <span class="tok-str">&quot;Colour scheme&quot;</span>,</span>
+<span class="ln" id="L738">            <span class="tok-str">&quot;The same schemes the website offers, plus any of your own.&quot;</span>,</span>
+<span class="ln" id="L739">        );</span>
+<span class="ln" id="L740"></span>
+<span class="ln" id="L741">        <span class="tok-kw">let</span> current = <span class="tok-kw">crate</span>::theme::<span class="tok-fn">active</span>();</span>
+<span class="ln" id="L742">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> chosen: Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; = None;</span>
+<span class="ln" id="L743"></span>
+<span class="ln" id="L744">        egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;theme-picker&quot;</span>)</span>
+<span class="ln" id="L745">            .<span class="tok-fn">selected_text</span>(current.name)</span>
+<span class="ln" id="L746">            .<span class="tok-fn">width</span>(<span class="tok-num">220.0</span>)</span>
+<span class="ln" id="L747">            .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
+<span class="ln" id="L748">                <span class="tok-kw">for</span> theme <span class="tok-kw">in</span> <span class="tok-fn">themes</span>() {</span>
+<span class="ln" id="L749">                    <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L750">                        .<span class="tok-fn">selectable_label</span>(theme.id == current.id, theme.name)</span>
+<span class="ln" id="L751">                        .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L752">                    {</span>
+<span class="ln" id="L753">                        chosen = <span class="tok-fn">Some</span>(theme.id);</span>
+<span class="ln" id="L754">                    }</span>
+<span class="ln" id="L755">                }</span>
+<span class="ln" id="L756">            });</span>
+<span class="ln" id="L757"></span>
+<span class="ln" id="L758">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L759">        <span class="tok-fn">swatches</span>(ui);</span>
 <span class="ln" id="L760"></span>
-<span class="ln" id="L761">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(id) = chosen {</span>
-<span class="ln" id="L762">            <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(ctx, id) {</span>
-<span class="ln" id="L763">                <span class="tok-kw">self</span>.prefs.theme = id.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L764">                <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L765">            }</span>
-<span class="ln" id="L766">        }</span>
-<span class="ln" id="L767">    }</span>
+<span class="ln" id="L761">        <span class="tok-kw">self</span>.<span class="tok-fn">custom_palette_help</span>(ui);</span>
+<span class="ln" id="L762"></span>
+<span class="ln" id="L763">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(id) = chosen {</span>
+<span class="ln" id="L764">            <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(ctx, id) {</span>
+<span class="ln" id="L765">                <span class="tok-kw">self</span>.prefs.theme = id.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L766">                <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L767">            }</span>
+<span class="ln" id="L768">        }</span>
+<span class="ln" id="L769">    }</span>
 </span>
-<span class="ln" id="L768"></span>
+<span class="ln" id="L770"></span>
 <span class="src-item" id="fn-settings-motion_page">
-<span class="ln" id="L769">    <span class="tok-kw">fn</span> <span class="tok-fn">motion_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
-<span class="ln" id="L770">        <span class="tok-kw">let</span> motion = <span class="tok-kw">self</span>.<span class="tok-fn">motion</span>(ctx);</span>
-<span class="ln" id="L771"></span>
-<span class="ln" id="L772">        <span class="tok-fn">section</span>(</span>
-<span class="ln" id="L773">            ui,</span>
-<span class="ln" id="L774">            <span class="tok-str">&quot;Animation&quot;</span>,</span>
-<span class="ln" id="L775">            <span class="tok-str">&quot;Transitions, easing, and the moving mark. On by default.&quot;</span>,</span>
-<span class="ln" id="L776">        );</span>
-<span class="ln" id="L777"></span>
-<span class="ln" id="L778">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = false;</span>
-<span class="ln" id="L779">        changed |= ui</span>
-<span class="ln" id="L780">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animations, <span class="tok-str">&quot;Animate the interface&quot;</span>)</span>
-<span class="ln" id="L781">            .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L782">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L783">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L784">                <span class="tok-str">&quot;  Off makes every change instant. Nothing is hidden either way; \</span></span>
-<span class="ln" id="L785"><span class="tok-str">                 animation only affects how a change is shown, never whether it happens.&quot;</span>,</span>
-<span class="ln" id="L786">            )</span>
-<span class="ln" id="L787">            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L788">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L789">        );</span>
-<span class="ln" id="L790"></span>
-<span class="ln" id="L791">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L792">        ui.<span class="tok-fn">add_enabled_ui</span>(<span class="tok-kw">self</span>.prefs.animations, |ui| {</span>
-<span class="ln" id="L793">            changed |= ui</span>
-<span class="ln" id="L794">                .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animated_icon, <span class="tok-str">&quot;Animate the mark&quot;</span>)</span>
-<span class="ln" id="L795">                .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L796">        });</span>
-<span class="ln" id="L797">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L798">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;  The soundbar in the header, as on the website.&quot;</span>)</span>
-<span class="ln" id="L799">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L800">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L801">        );</span>
-<span class="ln" id="L802"></span>
-<span class="ln" id="L803">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
-<span class="ln" id="L804">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L805">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;preview&quot;</span>).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L806">            <span class="tok-kw">crate</span>::soundbar::<span class="tok-fn">draw</span>(</span>
-<span class="ln" id="L807">                ui,</span>
-<span class="ln" id="L808">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">26.0</span>),</span>
-<span class="ln" id="L809">                motion,</span>
-<span class="ln" id="L810">                ui.<span class="tok-fn">input</span>(|i| i.time) <span class="tok-kw">as</span> f32,</span>
-<span class="ln" id="L811">            );</span>
-<span class="ln" id="L812">        });</span>
-<span class="ln" id="L813"></span>
-<span class="ln" id="L814">        <span class="tok-com">// If the system has asked for reduced motion, say so. Otherwise the</span></span>
-<span class="ln" id="L815">        <span class="tok-com">// toggle looks broken: it is ticked and nothing moves.</span></span>
-<span class="ln" id="L816">        <span class="tok-kw">if</span> motion.system_reduced {</span>
-<span class="ln" id="L817">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L818">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L819">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L820">                    <span class="tok-str">&quot;Your system is set to reduce motion, so animation stays off whatever \</span></span>
-<span class="ln" id="L821"><span class="tok-str">                     is ticked here. That setting wins on purpose.&quot;</span>,</span>
-<span class="ln" id="L822">                )</span>
-<span class="ln" id="L823">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L824">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L825">            );</span>
-<span class="ln" id="L826">        }</span>
-<span class="ln" id="L827">        <span class="tok-kw">if</span> std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;VEILVOICE_NO_ANIMATION&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L828">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L829">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L830">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L831">                    <span class="tok-str">&quot;VEILVOICE_NO_ANIMATION is set in the environment, which also \</span></span>
-<span class="ln" id="L832"><span class="tok-str">                     keeps animation off.&quot;</span>,</span>
-<span class="ln" id="L833">                )</span>
-<span class="ln" id="L834">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L835">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L836">            );</span>
-<span class="ln" id="L837">        }</span>
-<span class="ln" id="L838"></span>
-<span class="ln" id="L839">        <span class="tok-kw">if</span> changed {</span>
-<span class="ln" id="L840">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L841">        }</span>
-<span class="ln" id="L842">    }</span>
+<span class="ln" id="L771">    <span class="tok-kw">fn</span> <span class="tok-fn">motion_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, ctx: &amp;egui::Context) {</span>
+<span class="ln" id="L772">        <span class="tok-kw">let</span> motion = <span class="tok-kw">self</span>.<span class="tok-fn">motion</span>(ctx);</span>
+<span class="ln" id="L773"></span>
+<span class="ln" id="L774">        <span class="tok-fn">section</span>(</span>
+<span class="ln" id="L775">            ui,</span>
+<span class="ln" id="L776">            <span class="tok-str">&quot;Animation&quot;</span>,</span>
+<span class="ln" id="L777">            <span class="tok-str">&quot;Transitions, easing, and the moving mark. On by default.&quot;</span>,</span>
+<span class="ln" id="L778">        );</span>
+<span class="ln" id="L779"></span>
+<span class="ln" id="L780">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = false;</span>
+<span class="ln" id="L781">        changed |= ui</span>
+<span class="ln" id="L782">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animations, <span class="tok-str">&quot;Animate the interface&quot;</span>)</span>
+<span class="ln" id="L783">            .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L784">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L785">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L786">                <span class="tok-str">&quot;  Off makes every change instant. Nothing is hidden either way; \</span></span>
+<span class="ln" id="L787"><span class="tok-str">                 animation only affects how a change is shown, never whether it happens.&quot;</span>,</span>
+<span class="ln" id="L788">            )</span>
+<span class="ln" id="L789">            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L790">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L791">        );</span>
+<span class="ln" id="L792"></span>
+<span class="ln" id="L793">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L794">        ui.<span class="tok-fn">add_enabled_ui</span>(<span class="tok-kw">self</span>.prefs.animations, |ui| {</span>
+<span class="ln" id="L795">            changed |= ui</span>
+<span class="ln" id="L796">                .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.prefs.animated_icon, <span class="tok-str">&quot;Animate the mark&quot;</span>)</span>
+<span class="ln" id="L797">                .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L798">        });</span>
+<span class="ln" id="L799">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L800">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;  The soundbar in the header, as on the website.&quot;</span>)</span>
+<span class="ln" id="L801">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L802">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L803">        );</span>
+<span class="ln" id="L804"></span>
+<span class="ln" id="L805">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
+<span class="ln" id="L806">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L807">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;preview&quot;</span>).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L808">            <span class="tok-kw">crate</span>::soundbar::<span class="tok-fn">draw</span>(</span>
+<span class="ln" id="L809">                ui,</span>
+<span class="ln" id="L810">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">120.0</span>, <span class="tok-num">26.0</span>),</span>
+<span class="ln" id="L811">                motion,</span>
+<span class="ln" id="L812">                ui.<span class="tok-fn">input</span>(|i| i.time) <span class="tok-kw">as</span> f32,</span>
+<span class="ln" id="L813">            );</span>
+<span class="ln" id="L814">        });</span>
+<span class="ln" id="L815"></span>
+<span class="ln" id="L816">        <span class="tok-com">// If the system has asked for reduced motion, say so. Otherwise the</span></span>
+<span class="ln" id="L817">        <span class="tok-com">// toggle looks broken: it is ticked and nothing moves.</span></span>
+<span class="ln" id="L818">        <span class="tok-kw">if</span> motion.system_reduced {</span>
+<span class="ln" id="L819">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L820">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L821">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L822">                    <span class="tok-str">&quot;Your system is set to reduce motion, so animation stays off whatever \</span></span>
+<span class="ln" id="L823"><span class="tok-str">                     is ticked here. That setting wins on purpose.&quot;</span>,</span>
+<span class="ln" id="L824">                )</span>
+<span class="ln" id="L825">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L826">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L827">            );</span>
+<span class="ln" id="L828">        }</span>
+<span class="ln" id="L829">        <span class="tok-kw">if</span> std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;VEILVOICE_NO_ANIMATION&quot;</span>).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L830">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L831">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L832">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L833">                    <span class="tok-str">&quot;VEILVOICE_NO_ANIMATION is set in the environment, which also \</span></span>
+<span class="ln" id="L834"><span class="tok-str">                     keeps animation off.&quot;</span>,</span>
+<span class="ln" id="L835">                )</span>
+<span class="ln" id="L836">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L837">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L838">            );</span>
+<span class="ln" id="L839">        }</span>
+<span class="ln" id="L840"></span>
+<span class="ln" id="L841">        <span class="tok-kw">if</span> changed {</span>
+<span class="ln" id="L842">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L843">        }</span>
+<span class="ln" id="L844">    }</span>
 </span>
-<span class="ln" id="L843"></span>
+<span class="ln" id="L845"></span>
 <span class="src-item" id="fn-settings-security_page">
-<span class="ln" id="L844">    <span class="tok-com">/// Marker 92. The autolock, and the range it offers.</span></span>
-<span class="ln" id="L845">    <span class="tok-kw">fn</span> <span class="tok-fn">security_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L846">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::autolock::{describe_secs, parse, Autolock, CHOICES};</span>
-<span class="ln" id="L847"></span>
-<span class="ln" id="L848">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> auto = <span class="tok-kw">self</span>.<span class="tok-fn">autolock</span>();</span>
-<span class="ln" id="L849">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Lock the window when it is not used&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
-<span class="ln" id="L850">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L851">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L852">                <span class="tok-str">&quot;Off unless you turn it on. Starting a long job does not count as using \</span></span>
-<span class="ln" id="L853"><span class="tok-str">                 the window: if you walk away while something is rendering, that is \</span></span>
-<span class="ln" id="L854"><span class="tok-str">                 exactly when you would want it locked.&quot;</span>,</span>
-<span class="ln" id="L855">            )</span>
-<span class="ln" id="L856">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L857">            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L858">        );</span>
-<span class="ln" id="L859">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L860"></span>
-<span class="ln" id="L861">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = ui</span>
-<span class="ln" id="L862">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> auto.enabled, <span class="tok-str">&quot;lock after a period of no use&quot;</span>)</span>
-<span class="ln" id="L863">            .<span class="tok-fn">changed</span>();</span>
-<span class="ln" id="L864"></span>
-<span class="ln" id="L865">        <span class="tok-kw">if</span> auto.enabled {</span>
-<span class="ln" id="L866">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L867">            <span class="tok-kw">let</span> current = auto.after_secs;</span>
-<span class="ln" id="L868">            egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;autolock-after&quot;</span>)</span>
-<span class="ln" id="L869">                .<span class="tok-fn">selected_text</span>(<span class="tok-fn">describe_secs</span>(auto.after_secs))</span>
-<span class="ln" id="L870">                .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
-<span class="ln" id="L871">                    <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> CHOICES {</span>
-<span class="ln" id="L872">                        <span class="tok-com">// Only the ones inside the range this user has set, so</span></span>
-<span class="ln" id="L873">                        <span class="tok-com">// a shortened range does not offer a delay it would</span></span>
-<span class="ln" id="L874">                        <span class="tok-com">// then clamp away behind their back.</span></span>
-<span class="ln" id="L875">                        <span class="tok-kw">if</span> *choice &lt; auto.floor_secs || *choice &gt; auto.ceiling_secs {</span>
-<span class="ln" id="L876">                            continue;</span>
-<span class="ln" id="L877">                        }</span>
-<span class="ln" id="L878">                        ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> auto.after_secs, *choice, <span class="tok-fn">describe_secs</span>(*choice));</span>
-<span class="ln" id="L879">                    }</span>
-<span class="ln" id="L880">                });</span>
-<span class="ln" id="L881">            changed |= auto.after_secs != current;</span>
-<span class="ln" id="L882"></span>
-<span class="ln" id="L883">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L884">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L885">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;or type one&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L886">                <span class="tok-kw">let</span> box_ = ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L887">                    egui::TextEdit::<span class="tok-fn">singleline</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.autolock_typed)</span>
-<span class="ln" id="L888">                        .<span class="tok-fn">hint_text</span>(<span class="tok-str">&quot;90m, 2h, 1d&quot;</span>)</span>
-<span class="ln" id="L889">                        .<span class="tok-fn">desired_width</span>(<span class="tok-num">120.0</span>),</span>
-<span class="ln" id="L890">                );</span>
-<span class="ln" id="L891">                <span class="tok-kw">if</span> box_.<span class="tok-fn">lost_focus</span>() &amp;&amp; ui.<span class="tok-fn">input</span>(|i| i.<span class="tok-fn">key_pressed</span>(egui::Key::Enter)) {</span>
-<span class="ln" id="L892">                    <span class="tok-kw">match</span> <span class="tok-fn">parse</span>(&amp;<span class="tok-kw">self</span>.autolock_typed) {</span>
-<span class="ln" id="L893">                        <span class="tok-fn">Some</span>(secs) =&gt; {</span>
-<span class="ln" id="L894">                            auto.after_secs = secs;</span>
-<span class="ln" id="L895">                            <span class="tok-com">// Typing a value outside the range widens the range</span></span>
-<span class="ln" id="L896">                            <span class="tok-com">// to hold it, which is what somebody typing it</span></span>
-<span class="ln" id="L897">                            <span class="tok-com">// meant. Clamping it away silently would look like</span></span>
-<span class="ln" id="L898">                            <span class="tok-com">// the box being ignored.</span></span>
-<span class="ln" id="L899">                            auto.floor_secs = auto.floor_secs.<span class="tok-fn">min</span>(secs);</span>
-<span class="ln" id="L900">                            auto.ceiling_secs = auto.ceiling_secs.<span class="tok-fn">max</span>(secs);</span>
-<span class="ln" id="L901">                            <span class="tok-kw">self</span>.autolock_typed.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L902">                            <span class="tok-kw">self</span>.autolock_error = None;</span>
-<span class="ln" id="L903">                            changed = true;</span>
-<span class="ln" id="L904">                        }</span>
-<span class="ln" id="L905">                        None =&gt; {</span>
-<span class="ln" id="L906">                            <span class="tok-kw">self</span>.autolock_error = <span class="tok-fn">Some</span>(</span>
-<span class="ln" id="L907">                                <span class="tok-str">&quot;that is not a length of time. Try 90m, 2h or 1d.&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L908">                            );</span>
-<span class="ln" id="L909">                        }</span>
-<span class="ln" id="L910">                    }</span>
-<span class="ln" id="L911">                }</span>
-<span class="ln" id="L912">            });</span>
-<span class="ln" id="L913">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(error) = &amp;<span class="tok-kw">self</span>.autolock_error {</span>
-<span class="ln" id="L914">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L915">            }</span>
-<span class="ln" id="L916"></span>
-<span class="ln" id="L917">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L918">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L919">                RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L920">                    <span class="tok-str">&quot;the list offers {} to {}&quot;</span>,</span>
-<span class="ln" id="L921">                    <span class="tok-fn">describe_secs</span>(auto.floor_secs),</span>
-<span class="ln" id="L922">                    <span class="tok-fn">describe_secs</span>(auto.ceiling_secs)</span>
-<span class="ln" id="L923">                ))</span>
-<span class="ln" id="L924">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L925">                .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L926">            );</span>
-<span class="ln" id="L927">            <span class="tok-kw">if</span> auto != Autolock::<span class="tok-fn">default</span>().<span class="tok-fn">sane</span>()</span>
-<span class="ln" id="L928">                &amp;&amp; ui</span>
-<span class="ln" id="L929">                    .<span class="tok-fn">button</span>(<span class="tok-str">&quot;put the list back to five minutes to two days&quot;</span>)</span>
-<span class="ln" id="L930">                    .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L931">            {</span>
-<span class="ln" id="L932">                <span class="tok-kw">let</span> default = Autolock::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L933">                auto.floor_secs = default.floor_secs;</span>
-<span class="ln" id="L934">                auto.ceiling_secs = default.ceiling_secs;</span>
-<span class="ln" id="L935">                changed = true;</span>
-<span class="ln" id="L936">            }</span>
-<span class="ln" id="L937">        }</span>
-<span class="ln" id="L938"></span>
-<span class="ln" id="L939">        <span class="tok-kw">if</span> changed {</span>
-<span class="ln" id="L940">            <span class="tok-kw">self</span>.<span class="tok-fn">set_autolock</span>(auto);</span>
-<span class="ln" id="L941">        }</span>
-<span class="ln" id="L942">    }</span>
+<span class="ln" id="L846">    <span class="tok-com">/// Marker 92. The autolock, and the range it offers.</span></span>
+<span class="ln" id="L847">    <span class="tok-kw">fn</span> <span class="tok-fn">security_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L848">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::autolock::{describe_secs, parse, Autolock, CHOICES};</span>
+<span class="ln" id="L849"></span>
+<span class="ln" id="L850">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> auto = <span class="tok-kw">self</span>.<span class="tok-fn">autolock</span>();</span>
+<span class="ln" id="L851">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Lock the window when it is not used&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
+<span class="ln" id="L852">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L853">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L854">                <span class="tok-str">&quot;Off unless you turn it on. Starting a long job does not count as using \</span></span>
+<span class="ln" id="L855"><span class="tok-str">                 the window: if you walk away while something is rendering, that is \</span></span>
+<span class="ln" id="L856"><span class="tok-str">                 exactly when you would want it locked.&quot;</span>,</span>
+<span class="ln" id="L857">            )</span>
+<span class="ln" id="L858">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L859">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L860">        );</span>
+<span class="ln" id="L861">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L862"></span>
+<span class="ln" id="L863">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = ui</span>
+<span class="ln" id="L864">            .<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> auto.enabled, <span class="tok-str">&quot;lock after a period of no use&quot;</span>)</span>
+<span class="ln" id="L865">            .<span class="tok-fn">changed</span>();</span>
+<span class="ln" id="L866"></span>
+<span class="ln" id="L867">        <span class="tok-kw">if</span> auto.enabled {</span>
+<span class="ln" id="L868">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L869">            <span class="tok-kw">let</span> current = auto.after_secs;</span>
+<span class="ln" id="L870">            egui::ComboBox::<span class="tok-fn">from_id_salt</span>(<span class="tok-str">&quot;autolock-after&quot;</span>)</span>
+<span class="ln" id="L871">                .<span class="tok-fn">selected_text</span>(<span class="tok-fn">describe_secs</span>(auto.after_secs))</span>
+<span class="ln" id="L872">                .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
+<span class="ln" id="L873">                    <span class="tok-kw">for</span> choice <span class="tok-kw">in</span> CHOICES {</span>
+<span class="ln" id="L874">                        <span class="tok-com">// Only the ones inside the range this user has set, so</span></span>
+<span class="ln" id="L875">                        <span class="tok-com">// a shortened range does not offer a delay it would</span></span>
+<span class="ln" id="L876">                        <span class="tok-com">// then clamp away behind their back.</span></span>
+<span class="ln" id="L877">                        <span class="tok-kw">if</span> *choice &lt; auto.floor_secs || *choice &gt; auto.ceiling_secs {</span>
+<span class="ln" id="L878">                            continue;</span>
+<span class="ln" id="L879">                        }</span>
+<span class="ln" id="L880">                        ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> auto.after_secs, *choice, <span class="tok-fn">describe_secs</span>(*choice));</span>
+<span class="ln" id="L881">                    }</span>
+<span class="ln" id="L882">                });</span>
+<span class="ln" id="L883">            changed |= auto.after_secs != current;</span>
+<span class="ln" id="L884"></span>
+<span class="ln" id="L885">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L886">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L887">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;or type one&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L888">                <span class="tok-kw">let</span> box_ = ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L889">                    egui::TextEdit::<span class="tok-fn">singleline</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.autolock_typed)</span>
+<span class="ln" id="L890">                        .<span class="tok-fn">hint_text</span>(<span class="tok-str">&quot;90m, 2h, 1d&quot;</span>)</span>
+<span class="ln" id="L891">                        .<span class="tok-fn">desired_width</span>(<span class="tok-num">120.0</span>),</span>
+<span class="ln" id="L892">                );</span>
+<span class="ln" id="L893">                <span class="tok-kw">if</span> box_.<span class="tok-fn">lost_focus</span>() &amp;&amp; ui.<span class="tok-fn">input</span>(|i| i.<span class="tok-fn">key_pressed</span>(egui::Key::Enter)) {</span>
+<span class="ln" id="L894">                    <span class="tok-kw">match</span> <span class="tok-fn">parse</span>(&amp;<span class="tok-kw">self</span>.autolock_typed) {</span>
+<span class="ln" id="L895">                        <span class="tok-fn">Some</span>(secs) =&gt; {</span>
+<span class="ln" id="L896">                            auto.after_secs = secs;</span>
+<span class="ln" id="L897">                            <span class="tok-com">// Typing a value outside the range widens the range</span></span>
+<span class="ln" id="L898">                            <span class="tok-com">// to hold it, which is what somebody typing it</span></span>
+<span class="ln" id="L899">                            <span class="tok-com">// meant. Clamping it away silently would look like</span></span>
+<span class="ln" id="L900">                            <span class="tok-com">// the box being ignored.</span></span>
+<span class="ln" id="L901">                            auto.floor_secs = auto.floor_secs.<span class="tok-fn">min</span>(secs);</span>
+<span class="ln" id="L902">                            auto.ceiling_secs = auto.ceiling_secs.<span class="tok-fn">max</span>(secs);</span>
+<span class="ln" id="L903">                            <span class="tok-kw">self</span>.autolock_typed.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L904">                            <span class="tok-kw">self</span>.autolock_error = None;</span>
+<span class="ln" id="L905">                            changed = true;</span>
+<span class="ln" id="L906">                        }</span>
+<span class="ln" id="L907">                        None =&gt; {</span>
+<span class="ln" id="L908">                            <span class="tok-kw">self</span>.autolock_error = <span class="tok-fn">Some</span>(</span>
+<span class="ln" id="L909">                                <span class="tok-str">&quot;that is not a length of time. Try 90m, 2h or 1d.&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L910">                            );</span>
+<span class="ln" id="L911">                        }</span>
+<span class="ln" id="L912">                    }</span>
+<span class="ln" id="L913">                }</span>
+<span class="ln" id="L914">            });</span>
+<span class="ln" id="L915">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(error) = &amp;<span class="tok-kw">self</span>.autolock_error {</span>
+<span class="ln" id="L916">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L917">            }</span>
+<span class="ln" id="L918"></span>
+<span class="ln" id="L919">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L920">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L921">                RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L922">                    <span class="tok-str">&quot;the list offers {} to {}&quot;</span>,</span>
+<span class="ln" id="L923">                    <span class="tok-fn">describe_secs</span>(auto.floor_secs),</span>
+<span class="ln" id="L924">                    <span class="tok-fn">describe_secs</span>(auto.ceiling_secs)</span>
+<span class="ln" id="L925">                ))</span>
+<span class="ln" id="L926">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L927">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L928">            );</span>
+<span class="ln" id="L929">            <span class="tok-kw">if</span> auto != Autolock::<span class="tok-fn">default</span>().<span class="tok-fn">sane</span>()</span>
+<span class="ln" id="L930">                &amp;&amp; ui</span>
+<span class="ln" id="L931">                    .<span class="tok-fn">button</span>(<span class="tok-str">&quot;put the list back to five minutes to two days&quot;</span>)</span>
+<span class="ln" id="L932">                    .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L933">            {</span>
+<span class="ln" id="L934">                <span class="tok-kw">let</span> default = Autolock::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L935">                auto.floor_secs = default.floor_secs;</span>
+<span class="ln" id="L936">                auto.ceiling_secs = default.ceiling_secs;</span>
+<span class="ln" id="L937">                changed = true;</span>
+<span class="ln" id="L938">            }</span>
+<span class="ln" id="L939">        }</span>
+<span class="ln" id="L940"></span>
+<span class="ln" id="L941">        <span class="tok-kw">if</span> changed {</span>
+<span class="ln" id="L942">            <span class="tok-kw">self</span>.<span class="tok-fn">set_autolock</span>(auto);</span>
+<span class="ln" id="L943">        }</span>
+<span class="ln" id="L944">    }</span>
 </span>
-<span class="ln" id="L943"></span>
+<span class="ln" id="L945"></span>
 <span class="src-item" id="fn-settings-storage_page">
-<span class="ln" id="L944">    <span class="tok-kw">fn</span> <span class="tok-fn">storage_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L945">        <span class="tok-fn">section</span>(</span>
-<span class="ln" id="L946">            ui,</span>
-<span class="ln" id="L947">            <span class="tok-str">&quot;Where this is kept&quot;</span>,</span>
-<span class="ln" id="L948">            <span class="tok-str">&quot;Plain text. Edit it or delete it; nothing here is secret.&quot;</span>,</span>
-<span class="ln" id="L949">        );</span>
-<span class="ln" id="L950"></span>
-<span class="ln" id="L951">        <span class="tok-kw">match</span> &amp;<span class="tok-kw">self</span>.path {</span>
-<span class="ln" id="L952">            <span class="tok-fn">Some</span>(path) =&gt; {</span>
-<span class="ln" id="L953">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L954">                    RichText::<span class="tok-fn">new</span>(path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L955">                        .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L956">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()),</span>
-<span class="ln" id="L957">                );</span>
-<span class="ln" id="L958">            }</span>
-<span class="ln" id="L959">            None =&gt; {</span>
-<span class="ln" id="L960">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L961">                    RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L962">                        <span class="tok-str">&quot;Nowhere. This platform did not say where configuration belongs \</span></span>
-<span class="ln" id="L963"><span class="tok-str">                         (no APPDATA, XDG_CONFIG_HOME or HOME), so choices apply for this \</span></span>
-<span class="ln" id="L964"><span class="tok-str">                         session only.&quot;</span>,</span>
-<span class="ln" id="L965">                    )</span>
-<span class="ln" id="L966">                    .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L967">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L968">                );</span>
-<span class="ln" id="L969">            }</span>
-<span class="ln" id="L970">        }</span>
-<span class="ln" id="L971"></span>
-<span class="ln" id="L972">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.prefs.recovered_from_corrupt_file {</span>
-<span class="ln" id="L973">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L974">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L975">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L976">                    <span class="tok-str">&quot;The settings file could not be understood, so the defaults are in \</span></span>
-<span class="ln" id="L977"><span class="tok-str">                     force. Changing anything here will rewrite it.&quot;</span>,</span>
-<span class="ln" id="L978">                )</span>
-<span class="ln" id="L979">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L980">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L981">            );</span>
-<span class="ln" id="L982">        }</span>
-<span class="ln" id="L983"></span>
-<span class="ln" id="L984">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L985">        <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;reset to defaults&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L986">            <span class="tok-kw">let</span> configured = <span class="tok-kw">self</span>.prefs.configured;</span>
-<span class="ln" id="L987">            <span class="tok-kw">self</span>.prefs = Prefs {</span>
-<span class="ln" id="L988">                configured,</span>
-<span class="ln" id="L989">                ..Prefs::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L990">            };</span>
-<span class="ln" id="L991">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L992">        }</span>
-<span class="ln" id="L993">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L994">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L995">                <span class="tok-str">&quot;  Colour scheme and animation only. This does not touch the app lock, \</span></span>
-<span class="ln" id="L996"><span class="tok-str">                 your passphrase, or any recording.&quot;</span>,</span>
-<span class="ln" id="L997">            )</span>
-<span class="ln" id="L998">            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L999">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L1000">        );</span>
-<span class="ln" id="L1001">    }</span>
+<span class="ln" id="L946">    <span class="tok-kw">fn</span> <span class="tok-fn">storage_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L947">        <span class="tok-fn">section</span>(</span>
+<span class="ln" id="L948">            ui,</span>
+<span class="ln" id="L949">            <span class="tok-str">&quot;Where this is kept&quot;</span>,</span>
+<span class="ln" id="L950">            <span class="tok-str">&quot;Plain text. Edit it or delete it; nothing here is secret.&quot;</span>,</span>
+<span class="ln" id="L951">        );</span>
+<span class="ln" id="L952"></span>
+<span class="ln" id="L953">        <span class="tok-kw">match</span> &amp;<span class="tok-kw">self</span>.path {</span>
+<span class="ln" id="L954">            <span class="tok-fn">Some</span>(path) =&gt; {</span>
+<span class="ln" id="L955">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L956">                    RichText::<span class="tok-fn">new</span>(path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L957">                        .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L958">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()),</span>
+<span class="ln" id="L959">                );</span>
+<span class="ln" id="L960">            }</span>
+<span class="ln" id="L961">            None =&gt; {</span>
+<span class="ln" id="L962">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L963">                    RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L964">                        <span class="tok-str">&quot;Nowhere. This platform did not say where configuration belongs \</span></span>
+<span class="ln" id="L965"><span class="tok-str">                         (no APPDATA, XDG_CONFIG_HOME or HOME), so choices apply for this \</span></span>
+<span class="ln" id="L966"><span class="tok-str">                         session only.&quot;</span>,</span>
+<span class="ln" id="L967">                    )</span>
+<span class="ln" id="L968">                    .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L969">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L970">                );</span>
+<span class="ln" id="L971">            }</span>
+<span class="ln" id="L972">        }</span>
+<span class="ln" id="L973"></span>
+<span class="ln" id="L974">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.prefs.recovered_from_corrupt_file {</span>
+<span class="ln" id="L975">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L976">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L977">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L978">                    <span class="tok-str">&quot;The settings file could not be understood, so the defaults are in \</span></span>
+<span class="ln" id="L979"><span class="tok-str">                     force. Changing anything here will rewrite it.&quot;</span>,</span>
+<span class="ln" id="L980">                )</span>
+<span class="ln" id="L981">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L982">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L983">            );</span>
+<span class="ln" id="L984">        }</span>
+<span class="ln" id="L985"></span>
+<span class="ln" id="L986">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L987">        <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;reset to defaults&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L988">            <span class="tok-kw">let</span> configured = <span class="tok-kw">self</span>.prefs.configured;</span>
+<span class="ln" id="L989">            <span class="tok-kw">self</span>.prefs = Prefs {</span>
+<span class="ln" id="L990">                configured,</span>
+<span class="ln" id="L991">                ..Prefs::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L992">            };</span>
+<span class="ln" id="L993">            <span class="tok-kw">self</span>.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L994">        }</span>
+<span class="ln" id="L995">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L996">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L997">                <span class="tok-str">&quot;  Colour scheme and animation only. This does not touch the app lock, \</span></span>
+<span class="ln" id="L998"><span class="tok-str">                 your passphrase, or any recording.&quot;</span>,</span>
+<span class="ln" id="L999">            )</span>
+<span class="ln" id="L1000">            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L1001">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L1002">        );</span>
+<span class="ln" id="L1003">    }</span>
 </span>
-<span class="ln" id="L1002">}</span>
-<span class="ln" id="L1003"></span>
+<span class="ln" id="L1004">}</span>
+<span class="ln" id="L1005"></span>
 <span class="src-item" id="fn-section">
-<span class="ln" id="L1004"><span class="tok-com">/// A titled group with a one-line explanation under it.</span></span>
-<span class="ln" id="L1005"><span class="tok-kw">fn</span> <span class="tok-fn">section</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, title: &amp;str, blurb: &amp;str) {</span>
-<span class="ln" id="L1006">    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(title).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L1007">    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(blurb).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L1008">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L1009">}</span>
+<span class="ln" id="L1006"><span class="tok-com">/// A titled group with a one-line explanation under it.</span></span>
+<span class="ln" id="L1007"><span class="tok-kw">fn</span> <span class="tok-fn">section</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, title: &amp;str, blurb: &amp;str) {</span>
+<span class="ln" id="L1008">    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(title).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L1009">    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(blurb).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L1010">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L1011">}</span>
 </span>
-<span class="ln" id="L1010"></span>
+<span class="ln" id="L1012"></span>
 <span class="src-item" id="fn-swatches">
-<span class="ln" id="L1011"><span class="tok-com">/// The active palette, as a row of swatches, so the choice can be seen rather</span></span>
-<span class="ln" id="L1012"><span class="tok-com">/// than only read.</span></span>
-<span class="ln" id="L1013"><span class="tok-kw">fn</span> <span class="tok-fn">swatches</span>(ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L1014">    <span class="tok-kw">let</span> theme = <span class="tok-kw">crate</span>::theme::<span class="tok-fn">active</span>();</span>
-<span class="ln" id="L1015">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1016">        <span class="tok-kw">for</span> (name, colour) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1017">            (<span class="tok-str">&quot;accent&quot;</span>, theme.accent),</span>
-<span class="ln" id="L1018">            (<span class="tok-str">&quot;veiled&quot;</span>, theme.accent_2),</span>
-<span class="ln" id="L1019">            (<span class="tok-str">&quot;ok&quot;</span>, theme.ok),</span>
-<span class="ln" id="L1020">            (<span class="tok-str">&quot;warn&quot;</span>, theme.warn),</span>
-<span class="ln" id="L1021">            (<span class="tok-str">&quot;error&quot;</span>, theme.err),</span>
-<span class="ln" id="L1022">            (<span class="tok-str">&quot;text&quot;</span>, theme.fg),</span>
-<span class="ln" id="L1023">            (<span class="tok-str">&quot;muted&quot;</span>, theme.muted),</span>
-<span class="ln" id="L1024">        ] {</span>
-<span class="ln" id="L1025">            <span class="tok-kw">let</span> (rect, response) =</span>
-<span class="ln" id="L1026">                ui.<span class="tok-fn">allocate_exact_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">26.0</span>, <span class="tok-num">18.0</span>), egui::Sense::<span class="tok-fn">hover</span>());</span>
-<span class="ln" id="L1027">            <span class="tok-kw">if</span> ui.<span class="tok-fn">is_rect_visible</span>(rect) {</span>
-<span class="ln" id="L1028">                ui.<span class="tok-fn">painter</span>()</span>
-<span class="ln" id="L1029">                    .<span class="tok-fn">rect_filled</span>(rect, egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">3</span>), colour);</span>
-<span class="ln" id="L1030">                ui.<span class="tok-fn">painter</span>().<span class="tok-fn">rect_stroke</span>(</span>
-<span class="ln" id="L1031">                    rect,</span>
-<span class="ln" id="L1032">                    egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">3</span>),</span>
-<span class="ln" id="L1033">                    egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()),</span>
-<span class="ln" id="L1034">                    egui::StrokeKind::Inside,</span>
-<span class="ln" id="L1035">                );</span>
-<span class="ln" id="L1036">            }</span>
-<span class="ln" id="L1037">            response.<span class="tok-fn">on_hover_text</span>(name);</span>
-<span class="ln" id="L1038">        }</span>
-<span class="ln" id="L1039">    });</span>
-<span class="ln" id="L1040">}</span>
+<span class="ln" id="L1013"><span class="tok-com">/// The active palette, as a row of swatches, so the choice can be seen rather</span></span>
+<span class="ln" id="L1014"><span class="tok-com">/// than only read.</span></span>
+<span class="ln" id="L1015"><span class="tok-kw">fn</span> <span class="tok-fn">swatches</span>(ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L1016">    <span class="tok-kw">let</span> theme = <span class="tok-kw">crate</span>::theme::<span class="tok-fn">active</span>();</span>
+<span class="ln" id="L1017">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1018">        <span class="tok-kw">for</span> (name, colour) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1019">            (<span class="tok-str">&quot;accent&quot;</span>, theme.accent),</span>
+<span class="ln" id="L1020">            (<span class="tok-str">&quot;veiled&quot;</span>, theme.accent_2),</span>
+<span class="ln" id="L1021">            (<span class="tok-str">&quot;ok&quot;</span>, theme.ok),</span>
+<span class="ln" id="L1022">            (<span class="tok-str">&quot;warn&quot;</span>, theme.warn),</span>
+<span class="ln" id="L1023">            (<span class="tok-str">&quot;error&quot;</span>, theme.err),</span>
+<span class="ln" id="L1024">            (<span class="tok-str">&quot;text&quot;</span>, theme.fg),</span>
+<span class="ln" id="L1025">            (<span class="tok-str">&quot;muted&quot;</span>, theme.muted),</span>
+<span class="ln" id="L1026">        ] {</span>
+<span class="ln" id="L1027">            <span class="tok-kw">let</span> (rect, response) =</span>
+<span class="ln" id="L1028">                ui.<span class="tok-fn">allocate_exact_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">26.0</span>, <span class="tok-num">18.0</span>), egui::Sense::<span class="tok-fn">hover</span>());</span>
+<span class="ln" id="L1029">            <span class="tok-kw">if</span> ui.<span class="tok-fn">is_rect_visible</span>(rect) {</span>
+<span class="ln" id="L1030">                ui.<span class="tok-fn">painter</span>()</span>
+<span class="ln" id="L1031">                    .<span class="tok-fn">rect_filled</span>(rect, egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">3</span>), colour);</span>
+<span class="ln" id="L1032">                ui.<span class="tok-fn">painter</span>().<span class="tok-fn">rect_stroke</span>(</span>
+<span class="ln" id="L1033">                    rect,</span>
+<span class="ln" id="L1034">                    egui::CornerRadius::<span class="tok-fn">same</span>(<span class="tok-num">3</span>),</span>
+<span class="ln" id="L1035">                    egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()),</span>
+<span class="ln" id="L1036">                    egui::StrokeKind::Inside,</span>
+<span class="ln" id="L1037">                );</span>
+<span class="ln" id="L1038">            }</span>
+<span class="ln" id="L1039">            response.<span class="tok-fn">on_hover_text</span>(name);</span>
+<span class="ln" id="L1040">        }</span>
+<span class="ln" id="L1041">    });</span>
+<span class="ln" id="L1042">}</span>
 </span>
-<span class="ln" id="L1041"></span>
-<span class="ln" id="L1042"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1043"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L1044">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L1045"></span>
-<span class="ln" id="L1046">    <span class="tok-com">/// Drive the settings tab once, with no window.</span></span>
-<span class="ln" id="L1047">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(settings: &amp;<span class="tok-kw">mut</span> Settings) {</span>
-<span class="ln" id="L1048">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1049">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L1050">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">tab</span>(ui, ctx));</span>
-<span class="ln" id="L1051">        });</span>
-<span class="ln" id="L1052">    }</span>
-<span class="ln" id="L1053"></span>
-<span class="ln" id="L1054">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1055">    <span class="tok-kw">fn</span> <span class="tok-fn">every_page_renders_without_a_window</span>() {</span>
-<span class="ln" id="L1056">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1057">        <span class="tok-kw">for</span> (page, _, _) <span class="tok-kw">in</span> Page::ALL {</span>
-<span class="ln" id="L1058">            settings.page = *page;</span>
-<span class="ln" id="L1059">            <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
-<span class="ln" id="L1060">        }</span>
-<span class="ln" id="L1061">    }</span>
-<span class="ln" id="L1062"></span>
-<span class="ln" id="L1063">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1064">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_appearance_choices_render</span>() {</span>
-<span class="ln" id="L1065">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1066">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1067">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L1068">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">first_run_appearance</span>(ui));</span>
-<span class="ln" id="L1069">        });</span>
-<span class="ln" id="L1070">    }</span>
-<span class="ln" id="L1071"></span>
-<span class="ln" id="L1072">    <span class="tok-com">/// The menu has to cover the pages and the pages have to cover the menu, or</span></span>
-<span class="ln" id="L1073">    <span class="tok-com">/// a page becomes unreachable.</span></span>
-<span class="ln" id="L1074">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1075">    <span class="tok-kw">fn</span> <span class="tok-fn">the_menu_lists_every_page_exactly_once</span>() {</span>
-<span class="ln" id="L1076">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;Page&gt; = Page::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(p, _, _)| *p).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1077">        <span class="tok-kw">let</span> count = seen.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L1078">        seen.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L1079">        assert_eq!(seen.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;a page is listed twice&quot;</span>);</span>
-<span class="ln" id="L1080">        assert_eq!(count, <span class="tok-num">5</span>, <span class="tok-str">&quot;a page was added without a menu entry&quot;</span>);</span>
-<span class="ln" id="L1081">        <span class="tok-kw">for</span> (_, label, blurb) <span class="tok-kw">in</span> Page::ALL {</span>
-<span class="ln" id="L1082">            assert!(!label.<span class="tok-fn">is_empty</span>() &amp;&amp; !blurb.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L1083">        }</span>
-<span class="ln" id="L1084">    }</span>
-<span class="ln" id="L1085"></span>
-<span class="ln" id="L1086">    <span class="tok-com">/// A first run has not been configured; answering it must stick.</span></span>
-<span class="ln" id="L1087">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1088">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_is_offered_once</span>() {</span>
-<span class="ln" id="L1089">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1090">            prefs: Prefs::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1091">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1092">        };</span>
-<span class="ln" id="L1093">        settings.first_run = !settings.prefs.configured;</span>
-<span class="ln" id="L1094">        assert!(settings.<span class="tok-fn">needs_first_run</span>());</span>
-<span class="ln" id="L1095"></span>
-<span class="ln" id="L1096">        settings.prefs.configured = true;</span>
-<span class="ln" id="L1097">        settings.first_run = false;</span>
-<span class="ln" id="L1098">        assert!(!settings.<span class="tok-fn">needs_first_run</span>());</span>
-<span class="ln" id="L1099">    }</span>
-<span class="ln" id="L1100"></span>
-<span class="ln" id="L1101">    <span class="tok-com">/// Defaults are what the request asked for: animation on, offered at the</span></span>
-<span class="ln" id="L1102">    <span class="tok-com">/// start, switchable afterwards.</span></span>
-<span class="ln" id="L1103">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1104">    <span class="tok-kw">fn</span> <span class="tok-fn">animation_is_on_by_default_and_can_be_turned_off</span>() {</span>
-<span class="ln" id="L1105">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1106">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1107">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
-<span class="ln" id="L1108">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
-<span class="ln" id="L1109"></span>
-<span class="ln" id="L1110">        settings.prefs.animated_icon = false;</span>
-<span class="ln" id="L1111">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled, <span class="tok-str">&quot;only the mark was stilled&quot;</span>);</span>
-<span class="ln" id="L1112">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
-<span class="ln" id="L1113"></span>
-<span class="ln" id="L1114">        settings.prefs.animations = false;</span>
-<span class="ln" id="L1115">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
-<span class="ln" id="L1116">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
-<span class="ln" id="L1117">    }</span>
-<span class="ln" id="L1118"></span>
-<span class="ln" id="L1119">    <span class="tok-com">/// Choosing a theme must apply it and record it.</span></span>
-<span class="ln" id="L1120">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1121">    <span class="tok-kw">fn</span> <span class="tok-fn">choosing_a_theme_applies_and_records_it</span>() {</span>
-<span class="ln" id="L1122">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1123">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1124">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L1125">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1126">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L1127">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1128">        };</span>
-<span class="ln" id="L1129"></span>
-<span class="ln" id="L1130">        assert!(<span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;nord&quot;</span>));</span>
-<span class="ln" id="L1131">        settings.prefs.theme = <span class="tok-str">&quot;nord&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L1132">        settings.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L1133"></span>
-<span class="ln" id="L1134">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path).theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
-<span class="ln" id="L1135">        assert!(settings.save_error.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, settings.save_error);</span>
-<span class="ln" id="L1136"></span>
-<span class="ln" id="L1137">        <span class="tok-com">// And it comes back on the next launch.</span></span>
-<span class="ln" id="L1138">        <span class="tok-kw">let</span> reloaded = Settings {</span>
-<span class="ln" id="L1139">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
-<span class="ln" id="L1140">            path: <span class="tok-fn">Some</span>(path),</span>
-<span class="ln" id="L1141">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1142">        };</span>
-<span class="ln" id="L1143">        assert_eq!(reloaded.prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
-<span class="ln" id="L1144">        <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1145">    }</span>
-<span class="ln" id="L1146"></span>
-<span class="ln" id="L1147">    <span class="tok-com">/// A save that cannot happen must not be silent, and must not lose the</span></span>
-<span class="ln" id="L1148">    <span class="tok-com">/// choice for this session either.</span></span>
-<span class="ln" id="L1149">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1150">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_save_is_reported_rather_than_swallowed</span>() {</span>
-<span class="ln" id="L1151">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1152">            path: None,</span>
-<span class="ln" id="L1153">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1154">        };</span>
-<span class="ln" id="L1155">        settings.prefs.animations = false;</span>
-<span class="ln" id="L1156">        settings.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L1157">        assert!(settings.save_error.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the failure was swallowed&quot;</span>);</span>
-<span class="ln" id="L1158">        assert!(!settings.prefs.animations, <span class="tok-str">&quot;the choice was lost as well&quot;</span>);</span>
-<span class="ln" id="L1159">        <span class="tok-com">// And the panel shows it.</span></span>
-<span class="ln" id="L1160">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
-<span class="ln" id="L1161">    }</span>
-<span class="ln" id="L1162"></span>
-<span class="ln" id="L1163">    <span class="tok-com">/// Reset must not touch anything that is not a presentation choice.</span></span>
-<span class="ln" id="L1164">    <span class="tok-com">/// An installed copy never offers to install itself, whatever the</span></span>
-<span class="ln" id="L1165">    <span class="tok-com">/// preference says. The preference is only about the portable case.</span></span>
-<span class="ln" id="L1166">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1167">    <span class="tok-kw">fn</span> <span class="tok-fn">the_install_tab_is_never_offered_by_an_installed_copy</span>() {</span>
-<span class="ln" id="L1168">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1169">        assert!(</span>
-<span class="ln" id="L1170">            settings.<span class="tok-fn">show_install_tab</span>(false),</span>
-<span class="ln" id="L1171">            <span class="tok-str">&quot;a portable copy offers it by default&quot;</span></span>
-<span class="ln" id="L1172">        );</span>
-<span class="ln" id="L1173">        assert!(</span>
-<span class="ln" id="L1174">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
-<span class="ln" id="L1175">            <span class="tok-str">&quot;an installed copy must never offer to install itself&quot;</span></span>
-<span class="ln" id="L1176">        );</span>
-<span class="ln" id="L1177"></span>
-<span class="ln" id="L1178">        settings.prefs.hide_install_tab = true;</span>
-<span class="ln" id="L1179">        assert!(</span>
-<span class="ln" id="L1180">            !settings.<span class="tok-fn">show_install_tab</span>(false),</span>
-<span class="ln" id="L1181">            <span class="tok-str">&quot;the preference hides it on a portable copy&quot;</span></span>
-<span class="ln" id="L1182">        );</span>
-<span class="ln" id="L1183">        assert!(</span>
-<span class="ln" id="L1184">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
-<span class="ln" id="L1185">            <span class="tok-str">&quot;and an installed copy is still never offered it&quot;</span></span>
-<span class="ln" id="L1186">        );</span>
-<span class="ln" id="L1187">    }</span>
-<span class="ln" id="L1188"></span>
-<span class="ln" id="L1189">    <span class="tok-com">/// The tick is remembered. A preference that has to be set on every launch</span></span>
-<span class="ln" id="L1190">    <span class="tok-com">/// is not a preference.</span></span>
-<span class="ln" id="L1191">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1192">    <span class="tok-kw">fn</span> <span class="tok-fn">hiding_the_install_tab_survives_a_reload</span>() {</span>
-<span class="ln" id="L1193">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1194">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L1195">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1196">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L1197">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1198">        };</span>
-<span class="ln" id="L1199">        settings.<span class="tok-fn">set_hide_install_tab</span>(true);</span>
-<span class="ln" id="L1200">        assert!(</span>
-<span class="ln" id="L1201">            settings.<span class="tok-fn">save_error</span>().<span class="tok-fn">is_none</span>(),</span>
-<span class="ln" id="L1202">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
-<span class="ln" id="L1203">            settings.<span class="tok-fn">save_error</span>()</span>
-<span class="ln" id="L1204">        );</span>
-<span class="ln" id="L1205">        assert!(Prefs::<span class="tok-fn">load</span>(&amp;path).hide_install_tab);</span>
-<span class="ln" id="L1206">    }</span>
-<span class="ln" id="L1207"></span>
-<span class="ln" id="L1208">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1209">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_leaves_the_first_run_answered</span>() {</span>
-<span class="ln" id="L1210">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1211">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1212">            path: <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>)),</span>
-<span class="ln" id="L1213">            prefs: Prefs {</span>
-<span class="ln" id="L1214">                theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1215">                animations: false,</span>
-<span class="ln" id="L1216">                animated_icon: false,</span>
-<span class="ln" id="L1217">                configured: true,</span>
-<span class="ln" id="L1218">                toured_tabs: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1219">                notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1220">                failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1221">                live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1222">                hide_install_tab: false,</span>
-<span class="ln" id="L1223">                always_group: false,</span>
-<span class="ln" id="L1224">                seal_with_app_lock: false,</span>
-<span class="ln" id="L1225">                vault_dir: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1226">                vault_tool: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1227">                vault_hidden: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L1228">                autolock: false,</span>
-<span class="ln" id="L1229">                autolock_after: <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L1230">                autolock_floor: <span class="tok-kw">crate</span>::autolock::FLOOR_SECS,</span>
-<span class="ln" id="L1231">                autolock_ceiling: <span class="tok-kw">crate</span>::autolock::CEILING_SECS,</span>
-<span class="ln" id="L1232">                recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L1233">            },</span>
-<span class="ln" id="L1234">            page: Page::Storage,</span>
-<span class="ln" id="L1235">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1236">        };</span>
-<span class="ln" id="L1237"></span>
-<span class="ln" id="L1238">        <span class="tok-kw">let</span> configured = settings.prefs.configured;</span>
-<span class="ln" id="L1239">        settings.prefs = Prefs {</span>
-<span class="ln" id="L1240">            configured,</span>
-<span class="ln" id="L1241">            ..Prefs::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1242">        };</span>
-<span class="ln" id="L1243">        settings.<span class="tok-fn">persist</span>();</span>
-<span class="ln" id="L1244"></span>
-<span class="ln" id="L1245">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1246">        assert!(settings.prefs.animations);</span>
-<span class="ln" id="L1247">        assert!(</span>
-<span class="ln" id="L1248">            settings.prefs.configured,</span>
-<span class="ln" id="L1249">            <span class="tok-str">&quot;reset must not ask the first-run question again&quot;</span></span>
-<span class="ln" id="L1250">        );</span>
-<span class="ln" id="L1251">    }</span>
-<span class="ln" id="L1252"></span>
-<span class="ln" id="L1253">    <span class="tok-com">/// Loading must survive a settings file full of nonsense.</span></span>
-<span class="ln" id="L1254">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1255">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_file_leaves_a_usable_panel_that_says_so</span>() {</span>
-<span class="ln" id="L1256">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1257">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L1258">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;this is not a settings file\n@@@@\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1259"></span>
-<span class="ln" id="L1260">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
-<span class="ln" id="L1261">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
-<span class="ln" id="L1262">            path: <span class="tok-fn">Some</span>(path),</span>
-<span class="ln" id="L1263">            page: Page::Storage,</span>
-<span class="ln" id="L1264">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1265">        };</span>
-<span class="ln" id="L1266">        assert!(settings.prefs.recovered_from_corrupt_file);</span>
-<span class="ln" id="L1267">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L1268">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
-<span class="ln" id="L1269">    }</span>
-<span class="ln" id="L1270">}</span>
+<span class="ln" id="L1043"></span>
+<span class="ln" id="L1044"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1045"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L1046">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1047"></span>
+<span class="ln" id="L1048">    <span class="tok-com">/// Drive the settings tab once, with no window.</span></span>
+<span class="ln" id="L1049">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(settings: &amp;<span class="tok-kw">mut</span> Settings) {</span>
+<span class="ln" id="L1050">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1051">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L1052">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">tab</span>(ui, ctx));</span>
+<span class="ln" id="L1053">        });</span>
+<span class="ln" id="L1054">    }</span>
+<span class="ln" id="L1055"></span>
+<span class="ln" id="L1056">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1057">    <span class="tok-kw">fn</span> <span class="tok-fn">every_page_renders_without_a_window</span>() {</span>
+<span class="ln" id="L1058">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1059">        <span class="tok-kw">for</span> (page, _, _) <span class="tok-kw">in</span> Page::ALL {</span>
+<span class="ln" id="L1060">            settings.page = *page;</span>
+<span class="ln" id="L1061">            <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
+<span class="ln" id="L1062">        }</span>
+<span class="ln" id="L1063">    }</span>
+<span class="ln" id="L1064"></span>
+<span class="ln" id="L1065">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1066">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_appearance_choices_render</span>() {</span>
+<span class="ln" id="L1067">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1068">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1069">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
+<span class="ln" id="L1070">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| settings.<span class="tok-fn">first_run_appearance</span>(ui));</span>
+<span class="ln" id="L1071">        });</span>
+<span class="ln" id="L1072">    }</span>
+<span class="ln" id="L1073"></span>
+<span class="ln" id="L1074">    <span class="tok-com">/// The menu has to cover the pages and the pages have to cover the menu, or</span></span>
+<span class="ln" id="L1075">    <span class="tok-com">/// a page becomes unreachable.</span></span>
+<span class="ln" id="L1076">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1077">    <span class="tok-kw">fn</span> <span class="tok-fn">the_menu_lists_every_page_exactly_once</span>() {</span>
+<span class="ln" id="L1078">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;Page&gt; = Page::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(p, _, _)| *p).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1079">        <span class="tok-kw">let</span> count = seen.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L1080">        seen.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L1081">        assert_eq!(seen.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;a page is listed twice&quot;</span>);</span>
+<span class="ln" id="L1082">        assert_eq!(count, <span class="tok-num">5</span>, <span class="tok-str">&quot;a page was added without a menu entry&quot;</span>);</span>
+<span class="ln" id="L1083">        <span class="tok-kw">for</span> (_, label, blurb) <span class="tok-kw">in</span> Page::ALL {</span>
+<span class="ln" id="L1084">            assert!(!label.<span class="tok-fn">is_empty</span>() &amp;&amp; !blurb.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L1085">        }</span>
+<span class="ln" id="L1086">    }</span>
+<span class="ln" id="L1087"></span>
+<span class="ln" id="L1088">    <span class="tok-com">/// A first run has not been configured; answering it must stick.</span></span>
+<span class="ln" id="L1089">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1090">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_run_is_offered_once</span>() {</span>
+<span class="ln" id="L1091">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1092">            prefs: Prefs::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1093">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1094">        };</span>
+<span class="ln" id="L1095">        settings.first_run = !settings.prefs.configured;</span>
+<span class="ln" id="L1096">        assert!(settings.<span class="tok-fn">needs_first_run</span>());</span>
+<span class="ln" id="L1097"></span>
+<span class="ln" id="L1098">        settings.prefs.configured = true;</span>
+<span class="ln" id="L1099">        settings.first_run = false;</span>
+<span class="ln" id="L1100">        assert!(!settings.<span class="tok-fn">needs_first_run</span>());</span>
+<span class="ln" id="L1101">    }</span>
+<span class="ln" id="L1102"></span>
+<span class="ln" id="L1103">    <span class="tok-com">/// Defaults are what the request asked for: animation on, offered at the</span></span>
+<span class="ln" id="L1104">    <span class="tok-com">/// start, switchable afterwards.</span></span>
+<span class="ln" id="L1105">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1106">    <span class="tok-kw">fn</span> <span class="tok-fn">animation_is_on_by_default_and_can_be_turned_off</span>() {</span>
+<span class="ln" id="L1107">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1108">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1109">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
+<span class="ln" id="L1110">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
+<span class="ln" id="L1111"></span>
+<span class="ln" id="L1112">        settings.prefs.animated_icon = false;</span>
+<span class="ln" id="L1113">        assert!(settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled, <span class="tok-str">&quot;only the mark was stilled&quot;</span>);</span>
+<span class="ln" id="L1114">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
+<span class="ln" id="L1115"></span>
+<span class="ln" id="L1116">        settings.prefs.animations = false;</span>
+<span class="ln" id="L1117">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).enabled);</span>
+<span class="ln" id="L1118">        assert!(!settings.<span class="tok-fn">motion</span>(&amp;ctx).icon);</span>
+<span class="ln" id="L1119">    }</span>
+<span class="ln" id="L1120"></span>
+<span class="ln" id="L1121">    <span class="tok-com">/// Choosing a theme must apply it and record it.</span></span>
+<span class="ln" id="L1122">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1123">    <span class="tok-kw">fn</span> <span class="tok-fn">choosing_a_theme_applies_and_records_it</span>() {</span>
+<span class="ln" id="L1124">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1125">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1126">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L1127">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1128">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L1129">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1130">        };</span>
+<span class="ln" id="L1131"></span>
+<span class="ln" id="L1132">        assert!(<span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;nord&quot;</span>));</span>
+<span class="ln" id="L1133">        settings.prefs.theme = <span class="tok-str">&quot;nord&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L1134">        settings.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L1135"></span>
+<span class="ln" id="L1136">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path).theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
+<span class="ln" id="L1137">        assert!(settings.save_error.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, settings.save_error);</span>
+<span class="ln" id="L1138"></span>
+<span class="ln" id="L1139">        <span class="tok-com">// And it comes back on the next launch.</span></span>
+<span class="ln" id="L1140">        <span class="tok-kw">let</span> reloaded = Settings {</span>
+<span class="ln" id="L1141">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
+<span class="ln" id="L1142">            path: <span class="tok-fn">Some</span>(path),</span>
+<span class="ln" id="L1143">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1144">        };</span>
+<span class="ln" id="L1145">        assert_eq!(reloaded.prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
+<span class="ln" id="L1146">        <span class="tok-kw">crate</span>::theme::<span class="tok-fn">set_by_id</span>(&amp;ctx, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1147">    }</span>
+<span class="ln" id="L1148"></span>
+<span class="ln" id="L1149">    <span class="tok-com">/// A save that cannot happen must not be silent, and must not lose the</span></span>
+<span class="ln" id="L1150">    <span class="tok-com">/// choice for this session either.</span></span>
+<span class="ln" id="L1151">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1152">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_save_is_reported_rather_than_swallowed</span>() {</span>
+<span class="ln" id="L1153">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1154">            path: None,</span>
+<span class="ln" id="L1155">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1156">        };</span>
+<span class="ln" id="L1157">        settings.prefs.animations = false;</span>
+<span class="ln" id="L1158">        settings.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L1159">        assert!(settings.save_error.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the failure was swallowed&quot;</span>);</span>
+<span class="ln" id="L1160">        assert!(!settings.prefs.animations, <span class="tok-str">&quot;the choice was lost as well&quot;</span>);</span>
+<span class="ln" id="L1161">        <span class="tok-com">// And the panel shows it.</span></span>
+<span class="ln" id="L1162">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
+<span class="ln" id="L1163">    }</span>
+<span class="ln" id="L1164"></span>
+<span class="ln" id="L1165">    <span class="tok-com">/// Reset must not touch anything that is not a presentation choice.</span></span>
+<span class="ln" id="L1166">    <span class="tok-com">/// An installed copy never offers to install itself, whatever the</span></span>
+<span class="ln" id="L1167">    <span class="tok-com">/// preference says. The preference is only about the portable case.</span></span>
+<span class="ln" id="L1168">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1169">    <span class="tok-kw">fn</span> <span class="tok-fn">the_install_tab_is_never_offered_by_an_installed_copy</span>() {</span>
+<span class="ln" id="L1170">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1171">        assert!(</span>
+<span class="ln" id="L1172">            settings.<span class="tok-fn">show_install_tab</span>(false),</span>
+<span class="ln" id="L1173">            <span class="tok-str">&quot;a portable copy offers it by default&quot;</span></span>
+<span class="ln" id="L1174">        );</span>
+<span class="ln" id="L1175">        assert!(</span>
+<span class="ln" id="L1176">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
+<span class="ln" id="L1177">            <span class="tok-str">&quot;an installed copy must never offer to install itself&quot;</span></span>
+<span class="ln" id="L1178">        );</span>
+<span class="ln" id="L1179"></span>
+<span class="ln" id="L1180">        settings.prefs.hide_install_tab = true;</span>
+<span class="ln" id="L1181">        assert!(</span>
+<span class="ln" id="L1182">            !settings.<span class="tok-fn">show_install_tab</span>(false),</span>
+<span class="ln" id="L1183">            <span class="tok-str">&quot;the preference hides it on a portable copy&quot;</span></span>
+<span class="ln" id="L1184">        );</span>
+<span class="ln" id="L1185">        assert!(</span>
+<span class="ln" id="L1186">            !settings.<span class="tok-fn">show_install_tab</span>(true),</span>
+<span class="ln" id="L1187">            <span class="tok-str">&quot;and an installed copy is still never offered it&quot;</span></span>
+<span class="ln" id="L1188">        );</span>
+<span class="ln" id="L1189">    }</span>
+<span class="ln" id="L1190"></span>
+<span class="ln" id="L1191">    <span class="tok-com">/// The tick is remembered. A preference that has to be set on every launch</span></span>
+<span class="ln" id="L1192">    <span class="tok-com">/// is not a preference.</span></span>
+<span class="ln" id="L1193">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1194">    <span class="tok-kw">fn</span> <span class="tok-fn">hiding_the_install_tab_survives_a_reload</span>() {</span>
+<span class="ln" id="L1195">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1196">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L1197">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1198">            path: <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L1199">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1200">        };</span>
+<span class="ln" id="L1201">        settings.<span class="tok-fn">set_hide_install_tab</span>(true);</span>
+<span class="ln" id="L1202">        assert!(</span>
+<span class="ln" id="L1203">            settings.<span class="tok-fn">save_error</span>().<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L1204">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
+<span class="ln" id="L1205">            settings.<span class="tok-fn">save_error</span>()</span>
+<span class="ln" id="L1206">        );</span>
+<span class="ln" id="L1207">        assert!(Prefs::<span class="tok-fn">load</span>(&amp;path).hide_install_tab);</span>
+<span class="ln" id="L1208">    }</span>
+<span class="ln" id="L1209"></span>
+<span class="ln" id="L1210">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1211">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_leaves_the_first_run_answered</span>() {</span>
+<span class="ln" id="L1212">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1213">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1214">            path: <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>)),</span>
+<span class="ln" id="L1215">            prefs: Prefs {</span>
+<span class="ln" id="L1216">                theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1217">                animations: false,</span>
+<span class="ln" id="L1218">                animated_icon: false,</span>
+<span class="ln" id="L1219">                configured: true,</span>
+<span class="ln" id="L1220">                toured_tabs: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1221">                notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1222">                failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1223">                live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1224">                hide_install_tab: false,</span>
+<span class="ln" id="L1225">                always_group: false,</span>
+<span class="ln" id="L1226">                seal_with_app_lock: false,</span>
+<span class="ln" id="L1227">                vault_dir: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1228">                vault_tool: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1229">                vault_hidden: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1230">                autolock: false,</span>
+<span class="ln" id="L1231">                autolock_after: <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L1232">                autolock_floor: <span class="tok-kw">crate</span>::autolock::FLOOR_SECS,</span>
+<span class="ln" id="L1233">                autolock_ceiling: <span class="tok-kw">crate</span>::autolock::CEILING_SECS,</span>
+<span class="ln" id="L1234">                recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L1235">            },</span>
+<span class="ln" id="L1236">            page: Page::Storage,</span>
+<span class="ln" id="L1237">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1238">        };</span>
+<span class="ln" id="L1239"></span>
+<span class="ln" id="L1240">        <span class="tok-kw">let</span> configured = settings.prefs.configured;</span>
+<span class="ln" id="L1241">        settings.prefs = Prefs {</span>
+<span class="ln" id="L1242">            configured,</span>
+<span class="ln" id="L1243">            ..Prefs::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1244">        };</span>
+<span class="ln" id="L1245">        settings.<span class="tok-fn">persist</span>();</span>
+<span class="ln" id="L1246"></span>
+<span class="ln" id="L1247">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1248">        assert!(settings.prefs.animations);</span>
+<span class="ln" id="L1249">        assert!(</span>
+<span class="ln" id="L1250">            settings.prefs.configured,</span>
+<span class="ln" id="L1251">            <span class="tok-str">&quot;reset must not ask the first-run question again&quot;</span></span>
+<span class="ln" id="L1252">        );</span>
+<span class="ln" id="L1253">    }</span>
+<span class="ln" id="L1254"></span>
+<span class="ln" id="L1255">    <span class="tok-com">/// Loading must survive a settings file full of nonsense.</span></span>
+<span class="ln" id="L1256">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1257">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_file_leaves_a_usable_panel_that_says_so</span>() {</span>
+<span class="ln" id="L1258">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1259">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L1260">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;this is not a settings file\n@@@@\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1261"></span>
+<span class="ln" id="L1262">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = Settings {</span>
+<span class="ln" id="L1263">            prefs: Prefs::<span class="tok-fn">load</span>(&amp;path),</span>
+<span class="ln" id="L1264">            path: <span class="tok-fn">Some</span>(path),</span>
+<span class="ln" id="L1265">            page: Page::Storage,</span>
+<span class="ln" id="L1266">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1267">        };</span>
+<span class="ln" id="L1268">        assert!(settings.prefs.recovered_from_corrupt_file);</span>
+<span class="ln" id="L1269">        assert_eq!(settings.prefs.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L1270">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> settings);</span>
+<span class="ln" id="L1271">    }</span>
+<span class="ln" id="L1272">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

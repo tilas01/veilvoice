@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-setup/install.svg" alt="install.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-setup/src/install.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 568 lines &middot; <a href="install.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 569 lines &middot; <a href="install.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#portable-is-the-default-and-installing-is-the-exception">Portable is the default, and installing is the exception</a>
@@ -81,7 +81,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>568 lines defining <strong>18 functions</strong> (5 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>569 lines defining <strong>18 functions</strong> (5 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Status</code> <span style="color:var(--muted)">line 130</span> &middot; What an installation currently looks like.</li>
 <li><code>enum UserPath</code> <span style="color:var(--muted)">line 276</span></li>
@@ -90,10 +90,10 @@
 <li><code>status</code> <span style="color:var(--muted)">line 150</span> &middot; Read the current state without changing anything.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>exe_name</code>, <code>path_contains</code>, <code>prefix</code></span>
 </li>
-<li><code>install</code> <span style="color:var(--muted)">line 458</span> &middot; Install for this user.
+<li><code>install</code> <span style="color:var(--muted)">line 459</span> &middot; Install for this user.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>add_to_path</code>, <code>bin_dir</code>, <code>copy_programs</code>, <code>prefix</code>, <code>register_uninstall</code>, <code>read_user_path</code>, <code>reg_exe</code>, <code>exe_name</code></span>
 </li>
-<li><code>uninstall</code> <span style="color:var(--muted)">line 485</span> &middot; Remove what install added.
+<li><code>uninstall</code> <span style="color:var(--muted)">line 486</span> &middot; Remove what install added.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>bin_dir</code>, <code>prefix</code>, <code>remove_from_path</code>, <code>unregister_uninstall</code>, <code>read_user_path</code>, <code>reg_exe</code></span>
 </li>
 </ul>
@@ -181,47 +181,47 @@
 <a href="install.src.html#fn-add_to_path-2">
 <rect x="419.7" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="478.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">add_to_path</text>
-<text x="478.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 340</text>
+<text x="478.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
 </a>
 <a href="install.src.html#fn-register_uninstall">
 <rect x="244.8" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="331.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">register_uninstall</text>
-<text x="331.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 350</text>
+<text x="331.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 351</text>
 </a>
 <a href="install.src.html#fn-register_uninstall-2">
 <rect x="244.8" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="331.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">register_uninstall</text>
-<text x="331.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 389</text>
+<text x="331.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
 </a>
 <a href="install.src.html#fn-remove_from_path">
 <rect x="29.6" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="108.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_from_path</text>
-<text x="108.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 394</text>
+<text x="108.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
 </a>
 <a href="install.src.html#fn-remove_from_path-2">
 <rect x="29.6" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="108.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_from_path</text>
-<text x="108.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 439</text>
+<text x="108.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 440</text>
 </a>
 <a href="install.src.html#fn-unregister_uninstall">
 <rect x="427.8" y="320.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="522.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unregister_uninstall</text>
-<text x="522.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 444</text>
+<text x="522.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
 </a>
 <a href="install.src.html#fn-unregister_uninstall-2">
 <rect x="427.8" y="320.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="522.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unregister_uninstall</text>
-<text x="522.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 453</text>
+<text x="522.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 454</text>
 </a>
 <a href="install.src.html#fn-install">
 <rect x="213.8" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="260.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="260.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 458</text>
+<text x="260.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 459</text>
 </a>
 <a href="install.src.html#fn-uninstall">
 <rect x="332.3" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="382.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">uninstall</text>
-<text x="382.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 485</text>
+<text x="382.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 486</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -249,15 +249,15 @@ flowchart TD
     n_copy_programs[&quot;copy_programs&lt;br/&gt;line 192&quot;]
     n_add_to_path[&quot;add_to_path&lt;br/&gt;line 234&quot;]
     n_read_user_path[&quot;read_user_path&lt;br/&gt;line 296&quot;]
-    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 340&quot;]
-    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 350&quot;]
-    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 389&quot;]
-    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 394&quot;]
-    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 439&quot;]
-    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 444&quot;]
-    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 453&quot;]
-    n_install([&quot;install&lt;br/&gt;line 458&quot;])
-    n_uninstall([&quot;uninstall&lt;br/&gt;line 485&quot;])
+    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 341&quot;]
+    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 351&quot;]
+    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 390&quot;]
+    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 395&quot;]
+    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 440&quot;]
+    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 445&quot;]
+    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 454&quot;]
+    n_install([&quot;install&lt;br/&gt;line 459&quot;])
+    n_uninstall([&quot;uninstall&lt;br/&gt;line 486&quot;])
     n_add_to_path --&gt; n_read_user_path
     n_add_to_path --&gt; n_reg_exe
     n_bin_dir --&gt; n_prefix
@@ -289,15 +289,15 @@ flowchart TD
     click n_copy_programs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L192&quot; &quot;open the source&quot;
     click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L234&quot; &quot;open the source&quot;
     click n_read_user_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L296&quot; &quot;open the source&quot;
-    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L340&quot; &quot;open the source&quot;
-    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L350&quot; &quot;open the source&quot;
-    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L389&quot; &quot;open the source&quot;
-    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L394&quot; &quot;open the source&quot;
-    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L439&quot; &quot;open the source&quot;
-    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L444&quot; &quot;open the source&quot;
-    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L453&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L458&quot; &quot;open the source&quot;
-    click n_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L485&quot; &quot;open the source&quot;
+    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L341&quot; &quot;open the source&quot;
+    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L351&quot; &quot;open the source&quot;
+    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L390&quot; &quot;open the source&quot;
+    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L395&quot; &quot;open the source&quot;
+    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L440&quot; &quot;open the source&quot;
+    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L445&quot; &quot;open the source&quot;
+    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L454&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L459&quot; &quot;open the source&quot;
+    click n_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L486&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_install,n_uninstall entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -323,15 +323,15 @@ flowchart TD
 <tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path">234</a></td><td>Add dir to the user&#x27;s PATH, if it is not there already.</td></tr>
 <tr><td><code>UserPath</code> <sub>enum</sub></td><td><a href="install.src.html#fn-userpath">276</a></td><td></td></tr>
 <tr><td><code>read_user_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-read_user_path">296</a></td><td>Read this user&#x27;s PATH, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</td></tr>
-<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path-2">340</a></td><td></td></tr>
-<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall">350</a></td><td>Register with Add/Remove Programs, so the system can list and remove it.</td></tr>
-<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall-2">389</a></td><td></td></tr>
-<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path">394</a></td><td></td></tr>
-<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path-2">439</a></td><td></td></tr>
-<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall">444</a></td><td></td></tr>
-<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall-2">453</a></td><td></td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-install">458</a></td><td>Install for this user.</td></tr>
-<tr><td><code>uninstall</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-uninstall">485</a></td><td>Remove what install added.</td></tr>
+<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path-2">341</a></td><td></td></tr>
+<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall">351</a></td><td>Register with Add/Remove Programs, so the system can list and remove it.</td></tr>
+<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall-2">390</a></td><td></td></tr>
+<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path">395</a></td><td></td></tr>
+<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path-2">440</a></td><td></td></tr>
+<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall">445</a></td><td></td></tr>
+<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall-2">454</a></td><td></td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-install">459</a></td><td>Install for this user.</td></tr>
+<tr><td><code>uninstall</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-uninstall">486</a></td><td>Remove what install added.</td></tr>
 </tbody></table>
 </section>
 </div></div>

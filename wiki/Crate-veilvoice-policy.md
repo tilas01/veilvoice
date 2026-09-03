@@ -92,7 +92,7 @@ is a rule they will trip over.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>167 lines"])
-    n_mandate["mandate.rs<br/>406 lines"]
+    n_mandate["mandate.rs<br/>511 lines"]
     n_policy["policy.rs<br/>984 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs" "open the source"
     click n_mandate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" "open the source"
@@ -106,5 +106,5 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-policy-lib]] | 167 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
-| [[`mandate.rs`|File-veilvoice-policy-mandate]] | 406 | The two things VeilVoice insists on unless you say otherwise. |
+| [[`mandate.rs`|File-veilvoice-policy-mandate]] | 511 | The two things VeilVoice insists on unless you say otherwise. |
 | [[`policy.rs`|File-veilvoice-policy-policy]] | 984 | The policy itself: what can be required, and what requiring it does. |

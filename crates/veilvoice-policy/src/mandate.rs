@@ -298,9 +298,114 @@ fn yesno(value: bool) -> &'static str {
     }
 }
 
+impl Change {
+    /// When the change was made, as a UTC civil timestamp.
+    pub fn when(&self) -> String {
+        utc(self.at)
+    }
+
+    /// A whole sentence describing the change, for a log a person reads.
+    pub fn describe(&self) -> String {
+        let what = match self.field {
+            Field::AppLock => "the app lock",
+            Field::Encryption => "encryption of recordings at rest",
+        };
+        if self.to {
+            format!("{}  insisted on {what} again", self.when())
+        } else {
+            format!("{}  stopped insisting on {what}", self.when())
+        }
+    }
+}
+
+/// Unix seconds as `YYYY-MM-DD HH:MM:SS UTC`.
+///
+/// Written out rather than pulled from a date crate. The history is the one
+/// place this program shows a wall-clock time it did not get from the operating
+/// system's own formatter, and a dependency whose whole job is this line would
+/// be a supply chain nobody has read, for one line.
+///
+/// UTC, always, and it says so. A local time here would be a time whose meaning
+/// depends on where the reader was standing when they read it, in a log whose
+/// entire purpose is to settle when something happened.
+pub fn utc(seconds: i64) -> String {
+    // `div_euclid` rather than `/`: a timestamp before 1970 is negative, and
+    // truncating division would put it in the wrong day and then compute a
+    // negative time of day from it.
+    let days = seconds.div_euclid(86_400);
+    let rest = seconds.rem_euclid(86_400);
+    let (y, m, d) = civil_from_days(days);
+    format!(
+        "{y:04}-{m:02}-{d:02} {:02}:{:02}:{:02} UTC",
+        rest / 3600,
+        (rest % 3600) / 60,
+        rest % 60
+    )
+}
+
+/// Days since 1970-01-01 to a civil year, month and day.
+///
+/// Howard Hinnant's `civil_from_days`, which is exact for the whole proleptic
+/// Gregorian calendar and needs no table of month lengths or leap years: the
+/// era arithmetic makes 1 March the start of the year, so the leap day lands at
+/// the end where it stops being a special case.
+fn civil_from_days(z: i64) -> (i64, u32, u32) {
+    let z = z + 719_468;
+    let era = if z >= 0 { z } else { z - 146_096 } / 146_097;
+    let doe = z - era * 146_097; // [0, 146096]
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365; // [0, 399]
+    let y = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100); // [0, 365]
+    let mp = (5 * doy + 2) / 153; // [0, 11], March-based
+    let d = (doy - (153 * mp + 2) / 5 + 1) as u32; // [1, 31]
+    let m = if mp < 10 { mp + 3 } else { mp - 9 } as u32; // [1, 12]
+    (if m <= 2 { y + 1 } else { y }, m, d)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_epoch_and_the_dates_that_usually_break_this() {
+        // Checked against a calendar, not against another run of this code.
+        assert_eq!(utc(0), "1970-01-01 00:00:00 UTC");
+        assert_eq!(utc(86_399), "1970-01-01 23:59:59 UTC");
+        assert_eq!(utc(86_400), "1970-01-02 00:00:00 UTC");
+        // A leap day, in a year divisible by four.
+        assert_eq!(utc(1_709_164_800), "2024-02-29 00:00:00 UTC");
+        // 2000 is a leap year (divisible by 400) and 1900 was not (divisible
+        // by 100 but not 400). Both are where naive leap-year code goes wrong.
+        assert_eq!(utc(951_782_400), "2000-02-29 00:00:00 UTC");
+        assert_eq!(utc(-2_203_891_200), "1900-03-01 00:00:00 UTC");
+        // The end of a year, and the start of the next.
+        assert_eq!(utc(1_767_225_599), "2025-12-31 23:59:59 UTC");
+        assert_eq!(utc(1_767_225_600), "2026-01-01 00:00:00 UTC");
+    }
+
+    #[test]
+    fn a_time_before_the_epoch_does_not_wrap_into_a_negative_clock() {
+        // Truncating division would render this as the wrong day with a
+        // negative hour. Every field has to stay in range.
+        let text = utc(-1);
+        assert_eq!(text, "1969-12-31 23:59:59 UTC");
+        assert!(!text.contains('-') || text.starts_with("1969"));
+    }
+
+    #[test]
+    fn a_change_describes_itself_in_both_directions() {
+        let mut m = Mandate::default();
+        m.set_at(Field::Encryption, false, 1_767_225_600);
+        let off = m.history()[0].describe();
+        assert!(off.contains("2026-01-01"), "{off}");
+        assert!(off.contains("stopped insisting"), "{off}");
+        assert!(off.contains("encryption"), "{off}");
+
+        m.set_at(Field::Encryption, true, 1_767_225_600);
+        let on = m.history()[1].describe();
+        assert!(on.contains("insisted on"), "{on}");
+        assert!(!on.contains("stopped"), "{on}");
+    }
 
     #[test]
     fn the_default_requires_both() {

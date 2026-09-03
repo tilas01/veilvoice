@@ -67,6 +67,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`input.rs`|File-veilvoice-cli-input]] &middot; veilvoice input shows which running programs can see your keyboard and mouse.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &middot; veilvoice lock manages the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &middot; veilvoice, the command-line interface.
+- [[`mandate.rs`|File-veilvoice-cli-mandate]] &middot; veilvoice mandate -- the two things VeilVoice insists on, and how to stop.
 - [[`meter.rs`|File-veilvoice-cli-meter]] &middot; Level meters for veilvoice live, on a scale that means something.
 - [[`policy.rs`|File-veilvoice-cli-policy]] &middot; veilvoice policy -- settings that can only be tightened.
 - [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &middot; veilvoice privilege shows what VeilVoice runs with, and what it can see.

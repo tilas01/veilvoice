@@ -87,7 +87,7 @@ flowchart TD
     n_extracted["extracted.rs<br/>312 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
-    n_tests["tests.rs<br/>497 lines"]
+    n_tests["tests.rs<br/>587 lines"]
     n_builder --> n_deps
     n_builder --> n_report
     n_lib --> n_report
@@ -114,5 +114,5 @@ flowchart TD
 | [[`fetch.rs`|File-veilvoice-verify-fetch]] | 329 | Download a release, without putting an HTTP client in the dependency graph. |
 | [[`lib.rs`|File-veilvoice-verify-lib]] | 1888 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
-| [[`tests.rs`|File-veilvoice-verify-tests]] | 497 | The verifier's own tests. |
+| [[`tests.rs`|File-veilvoice-verify-tests]] | 587 | The verifier's own tests. |
 | [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] | 208 | Marker 97. |

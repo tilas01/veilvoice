@@ -79,6 +79,7 @@ mod guard;
 mod gui;
 mod input;
 mod lock;
+mod mandate;
 mod priv_mode;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
@@ -373,6 +374,23 @@ enum Command {
     Policy {
         #[command(subcommand)]
         what: PolicyCommand,
+    },
+
+    /// The two things VeilVoice insists on, unless you say otherwise.
+    ///
+    /// By default it wants a password for itself and encrypts every recording
+    /// where it is stored. Both are on without anybody choosing them, because
+    /// both protect the same thing: de-identification takes the voiceprint out
+    /// of a recording and leaves every word that was said in it.
+    ///
+    /// This is the one place in VeilVoice that can make it *less* strict, and
+    /// it is the opposite tool to `veilvoice policy`. A sealed policy is
+    /// somebody setting rules for somebody else and can only tighten; this is
+    /// your own baseline for your own machine, and you may relax it. Doing so
+    /// is written down with the date, so the choice is never a mystery later.
+    Mandate {
+        #[command(subcommand)]
+        what: MandateCommand,
     },
 
     /// A recording with several people in it: a voice each, and subtitles.
@@ -844,6 +862,42 @@ enum CaptureCommand {
     Check,
 }
 
+/// What `veilvoice mandate` can do.
+#[derive(Subcommand)]
+enum MandateCommand {
+    /// What is required now, and where it is written down.
+    Status,
+
+    /// Stop insisting on a requirement. Asks before it does it.
+    Relax {
+        /// Stop requiring a password for VeilVoice itself.
+        #[arg(long)]
+        app_lock: bool,
+        /// Stop requiring recordings to be encrypted where they are stored.
+        #[arg(long)]
+        encryption: bool,
+        /// Proceed rather than explaining what would happen.
+        #[arg(long)]
+        yes: bool,
+    },
+
+    /// Insist on a requirement again.
+    Insist {
+        /// Require a password for VeilVoice itself.
+        #[arg(long)]
+        app_lock: bool,
+        /// Require recordings to be encrypted where they are stored.
+        #[arg(long)]
+        encryption: bool,
+    },
+
+    /// Go back to insisting on both.
+    Reset,
+
+    /// Every change that has been made, oldest first.
+    History,
+}
+
 /// What `veilvoice policy` can do.
 #[derive(Subcommand)]
 enum PolicyCommand {
@@ -1231,7 +1285,9 @@ fn run(command: Command) -> Result<(), String> {
                     println!(
                         "{}",
                         warn(
-                            "VeilVoice never checks for updates and cannot tell you                              when one exists -- it has no network code at all.                              Watch the releases page, and verify what you download."
+                            "VeilVoice never checks for updates and cannot tell you when \
+                             one exists -- it has no network code at all. Watch the \
+                             releases page, and verify what you download."
                         )
                     );
                     Ok(())
@@ -1367,6 +1423,21 @@ fn run(command: Command) -> Result<(), String> {
                     Ok(())
                 }
             }
+        },
+
+        Command::Mandate { what } => match what {
+            MandateCommand::Status => mandate::status(),
+            MandateCommand::Relax {
+                app_lock,
+                encryption,
+                yes,
+            } => mandate::relax(app_lock, encryption, yes),
+            MandateCommand::Insist {
+                app_lock,
+                encryption,
+            } => mandate::insist(app_lock, encryption),
+            MandateCommand::Reset => mandate::reset(),
+            MandateCommand::History => mandate::history(),
         },
 
         Command::Policy { what } => match what {
@@ -2880,7 +2951,8 @@ mod tests {
                             };
                             if !known {
                                 problems.push(format!(
-                                    "{name}:{}: `veilvoice verify {word}` is documented,                                      and the verifier's own help does not mention it",
+                                    "{name}:{}: `veilvoice verify {word}` is documented, \
+                                     and the verifier's own help does not mention it",
                                     number + 1,
                                 ));
                             }

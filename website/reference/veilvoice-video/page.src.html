@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/page.rs</code></h1>
-<p style="color:var(--muted)"><a href="page.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1029 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="page.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1030 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -789,329 +789,330 @@
 <span class="ln" id="L704">        ] {</span>
 <span class="ln" id="L705">            assert!(</span>
 <span class="ln" id="L706">                !markup.<span class="tok-fn">contains</span>(detail),</span>
-<span class="ln" id="L707">                <span class="tok-str">&quot;{detail:?} describes the engine and does not belong in a file                  somebody shares&quot;</span></span>
-<span class="ln" id="L708">            );</span>
-<span class="ln" id="L709">        }</span>
-<span class="ln" id="L710">    }</span>
-<span class="ln" id="L711"></span>
-<span class="ln" id="L712">    <span class="tok-com">/// The circle that is lit must be the one whose turn it is.</span></span>
-<span class="ln" id="L713">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L714">    <span class="tok-kw">fn</span> <span class="tok-fn">the_speaker_who_is_talking_is_the_one_that_is_lit</span>() {</span>
-<span class="ln" id="L715">        <span class="tok-kw">let</span> first = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
-<span class="ln" id="L716">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L717">            .markup;</span>
-<span class="ln" id="L718">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L719">        assert!(</span>
-<span class="ln" id="L720">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
-<span class="ln" id="L721">            <span class="tok-str">&quot;slot 0 at 1 s&quot;</span></span>
-<span class="ln" id="L722">        );</span>
-<span class="ln" id="L723">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L724">        assert!(</span>
-<span class="ln" id="L725">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;0.35\&quot;&quot;</span>),</span>
-<span class="ln" id="L726">            <span class="tok-str">&quot;slot 1 at 1 s&quot;</span></span>
-<span class="ln" id="L727">        );</span>
-<span class="ln" id="L728"></span>
-<span class="ln" id="L729">        <span class="tok-kw">let</span> later = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">3.0</span>)</span>
-<span class="ln" id="L730">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L731">            .markup;</span>
-<span class="ln" id="L732">        <span class="tok-kw">let</span> at = later.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L733">        assert!(</span>
-<span class="ln" id="L734">            later[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
-<span class="ln" id="L735">            <span class="tok-str">&quot;slot 1 at 3 s&quot;</span></span>
-<span class="ln" id="L736">        );</span>
-<span class="ln" id="L737">    }</span>
-<span class="ln" id="L738"></span>
-<span class="ln" id="L739">    <span class="tok-com">/// An interruption is two people talking, and dimming one would be</span></span>
-<span class="ln" id="L740">    <span class="tok-com">/// choosing a winner the audio did not.</span></span>
-<span class="ln" id="L741">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L742">    <span class="tok-kw">fn</span> <span class="tok-fn">two_people_talking_at_once_are_both_lit</span>() {</span>
-<span class="ln" id="L743">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">plan</span>();</span>
-<span class="ln" id="L744">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L745">            start: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L746">            end: <span class="tok-num">1.5</span>,</span>
-<span class="ln" id="L747">            speaker: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L748">            text: None,</span>
-<span class="ln" id="L749">        })</span>
-<span class="ln" id="L750">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L751">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
-<span class="ln" id="L752">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L753">            .markup;</span>
-<span class="ln" id="L754">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L755">            <span class="tok-kw">let</span> at = markup.<span class="tok-fn">find</span>(&amp;format!(<span class="tok-str">&quot;id=\&quot;speaker{slot}\&quot;&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L756">            assert!(</span>
-<span class="ln" id="L757">                markup[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
-<span class="ln" id="L758">                <span class="tok-str">&quot;slot {slot} should be lit during an interruption&quot;</span></span>
-<span class="ln" id="L759">            );</span>
-<span class="ln" id="L760">        }</span>
-<span class="ln" id="L761">    }</span>
-<span class="ln" id="L762"></span>
-<span class="ln" id="L763">    <span class="tok-com">/// A name containing markup must not end the element it is in.</span></span>
-<span class="ln" id="L764">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L765">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_break_out_of_the_markup</span>() {</span>
-<span class="ln" id="L766">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L767">        plan.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L768">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>))</span>
-<span class="ln" id="L769">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L770">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L771">            start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L772">            end: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L773">            speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L774">            text: None,</span>
-<span class="ln" id="L775">        })</span>
-<span class="ln" id="L776">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L777">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>)</span>
-<span class="ln" id="L778">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L779">            .markup;</span>
-<span class="ln" id="L780">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;&quot;</span>), <span class="tok-str">&quot;a script element survived&quot;</span>);</span>
-<span class="ln" id="L781">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>), <span class="tok-str">&quot;an element survived&quot;</span>);</span>
-<span class="ln" id="L782">        assert!(markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&amp;lt;/text&amp;gt;&quot;</span>), <span class="tok-str">&quot;it must be escaped&quot;</span>);</span>
-<span class="ln" id="L783"></span>
-<span class="ln" id="L784">        <span class="tok-kw">let</span> page = <span class="tok-fn">player</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;a.wav&quot;</span>, <span class="tok-str">&quot;a.vtt&quot;</span>)</span>
-<span class="ln" id="L785">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L786">            .markup;</span>
-<span class="ln" id="L787">        assert!(</span>
-<span class="ln" id="L788">            !page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>),</span>
-<span class="ln" id="L789">            <span class="tok-str">&quot;the title escaped into the page&quot;</span></span>
-<span class="ln" id="L790">        );</span>
-<span class="ln" id="L791">    }</span>
-<span class="ln" id="L792"></span>
-<span class="ln" id="L793">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L794">    <span class="tok-kw">fn</span> <span class="tok-fn">escaping_covers_every_character_that_matters</span>() {</span>
-<span class="ln" id="L795">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;a&amp;b&quot;</span>), <span class="tok-str">&quot;a&amp;amp;b&quot;</span>);</span>
-<span class="ln" id="L796">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;&lt;b&gt;&quot;</span>), <span class="tok-str">&quot;&amp;lt;b&amp;gt;&quot;</span>);</span>
-<span class="ln" id="L797">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;\&quot;&#x27;&quot;</span>), <span class="tok-str">&quot;&amp;quot;&amp;#39;&quot;</span>);</span>
-<span class="ln" id="L798">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;plain&quot;</span>), <span class="tok-str">&quot;plain&quot;</span>);</span>
-<span class="ln" id="L799">    }</span>
-<span class="ln" id="L800"></span>
-<span class="ln" id="L801">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L802">    <span class="tok-kw">fn</span> <span class="tok-fn">the_player_is_a_whole_page_that_needs_nothing_else</span>() {</span>
-<span class="ln" id="L803">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">player</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;out.wav&quot;</span>, <span class="tok-str">&quot;out.vtt&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L804">        <span class="tok-kw">let</span> page = &amp;drawn.markup;</span>
-<span class="ln" id="L805">        assert!(page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;&lt;!DOCTYPE html&gt;&quot;</span>));</span>
-<span class="ln" id="L806">        assert!(page.<span class="tok-fn">trim_end</span>().<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;&lt;/html&gt;&quot;</span>));</span>
-<span class="ln" id="L807">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;svg &quot;</span>), <span class="tok-str">&quot;the picture is inline&quot;</span>);</span>
-<span class="ln" id="L808">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.wav\&quot;&quot;</span>));</span>
-<span class="ln" id="L809">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.vtt\&quot;&quot;</span>));</span>
-<span class="ln" id="L810">        assert!(</span>
-<span class="ln" id="L811">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;noscript&gt;&quot;</span>),</span>
-<span class="ln" id="L812">            <span class="tok-str">&quot;the script must explain itself&quot;</span></span>
-<span class="ln" id="L813">        );</span>
-<span class="ln" id="L814">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing veils a name&quot;</span>));</span>
-<span class="ln" id="L815">        <span class="tok-com">// Nothing may be fetched from anywhere. The SVG namespace is a URI and</span></span>
-<span class="ln" id="L816">        <span class="tok-com">// not a URL -- no browser resolves it, and every SVG document must</span></span>
-<span class="ln" id="L817">        <span class="tok-com">// declare it -- so it is excluded by name rather than by pretending</span></span>
-<span class="ln" id="L818">        <span class="tok-com">// the string is not there.</span></span>
-<span class="ln" id="L819">        <span class="tok-kw">let</span> fetchable = page.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;http://www.w3.org/2000/svg&quot;</span>, <span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L820">        <span class="tok-kw">for</span> scheme <span class="tok-kw">in</span> [<span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;https://&quot;</span>] {</span>
-<span class="ln" id="L821">            assert!(</span>
-<span class="ln" id="L822">                !fetchable.<span class="tok-fn">contains</span>(scheme),</span>
-<span class="ln" id="L823">                <span class="tok-str">&quot;the page reaches the network: {:?}&quot;</span>,</span>
-<span class="ln" id="L824">                fetchable</span>
-<span class="ln" id="L825">                    .<span class="tok-fn">find</span>(scheme)</span>
-<span class="ln" id="L826">                    .<span class="tok-fn">map</span>(|at| &amp;fetchable[at..(at + <span class="tok-num">60</span>).<span class="tok-fn">min</span>(fetchable.<span class="tok-fn">len</span>())])</span>
-<span class="ln" id="L827">            );</span>
-<span class="ln" id="L828">        }</span>
-<span class="ln" id="L829">        assert!(</span>
-<span class="ln" id="L830">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;width=device-width&quot;</span>),</span>
-<span class="ln" id="L831">            <span class="tok-str">&quot;it must work on a phone&quot;</span></span>
-<span class="ln" id="L832">        );</span>
-<span class="ln" id="L833">    }</span>
-<span class="ln" id="L834"></span>
-<span class="ln" id="L835">    <span class="tok-com">/// A look that cannot be drawn is refused rather than producing an</span></span>
-<span class="ln" id="L836">    <span class="tok-com">/// illegible picture that looks like a design decision.</span></span>
-<span class="ln" id="L837">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L838">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_look_is_refused</span>() {</span>
-<span class="ln" id="L839">        <span class="tok-kw">for</span> look <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L840">            Look {</span>
-<span class="ln" id="L841">                width: <span class="tok-num">100</span>,</span>
-<span class="ln" id="L842">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L843">            },</span>
-<span class="ln" id="L844">            Look {</span>
-<span class="ln" id="L845">                height: <span class="tok-num">100</span>,</span>
-<span class="ln" id="L846">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L847">            },</span>
-<span class="ln" id="L848">            Look {</span>
-<span class="ln" id="L849">                width: <span class="tok-num">9000</span>,</span>
-<span class="ln" id="L850">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L851">            },</span>
-<span class="ln" id="L852">            Look {</span>
-<span class="ln" id="L853">                padding: <span class="tok-num">600</span>,</span>
-<span class="ln" id="L854">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L855">            },</span>
-<span class="ln" id="L856">            Look {</span>
-<span class="ln" id="L857">                background: Background::<span class="tok-fn">Colour</span>(<span class="tok-str">&quot;nonsense&quot;</span>.<span class="tok-fn">into</span>()),</span>
-<span class="ln" id="L858">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L859">            },</span>
-<span class="ln" id="L860">        ] {</span>
-<span class="ln" id="L861">            assert!(look.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{look:?} should be refused&quot;</span>);</span>
-<span class="ln" id="L862">            assert!(<span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;look, <span class="tok-num">0.0</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L863">        }</span>
-<span class="ln" id="L864">        Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L865">            .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L866">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the default must be drawable&quot;</span>);</span>
-<span class="ln" id="L867">        Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L868">            .<span class="tok-fn">black</span>()</span>
-<span class="ln" id="L869">            .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L870">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;black must be drawable&quot;</span>);</span>
-<span class="ln" id="L871">    }</span>
-<span class="ln" id="L872"></span>
-<span class="ln" id="L873">    <span class="tok-com">/// Padding is a setting because the same picture is wanted at very</span></span>
-<span class="ln" id="L874">    <span class="tok-com">/// different sizes, so it has to actually move things.</span></span>
-<span class="ln" id="L875">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L876">    <span class="tok-kw">fn</span> <span class="tok-fn">more_padding_leaves_less_room_for_the_waveform</span>() {</span>
-<span class="ln" id="L877">        <span class="tok-kw">let</span> tight = <span class="tok-fn">layout</span>(</span>
-<span class="ln" id="L878">            &amp;Look {</span>
-<span class="ln" id="L879">                padding: <span class="tok-num">8</span>,</span>
-<span class="ln" id="L880">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L881">            },</span>
-<span class="ln" id="L882">            <span class="tok-num">2</span>,</span>
-<span class="ln" id="L883">        );</span>
-<span class="ln" id="L884">        <span class="tok-kw">let</span> loose = <span class="tok-fn">layout</span>(</span>
-<span class="ln" id="L885">            &amp;Look {</span>
-<span class="ln" id="L886">                padding: <span class="tok-num">120</span>,</span>
-<span class="ln" id="L887">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L888">            },</span>
-<span class="ln" id="L889">            <span class="tok-num">2</span>,</span>
-<span class="ln" id="L890">        );</span>
-<span class="ln" id="L891">        assert!(loose.wave_width &lt; tight.wave_width);</span>
-<span class="ln" id="L892">        assert!(loose.wave_x &gt; tight.wave_x);</span>
-<span class="ln" id="L893">    }</span>
-<span class="ln" id="L894"></span>
-<span class="ln" id="L895">    <span class="tok-com">/// Everything must stay inside the picture, at any speaker count.</span></span>
-<span class="ln" id="L896">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L897">    <span class="tok-kw">fn</span> <span class="tok-fn">the_layout_stays_inside_the_frame_for_every_speaker_count</span>() {</span>
-<span class="ln" id="L898">        <span class="tok-kw">let</span> look = Look::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L899">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">10</span> {</span>
-<span class="ln" id="L900">            <span class="tok-kw">let</span> layout = <span class="tok-fn">layout</span>(&amp;look, speakers);</span>
-<span class="ln" id="L901">            assert!(layout.wave_x &gt;= look.padding <span class="tok-kw">as</span> f32 - <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L902">            assert!(layout.wave_x + layout.wave_width &lt;= (look.width - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L903">            assert!(</span>
-<span class="ln" id="L904">                layout.wave_y + layout.wave_height &lt;= (look.height - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span></span>
-<span class="ln" id="L905">            );</span>
-<span class="ln" id="L906">            assert!(layout.circles_y - layout.radius &gt; layout.title_y);</span>
-<span class="ln" id="L907">            assert!(</span>
-<span class="ln" id="L908">                layout.circles_y + layout.radius &lt; layout.wave_y,</span>
-<span class="ln" id="L909">                <span class="tok-str">&quot;{speakers} speakers: the circles overlap the waveform&quot;</span></span>
-<span class="ln" id="L910">            );</span>
-<span class="ln" id="L911">            assert!(layout.radius &gt;= <span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L912">        }</span>
-<span class="ln" id="L913">    }</span>
-<span class="ln" id="L914"></span>
-<span class="ln" id="L915">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L916">    <span class="tok-kw">fn</span> <span class="tok-fn">base64_matches_the_standard_including_its_padding</span>() {</span>
-<span class="ln" id="L917">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;&quot;</span>), <span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L918">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;f&quot;</span>), <span class="tok-str">&quot;Zg==&quot;</span>);</span>
-<span class="ln" id="L919">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fo&quot;</span>), <span class="tok-str">&quot;Zm8=&quot;</span>);</span>
-<span class="ln" id="L920">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foo&quot;</span>), <span class="tok-str">&quot;Zm9v&quot;</span>);</span>
-<span class="ln" id="L921">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foob&quot;</span>), <span class="tok-str">&quot;Zm9vYg==&quot;</span>);</span>
-<span class="ln" id="L922">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fooba&quot;</span>), <span class="tok-str">&quot;Zm9vYmE=&quot;</span>);</span>
-<span class="ln" id="L923">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foobar&quot;</span>), <span class="tok-str">&quot;Zm9vYmFy&quot;</span>);</span>
-<span class="ln" id="L924">    }</span>
-<span class="ln" id="L925"></span>
-<span class="ln" id="L926">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L927">    <span class="tok-kw">fn</span> <span class="tok-fn">an_image_becomes_a_data_uri_and_an_unknown_one_is_refused</span>() {</span>
-<span class="ln" id="L928">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L929">        <span class="tok-kw">let</span> png = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.png&quot;</span>);</span>
-<span class="ln" id="L930">        std::fs::<span class="tok-fn">write</span>(&amp;png, b<span class="tok-str">&quot;not really a png, but the bytes go through&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L931">        <span class="tok-kw">let</span> uri = <span class="tok-fn">data_uri</span>(&amp;png).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L932">        assert!(uri.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>), <span class="tok-str">&quot;{uri}&quot;</span>);</span>
-<span class="ln" id="L933"></span>
-<span class="ln" id="L934">        <span class="tok-kw">let</span> bmp = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.bmp&quot;</span>);</span>
-<span class="ln" id="L935">        std::fs::<span class="tok-fn">write</span>(&amp;bmp, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L936">        <span class="tok-kw">let</span> error = <span class="tok-fn">data_uri</span>(&amp;bmp).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unknown type must be refused&quot;</span>);</span>
-<span class="ln" id="L937">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not an image this can embed&quot;</span>));</span>
-<span class="ln" id="L938">        assert!(<span class="tok-fn">data_uri</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;missing.png&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L939">    }</span>
-<span class="ln" id="L940"></span>
-<span class="ln" id="L941">    <span class="tok-com">/// A picture that cannot be used must draw the plain circle and say so,</span></span>
-<span class="ln" id="L942">    <span class="tok-com">/// rather than leaving a broken image that looks like a crash.</span></span>
-<span class="ln" id="L943">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L944">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unusable_picture_falls_back_and_is_reported</span>() {</span>
-<span class="ln" id="L945">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L946">        plan.<span class="tok-fn">add_speaker</span>(Speaker {</span>
-<span class="ln" id="L947">            name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L948">            picture: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;no-such-file.png&quot;</span>)),</span>
-<span class="ln" id="L949">        })</span>
-<span class="ln" id="L950">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L951">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L952">            start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L953">            end: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L954">            speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L955">            text: None,</span>
-<span class="ln" id="L956">        })</span>
-<span class="ln" id="L957">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L958">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L959">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;circle&quot;</span>), <span class="tok-str">&quot;the fallback circle&quot;</span>);</span>
-<span class="ln" id="L960">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;image &quot;</span>), <span class="tok-str">&quot;no broken image&quot;</span>);</span>
-<span class="ln" id="L961">        <span class="tok-kw">let</span> notes = drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
-<span class="ln" id="L962">        assert!(notes.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Sam&#x27;s picture was not used&quot;</span>), <span class="tok-str">&quot;{notes}&quot;</span>);</span>
-<span class="ln" id="L963">    }</span>
-<span class="ln" id="L964"></span>
-<span class="ln" id="L965">    <span class="tok-com">/// A background image is embedded so the page stays one file, and a large</span></span>
-<span class="ln" id="L966">    <span class="tok-com">/// one is reported rather than silently producing a huge page.</span></span>
-<span class="ln" id="L967">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L968">    <span class="tok-kw">fn</span> <span class="tok-fn">a_background_image_is_embedded_and_a_large_one_is_mentioned</span>() {</span>
-<span class="ln" id="L969">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L970">        <span class="tok-kw">let</span> small = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;bg.png&quot;</span>);</span>
-<span class="ln" id="L971">        std::fs::<span class="tok-fn">write</span>(&amp;small, vec![0u8; <span class="tok-num">64</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L972">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L973">            &amp;<span class="tok-fn">plan</span>(),</span>
-<span class="ln" id="L974">            &amp;<span class="tok-fn">envelope</span>(),</span>
-<span class="ln" id="L975">            &amp;Look {</span>
-<span class="ln" id="L976">                background: Background::<span class="tok-fn">Image</span>(small),</span>
-<span class="ln" id="L977">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L978">            },</span>
-<span class="ln" id="L979">            <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L980">        )</span>
-<span class="ln" id="L981">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L982">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>));</span>
-<span class="ln" id="L983">        assert!(drawn.notes.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;a small image needs no comment&quot;</span>);</span>
-<span class="ln" id="L984"></span>
-<span class="ln" id="L985">        <span class="tok-kw">let</span> big = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;big.png&quot;</span>);</span>
-<span class="ln" id="L986">        std::fs::<span class="tok-fn">write</span>(&amp;big, vec![0u8; <span class="tok-num">3</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L987">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L988">            &amp;<span class="tok-fn">plan</span>(),</span>
-<span class="ln" id="L989">            &amp;<span class="tok-fn">envelope</span>(),</span>
-<span class="ln" id="L990">            &amp;Look {</span>
-<span class="ln" id="L991">                background: Background::<span class="tok-fn">Image</span>(big),</span>
-<span class="ln" id="L992">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L993">            },</span>
-<span class="ln" id="L994">            <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L995">        )</span>
-<span class="ln" id="L996">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L997">        assert!(</span>
-<span class="ln" id="L998">            drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;adds about&quot;</span>),</span>
-<span class="ln" id="L999">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
-<span class="ln" id="L1000">            drawn.notes</span>
-<span class="ln" id="L1001">        );</span>
-<span class="ln" id="L1002">    }</span>
-<span class="ln" id="L1003"></span>
-<span class="ln" id="L1004">    <span class="tok-com">/// A missing background must not stop the picture being drawn.</span></span>
-<span class="ln" id="L1005">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1006">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_background_falls_back_and_says_so</span>() {</span>
-<span class="ln" id="L1007">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L1008">            &amp;<span class="tok-fn">plan</span>(),</span>
-<span class="ln" id="L1009">            &amp;<span class="tok-fn">envelope</span>(),</span>
-<span class="ln" id="L1010">            &amp;Look {</span>
-<span class="ln" id="L1011">                background: Background::<span class="tok-fn">Image</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;nowhere.png&quot;</span>)),</span>
-<span class="ln" id="L1012">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1013">            },</span>
-<span class="ln" id="L1014">            <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L1015">        )</span>
-<span class="ln" id="L1016">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1017">        assert!(drawn.markup.<span class="tok-fn">contains</span>(palette::BG));</span>
-<span class="ln" id="L1018">        assert!(drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;was not used&quot;</span>));</span>
-<span class="ln" id="L1019">    }</span>
-<span class="ln" id="L1020"></span>
-<span class="ln" id="L1021">    <span class="tok-com">/// An empty plan still draws: a recording with nobody assigned is a</span></span>
-<span class="ln" id="L1022">    <span class="tok-com">/// picture of a waveform, which is better than an error at this stage.</span></span>
-<span class="ln" id="L1023">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1024">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_no_speakers_still_draws_the_waveform</span>() {</span>
-<span class="ln" id="L1025">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;Conversation::<span class="tok-fn">new</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.0</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1026">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;path d=\&quot;M&quot;</span>));</span>
-<span class="ln" id="L1027">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>));</span>
-<span class="ln" id="L1028">    }</span>
-<span class="ln" id="L1029">}</span>
+<span class="ln" id="L707">                <span class="tok-str">&quot;{detail:?} describes the engine and does not belong in a file somebody \</span></span>
+<span class="ln" id="L708"><span class="tok-str">                 shares&quot;</span></span>
+<span class="ln" id="L709">            );</span>
+<span class="ln" id="L710">        }</span>
+<span class="ln" id="L711">    }</span>
+<span class="ln" id="L712"></span>
+<span class="ln" id="L713">    <span class="tok-com">/// The circle that is lit must be the one whose turn it is.</span></span>
+<span class="ln" id="L714">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L715">    <span class="tok-kw">fn</span> <span class="tok-fn">the_speaker_who_is_talking_is_the_one_that_is_lit</span>() {</span>
+<span class="ln" id="L716">        <span class="tok-kw">let</span> first = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
+<span class="ln" id="L717">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L718">            .markup;</span>
+<span class="ln" id="L719">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L720">        assert!(</span>
+<span class="ln" id="L721">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
+<span class="ln" id="L722">            <span class="tok-str">&quot;slot 0 at 1 s&quot;</span></span>
+<span class="ln" id="L723">        );</span>
+<span class="ln" id="L724">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L725">        assert!(</span>
+<span class="ln" id="L726">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;0.35\&quot;&quot;</span>),</span>
+<span class="ln" id="L727">            <span class="tok-str">&quot;slot 1 at 1 s&quot;</span></span>
+<span class="ln" id="L728">        );</span>
+<span class="ln" id="L729"></span>
+<span class="ln" id="L730">        <span class="tok-kw">let</span> later = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">3.0</span>)</span>
+<span class="ln" id="L731">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L732">            .markup;</span>
+<span class="ln" id="L733">        <span class="tok-kw">let</span> at = later.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L734">        assert!(</span>
+<span class="ln" id="L735">            later[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
+<span class="ln" id="L736">            <span class="tok-str">&quot;slot 1 at 3 s&quot;</span></span>
+<span class="ln" id="L737">        );</span>
+<span class="ln" id="L738">    }</span>
+<span class="ln" id="L739"></span>
+<span class="ln" id="L740">    <span class="tok-com">/// An interruption is two people talking, and dimming one would be</span></span>
+<span class="ln" id="L741">    <span class="tok-com">/// choosing a winner the audio did not.</span></span>
+<span class="ln" id="L742">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L743">    <span class="tok-kw">fn</span> <span class="tok-fn">two_people_talking_at_once_are_both_lit</span>() {</span>
+<span class="ln" id="L744">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">plan</span>();</span>
+<span class="ln" id="L745">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L746">            start: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L747">            end: <span class="tok-num">1.5</span>,</span>
+<span class="ln" id="L748">            speaker: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L749">            text: None,</span>
+<span class="ln" id="L750">        })</span>
+<span class="ln" id="L751">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L752">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
+<span class="ln" id="L753">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L754">            .markup;</span>
+<span class="ln" id="L755">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L756">            <span class="tok-kw">let</span> at = markup.<span class="tok-fn">find</span>(&amp;format!(<span class="tok-str">&quot;id=\&quot;speaker{slot}\&quot;&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L757">            assert!(</span>
+<span class="ln" id="L758">                markup[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
+<span class="ln" id="L759">                <span class="tok-str">&quot;slot {slot} should be lit during an interruption&quot;</span></span>
+<span class="ln" id="L760">            );</span>
+<span class="ln" id="L761">        }</span>
+<span class="ln" id="L762">    }</span>
+<span class="ln" id="L763"></span>
+<span class="ln" id="L764">    <span class="tok-com">/// A name containing markup must not end the element it is in.</span></span>
+<span class="ln" id="L765">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L766">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_break_out_of_the_markup</span>() {</span>
+<span class="ln" id="L767">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L768">        plan.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L769">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>))</span>
+<span class="ln" id="L770">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L771">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L772">            start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L773">            end: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L774">            speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L775">            text: None,</span>
+<span class="ln" id="L776">        })</span>
+<span class="ln" id="L777">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L778">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>)</span>
+<span class="ln" id="L779">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L780">            .markup;</span>
+<span class="ln" id="L781">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;&quot;</span>), <span class="tok-str">&quot;a script element survived&quot;</span>);</span>
+<span class="ln" id="L782">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>), <span class="tok-str">&quot;an element survived&quot;</span>);</span>
+<span class="ln" id="L783">        assert!(markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&amp;lt;/text&amp;gt;&quot;</span>), <span class="tok-str">&quot;it must be escaped&quot;</span>);</span>
+<span class="ln" id="L784"></span>
+<span class="ln" id="L785">        <span class="tok-kw">let</span> page = <span class="tok-fn">player</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;a.wav&quot;</span>, <span class="tok-str">&quot;a.vtt&quot;</span>)</span>
+<span class="ln" id="L786">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L787">            .markup;</span>
+<span class="ln" id="L788">        assert!(</span>
+<span class="ln" id="L789">            !page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>),</span>
+<span class="ln" id="L790">            <span class="tok-str">&quot;the title escaped into the page&quot;</span></span>
+<span class="ln" id="L791">        );</span>
+<span class="ln" id="L792">    }</span>
+<span class="ln" id="L793"></span>
+<span class="ln" id="L794">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L795">    <span class="tok-kw">fn</span> <span class="tok-fn">escaping_covers_every_character_that_matters</span>() {</span>
+<span class="ln" id="L796">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;a&amp;b&quot;</span>), <span class="tok-str">&quot;a&amp;amp;b&quot;</span>);</span>
+<span class="ln" id="L797">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;&lt;b&gt;&quot;</span>), <span class="tok-str">&quot;&amp;lt;b&amp;gt;&quot;</span>);</span>
+<span class="ln" id="L798">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;\&quot;&#x27;&quot;</span>), <span class="tok-str">&quot;&amp;quot;&amp;#39;&quot;</span>);</span>
+<span class="ln" id="L799">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;plain&quot;</span>), <span class="tok-str">&quot;plain&quot;</span>);</span>
+<span class="ln" id="L800">    }</span>
+<span class="ln" id="L801"></span>
+<span class="ln" id="L802">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L803">    <span class="tok-kw">fn</span> <span class="tok-fn">the_player_is_a_whole_page_that_needs_nothing_else</span>() {</span>
+<span class="ln" id="L804">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">player</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;out.wav&quot;</span>, <span class="tok-str">&quot;out.vtt&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L805">        <span class="tok-kw">let</span> page = &amp;drawn.markup;</span>
+<span class="ln" id="L806">        assert!(page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;&lt;!DOCTYPE html&gt;&quot;</span>));</span>
+<span class="ln" id="L807">        assert!(page.<span class="tok-fn">trim_end</span>().<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;&lt;/html&gt;&quot;</span>));</span>
+<span class="ln" id="L808">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;svg &quot;</span>), <span class="tok-str">&quot;the picture is inline&quot;</span>);</span>
+<span class="ln" id="L809">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.wav\&quot;&quot;</span>));</span>
+<span class="ln" id="L810">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.vtt\&quot;&quot;</span>));</span>
+<span class="ln" id="L811">        assert!(</span>
+<span class="ln" id="L812">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;noscript&gt;&quot;</span>),</span>
+<span class="ln" id="L813">            <span class="tok-str">&quot;the script must explain itself&quot;</span></span>
+<span class="ln" id="L814">        );</span>
+<span class="ln" id="L815">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing veils a name&quot;</span>));</span>
+<span class="ln" id="L816">        <span class="tok-com">// Nothing may be fetched from anywhere. The SVG namespace is a URI and</span></span>
+<span class="ln" id="L817">        <span class="tok-com">// not a URL -- no browser resolves it, and every SVG document must</span></span>
+<span class="ln" id="L818">        <span class="tok-com">// declare it -- so it is excluded by name rather than by pretending</span></span>
+<span class="ln" id="L819">        <span class="tok-com">// the string is not there.</span></span>
+<span class="ln" id="L820">        <span class="tok-kw">let</span> fetchable = page.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;http://www.w3.org/2000/svg&quot;</span>, <span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L821">        <span class="tok-kw">for</span> scheme <span class="tok-kw">in</span> [<span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;https://&quot;</span>] {</span>
+<span class="ln" id="L822">            assert!(</span>
+<span class="ln" id="L823">                !fetchable.<span class="tok-fn">contains</span>(scheme),</span>
+<span class="ln" id="L824">                <span class="tok-str">&quot;the page reaches the network: {:?}&quot;</span>,</span>
+<span class="ln" id="L825">                fetchable</span>
+<span class="ln" id="L826">                    .<span class="tok-fn">find</span>(scheme)</span>
+<span class="ln" id="L827">                    .<span class="tok-fn">map</span>(|at| &amp;fetchable[at..(at + <span class="tok-num">60</span>).<span class="tok-fn">min</span>(fetchable.<span class="tok-fn">len</span>())])</span>
+<span class="ln" id="L828">            );</span>
+<span class="ln" id="L829">        }</span>
+<span class="ln" id="L830">        assert!(</span>
+<span class="ln" id="L831">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;width=device-width&quot;</span>),</span>
+<span class="ln" id="L832">            <span class="tok-str">&quot;it must work on a phone&quot;</span></span>
+<span class="ln" id="L833">        );</span>
+<span class="ln" id="L834">    }</span>
+<span class="ln" id="L835"></span>
+<span class="ln" id="L836">    <span class="tok-com">/// A look that cannot be drawn is refused rather than producing an</span></span>
+<span class="ln" id="L837">    <span class="tok-com">/// illegible picture that looks like a design decision.</span></span>
+<span class="ln" id="L838">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L839">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_look_is_refused</span>() {</span>
+<span class="ln" id="L840">        <span class="tok-kw">for</span> look <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L841">            Look {</span>
+<span class="ln" id="L842">                width: <span class="tok-num">100</span>,</span>
+<span class="ln" id="L843">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L844">            },</span>
+<span class="ln" id="L845">            Look {</span>
+<span class="ln" id="L846">                height: <span class="tok-num">100</span>,</span>
+<span class="ln" id="L847">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L848">            },</span>
+<span class="ln" id="L849">            Look {</span>
+<span class="ln" id="L850">                width: <span class="tok-num">9000</span>,</span>
+<span class="ln" id="L851">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L852">            },</span>
+<span class="ln" id="L853">            Look {</span>
+<span class="ln" id="L854">                padding: <span class="tok-num">600</span>,</span>
+<span class="ln" id="L855">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L856">            },</span>
+<span class="ln" id="L857">            Look {</span>
+<span class="ln" id="L858">                background: Background::<span class="tok-fn">Colour</span>(<span class="tok-str">&quot;nonsense&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L859">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L860">            },</span>
+<span class="ln" id="L861">        ] {</span>
+<span class="ln" id="L862">            assert!(look.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{look:?} should be refused&quot;</span>);</span>
+<span class="ln" id="L863">            assert!(<span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;look, <span class="tok-num">0.0</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L864">        }</span>
+<span class="ln" id="L865">        Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L866">            .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L867">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the default must be drawable&quot;</span>);</span>
+<span class="ln" id="L868">        Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L869">            .<span class="tok-fn">black</span>()</span>
+<span class="ln" id="L870">            .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L871">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;black must be drawable&quot;</span>);</span>
+<span class="ln" id="L872">    }</span>
+<span class="ln" id="L873"></span>
+<span class="ln" id="L874">    <span class="tok-com">/// Padding is a setting because the same picture is wanted at very</span></span>
+<span class="ln" id="L875">    <span class="tok-com">/// different sizes, so it has to actually move things.</span></span>
+<span class="ln" id="L876">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L877">    <span class="tok-kw">fn</span> <span class="tok-fn">more_padding_leaves_less_room_for_the_waveform</span>() {</span>
+<span class="ln" id="L878">        <span class="tok-kw">let</span> tight = <span class="tok-fn">layout</span>(</span>
+<span class="ln" id="L879">            &amp;Look {</span>
+<span class="ln" id="L880">                padding: <span class="tok-num">8</span>,</span>
+<span class="ln" id="L881">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L882">            },</span>
+<span class="ln" id="L883">            <span class="tok-num">2</span>,</span>
+<span class="ln" id="L884">        );</span>
+<span class="ln" id="L885">        <span class="tok-kw">let</span> loose = <span class="tok-fn">layout</span>(</span>
+<span class="ln" id="L886">            &amp;Look {</span>
+<span class="ln" id="L887">                padding: <span class="tok-num">120</span>,</span>
+<span class="ln" id="L888">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L889">            },</span>
+<span class="ln" id="L890">            <span class="tok-num">2</span>,</span>
+<span class="ln" id="L891">        );</span>
+<span class="ln" id="L892">        assert!(loose.wave_width &lt; tight.wave_width);</span>
+<span class="ln" id="L893">        assert!(loose.wave_x &gt; tight.wave_x);</span>
+<span class="ln" id="L894">    }</span>
+<span class="ln" id="L895"></span>
+<span class="ln" id="L896">    <span class="tok-com">/// Everything must stay inside the picture, at any speaker count.</span></span>
+<span class="ln" id="L897">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L898">    <span class="tok-kw">fn</span> <span class="tok-fn">the_layout_stays_inside_the_frame_for_every_speaker_count</span>() {</span>
+<span class="ln" id="L899">        <span class="tok-kw">let</span> look = Look::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L900">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">10</span> {</span>
+<span class="ln" id="L901">            <span class="tok-kw">let</span> layout = <span class="tok-fn">layout</span>(&amp;look, speakers);</span>
+<span class="ln" id="L902">            assert!(layout.wave_x &gt;= look.padding <span class="tok-kw">as</span> f32 - <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L903">            assert!(layout.wave_x + layout.wave_width &lt;= (look.width - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L904">            assert!(</span>
+<span class="ln" id="L905">                layout.wave_y + layout.wave_height &lt;= (look.height - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span></span>
+<span class="ln" id="L906">            );</span>
+<span class="ln" id="L907">            assert!(layout.circles_y - layout.radius &gt; layout.title_y);</span>
+<span class="ln" id="L908">            assert!(</span>
+<span class="ln" id="L909">                layout.circles_y + layout.radius &lt; layout.wave_y,</span>
+<span class="ln" id="L910">                <span class="tok-str">&quot;{speakers} speakers: the circles overlap the waveform&quot;</span></span>
+<span class="ln" id="L911">            );</span>
+<span class="ln" id="L912">            assert!(layout.radius &gt;= <span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L913">        }</span>
+<span class="ln" id="L914">    }</span>
+<span class="ln" id="L915"></span>
+<span class="ln" id="L916">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L917">    <span class="tok-kw">fn</span> <span class="tok-fn">base64_matches_the_standard_including_its_padding</span>() {</span>
+<span class="ln" id="L918">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;&quot;</span>), <span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L919">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;f&quot;</span>), <span class="tok-str">&quot;Zg==&quot;</span>);</span>
+<span class="ln" id="L920">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fo&quot;</span>), <span class="tok-str">&quot;Zm8=&quot;</span>);</span>
+<span class="ln" id="L921">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foo&quot;</span>), <span class="tok-str">&quot;Zm9v&quot;</span>);</span>
+<span class="ln" id="L922">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foob&quot;</span>), <span class="tok-str">&quot;Zm9vYg==&quot;</span>);</span>
+<span class="ln" id="L923">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fooba&quot;</span>), <span class="tok-str">&quot;Zm9vYmE=&quot;</span>);</span>
+<span class="ln" id="L924">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foobar&quot;</span>), <span class="tok-str">&quot;Zm9vYmFy&quot;</span>);</span>
+<span class="ln" id="L925">    }</span>
+<span class="ln" id="L926"></span>
+<span class="ln" id="L927">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L928">    <span class="tok-kw">fn</span> <span class="tok-fn">an_image_becomes_a_data_uri_and_an_unknown_one_is_refused</span>() {</span>
+<span class="ln" id="L929">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L930">        <span class="tok-kw">let</span> png = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.png&quot;</span>);</span>
+<span class="ln" id="L931">        std::fs::<span class="tok-fn">write</span>(&amp;png, b<span class="tok-str">&quot;not really a png, but the bytes go through&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L932">        <span class="tok-kw">let</span> uri = <span class="tok-fn">data_uri</span>(&amp;png).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L933">        assert!(uri.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>), <span class="tok-str">&quot;{uri}&quot;</span>);</span>
+<span class="ln" id="L934"></span>
+<span class="ln" id="L935">        <span class="tok-kw">let</span> bmp = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.bmp&quot;</span>);</span>
+<span class="ln" id="L936">        std::fs::<span class="tok-fn">write</span>(&amp;bmp, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L937">        <span class="tok-kw">let</span> error = <span class="tok-fn">data_uri</span>(&amp;bmp).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unknown type must be refused&quot;</span>);</span>
+<span class="ln" id="L938">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not an image this can embed&quot;</span>));</span>
+<span class="ln" id="L939">        assert!(<span class="tok-fn">data_uri</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;missing.png&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L940">    }</span>
+<span class="ln" id="L941"></span>
+<span class="ln" id="L942">    <span class="tok-com">/// A picture that cannot be used must draw the plain circle and say so,</span></span>
+<span class="ln" id="L943">    <span class="tok-com">/// rather than leaving a broken image that looks like a crash.</span></span>
+<span class="ln" id="L944">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L945">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unusable_picture_falls_back_and_is_reported</span>() {</span>
+<span class="ln" id="L946">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L947">        plan.<span class="tok-fn">add_speaker</span>(Speaker {</span>
+<span class="ln" id="L948">            name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L949">            picture: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;no-such-file.png&quot;</span>)),</span>
+<span class="ln" id="L950">        })</span>
+<span class="ln" id="L951">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L952">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L953">            start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L954">            end: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L955">            speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L956">            text: None,</span>
+<span class="ln" id="L957">        })</span>
+<span class="ln" id="L958">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L959">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L960">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;circle&quot;</span>), <span class="tok-str">&quot;the fallback circle&quot;</span>);</span>
+<span class="ln" id="L961">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;image &quot;</span>), <span class="tok-str">&quot;no broken image&quot;</span>);</span>
+<span class="ln" id="L962">        <span class="tok-kw">let</span> notes = drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
+<span class="ln" id="L963">        assert!(notes.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Sam&#x27;s picture was not used&quot;</span>), <span class="tok-str">&quot;{notes}&quot;</span>);</span>
+<span class="ln" id="L964">    }</span>
+<span class="ln" id="L965"></span>
+<span class="ln" id="L966">    <span class="tok-com">/// A background image is embedded so the page stays one file, and a large</span></span>
+<span class="ln" id="L967">    <span class="tok-com">/// one is reported rather than silently producing a huge page.</span></span>
+<span class="ln" id="L968">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L969">    <span class="tok-kw">fn</span> <span class="tok-fn">a_background_image_is_embedded_and_a_large_one_is_mentioned</span>() {</span>
+<span class="ln" id="L970">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L971">        <span class="tok-kw">let</span> small = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;bg.png&quot;</span>);</span>
+<span class="ln" id="L972">        std::fs::<span class="tok-fn">write</span>(&amp;small, vec![0u8; <span class="tok-num">64</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L973">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L974">            &amp;<span class="tok-fn">plan</span>(),</span>
+<span class="ln" id="L975">            &amp;<span class="tok-fn">envelope</span>(),</span>
+<span class="ln" id="L976">            &amp;Look {</span>
+<span class="ln" id="L977">                background: Background::<span class="tok-fn">Image</span>(small),</span>
+<span class="ln" id="L978">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L979">            },</span>
+<span class="ln" id="L980">            <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L981">        )</span>
+<span class="ln" id="L982">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L983">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>));</span>
+<span class="ln" id="L984">        assert!(drawn.notes.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;a small image needs no comment&quot;</span>);</span>
+<span class="ln" id="L985"></span>
+<span class="ln" id="L986">        <span class="tok-kw">let</span> big = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;big.png&quot;</span>);</span>
+<span class="ln" id="L987">        std::fs::<span class="tok-fn">write</span>(&amp;big, vec![0u8; <span class="tok-num">3</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L988">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L989">            &amp;<span class="tok-fn">plan</span>(),</span>
+<span class="ln" id="L990">            &amp;<span class="tok-fn">envelope</span>(),</span>
+<span class="ln" id="L991">            &amp;Look {</span>
+<span class="ln" id="L992">                background: Background::<span class="tok-fn">Image</span>(big),</span>
+<span class="ln" id="L993">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L994">            },</span>
+<span class="ln" id="L995">            <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L996">        )</span>
+<span class="ln" id="L997">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L998">        assert!(</span>
+<span class="ln" id="L999">            drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;adds about&quot;</span>),</span>
+<span class="ln" id="L1000">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
+<span class="ln" id="L1001">            drawn.notes</span>
+<span class="ln" id="L1002">        );</span>
+<span class="ln" id="L1003">    }</span>
+<span class="ln" id="L1004"></span>
+<span class="ln" id="L1005">    <span class="tok-com">/// A missing background must not stop the picture being drawn.</span></span>
+<span class="ln" id="L1006">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1007">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_background_falls_back_and_says_so</span>() {</span>
+<span class="ln" id="L1008">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L1009">            &amp;<span class="tok-fn">plan</span>(),</span>
+<span class="ln" id="L1010">            &amp;<span class="tok-fn">envelope</span>(),</span>
+<span class="ln" id="L1011">            &amp;Look {</span>
+<span class="ln" id="L1012">                background: Background::<span class="tok-fn">Image</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;nowhere.png&quot;</span>)),</span>
+<span class="ln" id="L1013">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1014">            },</span>
+<span class="ln" id="L1015">            <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L1016">        )</span>
+<span class="ln" id="L1017">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1018">        assert!(drawn.markup.<span class="tok-fn">contains</span>(palette::BG));</span>
+<span class="ln" id="L1019">        assert!(drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;was not used&quot;</span>));</span>
+<span class="ln" id="L1020">    }</span>
+<span class="ln" id="L1021"></span>
+<span class="ln" id="L1022">    <span class="tok-com">/// An empty plan still draws: a recording with nobody assigned is a</span></span>
+<span class="ln" id="L1023">    <span class="tok-com">/// picture of a waveform, which is better than an error at this stage.</span></span>
+<span class="ln" id="L1024">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1025">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_no_speakers_still_draws_the_waveform</span>() {</span>
+<span class="ln" id="L1026">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;Conversation::<span class="tok-fn">new</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.0</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1027">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;path d=\&quot;M&quot;</span>));</span>
+<span class="ln" id="L1028">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>));</span>
+<span class="ln" id="L1029">    }</span>
+<span class="ln" id="L1030">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
