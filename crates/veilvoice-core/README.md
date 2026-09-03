@@ -156,7 +156,7 @@ flowchart TD
 | [`window.rs`](../../docs/files/veilvoice-core/window.md) | 101 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [`spectrum_report.rs`](../../docs/files/veilvoice-core/examples-spectrum_report.md) | 107 | Where do the output partials actually land? |
 | [`veil_a_buffer.rs`](../../docs/files/veilvoice-core/examples-veil_a_buffer.md) | 54 | _no module documentation yet_ |
-| [`hostile_audio.rs`](../../docs/files/veilvoice-core/tests-hostile_audio.md) | 363 | The engine against input that is not well-behaved audio. |
+| [`hostile_audio.rs`](../../docs/files/veilvoice-core/tests-hostile_audio.md) | 389 | The engine against input that is not well-behaved audio. |
 
 ## Public items
 

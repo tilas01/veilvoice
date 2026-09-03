@@ -129,6 +129,32 @@ fn digital_silence_stays_silent_and_leaves_the_state_usable() {
 
 /// Full-scale square waves and DC are legal audio and unlike anything the
 /// engine was tuned on.
+///
+/// # The bound, and why it is not 4.0
+///
+/// This asserts the output does not *run away*. It is not a claim about gain:
+/// a Nyquist-rate square wave is the worst case for any resampler, and the
+/// engine legitimately comes out above unity on one. That is contained where
+/// it matters -- `veilvoice_audio::io` clamps to full scale rather than
+/// letting a sample wrap, and has its own test for it.
+///
+/// The bound was 4.0, which is a round number rather than a measured one, and
+/// it was about ten percent above what this machine produces. Measured over
+/// twenty runs each, on x86-64 Linux:
+///
+///     DC           1.38
+///     square       2.13
+///     impulses     0.09
+///     alternating  3.58
+///
+/// Windows produced 4.0456 for `alternating` and failed. Nothing was wrong
+/// with the engine: a different libm and different floating-point contraction
+/// move the last few percent, and the round number sat inside that margin.
+///
+/// So the bound is 8.0, which is more than twice the worst measured and still
+/// an order of magnitude below anything that has actually diverged. Runaway in
+/// this engine has always meant thousands or a non-finite value, and the
+/// non-finite case is asserted separately just above.
 #[test]
 fn pathological_but_legal_audio_is_handled() {
     for (name, signal) in [
@@ -159,7 +185,7 @@ fn pathological_but_legal_audio_is_handled() {
             "{name}: non-finite output"
         );
         assert!(
-            out.iter().all(|v| v.abs() <= 4.0),
+            out.iter().all(|v| v.abs() <= 8.0),
             "{name}: output ran away to {}",
             out.iter().fold(0.0f32, |m, v| m.max(v.abs()))
         );

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/tests/hostile_audio.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 363 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 389 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs)
 
 ## Contents
 
@@ -36,7 +36,7 @@ had failed.
 
 ## What this file contains
 
-363 lines defining **13 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+389 lines defining **13 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -58,13 +58,13 @@ flowchart TD
     n_every_flavour_of_non_finite_is_survived["every_flavour_of_non_finite_is_<br/>survived<br/>line 73"]
     n_an_entirely_non_finite_buffer_is_handled["an_entirely_non_finite_buffer_is_<br/>handled<br/>line 103"]
     n_digital_silence_stays_silent_and_leaves_the_state_usable["digital_silence_stays_silent_and_<br/>leaves_the_state_usable<br/>line 115"]
-    n_pathological_but_legal_audio_is_handled["pathological_but_legal_audio_is_<br/>handled<br/>line 133"]
-    n_hostile_input_is_survived_with_accent_neutralisation_off["hostile_input_is_survived_with_accent_<br/>neutralisation_off<br/>line 172"]
-    n_a_non_finite_sample_rate_is_refused_rather_than_built["a_non_finite_sample_rate_is_refused_<br/>rather_than_built<br/>line 210"]
-    n_an_absurd_sample_rate_is_refused_rather_than_allocated["an_absurd_sample_rate_is_refused_<br/>rather_than_allocated<br/>line 231"]
-    n_an_absurd_frame_size_is_refused["an_absurd_frame_size_is_refused<br/>line 270"]
-    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped["non_finite_parameters_are_refused_and_<br/>wild_ones_are_clamped<br/>line 298"]
-    n_every_configuration_that_builds_produces_finite_audio["every_configuration_that_builds_<br/>produces_finite_audio<br/>line 349"]
+    n_pathological_but_legal_audio_is_handled["pathological_but_legal_audio_is_<br/>handled<br/>line 159"]
+    n_hostile_input_is_survived_with_accent_neutralisation_off["hostile_input_is_survived_with_accent_<br/>neutralisation_off<br/>line 198"]
+    n_a_non_finite_sample_rate_is_refused_rather_than_built["a_non_finite_sample_rate_is_refused_<br/>rather_than_built<br/>line 236"]
+    n_an_absurd_sample_rate_is_refused_rather_than_allocated["an_absurd_sample_rate_is_refused_<br/>rather_than_allocated<br/>line 257"]
+    n_an_absurd_frame_size_is_refused["an_absurd_frame_size_is_refused<br/>line 296"]
+    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped["non_finite_parameters_are_refused_and_<br/>wild_ones_are_clamped<br/>line 324"]
+    n_every_configuration_that_builds_produces_finite_audio["every_configuration_that_builds_<br/>produces_finite_audio<br/>line 375"]
     n_a_single_nan_does_not_poison_the_engine_for_ever --> n_engine
     n_a_single_nan_does_not_poison_the_engine_for_ever --> n_speech
     n_an_entirely_non_finite_buffer_is_handled --> n_engine
@@ -82,13 +82,13 @@ flowchart TD
     click n_every_flavour_of_non_finite_is_survived href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L73" "open the source"
     click n_an_entirely_non_finite_buffer_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L103" "open the source"
     click n_digital_silence_stays_silent_and_leaves_the_state_usable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L115" "open the source"
-    click n_pathological_but_legal_audio_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L133" "open the source"
-    click n_hostile_input_is_survived_with_accent_neutralisation_off href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L172" "open the source"
-    click n_a_non_finite_sample_rate_is_refused_rather_than_built href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L210" "open the source"
-    click n_an_absurd_sample_rate_is_refused_rather_than_allocated href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L231" "open the source"
-    click n_an_absurd_frame_size_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L270" "open the source"
-    click n_non_finite_parameters_are_refused_and_wild_ones_are_clamped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L298" "open the source"
-    click n_every_configuration_that_builds_produces_finite_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L349" "open the source"
+    click n_pathological_but_legal_audio_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L159" "open the source"
+    click n_hostile_input_is_survived_with_accent_neutralisation_off href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L198" "open the source"
+    click n_a_non_finite_sample_rate_is_refused_rather_than_built href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L236" "open the source"
+    click n_an_absurd_sample_rate_is_refused_rather_than_allocated href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L257" "open the source"
+    click n_an_absurd_frame_size_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L296" "open the source"
+    click n_non_finite_parameters_are_refused_and_wild_ones_are_clamped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L324" "open the source"
+    click n_every_configuration_that_builds_produces_finite_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L375" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_speech,n_engine,n_a_single_nan_does_not_poison_the_engine_for_ever,n_every_flavour_of_non_finite_is_survived,n_an_entirely_non_finite_buffer_is_handled,n_digital_silence_stays_silent_and_leaves_the_state_usable,n_pathological_but_legal_audio_is_handled,n_hostile_input_is_survived_with_accent_neutralisation_off,n_a_non_finite_sample_rate_is_refused_rather_than_built,n_an_absurd_sample_rate_is_refused_rather_than_allocated,n_an_absurd_frame_size_is_refused,n_non_finite_parameters_are_refused_and_wild_ones_are_clamped,n_every_configuration_that_builds_produces_finite_audio helper
 ```
@@ -105,10 +105,10 @@ flowchart TD
 | `every_flavour_of_non_finite_is_survived` <sub>fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L73) |  |
 | `an_entirely_non_finite_buffer_is_handled` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L103) | An input made entirely of poison must not panic, hang, or emit garbage. |
 | `digital_silence_stays_silent_and_leaves_the_state_usable` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L115) | Silence must not drive the long-term averages anywhere strange, and must not come out as anything but silence. |
-| `pathological_but_legal_audio_is_handled` <sub>fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L133) | Full-scale square waves and DC are legal audio and unlike anything the engine was tuned on. |
-| `hostile_input_is_survived_with_accent_neutralisation_off` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L172) | The same, with accent neutralisation off, since that changes which paths in spectral.rs run. |
-| `a_non_finite_sample_rate_is_refused_rather_than_built` <sub>fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L210) | A non-finite sample rate must be refused, not built. |
-| `an_absurd_sample_rate_is_refused_rather_than_allocated` <sub>fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L231) | A sample rate a file can legally declare, but no hardware produces, sizes the reverb and chorus delay lines. |
-| `an_absurd_frame_size_is_refused` <sub>fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L270) | frame_size had no upper bound at all, and it sizes every internal buffer and the FFT plan. |
-| `non_finite_parameters_are_refused_and_wild_ones_are_clamped` <sub>fn</sub> | [298](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L298) | Every other float is either clamped to something meaningful or refused for being NaN. |
-| `every_configuration_that_builds_produces_finite_audio` <sub>fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L349) | The whole point, checked end to end: a configuration that survives validation must produce finite audio from finite audio. |
+| `pathological_but_legal_audio_is_handled` <sub>fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L159) | Full-scale square waves and DC are legal audio and unlike anything the engine was tuned on. |
+| `hostile_input_is_survived_with_accent_neutralisation_off` <sub>fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L198) | The same, with accent neutralisation off, since that changes which paths in spectral.rs run. |
+| `a_non_finite_sample_rate_is_refused_rather_than_built` <sub>fn</sub> | [236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L236) | A non-finite sample rate must be refused, not built. |
+| `an_absurd_sample_rate_is_refused_rather_than_allocated` <sub>fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L257) | A sample rate a file can legally declare, but no hardware produces, sizes the reverb and chorus delay lines. |
+| `an_absurd_frame_size_is_refused` <sub>fn</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L296) | frame_size had no upper bound at all, and it sizes every internal buffer and the FFT plan. |
+| `non_finite_parameters_are_refused_and_wild_ones_are_clamped` <sub>fn</sub> | [324](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L324) | Every other float is either clamped to something meaningful or refused for being NaN. |
+| `every_configuration_that_builds_produces_finite_audio` <sub>fn</sub> | [375](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L375) | The whole point, checked end to end: a configuration that survives validation must produce finite audio from finite audio. |
