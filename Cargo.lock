@@ -4768,6 +4768,7 @@ version = "0.1.17"
 dependencies = [
  "tempfile",
  "veilvoice-core",
+ "veilvoice-crypto",
 ]
 
 [[package]]
@@ -4943,6 +4944,7 @@ dependencies = [
  "tempfile",
  "veilvoice-conversation",
  "veilvoice-core",
+ "veilvoice-crypto",
 ]
 
 [[package]]

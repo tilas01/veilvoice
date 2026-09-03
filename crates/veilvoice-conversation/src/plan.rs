@@ -565,7 +565,12 @@ impl Conversation {
                 std::fs::create_dir_all(parent)?;
             }
         }
-        std::fs::write(path, self.to_text())?;
+        // Owner-only. A plan holds every speaker's name and every word
+        // somebody typed into it, which is precisely the content that made the
+        // subtitle tracks worth protecting. Writing the subtitles 0600 and the
+        // file they are generated from 0644 would protect the copy and leave
+        // the original.
+        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())?;
         Ok(())
     }
 
@@ -788,6 +793,27 @@ mod tests {
         let path = dir.path().join("deeper").join("plan.txt");
         conversation.save(&path).unwrap();
         assert_eq!(Conversation::load(&path).unwrap(), conversation);
+    }
+
+    /// A saved plan is readable only by the account that saved it.
+    ///
+    /// A plan holds every speaker's name and every word typed into it, which
+    /// is the same content as the subtitle tracks a render produces from it.
+    /// Those are written owner-only; writing the source of them 0644 would
+    /// protect the copy and leave the original.
+    #[cfg(unix)]
+    #[test]
+    fn a_saved_plan_is_readable_only_by_this_account() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("plan.txt");
+        two_people().save(&path).unwrap();
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(
+            mode, 0o600,
+            "a plan is {mode:o}, so anyone with an account here can read the names in it"
+        );
+        assert_eq!(Conversation::load(&path).unwrap(), two_people());
     }
 
     #[test]
