@@ -73,6 +73,7 @@
 pub mod aead;
 pub mod amnesia;
 pub mod container;
+pub mod hoard;
 pub mod hybrid;
 pub mod kdf;
 pub mod lock;
