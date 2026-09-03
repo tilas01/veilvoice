@@ -10,6 +10,9 @@ description = "Several speakers in one recording: who spoke when, a distinct voi
 
 [dependencies]
 veilvoice-core = { path = "../veilvoice-core" }
+# For `privatefile`. A plan holds every speaker's name and every word
+# somebody typed, which is the same content as the subtitles it produces.
+veilvoice-crypto = { path = "../veilvoice-crypto" }
 
 [dev-dependencies]
 tempfile = "3"

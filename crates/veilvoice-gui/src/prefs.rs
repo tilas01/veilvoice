@@ -372,7 +372,14 @@ impl Prefs {
                 std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
             }
         }
-        std::fs::write(path, self.to_text()).map_err(|e| e.to_string())
+        // Owner-only. This file is not just a theme choice: it records
+        // `vault_dir`, which names an encrypted volume, and `vault_hidden`,
+        // which is the answer to whether that volume has a hidden one inside
+        // it. Somebody reading this learns that a hidden volume exists, which
+        // is the single thing a hidden volume is for concealing, and they
+        // learn where to look.
+        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())
+            .map_err(|e| e.to_string())
     }
 }
 
@@ -570,6 +577,20 @@ mod tests {
         };
         prefs.save(&path).unwrap();
         assert_eq!(Prefs::load(&path), prefs);
+
+        // And readable only by this account. The file records `vault_dir` and
+        // `vault_hidden`: where an encrypted volume is, and whether it has a
+        // hidden one inside it. The existence of a hidden volume is the single
+        // thing a hidden volume conceals, and this was written 0644.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+            assert_eq!(
+                mode, 0o600,
+                "settings are {mode:o}, so anyone here can read where the vault is"
+            );
+        }
     }
 
     /// The system's reduce-motion setting outranks the preference. Someone who

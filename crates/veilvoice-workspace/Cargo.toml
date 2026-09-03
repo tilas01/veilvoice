@@ -11,6 +11,9 @@ description = "Named profiles and saved projects: the settings a recording was m
 [dependencies]
 veilvoice-core = { path = "../veilvoice-core" }
 veilvoice-conversation = { path = "../veilvoice-conversation" }
+# For `privatefile`, which is what writes a project file the rest of this
+# program's rules would recognise. A project holds the names somebody typed.
+veilvoice-crypto = { path = "../veilvoice-crypto" }
 
 [dev-dependencies]
 tempfile = "3"

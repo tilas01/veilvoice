@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/plan.svg" alt="plan.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/plan.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 1084 lines &middot; <a href="plan.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 1110 lines &middot; <a href="plan.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#veilvoice-does-not-work-out-who-is-talking-and-will-not-guess">VeilVoice does not work out who is talking, and will not guess</a>
@@ -76,7 +76,7 @@ turn  4.100  9.050  1</code></pre>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1084 lines defining <strong>22 functions</strong> (21 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1110 lines defining <strong>22 functions</strong> (21 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Speaker</code> <span style="color:var(--muted)">line 71</span> &middot; One person in the recording.</li>
 <li><code>struct Turn</code> <span style="color:var(--muted)">line 97</span> &middot; A span of the recording belonging to one speaker.</li>
@@ -117,7 +117,7 @@ turn  4.100  9.050  1</code></pre>
 <li><code>Conversation::save</code> <span style="color:var(--muted)">line 562</span> &middot; Write the plan to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Conversation::load</code> <span style="color:var(--muted)">line 573</span> &middot; Read a plan written by Conversation::save.
+<li><code>Conversation::load</code> <span style="color:var(--muted)">line 578</span> &middot; Read a plan written by Conversation::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code>, <code>split_word</code></span>
 </li>
 </ul>
@@ -249,7 +249,7 @@ turn  4.100  9.050  1</code></pre>
 <a href="plan.src.html#fn-conversation-load">
 <rect x="434.2" y="920.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="520.8" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::load</text>
-<text x="520.8" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 573</text>
+<text x="520.8" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 578</text>
 </a>
 <rect x="20.0" y="1004.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -289,7 +289,7 @@ flowchart TD
     n_to_text[&quot;Conversation::to_text&lt;br/&gt;line 403&quot;]
     n_parse[&quot;Conversation::parse&lt;br/&gt;line 440&quot;]
     n_save([&quot;Conversation::save&lt;br/&gt;line 562&quot;])
-    n_load([&quot;Conversation::load&lt;br/&gt;line 573&quot;])
+    n_load([&quot;Conversation::load&lt;br/&gt;line 578&quot;])
     n_from_channels --&gt; n_named
     n_from_channels --&gt; n_new
     n_load --&gt; n_parse
@@ -317,7 +317,7 @@ flowchart TD
     click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L403&quot; &quot;open the source&quot;
     click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L440&quot; &quot;open the source&quot;
     click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L562&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L573&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L578&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration,n_add_speaker,n_add_turn,n_rename_speakers,n_speakers,n_turns,n_len,n_is_empty,n_voice,n_mode,n_set_mode,n_duration,n_overlaps,n_self_overlaps,n_from_channels,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -355,8 +355,8 @@ flowchart TD
 <tr><td><code>Conversation::to_text</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-to_text">403</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
 <tr><td><code>Conversation::parse</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-parse">440</a></td><td>Parse the text format.</td></tr>
 <tr><td><code>Conversation::save</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-save">562</a></td><td>Write the plan to path.</td></tr>
-<tr><td><code>Conversation::load</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-load">573</a></td><td>Read a plan written by Conversation::save.</td></tr>
-<tr><td><code>guide_tests</code> <sub>mod</sub></td><td><a href="plan.src.html#fn-guide_tests">987</a></td><td></td></tr>
+<tr><td><code>Conversation::load</code> <sub>pub fn</sub></td><td><a href="plan.src.html#fn-conversation-load">578</a></td><td>Read a plan written by Conversation::save.</td></tr>
+<tr><td><code>guide_tests</code> <sub>mod</sub></td><td><a href="plan.src.html#fn-guide_tests">1013</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

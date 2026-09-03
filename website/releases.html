@@ -92,6 +92,14 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <li>ffmpeg does the writing, so the fix is the step after it: the output of <code>import</code> and <code>video</code> is set owner-only once ffmpeg has finished.</li>
 <li>There is a window between ffmpeg creating the file and that happening, and it is not closed by this. That is inherent to handing the write to another program; the exposure goes from permanent to the length of one transcode, and the note the program prints says only what it actually did.</li>
 </ul>
+<p><strong>And the same slip in three more files, found by sweeping for it</strong></p>
+<ul>
+<li>Finding the first one by running a command is a bad way to find a class of defect, so every <code>fs::write</code> in the tree was listed and each asked what it holds. Three more were the same mistake.</li>
+<li><strong>A saved project.</strong> The panel that writes it says it holds where your files are, who is in the recording and what you called them. That reassurance is about audio and passwords; the names are the part it does not cover.</li>
+<li><strong>A saved plan.</strong> Every name and every word typed into it, which is exactly the content of the subtitles a render makes from it. Writing the copy 0600 and the original 0644 protects the wrong file.</li>
+<li><strong>The window&#x27;s settings.</strong> Not just a theme: it records where an encrypted volume is and whether it has a hidden one inside it. The existence of a hidden volume is the one thing a hidden volume conceals.</li>
+<li>What the sweep deliberately left alone is written down too: ciphertext and public keys stay 0644, cleaning in place preserves whatever mode the file already had (checked), and service state files are records of what this machine does rather than of who anybody is.</li>
+</ul>
 <p><strong>Three commands that would not say which file</strong></p>
 <ul>
 <li><code>veilvoice encrypt</code>, <code>decrypt</code> and <code>clean</code> reported a missing file as &quot;No such file or directory&quot; with no name, on commands that take two paths. <code>anonymise</code> named it, because its code formatted the path in by hand and theirs did not. Two helpers now, rather than a fourth copy of the format string.</li>
