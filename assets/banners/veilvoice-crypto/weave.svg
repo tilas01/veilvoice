@@ -30,7 +30,7 @@
 <rect x="346.0" y="61.1" width="7.0" height="27.8" rx="3" fill="#bb9af7" opacity="0.69"/>
 <rect x="359.0" y="53.1" width="7.0" height="43.8" rx="3" fill="#bb9af7" opacity="0.76"/>
 <text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">weave.rs</text>
-<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Twenty-seven reversible encodings, chosen at random, applied underneath the</text>
-<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">encryption.</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Thirty-one reversible encodings, chosen at random, applied around the encryption</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">-- before it, after it, or both.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRYPTO</text>
 </svg>

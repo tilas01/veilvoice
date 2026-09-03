@@ -99,14 +99,14 @@ flowchart TD
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>535 lines"]
-    n_hoard["hoard.rs<br/>929 lines"]
+    n_hoard["hoard.rs<br/>1037 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
     n_lock["lock.rs<br/>1821 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_vault["vault.rs<br/>615 lines"]
-    n_weave["weave.rs<br/>1166 lines"]
+    n_weave["weave.rs<br/>1314 lines"]
     n_hoard --> n_amnesia
     n_hoard --> n_privatefile
     n_hoard --> n_weave
@@ -139,7 +139,7 @@ flowchart TD
 | [[`aead.rs`|File-veilvoice-crypto-aead]] | 178 | Authenticated encryption with XChaCha20-Poly1305. |
 | [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] | 327 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [[`container.rs`|File-veilvoice-crypto-container]] | 535 | The .veil encrypted container format. |
-| [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 929 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
+| [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 1037 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 525 | Password-based key derivation with Argon2id. |
 | [[`lib.rs`|File-veilvoice-crypto-lib]] | 214 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
@@ -147,7 +147,7 @@ flowchart TD
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
 | [[`vault.rs`|File-veilvoice-crypto-vault]] | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
-| [[`weave.rs`|File-veilvoice-crypto-weave]] | 1166 | Twenty-seven reversible encodings, chosen at random, applied underneath the encryption. |
+| [[`weave.rs`|File-veilvoice-crypto-weave]] | 1314 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [[`seal_and_open.rs`|File-veilvoice-crypto-examples-seal_and_open]] | 80 | _no module documentation yet_ |
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |

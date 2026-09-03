@@ -79,3 +79,9 @@ skills/
 
 # The next-session prompt, beside HANDOFF.md. Working notes, not a deliverable.
 NEXT-SESSION.md
+
+# Self-signed code-signing material. The private key must never be committed;
+# only the public certificate and its fingerprint are published, on the website.
+veilvoice-code-key.pem
+*.p7s
+APPMANIFEST.json.sig
