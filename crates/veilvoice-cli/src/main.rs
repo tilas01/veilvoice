@@ -529,19 +529,34 @@ enum Command {
     },
     /// Check a download, and what does the checking
     ///
-    /// With no arguments this explains how a VeilVoice release is verified:
-    /// which files you need, where they are published, what VeilVoice checks
-    /// by itself, and what GnuPG adds that VeilVoice cannot add for itself.
+    /// With nothing after it, this finds a release near you and checks all of
+    /// it: the signature over the hash list, every archive against that list,
+    /// the contents manifest, and every file you extracted, one by one. That
+    /// is the whole of what used to be a separate `veilvoice-verify` program,
+    /// which no longer ships because this is where it belonged.
+    ///
+    /// `veilvoice verify --help` lists the rest: `key`, `sums`, `file`,
+    /// `gnupg`, `release`, and the build-it-yourself half -- `deps`, `build`
+    /// and `reproduce`. They are printed below the flags, from the verifier's
+    /// own help, so the two cannot disagree.
+    ///
+    /// `--how` explains how a release is verified and what GnuPG adds that
+    /// VeilVoice cannot add for itself.
     ///
     /// `--script` writes a short shell script that does the check with `gpg`
     /// and `sha256sum` and nothing from this project. That is the point of it.
     /// The program telling you a download is genuine came out of that
     /// download, so the check worth most is the one made by software this
     /// project did not write.
-    ///
-    /// The full check, including every file extracted out of the archive, is
-    /// `veilvoice-verify`, which ships in the same release.
+    #[command(after_long_help = veilvoice_verify::help_text())]
     Verify {
+        /// Explain how a release is verified, without checking anything.
+        ///
+        /// This was what `verify` printed with no arguments, before the
+        /// verifier was folded in and the useful default became doing the
+        /// check rather than describing it.
+        #[arg(long)]
+        how: bool,
         /// Write the verification script to standard output instead.
         #[arg(long)]
         script: bool,
@@ -559,6 +574,13 @@ enum Command {
         /// rather than `sha256sum`. A shorthand for `--system macos`.
         #[arg(long)]
         macos: bool,
+        /// A verifier command and its arguments, passed through untouched.
+        ///
+        /// Not modelled here on purpose: the verifier has its own parser, its
+        /// own help and its own documented exit statuses, and a second parser
+        /// in this file is how the two drift apart.
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
     /// Turn a veiled recording into a video with a black picture
     ///
@@ -1038,6 +1060,32 @@ fn explain_verification(
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
+
+    // The verifier is answered here rather than in `run` because it does not
+    // fit that function's shape, and bending it to fit would lose the part
+    // that matters. `run` returns ok-or-a-message, which collapses to exit 0
+    // or 1; the verifier has a documented table of statuses -- 2 means a check
+    // failed, 5 means a build differed, and they are deliberately not the same
+    // number -- that scripts and CI already branch on. Flattening those into 1
+    // would silently break every one of them.
+    if let Command::Verify {
+        how,
+        script,
+        build_script,
+        ref args,
+        ..
+    } = cli.command
+    {
+        // `--how`, `--script` and `--build-script` are this command's own and
+        // are handled in `run`. Everything else is the verifier's, including
+        // the no-argument case: `veilvoice verify` on its own finds a release
+        // nearby and checks it, which is what the standalone program did when
+        // somebody double-clicked it.
+        if !how && !script && !build_script {
+            return veilvoice_verify::run(args.clone());
+        }
+    }
+
     match run(cli.command) {
         Ok(()) => ExitCode::SUCCESS,
         Err(message) => {
@@ -1423,11 +1471,34 @@ fn run(command: Command) -> Result<(), String> {
         },
 
         Command::Verify {
+            how,
             script,
             build_script,
             system,
             macos,
+            args,
         } => {
+            // The script flags and `--how` are this command's own. Anything
+            // else -- a verifier subcommand, or nothing at all -- belongs to
+            // the verifier, and is dispatched in `main` so its exit statuses
+            // survive. Reaching here with either means the caller asked for a
+            // script and a check in one breath, which is two answers to one
+            // question.
+            if !args.is_empty() {
+                return Err(format!(
+                    "`{}` is a check, and --script and --how only describe one. Run them separately.",
+                    args.join(" ")
+                ));
+            }
+            if how {
+                let flavour = match system.as_deref() {
+                    Some("macos") => veilvoice_gnupg::script::Flavour::MacOs,
+                    _ if macos => veilvoice_gnupg::script::Flavour::MacOs,
+                    _ => veilvoice_gnupg::script::Flavour::Linux,
+                };
+                explain_verification(flavour, veilvoice_check::reproduce::System::here());
+                return Ok(());
+            }
             let named = system.as_deref().map(|name| {
                 veilvoice_check::reproduce::System::from_key(name).ok_or_else(|| {
                     format!(
@@ -2753,6 +2824,69 @@ mod tests {
                     let mut words = after.split_whitespace().peekable();
                     let mut node = &root;
                     let mut path: Vec<String> = Vec::new();
+
+                    // `verify` hands everything after it to the verifier,
+                    // which has its own parser, so clap cannot answer for the
+                    // words that follow. Checking them against clap would
+                    // report every one of them missing; skipping them would
+                    // leave the most safety-critical commands in the whole
+                    // documentation unchecked. So they are checked against the
+                    // verifier's own help, which is the thing that defines
+                    // them.
+                    if words.peek().copied() == Some("verify") {
+                        words.next();
+                        checked += 1;
+                        let help = veilvoice_verify::help_text();
+                        // A `#` starts a trailing comment in every shell
+                        // example here, so the comment is cut off first --
+                        // reading past one turns English prose into a list of
+                        // commands nobody wrote. Of what is left, only the
+                        // first word is a command; the rest are its arguments,
+                        // and the flags among them are checked below.
+                        let real: Vec<&str> = words.take_while(|w| !w.starts_with('#')).collect();
+                        let vetted: Vec<&str> = real
+                            .iter()
+                            .copied()
+                            .enumerate()
+                            .filter(|(i, w)| *i == 0 || w.starts_with("--"))
+                            .map(|(_, w)| w)
+                            .collect();
+                        for word in vetted {
+                            let known = if let Some(flag) = word.strip_prefix("--") {
+                                let flag: String = flag
+                                    .chars()
+                                    .take_while(|c| c.is_ascii_lowercase() || *c == '-')
+                                    .collect();
+                                flag.is_empty()
+                                    || flag == "help"
+                                    || flag == "version"
+                                    // This command's own flags, which clap owns.
+                                    || root
+                                        .find_subcommand("verify")
+                                        .map(|v| {
+                                            v.get_arguments()
+                                                .any(|a| a.get_long() == Some(flag.as_str()))
+                                        })
+                                        .unwrap_or(false)
+                                    || help.contains(&format!("--{flag}"))
+                            } else if word.chars().all(|c| c.is_ascii_lowercase() || c == '-')
+                                && !word.is_empty()
+                            {
+                                help.contains(&format!("veilvoice verify {word}"))
+                            } else {
+                                // A path, a hash, a placeholder: an argument
+                                // rather than something to look up.
+                                true
+                            };
+                            if !known {
+                                problems.push(format!(
+                                    "{name}:{}: `veilvoice verify {word}` is documented,                                      and the verifier's own help does not mention it",
+                                    number + 1,
+                                ));
+                            }
+                        }
+                        continue;
+                    }
 
                     // The leading words are subcommands until one is not.
                     while let Some(word) = words.peek().copied() {

@@ -346,23 +346,46 @@ jobs:
   # RUSTSEC-2023-0071 -- the Marvin attack, key recovery through a timing side
   # channel, with no fixed version available. `.cargo/audit.toml` accepts it on
   # one specific ground: the advisory is about RSA *private key* operations, and
-  # `veilvoice-verify` only ever verifies a signature against a public key
-  # compiled into it. There is no secret for a timing oracle to leak.
+  # VeilVoice only ever verifies a signature against a public key compiled into
+  # it. There is no secret for a timing oracle to leak.
   #
   # That is an argument about how the crate is used, not about the crate, so it
   # has to be enforced rather than believed. If a secret-key or decryption API
   # ever appears, this fails and the acceptance has to be re-argued.
+  #
+  # Both crates that reach `pgp` are checked, and the list is derived from the
+  # manifests rather than written here: the signature arithmetic moved from
+  # `veilvoice-verify` into `veilvoice-check` so the desktop application could
+  # share it, and for a while afterwards this job still grepped only the crate
+  # it had started in. A guard whose scope is narrower than the claim it
+  # enforces is worse than no guard, because it is green.
   rsa-usage:
     name: no RSA private-key operations
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fail if the verifier gains a private-key code path
+      - name: Fail if any crate reaching pgp gains a private-key code path
         run: |
+          set -euo pipefail
           PATTERN='SignedSecretKey|SecretKeyParams|decrypt|sign_binary_data|sign_text_data'
-          if grep -RnE "$PATTERN" crates/veilvoice-verify/src/; then
-            echo "::error::veilvoice-verify appears to perform a private-key operation."
+
+          # Every crate whose manifest names `pgp`, found rather than listed.
+          mapfile -t CRATES < <(grep -l '^pgp = ' crates/*/Cargo.toml | xargs -n1 dirname)
+          if [ "${#CRATES[@]}" -eq 0 ]; then
+            echo "::error::no crate depends on pgp any more; this job is checking nothing."
+            exit 1
+          fi
+          echo "crates reaching pgp: ${CRATES[*]}"
+
+          failed=0
+          for crate in "${CRATES[@]}"; do
+            if grep -RnE "$PATTERN" "$crate/src/"; then
+              echo "::error::$crate appears to perform a private-key operation."
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
             echo "RUSTSEC-2023-0071 is accepted in .cargo/audit.toml only because it does not."
             exit 1
           fi
-          echo "verification only: no secret-key or decryption API in the verifier"
+          echo "verification only: no secret-key or decryption API in ${CRATES[*]}"

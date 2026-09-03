@@ -43,7 +43,7 @@ DEPEND="
 RDEPEND="${DEPEND}"
 BDEPEND=">=virtual/rust-1.96"
 
-QA_FLAGS_IGNORED="usr/bin/veilvoice usr/bin/veilvoice-gui usr/bin/veilvoice-verify"
+QA_FLAGS_IGNORED="usr/bin/veilvoice usr/bin/veilvoice-gui"
 
 src_configure() {
 	local myfeatures=()
@@ -61,9 +61,6 @@ src_compile() {
 	local packages=()
 	use cli && packages+=( -p veilvoice-cli )
 	use gui && packages+=( -p veilvoice-gui )
-	# The verifier always: it is small, has no system dependencies, and is how
-	# a user checks a release they did not build themselves.
-	packages+=( -p veilvoice-verify )
 
 	cargo_src_compile "${packages[@]}"
 }
@@ -81,7 +78,6 @@ src_install() {
 		newicon -s 256 assets/icon.png veilvoice.png
 		domenu packaging/veilvoice.desktop
 	fi
-	dobin "$(cargo_target_dir)/veilvoice-verify"
 
 	dodoc README.md
 	dodoc -r docs/.
@@ -96,8 +92,9 @@ pkg_postinst() {
 	elog ""
 	elog "Limits, stated rather than hidden:"
 	elog "  - a strong regional accent may still be audible"
-	elog "  - the application lock is a verifier, not encryption, and is not"
-	elog "    tamper-proof"
+	elog "  - the application lock names and encrypts VeilVoice's own files,"
+	elog "    but cannot hide that VeilVoice is installed, and anybody who"
+	elog "    can read the folder can still delete it"
 	elog "  - secure erase is unreliable on flash storage"
 	elog ""
 	if use live; then
@@ -107,5 +104,13 @@ pkg_postinst() {
 		elog "Built without USE=live: file processing only, no microphone."
 	fi
 	elog ""
-	elog "Verify a release you did not build:  veilvoice-verify --help"
+	# The verifier used to be its own binary and was installed unconditionally.
+	# It is part of `veilvoice` now, so this line is only true where the command
+	# line was actually built; USE=-cli gets pointed at the window instead.
+	if use cli; then
+		elog "Verify a release you did not build:  veilvoice verify --help"
+	else
+		elog "Verify a release you did not build: open VeilVoice and use the"
+		elog "Verify tab. Same check, same code underneath."
+	fi
 }

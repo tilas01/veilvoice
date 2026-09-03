@@ -68,7 +68,6 @@ cargo build --release --locked --workspace
 
 %install
 install -Dpm 0755 target/release/veilvoice        %{buildroot}%{_bindir}/veilvoice
-install -Dpm 0755 target/release/veilvoice-verify %{buildroot}%{_bindir}/veilvoice-verify
 install -Dpm 0755 target/release/veilvoice-gui    %{buildroot}%{_bindir}/veilvoice-gui
 install -Dpm 0644 assets/icon.png                 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/veilvoice.png
 install -Dpm 0644 packaging/veilvoice.desktop     %{buildroot}%{_datadir}/applications/veilvoice.desktop
@@ -78,9 +77,6 @@ install -Dpm 0644 packaging/veilvoice.desktop     %{buildroot}%{_datadir}/applic
 # first by nothing but attention.
 python3 tools/release/manpage.py target/release/veilvoice \
     %{buildroot}%{_mandir}/man1/veilvoice.1
-python3 tools/release/manpage.py target/release/veilvoice-verify \
-    %{buildroot}%{_mandir}/man1/veilvoice-verify.1 \
-    --summary "check a VeilVoice release against its signature"
 python3 tools/release/manpage.py target/release/veilvoice-gui \
     %{buildroot}%{_mandir}/man1/veilvoice-gui.1 \
     --summary "the VeilVoice desktop application"
@@ -92,9 +88,7 @@ cargo test --release --locked --workspace
 %license LICENSE
 %doc README.md docs/
 %{_bindir}/veilvoice
-%{_bindir}/veilvoice-verify
 %{_mandir}/man1/veilvoice.1*
-%{_mandir}/man1/veilvoice-verify.1*
 
 %files gui
 %{_bindir}/veilvoice-gui

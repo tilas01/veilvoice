@@ -7,7 +7,7 @@
 
 # Why three files, and why they are not written three times
 
-A release ships three programs and somebody arriving with one of them in front
+A release ships two programs and somebody arriving with one of them in front
 of them should not have to read about the other two to find their part.
 `docs/USER_GUIDE.md` is the whole story and stays the whole story; these are
 views of it, one per program, for the wiki and for the archive.
@@ -57,7 +57,7 @@ GUIDES = [
             "is the part that says what to reach for and why.",
         "sections": [
             "Installing",
-            "The three programs, and which one you want",
+            "The two programs, and which one you want",
             "The command line",
             "An interview, start to finish",
             "Things VeilVoice will not do",
@@ -77,7 +77,7 @@ GUIDES = [
             "`veilvoice-gui --tab <name>` opens the window on one directly.",
         "sections": [
             "Installing",
-            "The three programs, and which one you want",
+            "The two programs, and which one you want",
             "The desktop app",
             "The app lock",
             "Locking the window when you walk away",
@@ -90,18 +90,18 @@ GUIDES = [
         "file": "docs/GUIDE_VERIFY.md",
         "wiki": "wiki/Guide-verifier.md",
         "title": "VeilVoice: checking a download",
-        "program": "`veilvoice-verify`",
+        "program": "`veilvoice verify`",
         "opening":
             "Read this one first. It is about deciding whether the archive you "
-            "just downloaded is the one that was published, and it is a "
-            "separate program so that it is usable *before* you trust the "
-            "other two.\n"
+            "just downloaded is the one that was published.\n"
             "\n"
-            "The short version: unpack the archive, run `veilvoice-verify` "
-            "inside the folder, read the verdict.",
+            "The short version: unpack the archive, run `veilvoice verify` "
+            "inside the folder, read the verdict. If you would rather not use "
+            "a terminal, the desktop application's Verify tab does the same "
+            "check with the same code underneath.",
         "sections": [
-            "The three programs, and which one you want",
-            "The verifier, `veilvoice-verify`",
+            "The two programs, and which one you want",
+            "The verifier, `veilvoice verify`",
             "Getting help, and checking for yourself",
         ],
     },

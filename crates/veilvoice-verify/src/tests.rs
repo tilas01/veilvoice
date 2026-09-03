@@ -161,7 +161,7 @@ fn an_armoured_block_that_is_not_a_signature_is_refused() {
 /// it in a pipeline where a stray line is a parse error.
 ///
 /// So the source itself is checked. Every `print!`, `println!` and `eprintln!`
-/// in `main.rs` must be reached through one of the three macros that gate on
+/// in `lib.rs` must be reached through one of the three macros that gate on
 /// the level, or from inside an explicit `if report::level() >= ...` block, or
 /// be one of the few lines that are not reports about a check at all.
 ///
@@ -179,7 +179,7 @@ fn every_line_printed_by_a_check_goes_through_the_level() {
     // including on the developer machine that had just run them.
     // Normalised here as well as pinned in .gitattributes: a test that
     // depends on a git setting is a test somebody will trip over.
-    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
 
     // What is allowed to print unconditionally, and why.
     //
@@ -229,7 +229,7 @@ fn every_line_printed_by_a_check_goes_through_the_level() {
         if asked_for_directly.contains(&trimmed) {
             continue;
         }
-        ungated.push(format!("main.rs:{}: {trimmed}", number + 1));
+        ungated.push(format!("lib.rs:{}: {trimmed}", number + 1));
     }
 
     assert!(
@@ -246,7 +246,7 @@ fn every_line_printed_by_a_check_goes_through_the_level() {
 /// leftover `FAILURE` would report a bad signature as a typing mistake.
 #[test]
 fn nothing_exits_with_an_undocumented_status() {
-    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
     let mut stray = Vec::new();
     for (number, line) in source.lines().enumerate() {
         let trimmed = line.trim();
@@ -254,7 +254,7 @@ fn nothing_exits_with_an_undocumented_status() {
             continue;
         }
         if trimmed.contains("ExitCode::FAILURE") {
-            stray.push(format!("main.rs:{}: {trimmed}", number + 1));
+            stray.push(format!("lib.rs:{}: {trimmed}", number + 1));
         }
     }
     assert!(
@@ -367,7 +367,7 @@ fn the_repository_pins_its_line_endings() {
 /// one.
 #[test]
 fn the_contents_list_is_verified_before_it_is_parsed() {
-    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
     let body = source
         .split("fn manifest(")
         .nth(1)
@@ -434,7 +434,7 @@ fn matches_name(manifest: &Manifest) -> &'static str {
 /// from GnuPG counts, and only a bad answer counts against.
 #[test]
 fn a_gnupg_that_cannot_run_is_never_counted_against_the_release() {
-    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
     let body = source
         .split("fn report_gnupg(")
         .nth(1)
@@ -470,7 +470,7 @@ fn a_gnupg_that_cannot_run_is_never_counted_against_the_release() {
 /// to stay true is that `command_auto` refuses before it searches.
 #[test]
 fn a_named_directory_that_is_not_there_is_refused_before_anything_is_searched() {
-    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
     let body = source
         .split("fn command_auto(")
         .nth(1)
