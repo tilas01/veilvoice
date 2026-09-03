@@ -96,10 +96,10 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>93 lines"])
     n_main(["main.rs<br/>190 lines"])
-    n_app["app.rs<br/>2857 lines"]
+    n_app["app.rs<br/>2879 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
-    n_crashlog["crashlog.rs<br/>443 lines"]
+    n_crashlog["crashlog.rs<br/>447 lines"]
     n_crashreport["crashreport.rs<br/>289 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
     n_firstrun["firstrun.rs<br/>490 lines"]
@@ -113,8 +113,8 @@ flowchart TD
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>638 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
-    n_security["security.rs<br/>1946 lines"]
-    n_settings["settings.rs<br/>1270 lines"]
+    n_security["security.rs<br/>2208 lines"]
+    n_settings["settings.rs<br/>1272 lines"]
     n_setup["setup.rs<br/>758 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
@@ -235,10 +235,10 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2857 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2879 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
-| [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 443 | Make a failure that produces no output produce some. |
+| [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 447 | Make a failure that produces no output produce some. |
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 289 | Offering the report from the last crash, on the run after it. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
 | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 490 | The first run: the four things worth deciding before anything else. |
@@ -254,8 +254,8 @@ flowchart TD
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 638 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
-| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1946 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1270 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 2208 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1272 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 758 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 766 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |

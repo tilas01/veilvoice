@@ -105,7 +105,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>169 lines"])
     n_companions["companions.rs<br/>855 lines"]
-    n_install["install.rs<br/>568 lines"]
+    n_install["install.rs<br/>569 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
     n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
@@ -121,7 +121,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | 855 | Optional third-party software, detected rather than assumed. |
-| [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 568 | Put this program somewhere the system can find it. |
+| [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 569 | Put this program somewhere the system can find it. |
 | [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 169 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 

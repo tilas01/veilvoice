@@ -141,5 +141,5 @@
 <text x="35.0" y="2284.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="2306.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions tests.rs defines, and the calls between them. An edge means the callee&#x27;s</text>
 <text x="20.0" y="2321.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body: a syntactic reading, not a</text>
-<text x="20.0" y="2336.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 24 are drawn, so the picture stays readable.</text>
+<text x="20.0" y="2336.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 25 are drawn, so the picture stays readable.</text>
 </svg>

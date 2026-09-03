@@ -1420,7 +1420,8 @@ mod tests {
         );
         assert!(
             !legacy.exists(),
-            "once the vault holds it the single file goes, or the next              creation trips over it exactly as F-141 did"
+            "once the vault holds it the single file goes, or the next creation trips over \
+             it exactly as F-141 did"
         );
         let (again, _) = open_in(dir.path()).unwrap();
         assert!(again.unwrap().unlock(b"from an older build").is_ok());
@@ -1432,7 +1433,8 @@ mod tests {
         LockStore::create(&dir.path().join(LEGACY_NAME), b"old", weak()).unwrap();
         assert!(
             create_in(dir.path(), b"new", weak()).is_err(),
-            "somebody's existing lock must not be replaced without their              passphrase, whichever file it happens to be in"
+            "somebody's existing lock must not be replaced without their passphrase, \
+             whichever file it happens to be in"
         );
     }
 

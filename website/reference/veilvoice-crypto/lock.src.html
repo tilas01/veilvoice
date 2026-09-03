@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/lock.rs</code></h1>
-<p style="color:var(--muted)"><a href="lock.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1821 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lock.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1823 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1599,405 +1599,407 @@
 <span class="ln" id="L1420">        );</span>
 <span class="ln" id="L1421">        assert!(</span>
 <span class="ln" id="L1422">            !legacy.<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L1423">            <span class="tok-str">&quot;once the vault holds it the single file goes, or the next              creation trips over it exactly as F-141 did&quot;</span></span>
-<span class="ln" id="L1424">        );</span>
-<span class="ln" id="L1425">        <span class="tok-kw">let</span> (again, _) = <span class="tok-fn">open_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1426">        assert!(again.<span class="tok-fn">unwrap</span>().<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;from an older build&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L1427">    }</span>
-<span class="ln" id="L1428"></span>
-<span class="ln" id="L1429">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1430">    <span class="tok-kw">fn</span> <span class="tok-fn">a_pre_vault_file_blocks_a_new_lock_rather_than_being_overwritten</span>() {</span>
-<span class="ln" id="L1431">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1432">        LockStore::<span class="tok-fn">create</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(LEGACY_NAME), b<span class="tok-str">&quot;old&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1433">        assert!(</span>
-<span class="ln" id="L1434">            <span class="tok-fn">create_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;new&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L1435">            <span class="tok-str">&quot;somebody&#x27;s existing lock must not be replaced without their              passphrase, whichever file it happens to be in&quot;</span></span>
-<span class="ln" id="L1436">        );</span>
-<span class="ln" id="L1437">    }</span>
-<span class="ln" id="L1438"></span>
-<span class="ln" id="L1439">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1440">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_directory_has_no_lock_and_that_is_not_an_error</span>() {</span>
-<span class="ln" id="L1441">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1442">        <span class="tok-kw">let</span> (found, restored) = <span class="tok-fn">open_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1443">        assert!(found.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L1444">        assert!(!restored);</span>
-<span class="ln" id="L1445">    }</span>
-<span class="ln" id="L1446"></span>
-<span class="ln" id="L1447">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1448">    <span class="tok-kw">fn</span> <span class="tok-fn">all_three_branches_of_one_run_are_independent</span>() {</span>
-<span class="ln" id="L1449">        <span class="tok-kw">let</span> salt = [5u8; kdf::SALT_LEN];</span>
-<span class="ln" id="L1450">        <span class="tok-kw">let</span> (verifier, tag_key, store) = <span class="tok-fn">derive_keys</span>(b<span class="tok-str">&quot;same passphrase&quot;</span>, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1451">        assert_ne!(verifier, tag_key);</span>
-<span class="ln" id="L1452">        assert_ne!(verifier, store);</span>
-<span class="ln" id="L1453">        assert_ne!(tag_key, store);</span>
-<span class="ln" id="L1454">    }</span>
-<span class="ln" id="L1455"></span>
-<span class="ln" id="L1456">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1457">    <span class="tok-kw">fn</span> <span class="tok-fn">the_store_key_does_not_follow_from_the_verifier_on_disk</span>() {</span>
-<span class="ln" id="L1458">        <span class="tok-com">// The verifier is published by the lock file simply existing. If the</span></span>
-<span class="ln" id="L1459">        <span class="tok-com">// store key could be recovered from it, the obfuscated folder would be</span></span>
-<span class="ln" id="L1460">        <span class="tok-com">// readable by anybody holding the disk, and the whole scheme would be</span></span>
-<span class="ln" id="L1461">        <span class="tok-com">// decoration. Distinct HKDF labels are what prevent that; this is the</span></span>
-<span class="ln" id="L1462">        <span class="tok-com">// test that says so.</span></span>
-<span class="ln" id="L1463">        <span class="tok-kw">let</span> salt = [5u8; kdf::SALT_LEN];</span>
-<span class="ln" id="L1464">        <span class="tok-kw">let</span> (verifier, _, store) = <span class="tok-fn">derive_keys</span>(b<span class="tok-str">&quot;passphrase&quot;</span>, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1465">        assert_ne!(verifier.<span class="tok-fn">expose</span>(), store.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L1466">    }</span>
-<span class="ln" id="L1467"></span>
-<span class="ln" id="L1468">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1469">    <span class="tok-kw">fn</span> <span class="tok-fn">the_store_key_is_the_same_every_time_for_one_passphrase</span>() {</span>
-<span class="ln" id="L1470">        <span class="tok-com">// Names are derived from it, so an unstable key would lose every</span></span>
-<span class="ln" id="L1471">        <span class="tok-com">// record on the next unlock.</span></span>
-<span class="ln" id="L1472">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;steady&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1473">        <span class="tok-kw">let</span> a = lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;steady&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1474">        <span class="tok-kw">let</span> b = lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;steady&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1475">        <span class="tok-kw">let</span> hoard_a = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>), a);</span>
-<span class="ln" id="L1476">        <span class="tok-kw">let</span> hoard_b = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>), b);</span>
-<span class="ln" id="L1477">        assert_eq!(</span>
-<span class="ln" id="L1478">            hoard_a.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1479">            hoard_b.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1480">        );</span>
-<span class="ln" id="L1481">    }</span>
-<span class="ln" id="L1482"></span>
-<span class="ln" id="L1483">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1484">    <span class="tok-kw">fn</span> <span class="tok-fn">a_different_passphrase_derives_a_different_store_key</span>() {</span>
-<span class="ln" id="L1485">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;right&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1486">        <span class="tok-kw">let</span> right = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(</span>
-<span class="ln" id="L1487">            std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>),</span>
-<span class="ln" id="L1488">            lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;right&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1489">        );</span>
-<span class="ln" id="L1490">        <span class="tok-kw">let</span> wrong = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(</span>
-<span class="ln" id="L1491">            std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>),</span>
-<span class="ln" id="L1492">            lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;wrong&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1493">        );</span>
-<span class="ln" id="L1494">        assert_ne!(</span>
-<span class="ln" id="L1495">            right.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1496">            wrong.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1497">        );</span>
-<span class="ln" id="L1498">    }</span>
-<span class="ln" id="L1499"></span>
-<span class="ln" id="L1500">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1501">    <span class="tok-kw">fn</span> <span class="tok-fn">the_stored_verifier_is_not_the_password_or_a_bare_hash_of_it</span>() {</span>
-<span class="ln" id="L1502">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;hunter2&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1503">        <span class="tok-kw">let</span> bytes = lock.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1504">        assert!(</span>
-<span class="ln" id="L1505">            !bytes.<span class="tok-fn">windows</span>(<span class="tok-num">7</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;hunter2&quot;</span>),</span>
-<span class="ln" id="L1506">            <span class="tok-str">&quot;the password itself is in the file&quot;</span></span>
-<span class="ln" id="L1507">        );</span>
-<span class="ln" id="L1508">    }</span>
-<span class="ln" id="L1509"></span>
-<span class="ln" id="L1510">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1511">    <span class="tok-kw">fn</span> <span class="tok-fn">the_store_persists_attempts_across_reopening</span>() {</span>
-<span class="ln" id="L1512">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1513">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1514"></span>
-<span class="ln" id="L1515">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1516">        assert!(path.<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L1517">        assert!(matches!(store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;no&quot;</span>), <span class="tok-fn">Err</span>(Error::AppLockRejected)));</span>
-<span class="ln" id="L1518"></span>
-<span class="ln" id="L1519">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> reopened = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;lock is there&quot;</span>);</span>
-<span class="ln" id="L1520">        assert_eq!(reopened.<span class="tok-fn">failures</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;the failure did not reach disk&quot;</span>);</span>
-<span class="ln" id="L1521">        reopened.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1522">        assert_eq!(reopened.<span class="tok-fn">failures</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L1523">    }</span>
-<span class="ln" id="L1524"></span>
-<span class="ln" id="L1525">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1526">    <span class="tok-kw">fn</span> <span class="tok-fn">no_lock_file_means_no_lock_but_a_broken_one_is_an_error</span>() {</span>
-<span class="ln" id="L1527">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1528">        <span class="tok-kw">let</span> missing = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1529">        assert!(LockStore::<span class="tok-fn">open</span>(&amp;missing).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L1530"></span>
-<span class="ln" id="L1531">        <span class="tok-kw">let</span> corrupt = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;corrupt.bin&quot;</span>);</span>
-<span class="ln" id="L1532">        std::fs::<span class="tok-fn">write</span>(&amp;corrupt, vec![0u8; LOCK_LEN]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1533">        assert!(</span>
-<span class="ln" id="L1534">            LockStore::<span class="tok-fn">open</span>(&amp;corrupt).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L1535">            <span class="tok-str">&quot;a corrupt lock must not read as an absent one&quot;</span></span>
-<span class="ln" id="L1536">        );</span>
-<span class="ln" id="L1537">    }</span>
-<span class="ln" id="L1538"></span>
-<span class="ln" id="L1539">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1540">    <span class="tok-kw">fn</span> <span class="tok-fn">creating_over_an_existing_lock_is_refused</span>() {</span>
-<span class="ln" id="L1541">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1542">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1543">        LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1544">        assert!(matches!(</span>
-<span class="ln" id="L1545">            LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;other&quot;</span>, <span class="tok-fn">weak</span>()),</span>
-<span class="ln" id="L1546">            <span class="tok-fn">Err</span>(Error::AppLockStore)</span>
-<span class="ln" id="L1547">        ));</span>
-<span class="ln" id="L1548">    }</span>
-<span class="ln" id="L1549"></span>
-<span class="ln" id="L1550">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1551">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_and_removing_need_the_current_password</span>() {</span>
-<span class="ln" id="L1552">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1553">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1554">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;first&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1555"></span>
-<span class="ln" id="L1556">        assert!(store.<span class="tok-fn">change_password</span>(b<span class="tok-str">&quot;wrong&quot;</span>, b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L1557">        store.<span class="tok-fn">change_password</span>(b<span class="tok-str">&quot;first&quot;</span>, b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1558">        assert!(matches!(</span>
-<span class="ln" id="L1559">            store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;first&quot;</span>),</span>
-<span class="ln" id="L1560">            <span class="tok-fn">Err</span>(Error::AppLockRejected)</span>
-<span class="ln" id="L1561">        ));</span>
-<span class="ln" id="L1562">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1563"></span>
-<span class="ln" id="L1564">        <span class="tok-kw">let</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1565">        assert!(store.<span class="tok-fn">remove</span>(b<span class="tok-str">&quot;nope&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L1566">        assert!(path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;a failed removal must leave the lock alone&quot;</span>);</span>
-<span class="ln" id="L1567"></span>
-<span class="ln" id="L1568">        <span class="tok-kw">let</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1569">        store.<span class="tok-fn">remove</span>(b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1570">        assert!(!path.<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L1571">    }</span>
-<span class="ln" id="L1572"></span>
-<span class="ln" id="L1573">    <span class="tok-com">/// The claim the tag exists to support, stated as a test so it cannot</span></span>
-<span class="ln" id="L1574">    <span class="tok-com">/// quietly stop being true: an edit made without the passphrase is caught</span></span>
-<span class="ln" id="L1575">    <span class="tok-com">/// at the next unlock.</span></span>
-<span class="ln" id="L1576">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1577">    <span class="tok-kw">fn</span> <span class="tok-fn">swapping_the_stored_verifier_is_reported_at_the_next_unlock</span>() {</span>
-<span class="ln" id="L1578">        <span class="tok-kw">let</span> honest = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1579">        <span class="tok-kw">let</span> attacker = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the attacker&#x27;s&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1580"></span>
-<span class="ln" id="L1581">        <span class="tok-com">// Splice the attacker&#x27;s verifier into the owner&#x27;s record, leaving</span></span>
-<span class="ln" id="L1582">        <span class="tok-com">// everything else including the tag alone. This is the attack: a lock</span></span>
-<span class="ln" id="L1583">        <span class="tok-com">// that opens to a password the owner never chose.</span></span>
-<span class="ln" id="L1584">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = honest.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1585">        <span class="tok-kw">let</span> theirs = attacker.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1586">        bytes[<span class="tok-num">24</span>..<span class="tok-num">72</span>].<span class="tok-fn">copy_from_slice</span>(&amp;theirs[<span class="tok-num">24</span>..<span class="tok-num">72</span>]);</span>
-<span class="ln" id="L1587"></span>
-<span class="ln" id="L1588">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> edited = AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1589">        assert!(!edited.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;nothing has been checked yet&quot;</span>);</span>
-<span class="ln" id="L1590">        edited.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;the attacker&#x27;s&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1591">        assert!(</span>
-<span class="ln" id="L1592">            edited.<span class="tok-fn">tampered</span>(),</span>
-<span class="ln" id="L1593">            <span class="tok-str">&quot;the record was edited by somebody without the passphrase and \</span></span>
-<span class="ln" id="L1594"><span class="tok-str">             nothing said so&quot;</span></span>
-<span class="ln" id="L1595">        );</span>
-<span class="ln" id="L1596">    }</span>
-<span class="ln" id="L1597"></span>
-<span class="ln" id="L1598">    <span class="tok-com">/// Weakening the stored cost is the other edit worth making, and it is</span></span>
-<span class="ln" id="L1599">    <span class="tok-com">/// answered before the tag is even consulted: the cost is an input to the</span></span>
-<span class="ln" id="L1600">    <span class="tok-com">/// derivation, so a changed cost produces a different verifier and the</span></span>
-<span class="ln" id="L1601">    <span class="tok-com">/// owner&#x27;s own passphrase stops matching. Refusal, not a warning, which is</span></span>
-<span class="ln" id="L1602">    <span class="tok-com">/// the stronger of the two answers.</span></span>
-<span class="ln" id="L1603">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1604">    <span class="tok-kw">fn</span> <span class="tok-fn">weakening_the_argon_cost_stops_the_lock_opening_at_all</span>() {</span>
-<span class="ln" id="L1605">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, kdf::KdfParams::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1606">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = lock.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1607">        bytes[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-fn">weak</span>().m_cost.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1608">        bytes[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-fn">weak</span>().t_cost.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1609">        bytes[<span class="tok-num">20</span>..<span class="tok-num">24</span>].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-fn">weak</span>().p_cost.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1610"></span>
-<span class="ln" id="L1611">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> edited = AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1612">        assert!(matches!(edited.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;pw&quot;</span>), <span class="tok-fn">Err</span>(Error::AppLockRejected)));</span>
-<span class="ln" id="L1613">    }</span>
-<span class="ln" id="L1614"></span>
-<span class="ln" id="L1615">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1616">    <span class="tok-kw">fn</span> <span class="tok-fn">clearing_the_tamper_flag_by_hand_puts_it_straight_back</span>() {</span>
-<span class="ln" id="L1617">        <span class="tok-kw">let</span> honest = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1618">        <span class="tok-kw">let</span> attacker = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;other&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1619">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = honest.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1620">        bytes[<span class="tok-num">24</span>..<span class="tok-num">72</span>].<span class="tok-fn">copy_from_slice</span>(&amp;attacker.<span class="tok-fn">to_bytes</span>()[<span class="tok-num">24</span>..<span class="tok-num">72</span>]);</span>
-<span class="ln" id="L1621"></span>
-<span class="ln" id="L1622">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> raised = AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1623">        raised.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1624">        assert!(raised.<span class="tok-fn">tampered</span>());</span>
-<span class="ln" id="L1625">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stored = raised.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1626">        assert_eq!(stored[<span class="tok-num">72</span>], <span class="tok-num">1</span>, <span class="tok-str">&quot;the report must reach the file&quot;</span>);</span>
-<span class="ln" id="L1627"></span>
-<span class="ln" id="L1628">        <span class="tok-com">// Now wipe the flag, as somebody hiding their tracks would.</span></span>
-<span class="ln" id="L1629">        stored[<span class="tok-num">72</span>] = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L1630">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hidden = AppLock::<span class="tok-fn">parse</span>(&amp;stored).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1631">        assert!(!hidden.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;the file no longer says so&quot;</span>);</span>
-<span class="ln" id="L1632">        hidden.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1633">        assert!(</span>
-<span class="ln" id="L1634">            hidden.<span class="tok-fn">tampered</span>(),</span>
-<span class="ln" id="L1635">            <span class="tok-str">&quot;the flag is inside the tag, so clearing it is itself an edit&quot;</span></span>
-<span class="ln" id="L1636">        );</span>
-<span class="ln" id="L1637">    }</span>
-<span class="ln" id="L1638"></span>
-<span class="ln" id="L1639">    <span class="tok-com">/// The report must not be dismissible by anything except the passphrase,</span></span>
-<span class="ln" id="L1640">    <span class="tok-com">/// and it must survive the process dying.</span></span>
-<span class="ln" id="L1641">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1642">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_outlives_a_restart_and_needs_the_passphrase_to_clear</span>() {</span>
-<span class="ln" id="L1643">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1644">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1645">        LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1646"></span>
-<span class="ln" id="L1647">        <span class="tok-kw">let</span> attacker = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;other&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1648">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1649">        bytes[<span class="tok-num">24</span>..<span class="tok-num">72</span>].<span class="tok-fn">copy_from_slice</span>(&amp;attacker.<span class="tok-fn">to_bytes</span>()[<span class="tok-num">24</span>..<span class="tok-num">72</span>]);</span>
-<span class="ln" id="L1650">        std::fs::<span class="tok-fn">write</span>(&amp;path, &amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1651"></span>
-<span class="ln" id="L1652">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1653">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1654">        assert!(store.<span class="tok-fn">tampered</span>());</span>
-<span class="ln" id="L1655"></span>
-<span class="ln" id="L1656">        <span class="tok-com">// Reopened from disk, the report is still there.</span></span>
-<span class="ln" id="L1657">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1658">        assert!(store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;the report did not survive a restart&quot;</span>);</span>
-<span class="ln" id="L1659">        assert!(matches!(</span>
-<span class="ln" id="L1660">            store.<span class="tok-fn">acknowledge</span>(b<span class="tok-str">&quot;wrong&quot;</span>),</span>
-<span class="ln" id="L1661">            <span class="tok-fn">Err</span>(Error::AppLockRejected)</span>
-<span class="ln" id="L1662">        ));</span>
-<span class="ln" id="L1663">        assert!(store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;a wrong password must not dismiss it&quot;</span>);</span>
-<span class="ln" id="L1664">        store.<span class="tok-fn">acknowledge</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1665">        assert!(!store.<span class="tok-fn">tampered</span>());</span>
-<span class="ln" id="L1666"></span>
-<span class="ln" id="L1667">        <span class="tok-kw">let</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1668">        assert!(!store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;the acknowledgement must reach disk&quot;</span>);</span>
-<span class="ln" id="L1669">    }</span>
-<span class="ln" id="L1670"></span>
-<span class="ln" id="L1671">    <span class="tok-com">/// An honest typo is not tampering, and a test says so because getting</span></span>
-<span class="ln" id="L1672">    <span class="tok-com">/// this wrong would train the user to ignore the warning.</span></span>
-<span class="ln" id="L1673">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1674">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wrong_password_is_never_reported_as_tampering</span>() {</span>
-<span class="ln" id="L1675">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1676">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1677">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1678">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
-<span class="ln" id="L1679">            assert!(matches!(store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;typo&quot;</span>), <span class="tok-fn">Err</span>(Error::AppLockRejected)));</span>
-<span class="ln" id="L1680">        }</span>
-<span class="ln" id="L1681">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1682">        assert!(!store.<span class="tok-fn">tampered</span>());</span>
-<span class="ln" id="L1683">    }</span>
-<span class="ln" id="L1684"></span>
-<span class="ln" id="L1685">    <span class="tok-com">/// A lock written by an older build has no tag. It must keep working, and</span></span>
-<span class="ln" id="L1686">    <span class="tok-com">/// it must gain one, and it must not be accused of anything on the way.</span></span>
-<span class="ln" id="L1687">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1688">    <span class="tok-kw">fn</span> <span class="tok-fn">a_version_one_lock_still_opens_and_is_upgraded_in_place</span>() {</span>
-<span class="ln" id="L1689">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1690">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1691"></span>
-<span class="ln" id="L1692">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1693">        <span class="tok-kw">let</span> v2 = lock.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1694">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> v1 = Vec::<span class="tok-fn">with_capacity</span>(LOCK_LEN_V1);</span>
-<span class="ln" id="L1695">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;v2[..<span class="tok-num">8</span>]);</span>
-<span class="ln" id="L1696">        v1.<span class="tok-fn">push</span>(<span class="tok-num">1</span>);</span>
-<span class="ln" id="L1697">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;v2[<span class="tok-num">9</span>..<span class="tok-num">72</span>]);</span>
-<span class="ln" id="L1698">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;2u32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// failures</span></span>
-<span class="ln" id="L1699">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;0i64.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// last failure</span></span>
-<span class="ln" id="L1700">        assert_eq!(v1.<span class="tok-fn">len</span>(), LOCK_LEN_V1);</span>
-<span class="ln" id="L1701">        std::fs::<span class="tok-fn">write</span>(&amp;path, &amp;v1).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1702"></span>
-<span class="ln" id="L1703">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1704">        assert_eq!(store.<span class="tok-fn">failures</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;the old counter must be read&quot;</span>);</span>
-<span class="ln" id="L1705">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1706">        assert!(!store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;an untagged record is not an edited one&quot;</span>);</span>
-<span class="ln" id="L1707"></span>
-<span class="ln" id="L1708">        <span class="tok-kw">let</span> raw = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1709">        assert_eq!(raw.<span class="tok-fn">len</span>(), LOCK_LEN, <span class="tok-str">&quot;it should have been rewritten&quot;</span>);</span>
-<span class="ln" id="L1710">        assert_eq!(raw[<span class="tok-num">8</span>], FORMAT_VERSION);</span>
-<span class="ln" id="L1711">    }</span>
-<span class="ln" id="L1712"></span>
-<span class="ln" id="L1713">    <span class="tok-com">/// The nonce must move on every write, because Poly1305 under a repeated</span></span>
-<span class="ln" id="L1714">    <span class="tok-com">/// nonce hands an observer of two records enough to forge a third.</span></span>
-<span class="ln" id="L1715">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1716">    <span class="tok-kw">fn</span> <span class="tok-fn">two_writes_never_share_a_tag_nonce</span>() {</span>
-<span class="ln" id="L1717">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1718">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L1719">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1720">        <span class="tok-kw">let</span> first = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>()[<span class="tok-num">73</span>..<span class="tok-num">97</span>].<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L1721">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1722">        <span class="tok-kw">let</span> second = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>()[<span class="tok-num">73</span>..<span class="tok-num">97</span>].<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L1723">        assert_ne!(first, second, <span class="tok-str">&quot;the tag nonce repeated across two writes&quot;</span>);</span>
-<span class="ln" id="L1724">    }</span>
-<span class="ln" id="L1725"></span>
-<span class="ln" id="L1726">    <span class="tok-com">/// F-91. The one file this program reads before anybody has authenticated</span></span>
-<span class="ln" id="L1727">    <span class="tok-com">/// must not be able to ask for more memory than the machine has. Nobody</span></span>
-<span class="ln" id="L1728">    <span class="tok-com">/// chose to open it, so nobody can choose to stop waiting for it.</span></span>
-<span class="ln" id="L1729">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1730">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_file_cannot_demand_more_memory_than_an_unattended_caller_allows</span>() {</span>
-<span class="ln" id="L1731">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1732">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = lock.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1733"></span>
-<span class="ln" id="L1734">        <span class="tok-com">// What the campaign produced: within `checked`, far outside anything</span></span>
-<span class="ln" id="L1735">        <span class="tok-com">// this program has ever written.</span></span>
-<span class="ln" id="L1736">        bytes[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;(1_703_936u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1737">        assert!(</span>
-<span class="ln" id="L1738">            AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L1739">            <span class="tok-str">&quot;a lock file declaring 1.6 GiB of Argon2 memory was accepted&quot;</span></span>
-<span class="ln" id="L1740">        );</span>
-<span class="ln" id="L1741"></span>
-<span class="ln" id="L1742">        <span class="tok-com">// And the ceiling itself is above anything legitimate, so a real lock</span></span>
-<span class="ln" id="L1743">        <span class="tok-com">// is not caught by it.</span></span>
-<span class="ln" id="L1744">        bytes[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;kdf::KdfParams::<span class="tok-fn">default</span>().m_cost.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1745">        bytes[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;kdf::KdfParams::<span class="tok-fn">default</span>().t_cost.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1746">        bytes[<span class="tok-num">20</span>..<span class="tok-num">24</span>].<span class="tok-fn">copy_from_slice</span>(&amp;kdf::KdfParams::<span class="tok-fn">default</span>().p_cost.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L1747">        assert!(</span>
-<span class="ln" id="L1748">            AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">is_ok</span>(),</span>
-<span class="ln" id="L1749">            <span class="tok-str">&quot;the default cost this program writes was refused by its own ceiling&quot;</span></span>
-<span class="ln" id="L1750">        );</span>
-<span class="ln" id="L1751">    }</span>
-<span class="ln" id="L1752"></span>
-<span class="ln" id="L1753">    <span class="tok-com">/// F-88. Acknowledging a report must cost one key derivation, not three.</span></span>
-<span class="ln" id="L1754">    <span class="tok-com">/// Counted in the source rather than timed, because a timing test on a</span></span>
-<span class="ln" id="L1755">    <span class="tok-com">/// deliberately slow function is a flaky test.</span></span>
-<span class="ln" id="L1756">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1757">    <span class="tok-kw">fn</span> <span class="tok-fn">acknowledging_a_report_derives_the_key_once</span>() {</span>
-<span class="ln" id="L1758">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lock.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1759">        <span class="tok-kw">let</span> start = source</span>
-<span class="ln" id="L1760">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn acknowledge(&amp;mut self, password: &amp;[u8]) -&gt; Result&lt;(), Error&gt; {\n        self.unlock&quot;</span>)</span>
-<span class="ln" id="L1761">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the store&#x27;s acknowledge has to exist&quot;</span>);</span>
-<span class="ln" id="L1762">        <span class="tok-kw">let</span> body = &amp;source[start..];</span>
-<span class="ln" id="L1763">        <span class="tok-kw">let</span> end = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    }&quot;</span>).<span class="tok-fn">unwrap_or</span>(body.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L1764">        <span class="tok-kw">let</span> body = &amp;body[..end];</span>
-<span class="ln" id="L1765">        assert!(</span>
-<span class="ln" id="L1766">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.lock.acknowledge&quot;</span>),</span>
-<span class="ln" id="L1767">            <span class="tok-str">&quot;the store verifies once through `unlock`; calling the record&#x27;s own \</span></span>
-<span class="ln" id="L1768"><span class="tok-str">             acknowledge verifies a second and a third time&quot;</span></span>
-<span class="ln" id="L1769">        );</span>
-<span class="ln" id="L1770">        assert_eq!(</span>
-<span class="ln" id="L1771">            body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;self.unlock&quot;</span>).<span class="tok-fn">count</span>(),</span>
-<span class="ln" id="L1772">            <span class="tok-num">1</span>,</span>
-<span class="ln" id="L1773">            <span class="tok-str">&quot;one proof of the passphrase is enough to clear a report&quot;</span></span>
-<span class="ln" id="L1774">        );</span>
-<span class="ln" id="L1775">    }</span>
-<span class="ln" id="L1776"></span>
-<span class="ln" id="L1777">    <span class="tok-com">/// F-86. A password change that could not reach the spare has left the</span></span>
-<span class="ln" id="L1778">    <span class="tok-com">/// previous password in a file this process cannot rewrite, so it is not a</span></span>
-<span class="ln" id="L1779">    <span class="tok-com">/// finished change and must not be reported as one.</span></span>
-<span class="ln" id="L1780">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1781">    <span class="tok-kw">fn</span> <span class="tok-fn">a_change_that_did_not_reach_the_spare_is_not_reported_as_done</span>() {</span>
-<span class="ln" id="L1782">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lock.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1783">        <span class="tok-kw">let</span> start = source</span>
-<span class="ln" id="L1784">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn change_password&quot;</span>)</span>
-<span class="ln" id="L1785">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;change_password exists&quot;</span>);</span>
-<span class="ln" id="L1786">        <span class="tok-kw">let</span> body = &amp;source[start..];</span>
-<span class="ln" id="L1787">        <span class="tok-kw">let</span> end = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// Remove the lock&quot;</span>).<span class="tok-fn">unwrap_or</span>(body.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L1788">        assert!(</span>
-<span class="ln" id="L1789">            body[..end].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Error::AppLockSpareStale&quot;</span>),</span>
-<span class="ln" id="L1790">            <span class="tok-str">&quot;a change that left the spare behind reported success&quot;</span></span>
-<span class="ln" id="L1791">        );</span>
-<span class="ln" id="L1792">    }</span>
-<span class="ln" id="L1793"></span>
-<span class="ln" id="L1794">    <span class="tok-com">/// The user-facing claim must keep stating the limit. If someone edits this</span></span>
-<span class="ln" id="L1795">    <span class="tok-com">/// into a promise, this test is what stops it shipping.</span></span>
-<span class="ln" id="L1796">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1797">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_states_the_limit_rather_than_a_guarantee</span>() {</span>
-<span class="ln" id="L1798">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L1799">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not disk encryption&quot;</span>));</span>
-<span class="ln" id="L1800">        assert!(</span>
-<span class="ln" id="L1801">            scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not tamper-proof&quot;</span>),</span>
-<span class="ln" id="L1802">            <span class="tok-str">&quot;the tag catches edits; it does not make the file tamper-proof, and \</span></span>
-<span class="ln" id="L1803"><span class="tok-str">             the difference is the whole of what this note exists to say&quot;</span></span>
-<span class="ln" id="L1804">        );</span>
-<span class="ln" id="L1805">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;delete&quot;</span>), <span class="tok-str">&quot;deletion must be admitted&quot;</span>);</span>
-<span class="ln" id="L1806">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;offline&quot;</span>), <span class="tok-str">&quot;offline attack must be admitted&quot;</span>);</span>
-<span class="ln" id="L1807">        <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;impossible&quot;</span>, <span class="tok-str">&quot;guarantee&quot;</span>] {</span>
-<span class="ln" id="L1808">            assert!(!scope.<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;overclaim: {boast}&quot;</span>);</span>
-<span class="ln" id="L1809">        }</span>
-<span class="ln" id="L1810">    }</span>
-<span class="ln" id="L1811"></span>
-<span class="ln" id="L1812">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1813">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_path_is_under_a_config_directory_when_the_environment_says</span>() {</span>
-<span class="ln" id="L1814">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() {</span>
-<span class="ln" id="L1815">            assert!(</span>
-<span class="ln" id="L1816">                path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;veilvoice/applock.bin&quot;</span>) || path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;veilvoice\\applock.bin&quot;</span>)</span>
-<span class="ln" id="L1817">            );</span>
-<span class="ln" id="L1818">            assert!(path.<span class="tok-fn">parent</span>().<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L1819">        }</span>
-<span class="ln" id="L1820">    }</span>
-<span class="ln" id="L1821">}</span>
+<span class="ln" id="L1423">            <span class="tok-str">&quot;once the vault holds it the single file goes, or the next creation trips over \</span></span>
+<span class="ln" id="L1424"><span class="tok-str">             it exactly as F-141 did&quot;</span></span>
+<span class="ln" id="L1425">        );</span>
+<span class="ln" id="L1426">        <span class="tok-kw">let</span> (again, _) = <span class="tok-fn">open_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1427">        assert!(again.<span class="tok-fn">unwrap</span>().<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;from an older build&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L1428">    }</span>
+<span class="ln" id="L1429"></span>
+<span class="ln" id="L1430">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1431">    <span class="tok-kw">fn</span> <span class="tok-fn">a_pre_vault_file_blocks_a_new_lock_rather_than_being_overwritten</span>() {</span>
+<span class="ln" id="L1432">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1433">        LockStore::<span class="tok-fn">create</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(LEGACY_NAME), b<span class="tok-str">&quot;old&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1434">        assert!(</span>
+<span class="ln" id="L1435">            <span class="tok-fn">create_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;new&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L1436">            <span class="tok-str">&quot;somebody&#x27;s existing lock must not be replaced without their passphrase, \</span></span>
+<span class="ln" id="L1437"><span class="tok-str">             whichever file it happens to be in&quot;</span></span>
+<span class="ln" id="L1438">        );</span>
+<span class="ln" id="L1439">    }</span>
+<span class="ln" id="L1440"></span>
+<span class="ln" id="L1441">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1442">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_directory_has_no_lock_and_that_is_not_an_error</span>() {</span>
+<span class="ln" id="L1443">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1444">        <span class="tok-kw">let</span> (found, restored) = <span class="tok-fn">open_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1445">        assert!(found.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L1446">        assert!(!restored);</span>
+<span class="ln" id="L1447">    }</span>
+<span class="ln" id="L1448"></span>
+<span class="ln" id="L1449">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1450">    <span class="tok-kw">fn</span> <span class="tok-fn">all_three_branches_of_one_run_are_independent</span>() {</span>
+<span class="ln" id="L1451">        <span class="tok-kw">let</span> salt = [5u8; kdf::SALT_LEN];</span>
+<span class="ln" id="L1452">        <span class="tok-kw">let</span> (verifier, tag_key, store) = <span class="tok-fn">derive_keys</span>(b<span class="tok-str">&quot;same passphrase&quot;</span>, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1453">        assert_ne!(verifier, tag_key);</span>
+<span class="ln" id="L1454">        assert_ne!(verifier, store);</span>
+<span class="ln" id="L1455">        assert_ne!(tag_key, store);</span>
+<span class="ln" id="L1456">    }</span>
+<span class="ln" id="L1457"></span>
+<span class="ln" id="L1458">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1459">    <span class="tok-kw">fn</span> <span class="tok-fn">the_store_key_does_not_follow_from_the_verifier_on_disk</span>() {</span>
+<span class="ln" id="L1460">        <span class="tok-com">// The verifier is published by the lock file simply existing. If the</span></span>
+<span class="ln" id="L1461">        <span class="tok-com">// store key could be recovered from it, the obfuscated folder would be</span></span>
+<span class="ln" id="L1462">        <span class="tok-com">// readable by anybody holding the disk, and the whole scheme would be</span></span>
+<span class="ln" id="L1463">        <span class="tok-com">// decoration. Distinct HKDF labels are what prevent that; this is the</span></span>
+<span class="ln" id="L1464">        <span class="tok-com">// test that says so.</span></span>
+<span class="ln" id="L1465">        <span class="tok-kw">let</span> salt = [5u8; kdf::SALT_LEN];</span>
+<span class="ln" id="L1466">        <span class="tok-kw">let</span> (verifier, _, store) = <span class="tok-fn">derive_keys</span>(b<span class="tok-str">&quot;passphrase&quot;</span>, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1467">        assert_ne!(verifier.<span class="tok-fn">expose</span>(), store.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L1468">    }</span>
+<span class="ln" id="L1469"></span>
+<span class="ln" id="L1470">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1471">    <span class="tok-kw">fn</span> <span class="tok-fn">the_store_key_is_the_same_every_time_for_one_passphrase</span>() {</span>
+<span class="ln" id="L1472">        <span class="tok-com">// Names are derived from it, so an unstable key would lose every</span></span>
+<span class="ln" id="L1473">        <span class="tok-com">// record on the next unlock.</span></span>
+<span class="ln" id="L1474">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;steady&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1475">        <span class="tok-kw">let</span> a = lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;steady&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1476">        <span class="tok-kw">let</span> b = lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;steady&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1477">        <span class="tok-kw">let</span> hoard_a = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>), a);</span>
+<span class="ln" id="L1478">        <span class="tok-kw">let</span> hoard_b = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>), b);</span>
+<span class="ln" id="L1479">        assert_eq!(</span>
+<span class="ln" id="L1480">            hoard_a.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1481">            hoard_b.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1482">        );</span>
+<span class="ln" id="L1483">    }</span>
+<span class="ln" id="L1484"></span>
+<span class="ln" id="L1485">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1486">    <span class="tok-kw">fn</span> <span class="tok-fn">a_different_passphrase_derives_a_different_store_key</span>() {</span>
+<span class="ln" id="L1487">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;right&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1488">        <span class="tok-kw">let</span> right = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(</span>
+<span class="ln" id="L1489">            std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>),</span>
+<span class="ln" id="L1490">            lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;right&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1491">        );</span>
+<span class="ln" id="L1492">        <span class="tok-kw">let</span> wrong = <span class="tok-kw">crate</span>::hoard::Hoard::<span class="tok-fn">open</span>(</span>
+<span class="ln" id="L1493">            std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>),</span>
+<span class="ln" id="L1494">            lock.<span class="tok-fn">store_key</span>(b<span class="tok-str">&quot;wrong&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1495">        );</span>
+<span class="ln" id="L1496">        assert_ne!(</span>
+<span class="ln" id="L1497">            right.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1498">            wrong.<span class="tok-fn">name_for</span>(<span class="tok-str">&quot;settings&quot;</span>).<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1499">        );</span>
+<span class="ln" id="L1500">    }</span>
+<span class="ln" id="L1501"></span>
+<span class="ln" id="L1502">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1503">    <span class="tok-kw">fn</span> <span class="tok-fn">the_stored_verifier_is_not_the_password_or_a_bare_hash_of_it</span>() {</span>
+<span class="ln" id="L1504">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;hunter2&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1505">        <span class="tok-kw">let</span> bytes = lock.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1506">        assert!(</span>
+<span class="ln" id="L1507">            !bytes.<span class="tok-fn">windows</span>(<span class="tok-num">7</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;hunter2&quot;</span>),</span>
+<span class="ln" id="L1508">            <span class="tok-str">&quot;the password itself is in the file&quot;</span></span>
+<span class="ln" id="L1509">        );</span>
+<span class="ln" id="L1510">    }</span>
+<span class="ln" id="L1511"></span>
+<span class="ln" id="L1512">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1513">    <span class="tok-kw">fn</span> <span class="tok-fn">the_store_persists_attempts_across_reopening</span>() {</span>
+<span class="ln" id="L1514">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1515">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1516"></span>
+<span class="ln" id="L1517">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1518">        assert!(path.<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L1519">        assert!(matches!(store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;no&quot;</span>), <span class="tok-fn">Err</span>(Error::AppLockRejected)));</span>
+<span class="ln" id="L1520"></span>
+<span class="ln" id="L1521">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> reopened = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;lock is there&quot;</span>);</span>
+<span class="ln" id="L1522">        assert_eq!(reopened.<span class="tok-fn">failures</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;the failure did not reach disk&quot;</span>);</span>
+<span class="ln" id="L1523">        reopened.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1524">        assert_eq!(reopened.<span class="tok-fn">failures</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L1525">    }</span>
+<span class="ln" id="L1526"></span>
+<span class="ln" id="L1527">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1528">    <span class="tok-kw">fn</span> <span class="tok-fn">no_lock_file_means_no_lock_but_a_broken_one_is_an_error</span>() {</span>
+<span class="ln" id="L1529">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1530">        <span class="tok-kw">let</span> missing = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1531">        assert!(LockStore::<span class="tok-fn">open</span>(&amp;missing).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L1532"></span>
+<span class="ln" id="L1533">        <span class="tok-kw">let</span> corrupt = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;corrupt.bin&quot;</span>);</span>
+<span class="ln" id="L1534">        std::fs::<span class="tok-fn">write</span>(&amp;corrupt, vec![0u8; LOCK_LEN]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1535">        assert!(</span>
+<span class="ln" id="L1536">            LockStore::<span class="tok-fn">open</span>(&amp;corrupt).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L1537">            <span class="tok-str">&quot;a corrupt lock must not read as an absent one&quot;</span></span>
+<span class="ln" id="L1538">        );</span>
+<span class="ln" id="L1539">    }</span>
+<span class="ln" id="L1540"></span>
+<span class="ln" id="L1541">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1542">    <span class="tok-kw">fn</span> <span class="tok-fn">creating_over_an_existing_lock_is_refused</span>() {</span>
+<span class="ln" id="L1543">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1544">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1545">        LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1546">        assert!(matches!(</span>
+<span class="ln" id="L1547">            LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;other&quot;</span>, <span class="tok-fn">weak</span>()),</span>
+<span class="ln" id="L1548">            <span class="tok-fn">Err</span>(Error::AppLockStore)</span>
+<span class="ln" id="L1549">        ));</span>
+<span class="ln" id="L1550">    }</span>
+<span class="ln" id="L1551"></span>
+<span class="ln" id="L1552">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1553">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_and_removing_need_the_current_password</span>() {</span>
+<span class="ln" id="L1554">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1555">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1556">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;first&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1557"></span>
+<span class="ln" id="L1558">        assert!(store.<span class="tok-fn">change_password</span>(b<span class="tok-str">&quot;wrong&quot;</span>, b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L1559">        store.<span class="tok-fn">change_password</span>(b<span class="tok-str">&quot;first&quot;</span>, b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1560">        assert!(matches!(</span>
+<span class="ln" id="L1561">            store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;first&quot;</span>),</span>
+<span class="ln" id="L1562">            <span class="tok-fn">Err</span>(Error::AppLockRejected)</span>
+<span class="ln" id="L1563">        ));</span>
+<span class="ln" id="L1564">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1565"></span>
+<span class="ln" id="L1566">        <span class="tok-kw">let</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1567">        assert!(store.<span class="tok-fn">remove</span>(b<span class="tok-str">&quot;nope&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L1568">        assert!(path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;a failed removal must leave the lock alone&quot;</span>);</span>
+<span class="ln" id="L1569"></span>
+<span class="ln" id="L1570">        <span class="tok-kw">let</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1571">        store.<span class="tok-fn">remove</span>(b<span class="tok-str">&quot;second&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1572">        assert!(!path.<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L1573">    }</span>
+<span class="ln" id="L1574"></span>
+<span class="ln" id="L1575">    <span class="tok-com">/// The claim the tag exists to support, stated as a test so it cannot</span></span>
+<span class="ln" id="L1576">    <span class="tok-com">/// quietly stop being true: an edit made without the passphrase is caught</span></span>
+<span class="ln" id="L1577">    <span class="tok-com">/// at the next unlock.</span></span>
+<span class="ln" id="L1578">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1579">    <span class="tok-kw">fn</span> <span class="tok-fn">swapping_the_stored_verifier_is_reported_at_the_next_unlock</span>() {</span>
+<span class="ln" id="L1580">        <span class="tok-kw">let</span> honest = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1581">        <span class="tok-kw">let</span> attacker = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the attacker&#x27;s&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1582"></span>
+<span class="ln" id="L1583">        <span class="tok-com">// Splice the attacker&#x27;s verifier into the owner&#x27;s record, leaving</span></span>
+<span class="ln" id="L1584">        <span class="tok-com">// everything else including the tag alone. This is the attack: a lock</span></span>
+<span class="ln" id="L1585">        <span class="tok-com">// that opens to a password the owner never chose.</span></span>
+<span class="ln" id="L1586">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = honest.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1587">        <span class="tok-kw">let</span> theirs = attacker.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1588">        bytes[<span class="tok-num">24</span>..<span class="tok-num">72</span>].<span class="tok-fn">copy_from_slice</span>(&amp;theirs[<span class="tok-num">24</span>..<span class="tok-num">72</span>]);</span>
+<span class="ln" id="L1589"></span>
+<span class="ln" id="L1590">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> edited = AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1591">        assert!(!edited.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;nothing has been checked yet&quot;</span>);</span>
+<span class="ln" id="L1592">        edited.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;the attacker&#x27;s&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1593">        assert!(</span>
+<span class="ln" id="L1594">            edited.<span class="tok-fn">tampered</span>(),</span>
+<span class="ln" id="L1595">            <span class="tok-str">&quot;the record was edited by somebody without the passphrase and \</span></span>
+<span class="ln" id="L1596"><span class="tok-str">             nothing said so&quot;</span></span>
+<span class="ln" id="L1597">        );</span>
+<span class="ln" id="L1598">    }</span>
+<span class="ln" id="L1599"></span>
+<span class="ln" id="L1600">    <span class="tok-com">/// Weakening the stored cost is the other edit worth making, and it is</span></span>
+<span class="ln" id="L1601">    <span class="tok-com">/// answered before the tag is even consulted: the cost is an input to the</span></span>
+<span class="ln" id="L1602">    <span class="tok-com">/// derivation, so a changed cost produces a different verifier and the</span></span>
+<span class="ln" id="L1603">    <span class="tok-com">/// owner&#x27;s own passphrase stops matching. Refusal, not a warning, which is</span></span>
+<span class="ln" id="L1604">    <span class="tok-com">/// the stronger of the two answers.</span></span>
+<span class="ln" id="L1605">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1606">    <span class="tok-kw">fn</span> <span class="tok-fn">weakening_the_argon_cost_stops_the_lock_opening_at_all</span>() {</span>
+<span class="ln" id="L1607">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, kdf::KdfParams::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1608">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = lock.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1609">        bytes[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-fn">weak</span>().m_cost.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1610">        bytes[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-fn">weak</span>().t_cost.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1611">        bytes[<span class="tok-num">20</span>..<span class="tok-num">24</span>].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-fn">weak</span>().p_cost.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1612"></span>
+<span class="ln" id="L1613">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> edited = AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1614">        assert!(matches!(edited.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;pw&quot;</span>), <span class="tok-fn">Err</span>(Error::AppLockRejected)));</span>
+<span class="ln" id="L1615">    }</span>
+<span class="ln" id="L1616"></span>
+<span class="ln" id="L1617">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1618">    <span class="tok-kw">fn</span> <span class="tok-fn">clearing_the_tamper_flag_by_hand_puts_it_straight_back</span>() {</span>
+<span class="ln" id="L1619">        <span class="tok-kw">let</span> honest = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1620">        <span class="tok-kw">let</span> attacker = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;other&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1621">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = honest.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1622">        bytes[<span class="tok-num">24</span>..<span class="tok-num">72</span>].<span class="tok-fn">copy_from_slice</span>(&amp;attacker.<span class="tok-fn">to_bytes</span>()[<span class="tok-num">24</span>..<span class="tok-num">72</span>]);</span>
+<span class="ln" id="L1623"></span>
+<span class="ln" id="L1624">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> raised = AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1625">        raised.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1626">        assert!(raised.<span class="tok-fn">tampered</span>());</span>
+<span class="ln" id="L1627">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stored = raised.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1628">        assert_eq!(stored[<span class="tok-num">72</span>], <span class="tok-num">1</span>, <span class="tok-str">&quot;the report must reach the file&quot;</span>);</span>
+<span class="ln" id="L1629"></span>
+<span class="ln" id="L1630">        <span class="tok-com">// Now wipe the flag, as somebody hiding their tracks would.</span></span>
+<span class="ln" id="L1631">        stored[<span class="tok-num">72</span>] = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1632">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hidden = AppLock::<span class="tok-fn">parse</span>(&amp;stored).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1633">        assert!(!hidden.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;the file no longer says so&quot;</span>);</span>
+<span class="ln" id="L1634">        hidden.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1635">        assert!(</span>
+<span class="ln" id="L1636">            hidden.<span class="tok-fn">tampered</span>(),</span>
+<span class="ln" id="L1637">            <span class="tok-str">&quot;the flag is inside the tag, so clearing it is itself an edit&quot;</span></span>
+<span class="ln" id="L1638">        );</span>
+<span class="ln" id="L1639">    }</span>
+<span class="ln" id="L1640"></span>
+<span class="ln" id="L1641">    <span class="tok-com">/// The report must not be dismissible by anything except the passphrase,</span></span>
+<span class="ln" id="L1642">    <span class="tok-com">/// and it must survive the process dying.</span></span>
+<span class="ln" id="L1643">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1644">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_outlives_a_restart_and_needs_the_passphrase_to_clear</span>() {</span>
+<span class="ln" id="L1645">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1646">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1647">        LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1648"></span>
+<span class="ln" id="L1649">        <span class="tok-kw">let</span> attacker = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;other&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1650">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1651">        bytes[<span class="tok-num">24</span>..<span class="tok-num">72</span>].<span class="tok-fn">copy_from_slice</span>(&amp;attacker.<span class="tok-fn">to_bytes</span>()[<span class="tok-num">24</span>..<span class="tok-num">72</span>]);</span>
+<span class="ln" id="L1652">        std::fs::<span class="tok-fn">write</span>(&amp;path, &amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1653"></span>
+<span class="ln" id="L1654">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1655">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1656">        assert!(store.<span class="tok-fn">tampered</span>());</span>
+<span class="ln" id="L1657"></span>
+<span class="ln" id="L1658">        <span class="tok-com">// Reopened from disk, the report is still there.</span></span>
+<span class="ln" id="L1659">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1660">        assert!(store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;the report did not survive a restart&quot;</span>);</span>
+<span class="ln" id="L1661">        assert!(matches!(</span>
+<span class="ln" id="L1662">            store.<span class="tok-fn">acknowledge</span>(b<span class="tok-str">&quot;wrong&quot;</span>),</span>
+<span class="ln" id="L1663">            <span class="tok-fn">Err</span>(Error::AppLockRejected)</span>
+<span class="ln" id="L1664">        ));</span>
+<span class="ln" id="L1665">        assert!(store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;a wrong password must not dismiss it&quot;</span>);</span>
+<span class="ln" id="L1666">        store.<span class="tok-fn">acknowledge</span>(b<span class="tok-str">&quot;other&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1667">        assert!(!store.<span class="tok-fn">tampered</span>());</span>
+<span class="ln" id="L1668"></span>
+<span class="ln" id="L1669">        <span class="tok-kw">let</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1670">        assert!(!store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;the acknowledgement must reach disk&quot;</span>);</span>
+<span class="ln" id="L1671">    }</span>
+<span class="ln" id="L1672"></span>
+<span class="ln" id="L1673">    <span class="tok-com">/// An honest typo is not tampering, and a test says so because getting</span></span>
+<span class="ln" id="L1674">    <span class="tok-com">/// this wrong would train the user to ignore the warning.</span></span>
+<span class="ln" id="L1675">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1676">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wrong_password_is_never_reported_as_tampering</span>() {</span>
+<span class="ln" id="L1677">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1678">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1679">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1680">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
+<span class="ln" id="L1681">            assert!(matches!(store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;typo&quot;</span>), <span class="tok-fn">Err</span>(Error::AppLockRejected)));</span>
+<span class="ln" id="L1682">        }</span>
+<span class="ln" id="L1683">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1684">        assert!(!store.<span class="tok-fn">tampered</span>());</span>
+<span class="ln" id="L1685">    }</span>
+<span class="ln" id="L1686"></span>
+<span class="ln" id="L1687">    <span class="tok-com">/// A lock written by an older build has no tag. It must keep working, and</span></span>
+<span class="ln" id="L1688">    <span class="tok-com">/// it must gain one, and it must not be accused of anything on the way.</span></span>
+<span class="ln" id="L1689">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1690">    <span class="tok-kw">fn</span> <span class="tok-fn">a_version_one_lock_still_opens_and_is_upgraded_in_place</span>() {</span>
+<span class="ln" id="L1691">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1692">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1693"></span>
+<span class="ln" id="L1694">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1695">        <span class="tok-kw">let</span> v2 = lock.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1696">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> v1 = Vec::<span class="tok-fn">with_capacity</span>(LOCK_LEN_V1);</span>
+<span class="ln" id="L1697">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;v2[..<span class="tok-num">8</span>]);</span>
+<span class="ln" id="L1698">        v1.<span class="tok-fn">push</span>(<span class="tok-num">1</span>);</span>
+<span class="ln" id="L1699">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;v2[<span class="tok-num">9</span>..<span class="tok-num">72</span>]);</span>
+<span class="ln" id="L1700">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;2u32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// failures</span></span>
+<span class="ln" id="L1701">        v1.<span class="tok-fn">extend_from_slice</span>(&amp;0i64.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// last failure</span></span>
+<span class="ln" id="L1702">        assert_eq!(v1.<span class="tok-fn">len</span>(), LOCK_LEN_V1);</span>
+<span class="ln" id="L1703">        std::fs::<span class="tok-fn">write</span>(&amp;path, &amp;v1).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1704"></span>
+<span class="ln" id="L1705">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1706">        assert_eq!(store.<span class="tok-fn">failures</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;the old counter must be read&quot;</span>);</span>
+<span class="ln" id="L1707">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1708">        assert!(!store.<span class="tok-fn">tampered</span>(), <span class="tok-str">&quot;an untagged record is not an edited one&quot;</span>);</span>
+<span class="ln" id="L1709"></span>
+<span class="ln" id="L1710">        <span class="tok-kw">let</span> raw = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1711">        assert_eq!(raw.<span class="tok-fn">len</span>(), LOCK_LEN, <span class="tok-str">&quot;it should have been rewritten&quot;</span>);</span>
+<span class="ln" id="L1712">        assert_eq!(raw[<span class="tok-num">8</span>], FORMAT_VERSION);</span>
+<span class="ln" id="L1713">    }</span>
+<span class="ln" id="L1714"></span>
+<span class="ln" id="L1715">    <span class="tok-com">/// The nonce must move on every write, because Poly1305 under a repeated</span></span>
+<span class="ln" id="L1716">    <span class="tok-com">/// nonce hands an observer of two records enough to forge a third.</span></span>
+<span class="ln" id="L1717">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1718">    <span class="tok-kw">fn</span> <span class="tok-fn">two_writes_never_share_a_tag_nonce</span>() {</span>
+<span class="ln" id="L1719">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1720">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L1721">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1722">        <span class="tok-kw">let</span> first = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>()[<span class="tok-num">73</span>..<span class="tok-num">97</span>].<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L1723">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;pw&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1724">        <span class="tok-kw">let</span> second = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>()[<span class="tok-num">73</span>..<span class="tok-num">97</span>].<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L1725">        assert_ne!(first, second, <span class="tok-str">&quot;the tag nonce repeated across two writes&quot;</span>);</span>
+<span class="ln" id="L1726">    }</span>
+<span class="ln" id="L1727"></span>
+<span class="ln" id="L1728">    <span class="tok-com">/// F-91. The one file this program reads before anybody has authenticated</span></span>
+<span class="ln" id="L1729">    <span class="tok-com">/// must not be able to ask for more memory than the machine has. Nobody</span></span>
+<span class="ln" id="L1730">    <span class="tok-com">/// chose to open it, so nobody can choose to stop waiting for it.</span></span>
+<span class="ln" id="L1731">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1732">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_file_cannot_demand_more_memory_than_an_unattended_caller_allows</span>() {</span>
+<span class="ln" id="L1733">        <span class="tok-kw">let</span> lock = AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1734">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = lock.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L1735"></span>
+<span class="ln" id="L1736">        <span class="tok-com">// What the campaign produced: within `checked`, far outside anything</span></span>
+<span class="ln" id="L1737">        <span class="tok-com">// this program has ever written.</span></span>
+<span class="ln" id="L1738">        bytes[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;(1_703_936u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1739">        assert!(</span>
+<span class="ln" id="L1740">            AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L1741">            <span class="tok-str">&quot;a lock file declaring 1.6 GiB of Argon2 memory was accepted&quot;</span></span>
+<span class="ln" id="L1742">        );</span>
+<span class="ln" id="L1743"></span>
+<span class="ln" id="L1744">        <span class="tok-com">// And the ceiling itself is above anything legitimate, so a real lock</span></span>
+<span class="ln" id="L1745">        <span class="tok-com">// is not caught by it.</span></span>
+<span class="ln" id="L1746">        bytes[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;kdf::KdfParams::<span class="tok-fn">default</span>().m_cost.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1747">        bytes[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;kdf::KdfParams::<span class="tok-fn">default</span>().t_cost.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1748">        bytes[<span class="tok-num">20</span>..<span class="tok-num">24</span>].<span class="tok-fn">copy_from_slice</span>(&amp;kdf::KdfParams::<span class="tok-fn">default</span>().p_cost.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L1749">        assert!(</span>
+<span class="ln" id="L1750">            AppLock::<span class="tok-fn">parse</span>(&amp;bytes).<span class="tok-fn">is_ok</span>(),</span>
+<span class="ln" id="L1751">            <span class="tok-str">&quot;the default cost this program writes was refused by its own ceiling&quot;</span></span>
+<span class="ln" id="L1752">        );</span>
+<span class="ln" id="L1753">    }</span>
+<span class="ln" id="L1754"></span>
+<span class="ln" id="L1755">    <span class="tok-com">/// F-88. Acknowledging a report must cost one key derivation, not three.</span></span>
+<span class="ln" id="L1756">    <span class="tok-com">/// Counted in the source rather than timed, because a timing test on a</span></span>
+<span class="ln" id="L1757">    <span class="tok-com">/// deliberately slow function is a flaky test.</span></span>
+<span class="ln" id="L1758">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1759">    <span class="tok-kw">fn</span> <span class="tok-fn">acknowledging_a_report_derives_the_key_once</span>() {</span>
+<span class="ln" id="L1760">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lock.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1761">        <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1762">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn acknowledge(&amp;mut self, password: &amp;[u8]) -&gt; Result&lt;(), Error&gt; {\n        self.unlock&quot;</span>)</span>
+<span class="ln" id="L1763">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the store&#x27;s acknowledge has to exist&quot;</span>);</span>
+<span class="ln" id="L1764">        <span class="tok-kw">let</span> body = &amp;source[start..];</span>
+<span class="ln" id="L1765">        <span class="tok-kw">let</span> end = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    }&quot;</span>).<span class="tok-fn">unwrap_or</span>(body.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L1766">        <span class="tok-kw">let</span> body = &amp;body[..end];</span>
+<span class="ln" id="L1767">        assert!(</span>
+<span class="ln" id="L1768">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.lock.acknowledge&quot;</span>),</span>
+<span class="ln" id="L1769">            <span class="tok-str">&quot;the store verifies once through `unlock`; calling the record&#x27;s own \</span></span>
+<span class="ln" id="L1770"><span class="tok-str">             acknowledge verifies a second and a third time&quot;</span></span>
+<span class="ln" id="L1771">        );</span>
+<span class="ln" id="L1772">        assert_eq!(</span>
+<span class="ln" id="L1773">            body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;self.unlock&quot;</span>).<span class="tok-fn">count</span>(),</span>
+<span class="ln" id="L1774">            <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1775">            <span class="tok-str">&quot;one proof of the passphrase is enough to clear a report&quot;</span></span>
+<span class="ln" id="L1776">        );</span>
+<span class="ln" id="L1777">    }</span>
+<span class="ln" id="L1778"></span>
+<span class="ln" id="L1779">    <span class="tok-com">/// F-86. A password change that could not reach the spare has left the</span></span>
+<span class="ln" id="L1780">    <span class="tok-com">/// previous password in a file this process cannot rewrite, so it is not a</span></span>
+<span class="ln" id="L1781">    <span class="tok-com">/// finished change and must not be reported as one.</span></span>
+<span class="ln" id="L1782">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1783">    <span class="tok-kw">fn</span> <span class="tok-fn">a_change_that_did_not_reach_the_spare_is_not_reported_as_done</span>() {</span>
+<span class="ln" id="L1784">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lock.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1785">        <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1786">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn change_password&quot;</span>)</span>
+<span class="ln" id="L1787">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;change_password exists&quot;</span>);</span>
+<span class="ln" id="L1788">        <span class="tok-kw">let</span> body = &amp;source[start..];</span>
+<span class="ln" id="L1789">        <span class="tok-kw">let</span> end = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// Remove the lock&quot;</span>).<span class="tok-fn">unwrap_or</span>(body.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L1790">        assert!(</span>
+<span class="ln" id="L1791">            body[..end].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Error::AppLockSpareStale&quot;</span>),</span>
+<span class="ln" id="L1792">            <span class="tok-str">&quot;a change that left the spare behind reported success&quot;</span></span>
+<span class="ln" id="L1793">        );</span>
+<span class="ln" id="L1794">    }</span>
+<span class="ln" id="L1795"></span>
+<span class="ln" id="L1796">    <span class="tok-com">/// The user-facing claim must keep stating the limit. If someone edits this</span></span>
+<span class="ln" id="L1797">    <span class="tok-com">/// into a promise, this test is what stops it shipping.</span></span>
+<span class="ln" id="L1798">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1799">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_states_the_limit_rather_than_a_guarantee</span>() {</span>
+<span class="ln" id="L1800">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L1801">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not disk encryption&quot;</span>));</span>
+<span class="ln" id="L1802">        assert!(</span>
+<span class="ln" id="L1803">            scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not tamper-proof&quot;</span>),</span>
+<span class="ln" id="L1804">            <span class="tok-str">&quot;the tag catches edits; it does not make the file tamper-proof, and \</span></span>
+<span class="ln" id="L1805"><span class="tok-str">             the difference is the whole of what this note exists to say&quot;</span></span>
+<span class="ln" id="L1806">        );</span>
+<span class="ln" id="L1807">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;delete&quot;</span>), <span class="tok-str">&quot;deletion must be admitted&quot;</span>);</span>
+<span class="ln" id="L1808">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;offline&quot;</span>), <span class="tok-str">&quot;offline attack must be admitted&quot;</span>);</span>
+<span class="ln" id="L1809">        <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;impossible&quot;</span>, <span class="tok-str">&quot;guarantee&quot;</span>] {</span>
+<span class="ln" id="L1810">            assert!(!scope.<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;overclaim: {boast}&quot;</span>);</span>
+<span class="ln" id="L1811">        }</span>
+<span class="ln" id="L1812">    }</span>
+<span class="ln" id="L1813"></span>
+<span class="ln" id="L1814">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1815">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_path_is_under_a_config_directory_when_the_environment_says</span>() {</span>
+<span class="ln" id="L1816">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">default_path</span>() {</span>
+<span class="ln" id="L1817">            assert!(</span>
+<span class="ln" id="L1818">                path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;veilvoice/applock.bin&quot;</span>) || path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;veilvoice\\applock.bin&quot;</span>)</span>
+<span class="ln" id="L1819">            );</span>
+<span class="ln" id="L1820">            assert!(path.<span class="tok-fn">parent</span>().<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L1821">        }</span>
+<span class="ln" id="L1822">    }</span>
+<span class="ln" id="L1823">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

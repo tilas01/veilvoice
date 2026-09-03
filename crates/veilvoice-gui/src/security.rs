@@ -59,6 +59,7 @@ use egui::{Color32, RichText};
 use std::path::PathBuf;
 use std::sync::mpsc;
 use veilvoice_crypto::{container, kdf, lock, LockStore, Secret};
+use veilvoice_policy::{Field as MField, Mandate};
 use zeroize::Zeroize;
 
 /// Move a typed passphrase out of its `String` and into page-locked storage,
@@ -212,6 +213,20 @@ pub struct Security {
     /// file in their own configuration directory, which is a worse outcome
     /// than an unlocked application saying plainly that it should be locked.
     pub lock_required: bool,
+    /// The user's own baseline: what VeilVoice insists on unless told otherwise.
+    ///
+    /// Held here, rather than read at each use, so that turning encryption off
+    /// in this window is the same recorded act as `veilvoice mandate relax
+    /// --encryption`. Before this, the checkbox was a setting that lasted until
+    /// the process exited and left no trace; the two front ends now share one
+    /// baseline and one history.
+    mandate: Mandate,
+    /// Where that baseline is stored, or `None` in tests, which never write.
+    mandate_path: Option<PathBuf>,
+    /// Why the baseline is the strict default, when a file exists and would not
+    /// parse. Shown rather than swallowed: a mandate file that does not parse
+    /// means requirements somebody set are not being applied.
+    pub mandate_problem: Option<String>,
 }
 
 impl Default for Security {
@@ -246,6 +261,9 @@ impl Default for Security {
             confirm_disable: false,
             encryption_pinned: false,
             lock_required: false,
+            mandate: Mandate::default(),
+            mandate_path: None,
+            mandate_problem: None,
         }
     }
 }
@@ -877,7 +895,9 @@ impl Security {
             );
             ui.label(
                 RichText::new(
-                    "No lock is set. VeilVoice cannot set one for you, because it                      needs a passphrase only you have, so it says so here                      instead of refusing to open.",
+                    "No lock is set. VeilVoice cannot set one for you, because it needs a \
+                     passphrase only you have, so it says so here instead of refusing to \
+                     open.",
                 )
                 .small()
                 .color(p::yellow()),
@@ -996,9 +1016,76 @@ impl Security {
         ui.label(RichText::new(lock::SCOPE).color(p::fg()));
     }
 
+    /// Read the baseline from disk and apply it to the checkbox.
+    ///
+    /// Called once at startup by the running app. A file that will not parse
+    /// leaves the strict default in place and records why, because the safe
+    /// direction and the silent direction are not the same thing.
+    pub fn load_mandate(&mut self) {
+        let Some(path) = veilvoice_policy::mandate_path() else {
+            return;
+        };
+        match Mandate::load(&path) {
+            Ok(mandate) => {
+                self.encrypt_recordings = mandate.requires_encryption();
+                self.mandate = mandate;
+            }
+            Err(problem) => self.mandate_problem = Some(problem),
+        }
+        self.mandate_path = Some(path);
+    }
+
+    /// Whether the baseline insists on the app lock.
+    pub fn mandate_requires_app_lock(&self) -> bool {
+        self.mandate.requires_app_lock()
+    }
+
+    /// Whether the baseline insists on encryption at rest.
+    pub fn mandate_requires_encryption(&self) -> bool {
+        self.mandate.requires_encryption()
+    }
+
+    /// The change log, for the panel that shows it.
+    pub fn mandate_history(&self) -> &[veilvoice_policy::Change] {
+        self.mandate.history()
+    }
+
+    /// Record a change to the baseline, and write it down.
+    ///
+    /// A no-op when the value is already that, so re-drawing a frame cannot
+    /// fill the history with entries nobody made. Failing to write is reported
+    /// rather than swallowed: a relaxation the user believes is recorded, and
+    /// is not, is the failure this whole module exists to avoid.
+    fn record(&mut self, field: MField, required: bool) {
+        if !self.mandate.set(field, required) {
+            return;
+        }
+        let Some(path) = self.mandate_path.clone() else {
+            return; // tests, which never write
+        };
+        if let Err(problem) = self.mandate.save(&path) {
+            self.mandate_problem = Some(problem);
+        }
+    }
+
     /// The at-rest controls that sit inside the file tab.
     pub fn recording_controls(&mut self, ui: &mut egui::Ui) {
         ui.label(RichText::new("At rest").color(p::blue()).small());
+
+        // A baseline file that would not parse left the strict default in
+        // place, and that has to be said rather than swallowed: it means a
+        // requirement somebody set is not the one being applied. The CLI's
+        // `veilvoice mandate status` says the same thing.
+        if let Some(problem) = &self.mandate_problem {
+            ui.label(
+                RichText::new(format!(
+                    "your saved baseline could not be read ({problem}), so both \
+                     requirements are on, which is the safe direction",
+                ))
+                .color(p::yellow())
+                .small(),
+            );
+        }
 
         if self.encryption_pinned {
             // Forced here as well as drawn disabled. The dialogue that turns
@@ -1019,6 +1106,7 @@ impl Security {
         if changed && !self.encryption_pinned {
             if wanted {
                 self.encrypt_recordings = true;
+                self.record(MField::Encryption, true);
             } else {
                 // Stay on until the warning has been read and answered.
                 self.confirm_disable = true;
@@ -1161,6 +1249,40 @@ impl Security {
                 );
             }
         }
+
+        self.mandate_history_panel(ui);
+    }
+
+    /// The log of every time a requirement was turned off or back on.
+    ///
+    /// The same history the CLI prints from `veilvoice mandate history`, shown
+    /// here so that a relaxation made in this window is not a change with no
+    /// visible record. Collapsed by default, because on a machine nobody has
+    /// relaxed anything on it says only "none", and that is the common case.
+    fn mandate_history_panel(&mut self, ui: &mut egui::Ui) {
+        let history = self.mandate.history();
+        if history.is_empty() {
+            return;
+        }
+        ui.add_space(8.0);
+        let summary = if history.len() == 1 {
+            "one change to what is required".to_string()
+        } else {
+            format!("{} changes to what is required", history.len())
+        };
+        egui::CollapsingHeader::new(RichText::new(summary).color(p::muted()).small())
+            .id_salt("mandate-history")
+            .show(ui, |ui| self.mandate_history_rows(ui));
+    }
+
+    /// One coloured line per change, newest concern last: green for a
+    /// requirement put back, yellow for one turned off. Split from the header
+    /// so a test can read the rows without opening a collapsed section.
+    fn mandate_history_rows(&self, ui: &mut egui::Ui) {
+        for change in self.mandate.history() {
+            let colour = if change.to { p::green() } else { p::yellow() };
+            ui.label(RichText::new(change.describe()).color(colour).small());
+        }
     }
 
     /// The dialogue shown when the user turns at-rest encryption off.
@@ -1195,6 +1317,9 @@ impl Security {
                     {
                         self.encrypt_recordings = false;
                         self.confirm_disable = false;
+                        // The same act as `veilvoice mandate relax
+                        // --encryption`, and written down the same way.
+                        self.record(MField::Encryption, false);
                     }
                 });
             });
@@ -1770,6 +1895,143 @@ mod tests {
                 "reassuring word: {reassurance}"
             );
         }
+    }
+
+    #[test]
+    fn turning_encryption_off_in_the_window_is_written_down_and_survives_a_restart() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("mandate.conf");
+
+        let mut s = Security::default();
+        s.mandate_path = Some(path.clone());
+        assert!(s.mandate_requires_encryption(), "the default insists on it");
+        assert!(s.mandate_history().is_empty());
+
+        s.record(MField::Encryption, false);
+        assert!(!s.mandate_requires_encryption());
+        assert_eq!(s.mandate_history().len(), 1);
+        assert!(s.mandate_problem.is_none(), "{:?}", s.mandate_problem);
+
+        // The point of writing it down: the command line, or the next launch,
+        // reads the same relaxation rather than the strict default. Before
+        // this, turning the checkbox off lasted until the process exited and
+        // left no trace that it had ever happened.
+        let again = Mandate::load(&path).expect("what was just written must parse");
+        assert!(!again.requires_encryption());
+        assert!(again.requires_app_lock(), "only the one field was relaxed");
+        assert_eq!(again.history().len(), 1);
+        assert!(!again.history()[0].to);
+
+        // And the reverse direction is recorded too, so the log is a history
+        // rather than a list of things that were switched off.
+        s.record(MField::Encryption, true);
+        assert!(s.mandate_requires_encryption());
+        assert_eq!(s.mandate_history().len(), 2);
+        assert!(Mandate::load(&path).unwrap().requires_encryption());
+    }
+
+    #[test]
+    fn redrawing_the_frame_does_not_fill_the_history_with_entries_nobody_made() {
+        // `recording_controls` runs every frame, sixty times a second. A record
+        // call that logged the value it was already at would turn a minute of
+        // an open window into thousands of entries and make the history
+        // useless, which is the failure mode that matters here.
+        let dir = tempfile::tempdir().unwrap();
+        let mut s = Security::default();
+        s.mandate_path = Some(dir.path().join("mandate.conf"));
+
+        s.record(MField::Encryption, false);
+        for _ in 0..100 {
+            s.record(MField::Encryption, false);
+        }
+        assert_eq!(s.mandate_history().len(), 1);
+    }
+
+    /// The text a panel renders, gathered by walking egui's output.
+    fn rendered_text(security: &mut Security, draw: impl Fn(&mut Security, &mut egui::Ui)) -> String {
+        let ctx = egui::Context::default();
+        let input = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(
+                egui::pos2(0.0, 0.0),
+                egui::vec2(640.0, 480.0),
+            )),
+            ..Default::default()
+        };
+        let mut text = String::new();
+        let output = ctx.run(input, |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| draw(security, ui));
+        });
+        for shape in output.shapes {
+            if let egui::epaint::Shape::Text(t) = shape.shape {
+                text.push_str(t.galley.text());
+                text.push('\n');
+            }
+        }
+        text
+    }
+
+    #[test]
+    fn the_window_shows_the_history_the_command_line_would_print() {
+        // The "with history" half of the feature has to be visible in the
+        // window too, or a relaxation made here is a change with no record a
+        // person can see without opening a terminal. A collapsing header is
+        // collapsed by default, so it is opened before the panel is read.
+        let mut s = Security::default();
+        s.record(MField::Encryption, false);
+        let seen = rendered_text(&mut s, |s, ui| s.mandate_history_rows(ui));
+
+        // A timestamp (the exact date format is the policy crate's to test) and
+        // the change described in words, both drawn into the panel.
+        assert!(seen.contains("UTC"), "no timestamp in the panel:\n{seen}");
+        assert!(
+            seen.contains("stopped insisting") && seen.contains("encryption"),
+            "the change is not described:\n{seen}"
+        );
+
+        // And the collapsed header still names the count, so the rows are
+        // discoverable without a terminal.
+        let header = rendered_text(&mut s, |s, ui| s.mandate_history_panel(ui));
+        assert!(
+            header.contains("one change to what is required"),
+            "the header does not summarise the history:\n{header}"
+        );
+    }
+
+    #[test]
+    fn a_baseline_that_would_not_parse_is_said_in_the_window() {
+        // A silent fallback to the strict default would tell somebody their
+        // relaxation is in force when it is not, or hide that a requirement
+        // they set is being ignored. The CLI says so; the window must too.
+        let mut s = Security::default();
+        s.mandate_problem = Some("line 3: not a setting anyone wrote".to_string());
+        let seen = rendered_text(&mut s, |s, ui| s.recording_controls(ui));
+        assert!(
+            seen.contains("could not be read"),
+            "the parse problem is not surfaced:\n{seen}"
+        );
+    }
+
+    #[test]
+    fn a_clean_baseline_shows_no_history_and_no_problem() {
+        // The common case: nobody has relaxed anything. Neither the history
+        // header nor a problem line should appear, or the panel cries wolf.
+        let mut s = Security::default();
+        let seen = rendered_text(&mut s, |s, ui| s.recording_controls(ui));
+        assert!(!seen.contains("could not be read"), "{seen}");
+        assert!(!seen.contains("change to what is required"), "{seen}");
+        assert!(!seen.contains("changes to what is required"), "{seen}");
+    }
+
+    #[test]
+    fn a_test_built_security_never_writes_to_the_real_configuration() {
+        // `Security::default()` has no path, so `record` changes the value in
+        // memory and writes nothing. Every other test in this file depends on
+        // that being true.
+        let mut s = Security::default();
+        assert!(s.mandate_path.is_none());
+        s.record(MField::Encryption, false);
+        assert!(!s.mandate_requires_encryption());
+        assert!(s.mandate_problem.is_none());
     }
 
     #[test]
