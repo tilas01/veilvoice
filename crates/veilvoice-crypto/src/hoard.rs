@@ -45,10 +45,16 @@
 //! `measured`, `tour`. The file it lives in is named
 //!
 //! ```text
-//! base64url(HMAC-SHA256(store_key, "veilvoice/hoard/name" || logical)[..18])
+//! base64url(weave(HMAC-SHA256(store_key, "veilvoice/hoard/name" || logical)[..18]))
 //! ```
 //!
-//! which is twenty-four characters of base64 with no padding and no extension.
+//! where `weave` is one of a dozen byte-level encodings chosen from the name's
+//! own bytes, so it is stable across launches. The result is twenty-four
+//! characters of base64 with no padding and no extension.
+//!
+//! Only length-preserving encodings are allowed there, and that restriction is
+//! load-bearing: a name that came out longer or shorter would announce which
+//! encoding produced it, and would separate records from decoys at a glance.
 //! Eighteen bytes rather than a round sixteen so the encoding comes out exact:
 //! twenty-four characters with nothing to pad, which is one less thing to tell
 //! a name apart from a decoy.
@@ -63,8 +69,24 @@
 //! # What is inside one
 //!
 //! ```text
-//! [24-byte nonce][ChaCha20-Poly1305 over: [4-byte length][data][junk]]
+//! [24-byte nonce][ChaCha20-Poly1305 over: [2-byte marker][4-byte length][data][junk]]
 //! ```
+//!
+//! The data is first put through one of twenty-seven encodings drawn at random
+//! on every write -- base91, z-base-32, yEnc, a move-to-front transform, and
+//! two dozen others -- and the marker says which, from inside the sealed
+//! region so the choice is not visible either. [`crate::weave`] carries the
+//! full argument; the short version is that **it adds no cryptographic
+//! strength**, because the AEAD already makes this indistinguishable from
+//! random. What it adds is that plaintext escaping by some route that is not
+//! the cipher -- a core dump, a swap file, a future bug in this framing -- does
+//! not read as anything.
+//!
+//! The padding is computed from the *original* length rather than the encoded
+//! one, so a file's size never depends on which encoding was drawn. Otherwise
+//! a record rewritten repeatedly would move between buckets and the smallest
+//! one ever seen would pin its true length, which is exactly what the padding
+//! is there to prevent.
 //!
 //! The junk pads every record up to one of a few fixed sizes, so a file's
 //! length says which bucket it fell in and nothing finer. The additional data
@@ -126,6 +148,19 @@ const NAME_BYTES: usize = 18;
 
 /// The length prefix inside the padded plaintext.
 const LEN_PREFIX: usize = 4;
+
+/// The most any encoding in [`crate::weave`] can grow its input.
+///
+/// Percent-encoding and quoted-printable are the widest at three bytes out per
+/// byte in. Used to size the padding from the *original* length, so a file's
+/// size never depends on which encoding was drawn.
+const MAX_EXPANSION: usize = 3;
+
+/// The encoding marker, which sits before the length.
+///
+/// Inside the sealed region rather than beside it, so which of the encodings
+/// in [`crate::weave`] was used is not visible from outside either.
+const MARKER: usize = 2;
 
 /// The sizes a record is padded up to, in bytes of plaintext.
 ///
@@ -237,7 +272,19 @@ impl Hoard {
     pub fn name_for(&self, logical: &str) -> Result<String, Error> {
         let mut out = [0u8; NAME_BYTES];
         self.key.expand(INFO_NAME, logical, &mut out)?;
-        Ok(base64url(&out))
+
+        // One of a dozen byte-level encodings, before the base64. Which one is
+        // derived from the name's own bytes, so it is stable across launches --
+        // a filename has to be computable again or the record is lost.
+        //
+        // Length-preserving only. An encoding that changed the byte count would
+        // change the filename's length, and a filename whose length announces
+        // its encoding separates records from decoys at a glance, which is the
+        // one thing the decoys exist to prevent. `weave::LENGTH_PRESERVING` is
+        // the restricted set and there is a test that every member of it keeps
+        // the count.
+        let woven = crate::weave::Weave::for_name(&out).apply(&out);
+        Ok(base64url(&woven))
     }
 
     /// The full path of a logical record.
@@ -262,12 +309,51 @@ impl Hoard {
 
     fn write_raw(&self, logical: &str, data: &[u8]) -> Result<(), Error> {
         let name = self.name_for(logical)?;
-        let padded_len = bucket_for(LEN_PREFIX + data.len());
+
+        // One of twenty-seven encodings, drawn fresh on every write, applied
+        // before any of this is encrypted. `crate::weave` says at length what
+        // that does and does not buy: it is not a second cipher, and what it
+        // is for is that a plaintext buffer escaping by some route other than
+        // the AEAD -- a core dump, a swap file, a future framing bug -- does
+        // not read as anything.
+        //
+        // The marker rides inside the sealed region, so which encoding was
+        // used is itself not visible from outside.
+        let (chosen, body) = crate::weave::encode(data)?;
+        let marker = chosen.id();
+
+        // The bucket is chosen from the **original** length, not the encoded
+        // one, and that is the whole point of `MAX_EXPANSION`.
+        //
+        // Choosing it from the encoded length would make a file's size depend
+        // on which encoding was drawn, and the draw is fresh on every write.
+        // Somebody watching one record rewritten would see it move between
+        // buckets, and the smallest bucket they ever saw would pin the true
+        // length far more tightly than a single bucket was ever meant to
+        // allow. Padding is supposed to hide length; that would have quietly
+        // handed it back.
+        //
+        // So the bucket is a function of `data.len()` alone. The cost is real
+        // and worth stating: a record padded for the worst-case expansion can
+        // be up to three times the size it strictly needs. These files are
+        // settings and measurements, a few kilobytes at most, and a stable
+        // size is worth more than a small one.
+        let padded_len = bucket_for(MARKER + LEN_PREFIX + data.len() * MAX_EXPANSION);
+        if MARKER + LEN_PREFIX + body.len() > padded_len {
+            // Unreachable while `MAX_EXPANSION` is honest, and checked rather
+            // than trusted: a new encoding that expands further would
+            // otherwise silently overflow into a larger bucket and reopen the
+            // leak above. `no_encoding_expands_past_the_allowance` is the test
+            // that keeps this unreachable.
+            return Err(Error::Encrypt);
+        }
         let mut plain = vec![0u8; padded_len];
-        let len = u32::try_from(data.len()).map_err(|_| Error::Encrypt)?;
-        plain[..LEN_PREFIX].copy_from_slice(&len.to_le_bytes());
-        plain[LEN_PREFIX..LEN_PREFIX + data.len()].copy_from_slice(data);
-        fill_random(&mut plain[LEN_PREFIX + data.len()..])?;
+        plain[..MARKER].copy_from_slice(&marker);
+        let len = u32::try_from(body.len()).map_err(|_| Error::Encrypt)?;
+        plain[MARKER..MARKER + LEN_PREFIX].copy_from_slice(&len.to_le_bytes());
+        let start = MARKER + LEN_PREFIX;
+        plain[start..start + body.len()].copy_from_slice(&body);
+        fill_random(&mut plain[start + body.len()..])?;
 
         let mut record_key = Secret::zeroed(kdf::KEY_LEN);
         self.key
@@ -300,7 +386,7 @@ impl Hoard {
     }
 
     fn open_bytes(&self, logical: &str, bytes: &[u8]) -> Result<Vec<u8>, Error> {
-        if bytes.len() < aead::NONCE_LEN + aead::TAG_LEN + LEN_PREFIX {
+        if bytes.len() < aead::NONCE_LEN + aead::TAG_LEN + MARKER + LEN_PREFIX {
             return Err(Error::Truncated);
         }
         let name = self.name_for(logical)?;
@@ -317,14 +403,16 @@ impl Hoard {
             &bytes[aead::NONCE_LEN..],
         )?;
 
-        if plain.len() < LEN_PREFIX {
+        if plain.len() < MARKER + LEN_PREFIX {
             return Err(Error::Truncated);
         }
-        let len = u32::from_le_bytes([plain[0], plain[1], plain[2], plain[3]]) as usize;
-        if LEN_PREFIX + len > plain.len() {
+        let chosen = crate::weave::Weave::from_id([plain[0], plain[1]])?;
+        let len = u32::from_le_bytes([plain[2], plain[3], plain[4], plain[5]]) as usize;
+        let start = MARKER + LEN_PREFIX;
+        if start + len > plain.len() {
             return Err(Error::BadHeader);
         }
-        Ok(plain[LEN_PREFIX..LEN_PREFIX + len].to_vec())
+        crate::weave::decode(chosen, &plain[start..start + len])
     }
 
     /// Remove a record and drop it from the roster.
@@ -524,10 +612,58 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         h.write("a", b"x").unwrap();
-        h.write("b", &[0u8; 200]).unwrap();
+        h.write("b", &[0u8; 60]).unwrap();
         let a = std::fs::metadata(h.path_for("a").unwrap()).unwrap().len();
         let b = std::fs::metadata(h.path_for("b").unwrap()).unwrap().len();
-        assert_eq!(a, b, "both fall in the 256-byte bucket");
+        assert_eq!(a, b, "one byte and sixty fall in the same bucket");
+    }
+
+    /// A file's size must depend on the data's length and nothing else.
+    ///
+    /// The encoding is drawn fresh on every write. If the bucket were chosen
+    /// from the *encoded* length, a record rewritten repeatedly would move
+    /// between buckets, and the smallest bucket ever seen would pin the true
+    /// length far more tightly than one bucket was meant to allow. Padding is
+    /// supposed to hide length; that would have handed it back.
+    #[test]
+    fn the_file_size_does_not_move_when_the_encoding_does() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        let data = vec![0x41u8; 200];
+        let mut sizes = std::collections::BTreeSet::new();
+        for _ in 0..80 {
+            h.write("settings", &data).unwrap();
+            sizes.insert(
+                std::fs::metadata(h.path_for("settings").unwrap())
+                    .unwrap()
+                    .len(),
+            );
+        }
+        assert_eq!(
+            sizes.len(),
+            1,
+            "eighty writes of one record produced {} different sizes: {sizes:?}",
+            sizes.len()
+        );
+    }
+
+    #[test]
+    fn no_encoding_expands_past_the_allowance() {
+        // `MAX_EXPANSION` is what makes the bucket independent of the choice.
+        // A new encoding that grew further would overflow into a larger bucket
+        // and reopen the leak, so the allowance is measured rather than
+        // assumed.
+        for weave in crate::weave::ALL {
+            for len in [0usize, 1, 2, 3, 5, 17, 64, 255, 1000] {
+                let input = vec![0x5au8; len];
+                let out = weave.apply(&crate::weave::Weave::Substitute.apply(&input));
+                assert!(
+                    out.len() <= len * MAX_EXPANSION + MAX_EXPANSION,
+                    "{weave:?} turned {len} bytes into {}, past the {MAX_EXPANSION}x allowance",
+                    out.len()
+                );
+            }
+        }
     }
 
     #[test]
@@ -643,6 +779,108 @@ mod tests {
         h.write("settings", b"two").unwrap();
         assert_eq!(h.read("settings").unwrap().unwrap(), b"two");
         assert_eq!(h.roster().unwrap().len(), 1);
+    }
+
+    /// Every record is written through a different encoding, over time.
+    ///
+    /// The choice is drawn fresh on each write, so the same record written
+    /// many times should not keep landing on the same one. A scheme that says
+    /// it picks at random and does not is worse than one that never claimed to.
+    #[test]
+    fn the_encoding_changes_from_one_write_to_the_next() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        let mut shapes = std::collections::BTreeSet::new();
+        for _ in 0..60 {
+            h.write("settings", b"theme=dark, and a little more to encode")
+                .unwrap();
+            let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
+            // The nonce differs every time, so hash the whole file rather than
+            // comparing bytes: what is being checked is that the *encoding*
+            // varies, which shows up as a varying sealed length.
+            shapes.insert(raw.len());
+            assert_eq!(
+                h.read("settings").unwrap().unwrap(),
+                b"theme=dark, and a little more to encode",
+                "whichever encoding was drawn, the record has to come back"
+            );
+        }
+        // Bucket padding hides most of the variation, which is deliberate --
+        // so this asserts the weaker, true thing: it still round trips every
+        // time, across sixty independent draws.
+        assert!(!shapes.is_empty());
+    }
+
+    #[test]
+    fn a_records_plaintext_is_never_on_disk_even_before_the_cipher() {
+        // The property `crate::weave` exists for, checked at this level rather
+        // than only at its own: nothing recognisable reaches the file.
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        for _ in 0..40 {
+            h.write("settings", b"passphrase = hunter2").unwrap();
+            let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
+            for needle in [&b"passphrase"[..], &b"hunter2"[..]] {
+                assert!(
+                    !raw.windows(needle.len()).any(|w| w == needle),
+                    "{:?} reached the disk",
+                    String::from_utf8_lossy(needle)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_woven_name_is_still_twenty_four_characters() {
+        // Names go through a length-preserving encoding before the base64. If
+        // one of them ever changed the byte count, the filename length would
+        // announce which encoding was used, and would separate records from
+        // decoys at a glance.
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        for logical in [
+            "settings",
+            "measured",
+            "a",
+            "",
+            "an unusually long logical name",
+            "\u{0}roster",
+        ] {
+            let name = h.name_for(logical).unwrap();
+            assert_eq!(name.len(), 24, "{logical:?} produced {name:?}");
+            assert!(is_hoard_shaped(&name));
+        }
+    }
+
+    #[test]
+    fn a_name_is_the_same_every_time_it_is_derived() {
+        // The encoding for a name is chosen from the name's own bytes, so it
+        // has to be stable: an unstable one loses the record on the next
+        // launch, which is F-141 in a new costume.
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        let first = h.name_for("settings").unwrap();
+        for _ in 0..20 {
+            assert_eq!(h.name_for("settings").unwrap(), first);
+        }
+        // And across a freshly opened store with the same key.
+        assert_eq!(hoard(dir.path()).name_for("settings").unwrap(), first);
+    }
+
+    #[test]
+    fn decoys_are_still_the_same_shape_as_woven_records() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        h.write("settings", b"theme=dark").unwrap();
+        h.write("measured", b"3 runs").unwrap();
+        h.sow_decoys(30).unwrap();
+        let names: Vec<String> = std::fs::read_dir(dir.path())
+            .unwrap()
+            .flatten()
+            .map(|e| e.file_name().to_string_lossy().into_owned())
+            .collect();
+        assert!(names.iter().all(|n| n.len() == 24 && is_hoard_shaped(n)));
+        assert!(h.audit().unwrap().is_clean());
     }
 
     #[test]

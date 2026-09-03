@@ -80,6 +80,7 @@ pub mod lock;
 pub mod privatefile;
 pub mod shred;
 pub mod vault;
+pub mod weave;
 
 pub use amnesia::Secret;
 pub use lock::{AppLock, LockStore};

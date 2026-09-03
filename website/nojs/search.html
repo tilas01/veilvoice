@@ -43,7 +43,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice, 336 files and 14671 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice, 336 files and 14689 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -1833,7 +1833,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">Measured</span> <span class="meta">line 4</span><br><span class="x">Numbers this project states about itself, taken from the tree rather than from memory. Regenerated and checked by `tools/verify.py`; the documents and the website that quote them are compared against this file, so a claim that drifts fails</span></li>
 <li><span class="sec">Measured</span> <span class="meta">line 4</span><br><span class="x">the build instead of ageing quietly. **The test count is a number about one machine.** Some tests are compiled only on one operating system, so running the same tree on another gives a different total: this tree measures 996 on Windows and</span></li>
 <li><span class="sec">Measured</span> <span class="meta">line 4</span><br><span class="x">988 on Linux. The row below says which machine produced the number in it, because a count with no platform beside it reads as a fact about the tree and is a fact about a computer. See F-77 in `docs/AUDIT.md`. | What | Measured | |---|---:|</span></li>
-<li><span class="sec">Measured</span> <span class="meta">line 4</span><br><span class="x">| Tests, measured by running them | 1278 | | Crates in the workspace | 27 | | Website suites | 17 | | Findings written up in the audit | 145 | | Highest finding number used | 145 | | Measured on | `x86_64-unknown-linux-gnu` |</span></li>
+<li><span class="sec">Measured</span> <span class="meta">line 4</span><br><span class="x">| Tests, measured by running them | 1298 | | Crates in the workspace | 27 | | Website suites | 17 | | Findings written up in the audit | 145 | | Highest finding number used | 145 | | Measured on | `x86_64-unknown-linux-gnu` |</span></li>
 </ul>
 </details>
 <details open>
@@ -4705,7 +4705,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-crypto/src/hoard.rs</code> <span class="meta">&middot; veilvoice-crypto, 692 lines, 82 sections</span></summary>
+<summary><code>crates/veilvoice-crypto/src/hoard.rs</code> <span class="meta">&middot; veilvoice-crypto, 930 lines, 99 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs">open hoard.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. # What this buys, stated before anything else Somebody who opens VeilVoice&#x27;s folder without the app-lock</span></li>
@@ -4718,78 +4718,95 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">thing the app lock could not previously offer: a reason to exist beyond a password prompt. Before this, the lock verified a passphrase and guarded a window; the files behind it sat in the clear under their own names, and deleting the lock</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">file removed the whole obstacle. Now the passphrase derives the key that names and opens these records, so deleting the lock does not reveal them -- it destroys the only copy of the salt they were derived through, and takes them with it.</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">That is a real change in what the lock is worth, and also a real way to lose your data, which is why [`crate::lock`] keeps a second copy and the interface says so. # How a record is found Every record has a *logical* name that only the</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">program uses: `settings`, `measured`, `tour`. The file it lives in is named ```text base64url(HMAC-SHA256(store_key, &quot;veilvoice/hoard/name&quot; || logical)[..18]) ``` which is twenty-four characters of base64 with no padding and no extension.</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Eighteen bytes rather than a round sixteen so the encoding comes out exact: twenty-four characters with nothing to pad, which is one less thing to tell a name apart from a decoy. The derivation is deterministic, so the program does not</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">search: it computes the name it wants and opens that file. This is what makes the selection *cryptographic* rather than a lookup table. There is no index mapping `settings` to a filename, because an index is exactly the thing an attacker</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">would want. Without the key there is no way to run the derivation, and with the key there is no need to store it. # What is inside one ```text [24-byte nonce][ChaCha20-Poly1305 over: [4-byte length][data][junk]] ``` The junk pads every</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">record up to one of a few fixed sizes, so a file&#x27;s length says which bucket it fell in and nothing finer. The additional data for the AEAD is the filename itself, which binds a record to its name: two real files cannot be swapped without</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the swap being detected, because each one authenticates the name it is supposed to be under. The per-record key is a separate HKDF branch, so one record&#x27;s key says nothing about another&#x27;s. # The roster, and the one deletion claim this can</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">honestly make A record can be modified, and the AEAD catches that: any edit fails to authenticate and [`Hoard::audit`] reports the record as tampered with. Deletion is harder, because a file that is not there looks exactly like a file that</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">was never written. So the hoard keeps one more record, the roster, listing the logical names that should exist. It is stored like any other record, under a derived name, encrypted and padded, so it is not identifiable from outside either.</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">That gives a real answer for deletion of *some* of the folder: a record in the roster whose file is gone was deleted, and audit says so. It gives no answer for deletion of *all* of it, including the roster, and nothing stored in this</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">folder ever could -- at that point the only evidence is that the folder is empty, which you can see for yourself. The roster is missing while the lock exists is itself reported, which is the closest honest approximation, and it is stated</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">as what it is rather than dressed up. # In plain words VeilVoice&#x27;s own files are encrypted and given meaningless names, and a pile of decoy files sits among them so nobody can tell which is which. Only the program, once you have unlocked</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">it, can work out which file is which. Anybody looking at the folder still knows you use VeilVoice, and can still delete the lot. What they cannot do is read any of it, work out how much of it there is, or change any of it without VeilVoice</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">telling you next time you unlock.</span></li>
-<li><span class="sec">const INFO_NAME</span> <span class="meta">line 116</span><br><span class="x">HKDF label for the filename key. Distinct from every other label in the project so a name can never coincide with a key.</span></li>
-<li><span class="sec">const INFO_REC</span> <span class="meta">line 118</span><br><span class="x">HKDF label prefix for a record&#x27;s own encryption key.</span></li>
-<li><span class="sec">const NAME_BYTES</span> <span class="meta">line 125</span><br><span class="x">How many bytes of the name HMAC end up in the filename. Eighteen encodes to exactly twenty-four base64 characters with no padding. 144 bits is far past any collision concern for a few dozen files; the choice is driven by the encoding</span></li>
-<li><span class="sec">const NAME_BYTES</span> <span class="meta">line 125</span><br><span class="x">coming out clean.</span></li>
-<li><span class="sec">const LEN_PREFIX</span> <span class="meta">line 128</span><br><span class="x">The length prefix inside the padded plaintext.</span></li>
-<li><span class="sec">const BUCKETS</span> <span class="meta">line 134</span><br><span class="x">The sizes a record is padded up to, in bytes of plaintext. A record&#x27;s file length reveals which of these it landed in and nothing finer. Beyond the largest, records round up to a whole mebibyte.</span></li>
-<li><span class="sec">const ROSTER</span> <span class="meta">line 137</span><br><span class="x">The logical name of the roster record.</span></li>
-<li><span class="sec">struct StoreKey</span> <span class="meta">line 144</span><br><span class="x">The key that names and opens everything in the hoard. Derived from the app-lock passphrase alongside the verifier and the tag key, under its own HKDF label, so it is independent of both. It exists only while the application is unlocked.</span></li>
-<li><span class="sec">impl StoreKey</span> <span class="meta">line 146</span><br><span class="x"></span></li>
-<li><span class="sec">fn from_secret</span> <span class="meta">line 148</span><br><span class="x">Wrap raw key material. The caller is trusted to have derived it.</span></li>
-<li><span class="sec">fn expand</span> <span class="meta">line 153</span><br><span class="x">Derive a subkey under a label.</span></li>
-<li><span class="sec">fn base64url</span> <span class="meta">line 165</span><br><span class="x">Base64url, no padding. Sixty-four characters, none of which needs escaping in a filename on any platform this project targets.</span></li>
-<li><span class="sec">const ALPHABET</span> <span class="meta">line 166</span><br><span class="x"></span></li>
-<li><span class="sec">fn bucket_for</span> <span class="meta">line 186</span><br><span class="x">The bucket a payload of this length pads up to.</span></li>
-<li><span class="sec">struct Audit</span> <span class="meta">line 197</span><br><span class="x">What an audit found.</span></li>
-<li><span class="sec">impl Audit</span> <span class="meta">line 211</span><br><span class="x"></span></li>
-<li><span class="sec">fn is_clean</span> <span class="meta">line 213</span><br><span class="x">Whether anything was found that a user should be told about.</span></li>
-<li><span class="sec">struct Hoard</span> <span class="meta">line 219</span><br><span class="x">An obfuscated store rooted at a directory.</span></li>
-<li><span class="sec">impl Hoard</span> <span class="meta">line 224</span><br><span class="x"></span></li>
-<li><span class="sec">fn open</span> <span class="meta">line 226</span><br><span class="x">Open the hoard in `dir`. Nothing is read or written until asked.</span></li>
-<li><span class="sec">fn name_for</span> <span class="meta">line 237</span><br><span class="x">The filename a logical record lives under. Deterministic in the store key, which is what lets the program find a record without keeping an index that would give the game away.</span></li>
-<li><span class="sec">fn path_for</span> <span class="meta">line 244</span><br><span class="x">The full path of a logical record.</span></li>
-<li><span class="sec">fn write</span> <span class="meta">line 252</span><br><span class="x">Encrypt and store `data` under `logical`, padded and named so that neither its content nor its purpose is visible from outside. The roster is updated so a later deletion of this record is detectable.</span></li>
-<li><span class="sec">fn write_raw</span> <span class="meta">line 263</span><br><span class="x"></span></li>
-<li><span class="sec">fn read</span> <span class="meta">line 292</span><br><span class="x">Read a record back, or `None` if it was never written. A file that is present but does not authenticate returns [`Error::Decrypt`] rather than `None`: that is tampering, and it must not be reported as absence.</span></li>
-<li><span class="sec">fn open_bytes</span> <span class="meta">line 302</span><br><span class="x"></span></li>
-<li><span class="sec">fn remove</span> <span class="meta">line 331</span><br><span class="x">Remove a record and drop it from the roster.</span></li>
-<li><span class="sec">fn roster</span> <span class="meta">line 346</span><br><span class="x">The logical names the roster says should exist.</span></li>
-<li><span class="sec">fn save_roster</span> <span class="meta">line 362</span><br><span class="x"></span></li>
-<li><span class="sec">fn sow_decoys</span> <span class="meta">line 381</span><br><span class="x">Write decoy files: names of the same shape, contents of the same character, holding nothing. A decoy is random bytes under a random name. It is not a valid record under any logical name, so the program never mistakes one for data -- it</span></li>
-<li><span class="sec">fn sow_decoys</span> <span class="meta">line 381</span><br><span class="x">simply never derives that name. From outside there is nothing to separate the two, which is the point. Returns how many were written. Names that happen to collide with an existing file are skipped rather than overwritten.</span></li>
-<li><span class="sec">fn audit</span> <span class="meta">line 407</span><br><span class="x">Check every record the roster knows about, and count what else is here. This is the tamper report the user sees after unlocking. It can say a record was edited, and it can say a record the roster expected is gone. It cannot say anything</span></li>
-<li><span class="sec">fn audit</span> <span class="meta">line 407</span><br><span class="x">about a folder somebody emptied entirely, including the roster, and does not try to.</span></li>
-<li><span class="sec">fn is_hoard_shaped</span> <span class="meta">line 444</span><br><span class="x">Whether a filename has the shape this module writes. Used only to count decoys, never to decide what to open: a name that looks right is still never read unless it is one the key derives.</span></li>
-<li><span class="sec">fn fill_random</span> <span class="meta">line 451</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 459</span><br><span class="x"></span></li>
-<li><span class="sec">fn hoard</span> <span class="meta">line 462</span><br><span class="x"></span></li>
-<li><span class="sec">fn other_hoard</span> <span class="meta">line 467</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_record_round_trips</span> <span class="meta">line 473</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_record_that_was_never_written_is_absent_not_an_error</span> <span class="meta">line 481</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_filename_gives_nothing_away</span> <span class="meta">line 487</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_different_key_derives_a_different_name_for_the_same_record</span> <span class="meta">line 497</span><br><span class="x"></span></li>
-<li><span class="sec">fn another_key_cannot_read_what_this_one_wrote</span> <span class="meta">line 506</span><br><span class="x"></span></li>
-<li><span class="sec">fn contents_do_not_appear_in_the_file</span> <span class="meta">line 514</span><br><span class="x"></span></li>
-<li><span class="sec">fn short_and_long_records_are_padded_to_the_same_few_sizes</span> <span class="meta">line 523</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_edited_record_is_refused_rather_than_returned</span> <span class="meta">line 534</span><br><span class="x"></span></li>
-<li><span class="sec">fn two_records_cannot_be_swapped</span> <span class="meta">line 547</span><br><span class="x"></span></li>
-<li><span class="sec">fn audit_reports_an_edited_record</span> <span class="meta">line 563</span><br><span class="x"></span></li>
-<li><span class="sec">fn audit_reports_a_deleted_record</span> <span class="meta">line 577</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_clean_folder_audits_clean</span> <span class="meta">line 588</span><br><span class="x"></span></li>
-<li><span class="sec">fn decoys_are_indistinguishable_from_records_by_shape</span> <span class="meta">line 599</span><br><span class="x"></span></li>
-<li><span class="sec">fn decoys_do_not_disturb_the_records_beside_them</span> <span class="meta">line 617</span><br><span class="x"></span></li>
-<li><span class="sec">fn removing_a_record_takes_it_out_of_the_roster</span> <span class="meta">line 629</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_record_can_be_overwritten_without_growing_the_roster</span> <span class="meta">line 639</span><br><span class="x"></span></li>
-<li><span class="sec">fn base64url_matches_the_standard_alphabet</span> <span class="meta">line 649</span><br><span class="x"></span></li>
-<li><span class="sec">fn buckets_round_up_and_never_shrink</span> <span class="meta">line 656</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_truncated_file_is_reported_not_returned</span> <span class="meta">line 667</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_empty_record_round_trips</span> <span class="meta">line 676</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_record_larger_than_every_bucket_round_trips</span> <span class="meta">line 684</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">program uses: `settings`, `measured`, `tour`. The file it lives in is named ```text base64url(weave(HMAC-SHA256(store_key, &quot;veilvoice/hoard/name&quot; || logical)[..18])) ``` where `weave` is one of a dozen byte-level encodings chosen from the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">name&#x27;s own bytes, so it is stable across launches. The result is twenty-four characters of base64 with no padding and no extension. Only length-preserving encodings are allowed there, and that restriction is load-bearing: a name that came</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">out longer or shorter would announce which encoding produced it, and would separate records from decoys at a glance. Eighteen bytes rather than a round sixteen so the encoding comes out exact: twenty-four characters with nothing to pad,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">which is one less thing to tell a name apart from a decoy. The derivation is deterministic, so the program does not search: it computes the name it wants and opens that file. This is what makes the selection *cryptographic* rather than a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">lookup table. There is no index mapping `settings` to a filename, because an index is exactly the thing an attacker would want. Without the key there is no way to run the derivation, and with the key there is no need to store it. # What is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">inside one ```text [24-byte nonce][ChaCha20-Poly1305 over: [2-byte marker][4-byte length][data][junk]] ``` The data is first put through one of twenty-seven encodings drawn at random on every write -- base91, z-base-32, yEnc, a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">move-to-front transform, and two dozen others -- and the marker says which, from inside the sealed region so the choice is not visible either. [`crate::weave`] carries the full argument; the short version is that **it adds no cryptographic</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">strength**, because the AEAD already makes this indistinguishable from random. What it adds is that plaintext escaping by some route that is not the cipher -- a core dump, a swap file, a future bug in this framing -- does not read as</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">anything. The padding is computed from the *original* length rather than the encoded one, so a file&#x27;s size never depends on which encoding was drawn. Otherwise a record rewritten repeatedly would move between buckets and the smallest one</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">ever seen would pin its true length, which is exactly what the padding is there to prevent. The junk pads every record up to one of a few fixed sizes, so a file&#x27;s length says which bucket it fell in and nothing finer. The additional data</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">for the AEAD is the filename itself, which binds a record to its name: two real files cannot be swapped without the swap being detected, because each one authenticates the name it is supposed to be under. The per-record key is a separate</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">HKDF branch, so one record&#x27;s key says nothing about another&#x27;s. # The roster, and the one deletion claim this can honestly make A record can be modified, and the AEAD catches that: any edit fails to authenticate and [`Hoard::audit`] reports</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the record as tampered with. Deletion is harder, because a file that is not there looks exactly like a file that was never written. So the hoard keeps one more record, the roster, listing the logical names that should exist. It is stored</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">like any other record, under a derived name, encrypted and padded, so it is not identifiable from outside either. That gives a real answer for deletion of *some* of the folder: a record in the roster whose file is gone was deleted, and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">audit says so. It gives no answer for deletion of *all* of it, including the roster, and nothing stored in this folder ever could -- at that point the only evidence is that the folder is empty, which you can see for yourself. The roster is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">missing while the lock exists is itself reported, which is the closest honest approximation, and it is stated as what it is rather than dressed up. # In plain words VeilVoice&#x27;s own files are encrypted and given meaningless names, and a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">pile of decoy files sits among them so nobody can tell which is which. Only the program, once you have unlocked it, can work out which file is which. Anybody looking at the folder still knows you use VeilVoice, and can still delete the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">lot. What they cannot do is read any of it, work out how much of it there is, or change any of it without VeilVoice telling you next time you unlock.</span></li>
+<li><span class="sec">const INFO_NAME</span> <span class="meta">line 138</span><br><span class="x">HKDF label for the filename key. Distinct from every other label in the project so a name can never coincide with a key.</span></li>
+<li><span class="sec">const INFO_REC</span> <span class="meta">line 140</span><br><span class="x">HKDF label prefix for a record&#x27;s own encryption key.</span></li>
+<li><span class="sec">const NAME_BYTES</span> <span class="meta">line 147</span><br><span class="x">How many bytes of the name HMAC end up in the filename. Eighteen encodes to exactly twenty-four base64 characters with no padding. 144 bits is far past any collision concern for a few dozen files; the choice is driven by the encoding</span></li>
+<li><span class="sec">const NAME_BYTES</span> <span class="meta">line 147</span><br><span class="x">coming out clean.</span></li>
+<li><span class="sec">const LEN_PREFIX</span> <span class="meta">line 150</span><br><span class="x">The length prefix inside the padded plaintext.</span></li>
+<li><span class="sec">const MAX_EXPANSION</span> <span class="meta">line 157</span><br><span class="x">The most any encoding in [`crate::weave`] can grow its input. Percent-encoding and quoted-printable are the widest at three bytes out per byte in. Used to size the padding from the *original* length, so a file&#x27;s size never depends on which</span></li>
+<li><span class="sec">const MAX_EXPANSION</span> <span class="meta">line 157</span><br><span class="x">encoding was drawn.</span></li>
+<li><span class="sec">const MARKER</span> <span class="meta">line 163</span><br><span class="x">The encoding marker, which sits before the length. Inside the sealed region rather than beside it, so which of the encodings in [`crate::weave`] was used is not visible from outside either.</span></li>
+<li><span class="sec">const BUCKETS</span> <span class="meta">line 169</span><br><span class="x">The sizes a record is padded up to, in bytes of plaintext. A record&#x27;s file length reveals which of these it landed in and nothing finer. Beyond the largest, records round up to a whole mebibyte.</span></li>
+<li><span class="sec">const ROSTER</span> <span class="meta">line 172</span><br><span class="x">The logical name of the roster record.</span></li>
+<li><span class="sec">struct StoreKey</span> <span class="meta">line 179</span><br><span class="x">The key that names and opens everything in the hoard. Derived from the app-lock passphrase alongside the verifier and the tag key, under its own HKDF label, so it is independent of both. It exists only while the application is unlocked.</span></li>
+<li><span class="sec">impl StoreKey</span> <span class="meta">line 181</span><br><span class="x"></span></li>
+<li><span class="sec">fn from_secret</span> <span class="meta">line 183</span><br><span class="x">Wrap raw key material. The caller is trusted to have derived it.</span></li>
+<li><span class="sec">fn expand</span> <span class="meta">line 188</span><br><span class="x">Derive a subkey under a label.</span></li>
+<li><span class="sec">fn base64url</span> <span class="meta">line 200</span><br><span class="x">Base64url, no padding. Sixty-four characters, none of which needs escaping in a filename on any platform this project targets.</span></li>
+<li><span class="sec">const ALPHABET</span> <span class="meta">line 201</span><br><span class="x"></span></li>
+<li><span class="sec">fn bucket_for</span> <span class="meta">line 221</span><br><span class="x">The bucket a payload of this length pads up to.</span></li>
+<li><span class="sec">struct Audit</span> <span class="meta">line 232</span><br><span class="x">What an audit found.</span></li>
+<li><span class="sec">impl Audit</span> <span class="meta">line 246</span><br><span class="x"></span></li>
+<li><span class="sec">fn is_clean</span> <span class="meta">line 248</span><br><span class="x">Whether anything was found that a user should be told about.</span></li>
+<li><span class="sec">struct Hoard</span> <span class="meta">line 254</span><br><span class="x">An obfuscated store rooted at a directory.</span></li>
+<li><span class="sec">impl Hoard</span> <span class="meta">line 259</span><br><span class="x"></span></li>
+<li><span class="sec">fn open</span> <span class="meta">line 261</span><br><span class="x">Open the hoard in `dir`. Nothing is read or written until asked.</span></li>
+<li><span class="sec">fn name_for</span> <span class="meta">line 272</span><br><span class="x">The filename a logical record lives under. Deterministic in the store key, which is what lets the program find a record without keeping an index that would give the game away.</span></li>
+<li><span class="sec">fn path_for</span> <span class="meta">line 291</span><br><span class="x">The full path of a logical record.</span></li>
+<li><span class="sec">fn write</span> <span class="meta">line 299</span><br><span class="x">Encrypt and store `data` under `logical`, padded and named so that neither its content nor its purpose is visible from outside. The roster is updated so a later deletion of this record is detectable.</span></li>
+<li><span class="sec">fn write_raw</span> <span class="meta">line 310</span><br><span class="x"></span></li>
+<li><span class="sec">fn read</span> <span class="meta">line 378</span><br><span class="x">Read a record back, or `None` if it was never written. A file that is present but does not authenticate returns [`Error::Decrypt`] rather than `None`: that is tampering, and it must not be reported as absence.</span></li>
+<li><span class="sec">fn open_bytes</span> <span class="meta">line 388</span><br><span class="x"></span></li>
+<li><span class="sec">fn remove</span> <span class="meta">line 419</span><br><span class="x">Remove a record and drop it from the roster.</span></li>
+<li><span class="sec">fn roster</span> <span class="meta">line 434</span><br><span class="x">The logical names the roster says should exist.</span></li>
+<li><span class="sec">fn save_roster</span> <span class="meta">line 450</span><br><span class="x"></span></li>
+<li><span class="sec">fn sow_decoys</span> <span class="meta">line 469</span><br><span class="x">Write decoy files: names of the same shape, contents of the same character, holding nothing. A decoy is random bytes under a random name. It is not a valid record under any logical name, so the program never mistakes one for data -- it</span></li>
+<li><span class="sec">fn sow_decoys</span> <span class="meta">line 469</span><br><span class="x">simply never derives that name. From outside there is nothing to separate the two, which is the point. Returns how many were written. Names that happen to collide with an existing file are skipped rather than overwritten.</span></li>
+<li><span class="sec">fn audit</span> <span class="meta">line 495</span><br><span class="x">Check every record the roster knows about, and count what else is here. This is the tamper report the user sees after unlocking. It can say a record was edited, and it can say a record the roster expected is gone. It cannot say anything</span></li>
+<li><span class="sec">fn audit</span> <span class="meta">line 495</span><br><span class="x">about a folder somebody emptied entirely, including the roster, and does not try to.</span></li>
+<li><span class="sec">fn is_hoard_shaped</span> <span class="meta">line 532</span><br><span class="x">Whether a filename has the shape this module writes. Used only to count decoys, never to decide what to open: a name that looks right is still never read unless it is one the key derives.</span></li>
+<li><span class="sec">fn fill_random</span> <span class="meta">line 539</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 547</span><br><span class="x"></span></li>
+<li><span class="sec">fn hoard</span> <span class="meta">line 550</span><br><span class="x"></span></li>
+<li><span class="sec">fn other_hoard</span> <span class="meta">line 555</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_record_round_trips</span> <span class="meta">line 561</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_record_that_was_never_written_is_absent_not_an_error</span> <span class="meta">line 569</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_filename_gives_nothing_away</span> <span class="meta">line 575</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_different_key_derives_a_different_name_for_the_same_record</span> <span class="meta">line 585</span><br><span class="x"></span></li>
+<li><span class="sec">fn another_key_cannot_read_what_this_one_wrote</span> <span class="meta">line 594</span><br><span class="x"></span></li>
+<li><span class="sec">fn contents_do_not_appear_in_the_file</span> <span class="meta">line 602</span><br><span class="x"></span></li>
+<li><span class="sec">fn short_and_long_records_are_padded_to_the_same_few_sizes</span> <span class="meta">line 611</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_file_size_does_not_move_when_the_encoding_does</span> <span class="meta">line 629</span><br><span class="x">A file&#x27;s size must depend on the data&#x27;s length and nothing else. The encoding is drawn fresh on every write. If the bucket were chosen from the *encoded* length, a record rewritten repeatedly would move between buckets, and the smallest</span></li>
+<li><span class="sec">fn the_file_size_does_not_move_when_the_encoding_does</span> <span class="meta">line 629</span><br><span class="x">bucket ever seen would pin the true length far more tightly than one bucket was meant to allow. Padding is supposed to hide length; that would have handed it back.</span></li>
+<li><span class="sec">fn no_encoding_expands_past_the_allowance</span> <span class="meta">line 651</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_edited_record_is_refused_rather_than_returned</span> <span class="meta">line 670</span><br><span class="x"></span></li>
+<li><span class="sec">fn two_records_cannot_be_swapped</span> <span class="meta">line 683</span><br><span class="x"></span></li>
+<li><span class="sec">fn audit_reports_an_edited_record</span> <span class="meta">line 699</span><br><span class="x"></span></li>
+<li><span class="sec">fn audit_reports_a_deleted_record</span> <span class="meta">line 713</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_clean_folder_audits_clean</span> <span class="meta">line 724</span><br><span class="x"></span></li>
+<li><span class="sec">fn decoys_are_indistinguishable_from_records_by_shape</span> <span class="meta">line 735</span><br><span class="x"></span></li>
+<li><span class="sec">fn decoys_do_not_disturb_the_records_beside_them</span> <span class="meta">line 753</span><br><span class="x"></span></li>
+<li><span class="sec">fn removing_a_record_takes_it_out_of_the_roster</span> <span class="meta">line 765</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_record_can_be_overwritten_without_growing_the_roster</span> <span class="meta">line 775</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_encoding_changes_from_one_write_to_the_next</span> <span class="meta">line 790</span><br><span class="x">Every record is written through a different encoding, over time. The choice is drawn fresh on each write, so the same record written many times should not keep landing on the same one. A scheme that says it picks at random and does not is</span></li>
+<li><span class="sec">fn the_encoding_changes_from_one_write_to_the_next</span> <span class="meta">line 790</span><br><span class="x">worse than one that never claimed to.</span></li>
+<li><span class="sec">fn a_records_plaintext_is_never_on_disk_even_before_the_cipher</span> <span class="meta">line 815</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_woven_name_is_still_twenty_four_characters</span> <span class="meta">line 834</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_name_is_the_same_every_time_it_is_derived</span> <span class="meta">line 856</span><br><span class="x"></span></li>
+<li><span class="sec">fn decoys_are_still_the_same_shape_as_woven_records</span> <span class="meta">line 871</span><br><span class="x"></span></li>
+<li><span class="sec">fn base64url_matches_the_standard_alphabet</span> <span class="meta">line 887</span><br><span class="x"></span></li>
+<li><span class="sec">fn buckets_round_up_and_never_shrink</span> <span class="meta">line 894</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_truncated_file_is_reported_not_returned</span> <span class="meta">line 905</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_empty_record_round_trips</span> <span class="meta">line 914</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_record_larger_than_every_bucket_round_trips</span> <span class="meta">line 922</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -4937,7 +4954,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-crypto/src/lib.rs</code> <span class="meta">&middot; veilvoice-crypto, 214 lines, 29 sections</span></summary>
+<summary><code>crates/veilvoice-crypto/src/lib.rs</code> <span class="meta">&middot; veilvoice-crypto, 215 lines, 30 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs">open lib.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x"># veilvoice-crypto Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. ## What this crate is for [`veilvoice_core`](../veilvoice_core/index.html) makes a voice</span></li>
@@ -4963,12 +4980,13 @@ nav.top a{margin-right:14px}
 <li><span class="sec">mod privatefile</span> <span class="meta">line 80</span><br><span class="x"></span></li>
 <li><span class="sec">mod shred</span> <span class="meta">line 81</span><br><span class="x"></span></li>
 <li><span class="sec">mod vault</span> <span class="meta">line 82</span><br><span class="x"></span></li>
-<li><span class="sec">const VERSION</span> <span class="meta">line 90</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
-<li><span class="sec">enum Error</span> <span class="meta">line 99</span><br><span class="x">Everything that can go wrong in this crate. Decryption failures are deliberately coarse: [`Error::Decrypt`] does not say *why* authentication failed, because distinguishing a wrong password from a corrupt tag would hand an attacker an</span></li>
-<li><span class="sec">enum Error</span> <span class="meta">line 99</span><br><span class="x">oracle.</span></li>
-<li><span class="sec">impl std::fmt::Display for Error</span> <span class="meta">line 164</span><br><span class="x"></span></li>
-<li><span class="sec">fn fmt</span> <span class="meta">line 165</span><br><span class="x"></span></li>
-<li><span class="sec">impl std::error::Error for Error {}</span> <span class="meta">line 213</span><br><span class="x"></span></li>
+<li><span class="sec">mod weave</span> <span class="meta">line 83</span><br><span class="x"></span></li>
+<li><span class="sec">const VERSION</span> <span class="meta">line 91</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
+<li><span class="sec">enum Error</span> <span class="meta">line 100</span><br><span class="x">Everything that can go wrong in this crate. Decryption failures are deliberately coarse: [`Error::Decrypt`] does not say *why* authentication failed, because distinguishing a wrong password from a corrupt tag would hand an attacker an</span></li>
+<li><span class="sec">enum Error</span> <span class="meta">line 100</span><br><span class="x">oracle.</span></li>
+<li><span class="sec">impl std::fmt::Display for Error</span> <span class="meta">line 165</span><br><span class="x"></span></li>
+<li><span class="sec">fn fmt</span> <span class="meta">line 166</span><br><span class="x"></span></li>
+<li><span class="sec">impl std::error::Error for Error {}</span> <span class="meta">line 214</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -10024,7 +10042,7 @@ nav.top a{margin-right:14px}
 <p class="meta"><a href="index.html">open index.html</a></p>
 <ul>
 <li><span class="sec">below states the same thing once, and a reader using a screen reader should hear it once. The picture this replaces was </span> <span class="meta">line 80</span><br><span class="x">VeilVoice destroys the biometric voiceprint of a speaker, meaning pitch, formants, timbre, micro-timing and the melody of an accent, so that neither software nor a human can re-identify them or reconstruct the original voice, while the</span></li>
-<li><span class="sec">below states the same thing once, and a reader using a screen reader should hear it once. The picture this replaces was </span> <span class="meta">line 80</span><br><span class="x">words stay clean and transcribable . download verify a download source No network code in the dependency graph CI fails the build if an HTTP client appears No unsafe code, in any of the 27 crates 1278 tests, and 17 more suites for the</span></li>
+<li><span class="sec">below states the same thing once, and a reader using a screen reader should hear it once. The picture this replaces was </span> <span class="meta">line 80</span><br><span class="x">words stay clean and transcribable . download verify a download source No network code in the dependency graph CI fails the build if an HTTP client appears No unsafe code, in any of the 27 crates 1298 tests, and 17 more suites for the</span></li>
 <li><span class="sec">below states the same thing once, and a reader using a screen reader should hear it once. The picture this replaces was </span> <span class="meta">line 80</span><br><span class="x">website Reproducible builds: each target built twice, and compared Releases signed; the fingerprint is published everywhere Measured phase is discarded every frame, and never stored Every speaker is mapped onto one canonical voice</span></li>
 <li><span class="sec">below states the same thing once, and a reader using a screen reader should hear it once. The picture this replaces was </span> <span class="meta">line 80</span><br><span class="x">Many-to-one, so there is no inverse to compute Modulation seeded by ChaCha20; the seed never leaves the process A forward-secure ratchet, every two seconds Recordings are encrypted at rest by default X25519 + ML-KEM-768: hybrid,</span></li>
 <li><span class="sec">below states the same thing once, and a reader using a screen reader should hear it once. The picture this replaces was </span> <span class="meta">line 80</span><br><span class="x">post-quantum XChaCha20-Poly1305, and Argon2id The app lock is a verifier, not disk encryption Tamper detection detects; it does not prevent Secure erase is unreliable on flash, and the docs say so Accent removal is partial, and that limit</span></li>
