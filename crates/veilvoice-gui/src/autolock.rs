@@ -1,19 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! Locking the window again after a period of no use.
 //!
-//! **Marker 92.** Off unless somebody turns it on, and when it is on the delay
-//! is theirs to choose: anything from five minutes to forty eight hours from a
-//! list, a number typed in if none of those fit, and the ends of that range
-//! movable by anybody who wants a shorter or longer one.
+//! **Marker 92.** On at half an hour, and the delay is the user's to choose:
+//! anything from five minutes to forty eight hours from a list, a number typed
+//! in if none of those fit, and the ends of that range movable by anybody who
+//! wants a shorter or longer one.
 //!
-//! # Why it is off by default
+//! # Why it is on by default, having been off
 //!
-//! Because a lock that engages while somebody is part way through a recording
-//! is a lock that gets removed. This project's app lock already carries the
-//! honest note that it protects a session rather than a disk, and an autolock
-//! is the same bargain in miniature: it helps the person who walks away from
-//! their machine and it costs the person who leaves a job running. Which of
-//! those a user is, VeilVoice cannot know, so it asks rather than assuming.
+//! It was off, on the argument that a lock engaging part way through a
+//! recording is a lock that gets removed, and that VeilVoice cannot know
+//! whether a given user is the one who walks away or the one who leaves a job
+//! running -- so it should ask rather than assume.
+//!
+//! The asking is the part that was wrong. A default nobody is shown is not a
+//! question, it is an answer, and the answer it gave was "no protection" to
+//! everybody who never opened the settings tab. The people most helped by an
+//! autolock are the least likely to go looking for one.
+//!
+//! So it is on, and the first-run setup shows it rather than leaving it to be
+//! discovered: half an hour, with the choice and the off switch right there.
+//! The original concern is answered by the delay rather than by the default --
+//! thirty minutes of an untouched window is not somebody part way through
+//! anything -- and by the fact that this has never counted a running job as
+//! use, which is deliberate and explained below.
 //!
 //! # What counts as use
 //!
@@ -30,14 +40,21 @@
 //!
 //! # In plain words
 //!
-//! Locks the window again if you have not touched it for a while.
+//! Locks the window again if you have not touched it for half an hour.
 //!
-//! Off until you switch it on. When you do, you pick how long, from five
-//! minutes up to two days, or type your own. Starting a long job does not count
-//! as using it: if you walk away while something is rendering, that is exactly
-//! when you would want it locked.
+//! On to begin with, and setup shows you the switch. You pick how long, from
+//! five minutes up to two days, or type your own, and you can turn it off.
+//! Starting a long job does not count as using it: if you walk away while
+//! something is rendering, that is exactly when you would want it locked.
 
 use std::time::Duration;
+
+/// The delay a fresh installation uses: half an hour.
+///
+/// Long enough that it does not interrupt somebody working, short enough to
+/// matter if they walk out. It is the setup screen's suggestion as well as the
+/// code's default, so the number a user is shown is the number they get.
+pub const DEFAULT_SECS: u64 = 30 * 60;
 
 /// The shortest delay the list offers, in seconds.
 pub const FLOOR_SECS: u64 = 5 * 60;
@@ -77,9 +94,9 @@ pub struct Autolock {
 impl Default for Autolock {
     fn default() -> Self {
         Self {
-            // Off. See the module note.
-            enabled: false,
-            after_secs: 15 * 60,
+            // On, at half an hour. See the module note for what changed.
+            enabled: true,
+            after_secs: DEFAULT_SECS,
             floor_secs: FLOOR_SECS,
             ceiling_secs: CEILING_SECS,
         }
@@ -193,13 +210,39 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_is_off_until_somebody_turns_it_on() {
+    fn it_is_on_at_half_an_hour_out_of_the_box() {
         let auto = Autolock::default();
-        assert!(!auto.enabled);
+        assert!(
+            auto.enabled,
+            "the default is protection, not the absence of it"
+        );
+        assert_eq!(auto.after_secs, DEFAULT_SECS);
+        assert_eq!(auto.after_secs, 30 * 60);
+        assert!(
+            !auto.expired(Duration::from_secs(29 * 60)),
+            "half an hour means half an hour"
+        );
+        assert!(auto.expired(Duration::from_secs(31 * 60)));
+    }
+
+    #[test]
+    fn switching_it_off_switches_it_off() {
+        // The default changed; the ability to refuse it must not have.
+        let auto = Autolock {
+            enabled: false,
+            ..Autolock::default()
+        };
         assert!(
             !auto.expired(Duration::from_secs(u64::MAX / 2)),
-            "a window must not lock itself when nobody asked it to"
+            "a window must not lock itself when somebody has said not to"
         );
+    }
+
+    #[test]
+    fn the_default_delay_is_one_of_the_offered_choices() {
+        // Otherwise the settings tab opens showing a custom value nobody
+        // typed, which reads as a setting that has been meddled with.
+        assert!(CHOICES.contains(&DEFAULT_SECS));
     }
 
     #[test]

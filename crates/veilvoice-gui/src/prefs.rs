@@ -106,9 +106,10 @@ pub struct Prefs {
     pub vault_hidden: String,
     /// Whether the window locks itself after a period of no use.
     ///
-    /// **Marker 92.** Off by default, and the reason is in
-    /// [`crate::autolock`]: a lock that engages part way through a recording is
-    /// a lock somebody removes.
+    /// **Marker 92.** On at half an hour, and the reason it is no longer off is
+    /// in [`crate::autolock`]: a default nobody is shown is an answer rather
+    /// than a question, and the answer it used to give was no protection at
+    /// all to everybody who never opened this tab.
     pub autolock: bool,
     /// How long that period is, in seconds.
     pub autolock_after: u64,
@@ -158,8 +159,8 @@ impl Default for Prefs {
             vault_dir: String::new(),
             vault_tool: String::new(),
             vault_hidden: String::new(),
-            autolock: false,
-            autolock_after: 15 * 60,
+            autolock: true,
+            autolock_after: crate::autolock::DEFAULT_SECS,
             autolock_floor: crate::autolock::FLOOR_SECS,
             autolock_ceiling: crate::autolock::CEILING_SECS,
             notify_style: crate::notify::Style::default().key().to_string(),
