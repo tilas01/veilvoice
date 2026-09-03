@@ -110,9 +110,6 @@
       <Component Id="VeilVoiceGui" Guid="*">
         <File Id="veilvoice_gui.exe" Source="$(var.BinDir)\veilvoice-gui.exe" KeyPath="yes" />
       </Component>
-      <Component Id="VeilVoiceVerify" Guid="*">
-        <File Id="veilvoice_verify.exe" Source="$(var.BinDir)\veilvoice-verify.exe" KeyPath="yes" />
-      </Component>
       <Component Id="LicenceText" Guid="*">
         <File Id="LICENSE" Source="$(var.BinDir)\LICENSE" KeyPath="yes" />
       </Component>

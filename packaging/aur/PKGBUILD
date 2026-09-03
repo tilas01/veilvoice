@@ -1,0 +1,85 @@
+# Maintainer: tilas01 <https://github.com/tilas01>
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Arch package built from a tagged release tarball. Every byte is compiled on
+# the machine installing it: no binary is downloaded and nothing is trusted
+# that makepkg did not build. For the live branch, see PKGBUILD-git beside
+# this file.
+#
+# Verify what you install: `veilvoice verify key` prints the signing key and
+# its fingerprint, to compare against README.md and the website. The stronger
+# check is that this package builds from source, so what lands in /usr/bin is
+# what your own machine compiled.
+
+pkgname=veilvoice
+pkgver=0.1.17
+pkgrel=1
+pkgdesc="Irreversible voice de-identification, fully offline"
+arch=('x86_64' 'aarch64')
+url="https://tilas01.github.io/veilvoice/"
+license=('GPL-3.0-or-later')
+
+# Runtime: ALSA for live mode, and the usual desktop stack for the window.
+depends=('alsa-lib' 'gtk3' 'libxkbcommon' 'libglvnd')
+makedepends=('cargo' 'git')
+optdepends=(
+  'gnupg: check a release with your own GnuPG rather than the key built in'
+  'ffmpeg: import audio from a video container, and write video out'
+  'pipewire: a loopback device for live mode'
+)
+
+source=("$pkgname-$pkgver.tar.gz::https://github.com/tilas01/veilvoice/archive/refs/tags/v$pkgver.tar.gz")
+# Set by `updpkgsums` when the tag is cut, and checked into the AUR repository
+# with the release. It is deliberately not SKIP: an unchecked source is the one
+# thing this package exists to argue against, and a package that skipped the
+# check while shipping a verifier would be saying two different things.
+sha256sums=('0000000000000000000000000000000000000000000000000000000000000000')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  # Both front ends. The verifier is part of `veilvoice` since 0.1.18 and is
+  # no longer a binary of its own.
+  cargo build --frozen --release -p veilvoice-cli -p veilvoice-gui
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  # The workspace suite. It is entirely offline and needs no audio device.
+  cargo test --frozen --release --workspace
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+
+  install -Dm0755 target/release/veilvoice     "$pkgdir/usr/bin/veilvoice"
+  install -Dm0755 target/release/veilvoice-gui "$pkgdir/usr/bin/veilvoice-gui"
+
+  install -Dm0644 assets/icon.png \
+    "$pkgdir/usr/share/icons/hicolor/256x256/apps/veilvoice.png"
+  install -Dm0644 packaging/veilvoice.desktop \
+    "$pkgdir/usr/share/applications/veilvoice.desktop"
+
+  install -Dm0644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm0644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+  for doc in docs/*.md; do
+    install -Dm0644 "$doc" "$pkgdir/usr/share/doc/$pkgname/$(basename "$doc")"
+  done
+
+  # Manual pages are generated from the programs' own help, so they cannot
+  # describe a flag that is not there.
+  python3 tools/release/manpage.py target/release/veilvoice \
+    "$pkgdir/usr/share/man/man1/veilvoice.1"
+  python3 tools/release/manpage.py target/release/veilvoice-gui \
+    "$pkgdir/usr/share/man/man1/veilvoice-gui.1" \
+    --summary "the VeilVoice desktop application"
+}

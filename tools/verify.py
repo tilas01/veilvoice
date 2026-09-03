@@ -137,6 +137,8 @@ CHECKS = [
     # program.
     ("every copy of the version agrees with Cargo.toml",
      [sys.executable, "tools/release/version.py", "--check"]),
+    ("every package installs what the workspace builds",
+     [sys.executable, "tools/release/packaging.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     ("no screenshot has a capture border",
      [sys.executable, "tools/shots/crop.py", "--check"]),

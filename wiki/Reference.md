@@ -108,6 +108,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`aead.rs`|File-veilvoice-crypto-aead]] &middot; Authenticated encryption with XChaCha20-Poly1305.
 - [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] &middot; Amnesic secret storage: page-locked, zeroized, and never printed.
 - [[`container.rs`|File-veilvoice-crypto-container]] &middot; The .veil encrypted container format.
+- [[`hoard.rs`|File-veilvoice-crypto-hoard]] &middot; The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing.
 - [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] &middot; Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.
 - [[`kdf.rs`|File-veilvoice-crypto-kdf]] &middot; Password-based key derivation with Argon2id.
 - [[`lib.rs`|File-veilvoice-crypto-lib]] &middot; Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.
@@ -258,7 +259,7 @@ Verify a VeilVoice release without GnuPG installed
 - [[`discover.rs`|File-veilvoice-verify-discover]] &middot; Finding a release to check, without being told where it is.
 - [[`extracted.rs`|File-veilvoice-verify-extracted]] &middot; What came out of the archive, and the GnuPG somebody already has.
 - [[`fetch.rs`|File-veilvoice-verify-fetch]] &middot; Download a release, without putting an HTTP client in the dependency graph.
-- [[`main.rs`|File-veilvoice-verify-main]] &middot; The portable verifier: check a VeilVoice release without GnuPG installed.
+- [[`lib.rs`|File-veilvoice-verify-lib]] &middot; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`report.rs`|File-veilvoice-verify-report]] &middot; How much this program says, and what it returns when it says nothing.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &middot; The verifier's own tests.
 - [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] &middot; Marker 97.

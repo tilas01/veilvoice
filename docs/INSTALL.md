@@ -198,19 +198,23 @@ removed on exit, and nothing is copied anywhere until every check has passed.
 
 ---
 
-## 2b. With the portable verifier
+## 2b. With the built-in verifier
 
-`veilvoice-verify` ships in every release archive. It is one binary that does
-the same checks as GnuPG, with **nothing else installed** -- the signing key and
-its fingerprint are compiled into it. It downloads nothing.
+`veilvoice verify` does the same checks as GnuPG with **nothing else
+installed** -- the signing key and its fingerprint are compiled into the
+program. It downloads nothing.
+
+Until 0.1.18 this was a separate `veilvoice verify` binary in every archive. It
+is a subcommand now, so there is one fewer file to find and one fewer name to
+learn; the checks and the code behind them are unchanged.
 
 ### The short way
 
-Put it in the folder you downloaded to and run it. That is the whole
+Open a terminal in the folder you downloaded to and run it. That is the whole
 instruction.
 
 ```bash
-veilvoice-verify
+veilvoice verify
 ```
 
 It finds the release near it and checks all of it, in this order, each step
@@ -250,10 +254,10 @@ independent and only you typing them makes the *invocation* independent.
 ### The long way, one file at a time
 
 ```bash
-veilvoice-verify key
+veilvoice verify key
     # prints the fingerprint it carries. Compare it against the one above.
 
-veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz     --sums SHA256SUMS --sig SHA256SUMS.asc
+veilvoice verify file veilvoice-v0.1.9-linux-x86_64.tar.gz     --sums SHA256SUMS --sig SHA256SUMS.asc
 ```
 
 ### The one thing it cannot carry
@@ -276,9 +280,9 @@ why this project cannot perform it for you.
 
 ```bash
 # the stronger check, once somebody else has published a hash from their build
-veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz --sha256 <their hash>
+veilvoice verify file veilvoice-v0.1.9-linux-x86_64.tar.gz --sha256 <their hash>
 
-veilvoice-verify --explain     # the difference, at length
+veilvoice verify --explain     # the difference, at length
 ```
 
 VeilVoice's own releases are built twice, in separate directories, and compared
@@ -287,7 +291,7 @@ something, and not the same as somebody else checking it.
 
 ### Why it depends on a large library
 
-`veilvoice-verify` uses [`pgp`](https://crates.io/crates/pgp) (rPGP), a pure-Rust
+`veilvoice verify` uses [`pgp`](https://crates.io/crates/pgp) (rPGP), a pure-Rust
 OpenPGP implementation, and it is by far the largest dependency in this project.
 That cost was weighed rather than ignored. The alternative was hand-writing
 OpenPGP packet parsing and RSA PKCS#1 v1.5 verification, and a subtle mistake

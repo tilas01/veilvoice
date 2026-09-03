@@ -67,7 +67,6 @@ modules:
       - cargo build --release --locked --workspace --offline
       - install -Dm755 target/release/veilvoice-gui /app/bin/veilvoice-gui
       - install -Dm755 target/release/veilvoice /app/bin/veilvoice
-      - install -Dm755 target/release/veilvoice-verify /app/bin/veilvoice-verify
       - install -Dm644 assets/icon.png /app/share/icons/hicolor/256x256/apps/io.github.tilas01.VeilVoice.png
       - install -Dm644 packaging/flatpak/io.github.tilas01.VeilVoice.desktop /app/share/applications/io.github.tilas01.VeilVoice.desktop
       - install -Dm644 packaging/flatpak/io.github.tilas01.VeilVoice.metainfo.xml /app/share/metainfo/io.github.tilas01.VeilVoice.metainfo.xml

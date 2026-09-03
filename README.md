@@ -198,7 +198,7 @@ curl -fsSLO $B/veilvoice-signing-key.asc
 # 2. Unpack and check it, from inside the folder.
 tar xzf veilvoice-$V-linux-x86_64.tar.gz
 cd veilvoice-$V-linux-x86_64
-./veilvoice-verify
+./veilvoice verify
 
 # 3. Run it, or install it so `veilvoice` works in any terminal.
 ./veilvoice-gui
@@ -239,7 +239,7 @@ curl -fsSLO $B/veilvoice-signing-key.asc
 
 tar xzf veilvoice-$V-macos-arm64.tar.gz
 cd veilvoice-$V-macos-arm64
-./veilvoice-verify
+./veilvoice verify
 ./veilvoice-gui
 ```
 
@@ -261,7 +261,7 @@ curl.exe -fsSLO "$B/veilvoice-signing-key.asc"
 
 Expand-Archive "veilvoice-$V-windows-x86_64.zip" -DestinationPath .
 cd "veilvoice-$V-windows-x86_64"
-.\veilvoice-verify.exe
+.\veilvoice.exe verify
 .\veilvoice-gui.exe
 ```
 
@@ -294,7 +294,7 @@ V=v0.1.17
 fetch https://github.com/tilas01/veilvoice/releases/download/$V/veilvoice-$V-freebsd-x86_64.tar.gz
 tar xzf veilvoice-$V-freebsd-x86_64.tar.gz
 cd veilvoice-$V-freebsd-x86_64
-./veilvoice-verify
+./veilvoice verify
 ```
 
 </details>
