@@ -148,6 +148,14 @@ pub enum Error {
     AppLockCooldown(u64),
     /// The app-lock file could not be read, written or removed.
     AppLockStore,
+    /// A lock is already set here, so creating one was refused.
+    ///
+    /// Its own variant because it was reported as [`Self::AppLockStore`], and
+    /// that message -- "could not read or write the app-lock file" -- reads as
+    /// a broken installation rather than as "you already have one of these".
+    /// A user who saw it had no way to tell a refusal from a failure, which is
+    /// half of what made F-141 so confusing to hit.
+    AppLockExists,
     /// The password was changed, but the second copy of the lock could not be
     /// updated, so it still holds the previous one.
     AppLockSpareStale,
@@ -188,6 +196,10 @@ impl std::fmt::Display for Error {
                 return write!(f, "too many attempts, so wait {secs}s before trying again")
             }
             Self::AppLockStore => "could not read or write the app-lock file",
+            Self::AppLockExists => {
+                "an app lock is already set on this machine. Change its password \
+                 from the security tab, or remove it there first"
+            }
             Self::AppLockSpareStale => {
                 "the password was changed here, but the administrator-owned copy of the lock \
                  still holds the previous one. Run VeilVoice as an administrator once to \
