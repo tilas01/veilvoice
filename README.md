@@ -595,6 +595,18 @@ Using it: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), or
 [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 Roadmap and open work: [`ROADMAP.md`](ROADMAP.md).
 
+## Credits
+
+Written and maintained by **tilas01**, who holds the copyright and is the sole
+author for licensing purposes.
+
+Much of the code, the documentation and this website were drafted with the help
+of **Claude**, Anthropic's assistant, working to tilas01's direction. Nothing
+reaches a release unread: every change is reviewed, built and tested before it
+is committed, and the audit rounds in [`docs/AUDIT.md`](docs/AUDIT.md) are the
+record of that review finding its own mistakes. The credit is stated here, in
+the open, rather than scattered through the commit log.
+
 ## Licence
 
 GPL-3.0-or-later. See [`LICENSE`](LICENSE).
