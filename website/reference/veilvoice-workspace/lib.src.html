@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-workspace/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-workspace.html">veilvoice-workspace</a> &middot; 785 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-workspace.html">veilvoice-workspace</a> &middot; 819 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -503,373 +503,407 @@
 <span class="ln" id="L425">                    .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot create {}: {e}&quot;</span>, parent.<span class="tok-fn">display</span>())))?;</span>
 <span class="ln" id="L426">            }</span>
 <span class="ln" id="L427">        }</span>
-<span class="ln" id="L428">        std::fs::<span class="tok-fn">write</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>())</span>
-<span class="ln" id="L429">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot write {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())))</span>
-<span class="ln" id="L430">    }</span>
+<span class="ln" id="L428">        <span class="tok-com">// Owner-only. The panel that saves these says what they hold: where</span></span>
+<span class="ln" id="L429">        <span class="tok-com">// your files are, who is in the recording, and what you called them.</span></span>
+<span class="ln" id="L430">        <span class="tok-com">// It says so to reassure -- no audio, no passwords -- and the names</span></span>
+<span class="ln" id="L431">        <span class="tok-com">// are the part that reassurance does not cover. A file of the names of</span></span>
+<span class="ln" id="L432">        <span class="tok-com">// the people in a recording is worth protecting on its own, and this</span></span>
+<span class="ln" id="L433">        <span class="tok-com">// was writing it readable by every account on the machine.</span></span>
+<span class="ln" id="L434">        <span class="tok-com">//</span></span>
+<span class="ln" id="L435">        <span class="tok-com">// The same slip as the group render&#x27;s four files, in a third program.</span></span>
+<span class="ln" id="L436">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>())</span>
+<span class="ln" id="L437">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot write {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())))</span>
+<span class="ln" id="L438">    }</span>
 </span>
-<span class="ln" id="L431"></span>
+<span class="ln" id="L439"></span>
 <span class="src-item" id="fn-workspace-profile">
-<span class="ln" id="L432">    <span class="tok-com">/// The profile this project names, if this build has it.</span></span>
-<span class="ln" id="L433">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">profile</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> Profile&gt; {</span>
-<span class="ln" id="L434">        <span class="tok-fn">profile</span>(&amp;<span class="tok-kw">self</span>.profile)</span>
-<span class="ln" id="L435">    }</span>
+<span class="ln" id="L440">    <span class="tok-com">/// The profile this project names, if this build has it.</span></span>
+<span class="ln" id="L441">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">profile</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> Profile&gt; {</span>
+<span class="ln" id="L442">        <span class="tok-fn">profile</span>(&amp;<span class="tok-kw">self</span>.profile)</span>
+<span class="ln" id="L443">    }</span>
 </span>
-<span class="ln" id="L436">}</span>
-<span class="ln" id="L437"></span>
+<span class="ln" id="L444">}</span>
+<span class="ln" id="L445"></span>
 <span class="src-item" id="fn-take_token">
-<span class="ln" id="L438"><span class="tok-com">/// The first whitespace-delimited token, and everything after it.</span></span>
-<span class="ln" id="L439"><span class="tok-com">///</span></span>
-<span class="ln" id="L440"><span class="tok-com">/// The remainder keeps its own internal spacing, because the last field on a</span></span>
-<span class="ln" id="L441"><span class="tok-com">/// line is a name and a name may contain spaces.</span></span>
-<span class="ln" id="L442"><span class="tok-kw">fn</span> <span class="tok-fn">take_token</span>(line: &amp;str) -&gt; (&amp;str, &amp;str) {</span>
-<span class="ln" id="L443">    <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L444">    <span class="tok-kw">match</span> line.<span class="tok-fn">find</span>(char::is_whitespace) {</span>
-<span class="ln" id="L445">        <span class="tok-fn">Some</span>(at) =&gt; (&amp;line[..at], line[at..].<span class="tok-fn">trim_start</span>()),</span>
-<span class="ln" id="L446">        None =&gt; (line, <span class="tok-str">&quot;&quot;</span>),</span>
-<span class="ln" id="L447">    }</span>
-<span class="ln" id="L448">}</span>
+<span class="ln" id="L446"><span class="tok-com">/// The first whitespace-delimited token, and everything after it.</span></span>
+<span class="ln" id="L447"><span class="tok-com">///</span></span>
+<span class="ln" id="L448"><span class="tok-com">/// The remainder keeps its own internal spacing, because the last field on a</span></span>
+<span class="ln" id="L449"><span class="tok-com">/// line is a name and a name may contain spaces.</span></span>
+<span class="ln" id="L450"><span class="tok-kw">fn</span> <span class="tok-fn">take_token</span>(line: &amp;str) -&gt; (&amp;str, &amp;str) {</span>
+<span class="ln" id="L451">    <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L452">    <span class="tok-kw">match</span> line.<span class="tok-fn">find</span>(char::is_whitespace) {</span>
+<span class="ln" id="L453">        <span class="tok-fn">Some</span>(at) =&gt; (&amp;line[..at], line[at..].<span class="tok-fn">trim_start</span>()),</span>
+<span class="ln" id="L454">        None =&gt; (line, <span class="tok-str">&quot;&quot;</span>),</span>
+<span class="ln" id="L455">    }</span>
+<span class="ln" id="L456">}</span>
 </span>
-<span class="ln" id="L449"></span>
+<span class="ln" id="L457"></span>
 <span class="src-item" id="fn-one_line">
-<span class="ln" id="L450"><span class="tok-com">/// A value with no line break in it.</span></span>
-<span class="ln" id="L451"><span class="tok-com">///</span></span>
-<span class="ln" id="L452"><span class="tok-com">/// A newline inside a name would let one line become two, and the second could</span></span>
-<span class="ln" id="L453"><span class="tok-com">/// claim to be any keyword it liked, the same forging a plan&#x27;s speaker names</span></span>
-<span class="ln" id="L454"><span class="tok-com">/// are already guarded against.</span></span>
-<span class="ln" id="L455"><span class="tok-kw">fn</span> <span class="tok-fn">one_line</span>(value: &amp;str) -&gt; String {</span>
-<span class="ln" id="L456">    value.<span class="tok-fn">replace</span>([<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&#x27;\r&#x27;</span>], <span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L457">}</span>
+<span class="ln" id="L458"><span class="tok-com">/// A value with no line break in it.</span></span>
+<span class="ln" id="L459"><span class="tok-com">///</span></span>
+<span class="ln" id="L460"><span class="tok-com">/// A newline inside a name would let one line become two, and the second could</span></span>
+<span class="ln" id="L461"><span class="tok-com">/// claim to be any keyword it liked, the same forging a plan&#x27;s speaker names</span></span>
+<span class="ln" id="L462"><span class="tok-com">/// are already guarded against.</span></span>
+<span class="ln" id="L463"><span class="tok-kw">fn</span> <span class="tok-fn">one_line</span>(value: &amp;str) -&gt; String {</span>
+<span class="ln" id="L464">    value.<span class="tok-fn">replace</span>([<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&#x27;\r&#x27;</span>], <span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L465">}</span>
 </span>
-<span class="ln" id="L458"></span>
+<span class="ln" id="L466"></span>
 <span class="src-item" id="fn-path_text">
-<span class="ln" id="L459"><span class="tok-com">/// A path as one line, with Windows separators normalised.</span></span>
-<span class="ln" id="L460"><span class="tok-kw">fn</span> <span class="tok-fn">path_text</span>(path: &amp;Path) -&gt; String {</span>
-<span class="ln" id="L461">    <span class="tok-fn">one_line</span>(&amp;path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>().<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\\&#x27;</span>, <span class="tok-str">&quot;/&quot;</span>))</span>
-<span class="ln" id="L462">}</span>
+<span class="ln" id="L467"><span class="tok-com">/// A path as one line, with Windows separators normalised.</span></span>
+<span class="ln" id="L468"><span class="tok-kw">fn</span> <span class="tok-fn">path_text</span>(path: &amp;Path) -&gt; String {</span>
+<span class="ln" id="L469">    <span class="tok-fn">one_line</span>(&amp;path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>().<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\\&#x27;</span>, <span class="tok-str">&quot;/&quot;</span>))</span>
+<span class="ln" id="L470">}</span>
 </span>
-<span class="ln" id="L463"></span>
-<span class="ln" id="L464"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L465"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L466">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L467"></span>
-<span class="ln" id="L468">    <span class="tok-kw">fn</span> <span class="tok-fn">sample</span>() -&gt; Workspace {</span>
-<span class="ln" id="L469">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L470">        work.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Two people, one afternoon&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L471">        work.input = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;recordings/talk.wav&quot;</span>));</span>
-<span class="ln" id="L472">        work.plan = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;recordings/plan.txt&quot;</span>));</span>
-<span class="ln" id="L473">        work.profile = GROUP_ONE_VOICE.id.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L474">        work.theme = <span class="tok-str">&quot;gruvbox&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L475">        work.members = vec![</span>
-<span class="ln" id="L476">            Member {</span>
-<span class="ln" id="L477">                name: <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L478">                colour: None,</span>
-<span class="ln" id="L479">            },</span>
-<span class="ln" id="L480">            Member {</span>
-<span class="ln" id="L481">                name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L482">                colour: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;#73daca&quot;</span>.<span class="tok-fn">into</span>()),</span>
-<span class="ln" id="L483">            },</span>
-<span class="ln" id="L484">        ];</span>
-<span class="ln" id="L485">        work</span>
-<span class="ln" id="L486">    }</span>
-<span class="ln" id="L487"></span>
-<span class="ln" id="L488">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L489">    <span class="tok-kw">fn</span> <span class="tok-fn">a_project_round_trips_through_its_text_format</span>() {</span>
-<span class="ln" id="L490">        <span class="tok-kw">let</span> work = <span class="tok-fn">sample</span>();</span>
-<span class="ln" id="L491">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;work.<span class="tok-fn">to_text</span>()).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should parse&quot;</span>);</span>
-<span class="ln" id="L492">        assert_eq!(read_back, work);</span>
-<span class="ln" id="L493">    }</span>
-<span class="ln" id="L494"></span>
-<span class="ln" id="L495">    <span class="tok-com">/// Saving and reading back must give the same project, for every shape a</span></span>
-<span class="ln" id="L496">    <span class="tok-com">/// project can be in -- not only the tidy one in `sample`.</span></span>
-<span class="ln" id="L497">    <span class="tok-com">///</span></span>
-<span class="ln" id="L498">    <span class="tok-com">/// This is where F-66 came from: `Some(&quot;   &quot;)` was written as `title  `</span></span>
-<span class="ln" id="L499">    <span class="tok-com">/// and read back as `Some(&quot;&quot;)`, which is neither what was saved nor</span></span>
-<span class="ln" id="L500">    <span class="tok-com">/// absent. A round trip that quietly changes its answer is worse than one</span></span>
-<span class="ln" id="L501">    <span class="tok-com">/// that fails, because nothing reports it.</span></span>
-<span class="ln" id="L502">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L503">    <span class="tok-kw">fn</span> <span class="tok-fn">every_shape_of_project_round_trips</span>() {</span>
-<span class="ln" id="L504">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shapes = vec![Workspace::<span class="tok-fn">new</span>(), <span class="tok-fn">sample</span>()];</span>
-<span class="ln" id="L505"></span>
-<span class="ln" id="L506">        <span class="tok-com">// Empty, whitespace, and absent, for each of the three optional values.</span></span>
-<span class="ln" id="L507">        <span class="tok-kw">for</span> value <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;a title&quot;</span>] {</span>
-<span class="ln" id="L508">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L509">            work.title = <span class="tok-fn">Some</span>(value.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L510">            work.input = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(value));</span>
-<span class="ln" id="L511">            work.plan = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(value));</span>
-<span class="ln" id="L512">            shapes.<span class="tok-fn">push</span>(work);</span>
-<span class="ln" id="L513">        }</span>
-<span class="ln" id="L514"></span>
-<span class="ln" id="L515">        <span class="tok-com">// No members, one member, the most a plan can hold.</span></span>
-<span class="ln" id="L516">        <span class="tok-kw">for</span> count <span class="tok-kw">in</span> [0usize, <span class="tok-num">1</span>, <span class="tok-num">10</span>] {</span>
-<span class="ln" id="L517">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L518">            work.members = (<span class="tok-num">0</span>..count)</span>
-<span class="ln" id="L519">                .<span class="tok-fn">map</span>(|n| Member {</span>
-<span class="ln" id="L520">                    name: format!(<span class="tok-str">&quot;Person {n}&quot;</span>),</span>
-<span class="ln" id="L521">                    colour: (n % <span class="tok-num">2</span> == <span class="tok-num">0</span>).<span class="tok-fn">then</span>(|| <span class="tok-str">&quot;#73daca&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L522">                })</span>
-<span class="ln" id="L523">                .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L524">            shapes.<span class="tok-fn">push</span>(work);</span>
-<span class="ln" id="L525">        }</span>
-<span class="ln" id="L526"></span>
-<span class="ln" id="L527">        <span class="tok-com">// No outputs at all, which is a thing somebody can tick their way to.</span></span>
-<span class="ln" id="L528">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> none = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L529">        none.outputs.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L530">        shapes.<span class="tok-fn">push</span>(none);</span>
-<span class="ln" id="L531"></span>
-<span class="ln" id="L532">        <span class="tok-com">// A name with the separator in it, and one with a line break.</span></span>
-<span class="ln" id="L533">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> awkward = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L534">        awkward.members = vec![</span>
-<span class="ln" id="L535">            Member {</span>
-<span class="ln" id="L536">                name: <span class="tok-str">&quot;Two  Spaces&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L537">                colour: None,</span>
-<span class="ln" id="L538">            },</span>
-<span class="ln" id="L539">            Member {</span>
-<span class="ln" id="L540">                name: <span class="tok-str">&quot;Line\nBreak&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L541">                colour: None,</span>
-<span class="ln" id="L542">            },</span>
-<span class="ln" id="L543">        ];</span>
-<span class="ln" id="L544">        shapes.<span class="tok-fn">push</span>(awkward);</span>
-<span class="ln" id="L545"></span>
-<span class="ln" id="L546">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> shapes {</span>
-<span class="ln" id="L547">            <span class="tok-kw">let</span> text = shape.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L548">            <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{e}\n---\n{text}&quot;</span>));</span>
-<span class="ln" id="L549">            <span class="tok-kw">let</span> again = Workspace::<span class="tok-fn">parse</span>(&amp;read_back.<span class="tok-fn">to_text</span>()).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;stable&quot;</span>);</span>
-<span class="ln" id="L550">            assert_eq!(</span>
-<span class="ln" id="L551">                read_back, again,</span>
-<span class="ln" id="L552">                <span class="tok-str">&quot;reading twice must give the same thing:\n{text}&quot;</span></span>
-<span class="ln" id="L553">            );</span>
-<span class="ln" id="L554">        }</span>
-<span class="ln" id="L555">    }</span>
-<span class="ln" id="L556"></span>
-<span class="ln" id="L557">    <span class="tok-com">/// A value that trims to nothing is absent, in both directions.</span></span>
-<span class="ln" id="L558">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L559">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_value_is_absent_rather_than_present_and_empty</span>() {</span>
-<span class="ln" id="L560">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L561">        work.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;   &quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L562">        work.plan = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;&quot;</span>));</span>
-<span class="ln" id="L563">        <span class="tok-kw">let</span> text = work.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L564">        <span class="tok-com">// By line, not by substring: `output  subtitles` contains &quot;title&quot;, and</span></span>
-<span class="ln" id="L565">        <span class="tok-com">// a looser check here passed for the wrong reason on the first run.</span></span>
-<span class="ln" id="L566">        <span class="tok-kw">let</span> keys: Vec&lt;&amp;str&gt; = text</span>
-<span class="ln" id="L567">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L568">            .<span class="tok-fn">filter_map</span>(|line| line.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L569">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L570">        assert!(!keys.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;title&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L571">        assert!(!keys.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;plan&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L572"></span>
-<span class="ln" id="L573">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\ntitle  \nplan  \n&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L574">        assert_eq!(read_back.title, None);</span>
-<span class="ln" id="L575">        assert_eq!(read_back.plan, None);</span>
-<span class="ln" id="L576">    }</span>
-<span class="ln" id="L577"></span>
-<span class="ln" id="L578">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L579">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_project_writes_all_three_outputs</span>() {</span>
-<span class="ln" id="L580">        <span class="tok-kw">let</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L581">        assert_eq!(work.outputs, vec![<span class="tok-str">&quot;audio&quot;</span>, <span class="tok-str">&quot;subtitles&quot;</span>, <span class="tok-str">&quot;page&quot;</span>]);</span>
-<span class="ln" id="L582">        assert_eq!(work.profile, INDIVIDUAL.id);</span>
-<span class="ln" id="L583">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;work.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L584">        assert_eq!(read_back.outputs, work.outputs);</span>
-<span class="ln" id="L585">    }</span>
-<span class="ln" id="L586"></span>
-<span class="ln" id="L587">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L588">    <span class="tok-kw">fn</span> <span class="tok-fn">it_saves_and_loads_through_a_real_file</span>() {</span>
-<span class="ln" id="L589">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L590">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;project.veilwork&quot;</span>);</span>
-<span class="ln" id="L591">        <span class="tok-kw">let</span> work = <span class="tok-fn">sample</span>();</span>
-<span class="ln" id="L592">        work.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L593">        assert_eq!(Workspace::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>(), work);</span>
-<span class="ln" id="L594">    }</span>
-<span class="ln" id="L595"></span>
-<span class="ln" id="L596">    <span class="tok-com">/// **No passwords and no audio.** A project file is a thing somebody might</span></span>
-<span class="ln" id="L597">    <span class="tok-com">/// send; if it carried a passphrase, sending it would hand over the</span></span>
-<span class="ln" id="L598">    <span class="tok-com">/// recordings too, and people would learn that afterwards.</span></span>
-<span class="ln" id="L599">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L600">    <span class="tok-kw">fn</span> <span class="tok-fn">a_project_file_carries_no_secret_and_no_audio</span>() {</span>
-<span class="ln" id="L601">        <span class="tok-kw">let</span> text = <span class="tok-fn">sample</span>().<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L602"></span>
-<span class="ln" id="L603">        <span class="tok-com">// The **data**, not the header comment. The first version of this</span></span>
-<span class="ln" id="L604">        <span class="tok-com">// scanned the whole file and tripped on the file&#x27;s own denial -- the</span></span>
-<span class="ln" id="L605">        <span class="tok-com">// header says &quot;no audio and no passwords&quot;, which contains &quot;password&quot;.</span></span>
-<span class="ln" id="L606">        <span class="tok-com">// `docs/AUDIT.md` records the identical trap in a scope note, where a</span></span>
-<span class="ln" id="L607">        <span class="tok-com">// search for &quot;prevents&quot; matched &quot;nothing here prevents it&quot;. A checker</span></span>
-<span class="ln" id="L608">        <span class="tok-com">// has to read the way the thing it checks is read.</span></span>
-<span class="ln" id="L609">        <span class="tok-kw">let</span> data: String = text</span>
-<span class="ln" id="L610">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L611">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>))</span>
-<span class="ln" id="L612">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L613">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L614">            .<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L615"></span>
-<span class="ln" id="L616">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;password&quot;</span>, <span class="tok-str">&quot;passphrase&quot;</span>, <span class="tok-str">&quot;secret&quot;</span>, <span class="tok-str">&quot;riff&quot;</span>, <span class="tok-str">&quot;wave&quot;</span>] {</span>
-<span class="ln" id="L617">            assert!(</span>
-<span class="ln" id="L618">                !data.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L619">                <span class="tok-str">&quot;a project file must not contain {forbidden:?}:\n{data}&quot;</span></span>
-<span class="ln" id="L620">            );</span>
-<span class="ln" id="L621">        }</span>
-<span class="ln" id="L622">        <span class="tok-com">// And the header does have to say what is not in here, in the words</span></span>
-<span class="ln" id="L623">        <span class="tok-com">// somebody opening the file would read.</span></span>
-<span class="ln" id="L624">        assert!(text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no audio and no passwords&quot;</span>));</span>
-<span class="ln" id="L625">    }</span>
-<span class="ln" id="L626"></span>
-<span class="ln" id="L627">    <span class="tok-com">/// An unknown keyword is refused rather than skipped, and the refusal says</span></span>
-<span class="ln" id="L628">    <span class="tok-com">/// why that is the safe answer.</span></span>
-<span class="ln" id="L629">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L630">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_keyword_is_refused_rather_than_ignored</span>() {</span>
-<span class="ln" id="L631">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nprofile  individual\nsomething_new  42\n&quot;</span>);</span>
-<span class="ln" id="L632">        <span class="tok-kw">let</span> error = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;unknown keywords are refused&quot;</span>);</span>
-<span class="ln" id="L633">        <span class="tok-kw">let</span> words = error.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L634">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;something_new&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L635">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;settings you did not choose&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L636">    }</span>
-<span class="ln" id="L637"></span>
-<span class="ln" id="L638">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L639">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_that_is_not_a_project_is_refused_by_its_first_line</span>() {</span>
-<span class="ln" id="L640">        <span class="tok-kw">let</span> error =</span>
-<span class="ln" id="L641">            Workspace::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;VEILCONV1\nspeaker  0  Alex\n&quot;</span>).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a plan, not a project&quot;</span>);</span>
-<span class="ln" id="L642">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(MAGIC));</span>
-<span class="ln" id="L643">        assert!(Workspace::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L644">    }</span>
-<span class="ln" id="L645"></span>
-<span class="ln" id="L646">    <span class="tok-com">/// A gap in the slots would move everybody after it onto a different voice</span></span>
-<span class="ln" id="L647">    <span class="tok-com">/// from the one they were saved with -- silently, and only audible as</span></span>
-<span class="ln" id="L648">    <span class="tok-com">/// &quot;somebody sounds wrong&quot;.</span></span>
-<span class="ln" id="L649">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L650">    <span class="tok-kw">fn</span> <span class="tok-fn">a_gap_in_the_slots_is_refused</span>() {</span>
-<span class="ln" id="L651">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nmember  0  -  Alex\nmember  2  -  Sam\n&quot;</span>);</span>
-<span class="ln" id="L652">        <span class="tok-kw">let</span> error = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;slot 1 is missing&quot;</span>);</span>
-<span class="ln" id="L653">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;different voice&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L654">    }</span>
-<span class="ln" id="L655"></span>
-<span class="ln" id="L656">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L657">    <span class="tok-kw">fn</span> <span class="tok-fn">a_repeated_slot_is_refused</span>() {</span>
-<span class="ln" id="L658">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nmember  0  -  Alex\nmember  0  -  Sam\n&quot;</span>);</span>
-<span class="ln" id="L659">        assert!(Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L660">    }</span>
-<span class="ln" id="L661"></span>
-<span class="ln" id="L662">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L663">    <span class="tok-kw">fn</span> <span class="tok-fn">a_member_with_no_name_is_refused</span>() {</span>
-<span class="ln" id="L664">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nmember  0  -  \n&quot;</span>);</span>
-<span class="ln" id="L665">        assert!(Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L666">    }</span>
-<span class="ln" id="L667"></span>
-<span class="ln" id="L668">    <span class="tok-com">/// A name with a line break in it could forge a record. The writer strips</span></span>
-<span class="ln" id="L669">    <span class="tok-com">/// it rather than producing a file that reads back as something else.</span></span>
-<span class="ln" id="L670">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L671">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_forge_a_second_line</span>() {</span>
-<span class="ln" id="L672">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L673">        work.members = vec![Member {</span>
-<span class="ln" id="L674">            name: <span class="tok-str">&quot;Alex\nprofile  group-one-voice&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L675">            colour: None,</span>
-<span class="ln" id="L676">        }];</span>
-<span class="ln" id="L677">        <span class="tok-kw">let</span> text = work.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L678">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should still parse&quot;</span>);</span>
-<span class="ln" id="L679">        assert_eq!(</span>
-<span class="ln" id="L680">            read_back.profile, INDIVIDUAL.id,</span>
-<span class="ln" id="L681">            <span class="tok-str">&quot;the forged line must not win&quot;</span></span>
-<span class="ln" id="L682">        );</span>
-<span class="ln" id="L683">        assert!(!read_back.members[<span class="tok-num">0</span>].name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\n&#x27;</span>));</span>
-<span class="ln" id="L684">    }</span>
-<span class="ln" id="L685"></span>
-<span class="ln" id="L686">    <span class="tok-com">/// A profile this build does not have is reported, not silently swapped for</span></span>
-<span class="ln" id="L687">    <span class="tok-com">/// one it does. Rendering under settings somebody did not choose is the</span></span>
-<span class="ln" id="L688">    <span class="tok-com">/// failure to avoid.</span></span>
-<span class="ln" id="L689">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L690">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_profile_is_reported_rather_than_replaced</span>() {</span>
-<span class="ln" id="L691">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L692">        work.profile = <span class="tok-str">&quot;from-a-newer-build&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L693">        assert!(work.<span class="tok-fn">profile</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L694">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;work.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L695">        assert_eq!(read_back.profile, <span class="tok-str">&quot;from-a-newer-build&quot;</span>);</span>
-<span class="ln" id="L696">        assert!(read_back.<span class="tok-fn">profile</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L697">    }</span>
-<span class="ln" id="L698"></span>
-<span class="ln" id="L699">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L700">    <span class="tok-kw">fn</span> <span class="tok-fn">every_built_in_profile_is_findable_and_uniquely_named</span>() {</span>
-<span class="ln" id="L701">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> ids: Vec&lt;&amp;str&gt; = BUILT_IN.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|p| p.id).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L702">        <span class="tok-kw">let</span> count = ids.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L703">        ids.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L704">        ids.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L705">        assert_eq!(ids.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;two profiles share an identifier&quot;</span>);</span>
-<span class="ln" id="L706">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN {</span>
-<span class="ln" id="L707">            assert_eq!(<span class="tok-fn">profile</span>(one.id), <span class="tok-fn">Some</span>(one));</span>
-<span class="ln" id="L708">            assert!(!one.name.<span class="tok-fn">is_empty</span>() &amp;&amp; !one.note.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L709">        }</span>
-<span class="ln" id="L710">        assert_eq!(<span class="tok-fn">default_profile</span>(), &amp;INDIVIDUAL);</span>
-<span class="ln" id="L711">    }</span>
-<span class="ln" id="L712"></span>
-<span class="ln" id="L713">    <span class="tok-com">/// Every profile&#x27;s note has to say what it does **not** do as well as what</span></span>
-<span class="ln" id="L714">    <span class="tok-com">/// it does. A name like &quot;highest security&quot; doing the work of an explanation</span></span>
-<span class="ln" id="L715">    <span class="tok-com">/// is the thing this project refuses everywhere else.</span></span>
-<span class="ln" id="L716">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L717">    <span class="tok-kw">fn</span> <span class="tok-fn">every_profile_note_states_a_limit</span>() {</span>
-<span class="ln" id="L718">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN {</span>
-<span class="ln" id="L719">            <span class="tok-kw">let</span> note = one.note.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L720">            assert!(</span>
-<span class="ln" id="L721">                note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not&quot;</span>)</span>
-<span class="ln" id="L722">                    || note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cannot&quot;</span>)</span>
-<span class="ln" id="L723">                    || note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the price&quot;</span>)</span>
-<span class="ln" id="L724">                    || note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;rather than&quot;</span>),</span>
-<span class="ln" id="L725">                <span class="tok-str">&quot;{}: the note states no limit:\n{}&quot;</span>,</span>
-<span class="ln" id="L726">                one.id,</span>
-<span class="ln" id="L727">                one.note</span>
-<span class="ln" id="L728">            );</span>
-<span class="ln" id="L729">        }</span>
-<span class="ln" id="L730">        <span class="tok-com">// And the most private one has to name its cost outright.</span></span>
-<span class="ln" id="L731">        assert!(GROUP_ONE_VOICE.note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;The price is&quot;</span>));</span>
-<span class="ln" id="L732">    }</span>
-<span class="ln" id="L733"></span>
-<span class="ln" id="L734">    <span class="tok-com">/// A profile shapes the engine but must not touch the sample rate, which</span></span>
-<span class="ln" id="L735">    <span class="tok-com">/// belongs to the recording. Overwriting it would resample somebody&#x27;s audio</span></span>
-<span class="ln" id="L736">    <span class="tok-com">/// because they picked a preset.</span></span>
-<span class="ln" id="L737">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L738">    <span class="tok-kw">fn</span> <span class="tok-fn">a_profile_leaves_the_sample_rate_alone</span>() {</span>
-<span class="ln" id="L739">        <span class="tok-kw">let</span> config = DeidConfig {</span>
-<span class="ln" id="L740">            sample_rate: <span class="tok-num">44_100.0</span>,</span>
-<span class="ln" id="L741">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L742">        };</span>
-<span class="ln" id="L743">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN {</span>
-<span class="ln" id="L744">            <span class="tok-kw">let</span> applied = one.<span class="tok-fn">applied_to</span>(config);</span>
-<span class="ln" id="L745">            assert_eq!(applied.sample_rate, <span class="tok-num">44_100.0</span>, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
-<span class="ln" id="L746">            assert_eq!(applied.intensity, one.intensity);</span>
-<span class="ln" id="L747">            assert_eq!(applied.accent.enabled, one.neutralise_accent);</span>
-<span class="ln" id="L748">        }</span>
-<span class="ln" id="L749">    }</span>
-<span class="ln" id="L750"></span>
-<span class="ln" id="L751">    <span class="tok-com">/// The two group profiles differ in exactly one thing, which is the point</span></span>
-<span class="ln" id="L752">    <span class="tok-com">/// of there being two of them.</span></span>
-<span class="ln" id="L753">    <span class="tok-com">///</span></span>
-<span class="ln" id="L754">    <span class="tok-com">/// Looked up by identifier rather than named directly: an assertion about</span></span>
-<span class="ln" id="L755">    <span class="tok-com">/// two `const`s is one the compiler can fold away, and clippy is right that</span></span>
-<span class="ln" id="L756">    <span class="tok-com">/// a test which cannot fail is not a test. Going through `profile` is the</span></span>
-<span class="ln" id="L757">    <span class="tok-com">/// path a front end takes anyway.</span></span>
-<span class="ln" id="L758">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L759">    <span class="tok-kw">fn</span> <span class="tok-fn">the_two_group_profiles_differ_only_in_the_voices</span>() {</span>
-<span class="ln" id="L760">        <span class="tok-kw">let</span> voices = <span class="tok-fn">profile</span>(<span class="tok-str">&quot;group-voices&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a built-in profile&quot;</span>);</span>
-<span class="ln" id="L761">        <span class="tok-kw">let</span> one_voice = <span class="tok-fn">profile</span>(<span class="tok-str">&quot;group-one-voice&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a built-in profile&quot;</span>);</span>
-<span class="ln" id="L762">        <span class="tok-kw">let</span> single = <span class="tok-fn">profile</span>(<span class="tok-str">&quot;individual&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a built-in profile&quot;</span>);</span>
-<span class="ln" id="L763"></span>
-<span class="ln" id="L764">        assert!(voices.group &amp;&amp; one_voice.group);</span>
-<span class="ln" id="L765">        assert!(!single.group);</span>
-<span class="ln" id="L766">        assert_eq!(voices.voices, VoiceMode::Distinct);</span>
-<span class="ln" id="L767">        assert_eq!(one_voice.voices, VoiceMode::Uniform);</span>
-<span class="ln" id="L768">        assert_eq!(voices.intensity, one_voice.intensity);</span>
-<span class="ln" id="L769">        assert_eq!(voices.neutralise_accent, one_voice.neutralise_accent);</span>
-<span class="ln" id="L770">        assert_eq!(voices.reseed_secs, one_voice.reseed_secs);</span>
-<span class="ln" id="L771">    }</span>
-<span class="ln" id="L772"></span>
-<span class="ln" id="L773">    <span class="tok-com">/// Every profile seals what it writes and strips metadata. A preset that</span></span>
-<span class="ln" id="L774">    <span class="tok-com">/// quietly turned either off would be a preset that loses somebody data</span></span>
-<span class="ln" id="L775">    <span class="tok-com">/// they thought was protected.</span></span>
-<span class="ln" id="L776">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L777">    <span class="tok-kw">fn</span> <span class="tok-fn">no_profile_turns_off_a_protection</span>() {</span>
-<span class="ln" id="L778">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN.<span class="tok-fn">iter</span>() {</span>
-<span class="ln" id="L779">            assert!(one.encrypt_at_rest, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
-<span class="ln" id="L780">            assert!(one.clean_metadata, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
-<span class="ln" id="L781">            assert!(one.neutralise_accent, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
-<span class="ln" id="L782">            assert!(one.intensity &gt;= <span class="tok-num">1.0</span>, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
-<span class="ln" id="L783">        }</span>
-<span class="ln" id="L784">    }</span>
-<span class="ln" id="L785">}</span>
+<span class="ln" id="L471"></span>
+<span class="ln" id="L472"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L473"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L474">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L475"></span>
+<span class="ln" id="L476">    <span class="tok-kw">fn</span> <span class="tok-fn">sample</span>() -&gt; Workspace {</span>
+<span class="ln" id="L477">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L478">        work.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Two people, one afternoon&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L479">        work.input = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;recordings/talk.wav&quot;</span>));</span>
+<span class="ln" id="L480">        work.plan = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;recordings/plan.txt&quot;</span>));</span>
+<span class="ln" id="L481">        work.profile = GROUP_ONE_VOICE.id.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L482">        work.theme = <span class="tok-str">&quot;gruvbox&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L483">        work.members = vec![</span>
+<span class="ln" id="L484">            Member {</span>
+<span class="ln" id="L485">                name: <span class="tok-str">&quot;Alex&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L486">                colour: None,</span>
+<span class="ln" id="L487">            },</span>
+<span class="ln" id="L488">            Member {</span>
+<span class="ln" id="L489">                name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L490">                colour: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;#73daca&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L491">            },</span>
+<span class="ln" id="L492">        ];</span>
+<span class="ln" id="L493">        work</span>
+<span class="ln" id="L494">    }</span>
+<span class="ln" id="L495"></span>
+<span class="ln" id="L496">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L497">    <span class="tok-kw">fn</span> <span class="tok-fn">a_project_round_trips_through_its_text_format</span>() {</span>
+<span class="ln" id="L498">        <span class="tok-kw">let</span> work = <span class="tok-fn">sample</span>();</span>
+<span class="ln" id="L499">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;work.<span class="tok-fn">to_text</span>()).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should parse&quot;</span>);</span>
+<span class="ln" id="L500">        assert_eq!(read_back, work);</span>
+<span class="ln" id="L501">    }</span>
+<span class="ln" id="L502"></span>
+<span class="ln" id="L503">    <span class="tok-com">/// Saving and reading back must give the same project, for every shape a</span></span>
+<span class="ln" id="L504">    <span class="tok-com">/// project can be in -- not only the tidy one in `sample`.</span></span>
+<span class="ln" id="L505">    <span class="tok-com">///</span></span>
+<span class="ln" id="L506">    <span class="tok-com">/// This is where F-66 came from: `Some(&quot;   &quot;)` was written as `title  `</span></span>
+<span class="ln" id="L507">    <span class="tok-com">/// and read back as `Some(&quot;&quot;)`, which is neither what was saved nor</span></span>
+<span class="ln" id="L508">    <span class="tok-com">/// absent. A round trip that quietly changes its answer is worse than one</span></span>
+<span class="ln" id="L509">    <span class="tok-com">/// that fails, because nothing reports it.</span></span>
+<span class="ln" id="L510">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L511">    <span class="tok-kw">fn</span> <span class="tok-fn">every_shape_of_project_round_trips</span>() {</span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> shapes = vec![Workspace::<span class="tok-fn">new</span>(), <span class="tok-fn">sample</span>()];</span>
+<span class="ln" id="L513"></span>
+<span class="ln" id="L514">        <span class="tok-com">// Empty, whitespace, and absent, for each of the three optional values.</span></span>
+<span class="ln" id="L515">        <span class="tok-kw">for</span> value <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;a title&quot;</span>] {</span>
+<span class="ln" id="L516">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L517">            work.title = <span class="tok-fn">Some</span>(value.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L518">            work.input = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(value));</span>
+<span class="ln" id="L519">            work.plan = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(value));</span>
+<span class="ln" id="L520">            shapes.<span class="tok-fn">push</span>(work);</span>
+<span class="ln" id="L521">        }</span>
+<span class="ln" id="L522"></span>
+<span class="ln" id="L523">        <span class="tok-com">// No members, one member, the most a plan can hold.</span></span>
+<span class="ln" id="L524">        <span class="tok-kw">for</span> count <span class="tok-kw">in</span> [0usize, <span class="tok-num">1</span>, <span class="tok-num">10</span>] {</span>
+<span class="ln" id="L525">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L526">            work.members = (<span class="tok-num">0</span>..count)</span>
+<span class="ln" id="L527">                .<span class="tok-fn">map</span>(|n| Member {</span>
+<span class="ln" id="L528">                    name: format!(<span class="tok-str">&quot;Person {n}&quot;</span>),</span>
+<span class="ln" id="L529">                    colour: (n % <span class="tok-num">2</span> == <span class="tok-num">0</span>).<span class="tok-fn">then</span>(|| <span class="tok-str">&quot;#73daca&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L530">                })</span>
+<span class="ln" id="L531">                .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L532">            shapes.<span class="tok-fn">push</span>(work);</span>
+<span class="ln" id="L533">        }</span>
+<span class="ln" id="L534"></span>
+<span class="ln" id="L535">        <span class="tok-com">// No outputs at all, which is a thing somebody can tick their way to.</span></span>
+<span class="ln" id="L536">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> none = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L537">        none.outputs.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L538">        shapes.<span class="tok-fn">push</span>(none);</span>
+<span class="ln" id="L539"></span>
+<span class="ln" id="L540">        <span class="tok-com">// A name with the separator in it, and one with a line break.</span></span>
+<span class="ln" id="L541">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> awkward = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L542">        awkward.members = vec![</span>
+<span class="ln" id="L543">            Member {</span>
+<span class="ln" id="L544">                name: <span class="tok-str">&quot;Two  Spaces&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L545">                colour: None,</span>
+<span class="ln" id="L546">            },</span>
+<span class="ln" id="L547">            Member {</span>
+<span class="ln" id="L548">                name: <span class="tok-str">&quot;Line\nBreak&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L549">                colour: None,</span>
+<span class="ln" id="L550">            },</span>
+<span class="ln" id="L551">        ];</span>
+<span class="ln" id="L552">        shapes.<span class="tok-fn">push</span>(awkward);</span>
+<span class="ln" id="L553"></span>
+<span class="ln" id="L554">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> shapes {</span>
+<span class="ln" id="L555">            <span class="tok-kw">let</span> text = shape.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L556">            <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{e}\n---\n{text}&quot;</span>));</span>
+<span class="ln" id="L557">            <span class="tok-kw">let</span> again = Workspace::<span class="tok-fn">parse</span>(&amp;read_back.<span class="tok-fn">to_text</span>()).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;stable&quot;</span>);</span>
+<span class="ln" id="L558">            assert_eq!(</span>
+<span class="ln" id="L559">                read_back, again,</span>
+<span class="ln" id="L560">                <span class="tok-str">&quot;reading twice must give the same thing:\n{text}&quot;</span></span>
+<span class="ln" id="L561">            );</span>
+<span class="ln" id="L562">        }</span>
+<span class="ln" id="L563">    }</span>
+<span class="ln" id="L564"></span>
+<span class="ln" id="L565">    <span class="tok-com">/// A value that trims to nothing is absent, in both directions.</span></span>
+<span class="ln" id="L566">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L567">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_value_is_absent_rather_than_present_and_empty</span>() {</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L569">        work.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;   &quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L570">        work.plan = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;&quot;</span>));</span>
+<span class="ln" id="L571">        <span class="tok-kw">let</span> text = work.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L572">        <span class="tok-com">// By line, not by substring: `output  subtitles` contains &quot;title&quot;, and</span></span>
+<span class="ln" id="L573">        <span class="tok-com">// a looser check here passed for the wrong reason on the first run.</span></span>
+<span class="ln" id="L574">        <span class="tok-kw">let</span> keys: Vec&lt;&amp;str&gt; = text</span>
+<span class="ln" id="L575">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L576">            .<span class="tok-fn">filter_map</span>(|line| line.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L577">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L578">        assert!(!keys.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;title&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L579">        assert!(!keys.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;plan&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L580"></span>
+<span class="ln" id="L581">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\ntitle  \nplan  \n&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L582">        assert_eq!(read_back.title, None);</span>
+<span class="ln" id="L583">        assert_eq!(read_back.plan, None);</span>
+<span class="ln" id="L584">    }</span>
+<span class="ln" id="L585"></span>
+<span class="ln" id="L586">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L587">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_project_writes_all_three_outputs</span>() {</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L589">        assert_eq!(work.outputs, vec![<span class="tok-str">&quot;audio&quot;</span>, <span class="tok-str">&quot;subtitles&quot;</span>, <span class="tok-str">&quot;page&quot;</span>]);</span>
+<span class="ln" id="L590">        assert_eq!(work.profile, INDIVIDUAL.id);</span>
+<span class="ln" id="L591">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;work.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L592">        assert_eq!(read_back.outputs, work.outputs);</span>
+<span class="ln" id="L593">    }</span>
+<span class="ln" id="L594"></span>
+<span class="ln" id="L595">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L596">    <span class="tok-kw">fn</span> <span class="tok-fn">it_saves_and_loads_through_a_real_file</span>() {</span>
+<span class="ln" id="L597">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L598">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;project.veilwork&quot;</span>);</span>
+<span class="ln" id="L599">        <span class="tok-kw">let</span> work = <span class="tok-fn">sample</span>();</span>
+<span class="ln" id="L600">        work.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L601">        assert_eq!(Workspace::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>(), work);</span>
+<span class="ln" id="L602">    }</span>
+<span class="ln" id="L603"></span>
+<span class="ln" id="L604">    <span class="tok-com">/// A saved project is readable only by the account that saved it.</span></span>
+<span class="ln" id="L605">    <span class="tok-com">///</span></span>
+<span class="ln" id="L606">    <span class="tok-com">/// The panel that writes these says what they hold -- where your files</span></span>
+<span class="ln" id="L607">    <span class="tok-com">/// are, who is in the recording, what you called them -- and says it to</span></span>
+<span class="ln" id="L608">    <span class="tok-com">/// reassure: no audio, no passwords. The names are the part that</span></span>
+<span class="ln" id="L609">    <span class="tok-com">/// reassurance does not cover, and this was written 0644, readable by</span></span>
+<span class="ln" id="L610">    <span class="tok-com">/// every other account on the machine.</span></span>
+<span class="ln" id="L611">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L612">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L613">    <span class="tok-kw">fn</span> <span class="tok-fn">a_saved_project_is_readable_only_by_this_account</span>() {</span>
+<span class="ln" id="L614">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L615">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L616">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;interview.veilproj&quot;</span>);</span>
+<span class="ln" id="L617">        <span class="tok-fn">sample</span>().<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L618">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L619">        assert_eq!(</span>
+<span class="ln" id="L620">            mode, 0o600,</span>
+<span class="ln" id="L621">            <span class="tok-str">&quot;a project is {mode:o}, so anyone with an account here can read the names in it&quot;</span></span>
+<span class="ln" id="L622">        );</span>
+<span class="ln" id="L623">        <span class="tok-com">// And it still round trips, which is the thing the mode must not break.</span></span>
+<span class="ln" id="L624">        assert_eq!(</span>
+<span class="ln" id="L625">            Workspace::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_text</span>(),</span>
+<span class="ln" id="L626">            <span class="tok-fn">sample</span>().<span class="tok-fn">to_text</span>()</span>
+<span class="ln" id="L627">        );</span>
+<span class="ln" id="L628">    }</span>
+<span class="ln" id="L629"></span>
+<span class="ln" id="L630">    <span class="tok-com">/// **No passwords and no audio.** A project file is a thing somebody might</span></span>
+<span class="ln" id="L631">    <span class="tok-com">/// send; if it carried a passphrase, sending it would hand over the</span></span>
+<span class="ln" id="L632">    <span class="tok-com">/// recordings too, and people would learn that afterwards.</span></span>
+<span class="ln" id="L633">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L634">    <span class="tok-kw">fn</span> <span class="tok-fn">a_project_file_carries_no_secret_and_no_audio</span>() {</span>
+<span class="ln" id="L635">        <span class="tok-kw">let</span> text = <span class="tok-fn">sample</span>().<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L636"></span>
+<span class="ln" id="L637">        <span class="tok-com">// The **data**, not the header comment. The first version of this</span></span>
+<span class="ln" id="L638">        <span class="tok-com">// scanned the whole file and tripped on the file&#x27;s own denial -- the</span></span>
+<span class="ln" id="L639">        <span class="tok-com">// header says &quot;no audio and no passwords&quot;, which contains &quot;password&quot;.</span></span>
+<span class="ln" id="L640">        <span class="tok-com">// `docs/AUDIT.md` records the identical trap in a scope note, where a</span></span>
+<span class="ln" id="L641">        <span class="tok-com">// search for &quot;prevents&quot; matched &quot;nothing here prevents it&quot;. A checker</span></span>
+<span class="ln" id="L642">        <span class="tok-com">// has to read the way the thing it checks is read.</span></span>
+<span class="ln" id="L643">        <span class="tok-kw">let</span> data: String = text</span>
+<span class="ln" id="L644">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L645">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>))</span>
+<span class="ln" id="L646">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L647">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L648">            .<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L649"></span>
+<span class="ln" id="L650">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;password&quot;</span>, <span class="tok-str">&quot;passphrase&quot;</span>, <span class="tok-str">&quot;secret&quot;</span>, <span class="tok-str">&quot;riff&quot;</span>, <span class="tok-str">&quot;wave&quot;</span>] {</span>
+<span class="ln" id="L651">            assert!(</span>
+<span class="ln" id="L652">                !data.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L653">                <span class="tok-str">&quot;a project file must not contain {forbidden:?}:\n{data}&quot;</span></span>
+<span class="ln" id="L654">            );</span>
+<span class="ln" id="L655">        }</span>
+<span class="ln" id="L656">        <span class="tok-com">// And the header does have to say what is not in here, in the words</span></span>
+<span class="ln" id="L657">        <span class="tok-com">// somebody opening the file would read.</span></span>
+<span class="ln" id="L658">        assert!(text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no audio and no passwords&quot;</span>));</span>
+<span class="ln" id="L659">    }</span>
+<span class="ln" id="L660"></span>
+<span class="ln" id="L661">    <span class="tok-com">/// An unknown keyword is refused rather than skipped, and the refusal says</span></span>
+<span class="ln" id="L662">    <span class="tok-com">/// why that is the safe answer.</span></span>
+<span class="ln" id="L663">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L664">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_keyword_is_refused_rather_than_ignored</span>() {</span>
+<span class="ln" id="L665">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nprofile  individual\nsomething_new  42\n&quot;</span>);</span>
+<span class="ln" id="L666">        <span class="tok-kw">let</span> error = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;unknown keywords are refused&quot;</span>);</span>
+<span class="ln" id="L667">        <span class="tok-kw">let</span> words = error.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L668">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;something_new&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L669">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;settings you did not choose&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L670">    }</span>
+<span class="ln" id="L671"></span>
+<span class="ln" id="L672">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L673">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_that_is_not_a_project_is_refused_by_its_first_line</span>() {</span>
+<span class="ln" id="L674">        <span class="tok-kw">let</span> error =</span>
+<span class="ln" id="L675">            Workspace::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;VEILCONV1\nspeaker  0  Alex\n&quot;</span>).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a plan, not a project&quot;</span>);</span>
+<span class="ln" id="L676">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(MAGIC));</span>
+<span class="ln" id="L677">        assert!(Workspace::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L678">    }</span>
+<span class="ln" id="L679"></span>
+<span class="ln" id="L680">    <span class="tok-com">/// A gap in the slots would move everybody after it onto a different voice</span></span>
+<span class="ln" id="L681">    <span class="tok-com">/// from the one they were saved with -- silently, and only audible as</span></span>
+<span class="ln" id="L682">    <span class="tok-com">/// &quot;somebody sounds wrong&quot;.</span></span>
+<span class="ln" id="L683">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L684">    <span class="tok-kw">fn</span> <span class="tok-fn">a_gap_in_the_slots_is_refused</span>() {</span>
+<span class="ln" id="L685">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nmember  0  -  Alex\nmember  2  -  Sam\n&quot;</span>);</span>
+<span class="ln" id="L686">        <span class="tok-kw">let</span> error = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;slot 1 is missing&quot;</span>);</span>
+<span class="ln" id="L687">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;different voice&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L688">    }</span>
+<span class="ln" id="L689"></span>
+<span class="ln" id="L690">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L691">    <span class="tok-kw">fn</span> <span class="tok-fn">a_repeated_slot_is_refused</span>() {</span>
+<span class="ln" id="L692">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nmember  0  -  Alex\nmember  0  -  Sam\n&quot;</span>);</span>
+<span class="ln" id="L693">        assert!(Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L694">    }</span>
+<span class="ln" id="L695"></span>
+<span class="ln" id="L696">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L697">    <span class="tok-kw">fn</span> <span class="tok-fn">a_member_with_no_name_is_refused</span>() {</span>
+<span class="ln" id="L698">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nmember  0  -  \n&quot;</span>);</span>
+<span class="ln" id="L699">        assert!(Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L700">    }</span>
+<span class="ln" id="L701"></span>
+<span class="ln" id="L702">    <span class="tok-com">/// A name with a line break in it could forge a record. The writer strips</span></span>
+<span class="ln" id="L703">    <span class="tok-com">/// it rather than producing a file that reads back as something else.</span></span>
+<span class="ln" id="L704">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L705">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_forge_a_second_line</span>() {</span>
+<span class="ln" id="L706">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L707">        work.members = vec![Member {</span>
+<span class="ln" id="L708">            name: <span class="tok-str">&quot;Alex\nprofile  group-one-voice&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L709">            colour: None,</span>
+<span class="ln" id="L710">        }];</span>
+<span class="ln" id="L711">        <span class="tok-kw">let</span> text = work.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L712">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should still parse&quot;</span>);</span>
+<span class="ln" id="L713">        assert_eq!(</span>
+<span class="ln" id="L714">            read_back.profile, INDIVIDUAL.id,</span>
+<span class="ln" id="L715">            <span class="tok-str">&quot;the forged line must not win&quot;</span></span>
+<span class="ln" id="L716">        );</span>
+<span class="ln" id="L717">        assert!(!read_back.members[<span class="tok-num">0</span>].name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\n&#x27;</span>));</span>
+<span class="ln" id="L718">    }</span>
+<span class="ln" id="L719"></span>
+<span class="ln" id="L720">    <span class="tok-com">/// A profile this build does not have is reported, not silently swapped for</span></span>
+<span class="ln" id="L721">    <span class="tok-com">/// one it does. Rendering under settings somebody did not choose is the</span></span>
+<span class="ln" id="L722">    <span class="tok-com">/// failure to avoid.</span></span>
+<span class="ln" id="L723">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L724">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_profile_is_reported_rather_than_replaced</span>() {</span>
+<span class="ln" id="L725">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> work = Workspace::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L726">        work.profile = <span class="tok-str">&quot;from-a-newer-build&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L727">        assert!(work.<span class="tok-fn">profile</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L728">        <span class="tok-kw">let</span> read_back = Workspace::<span class="tok-fn">parse</span>(&amp;work.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L729">        assert_eq!(read_back.profile, <span class="tok-str">&quot;from-a-newer-build&quot;</span>);</span>
+<span class="ln" id="L730">        assert!(read_back.<span class="tok-fn">profile</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L731">    }</span>
+<span class="ln" id="L732"></span>
+<span class="ln" id="L733">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L734">    <span class="tok-kw">fn</span> <span class="tok-fn">every_built_in_profile_is_findable_and_uniquely_named</span>() {</span>
+<span class="ln" id="L735">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> ids: Vec&lt;&amp;str&gt; = BUILT_IN.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|p| p.id).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L736">        <span class="tok-kw">let</span> count = ids.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L737">        ids.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L738">        ids.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L739">        assert_eq!(ids.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;two profiles share an identifier&quot;</span>);</span>
+<span class="ln" id="L740">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN {</span>
+<span class="ln" id="L741">            assert_eq!(<span class="tok-fn">profile</span>(one.id), <span class="tok-fn">Some</span>(one));</span>
+<span class="ln" id="L742">            assert!(!one.name.<span class="tok-fn">is_empty</span>() &amp;&amp; !one.note.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L743">        }</span>
+<span class="ln" id="L744">        assert_eq!(<span class="tok-fn">default_profile</span>(), &amp;INDIVIDUAL);</span>
+<span class="ln" id="L745">    }</span>
+<span class="ln" id="L746"></span>
+<span class="ln" id="L747">    <span class="tok-com">/// Every profile&#x27;s note has to say what it does **not** do as well as what</span></span>
+<span class="ln" id="L748">    <span class="tok-com">/// it does. A name like &quot;highest security&quot; doing the work of an explanation</span></span>
+<span class="ln" id="L749">    <span class="tok-com">/// is the thing this project refuses everywhere else.</span></span>
+<span class="ln" id="L750">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L751">    <span class="tok-kw">fn</span> <span class="tok-fn">every_profile_note_states_a_limit</span>() {</span>
+<span class="ln" id="L752">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN {</span>
+<span class="ln" id="L753">            <span class="tok-kw">let</span> note = one.note.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L754">            assert!(</span>
+<span class="ln" id="L755">                note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not&quot;</span>)</span>
+<span class="ln" id="L756">                    || note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cannot&quot;</span>)</span>
+<span class="ln" id="L757">                    || note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the price&quot;</span>)</span>
+<span class="ln" id="L758">                    || note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;rather than&quot;</span>),</span>
+<span class="ln" id="L759">                <span class="tok-str">&quot;{}: the note states no limit:\n{}&quot;</span>,</span>
+<span class="ln" id="L760">                one.id,</span>
+<span class="ln" id="L761">                one.note</span>
+<span class="ln" id="L762">            );</span>
+<span class="ln" id="L763">        }</span>
+<span class="ln" id="L764">        <span class="tok-com">// And the most private one has to name its cost outright.</span></span>
+<span class="ln" id="L765">        assert!(GROUP_ONE_VOICE.note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;The price is&quot;</span>));</span>
+<span class="ln" id="L766">    }</span>
+<span class="ln" id="L767"></span>
+<span class="ln" id="L768">    <span class="tok-com">/// A profile shapes the engine but must not touch the sample rate, which</span></span>
+<span class="ln" id="L769">    <span class="tok-com">/// belongs to the recording. Overwriting it would resample somebody&#x27;s audio</span></span>
+<span class="ln" id="L770">    <span class="tok-com">/// because they picked a preset.</span></span>
+<span class="ln" id="L771">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L772">    <span class="tok-kw">fn</span> <span class="tok-fn">a_profile_leaves_the_sample_rate_alone</span>() {</span>
+<span class="ln" id="L773">        <span class="tok-kw">let</span> config = DeidConfig {</span>
+<span class="ln" id="L774">            sample_rate: <span class="tok-num">44_100.0</span>,</span>
+<span class="ln" id="L775">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L776">        };</span>
+<span class="ln" id="L777">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN {</span>
+<span class="ln" id="L778">            <span class="tok-kw">let</span> applied = one.<span class="tok-fn">applied_to</span>(config);</span>
+<span class="ln" id="L779">            assert_eq!(applied.sample_rate, <span class="tok-num">44_100.0</span>, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
+<span class="ln" id="L780">            assert_eq!(applied.intensity, one.intensity);</span>
+<span class="ln" id="L781">            assert_eq!(applied.accent.enabled, one.neutralise_accent);</span>
+<span class="ln" id="L782">        }</span>
+<span class="ln" id="L783">    }</span>
+<span class="ln" id="L784"></span>
+<span class="ln" id="L785">    <span class="tok-com">/// The two group profiles differ in exactly one thing, which is the point</span></span>
+<span class="ln" id="L786">    <span class="tok-com">/// of there being two of them.</span></span>
+<span class="ln" id="L787">    <span class="tok-com">///</span></span>
+<span class="ln" id="L788">    <span class="tok-com">/// Looked up by identifier rather than named directly: an assertion about</span></span>
+<span class="ln" id="L789">    <span class="tok-com">/// two `const`s is one the compiler can fold away, and clippy is right that</span></span>
+<span class="ln" id="L790">    <span class="tok-com">/// a test which cannot fail is not a test. Going through `profile` is the</span></span>
+<span class="ln" id="L791">    <span class="tok-com">/// path a front end takes anyway.</span></span>
+<span class="ln" id="L792">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L793">    <span class="tok-kw">fn</span> <span class="tok-fn">the_two_group_profiles_differ_only_in_the_voices</span>() {</span>
+<span class="ln" id="L794">        <span class="tok-kw">let</span> voices = <span class="tok-fn">profile</span>(<span class="tok-str">&quot;group-voices&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a built-in profile&quot;</span>);</span>
+<span class="ln" id="L795">        <span class="tok-kw">let</span> one_voice = <span class="tok-fn">profile</span>(<span class="tok-str">&quot;group-one-voice&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a built-in profile&quot;</span>);</span>
+<span class="ln" id="L796">        <span class="tok-kw">let</span> single = <span class="tok-fn">profile</span>(<span class="tok-str">&quot;individual&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a built-in profile&quot;</span>);</span>
+<span class="ln" id="L797"></span>
+<span class="ln" id="L798">        assert!(voices.group &amp;&amp; one_voice.group);</span>
+<span class="ln" id="L799">        assert!(!single.group);</span>
+<span class="ln" id="L800">        assert_eq!(voices.voices, VoiceMode::Distinct);</span>
+<span class="ln" id="L801">        assert_eq!(one_voice.voices, VoiceMode::Uniform);</span>
+<span class="ln" id="L802">        assert_eq!(voices.intensity, one_voice.intensity);</span>
+<span class="ln" id="L803">        assert_eq!(voices.neutralise_accent, one_voice.neutralise_accent);</span>
+<span class="ln" id="L804">        assert_eq!(voices.reseed_secs, one_voice.reseed_secs);</span>
+<span class="ln" id="L805">    }</span>
+<span class="ln" id="L806"></span>
+<span class="ln" id="L807">    <span class="tok-com">/// Every profile seals what it writes and strips metadata. A preset that</span></span>
+<span class="ln" id="L808">    <span class="tok-com">/// quietly turned either off would be a preset that loses somebody data</span></span>
+<span class="ln" id="L809">    <span class="tok-com">/// they thought was protected.</span></span>
+<span class="ln" id="L810">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L811">    <span class="tok-kw">fn</span> <span class="tok-fn">no_profile_turns_off_a_protection</span>() {</span>
+<span class="ln" id="L812">        <span class="tok-kw">for</span> one <span class="tok-kw">in</span> BUILT_IN.<span class="tok-fn">iter</span>() {</span>
+<span class="ln" id="L813">            assert!(one.encrypt_at_rest, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
+<span class="ln" id="L814">            assert!(one.clean_metadata, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
+<span class="ln" id="L815">            assert!(one.neutralise_accent, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
+<span class="ln" id="L816">            assert!(one.intensity &gt;= <span class="tok-num">1.0</span>, <span class="tok-str">&quot;{}&quot;</span>, one.id);</span>
+<span class="ln" id="L817">        }</span>
+<span class="ln" id="L818">    }</span>
+<span class="ln" id="L819">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -98,7 +98,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>785 lines"])
+    n_lib(["lib.rs<br/>819 lines"])
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs" "open the source"
 ```
 
@@ -108,7 +108,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-workspace/lib.md) | 785 | Named profiles and saved projects. |
+| [`lib.rs`](../../docs/files/veilvoice-workspace/lib.md) | 819 | Named profiles and saved projects. |
 
 ## Public items
 

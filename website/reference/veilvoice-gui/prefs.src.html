@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/prefs.rs</code></h1>
-<p style="color:var(--muted)"><a href="prefs.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 616 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="prefs.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 637 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -428,257 +428,278 @@
 <span class="ln" id="L372">                std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L373">            }</span>
 <span class="ln" id="L374">        }</span>
-<span class="ln" id="L375">        std::fs::<span class="tok-fn">write</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L376">    }</span>
+<span class="ln" id="L375">        <span class="tok-com">// Owner-only. This file is not just a theme choice: it records</span></span>
+<span class="ln" id="L376">        <span class="tok-com">// `vault_dir`, which names an encrypted volume, and `vault_hidden`,</span></span>
+<span class="ln" id="L377">        <span class="tok-com">// which is the answer to whether that volume has a hidden one inside</span></span>
+<span class="ln" id="L378">        <span class="tok-com">// it. Somebody reading this learns that a hidden volume exists, which</span></span>
+<span class="ln" id="L379">        <span class="tok-com">// is the single thing a hidden volume is for concealing, and they</span></span>
+<span class="ln" id="L380">        <span class="tok-com">// learn where to look.</span></span>
+<span class="ln" id="L381">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>())</span>
+<span class="ln" id="L382">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L383">    }</span>
 </span>
-<span class="ln" id="L377">}</span>
-<span class="ln" id="L378"></span>
+<span class="ln" id="L384">}</span>
+<span class="ln" id="L385"></span>
 <span class="src-item" id="fn-parse_bool">
-<span class="ln" id="L379"><span class="tok-kw">fn</span> <span class="tok-fn">parse_bool</span>(value: &amp;str) -&gt; Option&lt;bool&gt; {</span>
-<span class="ln" id="L380">    <span class="tok-kw">match</span> value.<span class="tok-fn">to_ascii_lowercase</span>().<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L381">        <span class="tok-str">&quot;true&quot;</span> | <span class="tok-str">&quot;yes&quot;</span> | <span class="tok-str">&quot;on&quot;</span> | <span class="tok-str">&quot;1&quot;</span> =&gt; <span class="tok-fn">Some</span>(true),</span>
-<span class="ln" id="L382">        <span class="tok-str">&quot;false&quot;</span> | <span class="tok-str">&quot;no&quot;</span> | <span class="tok-str">&quot;off&quot;</span> | <span class="tok-str">&quot;0&quot;</span> =&gt; <span class="tok-fn">Some</span>(false),</span>
-<span class="ln" id="L383">        _ =&gt; None,</span>
-<span class="ln" id="L384">    }</span>
-<span class="ln" id="L385">}</span>
+<span class="ln" id="L386"><span class="tok-kw">fn</span> <span class="tok-fn">parse_bool</span>(value: &amp;str) -&gt; Option&lt;bool&gt; {</span>
+<span class="ln" id="L387">    <span class="tok-kw">match</span> value.<span class="tok-fn">to_ascii_lowercase</span>().<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L388">        <span class="tok-str">&quot;true&quot;</span> | <span class="tok-str">&quot;yes&quot;</span> | <span class="tok-str">&quot;on&quot;</span> | <span class="tok-str">&quot;1&quot;</span> =&gt; <span class="tok-fn">Some</span>(true),</span>
+<span class="ln" id="L389">        <span class="tok-str">&quot;false&quot;</span> | <span class="tok-str">&quot;no&quot;</span> | <span class="tok-str">&quot;off&quot;</span> | <span class="tok-str">&quot;0&quot;</span> =&gt; <span class="tok-fn">Some</span>(false),</span>
+<span class="ln" id="L390">        _ =&gt; None,</span>
+<span class="ln" id="L391">    }</span>
+<span class="ln" id="L392">}</span>
 </span>
-<span class="ln" id="L386"></span>
+<span class="ln" id="L393"></span>
 <span class="src-item" id="fn-motion">
-<span class="ln" id="L387"><span class="tok-com">/// Whether movement is allowed, and how much.</span></span>
-<span class="ln" id="L388"><span class="tok-com">///</span></span>
-<span class="ln" id="L389"><span class="tok-com">/// Resolved once per frame from three inputs, in order of authority:</span></span>
-<span class="ln" id="L390"><span class="tok-com">///</span></span>
-<span class="ln" id="L391"><span class="tok-com">/// 1. **The operating system&#x27;s reduce-motion setting.** Someone who has told</span></span>
-<span class="ln" id="L392"><span class="tok-com">///    their system they do not want movement has answered this already.</span></span>
-<span class="ln" id="L393"><span class="tok-com">/// 2. **`VEILVOICE_NO_ANIMATION`**, so a machine that struggles with animation</span></span>
-<span class="ln" id="L394"><span class="tok-com">///    can be fixed without opening the interface that is struggling.</span></span>
-<span class="ln" id="L395"><span class="tok-com">/// 3. **The preference**, which is on by default.</span></span>
-<span class="ln" id="L396"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L397"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Motion {</span>
-<span class="ln" id="L398">    <span class="tok-com">/// Whether anything may move at all.</span></span>
-<span class="ln" id="L399">    <span class="tok-kw">pub</span> enabled: bool,</span>
-<span class="ln" id="L400">    <span class="tok-com">/// Whether the header mark may animate.</span></span>
-<span class="ln" id="L401">    <span class="tok-kw">pub</span> icon: bool,</span>
-<span class="ln" id="L402">    <span class="tok-com">/// Whether the system asked for reduced motion, so the UI can say that is</span></span>
-<span class="ln" id="L403">    <span class="tok-com">/// why the toggle is doing nothing rather than appearing broken.</span></span>
-<span class="ln" id="L404">    <span class="tok-kw">pub</span> system_reduced: bool,</span>
-<span class="ln" id="L405">}</span>
+<span class="ln" id="L394"><span class="tok-com">/// Whether movement is allowed, and how much.</span></span>
+<span class="ln" id="L395"><span class="tok-com">///</span></span>
+<span class="ln" id="L396"><span class="tok-com">/// Resolved once per frame from three inputs, in order of authority:</span></span>
+<span class="ln" id="L397"><span class="tok-com">///</span></span>
+<span class="ln" id="L398"><span class="tok-com">/// 1. **The operating system&#x27;s reduce-motion setting.** Someone who has told</span></span>
+<span class="ln" id="L399"><span class="tok-com">///    their system they do not want movement has answered this already.</span></span>
+<span class="ln" id="L400"><span class="tok-com">/// 2. **`VEILVOICE_NO_ANIMATION`**, so a machine that struggles with animation</span></span>
+<span class="ln" id="L401"><span class="tok-com">///    can be fixed without opening the interface that is struggling.</span></span>
+<span class="ln" id="L402"><span class="tok-com">/// 3. **The preference**, which is on by default.</span></span>
+<span class="ln" id="L403"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L404"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Motion {</span>
+<span class="ln" id="L405">    <span class="tok-com">/// Whether anything may move at all.</span></span>
+<span class="ln" id="L406">    <span class="tok-kw">pub</span> enabled: bool,</span>
+<span class="ln" id="L407">    <span class="tok-com">/// Whether the header mark may animate.</span></span>
+<span class="ln" id="L408">    <span class="tok-kw">pub</span> icon: bool,</span>
+<span class="ln" id="L409">    <span class="tok-com">/// Whether the system asked for reduced motion, so the UI can say that is</span></span>
+<span class="ln" id="L410">    <span class="tok-com">/// why the toggle is doing nothing rather than appearing broken.</span></span>
+<span class="ln" id="L411">    <span class="tok-kw">pub</span> system_reduced: bool,</span>
+<span class="ln" id="L412">}</span>
 </span>
-<span class="ln" id="L406"></span>
-<span class="ln" id="L407"><span class="tok-kw">impl</span> Motion {</span>
+<span class="ln" id="L413"></span>
+<span class="ln" id="L414"><span class="tok-kw">impl</span> Motion {</span>
 <span class="src-item" id="fn-motion-resolve">
-<span class="ln" id="L408">    <span class="tok-com">/// Resolve for this frame.</span></span>
-<span class="ln" id="L409">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">resolve</span>(prefs: &amp;Prefs, system_reduced_motion: bool) -&gt; Self {</span>
-<span class="ln" id="L410">        <span class="tok-kw">let</span> env_off = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;VEILVOICE_NO_ANIMATION&quot;</span>)</span>
-<span class="ln" id="L411">            .<span class="tok-fn">map</span>(|v| v != <span class="tok-str">&quot;0&quot;</span> &amp;&amp; !v.<span class="tok-fn">is_empty</span>())</span>
-<span class="ln" id="L412">            .<span class="tok-fn">unwrap_or</span>(false);</span>
-<span class="ln" id="L413">        <span class="tok-kw">let</span> enabled = prefs.animations &amp;&amp; !env_off &amp;&amp; !system_reduced_motion;</span>
-<span class="ln" id="L414">        Self {</span>
-<span class="ln" id="L415">            enabled,</span>
-<span class="ln" id="L416">            icon: enabled &amp;&amp; prefs.animated_icon,</span>
-<span class="ln" id="L417">            system_reduced: system_reduced_motion,</span>
-<span class="ln" id="L418">        }</span>
-<span class="ln" id="L419">    }</span>
+<span class="ln" id="L415">    <span class="tok-com">/// Resolve for this frame.</span></span>
+<span class="ln" id="L416">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">resolve</span>(prefs: &amp;Prefs, system_reduced_motion: bool) -&gt; Self {</span>
+<span class="ln" id="L417">        <span class="tok-kw">let</span> env_off = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;VEILVOICE_NO_ANIMATION&quot;</span>)</span>
+<span class="ln" id="L418">            .<span class="tok-fn">map</span>(|v| v != <span class="tok-str">&quot;0&quot;</span> &amp;&amp; !v.<span class="tok-fn">is_empty</span>())</span>
+<span class="ln" id="L419">            .<span class="tok-fn">unwrap_or</span>(false);</span>
+<span class="ln" id="L420">        <span class="tok-kw">let</span> enabled = prefs.animations &amp;&amp; !env_off &amp;&amp; !system_reduced_motion;</span>
+<span class="ln" id="L421">        Self {</span>
+<span class="ln" id="L422">            enabled,</span>
+<span class="ln" id="L423">            icon: enabled &amp;&amp; prefs.animated_icon,</span>
+<span class="ln" id="L424">            system_reduced: system_reduced_motion,</span>
+<span class="ln" id="L425">        }</span>
+<span class="ln" id="L426">    }</span>
 </span>
-<span class="ln" id="L420"></span>
+<span class="ln" id="L427"></span>
 <span class="src-item" id="fn-motion-secs">
-<span class="ln" id="L421">    <span class="tok-com">/// A duration scaled by whether motion is allowed.</span></span>
-<span class="ln" id="L422">    <span class="tok-com">///</span></span>
-<span class="ln" id="L423">    <span class="tok-com">/// Returns zero when it is not, so a caller can pass this straight to an</span></span>
-<span class="ln" id="L424">    <span class="tok-com">/// easing function and get an instant result rather than having to branch</span></span>
-<span class="ln" id="L425">    <span class="tok-com">/// at every call site. That matters: a branch nobody wrote is how a stray</span></span>
-<span class="ln" id="L426">    <span class="tok-com">/// animation survives the toggle.</span></span>
-<span class="ln" id="L427">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">secs</span>(&amp;<span class="tok-kw">self</span>, wanted: f32) -&gt; f32 {</span>
-<span class="ln" id="L428">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.enabled {</span>
-<span class="ln" id="L429">            wanted</span>
-<span class="ln" id="L430">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L431">            <span class="tok-num">0.0</span></span>
-<span class="ln" id="L432">        }</span>
-<span class="ln" id="L433">    }</span>
+<span class="ln" id="L428">    <span class="tok-com">/// A duration scaled by whether motion is allowed.</span></span>
+<span class="ln" id="L429">    <span class="tok-com">///</span></span>
+<span class="ln" id="L430">    <span class="tok-com">/// Returns zero when it is not, so a caller can pass this straight to an</span></span>
+<span class="ln" id="L431">    <span class="tok-com">/// easing function and get an instant result rather than having to branch</span></span>
+<span class="ln" id="L432">    <span class="tok-com">/// at every call site. That matters: a branch nobody wrote is how a stray</span></span>
+<span class="ln" id="L433">    <span class="tok-com">/// animation survives the toggle.</span></span>
+<span class="ln" id="L434">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">secs</span>(&amp;<span class="tok-kw">self</span>, wanted: f32) -&gt; f32 {</span>
+<span class="ln" id="L435">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.enabled {</span>
+<span class="ln" id="L436">            wanted</span>
+<span class="ln" id="L437">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L438">            <span class="tok-num">0.0</span></span>
+<span class="ln" id="L439">        }</span>
+<span class="ln" id="L440">    }</span>
 </span>
-<span class="ln" id="L434">}</span>
-<span class="ln" id="L435"></span>
-<span class="ln" id="L436"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L437"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L438">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L439"></span>
-<span class="ln" id="L440">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">the_defaults_are_the_documented_ones</span>() {</span>
-<span class="ln" id="L442">        <span class="tok-kw">let</span> d = Prefs::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L443">        assert_eq!(d.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L444">        assert!(d.animations, <span class="tok-str">&quot;animations are on by default, as specified&quot;</span>);</span>
-<span class="ln" id="L445">        assert!(d.animated_icon, <span class="tok-str">&quot;the animated icon is on by default&quot;</span>);</span>
-<span class="ln" id="L446">        assert!(</span>
-<span class="ln" id="L447">            !d.configured,</span>
-<span class="ln" id="L448">            <span class="tok-str">&quot;a fresh install has not answered the first run&quot;</span></span>
-<span class="ln" id="L449">        );</span>
-<span class="ln" id="L450">    }</span>
-<span class="ln" id="L451"></span>
-<span class="ln" id="L452">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L453">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_its_text_format</span>() {</span>
-<span class="ln" id="L454">        <span class="tok-kw">let</span> prefs = Prefs {</span>
-<span class="ln" id="L455">            theme: <span class="tok-str">&quot;gruvbox&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L456">            animations: false,</span>
-<span class="ln" id="L457">            animated_icon: false,</span>
-<span class="ln" id="L458">            configured: true,</span>
-<span class="ln" id="L459">            toured_tabs: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L460">            hide_install_tab: true,</span>
-<span class="ln" id="L461">            always_group: true,</span>
-<span class="ln" id="L462">            seal_with_app_lock: false,</span>
-<span class="ln" id="L463">            vault_dir: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L464">            vault_tool: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L465">            vault_hidden: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L466">            autolock: true,</span>
-<span class="ln" id="L467">            autolock_after: <span class="tok-num">8</span> * <span class="tok-num">3_600</span>,</span>
-<span class="ln" id="L468">            autolock_floor: <span class="tok-num">30</span>,</span>
-<span class="ln" id="L469">            autolock_ceiling: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
-<span class="ln" id="L470">            notify_style: <span class="tok-str">&quot;alert&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L471">            failsafe: <span class="tok-str">&quot;warn&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L472">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L473">            recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L474">        };</span>
-<span class="ln" id="L475">        <span class="tok-kw">let</span> back = Prefs::<span class="tok-fn">parse</span>(&amp;prefs.<span class="tok-fn">to_text</span>());</span>
-<span class="ln" id="L476">        assert_eq!(back, prefs);</span>
-<span class="ln" id="L477">    }</span>
-<span class="ln" id="L478"></span>
-<span class="ln" id="L479">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L480">    <span class="tok-kw">fn</span> <span class="tok-fn">every_boolean_spelling_people_actually_type_is_accepted</span>() {</span>
-<span class="ln" id="L481">        <span class="tok-kw">for</span> on <span class="tok-kw">in</span> [<span class="tok-str">&quot;true&quot;</span>, <span class="tok-str">&quot;yes&quot;</span>, <span class="tok-str">&quot;on&quot;</span>, <span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;TRUE&quot;</span>, <span class="tok-str">&quot;Yes&quot;</span>] {</span>
-<span class="ln" id="L482">            assert!(</span>
-<span class="ln" id="L483">                Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {on}&quot;</span>)).animations,</span>
-<span class="ln" id="L484">                <span class="tok-str">&quot;{on} should mean on&quot;</span></span>
-<span class="ln" id="L485">            );</span>
-<span class="ln" id="L486">        }</span>
-<span class="ln" id="L487">        <span class="tok-kw">for</span> off <span class="tok-kw">in</span> [<span class="tok-str">&quot;false&quot;</span>, <span class="tok-str">&quot;no&quot;</span>, <span class="tok-str">&quot;off&quot;</span>, <span class="tok-str">&quot;0&quot;</span>, <span class="tok-str">&quot;FALSE&quot;</span>, <span class="tok-str">&quot;Off&quot;</span>] {</span>
-<span class="ln" id="L488">            assert!(</span>
-<span class="ln" id="L489">                !Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {off}&quot;</span>)).animations,</span>
-<span class="ln" id="L490">                <span class="tok-str">&quot;{off} should mean off&quot;</span></span>
-<span class="ln" id="L491">            );</span>
-<span class="ln" id="L492">        }</span>
-<span class="ln" id="L493">    }</span>
-<span class="ln" id="L494"></span>
-<span class="ln" id="L495">    <span class="tok-com">/// A settings file must never be able to stop the app starting.</span></span>
-<span class="ln" id="L496">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L497">    <span class="tok-kw">fn</span> <span class="tok-fn">hostile_and_broken_files_fall_back_to_the_defaults</span>() {</span>
-<span class="ln" id="L498">        <span class="tok-kw">for</span> text <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L499">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L500">            <span class="tok-str">&quot;\0\0\0\0&quot;</span>,</span>
-<span class="ln" id="L501">            <span class="tok-str">&quot;theme&quot;</span>,</span>
-<span class="ln" id="L502">            <span class="tok-str">&quot;= = = =&quot;</span>,</span>
-<span class="ln" id="L503">            <span class="tok-str">&quot;theme = &quot;</span>,</span>
-<span class="ln" id="L504">            <span class="tok-str">&quot;theme = ../../etc/passwd&quot;</span>,</span>
-<span class="ln" id="L505">            <span class="tok-str">&quot;theme = &lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>,</span>
-<span class="ln" id="L506">            <span class="tok-str">&quot;animations = perhaps&quot;</span>,</span>
-<span class="ln" id="L507">            &amp;<span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">100_000</span>),</span>
-<span class="ln" id="L508">            <span class="tok-str">&quot;[section]\nkey: value&quot;</span>,</span>
-<span class="ln" id="L509">        ] {</span>
-<span class="ln" id="L510">            <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(text);</span>
-<span class="ln" id="L511">            <span class="tok-com">// Whatever it said, the result is usable.</span></span>
-<span class="ln" id="L512">            assert!(</span>
-<span class="ln" id="L513">                <span class="tok-kw">crate</span>::theme::<span class="tok-fn">by_id</span>(&amp;prefs.theme).<span class="tok-fn">is_some</span>(),</span>
-<span class="ln" id="L514">                <span class="tok-str">&quot;parsing {:?} left an unknown theme: {}&quot;</span>,</span>
-<span class="ln" id="L515">                &amp;text[..text.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">30</span>)],</span>
-<span class="ln" id="L516">                prefs.theme</span>
-<span class="ln" id="L517">            );</span>
-<span class="ln" id="L518">        }</span>
-<span class="ln" id="L519">    }</span>
-<span class="ln" id="L520"></span>
-<span class="ln" id="L521">    <span class="tok-com">/// A file whose every line was rejected should say so, so the settings</span></span>
-<span class="ln" id="L522">    <span class="tok-com">/// panel can explain why the defaults are in force.</span></span>
-<span class="ln" id="L523">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L524">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wholly_unreadable_file_is_reported_rather_than_hidden</span>() {</span>
-<span class="ln" id="L525">        assert!(Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;nonsense\nmore nonsense&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L526">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L527">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;# just a comment&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L528">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L529">    }</span>
-<span class="ln" id="L530"></span>
-<span class="ln" id="L531">    <span class="tok-com">/// A newer build&#x27;s keys must not break an older one.</span></span>
-<span class="ln" id="L532">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L533">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_keys_are_ignored_not_fatal</span>() {</span>
-<span class="ln" id="L534">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord\nsomething_new = 42\nanimations = false&quot;</span>);</span>
-<span class="ln" id="L535">        assert_eq!(prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
-<span class="ln" id="L536">        assert!(!prefs.animations);</span>
-<span class="ln" id="L537">        assert!(!prefs.recovered_from_corrupt_file);</span>
-<span class="ln" id="L538">    }</span>
-<span class="ln" id="L539"></span>
-<span class="ln" id="L540">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L541">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_not_an_error</span>() {</span>
-<span class="ln" id="L542">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">load</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;no-such-settings-file-anywhere.conf&quot;</span>));</span>
-<span class="ln" id="L543">        assert_eq!(prefs, Prefs::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L544">    }</span>
-<span class="ln" id="L545"></span>
-<span class="ln" id="L546">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L547">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_and_loading_round_trips_through_a_real_file</span>() {</span>
-<span class="ln" id="L548">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L549">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L550">        <span class="tok-kw">let</span> prefs = Prefs {</span>
-<span class="ln" id="L551">            theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L552">            animations: false,</span>
-<span class="ln" id="L553">            animated_icon: true,</span>
-<span class="ln" id="L554">            configured: true,</span>
-<span class="ln" id="L555">            toured_tabs: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L556">            notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L557">            failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L558">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L559">            hide_install_tab: false,</span>
-<span class="ln" id="L560">            always_group: false,</span>
-<span class="ln" id="L561">            seal_with_app_lock: true,</span>
-<span class="ln" id="L562">            vault_dir: <span class="tok-str">&quot;/media/veracrypt1&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L563">            vault_tool: <span class="tok-str">&quot;veracrypt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L564">            vault_hidden: <span class="tok-str">&quot;none&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L565">            autolock: true,</span>
-<span class="ln" id="L566">            autolock_after: <span class="tok-num">3_600</span>,</span>
-<span class="ln" id="L567">            autolock_floor: <span class="tok-num">60</span>,</span>
-<span class="ln" id="L568">            autolock_ceiling: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
-<span class="ln" id="L569">            recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L570">        };</span>
-<span class="ln" id="L571">        prefs.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L572">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path), prefs);</span>
-<span class="ln" id="L573">    }</span>
-<span class="ln" id="L574"></span>
-<span class="ln" id="L575">    <span class="tok-com">/// The system&#x27;s reduce-motion setting outranks the preference. Someone who</span></span>
-<span class="ln" id="L576">    <span class="tok-com">/// asked their OS for less movement has already answered.</span></span>
-<span class="ln" id="L577">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L578">    <span class="tok-kw">fn</span> <span class="tok-fn">the_system_setting_wins_over_the_preference</span>() {</span>
-<span class="ln" id="L579">        <span class="tok-kw">let</span> on = Prefs {</span>
-<span class="ln" id="L580">            animations: true,</span>
-<span class="ln" id="L581">            animated_icon: true,</span>
-<span class="ln" id="L582">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L583">        };</span>
-<span class="ln" id="L584">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, true);</span>
-<span class="ln" id="L585">        assert!(!motion.enabled, <span class="tok-str">&quot;the system asked for reduced motion&quot;</span>);</span>
-<span class="ln" id="L586">        assert!(!motion.icon);</span>
-<span class="ln" id="L587">        assert!(motion.system_reduced, <span class="tok-str">&quot;the UI must be able to say why&quot;</span>);</span>
-<span class="ln" id="L588">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L589"></span>
-<span class="ln" id="L590">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, false);</span>
-<span class="ln" id="L591">        assert!(motion.enabled);</span>
-<span class="ln" id="L592">        assert!(motion.icon);</span>
-<span class="ln" id="L593">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.4</span>);</span>
+<span class="ln" id="L441">}</span>
+<span class="ln" id="L442"></span>
+<span class="ln" id="L443"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L444"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L445">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L446"></span>
+<span class="ln" id="L447">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L448">    <span class="tok-kw">fn</span> <span class="tok-fn">the_defaults_are_the_documented_ones</span>() {</span>
+<span class="ln" id="L449">        <span class="tok-kw">let</span> d = Prefs::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L450">        assert_eq!(d.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L451">        assert!(d.animations, <span class="tok-str">&quot;animations are on by default, as specified&quot;</span>);</span>
+<span class="ln" id="L452">        assert!(d.animated_icon, <span class="tok-str">&quot;the animated icon is on by default&quot;</span>);</span>
+<span class="ln" id="L453">        assert!(</span>
+<span class="ln" id="L454">            !d.configured,</span>
+<span class="ln" id="L455">            <span class="tok-str">&quot;a fresh install has not answered the first run&quot;</span></span>
+<span class="ln" id="L456">        );</span>
+<span class="ln" id="L457">    }</span>
+<span class="ln" id="L458"></span>
+<span class="ln" id="L459">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L460">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_its_text_format</span>() {</span>
+<span class="ln" id="L461">        <span class="tok-kw">let</span> prefs = Prefs {</span>
+<span class="ln" id="L462">            theme: <span class="tok-str">&quot;gruvbox&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L463">            animations: false,</span>
+<span class="ln" id="L464">            animated_icon: false,</span>
+<span class="ln" id="L465">            configured: true,</span>
+<span class="ln" id="L466">            toured_tabs: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L467">            hide_install_tab: true,</span>
+<span class="ln" id="L468">            always_group: true,</span>
+<span class="ln" id="L469">            seal_with_app_lock: false,</span>
+<span class="ln" id="L470">            vault_dir: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L471">            vault_tool: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L472">            vault_hidden: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L473">            autolock: true,</span>
+<span class="ln" id="L474">            autolock_after: <span class="tok-num">8</span> * <span class="tok-num">3_600</span>,</span>
+<span class="ln" id="L475">            autolock_floor: <span class="tok-num">30</span>,</span>
+<span class="ln" id="L476">            autolock_ceiling: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
+<span class="ln" id="L477">            notify_style: <span class="tok-str">&quot;alert&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L478">            failsafe: <span class="tok-str">&quot;warn&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L479">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L480">            recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L481">        };</span>
+<span class="ln" id="L482">        <span class="tok-kw">let</span> back = Prefs::<span class="tok-fn">parse</span>(&amp;prefs.<span class="tok-fn">to_text</span>());</span>
+<span class="ln" id="L483">        assert_eq!(back, prefs);</span>
+<span class="ln" id="L484">    }</span>
+<span class="ln" id="L485"></span>
+<span class="ln" id="L486">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L487">    <span class="tok-kw">fn</span> <span class="tok-fn">every_boolean_spelling_people_actually_type_is_accepted</span>() {</span>
+<span class="ln" id="L488">        <span class="tok-kw">for</span> on <span class="tok-kw">in</span> [<span class="tok-str">&quot;true&quot;</span>, <span class="tok-str">&quot;yes&quot;</span>, <span class="tok-str">&quot;on&quot;</span>, <span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;TRUE&quot;</span>, <span class="tok-str">&quot;Yes&quot;</span>] {</span>
+<span class="ln" id="L489">            assert!(</span>
+<span class="ln" id="L490">                Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {on}&quot;</span>)).animations,</span>
+<span class="ln" id="L491">                <span class="tok-str">&quot;{on} should mean on&quot;</span></span>
+<span class="ln" id="L492">            );</span>
+<span class="ln" id="L493">        }</span>
+<span class="ln" id="L494">        <span class="tok-kw">for</span> off <span class="tok-kw">in</span> [<span class="tok-str">&quot;false&quot;</span>, <span class="tok-str">&quot;no&quot;</span>, <span class="tok-str">&quot;off&quot;</span>, <span class="tok-str">&quot;0&quot;</span>, <span class="tok-str">&quot;FALSE&quot;</span>, <span class="tok-str">&quot;Off&quot;</span>] {</span>
+<span class="ln" id="L495">            assert!(</span>
+<span class="ln" id="L496">                !Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {off}&quot;</span>)).animations,</span>
+<span class="ln" id="L497">                <span class="tok-str">&quot;{off} should mean off&quot;</span></span>
+<span class="ln" id="L498">            );</span>
+<span class="ln" id="L499">        }</span>
+<span class="ln" id="L500">    }</span>
+<span class="ln" id="L501"></span>
+<span class="ln" id="L502">    <span class="tok-com">/// A settings file must never be able to stop the app starting.</span></span>
+<span class="ln" id="L503">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L504">    <span class="tok-kw">fn</span> <span class="tok-fn">hostile_and_broken_files_fall_back_to_the_defaults</span>() {</span>
+<span class="ln" id="L505">        <span class="tok-kw">for</span> text <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L506">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L507">            <span class="tok-str">&quot;\0\0\0\0&quot;</span>,</span>
+<span class="ln" id="L508">            <span class="tok-str">&quot;theme&quot;</span>,</span>
+<span class="ln" id="L509">            <span class="tok-str">&quot;= = = =&quot;</span>,</span>
+<span class="ln" id="L510">            <span class="tok-str">&quot;theme = &quot;</span>,</span>
+<span class="ln" id="L511">            <span class="tok-str">&quot;theme = ../../etc/passwd&quot;</span>,</span>
+<span class="ln" id="L512">            <span class="tok-str">&quot;theme = &lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>,</span>
+<span class="ln" id="L513">            <span class="tok-str">&quot;animations = perhaps&quot;</span>,</span>
+<span class="ln" id="L514">            &amp;<span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">100_000</span>),</span>
+<span class="ln" id="L515">            <span class="tok-str">&quot;[section]\nkey: value&quot;</span>,</span>
+<span class="ln" id="L516">        ] {</span>
+<span class="ln" id="L517">            <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(text);</span>
+<span class="ln" id="L518">            <span class="tok-com">// Whatever it said, the result is usable.</span></span>
+<span class="ln" id="L519">            assert!(</span>
+<span class="ln" id="L520">                <span class="tok-kw">crate</span>::theme::<span class="tok-fn">by_id</span>(&amp;prefs.theme).<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L521">                <span class="tok-str">&quot;parsing {:?} left an unknown theme: {}&quot;</span>,</span>
+<span class="ln" id="L522">                &amp;text[..text.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">30</span>)],</span>
+<span class="ln" id="L523">                prefs.theme</span>
+<span class="ln" id="L524">            );</span>
+<span class="ln" id="L525">        }</span>
+<span class="ln" id="L526">    }</span>
+<span class="ln" id="L527"></span>
+<span class="ln" id="L528">    <span class="tok-com">/// A file whose every line was rejected should say so, so the settings</span></span>
+<span class="ln" id="L529">    <span class="tok-com">/// panel can explain why the defaults are in force.</span></span>
+<span class="ln" id="L530">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L531">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wholly_unreadable_file_is_reported_rather_than_hidden</span>() {</span>
+<span class="ln" id="L532">        assert!(Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;nonsense\nmore nonsense&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L533">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L534">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;# just a comment&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L535">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L536">    }</span>
+<span class="ln" id="L537"></span>
+<span class="ln" id="L538">    <span class="tok-com">/// A newer build&#x27;s keys must not break an older one.</span></span>
+<span class="ln" id="L539">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L540">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_keys_are_ignored_not_fatal</span>() {</span>
+<span class="ln" id="L541">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord\nsomething_new = 42\nanimations = false&quot;</span>);</span>
+<span class="ln" id="L542">        assert_eq!(prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
+<span class="ln" id="L543">        assert!(!prefs.animations);</span>
+<span class="ln" id="L544">        assert!(!prefs.recovered_from_corrupt_file);</span>
+<span class="ln" id="L545">    }</span>
+<span class="ln" id="L546"></span>
+<span class="ln" id="L547">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L548">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_not_an_error</span>() {</span>
+<span class="ln" id="L549">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">load</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;no-such-settings-file-anywhere.conf&quot;</span>));</span>
+<span class="ln" id="L550">        assert_eq!(prefs, Prefs::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L551">    }</span>
+<span class="ln" id="L552"></span>
+<span class="ln" id="L553">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L554">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_and_loading_round_trips_through_a_real_file</span>() {</span>
+<span class="ln" id="L555">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L556">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L557">        <span class="tok-kw">let</span> prefs = Prefs {</span>
+<span class="ln" id="L558">            theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L559">            animations: false,</span>
+<span class="ln" id="L560">            animated_icon: true,</span>
+<span class="ln" id="L561">            configured: true,</span>
+<span class="ln" id="L562">            toured_tabs: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L563">            notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L564">            failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L565">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L566">            hide_install_tab: false,</span>
+<span class="ln" id="L567">            always_group: false,</span>
+<span class="ln" id="L568">            seal_with_app_lock: true,</span>
+<span class="ln" id="L569">            vault_dir: <span class="tok-str">&quot;/media/veracrypt1&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L570">            vault_tool: <span class="tok-str">&quot;veracrypt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L571">            vault_hidden: <span class="tok-str">&quot;none&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L572">            autolock: true,</span>
+<span class="ln" id="L573">            autolock_after: <span class="tok-num">3_600</span>,</span>
+<span class="ln" id="L574">            autolock_floor: <span class="tok-num">60</span>,</span>
+<span class="ln" id="L575">            autolock_ceiling: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
+<span class="ln" id="L576">            recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L577">        };</span>
+<span class="ln" id="L578">        prefs.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L579">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path), prefs);</span>
+<span class="ln" id="L580"></span>
+<span class="ln" id="L581">        <span class="tok-com">// And readable only by this account. The file records `vault_dir` and</span></span>
+<span class="ln" id="L582">        <span class="tok-com">// `vault_hidden`: where an encrypted volume is, and whether it has a</span></span>
+<span class="ln" id="L583">        <span class="tok-com">// hidden one inside it. The existence of a hidden volume is the single</span></span>
+<span class="ln" id="L584">        <span class="tok-com">// thing a hidden volume conceals, and this was written 0644.</span></span>
+<span class="ln" id="L585">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L586">        {</span>
+<span class="ln" id="L587">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L588">            <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L589">            assert_eq!(</span>
+<span class="ln" id="L590">                mode, 0o600,</span>
+<span class="ln" id="L591">                <span class="tok-str">&quot;settings are {mode:o}, so anyone here can read where the vault is&quot;</span></span>
+<span class="ln" id="L592">            );</span>
+<span class="ln" id="L593">        }</span>
 <span class="ln" id="L594">    }</span>
 <span class="ln" id="L595"></span>
-<span class="ln" id="L596">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L597">    <span class="tok-kw">fn</span> <span class="tok-fn">the_icon_can_be_stilled_without_stilling_everything_else</span>() {</span>
-<span class="ln" id="L598">        <span class="tok-kw">let</span> prefs = Prefs {</span>
-<span class="ln" id="L599">            animations: true,</span>
-<span class="ln" id="L600">            animated_icon: false,</span>
-<span class="ln" id="L601">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L602">        };</span>
-<span class="ln" id="L603">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;prefs, false);</span>
-<span class="ln" id="L604">        assert!(motion.enabled, <span class="tok-str">&quot;other animation is unaffected&quot;</span>);</span>
-<span class="ln" id="L605">        assert!(!motion.icon);</span>
-<span class="ln" id="L606">    }</span>
-<span class="ln" id="L607"></span>
-<span class="ln" id="L608">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L609">    <span class="tok-kw">fn</span> <span class="tok-fn">the_settings_file_sits_beside_the_app_lock</span>() {</span>
-<span class="ln" id="L610">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(prefs), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">default_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
-<span class="ln" id="L611">        {</span>
-<span class="ln" id="L612">            assert_eq!(prefs.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
-<span class="ln" id="L613">            assert!(prefs.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;settings.conf&quot;</span>));</span>
-<span class="ln" id="L614">        }</span>
+<span class="ln" id="L596">    <span class="tok-com">/// The system&#x27;s reduce-motion setting outranks the preference. Someone who</span></span>
+<span class="ln" id="L597">    <span class="tok-com">/// asked their OS for less movement has already answered.</span></span>
+<span class="ln" id="L598">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L599">    <span class="tok-kw">fn</span> <span class="tok-fn">the_system_setting_wins_over_the_preference</span>() {</span>
+<span class="ln" id="L600">        <span class="tok-kw">let</span> on = Prefs {</span>
+<span class="ln" id="L601">            animations: true,</span>
+<span class="ln" id="L602">            animated_icon: true,</span>
+<span class="ln" id="L603">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L604">        };</span>
+<span class="ln" id="L605">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, true);</span>
+<span class="ln" id="L606">        assert!(!motion.enabled, <span class="tok-str">&quot;the system asked for reduced motion&quot;</span>);</span>
+<span class="ln" id="L607">        assert!(!motion.icon);</span>
+<span class="ln" id="L608">        assert!(motion.system_reduced, <span class="tok-str">&quot;the UI must be able to say why&quot;</span>);</span>
+<span class="ln" id="L609">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L610"></span>
+<span class="ln" id="L611">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, false);</span>
+<span class="ln" id="L612">        assert!(motion.enabled);</span>
+<span class="ln" id="L613">        assert!(motion.icon);</span>
+<span class="ln" id="L614">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.4</span>);</span>
 <span class="ln" id="L615">    }</span>
-<span class="ln" id="L616">}</span>
+<span class="ln" id="L616"></span>
+<span class="ln" id="L617">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L618">    <span class="tok-kw">fn</span> <span class="tok-fn">the_icon_can_be_stilled_without_stilling_everything_else</span>() {</span>
+<span class="ln" id="L619">        <span class="tok-kw">let</span> prefs = Prefs {</span>
+<span class="ln" id="L620">            animations: true,</span>
+<span class="ln" id="L621">            animated_icon: false,</span>
+<span class="ln" id="L622">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L623">        };</span>
+<span class="ln" id="L624">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;prefs, false);</span>
+<span class="ln" id="L625">        assert!(motion.enabled, <span class="tok-str">&quot;other animation is unaffected&quot;</span>);</span>
+<span class="ln" id="L626">        assert!(!motion.icon);</span>
+<span class="ln" id="L627">    }</span>
+<span class="ln" id="L628"></span>
+<span class="ln" id="L629">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L630">    <span class="tok-kw">fn</span> <span class="tok-fn">the_settings_file_sits_beside_the_app_lock</span>() {</span>
+<span class="ln" id="L631">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(prefs), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">default_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
+<span class="ln" id="L632">        {</span>
+<span class="ln" id="L633">            assert_eq!(prefs.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
+<span class="ln" id="L634">            assert!(prefs.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;settings.conf&quot;</span>));</span>
+<span class="ln" id="L635">        }</span>
+<span class="ln" id="L636">    }</span>
+<span class="ln" id="L637">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
