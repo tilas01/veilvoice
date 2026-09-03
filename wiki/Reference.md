@@ -116,6 +116,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] &middot; Writing a file that only its owner can read.
 - [[`shred.rs`|File-veilvoice-crypto-shred]] &middot; Secure erasure, the self-destruct.
 - [[`vault.rs`|File-veilvoice-crypto-vault]] &middot; Where the app lock is kept: two copies, unpredictable names, and a restore.
+- [[`weave.rs`|File-veilvoice-crypto-weave]] &middot; Twenty-seven reversible encodings, chosen at random, applied underneath the encryption.
 - [[`seal_and_open.rs`|File-veilvoice-crypto-examples-seal_and_open]] &middot; no module documentation yet
 - [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] &middot; Randomised robustness testing for the two parsers that read untrusted input.
 - [[`timing.rs`|File-veilvoice-crypto-tests-timing]] &middot; Timing measurement of the password paths.
