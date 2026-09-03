@@ -28,6 +28,13 @@ Website, wiki, and an in-browser hash verifier that never uploads your file.
 There is a [JavaScript-free edition](https://tilas01.github.io/veilvoice/nojs/)
 for readers who would rather not run scripts.
 
+The whole site is static files in [`website/`](website), so you can read it
+offline if you cloned the repository, or if GitHub Pages is ever down: run
+`python3 tools/site/serve.py` and open <http://localhost:8000>. For a real
+server there is [`deploy/nginx.conf`](deploy/nginx.conf). The one number on the
+site that must never be stale, the signing-key fingerprint, lives in the HTML,
+so a local copy shows exactly what the source says.
+
 VeilVoice destroys the *biometric voiceprint* of a speaker, meaning pitch,
 formants, timbre, micro-timing and the melody of an accent, so that neither software nor
 a human listener can re-identify the speaker or reconstruct the original voice,
