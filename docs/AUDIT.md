@@ -38,6 +38,52 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-seventh round: the sentences with a hole in the middle
+
+One class, found by reading every interface string in the tree rather than the
+one that had just been touched. A Rust string literal split across source lines
+joins those lines only where each one ends in a backslash. Drop the backslash
+and the literal still compiles, still passes every test that looks for a word
+inside it, and renders on screen with the file's own indentation sitting in the
+middle of the sentence: twenty spaces between "because it" and "needs". Eleven
+strings across the two programs were in that state, and nothing had failed.
+
+### F-146 -- interface text carried its own source indentation into the window
+
+`veilvoice-gui/src/security.rs`, `veilvoice-gui/src/app.rs`,
+`veilvoice-gui/src/settings.rs`, `veilvoice-gui/src/crashlog.rs`,
+`veilvoice-cli/src/main.rs`, `veilvoice-cli/src/install.rs` (now
+`veilvoice-setup`), `veilvoice-crypto/src/lock.rs` and
+`veilvoice-video/src/page.rs`.
+
+The security tab's own explanation of why VeilVoice cannot set an app lock for
+you rendered, on screen, as "because it" followed by twenty blank spaces and
+then "needs a passphrase", the gap being exactly where a line break had been
+meant and the source indentation that filled it. The crash-report advice,
+the live-monitor note, the settings caution about what a level meter can and
+cannot tell you, a PATH refusal, and several assertion messages were the same:
+a literal written across two or three source lines whose continuation
+backslashes were absent, so the leading whitespace of the second line became
+part of the text.
+
+It is a quiet failure by construction. The string is still one string, still
+contains every word, so a test asserting `contains("passphrase")` passes and a
+reader skimming the source sees prose that looks wrapped. Only the rendered
+output, or a byte-level look at the literal, shows the hole.
+
+Fixed by restoring the continuations and letting each literal reflow to one
+sentence. The regression test is
+`no_interface_string_has_a_gap_where_a_line_continuation_belongs`, in
+`veilvoice-verify`'s tests: it walks every `.rs` file outside the test modules,
+and fails on any source line past `rustfmt`'s own 100-character width that holds
+three or more spaces between two words. That width is the discriminator.
+`rustfmt` reflows code but never the inside of a string literal, so a wide line
+with an internal gap is one a person joined by hand and did not close;
+deliberate columns of help text are written short and every one in the tree fits
+inside 88 characters, so none of them trips it. The test found the last two,
+in files the first scan had skipped because their literals also contained a
+`\n` escape.
+
 ## The twenty-sixth round: the file with more in it had the weaker permission
 
 Thirteen defects (F-133 to F-145), found by running commands nobody had run here

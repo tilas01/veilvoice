@@ -394,7 +394,9 @@ impl Settings {
         // working meter and a bypassed engine draw the same bar.
         ui.label(
             RichText::new(
-                "  It shows levels, which tells you sound is arriving and sound is                  leaving. It cannot tell you the disguise is working; listening to                  the preview on the live tab is what does that.",
+                "  It shows levels, which tells you sound is arriving and sound is leaving. \
+                 It cannot tell you the disguise is working; listening to the preview on \
+                 the live tab is what does that.",
             )
             .small()
             .color(p::muted()),

@@ -305,7 +305,8 @@ fn read_user_path() -> Result<UserPath, String> {
             return Ok(UserPath::Absent);
         }
         return Err(format!(
-            "could not read your PATH ({}). Refusing to change it: writing a PATH \n             that could not first be read would replace whatever is there.",
+            "could not read your PATH ({}). Refusing to change it: writing a \
+             PATH that could not first be read would replace whatever is there.",
             String::from_utf8_lossy(&output.stderr).trim()
         ));
     }

@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 497 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 587 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -593,6 +593,98 @@
 <span class="ln" id="L495"><span class="tok-str">         cannot tell which path was wrong&quot;</span></span>
 <span class="ln" id="L496">    );</span>
 <span class="ln" id="L497">}</span>
+</span>
+<span class="ln" id="L498"></span>
+<span class="src-item" id="fn-no_interface_string_has_a_gap_where_a_line_continuation_belongs">
+<span class="ln" id="L499"><span class="tok-com">/// No interface string carries a run of spaces left behind by its own source</span></span>
+<span class="ln" id="L500"><span class="tok-com">/// indentation.</span></span>
+<span class="ln" id="L501"><span class="tok-com">///</span></span>
+<span class="ln" id="L502"><span class="tok-com">/// A multi-line string literal in Rust joins its lines only if each one ends in</span></span>
+<span class="ln" id="L503"><span class="tok-com">/// a backslash. Drop the backslashes and the literal still compiles, still</span></span>
+<span class="ln" id="L504"><span class="tok-com">/// passes every test that looks for a word in it, and renders in the window</span></span>
+<span class="ln" id="L505"><span class="tok-com">/// with a twenty-space hole in the middle of a sentence, because the source</span></span>
+<span class="ln" id="L506"><span class="tok-com">/// file&#x27;s indentation is now part of the text. That is what happened to eleven</span></span>
+<span class="ln" id="L507"><span class="tok-com">/// strings across the interface, and nothing failed.</span></span>
+<span class="ln" id="L508"><span class="tok-com">///</span></span>
+<span class="ln" id="L509"><span class="tok-com">/// The rule below is `rustfmt`&#x27;s own width. `rustfmt` reflows code but never</span></span>
+<span class="ln" id="L510"><span class="tok-com">/// the inside of a string literal, so a source line past 100 characters that</span></span>
+<span class="ln" id="L511"><span class="tok-com">/// holds a gap inside a literal is a literal that was joined by hand and not</span></span>
+<span class="ln" id="L512"><span class="tok-com">/// put back together. A deliberate column of help text, meanwhile, is written</span></span>
+<span class="ln" id="L513"><span class="tok-com">/// short and stays well inside the limit: every one in this repository fits in</span></span>
+<span class="ln" id="L514"><span class="tok-com">/// 88 characters, so none of them trips this.</span></span>
+<span class="ln" id="L515"><span class="tok-com">///</span></span>
+<span class="ln" id="L516"><span class="tok-com">/// Two things are deliberately out of scope. Test modules are skipped, because</span></span>
+<span class="ln" id="L517"><span class="tok-com">/// a test legitimately holds wide fixtures: `reg query` output is reproduced</span></span>
+<span class="ln" id="L518"><span class="tok-com">/// space for space, and the tests that read this repository&#x27;s own source carry</span></span>
+<span class="ln" id="L519"><span class="tok-com">/// needles with the indentation they are searching for. And an escape is not a</span></span>
+<span class="ln" id="L520"><span class="tok-com">/// word, so the `n` of a `\n` cannot be the letter that starts a gap.</span></span>
+<span class="ln" id="L521"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L522"><span class="tok-kw">fn</span> <span class="tok-fn">no_interface_string_has_a_gap_where_a_line_continuation_belongs</span>() {</span>
+<span class="ln" id="L523">    <span class="tok-kw">let</span> crates = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">parent</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L524">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L525">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![crates.<span class="tok-fn">to_path_buf</span>()];</span>
+<span class="ln" id="L526">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L527">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates live here&quot;</span>) {</span>
+<span class="ln" id="L528">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L529">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L530">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L531">                <span class="tok-com">// `target` is build output, and can be enormous.</span></span>
+<span class="ln" id="L532">                <span class="tok-kw">if</span> path.<span class="tok-fn">file_name</span>().<span class="tok-fn">is_some_and</span>(|n| n == <span class="tok-str">&quot;target&quot;</span>) {</span>
+<span class="ln" id="L533">                    continue;</span>
+<span class="ln" id="L534">                }</span>
+<span class="ln" id="L535">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L536">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L537">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L538">            }</span>
+<span class="ln" id="L539">        }</span>
+<span class="ln" id="L540">    }</span>
+<span class="ln" id="L541">    assert!(</span>
+<span class="ln" id="L542">        sources.<span class="tok-fn">len</span>() &gt; <span class="tok-num">50</span>,</span>
+<span class="ln" id="L543">        <span class="tok-str">&quot;the walk found {} files, so it is not looking at the workspace&quot;</span>,</span>
+<span class="ln" id="L544">        sources.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L545">    );</span>
+<span class="ln" id="L546"></span>
+<span class="ln" id="L547">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L548">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L549">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>);</span>
+<span class="ln" id="L550">        <span class="tok-kw">let</span> text = text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L551">        <span class="tok-com">// Everything up to the test module: what a person is shown.</span></span>
+<span class="ln" id="L552">        <span class="tok-kw">let</span> interface = text.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L553">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> interface.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L554">            <span class="tok-kw">if</span> line.<span class="tok-fn">chars</span>().<span class="tok-fn">count</span>() &lt;= <span class="tok-num">100</span> {</span>
+<span class="ln" id="L555">                continue;</span>
+<span class="ln" id="L556">            }</span>
+<span class="ln" id="L557">            <span class="tok-com">// An escape is not a word. Without this the `n` of a `\n` reads as</span></span>
+<span class="ln" id="L558">            <span class="tok-com">// the letter before a gap, and a needle that searches this</span></span>
+<span class="ln" id="L559">            <span class="tok-com">// repository&#x27;s own indented source looks like broken prose.</span></span>
+<span class="ln" id="L560">            <span class="tok-kw">let</span> line = line.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\\n&quot;</span>, <span class="tok-str">&quot;..&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\\t&quot;</span>, <span class="tok-str">&quot;..&quot;</span>);</span>
+<span class="ln" id="L561">            <span class="tok-com">// The gap has to sit between two words to be prose rather than a</span></span>
+<span class="ln" id="L562">            <span class="tok-com">// column: three spaces after a letter or a comma, and a letter</span></span>
+<span class="ln" id="L563">            <span class="tok-com">// after them.</span></span>
+<span class="ln" id="L564">            <span class="tok-kw">let</span> bytes: Vec&lt;char&gt; = line.<span class="tok-fn">chars</span>().<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L565">            <span class="tok-kw">let</span> gap = bytes.<span class="tok-fn">windows</span>(<span class="tok-num">5</span>).<span class="tok-fn">any</span>(|w| {</span>
+<span class="ln" id="L566">                (w[<span class="tok-num">0</span>].<span class="tok-fn">is_ascii_alphabetic</span>() || w[<span class="tok-num">0</span>] == <span class="tok-str">&#x27;,&#x27;</span> || w[<span class="tok-num">0</span>] == <span class="tok-str">&#x27;.&#x27;</span>)</span>
+<span class="ln" id="L567">                    &amp;&amp; w[<span class="tok-num">1</span>] == <span class="tok-str">&#x27; &#x27;</span></span>
+<span class="ln" id="L568">                    &amp;&amp; w[<span class="tok-num">2</span>] == <span class="tok-str">&#x27; &#x27;</span></span>
+<span class="ln" id="L569">                    &amp;&amp; w[<span class="tok-num">3</span>] == <span class="tok-str">&#x27; &#x27;</span></span>
+<span class="ln" id="L570">                    &amp;&amp; (w[<span class="tok-num">4</span>] == <span class="tok-str">&#x27; &#x27;</span> || w[<span class="tok-num">4</span>].<span class="tok-fn">is_ascii_alphabetic</span>())</span>
+<span class="ln" id="L571">            });</span>
+<span class="ln" id="L572">            <span class="tok-kw">if</span> gap {</span>
+<span class="ln" id="L573">                found.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L574">                    <span class="tok-str">&quot;{}:{}&quot;</span>,</span>
+<span class="ln" id="L575">                    path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>(),</span>
+<span class="ln" id="L576">                    number + <span class="tok-num">1</span></span>
+<span class="ln" id="L577">                ));</span>
+<span class="ln" id="L578">            }</span>
+<span class="ln" id="L579">        }</span>
+<span class="ln" id="L580">    }</span>
+<span class="ln" id="L581">    assert!(</span>
+<span class="ln" id="L582">        found.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L583">        <span class="tok-str">&quot;these lines join a string literal without the backslash that would \</span></span>
+<span class="ln" id="L584"><span class="tok-str">         close the gap, so the text renders with the source indentation in the \</span></span>
+<span class="ln" id="L585"><span class="tok-str">         middle of it: {found:?}&quot;</span></span>
+<span class="ln" id="L586">    );</span>
+<span class="ln" id="L587">}</span>
 </span>
 </code></pre>
 </main>

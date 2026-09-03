@@ -79,7 +79,7 @@ none -- so it prints the command that would do it with `ffmpeg`, if you have
 flowchart TD
     n_lib(["lib.rs<br/>140 lines"])
     n_ffmpeg["ffmpeg.rs<br/>491 lines"]
-    n_page["page.rs<br/>1029 lines"]
+    n_page["page.rs<br/>1030 lines"]
     n_palette["palette.rs<br/>747 lines"]
     n_waveform["waveform.rs<br/>259 lines"]
     n_page --> n_palette
@@ -99,6 +99,6 @@ flowchart TD
 |---|---:|---|
 | [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 491 | The video file, which needs a codec this project does not ship. |
 | [[`lib.rs`|File-veilvoice-video-lib]] | 140 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [[`page.rs`|File-veilvoice-video-page]] | 1029 | The picture: one still for a preview, and one page that plays. |
+| [[`page.rs`|File-veilvoice-video-page]] | 1030 | The picture: one still for a preview, and one page that plays. |
 | [[`palette.rs`|File-veilvoice-video-palette]] | 747 | Colours: the site's own tokens, and one per speaker. |
 | [[`waveform.rs`|File-veilvoice-video-waveform]] | 259 | The shape of the audio, reduced to something a page can draw. |

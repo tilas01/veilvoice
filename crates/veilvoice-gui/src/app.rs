@@ -661,7 +661,14 @@ impl VeilVoiceApp {
         let mut app = Self {
             jetbrains,
             drawing: crate::graphics::describe(cc.gl.as_deref()),
-            security: Security::load(),
+            security: {
+                // The baseline is read here rather than inside `Security::load`
+                // so that `Security::default()` stays free of I/O, which is
+                // what keeps every test in this crate off the real files.
+                let mut security = Security::load();
+                security.load_mandate();
+                security
+            },
             group,
             preferences,
             policy,
@@ -726,9 +733,12 @@ impl VeilVoiceApp {
         self.security.encryption_pinned = self
             .policy
             .requires(&veilvoice_policy::Requirement::EncryptRecordings);
+        // The sealed policy or the user's own baseline. Either is a reason to
+        // say the lock should be set; only the policy makes it unchangeable.
         self.security.lock_required = self
             .policy
-            .requires(&veilvoice_policy::Requirement::AppLock);
+            .requires(&veilvoice_policy::Requirement::AppLock)
+            || self.security.mandate_requires_app_lock();
         if self.security.encryption_pinned {
             self.security.encrypt_recordings = true;
         }
@@ -879,7 +889,8 @@ impl eframe::App for VeilVoiceApp {
                         // on the security tab.
                         let touched = audit.tampered.len() + audit.missing.len();
                         self.notice = Some(crate::notify::Notice::warn(format!(
-                            "{touched} of VeilVoice's own files changed while it was                              closed. The security tab says which."
+                            "{touched} of VeilVoice's own files changed while it was \
+                             closed. The security tab says which."
                         )));
                     }
                 }
@@ -1105,7 +1116,8 @@ impl eframe::App for VeilVoiceApp {
             self.preferences
                 .set_live_monitor(crate::monitor::Style::Off);
             self.notice = Some(crate::notify::Notice::note(
-                "The live monitor is off. Settings brings it back, and the live                  tab still has the full meters.",
+                "The live monitor is off. Settings brings it back, and the live tab still \
+                 has the full meters.",
             ));
         }
 
@@ -1718,7 +1730,9 @@ impl VeilVoiceApp {
             meter(ui, "out", self.levels.output, self.levels.hold_output);
             ui.label(
                 RichText::new(
-                    "  These say sound is arriving and sound is leaving. They cannot say                      the voice has been changed: a working meter and a bypassed engine                      draw the same bar. Listen to the output to hear that.",
+                    "  These say sound is arriving and sound is leaving. They cannot say \
+                     the voice has been changed: a working meter and a bypassed engine draw \
+                     the same bar. Listen to the output to hear that.",
                 )
                 .small()
                 .color(p::muted()),
@@ -2458,7 +2472,8 @@ mod tests {
         );
         assert!(
             !body.contains("self.security.lock_now()"),
-            "the idle path must use lock_after_idle, or the lock screen cannot              tell somebody the window locked itself rather than that they left              it locked"
+            "the idle path must use lock_after_idle, or the lock screen cannot tell \
+             somebody the window locked itself rather than that they left it locked"
         );
     }
 
@@ -2833,7 +2848,14 @@ mod tests {
         }
         app.apply_policy();
         assert!(!app.security.encryption_pinned);
-        assert!(!app.security.lock_required);
+        // Nothing is *fixed*, which is what this test is about: no policy is in
+        // force, so nothing is beyond the user's reach.
+        assert!(!app.policy.requires(&veilvoice_policy::Requirement::AppLock));
+        // The lock is still asked for, by the user's own baseline rather than
+        // by a policy. That is a prompt they can answer or turn off, not a
+        // control taken away from them, and the two must not be conflated.
+        assert!(app.security.lock_required);
+        assert!(app.security.mandate_requires_app_lock());
         assert_eq!(app.intensity, 0.25);
         assert!(!app.neutralise_accent);
         assert!(!app.clean_metadata);

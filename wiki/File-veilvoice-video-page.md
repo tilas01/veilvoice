@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/page.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 1029 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 1030 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs)
 
 ## Contents
 
@@ -69,7 +69,7 @@ command to make one is printed for you.
 
 ## What this file contains
 
-1029 lines defining **13 functions** (8 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1030 lines defining **13 functions** (8 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

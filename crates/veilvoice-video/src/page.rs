@@ -704,7 +704,8 @@ mod tests {
         ] {
             assert!(
                 !markup.contains(detail),
-                "{detail:?} describes the engine and does not belong in a file                  somebody shares"
+                "{detail:?} describes the engine and does not belong in a file somebody \
+                 shares"
             );
         }
     }
