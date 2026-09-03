@@ -278,6 +278,9 @@ installing it, and finding their way around it without reading a manual.
 | 105 | **A crash report offered rather than buried**: the report already written to disk surfaced above whatever tab you land on, with what it contains listed and readable in full before anything leaves your machine, and the filing left to the person | **done** | - |
 | 106 | **A first run that explains itself**: one card per tab saying what it is for, skippable, and after an upgrade only the tabs that are new, with portable and installed said plainly on the last card | **done** | - |
 | 107 | **VeilVoice on a phone**: an Android package a person can install without developer tools, and iOS if it can be built and signed under a pseudonym, which is the part that decides it | **planned** | 10 |
+| 108 | **One binary**: fold `veilvoice-gui` into `veilvoice` so a release ships a single executable, resolving the Windows subsystem trade rather than working around it | planned | - |
+| 109 | **An obfuscated program folder**: VeilVoice's own files encrypted under names derived from the app-lock passphrase, with decoys among them, so the lock protects data rather than only a window | planned | - |
+| 110 | **A first-run setup and tour**: the app lock, the recording passphrase and the autolock explained and offered once, skipping whichever is already set | planned | - |
 
 **What was checked before estimating that, rather than after.** The same rule
 that turned the speaker-detection question from planned into a measurement was

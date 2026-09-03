@@ -113,7 +113,16 @@ enum Op {
 }
 
 /// A finished lock operation: the store as it now stands, and how it went.
-type OpResult = (Option<LockStore>, Result<Op, String>);
+type OpResult = (Option<LockStore>, Result<Op, String>, Option<StoreKey>);
+
+/// The obfuscated store's key, derived on the worker thread beside the unlock.
+///
+/// It has to be derived there. It costs a full Argon2id run at the configured
+/// cost, and doing that on the UI thread would freeze the window for the
+/// fraction of a second the unlock was supposed to have finished in. The
+/// unlock is already paying for one run on that thread, so the key rides back
+/// with the result rather than being asked for again.
+use veilvoice_crypto::hoard::StoreKey;
 
 /// Everything about locking the app and sealing its output.
 pub struct Security {
@@ -135,6 +144,13 @@ pub struct Security {
     /// on the lock screen: telling a stranger at the lock screen that their
     /// last attempt was noticed is telling them something they can use.
     tampered: bool,
+    /// The obfuscated store's key, derived beside the unlock that produced it.
+    ///
+    /// Held for exactly one caller, like the passphrase beside it, and for the
+    /// same reason: whoever takes it owns it for the session. It is not
+    /// re-derivable without another Argon2id run, so a caller that drops it
+    /// leaves the folder unreadable until the next unlock.
+    just_unlocked_key: Option<StoreKey>,
     /// The passphrase that just opened the lock, held for exactly one caller to
     /// collect. See [`Security::take_unlock_passphrase`].
     just_unlocked: Option<String>,
@@ -209,6 +225,7 @@ impl Default for Security {
             load_error: None,
             locked: false,
             auto_locked: false,
+            just_unlocked_key: None,
             tampered: false,
             just_unlocked: None,
             app_secret: None,
@@ -288,6 +305,15 @@ impl Security {
         self.just_unlocked.take()
     }
 
+    /// Collect the obfuscated store's key from the unlock that just happened.
+    ///
+    /// One caller, one frame, like the passphrase. See
+    /// [`crate::vault_store::VaultStore`] for what it opens and what that is
+    /// worth.
+    pub fn take_unlock_store_key(&mut self) -> Option<StoreKey> {
+        self.just_unlocked_key.take()
+    }
+
     /// Start in [`Sealing::AppLock`], because the user asked for that last time.
     ///
     /// Applied at startup, before the window is drawn and so before anything
@@ -352,6 +378,10 @@ impl Security {
 
     /// Wipe every plaintext secret this struct is holding.
     fn wipe_secrets(&mut self) {
+        // The store key goes with the passphrase. It is not a `String`, so it
+        // is dropped rather than zeroized here; `Secret` wipes itself on drop,
+        // which is the whole reason the key is held in one.
+        self.just_unlocked_key = None;
         for field in [
             &mut self.entry,
             &mut self.current,
@@ -454,12 +484,13 @@ impl Security {
         let Some(rx) = &self.pending else {
             return false;
         };
-        let (store, outcome) = match rx.try_recv() {
+        let (store, outcome, store_key) = match rx.try_recv() {
             Ok(v) => v,
             Err(mpsc::TryRecvError::Empty) => return false,
             Err(mpsc::TryRecvError::Disconnected) => (
                 None,
                 Err("the lock operation stopped unexpectedly".to_string()),
+                None,
             ),
         };
         self.pending = None;
@@ -491,6 +522,7 @@ impl Security {
                     self.app_secret = Some(into_secret(&mut copy));
                 }
                 self.just_unlocked = Some(opened);
+                self.just_unlocked_key = store_key;
                 self.message = None;
             }
             Ok(Op::Acknowledge) => {
@@ -1254,39 +1286,55 @@ fn run_op(
         // The store is handed back on failure too: it now carries the recorded
         // attempt, and dropping it would reset the rate limit.
         (Op::Unlock, Some(mut store)) => match store.unlock(password.as_bytes()) {
-            Ok(()) => (Some(store), Ok(Op::Unlock)),
-            Err(e) => (Some(store), Err(e.to_string())),
+            Ok(()) => {
+                // Derived here, while the passphrase is in hand and this
+                // thread is already the one paying for Argon2.
+                let key = store.store_key(password.as_bytes()).ok();
+                (Some(store), Ok(Op::Unlock), key)
+            }
+            Err(e) => (Some(store), Err(e.to_string()), None),
         },
         (Op::Acknowledge, Some(mut store)) => match store.acknowledge(password.as_bytes()) {
-            Ok(()) => (Some(store), Ok(Op::Acknowledge)),
-            Err(e) => (Some(store), Err(e.to_string())),
+            Ok(()) => (Some(store), Ok(Op::Acknowledge), None),
+            Err(e) => (Some(store), Err(e.to_string()), None),
         },
+        // **F-141.** Through the vault, which is what `Security::load` reads
+        // from. This called `LockStore::create`, which writes the single
+        // pre-vault file `applock.bin` -- so a lock set in the window was
+        // written somewhere the window never looked. It appeared to work,
+        // vanished on the next launch, and the *second* attempt failed with
+        // "could not read or write the app-lock file", because the file it was
+        // about to create was already there.
+        //
+        // `path` is still carried for the message below and for `reopen`.
         (Op::Set, None) => match path {
-            None => (None, Err("no configuration directory".into())),
+            None => (None, Err("no configuration directory".into()), None),
             Some(path) => {
-                match LockStore::create(&path, password.as_bytes(), kdf::KdfParams::default()) {
-                    Ok(store) => (Some(store), Ok(Op::Set)),
-                    Err(e) => (None, Err(e.to_string())),
+                let base = path.parent().unwrap_or(&path).to_path_buf();
+                match lock::create_in(&base, password.as_bytes(), kdf::KdfParams::default()) {
+                    Ok(store) => (Some(store), Ok(Op::Set), None),
+                    Err(e) => (None, Err(e.to_string()), None),
                 }
             }
         },
         (Op::Change, Some(mut store)) => {
             match store.change_password(password.as_bytes(), replacement.as_bytes()) {
-                Ok(()) => (Some(store), Ok(Op::Change)),
-                Err(e) => (Some(store), Err(e.to_string())),
+                Ok(()) => (Some(store), Ok(Op::Change), None),
+                Err(e) => (Some(store), Err(e.to_string()), None),
             }
         }
         (Op::Remove, Some(store)) => match store.remove(password.as_bytes()) {
-            Ok(()) => (None, Ok(Op::Remove)),
+            Ok(()) => (None, Ok(Op::Remove), None),
             // `remove` consumed the store, so it is reopened to keep the
             // recorded failure. A lock that vanished because the password was
             // wrong would be a spectacular own goal.
-            Err(e) => (reopen(path.as_deref()), Err(e.to_string())),
+            Err(e) => (reopen(path.as_deref()), Err(e.to_string()), None),
         },
         // The UI never offers these combinations; refusing beats guessing.
         (_, store) => (
             store,
             Err("the app lock changed underneath this action".into()),
+            None,
         ),
     };
 

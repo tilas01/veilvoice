@@ -816,6 +816,15 @@ impl LockStore {
         self.lock.cooldown()
     }
 
+    /// Derive the key that names and opens the obfuscated program folder.
+    ///
+    /// Delegates to [`AppLock::store_key`], and carries the same warning: the
+    /// password is not checked here, so call [`Self::unlock`] first and act on
+    /// what it says.
+    pub fn store_key(&self, password: &[u8]) -> Result<crate::hoard::StoreKey, Error> {
+        self.lock.store_key(password)
+    }
+
     /// Consecutive failed attempts recorded so far.
     pub fn failures(&self) -> u32 {
         self.lock.failures()
@@ -869,7 +878,19 @@ impl LockStore {
 /// stick.
 pub fn open_default() -> Result<(Option<LockStore>, bool), Error> {
     let base = default_dir().ok_or(Error::AppLockStore)?;
-    let vault = crate::vault::Vault::at(&base, crate::vault::admin_dir().as_deref())?;
+    open_in(&base)
+}
+
+/// The name the lock had before the vault: one file, under the obvious name.
+const LEGACY_NAME: &str = "applock.bin";
+
+/// Open a vault-backed lock under `base`, adopting a pre-vault file if one is
+/// there.
+///
+/// Split out of [`open_default`] so it can be tested against a directory a
+/// test owns, which is the half that was missing when F-141 shipped.
+pub fn open_in(base: &Path) -> Result<(Option<LockStore>, bool), Error> {
+    let vault = crate::vault::Vault::at(base, crate::vault::admin_dir().as_deref())?;
     let (record, found) = vault.load()?;
     // Both outcomes are evidence somebody has been at the files: a copy that
     // went, or two copies that no longer hold the same password.
@@ -877,23 +898,67 @@ pub fn open_default() -> Result<(Option<LockStore>, bool), Error> {
         found,
         crate::vault::Found::Restored | crate::vault::Found::Disagreed
     );
-    Ok((
-        record.map(|lock| LockStore {
+
+    if let Some(lock) = record {
+        return Ok((
+            Some(LockStore {
+                backing: Backing::Vault(vault),
+                lock,
+                every_copy_current: true,
+            }),
+            restored,
+        ));
+    }
+
+    // Nothing in the vault. There may still be a lock in the file the vault
+    // replaced, and there will be for every user who set one through the
+    // window in 0.1.17 -- see F-141. Ignoring it would take their lock away
+    // and hand them the same error again.
+    if let Some(lock) = read_legacy(base)? {
+        let mut store = LockStore {
             backing: Backing::Vault(vault),
             lock,
             every_copy_current: true,
-        }),
-        restored,
-    ))
+        };
+        store.every_copy_current = store.save()?;
+        // Only once the vault holds it. A crash between the two leaves the
+        // old file, which is still the copy that opens.
+        let _ = std::fs::remove_file(base.join(LEGACY_NAME));
+        return Ok((Some(store), restored));
+    }
+
+    Ok((None, restored))
+}
+
+/// Read a pre-vault lock file, if one is there.
+///
+/// A file that exists but does not parse is reported rather than ignored: it
+/// is somebody's lock, and treating it as absent is how a lock silently
+/// becomes no lock.
+fn read_legacy(base: &Path) -> Result<Option<AppLock>, Error> {
+    match std::fs::read(base.join(LEGACY_NAME)) {
+        Ok(bytes) => AppLock::parse(&bytes).map(Some),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(_) => Err(Error::AppLockStore),
+    }
 }
 
 /// Create a lock at the default location, refusing to replace one already
 /// there.
 pub fn create_default(password: &[u8], params: kdf::KdfParams) -> Result<LockStore, Error> {
     let base = default_dir().ok_or(Error::AppLockStore)?;
-    let vault = crate::vault::Vault::at(&base, crate::vault::admin_dir().as_deref())?;
-    if vault.load()?.0.is_some() {
-        return Err(Error::AppLockStore);
+    create_in(&base, password, params)
+}
+
+/// Create a vault-backed lock under `base`.
+///
+/// Split out of [`create_default`] for the same reason as [`open_in`]: so a
+/// test can drive creation and opening against one directory it owns, and
+/// catch the two disagreeing about where a lock lives.
+pub fn create_in(base: &Path, password: &[u8], params: kdf::KdfParams) -> Result<LockStore, Error> {
+    let vault = crate::vault::Vault::at(base, crate::vault::admin_dir().as_deref())?;
+    if vault.load()?.0.is_some() || read_legacy(base)?.is_some() {
+        return Err(Error::AppLockExists);
     }
     let mut store = LockStore {
         backing: Backing::Vault(vault),
@@ -1155,6 +1220,92 @@ mod tests {
         let salt = [5u8; kdf::SALT_LEN];
         let (verifier, tag_key) = derive_pair(b"same passphrase", &salt, weak()).unwrap();
         assert_ne!(verifier, tag_key);
+    }
+
+    /// **F-141.** A lock set through the interface has to be there next time.
+    ///
+    /// The desktop application created locks with `LockStore::create`, which
+    /// writes the single pre-vault file, and loaded them with `open_default`,
+    /// which reads the vault. Nothing tested the two against each other, so
+    /// nothing noticed they were using different files: the lock appeared to
+    /// be set, was gone on the next launch, and the second attempt failed with
+    /// `AppLockStore` because `applock.bin` was already there.
+    #[test]
+    fn a_lock_that_was_created_can_be_opened_again() {
+        let dir = tempfile::tempdir().unwrap();
+        create_in(dir.path(), b"passphrase", weak()).unwrap();
+        let (found, _) = open_in(dir.path()).unwrap();
+        let mut found = found.expect("a lock that was just created has to be there");
+        assert!(found.unlock(b"passphrase").is_ok());
+    }
+
+    /// The sharp half of F-141: *where* creation writes.
+    ///
+    /// The round trip above passes even with the bug present, now that
+    /// `open_in` adopts a pre-vault file -- adoption would quietly paper over
+    /// exactly the mistake that caused this. So this pins the thing that was
+    /// actually wrong: creation goes to the vault, and does not leave the
+    /// single file behind for the next creation to trip over.
+    #[test]
+    fn creation_writes_the_vault_and_not_the_pre_vault_file() {
+        let dir = tempfile::tempdir().unwrap();
+        create_in(dir.path(), b"passphrase", weak()).unwrap();
+        assert!(
+            !dir.path().join(LEGACY_NAME).exists(),
+            "creation wrote the pre-vault file, which is F-141 exactly"
+        );
+    }
+
+    #[test]
+    fn setting_a_lock_twice_is_refused_rather_than_failing_on_the_file() {
+        let dir = tempfile::tempdir().unwrap();
+        create_in(dir.path(), b"first", weak()).unwrap();
+        assert!(create_in(dir.path(), b"second", weak()).is_err());
+        // And the first still opens: a refused creation must not damage it.
+        let (found, _) = open_in(dir.path()).unwrap();
+        assert!(found.unwrap().unlock(b"first").is_ok());
+    }
+
+    /// A lock written by a version that predates the vault is adopted.
+    ///
+    /// Every user who set one through the window in 0.1.17 has one of these,
+    /// under a passphrase they chose and expect to still work.
+    #[test]
+    fn a_pre_vault_lock_file_is_adopted_on_open() {
+        let dir = tempfile::tempdir().unwrap();
+        let legacy = dir.path().join(LEGACY_NAME);
+        LockStore::create(&legacy, b"from an older build", weak()).unwrap();
+
+        let (found, _) = open_in(dir.path()).unwrap();
+        let mut found = found.expect("the older file has to be found");
+        assert!(
+            found.unlock(b"from an older build").is_ok(),
+            "and open with the passphrase it was set with"
+        );
+        assert!(
+            !legacy.exists(),
+            "once the vault holds it the single file goes, or the next              creation trips over it exactly as F-141 did"
+        );
+        let (again, _) = open_in(dir.path()).unwrap();
+        assert!(again.unwrap().unlock(b"from an older build").is_ok());
+    }
+
+    #[test]
+    fn a_pre_vault_file_blocks_a_new_lock_rather_than_being_overwritten() {
+        let dir = tempfile::tempdir().unwrap();
+        LockStore::create(&dir.path().join(LEGACY_NAME), b"old", weak()).unwrap();
+        assert!(
+            create_in(dir.path(), b"new", weak()).is_err(),
+            "somebody's existing lock must not be replaced without their              passphrase, whichever file it happens to be in"
+        );
+    }
+
+    #[test]
+    fn an_empty_directory_has_no_lock_and_that_is_not_an_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let (found, restored) = open_in(dir.path()).unwrap();
+        assert!(found.is_none());
+        assert!(!restored);
     }
 
     #[test]
