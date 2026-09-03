@@ -127,9 +127,24 @@ def markers(text):
     # invisible item, which is the worst of both: the document says the work is
     # tracked and nothing tracks it. So anything shaped like a row and not
     # matched is a failure here, loudly, rather than a gap nobody sees.
+    #
+    # Two shapes are caught. The first is a row carrying a bold status token,
+    # `63b`'s shape: a marker whose number is not a plain integer. The second is
+    # a row that opens with a plain integer and does not parse, which is what
+    # markers 109 and 110 were for as long as their status was written `planned`
+    # rather than `**planned**`: the bold-token detector could not see them
+    # because the only bold text on the line was the marker's own title, so they
+    # were numbered, present, and in no count of anything. A numbered row is a
+    # marker by definition, so a numbered row this cannot read is the same
+    # invisible-item failure, and is raised the same way.
     looks_like_a_row = re.compile(r"^\|\s*[^|\s]+\s*\|.*\|\s*\*\*\w+\*\*\s*\|", re.M)
+    numbered_row = re.compile(r"^\|\s*\d+\s*\|.*\|", re.M)
     parsed_at = {m.start() for m in ROW.finditer(text)}
-    for candidate in looks_like_a_row.finditer(text):
+    candidates = {}
+    for pattern in (looks_like_a_row, numbered_row):
+        for match in pattern.finditer(text):
+            candidates.setdefault(match.start(), match)
+    for candidate in (candidates[start] for start in sorted(candidates)):
         if candidate.start() in parsed_at:
             continue
         if section_of(candidate.start()) in SKIP_SECTIONS:

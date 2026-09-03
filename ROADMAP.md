@@ -278,8 +278,8 @@ installing it, and finding their way around it without reading a manual.
 | 105 | **A crash report offered rather than buried**: the report already written to disk surfaced above whatever tab you land on, with what it contains listed and readable in full before anything leaves your machine, and the filing left to the person | **done** | - |
 | 106 | **A first run that explains itself**: one card per tab saying what it is for, skippable, and after an upgrade only the tabs that are new, with portable and installed said plainly on the last card | **done** | - |
 | 107 | **VeilVoice on a phone**: an Android package a person can install without developer tools, and iOS if it can be built and signed under a pseudonym, which is the part that decides it | **planned** | 10 |
-| 109 | **An obfuscated program folder**: VeilVoice's own files encrypted under names derived from the app-lock passphrase, with decoys among them, so the lock protects data rather than only a window | planned | - |
-| 110 | **A first-run setup and tour**: the app lock, the recording passphrase and the autolock explained and offered once, skipping whichever is already set | planned | - |
+| 109 | **An obfuscated program folder**: VeilVoice's own files encrypted under names derived from the app-lock passphrase, with decoys among them, so the lock protects data rather than only a window | **planned** | - |
+| 110 | **A first-run setup and tour**: the app lock, the recording passphrase and the autolock explained and offered once, skipping whichever is already set | **planned** | - |
 | 111 | **Host the website locally**: a script and an nginx config that serve `website/` exactly as GitHub Pages does, so the site survives the repo or Pages going down, and is the audit surface during development | **done** | - |
 | 112 | **A self-signed code certificate** beside the OpenPGP key: a detached, signed `APPMANIFEST.json` describing each binary, verify scripts for Unix and Windows, and an import tutorial, for organisations that want a known publisher without breaking reproducible builds | **done** | - |
 
@@ -310,6 +310,26 @@ So the estimate stands as work rather than as a question, which is why this is
 macOS to build and an Apple Developer ID to sign, and this project is published
 under a pseudonym on purpose, which is the same wall already documented for
 kernel drivers. That will be answered before anything is promised.
+
+## Asked for after v0.1.18
+
+The app lock already turns the app-lock passphrase into a key that seals
+everything VeilVoice writes (marker 86). This asks for the same protection one
+layer in: the secrets and the veiling state while they are in memory, so that a
+program which can read another process's RAM, a rootkit or a debugger, reads
+ciphertext rather than a passphrase or a voiceprint.
+
+The honest limit is stated with the feature rather than after it. Data the CPU
+is actively working on has to be plaintext for the instant it is used, and an
+attacker already running as the kernel can wait for that instant. This raises
+the cost of an external read and narrows the window to nearly nothing; it does
+not claim to beat an adversary who already owns the machine.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 113 | **Memory that reads as ciphertext from outside the process**: the app-lock key holds the secrets and the veiling state encrypted in RAM with the same post-quantum sealing used at rest, each value decrypted only for the moment it is used and re-sealed straight after, so a scan of the process's memory finds no passphrase and no voiceprint | **planned** | 20 |
+| 114 | **A layout no two copies share**: the in-memory shape of that protected state varied per build and per run, so a scanner tuned to one copy of VeilVoice does not recognise the next, and no fixed offset survives from one binary to another. No junk and no decoy RAM: the footprint is unchanged, the protection is in the arrangement rather than in bulk | **planned** | 10 |
+| 115 | **Tamper noticed, and the source named**: an attempt to read or write VeilVoice's memory from another process detected where each operating system allows it, the app locked and the person told, and the reaching process identified as far as the platform permits, on Windows, macOS, Linux and the BSDs. Where a platform cannot say, it says that rather than guessing | **planned** | 20 |
 
 
 ---
