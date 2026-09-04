@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/studio.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 654 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 877 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs)
 
 ## Contents
 
@@ -75,13 +75,14 @@ VeilVoice at the moment you type both.
 
 ## What this file contains
 
-654 lines defining **18 functions** (9 public), **3 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+877 lines defining **20 functions** (11 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct StudioKey` (line 83) -- A key that exists only while both locks are open.
 - `struct Entry` (line 144) -- One recording in the vault.
 - `struct Studio` (line 175) -- A directory of recordings, sealed under a StudioKey.
+- `struct Shape` (line 376) -- What a decoy vault looks like from outside, so it looks like the real one.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -96,6 +97,9 @@ VeilVoice at the moment you type both.
   - reaches: `safe_id`, `unseal`, `secret_key`
 - `Studio::remove` (line 269) -- Remove one recording and its index entry.
   - reaches: `list`, `safe_id`, `write_index`, `parse_index`, `unseal`, `render_index`, `seal`, `secret_key`
+- `Shape::of` (line 385) -- Measure a real vault, to build decoys that match it.
+- `make_decoy` (line 428) -- Fill dir with a vault that never held anything.
+  - reaches: `new_id`
 
 ## What calls what
 
@@ -129,10 +133,13 @@ flowchart TD
     n_safe_id["safe_id<br/>line 327"]
     n_render_index["render_index<br/>line 337"]
     n_parse_index["parse_index<br/>line 346"]
+    n_of(["Shape::of<br/>line 385"])
+    n_make_decoy(["make_decoy<br/>line 428"])
     n_list --> n_parse_index
     n_list --> n_unseal
     n_load --> n_safe_id
     n_load --> n_unseal
+    n_make_decoy --> n_new_id
     n_parse_index --> n_safe_id
     n_remove --> n_list
     n_remove --> n_safe_id
@@ -163,8 +170,10 @@ flowchart TD
     click n_safe_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L327" "open the source"
     click n_render_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L337" "open the source"
     click n_parse_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L346" "open the source"
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L385" "open the source"
+    click n_make_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L428" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_remove entry
+    class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_remove,n_of,n_make_decoy entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_list api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -202,3 +211,6 @@ flowchart TD
 | `safe_id` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L327) | Whether id is one this vault could have produced. |
 | `render_index` <sub>fn</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L337) | The index, as lines. |
 | `parse_index` <sub>fn</sub> | [346](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L346) |  |
+| `Shape` <sub>pub struct</sub> | [376](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L376) | What a decoy vault looks like from outside, so it looks like the real one. |
+| `Shape::of` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L385) | Measure a real vault, to build decoys that match it. |
+| `make_decoy` <sub>pub fn</sub> | [428](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L428) | Fill dir with a vault that never held anything. |
