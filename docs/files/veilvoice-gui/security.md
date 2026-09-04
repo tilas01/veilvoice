@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/security.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 2211 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 2269 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs)
 
 ## Contents
 
@@ -80,7 +80,7 @@ disk. Encrypting the recording is what protects the recording.
 
 ## What this file contains
 
-2211 lines defining **43 functions** (26 public), **4 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2269 lines defining **44 functions** (26 public), **4 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -114,7 +114,7 @@ disk. Encrypting the recording is what protects the recording.
 - `Security::unlock_screen` (line 638) -- The full-window unlock screen.
   - reaches: `busy`, `poll`, `spawn`, `into_secret`, `wipe_form`, `run_op`, `reopen`
 - `Security::tab` (line 847) -- The security tab: manage the lock, and see what it is worth.
-  - reaches: `busy`, `has_lock`, `interference_banner`, `lock_now`, `password_row`, `poll`, `spawn`, `lock_inner`, `into_secret`, `wipe_form`, `run_op`, `wipe_secrets`
+  - reaches: `busy`, `button_column`, `has_lock`, `interference_banner`, `lock_now`, `password_row`, `poll`, `spawn`, `lock_inner`, `into_secret`, `wipe_form`, `run_op`
 - `Security::load_mandate` (line 1024) -- Read the baseline from disk and apply it to the checkbox.
 - `Security::mandate_requires_app_lock` (line 1039) -- Whether the baseline insists on the app lock.
 - `Security::mandate_requires_encryption` (line 1044) -- Whether the baseline insists on encryption at rest.
@@ -133,7 +133,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_22 of 43 functions are drawn; the diagram is bounded at 22 so it
+_22 of 44 functions are drawn; the diagram is bounded at 22 so it
 stays readable. The full list is in the table below._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
@@ -275,7 +275,8 @@ flowchart TD
 | `run_op` <sub>fn</sub> | [1433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1433) | Run one lock operation, off the UI thread. |
 | `reopen` <sub>fn</sub> | [1501](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1501) |  |
 | `PASSWORD_LABEL_WIDTH` <sub>const</sub> | [1508](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1508) | The width every passphrase label is given, so every field starts level. |
-| `password_row` <sub>fn</sub> | [1529](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1529) | One labelled passphrase field, with the field in the same place every time. |
+| `button_column` <sub>fn</sub> | [1542](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1542) | One labelled passphrase field, with the field in the same place every time. |
+| `password_row` <sub>fn</sub> | [1556](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1556) |  |
 
 ---
 
