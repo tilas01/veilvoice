@@ -167,7 +167,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="veilvoice-crypto/studio.src.html">
 <rect x="225.9" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="276.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">studio.rs</text>
-<text x="276.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">654 lines</text>
+<text x="276.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">877 lines</text>
 </a>
 <a href="veilvoice-crypto/tape.src.html">
 <rect x="352.5" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -202,7 +202,7 @@ flowchart TD
     n_lock[&quot;lock.rs&lt;br/&gt;1823 lines&quot;]
     n_privatefile[&quot;privatefile.rs&lt;br/&gt;308 lines&quot;]
     n_shred[&quot;shred.rs&lt;br/&gt;415 lines&quot;]
-    n_studio[&quot;studio.rs&lt;br/&gt;654 lines&quot;]
+    n_studio[&quot;studio.rs&lt;br/&gt;877 lines&quot;]
     n_tape[&quot;tape.rs&lt;br/&gt;350 lines&quot;]
     n_vault[&quot;vault.rs&lt;br/&gt;615 lines&quot;]
     n_weave[&quot;weave.rs&lt;br/&gt;1314 lines&quot;]
@@ -247,7 +247,7 @@ flowchart TD
 <tr><td><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a></td><td>1823</td><td>The application lock: an Argon2id password verifier with a rate limit.</td></tr>
 <tr><td><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a></td><td>308</td><td>Writing a file that only its owner can read.</td></tr>
 <tr><td><a href="veilvoice-crypto/shred.html"><code>shred.rs</code></a></td><td>415</td><td>Secure erasure, the self-destruct.</td></tr>
-<tr><td><a href="veilvoice-crypto/studio.html"><code>studio.rs</code></a></td><td>654</td><td>The studio vault: a key that exists only when both locks have been opened.</td></tr>
+<tr><td><a href="veilvoice-crypto/studio.html"><code>studio.rs</code></a></td><td>877</td><td>The studio vault: a key that exists only when both locks have been opened.</td></tr>
 <tr><td><a href="veilvoice-crypto/tape.html"><code>tape.rs</code></a></td><td>350</td><td>A recording held in locked, zeroizing memory while it is still being made.</td></tr>
 <tr><td><a href="veilvoice-crypto/vault.html"><code>vault.rs</code></a></td><td>615</td><td>Where the app lock is kept: two copies, unpredictable names, and a restore.</td></tr>
 <tr><td><a href="veilvoice-crypto/weave.html"><code>weave.rs</code></a></td><td>1314</td><td>Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both.</td></tr>

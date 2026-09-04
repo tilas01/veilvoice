@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/studio.svg" alt="studio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/studio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 654 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 877 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-one-thing-this-adds">The one thing this adds</a>
@@ -80,11 +80,12 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>654 lines defining <strong>18 functions</strong> (9 public), <strong>3 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>877 lines defining <strong>20 functions</strong> (11 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct StudioKey</code> <span style="color:var(--muted)">line 83</span> &middot; A key that exists only while both locks are open.</li>
 <li><code>struct Entry</code> <span style="color:var(--muted)">line 144</span> &middot; One recording in the vault.</li>
 <li><code>struct Studio</code> <span style="color:var(--muted)">line 175</span> &middot; A directory of recordings, sealed under a StudioKey.</li>
+<li><code>struct Shape</code> <span style="color:var(--muted)">line 376</span> &middot; What a decoy vault looks like from outside, so it looks like the real one.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>StudioKey::derive</code> <span style="color:var(--muted)">line 94</span> &middot; Derive the vault key from both secrets.
@@ -106,6 +107,11 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <li><code>Studio::remove</code> <span style="color:var(--muted)">line 269</span> &middot; Remove one recording and its index entry.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>list</code>, <code>safe_id</code>, <code>write_index</code>, <code>parse_index</code>, <code>unseal</code>, <code>render_index</code>, <code>seal</code>, <code>secret_key</code></span>
 </li>
+<li><code>Shape::of</code> <span style="color:var(--muted)">line 385</span> &middot; Measure a real vault, to build decoys that match it.
+</li>
+<li><code>make_decoy</code> <span style="color:var(--muted)">line 428</span> &middot; Fill dir with a vault that never held anything.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>new_id</code></span>
+</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -123,12 +129,13 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <rect x="0" y="0" width="641" height="831" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M340.6 274.0 C 340.6 294.0, 320.5 500.0, 320.5 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <path d="M340.6 274.0 C 340.6 294.0, 305.6 400.0, 305.6 417.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M237.1 374.0 C 237.1 394.0, 566.7 400.0, 566.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M237.1 374.0 C 237.1 394.0, 305.6 400.0, 305.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M106.5 374.0 C 106.5 394.0, 566.7 400.0, 566.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M106.5 374.0 C 106.5 394.0, 305.6 400.0, 305.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M542.5 374.0 C 542.5 394.0, 448.2 400.0, 448.2 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M378.8 547.0 C 634.9 547.0, 634.9 447.0, 615.9 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M466.2 347.0 C 488.2 347.0, 488.2 247.0, 406.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M395.8 374.0 C 395.8 394.0, 566.7 400.0, 566.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M395.8 374.0 C 395.8 394.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M335.7 347.0 C 425.0 347.0, 425.0 247.0, 406.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M265.3 374.0 C 265.3 394.0, 566.7 400.0, 566.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M265.3 374.0 C 265.3 394.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M307.5 647.0 C 329.5 647.0, 329.5 247.0, 255.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M561.8 247.0 C 583.8 247.0, 583.8 247.0, 406.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M495.4 274.0 C 495.4 294.0, 448.2 400.0, 448.2 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
@@ -183,14 +190,14 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <text x="495.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
 </a>
 <a href="studio.src.html#fn-studio-load">
-<rect x="174.7" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="237.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::load</text>
-<text x="237.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<rect x="44.1" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="106.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::load</text>
+<text x="106.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
 </a>
 <a href="studio.src.html#fn-studio-remove">
-<rect x="325.4" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="395.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::remove</text>
-<text x="395.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
+<rect x="194.8" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="265.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::remove</text>
+<text x="265.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
 </a>
 <a href="studio.src.html#fn-studio-write_index">
 <rect x="28.0" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
@@ -227,6 +234,16 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <text x="320.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_index</text>
 <text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 346</text>
 </a>
+<a href="studio.src.html#fn-shape-of">
+<rect x="361.7" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="411.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Shape::of</text>
+<text x="411.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 385</text>
+</a>
+<a href="studio.src.html#fn-make_decoy">
+<rect x="488.2" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="542.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">make_decoy</text>
+<text x="542.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 428</text>
+</a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
 <rect x="20.0" y="720.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
@@ -262,10 +279,13 @@ flowchart TD
     n_safe_id[&quot;safe_id&lt;br/&gt;line 327&quot;]
     n_render_index[&quot;render_index&lt;br/&gt;line 337&quot;]
     n_parse_index[&quot;parse_index&lt;br/&gt;line 346&quot;]
+    n_of([&quot;Shape::of&lt;br/&gt;line 385&quot;])
+    n_make_decoy([&quot;make_decoy&lt;br/&gt;line 428&quot;])
     n_list --&gt; n_parse_index
     n_list --&gt; n_unseal
     n_load --&gt; n_safe_id
     n_load --&gt; n_unseal
+    n_make_decoy --&gt; n_new_id
     n_parse_index --&gt; n_safe_id
     n_remove --&gt; n_list
     n_remove --&gt; n_safe_id
@@ -296,8 +316,10 @@ flowchart TD
     click n_safe_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L327&quot; &quot;open the source&quot;
     click n_render_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L337&quot; &quot;open the source&quot;
     click n_parse_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L346&quot; &quot;open the source&quot;
+    click n_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L385&quot; &quot;open the source&quot;
+    click n_make_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L428&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_remove entry
+    class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_remove,n_of,n_make_decoy entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_list api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -333,6 +355,9 @@ flowchart TD
 <tr><td><code>safe_id</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_id">327</a></td><td>Whether id is one this vault could have produced.</td></tr>
 <tr><td><code>render_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render_index">337</a></td><td>The index, as lines.</td></tr>
 <tr><td><code>parse_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-parse_index">346</a></td><td></td></tr>
+<tr><td><code>Shape</code> <sub>pub struct</sub></td><td><a href="studio.src.html#fn-shape">376</a></td><td>What a decoy vault looks like from outside, so it looks like the real one.</td></tr>
+<tr><td><code>Shape::of</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-shape-of">385</a></td><td>Measure a real vault, to build decoys that match it.</td></tr>
+<tr><td><code>make_decoy</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-make_decoy">428</a></td><td>Fill dir with a vault that never held anything.</td></tr>
 </tbody></table>
 </section>
 </div></div>

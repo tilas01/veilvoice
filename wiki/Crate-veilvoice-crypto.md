@@ -105,7 +105,7 @@ flowchart TD
     n_lock["lock.rs<br/>1823 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
-    n_studio["studio.rs<br/>654 lines"]
+    n_studio["studio.rs<br/>877 lines"]
     n_tape["tape.rs<br/>350 lines"]
     n_vault["vault.rs<br/>615 lines"]
     n_weave["weave.rs<br/>1314 lines"]
@@ -152,7 +152,7 @@ flowchart TD
 | [[`lock.rs`|File-veilvoice-crypto-lock]] | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
-| [[`studio.rs`|File-veilvoice-crypto-studio]] | 654 | The studio vault: a key that exists only when both locks have been opened. |
+| [[`studio.rs`|File-veilvoice-crypto-studio]] | 877 | The studio vault: a key that exists only when both locks have been opened. |
 | [[`tape.rs`|File-veilvoice-crypto-tape]] | 350 | A recording held in locked, zeroizing memory while it is still being made. |
 | [[`vault.rs`|File-veilvoice-crypto-vault]] | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [[`weave.rs`|File-veilvoice-crypto-weave]] | 1314 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
