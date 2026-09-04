@@ -66,11 +66,11 @@
 <span class="ln" id="L15"><span class="tok-com">//!</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! # Never a plaintext file, not even briefly</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
-<span class="ln" id="L18"><span class="tok-com">//! The recording is accumulated in a [`Tape`](veilvoice_crypto::Tape), encoded</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! into a [`Secret`](veilvoice_crypto::Secret), and sealed from there. At no</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! The recording is accumulated in a `Tape`, encoded</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! into a `Secret`, and sealed from there. At no</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! point is there a WAV on disk to be deleted afterwards, because a plaintext</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! file that is written and deleted is exactly what</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! [`veilvoice_crypto::shred`] explains cannot be reliably taken back on flash</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! `veilvoice_crypto::shred` explains cannot be reliably taken back on flash</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! storage. Writing one and encrypting it afterwards would leave the original</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! recoverable and the file merely tidy.</span></span>
 <span class="ln" id="L25"><span class="tok-com">//!</span></span>
