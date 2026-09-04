@@ -367,6 +367,100 @@ fn parse_index(text: &str) -> Result<Vec<Entry>, Error> {
     Ok(out)
 }
 
+/// What a decoy vault looks like from outside, so it looks like the real one.
+///
+/// Taken from a real vault rather than invented, because the whole value of a
+/// decoy is that the two cannot be told apart by looking. A decoy built to a
+/// guessed shape is a decoy that stands out.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Shape {
+    /// How many recordings the vault appears to hold.
+    pub recordings: usize,
+    /// Bytes in each, before sealing.
+    pub each: usize,
+}
+
+impl Shape {
+    /// Measure a real vault, to build decoys that match it.
+    pub fn of(studio: &Studio) -> Result<Self, Error> {
+        let entries = studio.list()?;
+        let total: usize = entries.iter().map(|e| e.bytes).sum();
+        Ok(Self {
+            recordings: entries.len(),
+            // The mean, so a decoy is the same size overall. Matching every
+            // individual length would copy the real vault's fingerprint into
+            // the decoy, which is the opposite of what a decoy is for.
+            each: if entries.is_empty() {
+                0
+            } else {
+                total / entries.len()
+            },
+        })
+    }
+}
+
+/// Fill `dir` with a vault that never held anything.
+///
+/// # What a decoy is, and what it deliberately is not
+///
+/// It is **not** a vault with weak contents, or a vault whose passphrase is
+/// written down somewhere, or a vault holding harmless recordings. Any of those
+/// is a vault that rewards cracking, and a decoy that rewards cracking teaches
+/// an attacker that cracking works.
+///
+/// It is a vault whose contents never existed. The files are random bytes
+/// sealed under a key generated here and dropped before this function returns,
+/// so nobody holds it: not the person who made the decoy, not this code, not
+/// anybody who takes the disk. Opened by brute force, it yields bytes that
+/// parse as nothing, because there is nothing under them to find.
+///
+/// # What it buys, stated plainly
+///
+/// It raises the cost of a search. Somebody who takes a disk and finds nine
+/// vaults must attack all nine to learn which one matters, and eight of them
+/// cannot be finished at any price.
+///
+/// It does **not** make the real vault unfindable to somebody who watches you
+/// open it, reads this process's memory, or has any other way to see which
+/// directory you actually use. Decoys are cover against a search of the disk,
+/// not against being observed, and anybody relying on them should know which of
+/// those they are facing.
+pub fn make_decoy(dir: impl AsRef<std::path::Path>, shape: Shape) -> Result<(), Error> {
+    let dir = dir.as_ref();
+    std::fs::create_dir_all(dir).map_err(|_| Error::AppLockStore)?;
+
+    // Generated, used, and never returned. Dropping it is the point: a key
+    // nobody holds is a key nobody can be made to give up.
+    let key = StudioKey(Secret::random(KEY_LEN)?);
+    let decoy = Studio {
+        dir: dir.to_path_buf(),
+        key,
+    };
+
+    let mut entries = Vec::with_capacity(shape.recordings);
+    for _ in 0..shape.recordings {
+        let id = new_id()?;
+        // Random bytes rather than silence or a tone. A decoy full of zeroes
+        // compresses differently from a real recording, and a stored size that
+        // does not match its entropy is exactly the tell this exists to avoid.
+        let mut filler = vec![0u8; shape.each];
+        getrandom::getrandom(&mut filler).map_err(|_| Error::Random)?;
+        let sealed = decoy.seal(&filler, id.as_bytes())?;
+        crate::privatefile::write_owner_only(&dir.join(&id), &sealed)
+            .map_err(|_| Error::AppLockStore)?;
+        entries.push(Entry {
+            id,
+            // A name nobody will ever read, because nobody can open the index.
+            // Still generated rather than left blank so the index is the same
+            // shape as a real one.
+            name: String::new(),
+            made: 0,
+            bytes: shape.each,
+        });
+    }
+    decoy.write_index(&entries)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -642,6 +736,135 @@ mod tests {
             assert!(seen.insert(e.id), "an identifier repeated");
         }
         assert_eq!(studio.list().unwrap().len(), 25);
+    }
+
+    #[test]
+    fn a_decoy_looks_like_the_real_thing_from_outside() {
+        // The whole value of a decoy is that the two cannot be told apart by
+        // looking at the directory, so that is what this checks: the same
+        // number of files, the same shape of names, an index present in both.
+        let real_dir = tempfile::tempdir().unwrap();
+        let real = a_studio(real_dir.path());
+        for i in 0..4 {
+            real.store(&format!("take {i}"), 100 + i, &vec![9u8; 2048])
+                .unwrap();
+        }
+        let shape = Shape::of(&real).unwrap();
+        assert_eq!(shape.recordings, 4);
+        assert_eq!(shape.each, 2048);
+
+        let decoy_dir = tempfile::tempdir().unwrap();
+        make_decoy(decoy_dir.path(), shape).unwrap();
+
+        let names = |d: &std::path::Path| {
+            let mut v: Vec<String> = std::fs::read_dir(d)
+                .unwrap()
+                .map(|e| e.unwrap().file_name().to_string_lossy().to_string())
+                .collect();
+            v.sort();
+            v
+        };
+        let r = names(real_dir.path());
+        let d = names(decoy_dir.path());
+        assert_eq!(
+            r.len(),
+            d.len(),
+            "a different number of files gives it away"
+        );
+        assert!(d.contains(&INDEX.to_string()), "a decoy has an index too");
+        for name in &d {
+            assert!(
+                name == INDEX || safe_id(name),
+                "{name:?} is not shaped like a real identifier"
+            );
+        }
+    }
+
+    #[test]
+    fn a_decoy_holds_nothing_and_nobody_can_open_it() {
+        // Not a vault with weak contents: a vault whose contents never existed.
+        // The key is generated inside `make_decoy` and dropped before it
+        // returns, so there is no key to find, to leak, or to be compelled to
+        // hand over.
+        let dir = tempfile::tempdir().unwrap();
+        make_decoy(
+            dir.path(),
+            Shape {
+                recordings: 3,
+                each: 512,
+            },
+        )
+        .unwrap();
+
+        // The real vault's key opens none of it, and neither does any other.
+        for (app, rest) in [(&b"app-lock"[..], &b"at-rest"[..]), (&b"x"[..], &b"y"[..])] {
+            let key = StudioKey::derive(&secret(app), &secret(rest)).unwrap();
+            let attempt = Studio::open(dir.path(), key).unwrap();
+            assert!(attempt.list().is_err(), "a decoy index opened");
+        }
+    }
+
+    #[test]
+    fn a_decoy_is_not_full_of_zeroes() {
+        // A decoy of silence compresses differently from a real recording, and
+        // a file whose size does not match its entropy is the exact tell this
+        // is meant to avoid.
+        let dir = tempfile::tempdir().unwrap();
+        make_decoy(
+            dir.path(),
+            Shape {
+                recordings: 1,
+                each: 4096,
+            },
+        )
+        .unwrap();
+        for file in std::fs::read_dir(dir.path()).unwrap() {
+            let bytes = std::fs::read(file.unwrap().path()).unwrap();
+            let zeroes = bytes.iter().filter(|&&b| b == 0).count();
+            assert!(
+                zeroes * 4 < bytes.len(),
+                "a decoy file is mostly zeroes, which is a tell"
+            );
+        }
+    }
+
+    #[test]
+    fn decoys_differ_from_each_other() {
+        // Identical decoys are one decoy copied, and an attacker who notices
+        // that has learned they are all fake.
+        let a = tempfile::tempdir().unwrap();
+        let b = tempfile::tempdir().unwrap();
+        let shape = Shape {
+            recordings: 2,
+            each: 1024,
+        };
+        make_decoy(a.path(), shape).unwrap();
+        make_decoy(b.path(), shape).unwrap();
+
+        let read_all = |d: &std::path::Path| {
+            let mut v: Vec<Vec<u8>> = std::fs::read_dir(d)
+                .unwrap()
+                .map(|e| std::fs::read(e.unwrap().path()).unwrap())
+                .collect();
+            v.sort();
+            v
+        };
+        assert_ne!(read_all(a.path()), read_all(b.path()));
+    }
+
+    #[test]
+    fn the_shape_of_an_empty_vault_does_not_divide_by_zero() {
+        let dir = tempfile::tempdir().unwrap();
+        let studio = a_studio(dir.path());
+        let shape = Shape::of(&studio).unwrap();
+        assert_eq!(shape.recordings, 0);
+        assert_eq!(shape.each, 0);
+
+        // And a decoy of that shape is an empty vault, which is still a
+        // believable thing for somebody to have.
+        let decoy = tempfile::tempdir().unwrap();
+        make_decoy(decoy.path(), shape).unwrap();
+        assert!(decoy.path().join(INDEX).exists());
     }
 
     #[test]

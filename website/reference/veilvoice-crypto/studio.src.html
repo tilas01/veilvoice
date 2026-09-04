@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/studio.rs</code></h1>
-<p style="color:var(--muted)"><a href="studio.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 654 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="studio.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 877 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -468,291 +468,520 @@
 <span class="ln" id="L368">}</span>
 </span>
 <span class="ln" id="L369"></span>
-<span class="ln" id="L370"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L371"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L372">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L373"></span>
-<span class="ln" id="L374">    <span class="tok-kw">fn</span> <span class="tok-fn">secret</span>(bytes: &amp;[u8]) -&gt; Secret {</span>
-<span class="ln" id="L375">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> copy = bytes.<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L376">        Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> copy)</span>
-<span class="ln" id="L377">    }</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L380">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_pair_always_gives_the_same_key</span>() {</span>
-<span class="ln" id="L381">        <span class="tok-kw">let</span> a = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L382">        <span class="tok-kw">let</span> b = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L383">        assert_eq!(a.<span class="tok-fn">expose</span>(), b.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L384">        assert_eq!(a.<span class="tok-fn">expose</span>().<span class="tok-fn">len</span>(), KEY_LEN);</span>
-<span class="ln" id="L385">    }</span>
-<span class="ln" id="L386"></span>
-<span class="ln" id="L387">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L388">    <span class="tok-kw">fn</span> <span class="tok-fn">neither_secret_alone_produces_the_vault_key</span>() {</span>
-<span class="ln" id="L389">        <span class="tok-com">// The whole point of the type. Holding one half and an empty other half</span></span>
-<span class="ln" id="L390">        <span class="tok-com">// must not derive anything, let alone the real key.</span></span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> real = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L392"></span>
-<span class="ln" id="L393">        assert!(matches!(</span>
-<span class="ln" id="L394">            StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>)),</span>
-<span class="ln" id="L395">            <span class="tok-fn">Err</span>(Error::StudioNeedsBoth)</span>
-<span class="ln" id="L396">        ));</span>
-<span class="ln" id="L397">        assert!(matches!(</span>
-<span class="ln" id="L398">            StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)),</span>
-<span class="ln" id="L399">            <span class="tok-fn">Err</span>(Error::StudioNeedsBoth)</span>
-<span class="ln" id="L400">        ));</span>
-<span class="ln" id="L401">        assert!(matches!(</span>
-<span class="ln" id="L402">            StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>)),</span>
-<span class="ln" id="L403">            <span class="tok-fn">Err</span>(Error::StudioNeedsBoth)</span>
-<span class="ln" id="L404">        ));</span>
-<span class="ln" id="L405"></span>
-<span class="ln" id="L406">        <span class="tok-com">// And a wrong half gives a key unrelated to the right one, rather than</span></span>
-<span class="ln" id="L407">        <span class="tok-com">// something close to it.</span></span>
-<span class="ln" id="L408">        <span class="tok-kw">let</span> wrong_app = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;WRONG&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L409">        <span class="tok-kw">let</span> wrong_rest = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;WRONG&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L410">        assert_ne!(real.<span class="tok-fn">expose</span>(), wrong_app.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L411">        assert_ne!(real.<span class="tok-fn">expose</span>(), wrong_rest.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L412">        assert_ne!(wrong_app.<span class="tok-fn">expose</span>(), wrong_rest.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L413">    }</span>
-<span class="ln" id="L414"></span>
-<span class="ln" id="L415">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L416">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_either_half_by_one_bit_changes_the_key</span>() {</span>
-<span class="ln" id="L417">        <span class="tok-kw">let</span> base = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;aaaaaaaa&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bbbbbbbb&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L418">        <span class="tok-kw">let</span> first = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;aaaaaaab&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bbbbbbbb&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L419">        <span class="tok-kw">let</span> second = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;aaaaaaaa&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bbbbbbbc&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L420">        assert_ne!(base.<span class="tok-fn">expose</span>(), first.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L421">        assert_ne!(base.<span class="tok-fn">expose</span>(), second.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L422">    }</span>
-<span class="ln" id="L423"></span>
-<span class="ln" id="L424">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L425">    <span class="tok-kw">fn</span> <span class="tok-fn">where_the_split_falls_is_part_of_the_key</span>() {</span>
-<span class="ln" id="L426">        <span class="tok-com">// Without the length in the info, these two pairs concatenate to the</span></span>
-<span class="ln" id="L427">        <span class="tok-com">// same bytes and would derive the same vault key. That is a collision</span></span>
-<span class="ln" id="L428">        <span class="tok-com">// an attacker picks rather than stumbles on: it would let a vault built</span></span>
-<span class="ln" id="L429">        <span class="tok-com">// from one pair be opened by another.</span></span>
-<span class="ln" id="L430">        <span class="tok-kw">let</span> a = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;ab&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;c&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L431">        <span class="tok-kw">let</span> b = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;a&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bc&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L432">        assert_ne!(</span>
-<span class="ln" id="L433">            a.<span class="tok-fn">expose</span>(),</span>
-<span class="ln" id="L434">            b.<span class="tok-fn">expose</span>(),</span>
-<span class="ln" id="L435">            <span class="tok-str">&quot;the split point is not bound into the key&quot;</span></span>
-<span class="ln" id="L436">        );</span>
-<span class="ln" id="L437">    }</span>
-<span class="ln" id="L438"></span>
-<span class="ln" id="L439">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L440">    <span class="tok-kw">fn</span> <span class="tok-fn">swapping_the_two_halves_is_a_different_vault</span>() {</span>
-<span class="ln" id="L441">        <span class="tok-kw">let</span> forward = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;one&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;two&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L442">        <span class="tok-kw">let</span> backward = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;two&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;one&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L443">        assert_ne!(forward.<span class="tok-fn">expose</span>(), backward.<span class="tok-fn">expose</span>());</span>
-<span class="ln" id="L444">    }</span>
-<span class="ln" id="L445"></span>
-<span class="ln" id="L446">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L447">    <span class="tok-kw">fn</span> <span class="tok-fn">the_key_is_key_shaped_rather_than_a_copy_of_its_inputs</span>() {</span>
-<span class="ln" id="L448">        <span class="tok-com">// A construction that returned one of its inputs, or their</span></span>
-<span class="ln" id="L449">        <span class="tok-com">// concatenation, would pass every equality test above while providing</span></span>
-<span class="ln" id="L450">        <span class="tok-com">// no mixing at all.</span></span>
-<span class="ln" id="L451">        <span class="tok-kw">let</span> app = b<span class="tok-str">&quot;app-lock-key-material&quot;</span>;</span>
-<span class="ln" id="L452">        <span class="tok-kw">let</span> rest = b<span class="tok-str">&quot;at-rest-key-material&quot;</span>;</span>
-<span class="ln" id="L453">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(app), &amp;<span class="tok-fn">secret</span>(rest)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L454">        assert_ne!(key.<span class="tok-fn">expose</span>(), &amp;app[..]);</span>
-<span class="ln" id="L455">        assert_ne!(key.<span class="tok-fn">expose</span>(), &amp;rest[..]);</span>
-<span class="ln" id="L456">        <span class="tok-kw">let</span> joined: Vec&lt;u8&gt; = app.<span class="tok-fn">iter</span>().<span class="tok-fn">chain</span>(rest.<span class="tok-fn">iter</span>()).<span class="tok-fn">copied</span>().<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L457">        assert_ne!(key.<span class="tok-fn">expose</span>(), &amp;joined[..]);</span>
-<span class="ln" id="L458">        assert!(</span>
-<span class="ln" id="L459">            !joined.<span class="tok-fn">windows</span>(KEY_LEN).<span class="tok-fn">any</span>(|w| w == key.<span class="tok-fn">expose</span>()),</span>
-<span class="ln" id="L460">            <span class="tok-str">&quot;the key appears verbatim inside its own inputs&quot;</span></span>
-<span class="ln" id="L461">        );</span>
-<span class="ln" id="L462">    }</span>
+<span class="src-item" id="fn-shape">
+<span class="ln" id="L370"><span class="tok-com">/// What a decoy vault looks like from outside, so it looks like the real one.</span></span>
+<span class="ln" id="L371"><span class="tok-com">///</span></span>
+<span class="ln" id="L372"><span class="tok-com">/// Taken from a real vault rather than invented, because the whole value of a</span></span>
+<span class="ln" id="L373"><span class="tok-com">/// decoy is that the two cannot be told apart by looking. A decoy built to a</span></span>
+<span class="ln" id="L374"><span class="tok-com">/// guessed shape is a decoy that stands out.</span></span>
+<span class="ln" id="L375"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L376"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Shape {</span>
+<span class="ln" id="L377">    <span class="tok-com">/// How many recordings the vault appears to hold.</span></span>
+<span class="ln" id="L378">    <span class="tok-kw">pub</span> recordings: usize,</span>
+<span class="ln" id="L379">    <span class="tok-com">/// Bytes in each, before sealing.</span></span>
+<span class="ln" id="L380">    <span class="tok-kw">pub</span> each: usize,</span>
+<span class="ln" id="L381">}</span>
+</span>
+<span class="ln" id="L382"></span>
+<span class="ln" id="L383"><span class="tok-kw">impl</span> Shape {</span>
+<span class="src-item" id="fn-shape-of">
+<span class="ln" id="L384">    <span class="tok-com">/// Measure a real vault, to build decoys that match it.</span></span>
+<span class="ln" id="L385">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">of</span>(studio: &amp;Studio) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L386">        <span class="tok-kw">let</span> entries = studio.<span class="tok-fn">list</span>()?;</span>
+<span class="ln" id="L387">        <span class="tok-kw">let</span> total: usize = entries.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|e| e.bytes).<span class="tok-fn">sum</span>();</span>
+<span class="ln" id="L388">        <span class="tok-fn">Ok</span>(Self {</span>
+<span class="ln" id="L389">            recordings: entries.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L390">            <span class="tok-com">// The mean, so a decoy is the same size overall. Matching every</span></span>
+<span class="ln" id="L391">            <span class="tok-com">// individual length would copy the real vault&#x27;s fingerprint into</span></span>
+<span class="ln" id="L392">            <span class="tok-com">// the decoy, which is the opposite of what a decoy is for.</span></span>
+<span class="ln" id="L393">            each: <span class="tok-kw">if</span> entries.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L394">                <span class="tok-num">0</span></span>
+<span class="ln" id="L395">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L396">                total / entries.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L397">            },</span>
+<span class="ln" id="L398">        })</span>
+<span class="ln" id="L399">    }</span>
+</span>
+<span class="ln" id="L400">}</span>
+<span class="ln" id="L401"></span>
+<span class="src-item" id="fn-make_decoy">
+<span class="ln" id="L402"><span class="tok-com">/// Fill `dir` with a vault that never held anything.</span></span>
+<span class="ln" id="L403"><span class="tok-com">///</span></span>
+<span class="ln" id="L404"><span class="tok-com">/// # What a decoy is, and what it deliberately is not</span></span>
+<span class="ln" id="L405"><span class="tok-com">///</span></span>
+<span class="ln" id="L406"><span class="tok-com">/// It is **not** a vault with weak contents, or a vault whose passphrase is</span></span>
+<span class="ln" id="L407"><span class="tok-com">/// written down somewhere, or a vault holding harmless recordings. Any of those</span></span>
+<span class="ln" id="L408"><span class="tok-com">/// is a vault that rewards cracking, and a decoy that rewards cracking teaches</span></span>
+<span class="ln" id="L409"><span class="tok-com">/// an attacker that cracking works.</span></span>
+<span class="ln" id="L410"><span class="tok-com">///</span></span>
+<span class="ln" id="L411"><span class="tok-com">/// It is a vault whose contents never existed. The files are random bytes</span></span>
+<span class="ln" id="L412"><span class="tok-com">/// sealed under a key generated here and dropped before this function returns,</span></span>
+<span class="ln" id="L413"><span class="tok-com">/// so nobody holds it: not the person who made the decoy, not this code, not</span></span>
+<span class="ln" id="L414"><span class="tok-com">/// anybody who takes the disk. Opened by brute force, it yields bytes that</span></span>
+<span class="ln" id="L415"><span class="tok-com">/// parse as nothing, because there is nothing under them to find.</span></span>
+<span class="ln" id="L416"><span class="tok-com">///</span></span>
+<span class="ln" id="L417"><span class="tok-com">/// # What it buys, stated plainly</span></span>
+<span class="ln" id="L418"><span class="tok-com">///</span></span>
+<span class="ln" id="L419"><span class="tok-com">/// It raises the cost of a search. Somebody who takes a disk and finds nine</span></span>
+<span class="ln" id="L420"><span class="tok-com">/// vaults must attack all nine to learn which one matters, and eight of them</span></span>
+<span class="ln" id="L421"><span class="tok-com">/// cannot be finished at any price.</span></span>
+<span class="ln" id="L422"><span class="tok-com">///</span></span>
+<span class="ln" id="L423"><span class="tok-com">/// It does **not** make the real vault unfindable to somebody who watches you</span></span>
+<span class="ln" id="L424"><span class="tok-com">/// open it, reads this process&#x27;s memory, or has any other way to see which</span></span>
+<span class="ln" id="L425"><span class="tok-com">/// directory you actually use. Decoys are cover against a search of the disk,</span></span>
+<span class="ln" id="L426"><span class="tok-com">/// not against being observed, and anybody relying on them should know which of</span></span>
+<span class="ln" id="L427"><span class="tok-com">/// those they are facing.</span></span>
+<span class="ln" id="L428"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">make_decoy</span>(dir: <span class="tok-kw">impl</span> AsRef&lt;std::path::Path&gt;, shape: Shape) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L429">    <span class="tok-kw">let</span> dir = dir.<span class="tok-fn">as_ref</span>();</span>
+<span class="ln" id="L430">    std::fs::<span class="tok-fn">create_dir_all</span>(dir).<span class="tok-fn">map_err</span>(|_| Error::AppLockStore)?;</span>
+<span class="ln" id="L431"></span>
+<span class="ln" id="L432">    <span class="tok-com">// Generated, used, and never returned. Dropping it is the point: a key</span></span>
+<span class="ln" id="L433">    <span class="tok-com">// nobody holds is a key nobody can be made to give up.</span></span>
+<span class="ln" id="L434">    <span class="tok-kw">let</span> key = <span class="tok-fn">StudioKey</span>(Secret::<span class="tok-fn">random</span>(KEY_LEN)?);</span>
+<span class="ln" id="L435">    <span class="tok-kw">let</span> decoy = Studio {</span>
+<span class="ln" id="L436">        dir: dir.<span class="tok-fn">to_path_buf</span>(),</span>
+<span class="ln" id="L437">        key,</span>
+<span class="ln" id="L438">    };</span>
+<span class="ln" id="L439"></span>
+<span class="ln" id="L440">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> entries = Vec::<span class="tok-fn">with_capacity</span>(shape.recordings);</span>
+<span class="ln" id="L441">    <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..shape.recordings {</span>
+<span class="ln" id="L442">        <span class="tok-kw">let</span> id = <span class="tok-fn">new_id</span>()?;</span>
+<span class="ln" id="L443">        <span class="tok-com">// Random bytes rather than silence or a tone. A decoy full of zeroes</span></span>
+<span class="ln" id="L444">        <span class="tok-com">// compresses differently from a real recording, and a stored size that</span></span>
+<span class="ln" id="L445">        <span class="tok-com">// does not match its entropy is exactly the tell this exists to avoid.</span></span>
+<span class="ln" id="L446">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> filler = vec![0u8; shape.each];</span>
+<span class="ln" id="L447">        getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> filler).<span class="tok-fn">map_err</span>(|_| Error::Random)?;</span>
+<span class="ln" id="L448">        <span class="tok-kw">let</span> sealed = decoy.<span class="tok-fn">seal</span>(&amp;filler, id.<span class="tok-fn">as_bytes</span>())?;</span>
+<span class="ln" id="L449">        <span class="tok-kw">crate</span>::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;dir.<span class="tok-fn">join</span>(&amp;id), &amp;sealed)</span>
+<span class="ln" id="L450">            .<span class="tok-fn">map_err</span>(|_| Error::AppLockStore)?;</span>
+<span class="ln" id="L451">        entries.<span class="tok-fn">push</span>(Entry {</span>
+<span class="ln" id="L452">            id,</span>
+<span class="ln" id="L453">            <span class="tok-com">// A name nobody will ever read, because nobody can open the index.</span></span>
+<span class="ln" id="L454">            <span class="tok-com">// Still generated rather than left blank so the index is the same</span></span>
+<span class="ln" id="L455">            <span class="tok-com">// shape as a real one.</span></span>
+<span class="ln" id="L456">            name: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L457">            made: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L458">            bytes: shape.each,</span>
+<span class="ln" id="L459">        });</span>
+<span class="ln" id="L460">    }</span>
+<span class="ln" id="L461">    decoy.<span class="tok-fn">write_index</span>(&amp;entries)</span>
+<span class="ln" id="L462">}</span>
+</span>
 <span class="ln" id="L463"></span>
-<span class="ln" id="L464">    <span class="tok-kw">fn</span> <span class="tok-fn">a_studio</span>(dir: &amp;std::path::Path) -&gt; Studio {</span>
-<span class="ln" id="L465">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L466">        Studio::<span class="tok-fn">open</span>(dir, key).<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L467">    }</span>
-<span class="ln" id="L468"></span>
-<span class="ln" id="L469">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L470">    <span class="tok-kw">fn</span> <span class="tok-fn">a_recording_stored_comes_back_byte_for_byte</span>() {</span>
-<span class="ln" id="L471">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L472">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L473">        assert!(</span>
-<span class="ln" id="L474">            studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L475">            <span class="tok-str">&quot;a new vault holds nothing&quot;</span></span>
-<span class="ln" id="L476">        );</span>
-<span class="ln" id="L477"></span>
-<span class="ln" id="L478">        <span class="tok-kw">let</span> audio = vec![7u8; <span class="tok-num">5000</span>];</span>
-<span class="ln" id="L479">        <span class="tok-kw">let</span> entry = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;interview&quot;</span>, <span class="tok-num">1_767_225_600</span>, &amp;audio).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L464"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L465"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L466">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L467"></span>
+<span class="ln" id="L468">    <span class="tok-kw">fn</span> <span class="tok-fn">secret</span>(bytes: &amp;[u8]) -&gt; Secret {</span>
+<span class="ln" id="L469">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> copy = bytes.<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L470">        Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> copy)</span>
+<span class="ln" id="L471">    }</span>
+<span class="ln" id="L472"></span>
+<span class="ln" id="L473">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L474">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_pair_always_gives_the_same_key</span>() {</span>
+<span class="ln" id="L475">        <span class="tok-kw">let</span> a = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L476">        <span class="tok-kw">let</span> b = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L477">        assert_eq!(a.<span class="tok-fn">expose</span>(), b.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L478">        assert_eq!(a.<span class="tok-fn">expose</span>().<span class="tok-fn">len</span>(), KEY_LEN);</span>
+<span class="ln" id="L479">    }</span>
 <span class="ln" id="L480"></span>
-<span class="ln" id="L481">        <span class="tok-kw">let</span> listed = studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L482">        assert_eq!(listed.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L483">        assert_eq!(listed[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;interview&quot;</span>);</span>
-<span class="ln" id="L484">        assert_eq!(listed[<span class="tok-num">0</span>].made, <span class="tok-num">1_767_225_600</span>);</span>
-<span class="ln" id="L485">        assert_eq!(listed[<span class="tok-num">0</span>].bytes, audio.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L481">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L482">    <span class="tok-kw">fn</span> <span class="tok-fn">neither_secret_alone_produces_the_vault_key</span>() {</span>
+<span class="ln" id="L483">        <span class="tok-com">// The whole point of the type. Holding one half and an empty other half</span></span>
+<span class="ln" id="L484">        <span class="tok-com">// must not derive anything, let alone the real key.</span></span>
+<span class="ln" id="L485">        <span class="tok-kw">let</span> real = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L486"></span>
-<span class="ln" id="L487">        <span class="tok-kw">let</span> back = studio.<span class="tok-fn">load</span>(&amp;entry.id).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L488">        assert_eq!(back.<span class="tok-fn">expose</span>(), &amp;audio[..]);</span>
-<span class="ln" id="L489">    }</span>
-<span class="ln" id="L490"></span>
-<span class="ln" id="L491">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L492">    <span class="tok-kw">fn</span> <span class="tok-fn">the_other_key_opens_nothing_in_this_vault</span>() {</span>
-<span class="ln" id="L493">        <span class="tok-com">// The whole promise. A vault written with one pair of secrets must be</span></span>
-<span class="ln" id="L494">        <span class="tok-com">// opaque to any other pair, including one sharing a half.</span></span>
-<span class="ln" id="L495">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L496">        <span class="tok-kw">let</span> entry = {</span>
-<span class="ln" id="L497">            <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L498">            studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;private&quot;</span>, <span class="tok-num">1</span>, &amp;[3u8; <span class="tok-num">128</span>]).<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L499">        };</span>
-<span class="ln" id="L500"></span>
-<span class="ln" id="L501">        <span class="tok-kw">for</span> (app, rest) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L502">            (&amp;b<span class="tok-str">&quot;app-lock&quot;</span>[..], &amp;b<span class="tok-str">&quot;WRONG&quot;</span>[..]),</span>
-<span class="ln" id="L503">            (&amp;b<span class="tok-str">&quot;WRONG&quot;</span>[..], &amp;b<span class="tok-str">&quot;at-rest&quot;</span>[..]),</span>
-<span class="ln" id="L504">            (&amp;b<span class="tok-str">&quot;WRONG&quot;</span>[..], &amp;b<span class="tok-str">&quot;ALSO-WRONG&quot;</span>[..]),</span>
-<span class="ln" id="L505">        ] {</span>
-<span class="ln" id="L506">            <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(app), &amp;<span class="tok-fn">secret</span>(rest)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L507">            <span class="tok-kw">let</span> other = Studio::<span class="tok-fn">open</span>(tmp.<span class="tok-fn">path</span>(), key).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L508">            assert!(other.<span class="tok-fn">list</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;the index opened with the wrong key&quot;</span>);</span>
-<span class="ln" id="L509">            assert!(other.<span class="tok-fn">load</span>(&amp;entry.id).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;a recording opened&quot;</span>);</span>
-<span class="ln" id="L510">        }</span>
-<span class="ln" id="L511">    }</span>
-<span class="ln" id="L512"></span>
-<span class="ln" id="L513">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L514">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_readable_is_left_on_disk</span>() {</span>
-<span class="ln" id="L515">        <span class="tok-com">// The audio must not be findable by reading the vault directory, and</span></span>
-<span class="ln" id="L516">        <span class="tok-com">// neither must the name: both are what the vault is for.</span></span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L519">        <span class="tok-kw">let</span> audio: Vec&lt;u8&gt; = (<span class="tok-num">0</span>..<span class="tok-num">4096</span>).<span class="tok-fn">map</span>(|i| (i % <span class="tok-num">251</span>) <span class="tok-kw">as</span> u8).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L520">        studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;meeting with the lawyer&quot;</span>, <span class="tok-num">1</span>, &amp;audio).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L521"></span>
-<span class="ln" id="L522">        <span class="tok-kw">for</span> file <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(tmp.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
-<span class="ln" id="L523">            <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(file.<span class="tok-fn">unwrap</span>().<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L524">            assert!(</span>
-<span class="ln" id="L525">                !bytes</span>
-<span class="ln" id="L526">                    .<span class="tok-fn">windows</span>(audio.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">64</span>))</span>
-<span class="ln" id="L527">                    .<span class="tok-fn">any</span>(|w| w == &amp;audio[..<span class="tok-num">64</span>]),</span>
-<span class="ln" id="L528">                <span class="tok-str">&quot;the audio is on disk in the clear&quot;</span></span>
-<span class="ln" id="L529">            );</span>
-<span class="ln" id="L530">            assert!(</span>
-<span class="ln" id="L531">                !bytes.<span class="tok-fn">windows</span>(<span class="tok-num">6</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;lawyer&quot;</span>),</span>
-<span class="ln" id="L532">                <span class="tok-str">&quot;the name is on disk in the clear&quot;</span></span>
-<span class="ln" id="L533">            );</span>
-<span class="ln" id="L534">        }</span>
-<span class="ln" id="L535">    }</span>
-<span class="ln" id="L536"></span>
-<span class="ln" id="L537">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L538">    <span class="tok-kw">fn</span> <span class="tok-fn">a_recording_cannot_be_moved_to_another_identity_and_still_open</span>() {</span>
-<span class="ln" id="L539">        <span class="tok-com">// Each file is sealed with its own id as authenticated data, so</span></span>
-<span class="ln" id="L540">        <span class="tok-com">// swapping two files inside a vault, which somebody with the directory</span></span>
-<span class="ln" id="L541">        <span class="tok-com">// can do without the key, is detected rather than silently serving the</span></span>
-<span class="ln" id="L542">        <span class="tok-com">// wrong recording under the wrong name.</span></span>
-<span class="ln" id="L543">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L544">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L545">        <span class="tok-kw">let</span> first = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;one&quot;</span>, <span class="tok-num">1</span>, b<span class="tok-str">&quot;first recording&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L546">        <span class="tok-kw">let</span> second = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;two&quot;</span>, <span class="tok-num">2</span>, b<span class="tok-str">&quot;second recording&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L547"></span>
-<span class="ln" id="L548">        <span class="tok-kw">let</span> a = tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(&amp;first.id);</span>
-<span class="ln" id="L549">        <span class="tok-kw">let</span> b = tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(&amp;second.id);</span>
-<span class="ln" id="L550">        <span class="tok-kw">let</span> swap = tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;swap&quot;</span>);</span>
-<span class="ln" id="L551">        std::fs::<span class="tok-fn">rename</span>(&amp;a, &amp;swap).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L552">        std::fs::<span class="tok-fn">rename</span>(&amp;b, &amp;a).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L553">        std::fs::<span class="tok-fn">rename</span>(&amp;swap, &amp;b).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L554"></span>
-<span class="ln" id="L555">        assert!(</span>
-<span class="ln" id="L556">            studio.<span class="tok-fn">load</span>(&amp;first.id).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L557">            <span class="tok-str">&quot;a swapped file still opened&quot;</span></span>
-<span class="ln" id="L558">        );</span>
-<span class="ln" id="L559">        assert!(studio.<span class="tok-fn">load</span>(&amp;second.id).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L560">    }</span>
-<span class="ln" id="L561"></span>
-<span class="ln" id="L562">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L563">    <span class="tok-kw">fn</span> <span class="tok-fn">an_identifier_out_of_an_index_cannot_walk_out_of_the_vault</span>() {</span>
-<span class="ln" id="L564">        <span class="tok-com">// The index is a file. Somebody who can write it can put anything in</span></span>
-<span class="ln" id="L565">        <span class="tok-com">// the id column, and that value reaches a path, so it is checked.</span></span>
-<span class="ln" id="L566">        assert!(<span class="tok-fn">safe_id</span>(<span class="tok-str">&quot;abcdefgh2345&quot;</span>));</span>
-<span class="ln" id="L567">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L568">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L569">            <span class="tok-str">&quot;../../.bashrc&quot;</span>,</span>
-<span class="ln" id="L570">            <span class="tok-str">&quot;..&quot;</span>,</span>
-<span class="ln" id="L571">            <span class="tok-str">&quot;a/b&quot;</span>,</span>
-<span class="ln" id="L572">            <span class="tok-str">&quot;a\\b&quot;</span>,</span>
-<span class="ln" id="L573">            <span class="tok-str">&quot;ABC&quot;</span>,</span>
-<span class="ln" id="L574">            <span class="tok-str">&quot;with space&quot;</span>,</span>
-<span class="ln" id="L575">            <span class="tok-str">&quot;with.dot&quot;</span>,</span>
-<span class="ln" id="L576">        ] {</span>
-<span class="ln" id="L577">            assert!(!<span class="tok-fn">safe_id</span>(bad), <span class="tok-str">&quot;{bad:?} was accepted as an identifier&quot;</span>);</span>
-<span class="ln" id="L578">        }</span>
-<span class="ln" id="L579"></span>
-<span class="ln" id="L580">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L582">        assert!(studio.<span class="tok-fn">load</span>(<span class="tok-str">&quot;../../.bashrc&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L583">        assert!(studio.<span class="tok-fn">remove</span>(<span class="tok-str">&quot;../../.bashrc&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L584">    }</span>
-<span class="ln" id="L585"></span>
-<span class="ln" id="L586">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L587">    <span class="tok-kw">fn</span> <span class="tok-fn">removing_one_leaves_the_others_openable</span>() {</span>
-<span class="ln" id="L588">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L589">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L590">        <span class="tok-kw">let</span> a = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;a&quot;</span>, <span class="tok-num">1</span>, b<span class="tok-str">&quot;aaaa&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L591">        <span class="tok-kw">let</span> b = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;b&quot;</span>, <span class="tok-num">2</span>, b<span class="tok-str">&quot;bbbb&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L592"></span>
-<span class="ln" id="L593">        studio.<span class="tok-fn">remove</span>(&amp;a.id).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L594">        <span class="tok-kw">let</span> left = studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L595">        assert_eq!(left.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L596">        assert_eq!(left[<span class="tok-num">0</span>].id, b.id);</span>
-<span class="ln" id="L597">        assert_eq!(studio.<span class="tok-fn">load</span>(&amp;b.id).<span class="tok-fn">unwrap</span>().<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;bbbb&quot;</span>);</span>
-<span class="ln" id="L598">        assert!(</span>
-<span class="ln" id="L599">            studio.<span class="tok-fn">load</span>(&amp;a.id).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L600">            <span class="tok-str">&quot;the removed file is still there&quot;</span></span>
-<span class="ln" id="L601">        );</span>
-<span class="ln" id="L602">    }</span>
-<span class="ln" id="L603"></span>
-<span class="ln" id="L604">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L605">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unreadable_index_is_an_error_rather_than_an_empty_vault</span>() {</span>
-<span class="ln" id="L606">        <span class="tok-com">// Reporting &quot;no recordings&quot; when the truth is &quot;wrong key, or tampered</span></span>
-<span class="ln" id="L607">        <span class="tok-com">// with&quot; reads as reassurance, which is the worst possible answer.</span></span>
-<span class="ln" id="L608">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L609">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L610">        studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;one&quot;</span>, <span class="tok-num">1</span>, b<span class="tok-str">&quot;audio&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L611">        std::fs::<span class="tok-fn">write</span>(tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(INDEX), b<span class="tok-str">&quot;not a sealed index at all&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L612">        assert!(studio.<span class="tok-fn">list</span>().<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L613">    }</span>
-<span class="ln" id="L614"></span>
-<span class="ln" id="L615">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L616">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_with_a_tab_or_newline_cannot_forge_a_second_entry</span>() {</span>
-<span class="ln" id="L617">        <span class="tok-com">// The index is line-based, so a name carrying a newline could otherwise</span></span>
-<span class="ln" id="L618">        <span class="tok-com">// inject a row, and one carrying a tab could shift every column.</span></span>
-<span class="ln" id="L619">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L620">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L621">        studio</span>
-<span class="ln" id="L622">            .<span class="tok-fn">store</span>(</span>
-<span class="ln" id="L623">                <span class="tok-str">&quot;evil\tzzzzzzzzzzzz\t9\t9\nzzzzzzzzzzzz\t1\t1\tinjected&quot;</span>,</span>
-<span class="ln" id="L624">                <span class="tok-num">1</span>,</span>
-<span class="ln" id="L625">                b<span class="tok-str">&quot;x&quot;</span>,</span>
-<span class="ln" id="L626">            )</span>
-<span class="ln" id="L627">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L628">        <span class="tok-kw">let</span> listed = studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L629">        assert_eq!(listed.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;a name forged an extra entry&quot;</span>);</span>
-<span class="ln" id="L630">        assert!(!listed[<span class="tok-num">0</span>].name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\t&#x27;</span>));</span>
-<span class="ln" id="L631">        assert!(!listed[<span class="tok-num">0</span>].name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\n&#x27;</span>));</span>
-<span class="ln" id="L632">    }</span>
-<span class="ln" id="L633"></span>
-<span class="ln" id="L634">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L635">    <span class="tok-kw">fn</span> <span class="tok-fn">each_stored_recording_gets_an_identifier_of_its_own</span>() {</span>
-<span class="ln" id="L636">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L637">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L638">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = std::collections::HashSet::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L639">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">25</span> {</span>
-<span class="ln" id="L640">            <span class="tok-kw">let</span> e = studio.<span class="tok-fn">store</span>(&amp;format!(<span class="tok-str">&quot;take {i}&quot;</span>), i, b<span class="tok-str">&quot;audio&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L641">            assert!(<span class="tok-fn">safe_id</span>(&amp;e.id), <span class="tok-str">&quot;{:?} is not a usable identifier&quot;</span>, e.id);</span>
-<span class="ln" id="L642">            assert!(seen.<span class="tok-fn">insert</span>(e.id), <span class="tok-str">&quot;an identifier repeated&quot;</span>);</span>
-<span class="ln" id="L643">        }</span>
-<span class="ln" id="L644">        assert_eq!(studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">len</span>(), <span class="tok-num">25</span>);</span>
-<span class="ln" id="L645">    }</span>
-<span class="ln" id="L646"></span>
-<span class="ln" id="L647">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L648">    <span class="tok-kw">fn</span> <span class="tok-fn">the_key_reports_its_locking_rather_than_claiming_it</span>() {</span>
-<span class="ln" id="L649">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;one&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;two&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L650">        <span class="tok-com">// Best effort, budget-dependent: this asserts the report exists and is</span></span>
-<span class="ln" id="L651">        <span class="tok-com">// a plain answer, not that the lock was granted.</span></span>
-<span class="ln" id="L652">        <span class="tok-kw">let</span> _: bool = key.<span class="tok-fn">is_locked</span>();</span>
-<span class="ln" id="L653">    }</span>
-<span class="ln" id="L654">}</span>
+<span class="ln" id="L487">        assert!(matches!(</span>
+<span class="ln" id="L488">            StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>)),</span>
+<span class="ln" id="L489">            <span class="tok-fn">Err</span>(Error::StudioNeedsBoth)</span>
+<span class="ln" id="L490">        ));</span>
+<span class="ln" id="L491">        assert!(matches!(</span>
+<span class="ln" id="L492">            StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)),</span>
+<span class="ln" id="L493">            <span class="tok-fn">Err</span>(Error::StudioNeedsBoth)</span>
+<span class="ln" id="L494">        ));</span>
+<span class="ln" id="L495">        assert!(matches!(</span>
+<span class="ln" id="L496">            StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;&quot;</span>)),</span>
+<span class="ln" id="L497">            <span class="tok-fn">Err</span>(Error::StudioNeedsBoth)</span>
+<span class="ln" id="L498">        ));</span>
+<span class="ln" id="L499"></span>
+<span class="ln" id="L500">        <span class="tok-com">// And a wrong half gives a key unrelated to the right one, rather than</span></span>
+<span class="ln" id="L501">        <span class="tok-com">// something close to it.</span></span>
+<span class="ln" id="L502">        <span class="tok-kw">let</span> wrong_app = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;WRONG&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest-key&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L503">        <span class="tok-kw">let</span> wrong_rest = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock-key&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;WRONG&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L504">        assert_ne!(real.<span class="tok-fn">expose</span>(), wrong_app.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L505">        assert_ne!(real.<span class="tok-fn">expose</span>(), wrong_rest.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L506">        assert_ne!(wrong_app.<span class="tok-fn">expose</span>(), wrong_rest.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L507">    }</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L510">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_either_half_by_one_bit_changes_the_key</span>() {</span>
+<span class="ln" id="L511">        <span class="tok-kw">let</span> base = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;aaaaaaaa&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bbbbbbbb&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> first = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;aaaaaaab&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bbbbbbbb&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L513">        <span class="tok-kw">let</span> second = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;aaaaaaaa&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bbbbbbbc&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L514">        assert_ne!(base.<span class="tok-fn">expose</span>(), first.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L515">        assert_ne!(base.<span class="tok-fn">expose</span>(), second.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L516">    }</span>
+<span class="ln" id="L517"></span>
+<span class="ln" id="L518">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L519">    <span class="tok-kw">fn</span> <span class="tok-fn">where_the_split_falls_is_part_of_the_key</span>() {</span>
+<span class="ln" id="L520">        <span class="tok-com">// Without the length in the info, these two pairs concatenate to the</span></span>
+<span class="ln" id="L521">        <span class="tok-com">// same bytes and would derive the same vault key. That is a collision</span></span>
+<span class="ln" id="L522">        <span class="tok-com">// an attacker picks rather than stumbles on: it would let a vault built</span></span>
+<span class="ln" id="L523">        <span class="tok-com">// from one pair be opened by another.</span></span>
+<span class="ln" id="L524">        <span class="tok-kw">let</span> a = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;ab&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;c&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L525">        <span class="tok-kw">let</span> b = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;a&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;bc&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L526">        assert_ne!(</span>
+<span class="ln" id="L527">            a.<span class="tok-fn">expose</span>(),</span>
+<span class="ln" id="L528">            b.<span class="tok-fn">expose</span>(),</span>
+<span class="ln" id="L529">            <span class="tok-str">&quot;the split point is not bound into the key&quot;</span></span>
+<span class="ln" id="L530">        );</span>
+<span class="ln" id="L531">    }</span>
+<span class="ln" id="L532"></span>
+<span class="ln" id="L533">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L534">    <span class="tok-kw">fn</span> <span class="tok-fn">swapping_the_two_halves_is_a_different_vault</span>() {</span>
+<span class="ln" id="L535">        <span class="tok-kw">let</span> forward = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;one&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;two&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L536">        <span class="tok-kw">let</span> backward = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;two&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;one&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L537">        assert_ne!(forward.<span class="tok-fn">expose</span>(), backward.<span class="tok-fn">expose</span>());</span>
+<span class="ln" id="L538">    }</span>
+<span class="ln" id="L539"></span>
+<span class="ln" id="L540">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L541">    <span class="tok-kw">fn</span> <span class="tok-fn">the_key_is_key_shaped_rather_than_a_copy_of_its_inputs</span>() {</span>
+<span class="ln" id="L542">        <span class="tok-com">// A construction that returned one of its inputs, or their</span></span>
+<span class="ln" id="L543">        <span class="tok-com">// concatenation, would pass every equality test above while providing</span></span>
+<span class="ln" id="L544">        <span class="tok-com">// no mixing at all.</span></span>
+<span class="ln" id="L545">        <span class="tok-kw">let</span> app = b<span class="tok-str">&quot;app-lock-key-material&quot;</span>;</span>
+<span class="ln" id="L546">        <span class="tok-kw">let</span> rest = b<span class="tok-str">&quot;at-rest-key-material&quot;</span>;</span>
+<span class="ln" id="L547">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(app), &amp;<span class="tok-fn">secret</span>(rest)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L548">        assert_ne!(key.<span class="tok-fn">expose</span>(), &amp;app[..]);</span>
+<span class="ln" id="L549">        assert_ne!(key.<span class="tok-fn">expose</span>(), &amp;rest[..]);</span>
+<span class="ln" id="L550">        <span class="tok-kw">let</span> joined: Vec&lt;u8&gt; = app.<span class="tok-fn">iter</span>().<span class="tok-fn">chain</span>(rest.<span class="tok-fn">iter</span>()).<span class="tok-fn">copied</span>().<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L551">        assert_ne!(key.<span class="tok-fn">expose</span>(), &amp;joined[..]);</span>
+<span class="ln" id="L552">        assert!(</span>
+<span class="ln" id="L553">            !joined.<span class="tok-fn">windows</span>(KEY_LEN).<span class="tok-fn">any</span>(|w| w == key.<span class="tok-fn">expose</span>()),</span>
+<span class="ln" id="L554">            <span class="tok-str">&quot;the key appears verbatim inside its own inputs&quot;</span></span>
+<span class="ln" id="L555">        );</span>
+<span class="ln" id="L556">    }</span>
+<span class="ln" id="L557"></span>
+<span class="ln" id="L558">    <span class="tok-kw">fn</span> <span class="tok-fn">a_studio</span>(dir: &amp;std::path::Path) -&gt; Studio {</span>
+<span class="ln" id="L559">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L560">        Studio::<span class="tok-fn">open</span>(dir, key).<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L561">    }</span>
+<span class="ln" id="L562"></span>
+<span class="ln" id="L563">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L564">    <span class="tok-kw">fn</span> <span class="tok-fn">a_recording_stored_comes_back_byte_for_byte</span>() {</span>
+<span class="ln" id="L565">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L567">        assert!(</span>
+<span class="ln" id="L568">            studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L569">            <span class="tok-str">&quot;a new vault holds nothing&quot;</span></span>
+<span class="ln" id="L570">        );</span>
+<span class="ln" id="L571"></span>
+<span class="ln" id="L572">        <span class="tok-kw">let</span> audio = vec![7u8; <span class="tok-num">5000</span>];</span>
+<span class="ln" id="L573">        <span class="tok-kw">let</span> entry = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;interview&quot;</span>, <span class="tok-num">1_767_225_600</span>, &amp;audio).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L574"></span>
+<span class="ln" id="L575">        <span class="tok-kw">let</span> listed = studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L576">        assert_eq!(listed.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L577">        assert_eq!(listed[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;interview&quot;</span>);</span>
+<span class="ln" id="L578">        assert_eq!(listed[<span class="tok-num">0</span>].made, <span class="tok-num">1_767_225_600</span>);</span>
+<span class="ln" id="L579">        assert_eq!(listed[<span class="tok-num">0</span>].bytes, audio.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L580"></span>
+<span class="ln" id="L581">        <span class="tok-kw">let</span> back = studio.<span class="tok-fn">load</span>(&amp;entry.id).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L582">        assert_eq!(back.<span class="tok-fn">expose</span>(), &amp;audio[..]);</span>
+<span class="ln" id="L583">    }</span>
+<span class="ln" id="L584"></span>
+<span class="ln" id="L585">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L586">    <span class="tok-kw">fn</span> <span class="tok-fn">the_other_key_opens_nothing_in_this_vault</span>() {</span>
+<span class="ln" id="L587">        <span class="tok-com">// The whole promise. A vault written with one pair of secrets must be</span></span>
+<span class="ln" id="L588">        <span class="tok-com">// opaque to any other pair, including one sharing a half.</span></span>
+<span class="ln" id="L589">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L590">        <span class="tok-kw">let</span> entry = {</span>
+<span class="ln" id="L591">            <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L592">            studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;private&quot;</span>, <span class="tok-num">1</span>, &amp;[3u8; <span class="tok-num">128</span>]).<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L593">        };</span>
+<span class="ln" id="L594"></span>
+<span class="ln" id="L595">        <span class="tok-kw">for</span> (app, rest) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L596">            (&amp;b<span class="tok-str">&quot;app-lock&quot;</span>[..], &amp;b<span class="tok-str">&quot;WRONG&quot;</span>[..]),</span>
+<span class="ln" id="L597">            (&amp;b<span class="tok-str">&quot;WRONG&quot;</span>[..], &amp;b<span class="tok-str">&quot;at-rest&quot;</span>[..]),</span>
+<span class="ln" id="L598">            (&amp;b<span class="tok-str">&quot;WRONG&quot;</span>[..], &amp;b<span class="tok-str">&quot;ALSO-WRONG&quot;</span>[..]),</span>
+<span class="ln" id="L599">        ] {</span>
+<span class="ln" id="L600">            <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(app), &amp;<span class="tok-fn">secret</span>(rest)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L601">            <span class="tok-kw">let</span> other = Studio::<span class="tok-fn">open</span>(tmp.<span class="tok-fn">path</span>(), key).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L602">            assert!(other.<span class="tok-fn">list</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;the index opened with the wrong key&quot;</span>);</span>
+<span class="ln" id="L603">            assert!(other.<span class="tok-fn">load</span>(&amp;entry.id).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;a recording opened&quot;</span>);</span>
+<span class="ln" id="L604">        }</span>
+<span class="ln" id="L605">    }</span>
+<span class="ln" id="L606"></span>
+<span class="ln" id="L607">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L608">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_readable_is_left_on_disk</span>() {</span>
+<span class="ln" id="L609">        <span class="tok-com">// The audio must not be findable by reading the vault directory, and</span></span>
+<span class="ln" id="L610">        <span class="tok-com">// neither must the name: both are what the vault is for.</span></span>
+<span class="ln" id="L611">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L612">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L613">        <span class="tok-kw">let</span> audio: Vec&lt;u8&gt; = (<span class="tok-num">0</span>..<span class="tok-num">4096</span>).<span class="tok-fn">map</span>(|i| (i % <span class="tok-num">251</span>) <span class="tok-kw">as</span> u8).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L614">        studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;meeting with the lawyer&quot;</span>, <span class="tok-num">1</span>, &amp;audio).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L615"></span>
+<span class="ln" id="L616">        <span class="tok-kw">for</span> file <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(tmp.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
+<span class="ln" id="L617">            <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(file.<span class="tok-fn">unwrap</span>().<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L618">            assert!(</span>
+<span class="ln" id="L619">                !bytes</span>
+<span class="ln" id="L620">                    .<span class="tok-fn">windows</span>(audio.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">64</span>))</span>
+<span class="ln" id="L621">                    .<span class="tok-fn">any</span>(|w| w == &amp;audio[..<span class="tok-num">64</span>]),</span>
+<span class="ln" id="L622">                <span class="tok-str">&quot;the audio is on disk in the clear&quot;</span></span>
+<span class="ln" id="L623">            );</span>
+<span class="ln" id="L624">            assert!(</span>
+<span class="ln" id="L625">                !bytes.<span class="tok-fn">windows</span>(<span class="tok-num">6</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;lawyer&quot;</span>),</span>
+<span class="ln" id="L626">                <span class="tok-str">&quot;the name is on disk in the clear&quot;</span></span>
+<span class="ln" id="L627">            );</span>
+<span class="ln" id="L628">        }</span>
+<span class="ln" id="L629">    }</span>
+<span class="ln" id="L630"></span>
+<span class="ln" id="L631">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L632">    <span class="tok-kw">fn</span> <span class="tok-fn">a_recording_cannot_be_moved_to_another_identity_and_still_open</span>() {</span>
+<span class="ln" id="L633">        <span class="tok-com">// Each file is sealed with its own id as authenticated data, so</span></span>
+<span class="ln" id="L634">        <span class="tok-com">// swapping two files inside a vault, which somebody with the directory</span></span>
+<span class="ln" id="L635">        <span class="tok-com">// can do without the key, is detected rather than silently serving the</span></span>
+<span class="ln" id="L636">        <span class="tok-com">// wrong recording under the wrong name.</span></span>
+<span class="ln" id="L637">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L638">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L639">        <span class="tok-kw">let</span> first = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;one&quot;</span>, <span class="tok-num">1</span>, b<span class="tok-str">&quot;first recording&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L640">        <span class="tok-kw">let</span> second = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;two&quot;</span>, <span class="tok-num">2</span>, b<span class="tok-str">&quot;second recording&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L641"></span>
+<span class="ln" id="L642">        <span class="tok-kw">let</span> a = tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(&amp;first.id);</span>
+<span class="ln" id="L643">        <span class="tok-kw">let</span> b = tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(&amp;second.id);</span>
+<span class="ln" id="L644">        <span class="tok-kw">let</span> swap = tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;swap&quot;</span>);</span>
+<span class="ln" id="L645">        std::fs::<span class="tok-fn">rename</span>(&amp;a, &amp;swap).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L646">        std::fs::<span class="tok-fn">rename</span>(&amp;b, &amp;a).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L647">        std::fs::<span class="tok-fn">rename</span>(&amp;swap, &amp;b).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L648"></span>
+<span class="ln" id="L649">        assert!(</span>
+<span class="ln" id="L650">            studio.<span class="tok-fn">load</span>(&amp;first.id).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L651">            <span class="tok-str">&quot;a swapped file still opened&quot;</span></span>
+<span class="ln" id="L652">        );</span>
+<span class="ln" id="L653">        assert!(studio.<span class="tok-fn">load</span>(&amp;second.id).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L654">    }</span>
+<span class="ln" id="L655"></span>
+<span class="ln" id="L656">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L657">    <span class="tok-kw">fn</span> <span class="tok-fn">an_identifier_out_of_an_index_cannot_walk_out_of_the_vault</span>() {</span>
+<span class="ln" id="L658">        <span class="tok-com">// The index is a file. Somebody who can write it can put anything in</span></span>
+<span class="ln" id="L659">        <span class="tok-com">// the id column, and that value reaches a path, so it is checked.</span></span>
+<span class="ln" id="L660">        assert!(<span class="tok-fn">safe_id</span>(<span class="tok-str">&quot;abcdefgh2345&quot;</span>));</span>
+<span class="ln" id="L661">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L662">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L663">            <span class="tok-str">&quot;../../.bashrc&quot;</span>,</span>
+<span class="ln" id="L664">            <span class="tok-str">&quot;..&quot;</span>,</span>
+<span class="ln" id="L665">            <span class="tok-str">&quot;a/b&quot;</span>,</span>
+<span class="ln" id="L666">            <span class="tok-str">&quot;a\\b&quot;</span>,</span>
+<span class="ln" id="L667">            <span class="tok-str">&quot;ABC&quot;</span>,</span>
+<span class="ln" id="L668">            <span class="tok-str">&quot;with space&quot;</span>,</span>
+<span class="ln" id="L669">            <span class="tok-str">&quot;with.dot&quot;</span>,</span>
+<span class="ln" id="L670">        ] {</span>
+<span class="ln" id="L671">            assert!(!<span class="tok-fn">safe_id</span>(bad), <span class="tok-str">&quot;{bad:?} was accepted as an identifier&quot;</span>);</span>
+<span class="ln" id="L672">        }</span>
+<span class="ln" id="L673"></span>
+<span class="ln" id="L674">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L675">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L676">        assert!(studio.<span class="tok-fn">load</span>(<span class="tok-str">&quot;../../.bashrc&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L677">        assert!(studio.<span class="tok-fn">remove</span>(<span class="tok-str">&quot;../../.bashrc&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L678">    }</span>
+<span class="ln" id="L679"></span>
+<span class="ln" id="L680">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L681">    <span class="tok-kw">fn</span> <span class="tok-fn">removing_one_leaves_the_others_openable</span>() {</span>
+<span class="ln" id="L682">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L683">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L684">        <span class="tok-kw">let</span> a = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;a&quot;</span>, <span class="tok-num">1</span>, b<span class="tok-str">&quot;aaaa&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L685">        <span class="tok-kw">let</span> b = studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;b&quot;</span>, <span class="tok-num">2</span>, b<span class="tok-str">&quot;bbbb&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L686"></span>
+<span class="ln" id="L687">        studio.<span class="tok-fn">remove</span>(&amp;a.id).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L688">        <span class="tok-kw">let</span> left = studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L689">        assert_eq!(left.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L690">        assert_eq!(left[<span class="tok-num">0</span>].id, b.id);</span>
+<span class="ln" id="L691">        assert_eq!(studio.<span class="tok-fn">load</span>(&amp;b.id).<span class="tok-fn">unwrap</span>().<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;bbbb&quot;</span>);</span>
+<span class="ln" id="L692">        assert!(</span>
+<span class="ln" id="L693">            studio.<span class="tok-fn">load</span>(&amp;a.id).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L694">            <span class="tok-str">&quot;the removed file is still there&quot;</span></span>
+<span class="ln" id="L695">        );</span>
+<span class="ln" id="L696">    }</span>
+<span class="ln" id="L697"></span>
+<span class="ln" id="L698">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L699">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unreadable_index_is_an_error_rather_than_an_empty_vault</span>() {</span>
+<span class="ln" id="L700">        <span class="tok-com">// Reporting &quot;no recordings&quot; when the truth is &quot;wrong key, or tampered</span></span>
+<span class="ln" id="L701">        <span class="tok-com">// with&quot; reads as reassurance, which is the worst possible answer.</span></span>
+<span class="ln" id="L702">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L703">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L704">        studio.<span class="tok-fn">store</span>(<span class="tok-str">&quot;one&quot;</span>, <span class="tok-num">1</span>, b<span class="tok-str">&quot;audio&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L705">        std::fs::<span class="tok-fn">write</span>(tmp.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(INDEX), b<span class="tok-str">&quot;not a sealed index at all&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L706">        assert!(studio.<span class="tok-fn">list</span>().<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L707">    }</span>
+<span class="ln" id="L708"></span>
+<span class="ln" id="L709">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L710">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_with_a_tab_or_newline_cannot_forge_a_second_entry</span>() {</span>
+<span class="ln" id="L711">        <span class="tok-com">// The index is line-based, so a name carrying a newline could otherwise</span></span>
+<span class="ln" id="L712">        <span class="tok-com">// inject a row, and one carrying a tab could shift every column.</span></span>
+<span class="ln" id="L713">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L714">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L715">        studio</span>
+<span class="ln" id="L716">            .<span class="tok-fn">store</span>(</span>
+<span class="ln" id="L717">                <span class="tok-str">&quot;evil\tzzzzzzzzzzzz\t9\t9\nzzzzzzzzzzzz\t1\t1\tinjected&quot;</span>,</span>
+<span class="ln" id="L718">                <span class="tok-num">1</span>,</span>
+<span class="ln" id="L719">                b<span class="tok-str">&quot;x&quot;</span>,</span>
+<span class="ln" id="L720">            )</span>
+<span class="ln" id="L721">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L722">        <span class="tok-kw">let</span> listed = studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L723">        assert_eq!(listed.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;a name forged an extra entry&quot;</span>);</span>
+<span class="ln" id="L724">        assert!(!listed[<span class="tok-num">0</span>].name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\t&#x27;</span>));</span>
+<span class="ln" id="L725">        assert!(!listed[<span class="tok-num">0</span>].name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\n&#x27;</span>));</span>
+<span class="ln" id="L726">    }</span>
+<span class="ln" id="L727"></span>
+<span class="ln" id="L728">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L729">    <span class="tok-kw">fn</span> <span class="tok-fn">each_stored_recording_gets_an_identifier_of_its_own</span>() {</span>
+<span class="ln" id="L730">        <span class="tok-kw">let</span> tmp = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L731">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(tmp.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L732">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = std::collections::HashSet::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L733">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">25</span> {</span>
+<span class="ln" id="L734">            <span class="tok-kw">let</span> e = studio.<span class="tok-fn">store</span>(&amp;format!(<span class="tok-str">&quot;take {i}&quot;</span>), i, b<span class="tok-str">&quot;audio&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L735">            assert!(<span class="tok-fn">safe_id</span>(&amp;e.id), <span class="tok-str">&quot;{:?} is not a usable identifier&quot;</span>, e.id);</span>
+<span class="ln" id="L736">            assert!(seen.<span class="tok-fn">insert</span>(e.id), <span class="tok-str">&quot;an identifier repeated&quot;</span>);</span>
+<span class="ln" id="L737">        }</span>
+<span class="ln" id="L738">        assert_eq!(studio.<span class="tok-fn">list</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">len</span>(), <span class="tok-num">25</span>);</span>
+<span class="ln" id="L739">    }</span>
+<span class="ln" id="L740"></span>
+<span class="ln" id="L741">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L742">    <span class="tok-kw">fn</span> <span class="tok-fn">a_decoy_looks_like_the_real_thing_from_outside</span>() {</span>
+<span class="ln" id="L743">        <span class="tok-com">// The whole value of a decoy is that the two cannot be told apart by</span></span>
+<span class="ln" id="L744">        <span class="tok-com">// looking at the directory, so that is what this checks: the same</span></span>
+<span class="ln" id="L745">        <span class="tok-com">// number of files, the same shape of names, an index present in both.</span></span>
+<span class="ln" id="L746">        <span class="tok-kw">let</span> real_dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L747">        <span class="tok-kw">let</span> real = <span class="tok-fn">a_studio</span>(real_dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L748">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L749">            real.<span class="tok-fn">store</span>(&amp;format!(<span class="tok-str">&quot;take {i}&quot;</span>), <span class="tok-num">100</span> + i, &amp;vec![9u8; <span class="tok-num">2048</span>])</span>
+<span class="ln" id="L750">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L751">        }</span>
+<span class="ln" id="L752">        <span class="tok-kw">let</span> shape = Shape::<span class="tok-fn">of</span>(&amp;real).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L753">        assert_eq!(shape.recordings, <span class="tok-num">4</span>);</span>
+<span class="ln" id="L754">        assert_eq!(shape.each, <span class="tok-num">2048</span>);</span>
+<span class="ln" id="L755"></span>
+<span class="ln" id="L756">        <span class="tok-kw">let</span> decoy_dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L757">        <span class="tok-fn">make_decoy</span>(decoy_dir.<span class="tok-fn">path</span>(), shape).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L758"></span>
+<span class="ln" id="L759">        <span class="tok-kw">let</span> names = |d: &amp;std::path::Path| {</span>
+<span class="ln" id="L760">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> v: Vec&lt;String&gt; = std::fs::<span class="tok-fn">read_dir</span>(d)</span>
+<span class="ln" id="L761">                .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L762">                .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">unwrap</span>().<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L763">                .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L764">            v.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L765">            v</span>
+<span class="ln" id="L766">        };</span>
+<span class="ln" id="L767">        <span class="tok-kw">let</span> r = <span class="tok-fn">names</span>(real_dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L768">        <span class="tok-kw">let</span> d = <span class="tok-fn">names</span>(decoy_dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L769">        assert_eq!(</span>
+<span class="ln" id="L770">            r.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L771">            d.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L772">            <span class="tok-str">&quot;a different number of files gives it away&quot;</span></span>
+<span class="ln" id="L773">        );</span>
+<span class="ln" id="L774">        assert!(d.<span class="tok-fn">contains</span>(&amp;INDEX.<span class="tok-fn">to_string</span>()), <span class="tok-str">&quot;a decoy has an index too&quot;</span>);</span>
+<span class="ln" id="L775">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> &amp;d {</span>
+<span class="ln" id="L776">            assert!(</span>
+<span class="ln" id="L777">                name == INDEX || <span class="tok-fn">safe_id</span>(name),</span>
+<span class="ln" id="L778">                <span class="tok-str">&quot;{name:?} is not shaped like a real identifier&quot;</span></span>
+<span class="ln" id="L779">            );</span>
+<span class="ln" id="L780">        }</span>
+<span class="ln" id="L781">    }</span>
+<span class="ln" id="L782"></span>
+<span class="ln" id="L783">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L784">    <span class="tok-kw">fn</span> <span class="tok-fn">a_decoy_holds_nothing_and_nobody_can_open_it</span>() {</span>
+<span class="ln" id="L785">        <span class="tok-com">// Not a vault with weak contents: a vault whose contents never existed.</span></span>
+<span class="ln" id="L786">        <span class="tok-com">// The key is generated inside `make_decoy` and dropped before it</span></span>
+<span class="ln" id="L787">        <span class="tok-com">// returns, so there is no key to find, to leak, or to be compelled to</span></span>
+<span class="ln" id="L788">        <span class="tok-com">// hand over.</span></span>
+<span class="ln" id="L789">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L790">        <span class="tok-fn">make_decoy</span>(</span>
+<span class="ln" id="L791">            dir.<span class="tok-fn">path</span>(),</span>
+<span class="ln" id="L792">            Shape {</span>
+<span class="ln" id="L793">                recordings: <span class="tok-num">3</span>,</span>
+<span class="ln" id="L794">                each: <span class="tok-num">512</span>,</span>
+<span class="ln" id="L795">            },</span>
+<span class="ln" id="L796">        )</span>
+<span class="ln" id="L797">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L798"></span>
+<span class="ln" id="L799">        <span class="tok-com">// The real vault&#x27;s key opens none of it, and neither does any other.</span></span>
+<span class="ln" id="L800">        <span class="tok-kw">for</span> (app, rest) <span class="tok-kw">in</span> [(&amp;b<span class="tok-str">&quot;app-lock&quot;</span>[..], &amp;b<span class="tok-str">&quot;at-rest&quot;</span>[..]), (&amp;b<span class="tok-str">&quot;x&quot;</span>[..], &amp;b<span class="tok-str">&quot;y&quot;</span>[..])] {</span>
+<span class="ln" id="L801">            <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(app), &amp;<span class="tok-fn">secret</span>(rest)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L802">            <span class="tok-kw">let</span> attempt = Studio::<span class="tok-fn">open</span>(dir.<span class="tok-fn">path</span>(), key).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L803">            assert!(attempt.<span class="tok-fn">list</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;a decoy index opened&quot;</span>);</span>
+<span class="ln" id="L804">        }</span>
+<span class="ln" id="L805">    }</span>
+<span class="ln" id="L806"></span>
+<span class="ln" id="L807">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L808">    <span class="tok-kw">fn</span> <span class="tok-fn">a_decoy_is_not_full_of_zeroes</span>() {</span>
+<span class="ln" id="L809">        <span class="tok-com">// A decoy of silence compresses differently from a real recording, and</span></span>
+<span class="ln" id="L810">        <span class="tok-com">// a file whose size does not match its entropy is the exact tell this</span></span>
+<span class="ln" id="L811">        <span class="tok-com">// is meant to avoid.</span></span>
+<span class="ln" id="L812">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L813">        <span class="tok-fn">make_decoy</span>(</span>
+<span class="ln" id="L814">            dir.<span class="tok-fn">path</span>(),</span>
+<span class="ln" id="L815">            Shape {</span>
+<span class="ln" id="L816">                recordings: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L817">                each: <span class="tok-num">4096</span>,</span>
+<span class="ln" id="L818">            },</span>
+<span class="ln" id="L819">        )</span>
+<span class="ln" id="L820">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L821">        <span class="tok-kw">for</span> file <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
+<span class="ln" id="L822">            <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(file.<span class="tok-fn">unwrap</span>().<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L823">            <span class="tok-kw">let</span> zeroes = bytes.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|&amp;&amp;b| b == <span class="tok-num">0</span>).<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L824">            assert!(</span>
+<span class="ln" id="L825">                zeroes * <span class="tok-num">4</span> &lt; bytes.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L826">                <span class="tok-str">&quot;a decoy file is mostly zeroes, which is a tell&quot;</span></span>
+<span class="ln" id="L827">            );</span>
+<span class="ln" id="L828">        }</span>
+<span class="ln" id="L829">    }</span>
+<span class="ln" id="L830"></span>
+<span class="ln" id="L831">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L832">    <span class="tok-kw">fn</span> <span class="tok-fn">decoys_differ_from_each_other</span>() {</span>
+<span class="ln" id="L833">        <span class="tok-com">// Identical decoys are one decoy copied, and an attacker who notices</span></span>
+<span class="ln" id="L834">        <span class="tok-com">// that has learned they are all fake.</span></span>
+<span class="ln" id="L835">        <span class="tok-kw">let</span> a = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L836">        <span class="tok-kw">let</span> b = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L837">        <span class="tok-kw">let</span> shape = Shape {</span>
+<span class="ln" id="L838">            recordings: <span class="tok-num">2</span>,</span>
+<span class="ln" id="L839">            each: <span class="tok-num">1024</span>,</span>
+<span class="ln" id="L840">        };</span>
+<span class="ln" id="L841">        <span class="tok-fn">make_decoy</span>(a.<span class="tok-fn">path</span>(), shape).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L842">        <span class="tok-fn">make_decoy</span>(b.<span class="tok-fn">path</span>(), shape).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L843"></span>
+<span class="ln" id="L844">        <span class="tok-kw">let</span> read_all = |d: &amp;std::path::Path| {</span>
+<span class="ln" id="L845">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> v: Vec&lt;Vec&lt;u8&gt;&gt; = std::fs::<span class="tok-fn">read_dir</span>(d)</span>
+<span class="ln" id="L846">                .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L847">                .<span class="tok-fn">map</span>(|e| std::fs::<span class="tok-fn">read</span>(e.<span class="tok-fn">unwrap</span>().<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>())</span>
+<span class="ln" id="L848">                .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L849">            v.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L850">            v</span>
+<span class="ln" id="L851">        };</span>
+<span class="ln" id="L852">        assert_ne!(<span class="tok-fn">read_all</span>(a.<span class="tok-fn">path</span>()), <span class="tok-fn">read_all</span>(b.<span class="tok-fn">path</span>()));</span>
+<span class="ln" id="L853">    }</span>
+<span class="ln" id="L854"></span>
+<span class="ln" id="L855">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L856">    <span class="tok-kw">fn</span> <span class="tok-fn">the_shape_of_an_empty_vault_does_not_divide_by_zero</span>() {</span>
+<span class="ln" id="L857">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L858">        <span class="tok-kw">let</span> studio = <span class="tok-fn">a_studio</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L859">        <span class="tok-kw">let</span> shape = Shape::<span class="tok-fn">of</span>(&amp;studio).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L860">        assert_eq!(shape.recordings, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L861">        assert_eq!(shape.each, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L862"></span>
+<span class="ln" id="L863">        <span class="tok-com">// And a decoy of that shape is an empty vault, which is still a</span></span>
+<span class="ln" id="L864">        <span class="tok-com">// believable thing for somebody to have.</span></span>
+<span class="ln" id="L865">        <span class="tok-kw">let</span> decoy = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L866">        <span class="tok-fn">make_decoy</span>(decoy.<span class="tok-fn">path</span>(), shape).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L867">        assert!(decoy.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(INDEX).<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L868">    }</span>
+<span class="ln" id="L869"></span>
+<span class="ln" id="L870">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L871">    <span class="tok-kw">fn</span> <span class="tok-fn">the_key_reports_its_locking_rather_than_claiming_it</span>() {</span>
+<span class="ln" id="L872">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;one&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;two&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L873">        <span class="tok-com">// Best effort, budget-dependent: this asserts the report exists and is</span></span>
+<span class="ln" id="L874">        <span class="tok-com">// a plain answer, not that the lock was granted.</span></span>
+<span class="ln" id="L875">        <span class="tok-kw">let</span> _: bool = key.<span class="tok-fn">is_locked</span>();</span>
+<span class="ln" id="L876">    }</span>
+<span class="ln" id="L877">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
