@@ -72,7 +72,7 @@ flowchart TD
     n_io["io.rs<br/>569 lines"]
     n_live["live.rs<br/>281 lines"]
     n_meter["meter.rs<br/>166 lines"]
-    n_record["record.rs<br/>415 lines"]
+    n_record["record.rs<br/>416 lines"]
     n_live --> n_record
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
     click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
@@ -93,4 +93,4 @@ flowchart TD
 | [[`lib.rs`|File-veilvoice-audio-lib]] | 231 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [[`live.rs`|File-veilvoice-audio-live]] | 281 | Live microphone scrambling. |
 | [[`meter.rs`|File-veilvoice-audio-meter]] | 166 | The scale a level meter is drawn on. |
-| [[`record.rs`|File-veilvoice-audio-record]] | 415 | Recording the veiled voice without it ever reaching unprotected memory. |
+| [[`record.rs`|File-veilvoice-audio-record]] | 416 | Recording the veiled voice without it ever reaching unprotected memory. |

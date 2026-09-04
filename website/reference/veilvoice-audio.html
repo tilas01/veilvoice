@@ -116,7 +116,7 @@
 <a href="veilvoice-audio/record.src.html">
 <rect x="213.8" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="264.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">record.rs</text>
-<text x="264.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">415 lines</text>
+<text x="264.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">416 lines</text>
 </a>
 <text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">Every arrow is a crate:: or super:: path one module actually uses, read</text>
 <text x="20.0" y="328.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">out of the source rather than drawn by hand.</text>
@@ -131,7 +131,7 @@ flowchart TD
     n_io[&quot;io.rs&lt;br/&gt;569 lines&quot;]
     n_live[&quot;live.rs&lt;br/&gt;281 lines&quot;]
     n_meter[&quot;meter.rs&lt;br/&gt;166 lines&quot;]
-    n_record[&quot;record.rs&lt;br/&gt;415 lines&quot;]
+    n_record[&quot;record.rs&lt;br/&gt;416 lines&quot;]
     n_live --&gt; n_record
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs&quot; &quot;open the source&quot;
     click n_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs&quot; &quot;open the source&quot;
@@ -150,7 +150,7 @@ flowchart TD
 <tr><td><a href="veilvoice-audio/lib.html"><code>lib.rs</code></a></td><td>231</td><td>Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</td></tr>
 <tr><td><a href="veilvoice-audio/live.html"><code>live.rs</code></a></td><td>281</td><td>Live microphone scrambling.</td></tr>
 <tr><td><a href="veilvoice-audio/meter.html"><code>meter.rs</code></a></td><td>166</td><td>The scale a level meter is drawn on.</td></tr>
-<tr><td><a href="veilvoice-audio/record.html"><code>record.rs</code></a></td><td>415</td><td>Recording the veiled voice without it ever reaching unprotected memory.</td></tr>
+<tr><td><a href="veilvoice-audio/record.html"><code>record.rs</code></a></td><td>416</td><td>Recording the veiled voice without it ever reaching unprotected memory.</td></tr>
 </tbody></table>
 </section>
 </div></div>

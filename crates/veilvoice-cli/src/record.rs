@@ -15,11 +15,11 @@
 //!
 //! # Never a plaintext file, not even briefly
 //!
-//! The recording is accumulated in a [`Tape`](veilvoice_crypto::Tape), encoded
-//! into a [`Secret`](veilvoice_crypto::Secret), and sealed from there. At no
+//! The recording is accumulated in a `Tape`, encoded
+//! into a `Secret`, and sealed from there. At no
 //! point is there a WAV on disk to be deleted afterwards, because a plaintext
 //! file that is written and deleted is exactly what
-//! [`veilvoice_crypto::shred`] explains cannot be reliably taken back on flash
+//! `veilvoice_crypto::shred` explains cannot be reliably taken back on flash
 //! storage. Writing one and encrypting it afterwards would leave the original
 //! recoverable and the file merely tidy.
 //!

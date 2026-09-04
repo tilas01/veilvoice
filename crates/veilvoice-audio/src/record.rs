@@ -22,7 +22,8 @@
 //! Nothing here writes to disk at all. The caller seals the [`Secret`] and
 //! writes the result. A recorder that wrote a WAV and encrypted it afterwards
 //! would leave a plaintext file that
-//! [`veilvoice_crypto::shred`](veilvoice_crypto::shred) explains cannot be
+//! [`veilvoice_crypto::shred`](../../veilvoice_crypto/shred/index.html) explains
+//! cannot be
 //! reliably taken back on flash storage, which is the whole reason at-rest
 //! encryption is the default rather than an option.
 //!

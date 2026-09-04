@@ -25,6 +25,7 @@
 <script src="js/reveal.js" defer></script>
 <script src="js/demo-data.js" defer></script>
 <script src="js/demo.js" defer></script>
+<script src="js/walkthrough.js" defer></script>
 </head>
 <body>
 
@@ -733,6 +734,27 @@
       nobody uses it.</p>
     </figcaption>
   </figure>
+
+  <div id="walkthrough" class="walk">
+    <h3 class="walk-h">EVERY SCREEN, AND WHAT IT IS FOR</h3>
+    <p class="walk-lede">Photographs of the real window, one per tab. Pick a
+    tab and its picture is below. These are captures of the program running,
+    not drawings of it, and the build re-takes them so a screen that changes
+    cannot leave a stale picture here.</p>
+
+    <div class="walk-tabs" role="tablist" aria-label="Application screens"></div>
+    <figure class="walk-shot">
+      <img id="walk-img" alt="" loading="lazy" decoding="async">
+      <figcaption id="walk-note"></figcaption>
+    </figure>
+
+    <h3 class="walk-h walk-h-cli">THE COMMAND LINE, ONE JOB AT A TIME</h3>
+    <p class="walk-lede">Each of these is a real command. Every one is checked
+    against this build's own <code>--help</code> when the page is generated, so
+    a command here that no longer exists stops the build rather than teaching
+    you something that fails.</p>
+    <div class="walk-cases"></div>
+  </div>
   </div>
 </section>
 
