@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 223 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 234 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-crate-is-for">What this crate is for</a>
@@ -92,9 +92,9 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>223 lines defining <strong>1 function</strong> (0 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>234 lines defining <strong>1 function</strong> (0 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 102</span> &middot; Everything that can go wrong in this crate.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 104</span> &middot; Everything that can go wrong in this crate.</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -113,7 +113,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="lib.src.html#fn-error-fmt">
 <rect x="171.0" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
+<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
@@ -129,8 +129,8 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_fmt[&quot;Error::fmt&lt;br/&gt;line 172&quot;]
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L172&quot; &quot;open the source&quot;
+    n_fmt[&quot;Error::fmt&lt;br/&gt;line 179&quot;]
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L179&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_fmt helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -139,9 +139,9 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-version">93</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
-<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-error">102</a></td><td>Everything that can go wrong in this crate.</td></tr>
-<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-fmt">172</a></td><td></td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-version">95</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
+<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-error">104</a></td><td>Everything that can go wrong in this crate.</td></tr>
+<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-fmt">179</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

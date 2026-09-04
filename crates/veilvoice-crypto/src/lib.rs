@@ -79,6 +79,7 @@ pub mod kdf;
 pub mod lock;
 pub mod privatefile;
 pub mod shred;
+pub mod studio;
 pub mod tape;
 pub mod vault;
 pub mod weave;
@@ -86,6 +87,7 @@ pub mod weave;
 pub use amnesia::Secret;
 pub use lock::{AppLock, LockStore};
 pub use shred::{shred_file, Passes, ShredReport};
+pub use studio::StudioKey;
 pub use tape::Tape;
 pub use vault::Vault;
 
@@ -166,6 +168,11 @@ pub enum Error {
     /// own length. Refused rather than part-filled: a recording written into a
     /// buffer sized for a different one is a truncated file nothing would flag.
     TapeLength,
+    /// A studio vault key was asked for with one of its two secrets missing.
+    /// Refused rather than derived from the one that was present: silently
+    /// falling back to a single secret is the failure that construction exists
+    /// to prevent.
+    StudioNeedsBoth,
 }
 
 impl std::fmt::Display for Error {
@@ -214,6 +221,10 @@ impl std::fmt::Display for Error {
             }
             Self::TapeLength => {
                 "the buffer offered for the recording is not the length of the recording"
+            }
+            Self::StudioNeedsBoth => {
+                "the studio vault needs both the app lock and the at-rest passphrase, and \
+                 only one was given"
             }
         };
         f.write_str(msg)
