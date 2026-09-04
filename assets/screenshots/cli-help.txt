@@ -5,6 +5,7 @@ Usage: veilvoice <COMMAND>
 Commands:
   anonymise     De-identify an audio file and write a WAV
   live          Scramble a microphone live, into a device or a virtual cable
+  record        Record yourself already veiled, straight into an encrypted file
   devices       List the audio devices this machine offers
   clean         Strip identifying metadata from an audio or image file, in place
   encrypt       Encrypt a file into a `.veil` container
@@ -20,6 +21,7 @@ Commands:
   install       Copy VeilVoice somewhere the system can find it, and add it to PATH
   uninstall     Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy
   policy        Settings fixed so the interface cannot turn them off
+  mandate       The two things VeilVoice insists on, unless you say otherwise
   conversation  A recording with several people in it: a voice each, and subtitles
   capture       Which screen recorders are running, and which you meant to run
   decoy         A second passphrase that opens an empty VeilVoice, and its limits
