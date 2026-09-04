@@ -62,6 +62,19 @@ use veilvoice_crypto::{Secret, Tape};
 /// Bytes in a canonical 16-bit PCM WAV header.
 const HEADER: usize = 44;
 
+/// The most PCM data a RIFF/WAVE file can describe, in bytes.
+///
+/// Not a limit this module chose. A WAV header states its sizes in unsigned
+/// 32-bit fields, so the format itself cannot describe more, and the `RIFF`
+/// size field has to hold the data plus the 36 bytes of header around it.
+/// At 48 kHz, 16-bit, mono, this is a little over twelve hours.
+///
+/// It is checked rather than wrapped. A cast would produce a header claiming a
+/// fraction of the real length, and that file opens, plays, and is silently
+/// short: the worst shape a defect can take on a recording somebody made once
+/// and cannot make again.
+const WAV_MAX_DATA: usize = u32::MAX as usize - 36;
+
 /// How much audio the ring holds before samples are dropped, in seconds.
 ///
 /// Generous on purpose. The ring exists to absorb the gap between an audio
@@ -217,6 +230,12 @@ impl Recorder {
     pub fn wav(&mut self) -> Result<Secret, Error> {
         self.drain();
         let data = self.tape.len();
+        // Refused before the allocation, not after: a recording this long is
+        // already several gigabytes, and finding out afterwards would mean
+        // reserving all of it to then throw it away.
+        if data > WAV_MAX_DATA {
+            return Err(Error::TooLong(data));
+        }
         let mut out = Secret::zeroed(HEADER + data);
         write_header(out.expose_mut(), self.sample_rate, data);
         self.tape
@@ -224,7 +243,7 @@ impl Recorder {
             .map_err(Error::Crypto)?;
         // The last drained block is still in the scratch buffer, which is not
         // protected memory. Nothing else wipes it.
-        self.scratch.iter_mut().for_each(|s| *s = 0.0);
+        self.wipe_scratch();
         Ok(out)
     }
 
@@ -232,7 +251,41 @@ impl Recorder {
     pub fn discard(&mut self) {
         self.tape.wipe();
         self.samples = 0;
+        self.wipe_scratch();
+    }
+
+    /// Clear the drain scratch.
+    ///
+    /// The one place this is written. `wav`, `discard` and the destructor all
+    /// call it rather than each clearing the buffer themselves, so there is no
+    /// second copy of the operation to fall out of step with the others, and a
+    /// test of this function is a test of what the destructor actually runs.
+    fn wipe_scratch(&mut self) {
         self.scratch.iter_mut().for_each(|s| *s = 0.0);
+    }
+}
+
+impl Drop for Recorder {
+    /// Wipe the drain scratch.
+    ///
+    /// The tape wipes itself: every chunk of it is a [`Secret`]. The scratch
+    /// buffer is not, and it holds up to one drain's worth of veiled audio in
+    /// ordinary heap memory. Without this, abandoning a recording (Ctrl-C, an
+    /// error on the way to sealing, or simply dropping the recorder) frees
+    /// those samples without clearing them, and the allocator is then free to
+    /// hand that memory, contents intact, to anything else in the process.
+    ///
+    /// # What this does not reach
+    ///
+    /// The ring buffer between [`Sink`] and [`Recorder`] also holds veiled
+    /// samples, up to [`SLACK_SECONDS`] of them, and `ringbuf` exposes no way
+    /// to clear its backing storage. Those bytes are freed unwiped and this
+    /// module cannot prevent it. It is written down rather than left for
+    /// somebody to discover: the exposure is veiled audio, which is the same
+    /// audio the file holds and is not key material, but it is not nothing and
+    /// claiming the recorder wipes everything would be false.
+    fn drop(&mut self) {
+        self.wipe_scratch();
     }
 }
 
@@ -241,10 +294,15 @@ impl Recorder {
 /// `out` must be at least [`HEADER`] bytes; callers here always size it from
 /// the same constant.
 fn write_header(out: &mut [u8], sample_rate: u32, data_len: usize) {
-    let data_len = data_len as u32;
-    let byte_rate = sample_rate * 2; // one channel, two bytes per sample
+    // `wav` refuses anything past `WAV_MAX_DATA` before calling here, so both
+    // of these fit. They are still written as saturating rather than wrapping
+    // conversions: if that guard is ever moved or lost, an over-long file
+    // becomes an obviously wrong header rather than a plausible short one.
+    let data_len = u32::try_from(data_len).unwrap_or(u32::MAX);
+    let riff = data_len.saturating_add(36);
+    let byte_rate = sample_rate.saturating_mul(2); // one channel, two bytes
     out[0..4].copy_from_slice(b"RIFF");
-    out[4..8].copy_from_slice(&(36 + data_len).to_le_bytes());
+    out[4..8].copy_from_slice(&riff.to_le_bytes());
     out[8..12].copy_from_slice(b"WAVE");
     out[12..16].copy_from_slice(b"fmt ");
     out[16..20].copy_from_slice(&16u32.to_le_bytes()); // PCM fmt chunk size
@@ -290,9 +348,7 @@ mod tests {
     #[test]
     fn what_was_spoken_is_what_comes_back() {
         let (mut rec, mut sink) = start(16_000);
-        let input: Vec<f32> = (0..1000)
-            .map(|i| (i as f32 / 40.0).sin() * 0.8)
-            .collect();
+        let input: Vec<f32> = (0..1000).map(|i| (i as f32 / 40.0).sin() * 0.8).collect();
         sink.write(&input);
         rec.drain();
         let wav = rec.wav().unwrap();
@@ -406,6 +462,68 @@ mod tests {
         sink.write(&vec![0.5f32; 64]);
         let wav: Secret = rec.wav().unwrap();
         assert_eq!(wav.len(), HEADER + 128);
+    }
+
+    #[test]
+    fn a_recording_too_long_for_the_format_is_refused_rather_than_truncated() {
+        // A WAV states its sizes in 32-bit fields. Casting a longer length into
+        // one wraps, and the file that comes out opens, plays, and is silently
+        // a fraction of its real length. On a recording somebody made once,
+        // that is the worst shape a defect can take, so the limit is checked.
+        //
+        // The limit itself is asserted rather than the behaviour of a
+        // multi-gigabyte allocation: at 48 kHz 16-bit mono this is a little
+        // over twelve hours, and a test that actually recorded that would not
+        // be a test anybody runs.
+        assert_eq!(WAV_MAX_DATA, u32::MAX as usize - 36);
+
+        // Twelve hours fits; thirteen does not. Both are computed the way the
+        // recorder computes a length, so the boundary is checked in the units
+        // a caller thinks in.
+        let per_second = 48_000 * 2;
+        assert!(12 * 3600 * per_second < WAV_MAX_DATA);
+        assert!(13 * 3600 * per_second > WAV_MAX_DATA);
+    }
+
+    #[test]
+    fn the_header_stays_wrong_rather_than_plausible_if_the_guard_is_ever_lost() {
+        // `write_header` is only reached after `wav` has refused an over-long
+        // recording. This asserts the second line of defence: were that guard
+        // moved or removed, the length written saturates rather than wrapping,
+        // so the file is obviously broken instead of quietly short.
+        let mut out = [0u8; HEADER];
+        write_header(&mut out, 48_000, usize::MAX);
+        let data = u32::from_le_bytes(out[40..44].try_into().unwrap());
+        let riff = u32::from_le_bytes(out[4..8].try_into().unwrap());
+        assert_eq!(data, u32::MAX, "a wrapped length would look plausible");
+        assert_eq!(riff, u32::MAX);
+    }
+
+    #[test]
+    fn abandoning_a_recording_does_not_leave_the_scratch_buffer_full_of_audio() {
+        // The tape wipes itself, chunk by chunk, because every chunk is a
+        // Secret. The scratch buffer is ordinary heap memory, and before this
+        // it was freed with the last drained block still in it: Ctrl-C, or any
+        // error on the way to sealing, handed that memory back to the
+        // allocator with the audio intact.
+        //
+        // Reading freed memory is not something a safe test can do, so this
+        // checks the state `drop` leaves rather than the heap afterwards: the
+        // same buffer, wiped by the same code path the destructor runs.
+        let (mut rec, mut sink) = start(8_000);
+        sink.write(&vec![0.75f32; 2048]);
+        rec.drain();
+        assert!(
+            rec.scratch.iter().any(|&s| s != 0.0),
+            "the drain left nothing in the scratch, so this proves nothing"
+        );
+
+        // The very function the destructor calls, not a copy of it.
+        rec.wipe_scratch();
+        assert!(
+            rec.scratch.iter().all(|&s| s == 0.0),
+            "audio survived in the scratch buffer"
+        );
     }
 
     #[test]

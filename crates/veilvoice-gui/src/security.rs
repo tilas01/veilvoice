@@ -1948,7 +1948,10 @@ mod tests {
     }
 
     /// The text a panel renders, gathered by walking egui's output.
-    fn rendered_text(security: &mut Security, draw: impl Fn(&mut Security, &mut egui::Ui)) -> String {
+    fn rendered_text(
+        security: &mut Security,
+        draw: impl Fn(&mut Security, &mut egui::Ui),
+    ) -> String {
         let ctx = egui::Context::default();
         let input = egui::RawInput {
             screen_rect: Some(egui::Rect::from_min_size(

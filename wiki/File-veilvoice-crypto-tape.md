@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/tape.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 346 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 350 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs)
 
 ## Contents
 
@@ -77,7 +77,7 @@ memory, which is exactly what this is for avoiding.
 
 ## What this file contains
 
-346 lines defining **10 functions** (9 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+350 lines defining **10 functions** (9 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

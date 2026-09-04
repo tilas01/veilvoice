@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 231 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 243 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -142,158 +142,170 @@
 <span class="ln" id="L88">    <span class="tok-com">/// Protected memory for a recording could not be prepared or filled.</span></span>
 <span class="ln" id="L89">    <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
 <span class="ln" id="L90">    <span class="tok-fn">Crypto</span>(veilvoice_crypto::Error),</span>
-<span class="ln" id="L91">}</span>
+<span class="ln" id="L91">    <span class="tok-com">/// The recording is longer than a WAV file can describe. The payload is</span></span>
+<span class="ln" id="L92">    <span class="tok-com">/// how many bytes of audio it holds.</span></span>
+<span class="ln" id="L93">    <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L94">    <span class="tok-fn">TooLong</span>(usize),</span>
+<span class="ln" id="L95">}</span>
 </span>
-<span class="ln" id="L92"></span>
-<span class="ln" id="L93"><span class="tok-kw">impl</span> From&lt;std::io::Error&gt; <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L96"></span>
+<span class="ln" id="L97"><span class="tok-kw">impl</span> From&lt;std::io::Error&gt; <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-from">
-<span class="ln" id="L94">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(e: std::io::Error) -&gt; Self {</span>
-<span class="ln" id="L95">        Self::<span class="tok-fn">Io</span>(e)</span>
-<span class="ln" id="L96">    }</span>
+<span class="ln" id="L98">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(e: std::io::Error) -&gt; Self {</span>
+<span class="ln" id="L99">        Self::<span class="tok-fn">Io</span>(e)</span>
+<span class="ln" id="L100">    }</span>
 </span>
-<span class="ln" id="L97">}</span>
-<span class="ln" id="L98"></span>
-<span class="ln" id="L99"><span class="tok-kw">impl</span> From&lt;hound::Error&gt; <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L101">}</span>
+<span class="ln" id="L102"></span>
+<span class="ln" id="L103"><span class="tok-kw">impl</span> From&lt;hound::Error&gt; <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-from-2">
-<span class="ln" id="L100">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(e: hound::Error) -&gt; Self {</span>
-<span class="ln" id="L101">        Self::<span class="tok-fn">Wav</span>(e)</span>
-<span class="ln" id="L102">    }</span>
+<span class="ln" id="L104">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(e: hound::Error) -&gt; Self {</span>
+<span class="ln" id="L105">        Self::<span class="tok-fn">Wav</span>(e)</span>
+<span class="ln" id="L106">    }</span>
 </span>
-<span class="ln" id="L103">}</span>
-<span class="ln" id="L104"></span>
-<span class="ln" id="L105"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L107">}</span>
+<span class="ln" id="L108"></span>
+<span class="ln" id="L109"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-fmt">
-<span class="ln" id="L106">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L107">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L108">            Self::<span class="tok-fn">Io</span>(e) =&gt; write!(f, <span class="tok-str">&quot;input/output error: {e}&quot;</span>),</span>
-<span class="ln" id="L109">            Self::<span class="tok-fn">Decode</span>(m) =&gt; write!(f, <span class="tok-str">&quot;could not decode audio: {m}&quot;</span>),</span>
-<span class="ln" id="L110">            Self::<span class="tok-fn">Wav</span>(e) =&gt; write!(f, <span class="tok-str">&quot;could not write WAV: {e}&quot;</span>),</span>
-<span class="ln" id="L111">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
-<span class="ln" id="L112">            Self::<span class="tok-fn">Device</span>(m) =&gt; write!(f, <span class="tok-str">&quot;audio device error: {m}&quot;</span>),</span>
-<span class="ln" id="L113">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
-<span class="ln" id="L114">            Self::<span class="tok-fn">Stream</span>(m) =&gt; write!(f, <span class="tok-str">&quot;audio stream error: {m}&quot;</span>),</span>
-<span class="ln" id="L115">            Self::<span class="tok-fn">Engine</span>(m) =&gt; write!(f, <span class="tok-str">&quot;de-identification engine error: {m}&quot;</span>),</span>
-<span class="ln" id="L116">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
-<span class="ln" id="L117">            Self::<span class="tok-fn">Crypto</span>(e) =&gt; write!(f, <span class="tok-str">&quot;protected memory for the recording: {e}&quot;</span>),</span>
-<span class="ln" id="L118">        }</span>
-<span class="ln" id="L119">    }</span>
+<span class="ln" id="L110">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L111">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L112">            Self::<span class="tok-fn">Io</span>(e) =&gt; write!(f, <span class="tok-str">&quot;input/output error: {e}&quot;</span>),</span>
+<span class="ln" id="L113">            Self::<span class="tok-fn">Decode</span>(m) =&gt; write!(f, <span class="tok-str">&quot;could not decode audio: {m}&quot;</span>),</span>
+<span class="ln" id="L114">            Self::<span class="tok-fn">Wav</span>(e) =&gt; write!(f, <span class="tok-str">&quot;could not write WAV: {e}&quot;</span>),</span>
+<span class="ln" id="L115">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L116">            Self::<span class="tok-fn">Device</span>(m) =&gt; write!(f, <span class="tok-str">&quot;audio device error: {m}&quot;</span>),</span>
+<span class="ln" id="L117">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L118">            Self::<span class="tok-fn">Stream</span>(m) =&gt; write!(f, <span class="tok-str">&quot;audio stream error: {m}&quot;</span>),</span>
+<span class="ln" id="L119">            Self::<span class="tok-fn">Engine</span>(m) =&gt; write!(f, <span class="tok-str">&quot;de-identification engine error: {m}&quot;</span>),</span>
+<span class="ln" id="L120">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L121">            Self::<span class="tok-fn">Crypto</span>(e) =&gt; write!(f, <span class="tok-str">&quot;protected memory for the recording: {e}&quot;</span>),</span>
+<span class="ln" id="L122">            <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L123">            Self::<span class="tok-fn">TooLong</span>(bytes) =&gt; write!(</span>
+<span class="ln" id="L124">                f,</span>
+<span class="ln" id="L125">                <span class="tok-str">&quot;this recording holds {bytes} bytes of audio, and a WAV file states \</span></span>
+<span class="ln" id="L126"><span class="tok-str">                 its size in 32-bit fields, so it cannot describe more than {}. \</span></span>
+<span class="ln" id="L127"><span class="tok-str">                 Record in more than one part.&quot;</span>,</span>
+<span class="ln" id="L128">                u32::MAX <span class="tok-kw">as</span> usize - <span class="tok-num">36</span></span>
+<span class="ln" id="L129">            ),</span>
+<span class="ln" id="L130">        }</span>
+<span class="ln" id="L131">    }</span>
 </span>
-<span class="ln" id="L120">}</span>
-<span class="ln" id="L121"></span>
-<span class="ln" id="L122"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L132">}</span>
+<span class="ln" id="L133"></span>
+<span class="ln" id="L134"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-source">
-<span class="ln" id="L123">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;(<span class="tok-kw">dyn</span> std::error::Error + &#x27;<span class="tok-kw">static</span>)&gt; {</span>
-<span class="ln" id="L124">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L125">            Self::<span class="tok-fn">Io</span>(e) =&gt; <span class="tok-fn">Some</span>(e),</span>
-<span class="ln" id="L126">            Self::<span class="tok-fn">Wav</span>(e) =&gt; <span class="tok-fn">Some</span>(e),</span>
-<span class="ln" id="L127">            _ =&gt; None,</span>
-<span class="ln" id="L128">        }</span>
-<span class="ln" id="L129">    }</span>
+<span class="ln" id="L135">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;(<span class="tok-kw">dyn</span> std::error::Error + &#x27;<span class="tok-kw">static</span>)&gt; {</span>
+<span class="ln" id="L136">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L137">            Self::<span class="tok-fn">Io</span>(e) =&gt; <span class="tok-fn">Some</span>(e),</span>
+<span class="ln" id="L138">            Self::<span class="tok-fn">Wav</span>(e) =&gt; <span class="tok-fn">Some</span>(e),</span>
+<span class="ln" id="L139">            _ =&gt; None,</span>
+<span class="ln" id="L140">        }</span>
+<span class="ln" id="L141">    }</span>
 </span>
-<span class="ln" id="L130">}</span>
-<span class="ln" id="L131"></span>
+<span class="ln" id="L142">}</span>
+<span class="ln" id="L143"></span>
 <span class="src-item" id="fn-deidentify">
-<span class="ln" id="L132"><span class="tok-com">/// De-identify a whole buffer of audio in one call.</span></span>
-<span class="ln" id="L133"><span class="tok-com">///</span></span>
-<span class="ln" id="L134"><span class="tok-com">/// Convenience for file processing: it builds an engine at the buffer&#x27;s own</span></span>
-<span class="ln" id="L135"><span class="tok-com">/// sample rate, runs it, and trims the engine&#x27;s start-up delay so the output</span></span>
-<span class="ln" id="L136"><span class="tok-com">/// lines up with the input rather than beginning with a frame of silence.</span></span>
-<span class="ln" id="L137"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">deidentify</span>(audio: &amp;Audio, config: veilvoice_core::DeidConfig) -&gt; Result&lt;Audio, Error&gt; {</span>
-<span class="ln" id="L138">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> config = config;</span>
-<span class="ln" id="L139">    config.sample_rate = audio.sample_rate <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L140">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> engine = veilvoice_core::Deidentifier::<span class="tok-fn">new</span>(config).<span class="tok-fn">map_err</span>(Error::Engine)?;</span>
-<span class="ln" id="L141"></span>
-<span class="ln" id="L142">    <span class="tok-com">// Run past the end by the group delay so the tail is not cut off, then drop</span></span>
-<span class="ln" id="L143">    <span class="tok-com">// the leading silence the STFT inevitably produces.</span></span>
-<span class="ln" id="L144">    <span class="tok-kw">let</span> latency = engine.<span class="tok-fn">latency_samples</span>();</span>
-<span class="ln" id="L145">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> padded = audio.samples.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L146">    padded.<span class="tok-fn">extend</span>(std::iter::<span class="tok-fn">repeat_n</span>(<span class="tok-num">0.0</span>, latency));</span>
-<span class="ln" id="L147"></span>
-<span class="ln" id="L148">    <span class="tok-kw">let</span> processed = engine.<span class="tok-fn">process_vec</span>(&amp;padded);</span>
-<span class="ln" id="L149">    <span class="tok-kw">let</span> samples = processed[latency.<span class="tok-fn">min</span>(processed.<span class="tok-fn">len</span>())..].<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L150">    <span class="tok-fn">Ok</span>(Audio {</span>
-<span class="ln" id="L151">        samples,</span>
-<span class="ln" id="L152">        sample_rate: audio.sample_rate,</span>
-<span class="ln" id="L153">    })</span>
-<span class="ln" id="L154">}</span>
-</span>
-<span class="ln" id="L155"></span>
-<span class="ln" id="L156"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L157"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L158">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L144"><span class="tok-com">/// De-identify a whole buffer of audio in one call.</span></span>
+<span class="ln" id="L145"><span class="tok-com">///</span></span>
+<span class="ln" id="L146"><span class="tok-com">/// Convenience for file processing: it builds an engine at the buffer&#x27;s own</span></span>
+<span class="ln" id="L147"><span class="tok-com">/// sample rate, runs it, and trims the engine&#x27;s start-up delay so the output</span></span>
+<span class="ln" id="L148"><span class="tok-com">/// lines up with the input rather than beginning with a frame of silence.</span></span>
+<span class="ln" id="L149"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">deidentify</span>(audio: &amp;Audio, config: veilvoice_core::DeidConfig) -&gt; Result&lt;Audio, Error&gt; {</span>
+<span class="ln" id="L150">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> config = config;</span>
+<span class="ln" id="L151">    config.sample_rate = audio.sample_rate <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L152">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> engine = veilvoice_core::Deidentifier::<span class="tok-fn">new</span>(config).<span class="tok-fn">map_err</span>(Error::Engine)?;</span>
+<span class="ln" id="L153"></span>
+<span class="ln" id="L154">    <span class="tok-com">// Run past the end by the group delay so the tail is not cut off, then drop</span></span>
+<span class="ln" id="L155">    <span class="tok-com">// the leading silence the STFT inevitably produces.</span></span>
+<span class="ln" id="L156">    <span class="tok-kw">let</span> latency = engine.<span class="tok-fn">latency_samples</span>();</span>
+<span class="ln" id="L157">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> padded = audio.samples.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L158">    padded.<span class="tok-fn">extend</span>(std::iter::<span class="tok-fn">repeat_n</span>(<span class="tok-num">0.0</span>, latency));</span>
 <span class="ln" id="L159"></span>
-<span class="ln" id="L160">    <span class="tok-kw">fn</span> <span class="tok-fn">speech_like</span>(sample_rate: u32, secs: f32) -&gt; Audio {</span>
-<span class="ln" id="L161">        <span class="tok-kw">let</span> n = (sample_rate <span class="tok-kw">as</span> f32 * secs) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L162">        <span class="tok-kw">let</span> samples = (<span class="tok-num">0</span>..n)</span>
-<span class="ln" id="L163">            .<span class="tok-fn">map</span>(|i| {</span>
-<span class="ln" id="L164">                <span class="tok-kw">let</span> t = i <span class="tok-kw">as</span> f32 / sample_rate <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L165">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L166">                <span class="tok-kw">for</span> h <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">12</span> {</span>
-<span class="ln" id="L167">                    s += (std::f32::consts::TAU * <span class="tok-num">150.0</span> * h <span class="tok-kw">as</span> f32 * t).<span class="tok-fn">sin</span>() / h <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L168">                }</span>
-<span class="ln" id="L169">                s * <span class="tok-num">0.1</span></span>
-<span class="ln" id="L170">            })</span>
-<span class="ln" id="L171">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L172">        Audio {</span>
-<span class="ln" id="L173">            samples,</span>
-<span class="ln" id="L174">            sample_rate,</span>
-<span class="ln" id="L175">        }</span>
-<span class="ln" id="L176">    }</span>
-<span class="ln" id="L177"></span>
-<span class="ln" id="L178">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L179">    <span class="tok-kw">fn</span> <span class="tok-fn">deidentify_preserves_length_and_rate</span>() {</span>
-<span class="ln" id="L180">        <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L181">        <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L182">        assert_eq!(out.sample_rate, input.sample_rate);</span>
-<span class="ln" id="L183">        assert_eq!(out.samples.<span class="tok-fn">len</span>(), input.samples.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L184">        assert!(out.samples.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">is_finite</span>()));</span>
-<span class="ln" id="L185">    }</span>
-<span class="ln" id="L186"></span>
-<span class="ln" id="L187">    <span class="tok-com">/// Trimming the group delay matters: without it every processed file would</span></span>
-<span class="ln" id="L188">    <span class="tok-com">/// start with a frame of silence and drift against the original.</span></span>
-<span class="ln" id="L189">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L190">    <span class="tok-kw">fn</span> <span class="tok-fn">output_is_aligned_not_delayed_by_a_silent_frame</span>() {</span>
-<span class="ln" id="L191">        <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L192">        <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L193">        <span class="tok-kw">let</span> head_energy: f32 = out.samples[..<span class="tok-num">2_000</span>].<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|s| s * s).<span class="tok-fn">sum</span>();</span>
-<span class="ln" id="L194">        assert!(</span>
-<span class="ln" id="L195">            head_energy &gt; 1e-<span class="tok-num">6</span>,</span>
-<span class="ln" id="L196">            <span class="tok-str">&quot;output begins with silence: {head_energy:e}&quot;</span></span>
-<span class="ln" id="L197">        );</span>
-<span class="ln" id="L198">    }</span>
-<span class="ln" id="L199"></span>
-<span class="ln" id="L200">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L201">    <span class="tok-kw">fn</span> <span class="tok-fn">output_is_audible_but_not_runaway</span>() {</span>
-<span class="ln" id="L202">        <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L203">        <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L204">        <span class="tok-kw">let</span> rms = |x: &amp;[f32]| (x.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| v * v).sum::&lt;f32&gt;() / x.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32).<span class="tok-fn">sqrt</span>();</span>
-<span class="ln" id="L205">        <span class="tok-kw">let</span> (a, b) = (<span class="tok-fn">rms</span>(&amp;input.samples), <span class="tok-fn">rms</span>(&amp;out.samples));</span>
-<span class="ln" id="L206">        assert!(b &gt; a * <span class="tok-num">0.1</span>, <span class="tok-str">&quot;output too quiet: {a} -&gt; {b}&quot;</span>);</span>
-<span class="ln" id="L207">        assert!(b &lt; a * <span class="tok-num">6.0</span>, <span class="tok-str">&quot;output too loud: {a} -&gt; {b}&quot;</span>);</span>
-<span class="ln" id="L208">    }</span>
-<span class="ln" id="L209"></span>
-<span class="ln" id="L210">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L211">    <span class="tok-kw">fn</span> <span class="tok-fn">works_at_several_sample_rates</span>() {</span>
-<span class="ln" id="L212">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [16_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>] {</span>
-<span class="ln" id="L213">            <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(rate, <span class="tok-num">0.4</span>);</span>
-<span class="ln" id="L214">            <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L215">            assert_eq!(out.sample_rate, rate);</span>
-<span class="ln" id="L216">            assert!(out.samples.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">is_finite</span>()), <span class="tok-str">&quot;rate {rate}&quot;</span>);</span>
-<span class="ln" id="L217">        }</span>
-<span class="ln" id="L218">    }</span>
-<span class="ln" id="L219"></span>
-<span class="ln" id="L220">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L221">    <span class="tok-kw">fn</span> <span class="tok-fn">an_invalid_configuration_is_reported</span>() {</span>
-<span class="ln" id="L222">        <span class="tok-kw">let</span> bad = veilvoice_core::DeidConfig {</span>
-<span class="ln" id="L223">            overlap: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L224">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L225">        };</span>
-<span class="ln" id="L226">        assert!(matches!(</span>
-<span class="ln" id="L227">            <span class="tok-fn">deidentify</span>(&amp;<span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.1</span>), bad),</span>
-<span class="ln" id="L228">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Engine</span>(_))</span>
-<span class="ln" id="L229">        ));</span>
+<span class="ln" id="L160">    <span class="tok-kw">let</span> processed = engine.<span class="tok-fn">process_vec</span>(&amp;padded);</span>
+<span class="ln" id="L161">    <span class="tok-kw">let</span> samples = processed[latency.<span class="tok-fn">min</span>(processed.<span class="tok-fn">len</span>())..].<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L162">    <span class="tok-fn">Ok</span>(Audio {</span>
+<span class="ln" id="L163">        samples,</span>
+<span class="ln" id="L164">        sample_rate: audio.sample_rate,</span>
+<span class="ln" id="L165">    })</span>
+<span class="ln" id="L166">}</span>
+</span>
+<span class="ln" id="L167"></span>
+<span class="ln" id="L168"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L169"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L170">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L171"></span>
+<span class="ln" id="L172">    <span class="tok-kw">fn</span> <span class="tok-fn">speech_like</span>(sample_rate: u32, secs: f32) -&gt; Audio {</span>
+<span class="ln" id="L173">        <span class="tok-kw">let</span> n = (sample_rate <span class="tok-kw">as</span> f32 * secs) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L174">        <span class="tok-kw">let</span> samples = (<span class="tok-num">0</span>..n)</span>
+<span class="ln" id="L175">            .<span class="tok-fn">map</span>(|i| {</span>
+<span class="ln" id="L176">                <span class="tok-kw">let</span> t = i <span class="tok-kw">as</span> f32 / sample_rate <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L177">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L178">                <span class="tok-kw">for</span> h <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">12</span> {</span>
+<span class="ln" id="L179">                    s += (std::f32::consts::TAU * <span class="tok-num">150.0</span> * h <span class="tok-kw">as</span> f32 * t).<span class="tok-fn">sin</span>() / h <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L180">                }</span>
+<span class="ln" id="L181">                s * <span class="tok-num">0.1</span></span>
+<span class="ln" id="L182">            })</span>
+<span class="ln" id="L183">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L184">        Audio {</span>
+<span class="ln" id="L185">            samples,</span>
+<span class="ln" id="L186">            sample_rate,</span>
+<span class="ln" id="L187">        }</span>
+<span class="ln" id="L188">    }</span>
+<span class="ln" id="L189"></span>
+<span class="ln" id="L190">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L191">    <span class="tok-kw">fn</span> <span class="tok-fn">deidentify_preserves_length_and_rate</span>() {</span>
+<span class="ln" id="L192">        <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L193">        <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L194">        assert_eq!(out.sample_rate, input.sample_rate);</span>
+<span class="ln" id="L195">        assert_eq!(out.samples.<span class="tok-fn">len</span>(), input.samples.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L196">        assert!(out.samples.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">is_finite</span>()));</span>
+<span class="ln" id="L197">    }</span>
+<span class="ln" id="L198"></span>
+<span class="ln" id="L199">    <span class="tok-com">/// Trimming the group delay matters: without it every processed file would</span></span>
+<span class="ln" id="L200">    <span class="tok-com">/// start with a frame of silence and drift against the original.</span></span>
+<span class="ln" id="L201">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L202">    <span class="tok-kw">fn</span> <span class="tok-fn">output_is_aligned_not_delayed_by_a_silent_frame</span>() {</span>
+<span class="ln" id="L203">        <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L204">        <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L205">        <span class="tok-kw">let</span> head_energy: f32 = out.samples[..<span class="tok-num">2_000</span>].<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|s| s * s).<span class="tok-fn">sum</span>();</span>
+<span class="ln" id="L206">        assert!(</span>
+<span class="ln" id="L207">            head_energy &gt; 1e-<span class="tok-num">6</span>,</span>
+<span class="ln" id="L208">            <span class="tok-str">&quot;output begins with silence: {head_energy:e}&quot;</span></span>
+<span class="ln" id="L209">        );</span>
+<span class="ln" id="L210">    }</span>
+<span class="ln" id="L211"></span>
+<span class="ln" id="L212">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L213">    <span class="tok-kw">fn</span> <span class="tok-fn">output_is_audible_but_not_runaway</span>() {</span>
+<span class="ln" id="L214">        <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L215">        <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L216">        <span class="tok-kw">let</span> rms = |x: &amp;[f32]| (x.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| v * v).sum::&lt;f32&gt;() / x.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32).<span class="tok-fn">sqrt</span>();</span>
+<span class="ln" id="L217">        <span class="tok-kw">let</span> (a, b) = (<span class="tok-fn">rms</span>(&amp;input.samples), <span class="tok-fn">rms</span>(&amp;out.samples));</span>
+<span class="ln" id="L218">        assert!(b &gt; a * <span class="tok-num">0.1</span>, <span class="tok-str">&quot;output too quiet: {a} -&gt; {b}&quot;</span>);</span>
+<span class="ln" id="L219">        assert!(b &lt; a * <span class="tok-num">6.0</span>, <span class="tok-str">&quot;output too loud: {a} -&gt; {b}&quot;</span>);</span>
+<span class="ln" id="L220">    }</span>
+<span class="ln" id="L221"></span>
+<span class="ln" id="L222">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L223">    <span class="tok-kw">fn</span> <span class="tok-fn">works_at_several_sample_rates</span>() {</span>
+<span class="ln" id="L224">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [16_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>] {</span>
+<span class="ln" id="L225">            <span class="tok-kw">let</span> input = <span class="tok-fn">speech_like</span>(rate, <span class="tok-num">0.4</span>);</span>
+<span class="ln" id="L226">            <span class="tok-kw">let</span> out = <span class="tok-fn">deidentify</span>(&amp;input, Default::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L227">            assert_eq!(out.sample_rate, rate);</span>
+<span class="ln" id="L228">            assert!(out.samples.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">is_finite</span>()), <span class="tok-str">&quot;rate {rate}&quot;</span>);</span>
+<span class="ln" id="L229">        }</span>
 <span class="ln" id="L230">    }</span>
-<span class="ln" id="L231">}</span>
+<span class="ln" id="L231"></span>
+<span class="ln" id="L232">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L233">    <span class="tok-kw">fn</span> <span class="tok-fn">an_invalid_configuration_is_reported</span>() {</span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> bad = veilvoice_core::DeidConfig {</span>
+<span class="ln" id="L235">            overlap: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L236">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L237">        };</span>
+<span class="ln" id="L238">        assert!(matches!(</span>
+<span class="ln" id="L239">            <span class="tok-fn">deidentify</span>(&amp;<span class="tok-fn">speech_like</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.1</span>), bad),</span>
+<span class="ln" id="L240">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Engine</span>(_))</span>
+<span class="ln" id="L241">        ));</span>
+<span class="ln" id="L242">    }</span>
+<span class="ln" id="L243">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
