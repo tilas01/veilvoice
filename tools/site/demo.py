@@ -82,6 +82,102 @@ COMMANDS = [
 ]
 
 
+
+# What each tab of the application is for, in one sentence, for the walkthrough
+# that shows the screenshots. The tab list itself is read out of `app.rs`: this
+# is only the sentence under the picture, and a tab that gains a screenshot
+# without gaining a sentence here fails the build rather than appearing blank.
+TAB_NOTES = {
+    "file": "Point it at a recording, choose how hard to push the voice, and "
+            "write the result. Encryption at rest is already on.",
+    "live": "The microphone, veiled as it runs, into a virtual cable other "
+            "programs can hear. The meters say sound is arriving and leaving.",
+    "group": "One recording with several people in it. Each speaker is given "
+             "their own destination voice, and every voiceprint is destroyed.",
+    "monitor": "Which programs are holding the microphone and camera right "
+               "now, and which screen recorders are running.",
+    "lock": "The password for VeilVoice itself, what that lock is worth, and "
+            "what it deliberately does not protect.",
+    "verify": "Check a download against the signed hash list, then ask your "
+              "own GnuPG the same question.",
+    "settings": "Palettes, motion, the autolock timeout, and the ratchet "
+                "interval. Every one of them says what it costs.",
+    "install": "Copy VeilVoice somewhere the system can find it, or keep "
+               "running it from the folder it is in.",
+    "about": "The version, what this build can do on this machine, and the "
+             "graphics driver that actually drew the window.",
+}
+
+# Worked cases: the things somebody actually wants to do, each as a real
+# command. The *prose* is written here, because an explanation is writing. The
+# **command is checked against the program** in `usecases()`: a case naming a
+# subcommand this build does not have fails the build, so the page cannot go on
+# teaching a command that has been renamed or removed.
+USECASES = [
+    ("Veil one recording",
+     "veilvoice anonymise interview.m4a",
+     "Reads almost any format, writes a veiled WAV, and seals it. It asks for "
+     "a passphrase because the words survive on purpose: a veiled recording "
+     "left in the clear is still a recording of everything that was said."),
+    ("Veil it, and keep the accent",
+     "veilvoice anonymise talk.wav --keep-accent",
+     "The voiceprint still goes. The rhythm and intonation stay, which is "
+     "what you want when the delivery is the point and only the speaker is not."),
+    ("Write it unencrypted, deliberately",
+     "veilvoice anonymise clip.wav --encrypt false",
+     "Allowed, and it tells you in full what you are giving up first, then "
+     "waits for an answer. In a script it prints the same warning and refuses "
+     "rather than guessing."),
+    ("Seal it to somebody else",
+     "veilvoice anonymise clip.wav --encrypt-to them.pub",
+     "X25519 and ML-KEM-768 together, so a recording stored today survives a "
+     "quantum adversary later. Only their secret key opens it, and yours never "
+     "existed."),
+    ("Hear yourself before anybody else does",
+     "veilvoice live --preview",
+     "Routes the veiled voice to your own headphones and nowhere else. This is "
+     "the check to run before an interview rather than during one."),
+    ("Be a microphone other programs can use",
+     "veilvoice live",
+     "Finds a virtual cable and sends the veiled voice into it, so a call, a "
+     "stream or a recorder hears the veiled voice and never the real one."),
+    ("Record yourself, already veiled",
+     "veilvoice record --seconds 30",
+     "Captures the veiled voice straight into an encrypted file. There is "
+     "never an unencrypted recording on the disk, not even briefly, so there "
+     "is nothing to delete afterwards."),
+    ("An interview, one voice each",
+     "veilvoice conversation render --plan interview.toml",
+     "Give each speaker their own destination voice so a question can still be "
+     "told from its answer, with every voiceprint destroyed just as thoroughly."),
+    ("Check a download before running it",
+     "veilvoice verify auto",
+     "Looks in Downloads, checks the signature over the hash list, then checks "
+     "the archive and every file that came out of it. It never holds a private "
+     "key and needs no GnuPG."),
+    ("Strip the metadata off a file",
+     "veilvoice clean photo.jpg",
+     "Tags, EXIF and GPS, in place. A veiled recording in a folder of "
+     "photographs that still carry coordinates is not anonymous."),
+    ("See what is listening",
+     "veilvoice watch",
+     "Which programs currently hold the microphone and the camera. It says "
+     "what it cannot see as plainly as what it can."),
+    ("Erase something properly",
+     "veilvoice shred draft.wav",
+     "Overwrites and deletes, and is honest that on an SSD or a memory card "
+     "the original blocks can survive every overwrite. That is why encryption "
+     "at rest is the default rather than a thing to remember."),
+    ("What this build can actually do here",
+     "veilvoice info",
+     "Every version, whether live audio has a backend on this machine, and the "
+     "network answer, which is that nothing here reaches one."),
+    ("Require a lock and encryption, always",
+     "veilvoice mandate status",
+     "The two things VeilVoice insists on unless told otherwise. Relaxing one "
+     "is written down with the date, so the choice is never a mystery later."),
+]
+
 # The recorded sessions, in the order somebody meeting this project would want
 # them: check the download first, then see what the program does, then see what
 # it refuses to do. `tools/shots/sessions.py` records them; this is what each
@@ -207,6 +303,71 @@ def sessions():
     return out
 
 
+def shots():
+    """Each tab, its screenshot, and the sentence that goes under it.
+
+    The tab list comes from `app.rs` and the pictures from `assets/screenshots`.
+    Pairing them here is what keeps the walkthrough honest: a tab with no
+    photograph, or a photograph with no sentence, stops the build rather than
+    rendering a gap somebody has to notice.
+    """
+    out = []
+    for tab in tabs():
+        key = tab["key"]
+        name = "gui-%s.png" % key
+        path = os.path.join(ROOT, "assets", "screenshots", name)
+        if not os.path.exists(path):
+            raise SystemExit(
+                "the application has a %r tab and %s does not exist, so the\n"
+                "  walkthrough would show a heading with nothing under it.\n"
+                "  Run: python tools/shots/gui.py --capture"
+                % (key, os.path.relpath(path, ROOT)))
+        note = TAB_NOTES.get(key)
+        if not note:
+            raise SystemExit(
+                "the application has a %r tab with no sentence in TAB_NOTES.\n"
+                "  Every picture in the walkthrough is captioned; add one\n"
+                "  rather than shipping a screenshot nobody has explained."
+                % key)
+        out.append({
+            "key": key,
+            "label": tab["label"],
+            "image": "assets/screenshots/" + name,
+            "note": note,
+        })
+    return out
+
+
+def usecases():
+    """The worked command line cases, each checked against the real program.
+
+    The explanation is written by hand. The command is not trusted: the
+    subcommand it names is looked up in the captured `veilvoice --help`, so a
+    case teaching a command that has been renamed or removed fails here instead
+    of on somebody's terminal.
+    """
+    help_text = read(os.path.join(ROOT, "assets", "screenshots", "cli-help.txt"))
+    known = set(re.findall(r"^\s{2}([a-z][a-z-]+)\s{2,}\S", help_text, re.M))
+    out = []
+    for title, typed, note in USECASES:
+        parts = typed.split()
+        if not parts or parts[0] != "veilvoice":
+            raise SystemExit("a use case must be a `veilvoice ...` command: %r" % typed)
+        if len(parts) < 2:
+            raise SystemExit("a use case must name a subcommand: %r" % typed)
+        sub = parts[1]
+        if sub not in known:
+            raise SystemExit(
+                "the use case %r runs `veilvoice %s`, which this build's own\n"
+                "  --help does not list. Either the command was renamed and this\n"
+                "  case teaches something that no longer works, or the capture in\n"
+                "  assets/screenshots/cli-help.txt is stale. Fix whichever it is\n"
+                "  rather than publishing a command that fails.\n"
+                "  Known: %s" % (title, sub, ", ".join(sorted(known))))
+        out.append({"title": title, "typed": typed, "note": note})
+    return out
+
+
 def version():
     manifest = read(os.path.join(ROOT, "Cargo.toml"))
     block = re.search(r"\[workspace\.package\]([\s\S]*?)(\n\[|$)", manifest)
@@ -220,6 +381,8 @@ def build():
         "tabs": tabs(),
         "commands": commands(),
         "sessions": sessions(),
+        "shots": shots(),
+        "usecases": usecases(),
     }
     # Sorted keys and a fixed indent, so the file is a function of the facts
     # rather than of the order a dict happened to be built in.
@@ -263,8 +426,9 @@ def main():
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with io.open(path, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(text)
-    print("  wrote %s (%d tabs, %d commands, %d sessions)"
-          % (OUT, len(tabs()), len(commands()), len(sessions())))
+    print("  wrote %s (%d tabs, %d commands, %d sessions, %d shots, %d cases)"
+          % (OUT, len(tabs()), len(commands()), len(sessions()),
+             len(shots()), len(usecases())))
     return 0
 
 

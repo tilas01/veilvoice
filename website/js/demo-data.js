@@ -19,7 +19,7 @@ window.VEILVOICE_DEMO = {
     {
       "name": "help",
       "note": "everything the command line offers",
-      "output": "VeilVoice destroys the biometric voiceprint of a speaker: the pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here.\n\nUsage: veilvoice <COMMAND>\n\nCommands:\n  anonymise     De-identify an audio file and write a WAV\n  live          Scramble a microphone live, into a device or a virtual cable\n  devices       List the audio devices this machine offers\n  clean         Strip identifying metadata from an audio or image file, in place\n  encrypt       Encrypt a file into a `.veil` container\n  decrypt       Decrypt a `.veil` container\n  keygen        Generate a hybrid post-quantum key pair\n  guard         Record and check the integrity of VeilVoice's own files\n  lock          Manage the application lock that guards the desktop app\n  watch         Show which applications are using the microphone and camera\n  shred         Securely erase a file, then delete it. Irreversible\n  info          Show version and build information\n  accel         The graphics hardware here, and what it is good for\n  gui           Open the desktop application\n  install       Copy VeilVoice somewhere the system can find it, and add it to PATH\n  uninstall     Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy\n  policy        Settings fixed so the interface cannot turn them off\n  conversation  A recording with several people in it: a voice each, and subtitles\n  capture       Which screen recorders are running, and which you meant to run\n  decoy         A second passphrase that opens an empty VeilVoice, and its limits\n  failsafe      The safety catch: what it watches for, and what it cannot do\n  privilege     What VeilVoice is running with, and what that lets it see\n  appctl        Learn what normally runs here, then notice what does not\n  input         What running programs can see your keyboard and mouse\n  sentry        Canaries, and how fast a folder is changing\n  companions    Optional third-party software VeilVoice works with, and whether this machine already has it\n  verify        Check a download, and what does the checking\n  video         Turn a veiled recording into a video with a black picture\n  import        Take the sound out of a recording made somewhere else\n  volumes       Encrypted volumes this machine has: Cryptomator and VeraCrypt\n  help          Print this message or the help of the given subcommand(s)\n\nOptions:\n  -h, --help\n          Print help (see a summary with '-h')\n\n  -V, --version\n          Print version",
+      "output": "VeilVoice destroys the biometric voiceprint of a speaker: the pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here.\n\nUsage: veilvoice <COMMAND>\n\nCommands:\n  anonymise     De-identify an audio file and write a WAV\n  live          Scramble a microphone live, into a device or a virtual cable\n  record        Record yourself already veiled, straight into an encrypted file\n  devices       List the audio devices this machine offers\n  clean         Strip identifying metadata from an audio or image file, in place\n  encrypt       Encrypt a file into a `.veil` container\n  decrypt       Decrypt a `.veil` container\n  keygen        Generate a hybrid post-quantum key pair\n  guard         Record and check the integrity of VeilVoice's own files\n  lock          Manage the application lock that guards the desktop app\n  watch         Show which applications are using the microphone and camera\n  shred         Securely erase a file, then delete it. Irreversible\n  info          Show version and build information\n  accel         The graphics hardware here, and what it is good for\n  gui           Open the desktop application\n  install       Copy VeilVoice somewhere the system can find it, and add it to PATH\n  uninstall     Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy\n  policy        Settings fixed so the interface cannot turn them off\n  mandate       The two things VeilVoice insists on, unless you say otherwise\n  conversation  A recording with several people in it: a voice each, and subtitles\n  capture       Which screen recorders are running, and which you meant to run\n  decoy         A second passphrase that opens an empty VeilVoice, and its limits\n  failsafe      The safety catch: what it watches for, and what it cannot do\n  privilege     What VeilVoice is running with, and what that lets it see\n  appctl        Learn what normally runs here, then notice what does not\n  input         What running programs can see your keyboard and mouse\n  sentry        Canaries, and how fast a folder is changing\n  companions    Optional third-party software VeilVoice works with, and whether this machine already has it\n  verify        Check a download, and what does the checking\n  video         Turn a veiled recording into a video with a black picture\n  import        Take the sound out of a recording made somewhere else\n  volumes       Encrypted volumes this machine has: Cryptomator and VeraCrypt\n  help          Print this message or the help of the given subcommand(s)\n\nOptions:\n  -h, --help\n          Print help (see a summary with '-h')\n\n  -V, --version\n          Print version",
       "typed": "veilvoice --help"
     },
     {
@@ -143,6 +143,62 @@ window.VEILVOICE_DEMO = {
       "title": "Asking for it in the clear"
     }
   ],
+  "shots": [
+    {
+      "image": "assets/screenshots/gui-file.png",
+      "key": "file",
+      "label": "Anonymise file",
+      "note": "Point it at a recording, choose how hard to push the voice, and write the result. Encryption at rest is already on."
+    },
+    {
+      "image": "assets/screenshots/gui-live.png",
+      "key": "live",
+      "label": "Live scramble",
+      "note": "The microphone, veiled as it runs, into a virtual cable other programs can hear. The meters say sound is arriving and leaving."
+    },
+    {
+      "image": "assets/screenshots/gui-group.png",
+      "key": "group",
+      "label": "Group",
+      "note": "One recording with several people in it. Each speaker is given their own destination voice, and every voiceprint is destroyed."
+    },
+    {
+      "image": "assets/screenshots/gui-monitor.png",
+      "key": "monitor",
+      "label": "Monitor",
+      "note": "Which programs are holding the microphone and camera right now, and which screen recorders are running."
+    },
+    {
+      "image": "assets/screenshots/gui-lock.png",
+      "key": "lock",
+      "label": "Lock",
+      "note": "The password for VeilVoice itself, what that lock is worth, and what it deliberately does not protect."
+    },
+    {
+      "image": "assets/screenshots/gui-verify.png",
+      "key": "verify",
+      "label": "Verify",
+      "note": "Check a download against the signed hash list, then ask your own GnuPG the same question."
+    },
+    {
+      "image": "assets/screenshots/gui-settings.png",
+      "key": "settings",
+      "label": "Settings",
+      "note": "Palettes, motion, the autolock timeout, and the ratchet interval. Every one of them says what it costs."
+    },
+    {
+      "image": "assets/screenshots/gui-install.png",
+      "key": "install",
+      "label": "Install",
+      "note": "Copy VeilVoice somewhere the system can find it, or keep running it from the folder it is in."
+    },
+    {
+      "image": "assets/screenshots/gui-about.png",
+      "key": "about",
+      "label": "About",
+      "note": "The version, what this build can do on this machine, and the graphics driver that actually drew the window."
+    }
+  ],
   "tabs": [
     {
       "key": "file",
@@ -179,6 +235,78 @@ window.VEILVOICE_DEMO = {
     {
       "key": "about",
       "label": "About"
+    }
+  ],
+  "usecases": [
+    {
+      "note": "Reads almost any format, writes a veiled WAV, and seals it. It asks for a passphrase because the words survive on purpose: a veiled recording left in the clear is still a recording of everything that was said.",
+      "title": "Veil one recording",
+      "typed": "veilvoice anonymise interview.m4a"
+    },
+    {
+      "note": "The voiceprint still goes. The rhythm and intonation stay, which is what you want when the delivery is the point and only the speaker is not.",
+      "title": "Veil it, and keep the accent",
+      "typed": "veilvoice anonymise talk.wav --keep-accent"
+    },
+    {
+      "note": "Allowed, and it tells you in full what you are giving up first, then waits for an answer. In a script it prints the same warning and refuses rather than guessing.",
+      "title": "Write it unencrypted, deliberately",
+      "typed": "veilvoice anonymise clip.wav --encrypt false"
+    },
+    {
+      "note": "X25519 and ML-KEM-768 together, so a recording stored today survives a quantum adversary later. Only their secret key opens it, and yours never existed.",
+      "title": "Seal it to somebody else",
+      "typed": "veilvoice anonymise clip.wav --encrypt-to them.pub"
+    },
+    {
+      "note": "Routes the veiled voice to your own headphones and nowhere else. This is the check to run before an interview rather than during one.",
+      "title": "Hear yourself before anybody else does",
+      "typed": "veilvoice live --preview"
+    },
+    {
+      "note": "Finds a virtual cable and sends the veiled voice into it, so a call, a stream or a recorder hears the veiled voice and never the real one.",
+      "title": "Be a microphone other programs can use",
+      "typed": "veilvoice live"
+    },
+    {
+      "note": "Captures the veiled voice straight into an encrypted file. There is never an unencrypted recording on the disk, not even briefly, so there is nothing to delete afterwards.",
+      "title": "Record yourself, already veiled",
+      "typed": "veilvoice record --seconds 30"
+    },
+    {
+      "note": "Give each speaker their own destination voice so a question can still be told from its answer, with every voiceprint destroyed just as thoroughly.",
+      "title": "An interview, one voice each",
+      "typed": "veilvoice conversation render --plan interview.toml"
+    },
+    {
+      "note": "Looks in Downloads, checks the signature over the hash list, then checks the archive and every file that came out of it. It never holds a private key and needs no GnuPG.",
+      "title": "Check a download before running it",
+      "typed": "veilvoice verify auto"
+    },
+    {
+      "note": "Tags, EXIF and GPS, in place. A veiled recording in a folder of photographs that still carry coordinates is not anonymous.",
+      "title": "Strip the metadata off a file",
+      "typed": "veilvoice clean photo.jpg"
+    },
+    {
+      "note": "Which programs currently hold the microphone and the camera. It says what it cannot see as plainly as what it can.",
+      "title": "See what is listening",
+      "typed": "veilvoice watch"
+    },
+    {
+      "note": "Overwrites and deletes, and is honest that on an SSD or a memory card the original blocks can survive every overwrite. That is why encryption at rest is the default rather than a thing to remember.",
+      "title": "Erase something properly",
+      "typed": "veilvoice shred draft.wav"
+    },
+    {
+      "note": "Every version, whether live audio has a backend on this machine, and the network answer, which is that nothing here reaches one.",
+      "title": "What this build can actually do here",
+      "typed": "veilvoice info"
+    },
+    {
+      "note": "The two things VeilVoice insists on unless told otherwise. Relaxing one is written down with the date, so the choice is never a mystery later.",
+      "title": "Require a lock and encryption, always",
+      "typed": "veilvoice mandate status"
     }
   ],
   "version": "0.1.18"

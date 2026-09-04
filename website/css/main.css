@@ -2504,3 +2504,123 @@ html:not(.js) .js-toggle-lock { display: inline; }
   .viewer { padding: 10px; }
   .viewer .shut { top: 10px; right: 12px; }
 }
+
+/* ---------------------------------------------------------------------------
+   The walkthrough: photographs of every screen, and the command line as jobs.
+
+   Deliberately plain. The pictures are the content, so the chrome around them
+   stays out of the way: a row of tabs, one framed image, and a caption. The
+   grid for the command cases collapses to a single column rather than
+   shrinking, because a worked example is a sentence and a sentence in a
+   40-character column is worse than a taller page.
+   --------------------------------------------------------------------------- */
+
+.walk { margin-top: 46px; }
+
+.walk-h {
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--accent-2);
+  margin: 0 0 8px;
+}
+.walk-h-cli { margin-top: 44px; }
+
+.walk-lede {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0 0 16px;
+  max-width: 70ch;
+}
+
+.walk-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.walk-tab {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--muted);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.walk-tab:hover { color: var(--fg); border-color: var(--accent); }
+.walk-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.walk-tab-on {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.walk-shot {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-inset);
+  padding: 10px;
+}
+.walk-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+.walk-shot figcaption {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 10px;
+  max-width: 70ch;
+}
+
+.walk-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.walk-case {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  padding: 13px 15px;
+}
+
+.walk-case-title {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  color: var(--fg);
+}
+
+.walk-case-cmd {
+  display: block;
+  font-size: 12.5px;
+  color: var(--cyan);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 7px 9px;
+  margin-bottom: 9px;
+  /* A long command wraps rather than scrolling the page sideways. */
+  overflow-wrap: anywhere;
+}
+
+.walk-case-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .walk-cases { grid-template-columns: 1fr; }
+  .walk-shot { padding: 6px; }
+}
