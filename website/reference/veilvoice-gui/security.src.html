@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="security.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2211 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="security.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2269 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1033,7 +1033,7 @@
 <span class="ln" id="L917">            });</span>
 <span class="ln" id="L918">            <span class="tok-kw">let</span> matched = !<span class="tok-kw">self</span>.fresh.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.fresh == <span class="tok-kw">self</span>.repeat;</span>
 <span class="ln" id="L919"></span>
-<span class="ln" id="L920">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L920">            <span class="tok-fn">button_column</span>(ui, |ui| {</span>
 <span class="ln" id="L921">                <span class="tok-kw">if</span> ui</span>
 <span class="ln" id="L922">                    .<span class="tok-fn">add_enabled</span>(</span>
 <span class="ln" id="L923">                        !busy &amp;&amp; matched &amp;&amp; !<span class="tok-kw">self</span>.current.<span class="tok-fn">is_empty</span>(),</span>
@@ -1082,10 +1082,10 @@
 <span class="ln" id="L966">                <span class="tok-fn">password_row</span>(ui, <span class="tok-str">&quot;repeat&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.repeat);</span>
 <span class="ln" id="L967">            });</span>
 <span class="ln" id="L968">            <span class="tok-kw">let</span> matched = !<span class="tok-kw">self</span>.fresh.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.fresh == <span class="tok-kw">self</span>.repeat;</span>
-<span class="ln" id="L969">            <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L970">                .<span class="tok-fn">add_enabled</span>(!busy &amp;&amp; matched, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;set app lock&quot;</span>))</span>
-<span class="ln" id="L971">                .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L972">            {</span>
+<span class="ln" id="L969">            <span class="tok-kw">let</span> set = <span class="tok-fn">button_column</span>(ui, |ui| {</span>
+<span class="ln" id="L970">                ui.<span class="tok-fn">add_enabled</span>(!busy &amp;&amp; matched, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;set app lock&quot;</span>))</span>
+<span class="ln" id="L971">            });</span>
+<span class="ln" id="L972">            <span class="tok-kw">if</span> set.<span class="tok-fn">clicked</span>() {</span>
 <span class="ln" id="L973">                <span class="tok-kw">let</span> fresh = std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.fresh);</span>
 <span class="ln" id="L974">                <span class="tok-kw">self</span>.repeat.<span class="tok-fn">zeroize</span>();</span>
 <span class="ln" id="L975">                <span class="tok-kw">self</span>.<span class="tok-fn">spawn</span>(Op::Set, fresh, String::<span class="tok-fn">new</span>());</span>
@@ -1656,7 +1656,7 @@
 <span class="ln" id="L1508"><span class="tok-kw">const</span> PASSWORD_LABEL_WIDTH: f32 = <span class="tok-num">82.0</span>;</span>
 </span>
 <span class="ln" id="L1509"></span>
-<span class="src-item" id="fn-password_row">
+<span class="src-item" id="fn-button_column">
 <span class="ln" id="L1510"><span class="tok-com">/// One labelled passphrase field, with the field in the same place every time.</span></span>
 <span class="ln" id="L1511"><span class="tok-com">///</span></span>
 <span class="ln" id="L1512"><span class="tok-com">/// # Why the label gets a column of its own</span></span>
@@ -1676,690 +1676,750 @@
 <span class="ln" id="L1526"><span class="tok-com">/// x on every screen.</span></span>
 <span class="ln" id="L1527"><span class="tok-com">///</span></span>
 <span class="ln" id="L1528"><span class="tok-com">/// Returns the field itself, so a caller, or a test, can ask where it landed.</span></span>
-<span class="ln" id="L1529"><span class="tok-kw">fn</span> <span class="tok-fn">password_row</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, value: &amp;<span class="tok-kw">mut</span> String) -&gt; egui::Response {</span>
-<span class="ln" id="L1530">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1531">        ui.<span class="tok-fn">allocate_ui_with_layout</span>(</span>
-<span class="ln" id="L1532">            egui::<span class="tok-fn">vec2</span>(PASSWORD_LABEL_WIDTH, ui.<span class="tok-fn">spacing</span>().interact_size.y),</span>
-<span class="ln" id="L1533">            egui::Layout::<span class="tok-fn">left_to_right</span>(egui::Align::Center),</span>
-<span class="ln" id="L1534">            |ui| {</span>
-<span class="ln" id="L1535">                <span class="tok-com">// `allocate_ui_with_layout` asks for this width but gives back</span></span>
-<span class="ln" id="L1536">                <span class="tok-com">// only what the contents used, so a short label would consume a</span></span>
-<span class="ln" id="L1537">                <span class="tok-com">// short column and the field would move left again.</span></span>
-<span class="ln" id="L1538">                <span class="tok-com">// `set_min_width` is what makes the column a column.</span></span>
-<span class="ln" id="L1539">                ui.<span class="tok-fn">set_min_width</span>(PASSWORD_LABEL_WIDTH);</span>
-<span class="ln" id="L1540">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()))</span>
-<span class="ln" id="L1541">            },</span>
-<span class="ln" id="L1542">        );</span>
-<span class="ln" id="L1543">        ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L1544">            egui::TextEdit::<span class="tok-fn">singleline</span>(value)</span>
-<span class="ln" id="L1545">                .<span class="tok-fn">password</span>(true)</span>
-<span class="ln" id="L1546">                .<span class="tok-fn">desired_width</span>(<span class="tok-num">260.0</span>),</span>
-<span class="ln" id="L1547">        )</span>
-<span class="ln" id="L1548">    })</span>
-<span class="ln" id="L1549">    .inner</span>
-<span class="ln" id="L1550">}</span>
+<span class="ln" id="L1529"><span class="tok-com">/// Draw `contents` in the same column the passphrase fields occupy.</span></span>
+<span class="ln" id="L1530"><span class="tok-com">///</span></span>
+<span class="ln" id="L1531"><span class="tok-com">/// The buttons under a passphrase field act on that field, and they were</span></span>
+<span class="ln" id="L1532"><span class="tok-com">/// starting at the panel&#x27;s left edge while the fields they belong to started</span></span>
+<span class="ln" id="L1533"><span class="tok-com">/// one label-width in. The eye reads a left edge as a grouping, so the buttons</span></span>
+<span class="ln" id="L1534"><span class="tok-com">/// looked like they belonged to the section rather than to the fields directly</span></span>
+<span class="ln" id="L1535"><span class="tok-com">/// above them, and the further down the tab you went the more obviously the two</span></span>
+<span class="ln" id="L1536"><span class="tok-com">/// columns disagreed.</span></span>
+<span class="ln" id="L1537"><span class="tok-com">///</span></span>
+<span class="ln" id="L1538"><span class="tok-com">/// Indented by the same [`PASSWORD_LABEL_WIDTH`] the labels reserve, so there</span></span>
+<span class="ln" id="L1539"><span class="tok-com">/// is one column rather than two. Taking the width from that constant rather</span></span>
+<span class="ln" id="L1540"><span class="tok-com">/// than repeating the number is what keeps them in step: changing the label</span></span>
+<span class="ln" id="L1541"><span class="tok-com">/// column moves the buttons with it.</span></span>
+<span class="ln" id="L1542"><span class="tok-kw">fn</span> button_column&lt;R&gt;(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>(&amp;<span class="tok-kw">mut</span> egui::Ui) -&gt; R) -&gt; R {</span>
+<span class="ln" id="L1543">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1544">        <span class="tok-com">// The label column *plus* the gap between it and the field. A field sits</span></span>
+<span class="ln" id="L1545">        <span class="tok-com">// at `left + PASSWORD_LABEL_WIDTH + item_spacing`, because the row lays</span></span>
+<span class="ln" id="L1546">        <span class="tok-com">// the label column and the field out as two items; a button indented by</span></span>
+<span class="ln" id="L1547">        <span class="tok-com">// the width alone lands one gap short, which is the eight pixels this</span></span>
+<span class="ln" id="L1548">        <span class="tok-com">// was out by. Read from the style rather than written as a number, so a</span></span>
+<span class="ln" id="L1549">        <span class="tok-com">// theme with different spacing keeps the two in step.</span></span>
+<span class="ln" id="L1550">        ui.<span class="tok-fn">add_space</span>(PASSWORD_LABEL_WIDTH + ui.<span class="tok-fn">spacing</span>().item_spacing.x);</span>
+<span class="ln" id="L1551">        <span class="tok-fn">contents</span>(ui)</span>
+<span class="ln" id="L1552">    })</span>
+<span class="ln" id="L1553">    .inner</span>
+<span class="ln" id="L1554">}</span>
 </span>
-<span class="ln" id="L1551"></span>
-<span class="ln" id="L1552"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1553"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L1554">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L1555"></span>
-<span class="ln" id="L1556">    <span class="tok-com">/// Every passphrase field starts at the same x, whatever its label says.</span></span>
-<span class="ln" id="L1557">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1558">    <span class="tok-com">/// The defect: the labels were padded with trailing spaces to fake a</span></span>
-<span class="ln" id="L1559">    <span class="tok-com">/// column, which lines nothing up in a proportional font. Screens drawn</span></span>
-<span class="ln" id="L1560">    <span class="tok-com">/// only after setup carry the labels that needed the most padding, so</span></span>
-<span class="ln" id="L1561">    <span class="tok-com">/// their fields, and the buttons under them, sat at a different place</span></span>
-<span class="ln" id="L1562">    <span class="tok-com">/// from the ones present at launch.</span></span>
-<span class="ln" id="L1563">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1564">    <span class="tok-com">/// The shortest and the longest label in use are drawn here. If the fields</span></span>
-<span class="ln" id="L1565">    <span class="tok-com">/// ever part company again this fails with both positions.</span></span>
-<span class="ln" id="L1566">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1567">    <span class="tok-kw">fn</span> <span class="tok-fn">every_passphrase_field_starts_in_the_same_place</span>() {</span>
-<span class="ln" id="L1568">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1569">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
-<span class="ln" id="L1570">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
-<span class="ln" id="L1571">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L1572">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">400.0</span>),</span>
-<span class="ln" id="L1573">            )),</span>
-<span class="ln" id="L1574">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1575">        };</span>
-<span class="ln" id="L1576"></span>
-<span class="ln" id="L1577">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> starts: Vec&lt;(&amp;str, f32)&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1578">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
-<span class="ln" id="L1579">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
-<span class="ln" id="L1580">                <span class="tok-kw">for</span> label <span class="tok-kw">in</span> [<span class="tok-str">&quot;new&quot;</span>, <span class="tok-str">&quot;password&quot;</span>, <span class="tok-str">&quot;passphrase&quot;</span>] {</span>
-<span class="ln" id="L1581">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> value = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1582">                    <span class="tok-com">// Where the field actually landed, read back from the</span></span>
-<span class="ln" id="L1583">                    <span class="tok-com">// widget. Deriving it from the column width instead would</span></span>
-<span class="ln" id="L1584">                    <span class="tok-com">// be the test agreeing with itself: it would pass whether</span></span>
-<span class="ln" id="L1585">                    <span class="tok-com">// or not the column was ever applied.</span></span>
-<span class="ln" id="L1586">                    <span class="tok-kw">let</span> field = <span class="tok-fn">password_row</span>(ui, label, &amp;<span class="tok-kw">mut</span> value);</span>
-<span class="ln" id="L1587">                    starts.<span class="tok-fn">push</span>((label, field.rect.<span class="tok-fn">left</span>()));</span>
-<span class="ln" id="L1588">                }</span>
-<span class="ln" id="L1589">            });</span>
-<span class="ln" id="L1590">        });</span>
-<span class="ln" id="L1591"></span>
-<span class="ln" id="L1592">        <span class="tok-kw">let</span> first = starts[<span class="tok-num">0</span>].<span class="tok-num">1</span>;</span>
-<span class="ln" id="L1593">        <span class="tok-kw">for</span> (label, at) <span class="tok-kw">in</span> &amp;starts {</span>
-<span class="ln" id="L1594">            assert!(</span>
-<span class="ln" id="L1595">                (at - first).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L1596">                <span class="tok-str">&quot;the field after {label:?} starts at {at}, and the first starts at {first}&quot;</span></span>
-<span class="ln" id="L1597">            );</span>
-<span class="ln" id="L1598">        }</span>
-<span class="ln" id="L1599">    }</span>
-<span class="ln" id="L1600"></span>
-<span class="ln" id="L1601">    <span class="tok-com">/// No passphrase label is padded with spaces to fake its width.</span></span>
-<span class="ln" id="L1602">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1603">    <span class="tok-com">/// The column is what aligns these now. A label that comes back padded is</span></span>
-<span class="ln" id="L1604">    <span class="tok-com">/// somebody reaching for the old trick, and it would drift again the first</span></span>
-<span class="ln" id="L1605">    <span class="tok-com">/// time the font changed.</span></span>
-<span class="ln" id="L1606">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1607">    <span class="tok-kw">fn</span> <span class="tok-fn">no_passphrase_label_is_padded_with_spaces</span>() {</span>
-<span class="ln" id="L1608">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1609">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> source.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L1610">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1611">            <span class="tok-kw">if</span> !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;password_row(ui, \&quot;&quot;</span>) {</span>
-<span class="ln" id="L1612">                continue;</span>
-<span class="ln" id="L1613">            }</span>
-<span class="ln" id="L1614">            <span class="tok-kw">let</span> label = trimmed.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a quoted label&quot;</span>);</span>
-<span class="ln" id="L1615">            assert_eq!(</span>
-<span class="ln" id="L1616">                label,</span>
-<span class="ln" id="L1617">                label.<span class="tok-fn">trim</span>(),</span>
-<span class="ln" id="L1618">                <span class="tok-str">&quot;the label {label:?} is padded with spaces; give it the column instead&quot;</span></span>
-<span class="ln" id="L1619">            );</span>
-<span class="ln" id="L1620">        }</span>
-<span class="ln" id="L1621">    }</span>
-<span class="ln" id="L1622"></span>
-<span class="ln" id="L1623">    <span class="tok-com">/// **Marker 74.** The locked window explains nothing.</span></span>
-<span class="ln" id="L1624">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1625">    <span class="tok-com">/// It used to explain a great deal: what the lock is and is not worth,</span></span>
-<span class="ln" id="L1626">    <span class="tok-com">/// where its file lives, and that deleting that file starts over. All true,</span></span>
-<span class="ln" id="L1627">    <span class="tok-com">/// all addressed to the wrong person. The reader of a locked window is</span></span>
-<span class="ln" id="L1628">    <span class="tok-com">/// either its owner, who does not need any of it at that moment, or</span></span>
-<span class="ln" id="L1629">    <span class="tok-com">/// somebody who picked the machine up.</span></span>
-<span class="ln" id="L1630">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1631">    <span class="tok-com">/// This reads the source of `unlock_screen` rather than rendering it,</span></span>
-<span class="ln" id="L1632">    <span class="tok-com">/// because what is being held is that certain sentences are not reachable</span></span>
-<span class="ln" id="L1633">    <span class="tok-com">/// from that function at all. A rendering test would only prove they were</span></span>
-<span class="ln" id="L1634">    <span class="tok-com">/// absent from one frame.</span></span>
-<span class="ln" id="L1635">    <span class="tok-com">/// Marker 86. The passphrase is kept only for the mode that needs it.</span></span>
-<span class="ln" id="L1636">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1637">    <span class="tok-com">/// A user who has not asked for app-lock sealing must keep the old</span></span>
-<span class="ln" id="L1638">    <span class="tok-com">/// behaviour exactly: the passphrase is wiped the instant it has been</span></span>
-<span class="ln" id="L1639">    <span class="tok-com">/// checked. Holding it &quot;just in case&quot; would be a security regression paid</span></span>
-<span class="ln" id="L1640">    <span class="tok-com">/// for by everybody, to make a feature nobody switched on slightly more</span></span>
-<span class="ln" id="L1641">    <span class="tok-com">/// convenient.</span></span>
-<span class="ln" id="L1642">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1643">    <span class="tok-kw">fn</span> <span class="tok-fn">the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span>() {</span>
-<span class="ln" id="L1644">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1645">        <span class="tok-kw">let</span> poll = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn poll(&amp;mut self)&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;poll exists&quot;</span>);</span>
-<span class="ln" id="L1646">        <span class="tok-kw">let</span> end = source[poll..]</span>
-<span class="ln" id="L1647">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    fn wipe_form&quot;</span>)</span>
-<span class="ln" id="L1648">            .<span class="tok-fn">map</span>(|at| poll + at)</span>
-<span class="ln" id="L1649">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L1650">        <span class="tok-kw">let</span> body = &amp;source[poll..end];</span>
-<span class="ln" id="L1651">        assert!(</span>
-<span class="ln" id="L1652">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;if self.sealing == Sealing::AppLock&quot;</span>),</span>
-<span class="ln" id="L1653">            <span class="tok-str">&quot;the capture is unconditional, so every user now carries their \</span></span>
-<span class="ln" id="L1654"><span class="tok-str">             app-lock passphrase in memory for the session&quot;</span></span>
-<span class="ln" id="L1655">        );</span>
-<span class="ln" id="L1656">    }</span>
-<span class="ln" id="L1657"></span>
-<span class="ln" id="L1658">    <span class="tok-com">/// F-94. Changing the app-lock password must not leave the old one sealing</span></span>
-<span class="ln" id="L1659">    <span class="tok-com">/// new recordings. A user who changes their password and keeps working</span></span>
-<span class="ln" id="L1660">    <span class="tok-com">/// would otherwise produce files that open with a password they have just</span></span>
-<span class="ln" id="L1661">    <span class="tok-com">/// replaced, and be told nothing.</span></span>
-<span class="ln" id="L1662">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1663">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_the_password_drops_the_passphrase_that_was_sealing_with_it</span>() {</span>
-<span class="ln" id="L1664">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1665">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Ok(Op::Change) =&gt; {&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the arm exists&quot;</span>);</span>
-<span class="ln" id="L1666">        <span class="tok-com">// To the next arm rather than a fixed number of bytes: the first</span></span>
-<span class="ln" id="L1667">        <span class="tok-com">// version of this used 900 and reported a message that was there.</span></span>
-<span class="ln" id="L1668">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1669">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;Ok(Op::Remove)&quot;</span>)</span>
-<span class="ln" id="L1670">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1671">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L1672">        <span class="tok-kw">let</span> arm = &amp;source[start..end];</span>
-<span class="ln" id="L1673">        assert!(</span>
-<span class="ln" id="L1674">            arm.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.app_secret.take()&quot;</span>),</span>
-<span class="ln" id="L1675">            <span class="tok-str">&quot;the old passphrase survives a password change and keeps sealing \</span></span>
-<span class="ln" id="L1676"><span class="tok-str">             recordings with it&quot;</span></span>
-<span class="ln" id="L1677">        );</span>
-<span class="ln" id="L1678">        <span class="tok-com">// Two short phrases rather than one long one: the message is written</span></span>
-<span class="ln" id="L1679">        <span class="tok-com">// across several source lines with Rust&#x27;s string continuation, so the</span></span>
-<span class="ln" id="L1680">        <span class="tok-com">// sentence never appears contiguously in the file. The first version of</span></span>
-<span class="ln" id="L1681">        <span class="tok-com">// this searched for the whole sentence and failed on a message that was</span></span>
-<span class="ln" id="L1682">        <span class="tok-com">// there and correct.</span></span>
-<span class="ln" id="L1683">        <span class="tok-kw">for</span> phrase <span class="tok-kw">in</span> [<span class="tok-str">&quot;Lock and unlock&quot;</span>, <span class="tok-str">&quot;old password&quot;</span>] {</span>
-<span class="ln" id="L1684">            assert!(</span>
-<span class="ln" id="L1685">                arm.<span class="tok-fn">contains</span>(phrase),</span>
-<span class="ln" id="L1686">                <span class="tok-str">&quot;the message does not mention {phrase:?}: a user whose \</span></span>
-<span class="ln" id="L1687"><span class="tok-str">                 already-written recordings still use the previous password has \</span></span>
-<span class="ln" id="L1688"><span class="tok-str">                 to be told, or they will delete it&quot;</span></span>
-<span class="ln" id="L1689">            );</span>
-<span class="ln" id="L1690">        }</span>
-<span class="ln" id="L1691">    }</span>
-<span class="ln" id="L1692"></span>
-<span class="ln" id="L1693">    <span class="tok-com">/// Marker 86. Locking the window must put the state back where a fresh</span></span>
-<span class="ln" id="L1694">    <span class="tok-com">/// launch would leave it, or the lock is a picture of a lock.</span></span>
-<span class="ln" id="L1695">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1696">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_the_window_drops_the_sealing_passphrase</span>() {</span>
-<span class="ln" id="L1697">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1698">        <span class="tok-kw">let</span> wipe = source</span>
-<span class="ln" id="L1699">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn wipe_secrets(&amp;mut self)&quot;</span>)</span>
-<span class="ln" id="L1700">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;wipe_secrets exists&quot;</span>);</span>
-<span class="ln" id="L1701">        <span class="tok-kw">let</span> end = source[wipe..]</span>
-<span class="ln" id="L1702">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// &quot;</span>)</span>
-<span class="ln" id="L1703">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>() - wipe);</span>
-<span class="ln" id="L1704">        assert!(</span>
-<span class="ln" id="L1705">            source[wipe..wipe + end].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.app_secret = None&quot;</span>),</span>
-<span class="ln" id="L1706">            <span class="tok-str">&quot;the session copy of the app-lock passphrase outlives a lock&quot;</span></span>
-<span class="ln" id="L1707">        );</span>
-<span class="ln" id="L1708">    }</span>
-<span class="ln" id="L1709"></span>
-<span class="ln" id="L1710">    <span class="tok-com">/// Marker 86. The plan has to be a password plan, because that is what</span></span>
-<span class="ln" id="L1711">    <span class="tok-com">/// keeps the recordings openable after the lock is gone.</span></span>
-<span class="ln" id="L1712">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1713">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock_sealing_produces_a_container_that_outlives_the_lock</span>() {</span>
-<span class="ln" id="L1714">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1715">        security.encrypt_recordings = true;</span>
-<span class="ln" id="L1716">        security.sealing = Sealing::AppLock;</span>
-<span class="ln" id="L1717"></span>
-<span class="ln" id="L1718">        <span class="tok-com">// Nothing captured yet: refused rather than quietly written in clear.</span></span>
-<span class="ln" id="L1719">        assert!(matches!(security.<span class="tok-fn">plan</span>(), Plan::Missing));</span>
-<span class="ln" id="L1720">        assert!(!security.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L1721"></span>
-<span class="ln" id="L1722">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;the app lock passphrase&quot;</span>);</span>
-<span class="ln" id="L1723">        security.app_secret = <span class="tok-fn">Some</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed));</span>
-<span class="ln" id="L1724">        assert!(security.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L1725"></span>
-<span class="ln" id="L1726">        <span class="tok-kw">let</span> Plan::<span class="tok-fn">Password</span>(secret) = security.<span class="tok-fn">plan</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1727">            panic!(</span>
-<span class="ln" id="L1728">                <span class="tok-str">&quot;app-lock sealing must produce a password plan, so the file \</span></span>
-<span class="ln" id="L1729"><span class="tok-str">                    carries its own salt and needs no lock file to open&quot;</span></span>
-<span class="ln" id="L1730">            );</span>
-<span class="ln" id="L1731">        };</span>
-<span class="ln" id="L1732">        assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;the app lock passphrase&quot;</span>);</span>
-<span class="ln" id="L1733">    }</span>
-<span class="ln" id="L1734"></span>
-<span class="ln" id="L1735">    <span class="tok-com">/// The mode is only offered where there is a lock to seal with.</span></span>
-<span class="ln" id="L1736">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1737">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock_sealing_is_not_offered_without_a_lock</span>() {</span>
-<span class="ln" id="L1738">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1739">        assert!(</span>
-<span class="ln" id="L1740">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;if self.store.is_some() {&quot;</span>)</span>
-<span class="ln" id="L1741">                &amp;&amp; source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Sealing::AppLock, \&quot;app lock\&quot;&quot;</span>),</span>
-<span class="ln" id="L1742">            <span class="tok-str">&quot;the app-lock mode must be offered only when a lock exists&quot;</span></span>
-<span class="ln" id="L1743">        );</span>
-<span class="ln" id="L1744">    }</span>
-<span class="ln" id="L1745"></span>
-<span class="ln" id="L1746">    <span class="tok-com">/// Marker 76. The report has to be reachable from the tab and only from</span></span>
-<span class="ln" id="L1747">    <span class="tok-com">/// the tab, and clearing it has to go through the passphrase rather than</span></span>
-<span class="ln" id="L1748">    <span class="tok-com">/// through a flag the drawing code can set.</span></span>
-<span class="ln" id="L1749">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1750">    <span class="tok-kw">fn</span> <span class="tok-fn">the_interference_report_is_behind_the_lock_and_behind_the_passphrase</span>() {</span>
-<span class="ln" id="L1751">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1752">        <span class="tok-kw">let</span> tab = source</span>
-<span class="ln" id="L1753">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;    /// The security tab&quot;</span>)</span>
-<span class="ln" id="L1754">            .<span class="tok-fn">map</span>(|at| &amp;source[at..])</span>
-<span class="ln" id="L1755">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the tab has to exist&quot;</span>);</span>
-<span class="ln" id="L1756">        assert!(</span>
-<span class="ln" id="L1757">            tab.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.interference_banner(ui)&quot;</span>),</span>
-<span class="ln" id="L1758">            <span class="tok-str">&quot;the report has to be drawn somewhere its owner will see it&quot;</span></span>
-<span class="ln" id="L1759">        );</span>
-<span class="ln" id="L1760"></span>
-<span class="ln" id="L1761">        <span class="tok-kw">let</span> banner = source</span>
-<span class="ln" id="L1762">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn interference_banner&quot;</span>)</span>
-<span class="ln" id="L1763">            .<span class="tok-fn">map</span>(|at| &amp;source[at..])</span>
-<span class="ln" id="L1764">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the banner has to exist&quot;</span>);</span>
-<span class="ln" id="L1765">        assert!(</span>
-<span class="ln" id="L1766">            banner.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Op::Acknowledge&quot;</span>),</span>
-<span class="ln" id="L1767">            <span class="tok-str">&quot;clearing the report has to run the acknowledgement, which asks for \</span></span>
-<span class="ln" id="L1768"><span class="tok-str">             the passphrase, not just clear a flag&quot;</span></span>
-<span class="ln" id="L1769">        );</span>
-<span class="ln" id="L1770">        <span class="tok-kw">let</span> clears: usize = banner</span>
-<span class="ln" id="L1771">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn tab&quot;</span>)</span>
-<span class="ln" id="L1772">            .<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L1773">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>)</span>
-<span class="ln" id="L1774">            .<span class="tok-fn">matches</span>(<span class="tok-str">&quot;self.tampered = false&quot;</span>)</span>
-<span class="ln" id="L1775">            .<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L1776">        assert_eq!(</span>
-<span class="ln" id="L1777">            clears, <span class="tok-num">0</span>,</span>
-<span class="ln" id="L1778">            <span class="tok-str">&quot;the banner must not clear the report itself; only the finished \</span></span>
-<span class="ln" id="L1779"><span class="tok-str">             acknowledgement may, and that has already proved the passphrase&quot;</span></span>
-<span class="ln" id="L1780">        );</span>
-<span class="ln" id="L1781">    }</span>
-<span class="ln" id="L1782"></span>
-<span class="ln" id="L1783">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1784">    <span class="tok-kw">fn</span> <span class="tok-fn">the_locked_window_tells_a_stranger_nothing</span>() {</span>
-<span class="ln" id="L1785">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1786">        <span class="tok-kw">let</span> start = source</span>
-<span class="ln" id="L1787">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>)</span>
-<span class="ln" id="L1788">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the unlock screen has to exist&quot;</span>);</span>
-<span class="ln" id="L1789">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1790">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// The standing report&quot;</span>)</span>
-<span class="ln" id="L1791">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1792">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L1793">        <span class="tok-com">// Comments stripped first. The first version of this flagged its own</span></span>
-<span class="ln" id="L1794">        <span class="tok-com">// explanation of why the count is not shown, which is the same honest</span></span>
-<span class="ln" id="L1795">        <span class="tok-com">// failure `veilvoice-priv`&#x27;s subprocess guard records: what matters is</span></span>
-<span class="ln" id="L1796">        <span class="tok-com">// what the function *draws*, so that is what is searched.</span></span>
-<span class="ln" id="L1797">        <span class="tok-kw">let</span> body: String = source[start..end]</span>
-<span class="ln" id="L1798">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L1799">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
-<span class="ln" id="L1800">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L1801">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1802"></span>
-<span class="ln" id="L1803">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1804">            <span class="tok-str">&quot;lock::SCOPE&quot;</span>,</span>
-<span class="ln" id="L1805">            <span class="tok-str">&quot;path.display()&quot;</span>,</span>
-<span class="ln" id="L1806">            <span class="tok-str">&quot;Delete the lock file&quot;</span>,</span>
-<span class="ln" id="L1807">            <span class="tok-str">&quot;failed attempt&quot;</span>,</span>
-<span class="ln" id="L1808">            <span class="tok-com">// Marker 76. The interference report is the same mistake in a new</span></span>
-<span class="ln" id="L1809">            <span class="tok-com">// shape: telling whoever is holding the machine that their last</span></span>
-<span class="ln" id="L1810">            <span class="tok-com">// edit was noticed tells them to try a different one.</span></span>
-<span class="ln" id="L1811">            <span class="tok-str">&quot;interference_banner&quot;</span>,</span>
-<span class="ln" id="L1812">        ] {</span>
-<span class="ln" id="L1813">            assert!(</span>
-<span class="ln" id="L1814">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L1815">                <span class="tok-str">&quot;the locked window mentions {forbidden:?}, which is for its owner \</span></span>
-<span class="ln" id="L1816"><span class="tok-str">                 and not for whoever is holding the machine&quot;</span></span>
-<span class="ln" id="L1817">            );</span>
-<span class="ln" id="L1818">        }</span>
-<span class="ln" id="L1819"></span>
-<span class="ln" id="L1820">        <span class="tok-com">// And the account itself has not simply been deleted: the tab, which</span></span>
-<span class="ln" id="L1821">        <span class="tok-com">// only an unlocked application draws, still carries it.</span></span>
-<span class="ln" id="L1822">        <span class="tok-kw">let</span> tab = source</span>
-<span class="ln" id="L1823">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn tab&quot;</span>)</span>
-<span class="ln" id="L1824">            .<span class="tok-fn">map</span>(|at| &amp;source[at..])</span>
-<span class="ln" id="L1825">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L1826">        assert!(</span>
-<span class="ln" id="L1827">            tab.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;lock::SCOPE&quot;</span>),</span>
-<span class="ln" id="L1828">            <span class="tok-str">&quot;what the lock is worth has to be somewhere its owner reads it&quot;</span></span>
-<span class="ln" id="L1829">        );</span>
-<span class="ln" id="L1830">    }</span>
-<span class="ln" id="L1831"></span>
-<span class="ln" id="L1832">    <span class="tok-com">/// Cheap on purpose: these tests exercise the plan, not Argon2.</span></span>
-<span class="ln" id="L1833">    <span class="tok-kw">fn</span> <span class="tok-fn">weak</span>() -&gt; kdf::KdfParams {</span>
-<span class="ln" id="L1834">        kdf::KdfParams::<span class="tok-fn">weak_for_tests</span>()</span>
-<span class="ln" id="L1835">    }</span>
-<span class="ln" id="L1836"></span>
-<span class="ln" id="L1837">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1838">    <span class="tok-kw">fn</span> <span class="tok-fn">encryption_at_rest_is_the_default</span>() {</span>
-<span class="ln" id="L1839">        <span class="tok-kw">let</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1840">        assert!(</span>
-<span class="ln" id="L1841">            s.encrypt_recordings,</span>
-<span class="ln" id="L1842">            <span class="tok-str">&quot;recordings must be encrypted unless the user says otherwise&quot;</span></span>
-<span class="ln" id="L1843">        );</span>
-<span class="ln" id="L1844">        assert!(!s.<span class="tok-fn">is_locked</span>(), <span class="tok-str">&quot;no lock file means no lock&quot;</span>);</span>
-<span class="ln" id="L1845">        assert!(!s.<span class="tok-fn">has_lock</span>());</span>
-<span class="ln" id="L1846">    }</span>
-<span class="ln" id="L1847"></span>
-<span class="ln" id="L1848">    <span class="tok-com">/// A job must not be able to start with encryption on and nothing to</span></span>
-<span class="ln" id="L1849">    <span class="tok-com">/// encrypt with, or the &quot;default&quot; would silently degrade to plaintext.</span></span>
-<span class="ln" id="L1850">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1851">    <span class="tok-kw">fn</span> <span class="tok-fn">a_job_is_blocked_until_there_is_something_to_encrypt_with</span>() {</span>
-<span class="ln" id="L1852">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1853">        assert!(!s.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L1854">        assert_eq!(s.<span class="tok-fn">blocked_reason</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;set a recording passphrase first&quot;</span>));</span>
-<span class="ln" id="L1855"></span>
-<span class="ln" id="L1856">        s.sealing = Sealing::PublicKey;</span>
-<span class="ln" id="L1857">        assert_eq!(</span>
-<span class="ln" id="L1858">            s.<span class="tok-fn">blocked_reason</span>(),</span>
-<span class="ln" id="L1859">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;choose a recipient public key first&quot;</span>)</span>
-<span class="ln" id="L1860">        );</span>
-<span class="ln" id="L1861">        s.public_key = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;someone.pub&quot;</span>));</span>
-<span class="ln" id="L1862">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L1863"></span>
-<span class="ln" id="L1864">        <span class="tok-com">// Turning encryption off is the one way to proceed with nothing set.</span></span>
-<span class="ln" id="L1865">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1866">        s.encrypt_recordings = false;</span>
-<span class="ln" id="L1867">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L1868">        assert_eq!(s.<span class="tok-fn">blocked_reason</span>(), None);</span>
-<span class="ln" id="L1869">    }</span>
-<span class="ln" id="L1870"></span>
-<span class="ln" id="L1871">    <span class="tok-com">/// Unticking the box must not take effect until the warning is answered.</span></span>
-<span class="ln" id="L1872">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1873">    <span class="tok-kw">fn</span> <span class="tok-fn">disabling_encryption_needs_the_dialogue_to_be_answered</span>() {</span>
-<span class="ln" id="L1874">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1875">        s.confirm_disable = true;</span>
-<span class="ln" id="L1876">        assert!(</span>
-<span class="ln" id="L1877">            s.encrypt_recordings,</span>
-<span class="ln" id="L1878">            <span class="tok-str">&quot;encryption must stay on while the question is open&quot;</span></span>
-<span class="ln" id="L1879">        );</span>
-<span class="ln" id="L1880">        <span class="tok-com">// The dialogue&#x27;s destructive button is the only thing that clears it.</span></span>
-<span class="ln" id="L1881">        s.encrypt_recordings = false;</span>
-<span class="ln" id="L1882">        s.confirm_disable = false;</span>
-<span class="ln" id="L1883">        assert!(matches!(s.<span class="tok-fn">plan</span>(), Plan::Plaintext));</span>
-<span class="ln" id="L1884">    }</span>
-<span class="ln" id="L1885"></span>
-<span class="ln" id="L1886">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1887">    <span class="tok-kw">fn</span> <span class="tok-fn">the_warning_states_the_actual_consequence</span>() {</span>
-<span class="ln" id="L1888">        <span class="tok-kw">let</span> text = DISABLE_WARNING.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L1889">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;everything that was said&quot;</span>));</span>
-<span class="ln" id="L1890">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;deleting it afterwards is not a fix&quot;</span>));</span>
-<span class="ln" id="L1891">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;default&quot;</span>));</span>
-<span class="ln" id="L1892">        <span class="tok-kw">for</span> reassurance <span class="tok-kw">in</span> [<span class="tok-str">&quot;safe&quot;</span>, <span class="tok-str">&quot;secure&quot;</span>, <span class="tok-str">&quot;protected&quot;</span>] {</span>
-<span class="ln" id="L1893">            assert!(</span>
-<span class="ln" id="L1894">                !text.<span class="tok-fn">contains</span>(reassurance),</span>
-<span class="ln" id="L1895">                <span class="tok-str">&quot;reassuring word: {reassurance}&quot;</span></span>
-<span class="ln" id="L1896">            );</span>
-<span class="ln" id="L1897">        }</span>
-<span class="ln" id="L1898">    }</span>
-<span class="ln" id="L1899"></span>
-<span class="ln" id="L1900">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1901">    <span class="tok-kw">fn</span> <span class="tok-fn">turning_encryption_off_in_the_window_is_written_down_and_survives_a_restart</span>() {</span>
-<span class="ln" id="L1902">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1903">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>);</span>
-<span class="ln" id="L1904"></span>
-<span class="ln" id="L1905">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1906">        s.mandate_path = <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L1907">        assert!(s.<span class="tok-fn">mandate_requires_encryption</span>(), <span class="tok-str">&quot;the default insists on it&quot;</span>);</span>
-<span class="ln" id="L1908">        assert!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L1909"></span>
-<span class="ln" id="L1910">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L1911">        assert!(!s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
-<span class="ln" id="L1912">        assert_eq!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1913">        assert!(s.mandate_problem.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, s.mandate_problem);</span>
-<span class="ln" id="L1914"></span>
-<span class="ln" id="L1915">        <span class="tok-com">// The point of writing it down: the command line, or the next launch,</span></span>
-<span class="ln" id="L1916">        <span class="tok-com">// reads the same relaxation rather than the strict default. Before</span></span>
-<span class="ln" id="L1917">        <span class="tok-com">// this, turning the checkbox off lasted until the process exited and</span></span>
-<span class="ln" id="L1918">        <span class="tok-com">// left no trace that it had ever happened.</span></span>
-<span class="ln" id="L1919">        <span class="tok-kw">let</span> again = Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;what was just written must parse&quot;</span>);</span>
-<span class="ln" id="L1920">        assert!(!again.<span class="tok-fn">requires_encryption</span>());</span>
-<span class="ln" id="L1921">        assert!(again.<span class="tok-fn">requires_app_lock</span>(), <span class="tok-str">&quot;only the one field was relaxed&quot;</span>);</span>
-<span class="ln" id="L1922">        assert_eq!(again.<span class="tok-fn">history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1923">        assert!(!again.<span class="tok-fn">history</span>()[<span class="tok-num">0</span>].to);</span>
-<span class="ln" id="L1924"></span>
-<span class="ln" id="L1925">        <span class="tok-com">// And the reverse direction is recorded too, so the log is a history</span></span>
-<span class="ln" id="L1926">        <span class="tok-com">// rather than a list of things that were switched off.</span></span>
-<span class="ln" id="L1927">        s.<span class="tok-fn">record</span>(MField::Encryption, true);</span>
-<span class="ln" id="L1928">        assert!(s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
-<span class="ln" id="L1929">        assert_eq!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L1930">        assert!(Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">requires_encryption</span>());</span>
-<span class="ln" id="L1931">    }</span>
-<span class="ln" id="L1932"></span>
-<span class="ln" id="L1933">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1934">    <span class="tok-kw">fn</span> <span class="tok-fn">redrawing_the_frame_does_not_fill_the_history_with_entries_nobody_made</span>() {</span>
-<span class="ln" id="L1935">        <span class="tok-com">// `recording_controls` runs every frame, sixty times a second. A record</span></span>
-<span class="ln" id="L1936">        <span class="tok-com">// call that logged the value it was already at would turn a minute of</span></span>
-<span class="ln" id="L1937">        <span class="tok-com">// an open window into thousands of entries and make the history</span></span>
-<span class="ln" id="L1938">        <span class="tok-com">// useless, which is the failure mode that matters here.</span></span>
-<span class="ln" id="L1939">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1940">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1941">        s.mandate_path = <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>));</span>
-<span class="ln" id="L1942"></span>
-<span class="ln" id="L1943">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L1944">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
-<span class="ln" id="L1945">            s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L1946">        }</span>
-<span class="ln" id="L1947">        assert_eq!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1948">    }</span>
-<span class="ln" id="L1949"></span>
-<span class="ln" id="L1950">    <span class="tok-com">/// The text a panel renders, gathered by walking egui&#x27;s output.</span></span>
-<span class="ln" id="L1951">    <span class="tok-kw">fn</span> <span class="tok-fn">rendered_text</span>(</span>
-<span class="ln" id="L1952">        security: &amp;<span class="tok-kw">mut</span> Security,</span>
-<span class="ln" id="L1953">        draw: <span class="tok-kw">impl</span> <span class="tok-fn">Fn</span>(&amp;<span class="tok-kw">mut</span> Security, &amp;<span class="tok-kw">mut</span> egui::Ui),</span>
-<span class="ln" id="L1954">    ) -&gt; String {</span>
-<span class="ln" id="L1955">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1956">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
-<span class="ln" id="L1957">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
-<span class="ln" id="L1958">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L1959">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">480.0</span>),</span>
-<span class="ln" id="L1960">            )),</span>
-<span class="ln" id="L1961">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1962">        };</span>
-<span class="ln" id="L1963">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1964">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
-<span class="ln" id="L1965">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| <span class="tok-fn">draw</span>(security, ui));</span>
-<span class="ln" id="L1966">        });</span>
-<span class="ln" id="L1967">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> output.shapes {</span>
-<span class="ln" id="L1968">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::epaint::Shape::<span class="tok-fn">Text</span>(t) = shape.shape {</span>
-<span class="ln" id="L1969">                text.<span class="tok-fn">push_str</span>(t.galley.<span class="tok-fn">text</span>());</span>
-<span class="ln" id="L1970">                text.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
-<span class="ln" id="L1971">            }</span>
-<span class="ln" id="L1972">        }</span>
-<span class="ln" id="L1973">        text</span>
-<span class="ln" id="L1974">    }</span>
-<span class="ln" id="L1975"></span>
-<span class="ln" id="L1976">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1977">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_shows_the_history_the_command_line_would_print</span>() {</span>
-<span class="ln" id="L1978">        <span class="tok-com">// The &quot;with history&quot; half of the feature has to be visible in the</span></span>
-<span class="ln" id="L1979">        <span class="tok-com">// window too, or a relaxation made here is a change with no record a</span></span>
-<span class="ln" id="L1980">        <span class="tok-com">// person can see without opening a terminal. A collapsing header is</span></span>
-<span class="ln" id="L1981">        <span class="tok-com">// collapsed by default, so it is opened before the panel is read.</span></span>
-<span class="ln" id="L1982">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1983">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L1984">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_rows</span>(ui));</span>
-<span class="ln" id="L1985"></span>
-<span class="ln" id="L1986">        <span class="tok-com">// A timestamp (the exact date format is the policy crate&#x27;s to test) and</span></span>
-<span class="ln" id="L1987">        <span class="tok-com">// the change described in words, both drawn into the panel.</span></span>
-<span class="ln" id="L1988">        assert!(seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;UTC&quot;</span>), <span class="tok-str">&quot;no timestamp in the panel:\n{seen}&quot;</span>);</span>
-<span class="ln" id="L1989">        assert!(</span>
-<span class="ln" id="L1990">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped insisting&quot;</span>) &amp;&amp; seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;encryption&quot;</span>),</span>
-<span class="ln" id="L1991">            <span class="tok-str">&quot;the change is not described:\n{seen}&quot;</span></span>
-<span class="ln" id="L1992">        );</span>
-<span class="ln" id="L1993"></span>
-<span class="ln" id="L1994">        <span class="tok-com">// And the collapsed header still names the count, so the rows are</span></span>
-<span class="ln" id="L1995">        <span class="tok-com">// discoverable without a terminal.</span></span>
-<span class="ln" id="L1996">        <span class="tok-kw">let</span> header = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_panel</span>(ui));</span>
-<span class="ln" id="L1997">        assert!(</span>
-<span class="ln" id="L1998">            header.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one change to what is required&quot;</span>),</span>
-<span class="ln" id="L1999">            <span class="tok-str">&quot;the header does not summarise the history:\n{header}&quot;</span></span>
-<span class="ln" id="L2000">        );</span>
-<span class="ln" id="L2001">    }</span>
-<span class="ln" id="L2002"></span>
-<span class="ln" id="L2003">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2004">    <span class="tok-kw">fn</span> <span class="tok-fn">a_baseline_that_would_not_parse_is_said_in_the_window</span>() {</span>
-<span class="ln" id="L2005">        <span class="tok-com">// A silent fallback to the strict default would tell somebody their</span></span>
-<span class="ln" id="L2006">        <span class="tok-com">// relaxation is in force when it is not, or hide that a requirement</span></span>
-<span class="ln" id="L2007">        <span class="tok-com">// they set is being ignored. The CLI says so; the window must too.</span></span>
-<span class="ln" id="L2008">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2009">        s.mandate_problem = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;line 3: not a setting anyone wrote&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L2010">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
-<span class="ln" id="L2011">        assert!(</span>
-<span class="ln" id="L2012">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>),</span>
-<span class="ln" id="L2013">            <span class="tok-str">&quot;the parse problem is not surfaced:\n{seen}&quot;</span></span>
-<span class="ln" id="L2014">        );</span>
-<span class="ln" id="L2015">    }</span>
-<span class="ln" id="L2016"></span>
-<span class="ln" id="L2017">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2018">    <span class="tok-kw">fn</span> <span class="tok-fn">a_clean_baseline_shows_no_history_and_no_problem</span>() {</span>
-<span class="ln" id="L2019">        <span class="tok-com">// The common case: nobody has relaxed anything. Neither the history</span></span>
-<span class="ln" id="L2020">        <span class="tok-com">// header nor a problem line should appear, or the panel cries wolf.</span></span>
-<span class="ln" id="L2021">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2022">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
-<span class="ln" id="L2023">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
-<span class="ln" id="L2024">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;change to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
-<span class="ln" id="L2025">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;changes to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
-<span class="ln" id="L2026">    }</span>
-<span class="ln" id="L2027"></span>
-<span class="ln" id="L2028">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2029">    <span class="tok-kw">fn</span> <span class="tok-fn">a_test_built_security_never_writes_to_the_real_configuration</span>() {</span>
-<span class="ln" id="L2030">        <span class="tok-com">// `Security::default()` has no path, so `record` changes the value in</span></span>
-<span class="ln" id="L2031">        <span class="tok-com">// memory and writes nothing. Every other test in this file depends on</span></span>
-<span class="ln" id="L2032">        <span class="tok-com">// that being true.</span></span>
-<span class="ln" id="L2033">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2034">        assert!(s.mandate_path.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L2035">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L2036">        assert!(!s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
-<span class="ln" id="L2037">        assert!(s.mandate_problem.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L2038">    }</span>
-<span class="ln" id="L2039"></span>
-<span class="ln" id="L2040">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2041">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_nothing_set_refuses_rather_than_writing_plaintext</span>() {</span>
-<span class="ln" id="L2042">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2043">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
-<span class="ln" id="L2044">        assert!(Plan::Missing.<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L2045">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;nothing may be written on refusal&quot;</span>);</span>
-<span class="ln" id="L2046">    }</span>
-<span class="ln" id="L2047"></span>
-<span class="ln" id="L2048">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2049">    <span class="tok-kw">fn</span> <span class="tok-fn">a_password_plan_seals_beside_the_recording_and_leaves_no_plaintext</span>() {</span>
-<span class="ln" id="L2050">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2051">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>);</span>
-<span class="ln" id="L2052">        <span class="tok-kw">let</span> wav = b<span class="tok-str">&quot;RIFF....WAVEfake but recognisable&quot;</span>.<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L2053"></span>
-<span class="ln" id="L2054">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
-<span class="ln" id="L2055">        <span class="tok-kw">let</span> out = Plan::<span class="tok-fn">Password</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed))</span>
-<span class="ln" id="L2056">            .<span class="tok-fn">write</span>(&amp;path, &amp;wav, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2057">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2058">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
-<span class="ln" id="L2059">        assert_eq!(out, container::<span class="tok-fn">veil_path</span>(&amp;path));</span>
-<span class="ln" id="L2060">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the plaintext must never reach the disk&quot;</span>);</span>
-<span class="ln" id="L2061"></span>
-<span class="ln" id="L2062">        <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;out).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2063">        assert!(!sealed.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;RIFF&quot;</span>));</span>
-<span class="ln" id="L2064">        assert_eq!(</span>
-<span class="ln" id="L2065">            container::<span class="tok-fn">open_with_password</span>(b<span class="tok-str">&quot;a recording passphrase&quot;</span>, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L2066">            wav</span>
-<span class="ln" id="L2067">        );</span>
-<span class="ln" id="L2068">    }</span>
-<span class="ln" id="L2069"></span>
-<span class="ln" id="L2070">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2071">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_writes_the_file_as_asked</span>() {</span>
-<span class="ln" id="L2072">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2073">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
-<span class="ln" id="L2074">        <span class="tok-kw">let</span> out = Plan::Plaintext</span>
-<span class="ln" id="L2075">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2076">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2077">        assert_eq!(out, path);</span>
-<span class="ln" id="L2078">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;audio bytes&quot;</span>);</span>
-<span class="ln" id="L2079">    }</span>
-<span class="ln" id="L2080"></span>
-<span class="ln" id="L2081">    <span class="tok-com">/// An unencrypted recording is still readable only by this account.</span></span>
-<span class="ln" id="L2082">    <span class="tok-com">///</span></span>
-<span class="ln" id="L2083">    <span class="tok-com">/// `veilvoice anonymise --encrypt false` had written 0600 since it was</span></span>
-<span class="ln" id="L2084">    <span class="tok-com">/// written. This, the window&#x27;s version of the same decision, wrote 0644,</span></span>
-<span class="ln" id="L2085">    <span class="tok-com">/// so turning encryption off in the interface left the recording readable</span></span>
-<span class="ln" id="L2086">    <span class="tok-com">/// by every other account on the machine and turning it off on the command</span></span>
-<span class="ln" id="L2087">    <span class="tok-com">/// line did not.</span></span>
-<span class="ln" id="L2088">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L2089">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2090">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_still_writes_owner_only</span>() {</span>
-<span class="ln" id="L2091">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L2092">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2093">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
-<span class="ln" id="L2094">        Plan::Plaintext</span>
-<span class="ln" id="L2095">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2096">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2097">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
-<span class="ln" id="L2098">        assert_eq!(</span>
-<span class="ln" id="L2099">            mode, 0o600,</span>
-<span class="ln" id="L2100">            <span class="tok-str">&quot;an unencrypted recording is {mode:o}, so anyone with an account here can play it&quot;</span></span>
-<span class="ln" id="L2101">        );</span>
-<span class="ln" id="L2102">    }</span>
-<span class="ln" id="L2103"></span>
-<span class="ln" id="L2104">    <span class="tok-com">/// The confirmed passphrase must not linger as ordinary heap bytes. It used</span></span>
-<span class="ln" id="L2105">    <span class="tok-com">/// to be kept as a `String` for the whole session; it is now moved into a</span></span>
-<span class="ln" id="L2106">    <span class="tok-com">/// page-locked `Secret` the moment it is confirmed, and the typing buffer</span></span>
-<span class="ln" id="L2107">    <span class="tok-com">/// is wiped.</span></span>
-<span class="ln" id="L2108">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2109">    <span class="tok-kw">fn</span> <span class="tok-fn">the_confirmed_passphrase_leaves_no_plaintext_buffer_behind</span>() {</span>
-<span class="ln" id="L2110">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
-<span class="ln" id="L2111">        <span class="tok-kw">let</span> secret = <span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed);</span>
-<span class="ln" id="L2112"></span>
-<span class="ln" id="L2113">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
-<span class="ln" id="L2114">        assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
-<span class="ln" id="L2115">        assert!(</span>
-<span class="ln" id="L2116">            format!(<span class="tok-str">&quot;{secret:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>),</span>
-<span class="ln" id="L2117">            <span class="tok-str">&quot;a secret must not be printable&quot;</span></span>
-<span class="ln" id="L2118">        );</span>
-<span class="ln" id="L2119">    }</span>
-<span class="ln" id="L2120"></span>
-<span class="ln" id="L2121">    <span class="tok-com">/// And the plan handed to the worker thread carries the `Secret`, not a</span></span>
-<span class="ln" id="L2122">    <span class="tok-com">/// copy of the text.</span></span>
-<span class="ln" id="L2123">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2124">    <span class="tok-kw">fn</span> <span class="tok-fn">the_plan_carries_page_locked_material_not_a_string</span>() {</span>
-<span class="ln" id="L2125">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2126">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;session passphrase&quot;</span>);</span>
-<span class="ln" id="L2127">        s.held = <span class="tok-fn">Some</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed));</span>
-<span class="ln" id="L2128">        s.passphrase_set = true;</span>
-<span class="ln" id="L2129"></span>
-<span class="ln" id="L2130">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L2131">        <span class="tok-kw">match</span> s.<span class="tok-fn">plan</span>() {</span>
-<span class="ln" id="L2132">            Plan::<span class="tok-fn">Password</span>(secret) =&gt; assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;session passphrase&quot;</span>),</span>
-<span class="ln" id="L2133">            other =&gt; panic!(<span class="tok-str">&quot;expected a password plan, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L2134">        }</span>
-<span class="ln" id="L2135">    }</span>
-<span class="ln" id="L2136"></span>
-<span class="ln" id="L2137">    <span class="tok-com">/// Locking must take the session passphrase with it, or &quot;locked&quot; would be</span></span>
-<span class="ln" id="L2138">    <span class="tok-com">/// a screen rather than a state.</span></span>
-<span class="ln" id="L2139">    <span class="tok-com">/// A real lock in a temporary directory, at test cost.</span></span>
+<span class="src-item" id="fn-password_row">
+<span class="ln" id="L1556"><span class="tok-kw">fn</span> <span class="tok-fn">password_row</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, value: &amp;<span class="tok-kw">mut</span> String) -&gt; egui::Response {</span>
+<span class="ln" id="L1557">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1558">        ui.<span class="tok-fn">allocate_ui_with_layout</span>(</span>
+<span class="ln" id="L1559">            egui::<span class="tok-fn">vec2</span>(PASSWORD_LABEL_WIDTH, ui.<span class="tok-fn">spacing</span>().interact_size.y),</span>
+<span class="ln" id="L1560">            egui::Layout::<span class="tok-fn">left_to_right</span>(egui::Align::Center),</span>
+<span class="ln" id="L1561">            |ui| {</span>
+<span class="ln" id="L1562">                <span class="tok-com">// `allocate_ui_with_layout` asks for this width but gives back</span></span>
+<span class="ln" id="L1563">                <span class="tok-com">// only what the contents used, so a short label would consume a</span></span>
+<span class="ln" id="L1564">                <span class="tok-com">// short column and the field would move left again.</span></span>
+<span class="ln" id="L1565">                <span class="tok-com">// `set_min_width` is what makes the column a column.</span></span>
+<span class="ln" id="L1566">                ui.<span class="tok-fn">set_min_width</span>(PASSWORD_LABEL_WIDTH);</span>
+<span class="ln" id="L1567">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()))</span>
+<span class="ln" id="L1568">            },</span>
+<span class="ln" id="L1569">        );</span>
+<span class="ln" id="L1570">        ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L1571">            egui::TextEdit::<span class="tok-fn">singleline</span>(value)</span>
+<span class="ln" id="L1572">                .<span class="tok-fn">password</span>(true)</span>
+<span class="ln" id="L1573">                .<span class="tok-fn">desired_width</span>(<span class="tok-num">260.0</span>),</span>
+<span class="ln" id="L1574">        )</span>
+<span class="ln" id="L1575">    })</span>
+<span class="ln" id="L1576">    .inner</span>
+<span class="ln" id="L1577">}</span>
+</span>
+<span class="ln" id="L1578"></span>
+<span class="ln" id="L1579"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1580"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L1581">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1582"></span>
+<span class="ln" id="L1583">    <span class="tok-com">/// The buttons under the passphrase fields start where the fields do.</span></span>
+<span class="ln" id="L1584">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1585">    <span class="tok-com">/// Measured rather than eyeballed: this renders a real `password_row` and a</span></span>
+<span class="ln" id="L1586">    <span class="tok-com">/// real button in the same column and compares where each begins.</span></span>
+<span class="ln" id="L1587">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1588">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_button_lines_up_with_the_field_above_it</span>() {</span>
+<span class="ln" id="L1589">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1590">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
+<span class="ln" id="L1591">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
+<span class="ln" id="L1592">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L1593">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">400.0</span>),</span>
+<span class="ln" id="L1594">            )),</span>
+<span class="ln" id="L1595">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1596">        };</span>
+<span class="ln" id="L1597">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> field_x = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L1598">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> button_x = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L1599">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
+<span class="ln" id="L1600">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L1601">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> value = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1602">                field_x = <span class="tok-fn">password_row</span>(ui, <span class="tok-str">&quot;current&quot;</span>, &amp;<span class="tok-kw">mut</span> value).rect.<span class="tok-fn">left</span>();</span>
+<span class="ln" id="L1603">                button_x = <span class="tok-fn">button_column</span>(ui, |ui| ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;change password&quot;</span>))</span>
+<span class="ln" id="L1604">                    .rect</span>
+<span class="ln" id="L1605">                    .<span class="tok-fn">left</span>();</span>
+<span class="ln" id="L1606">            });</span>
+<span class="ln" id="L1607">        });</span>
+<span class="ln" id="L1608">        assert!(</span>
+<span class="ln" id="L1609">            (field_x - button_x).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L1610">            <span class="tok-str">&quot;the field starts at {field_x} and the button under it at {button_x}&quot;</span></span>
+<span class="ln" id="L1611">        );</span>
+<span class="ln" id="L1612">    }</span>
+<span class="ln" id="L1613"></span>
+<span class="ln" id="L1614">    <span class="tok-com">/// Every passphrase field starts at the same x, whatever its label says.</span></span>
+<span class="ln" id="L1615">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1616">    <span class="tok-com">/// The defect: the labels were padded with trailing spaces to fake a</span></span>
+<span class="ln" id="L1617">    <span class="tok-com">/// column, which lines nothing up in a proportional font. Screens drawn</span></span>
+<span class="ln" id="L1618">    <span class="tok-com">/// only after setup carry the labels that needed the most padding, so</span></span>
+<span class="ln" id="L1619">    <span class="tok-com">/// their fields, and the buttons under them, sat at a different place</span></span>
+<span class="ln" id="L1620">    <span class="tok-com">/// from the ones present at launch.</span></span>
+<span class="ln" id="L1621">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1622">    <span class="tok-com">/// The shortest and the longest label in use are drawn here. If the fields</span></span>
+<span class="ln" id="L1623">    <span class="tok-com">/// ever part company again this fails with both positions.</span></span>
+<span class="ln" id="L1624">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1625">    <span class="tok-kw">fn</span> <span class="tok-fn">every_passphrase_field_starts_in_the_same_place</span>() {</span>
+<span class="ln" id="L1626">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1627">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
+<span class="ln" id="L1628">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
+<span class="ln" id="L1629">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L1630">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">400.0</span>),</span>
+<span class="ln" id="L1631">            )),</span>
+<span class="ln" id="L1632">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1633">        };</span>
+<span class="ln" id="L1634"></span>
+<span class="ln" id="L1635">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> starts: Vec&lt;(&amp;str, f32)&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1636">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
+<span class="ln" id="L1637">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L1638">                <span class="tok-kw">for</span> label <span class="tok-kw">in</span> [<span class="tok-str">&quot;new&quot;</span>, <span class="tok-str">&quot;password&quot;</span>, <span class="tok-str">&quot;passphrase&quot;</span>] {</span>
+<span class="ln" id="L1639">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> value = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1640">                    <span class="tok-com">// Where the field actually landed, read back from the</span></span>
+<span class="ln" id="L1641">                    <span class="tok-com">// widget. Deriving it from the column width instead would</span></span>
+<span class="ln" id="L1642">                    <span class="tok-com">// be the test agreeing with itself: it would pass whether</span></span>
+<span class="ln" id="L1643">                    <span class="tok-com">// or not the column was ever applied.</span></span>
+<span class="ln" id="L1644">                    <span class="tok-kw">let</span> field = <span class="tok-fn">password_row</span>(ui, label, &amp;<span class="tok-kw">mut</span> value);</span>
+<span class="ln" id="L1645">                    starts.<span class="tok-fn">push</span>((label, field.rect.<span class="tok-fn">left</span>()));</span>
+<span class="ln" id="L1646">                }</span>
+<span class="ln" id="L1647">            });</span>
+<span class="ln" id="L1648">        });</span>
+<span class="ln" id="L1649"></span>
+<span class="ln" id="L1650">        <span class="tok-kw">let</span> first = starts[<span class="tok-num">0</span>].<span class="tok-num">1</span>;</span>
+<span class="ln" id="L1651">        <span class="tok-kw">for</span> (label, at) <span class="tok-kw">in</span> &amp;starts {</span>
+<span class="ln" id="L1652">            assert!(</span>
+<span class="ln" id="L1653">                (at - first).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L1654">                <span class="tok-str">&quot;the field after {label:?} starts at {at}, and the first starts at {first}&quot;</span></span>
+<span class="ln" id="L1655">            );</span>
+<span class="ln" id="L1656">        }</span>
+<span class="ln" id="L1657">    }</span>
+<span class="ln" id="L1658"></span>
+<span class="ln" id="L1659">    <span class="tok-com">/// No passphrase label is padded with spaces to fake its width.</span></span>
+<span class="ln" id="L1660">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1661">    <span class="tok-com">/// The column is what aligns these now. A label that comes back padded is</span></span>
+<span class="ln" id="L1662">    <span class="tok-com">/// somebody reaching for the old trick, and it would drift again the first</span></span>
+<span class="ln" id="L1663">    <span class="tok-com">/// time the font changed.</span></span>
+<span class="ln" id="L1664">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1665">    <span class="tok-kw">fn</span> <span class="tok-fn">no_passphrase_label_is_padded_with_spaces</span>() {</span>
+<span class="ln" id="L1666">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1667">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> source.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L1668">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1669">            <span class="tok-kw">if</span> !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;password_row(ui, \&quot;&quot;</span>) {</span>
+<span class="ln" id="L1670">                continue;</span>
+<span class="ln" id="L1671">            }</span>
+<span class="ln" id="L1672">            <span class="tok-kw">let</span> label = trimmed.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a quoted label&quot;</span>);</span>
+<span class="ln" id="L1673">            assert_eq!(</span>
+<span class="ln" id="L1674">                label,</span>
+<span class="ln" id="L1675">                label.<span class="tok-fn">trim</span>(),</span>
+<span class="ln" id="L1676">                <span class="tok-str">&quot;the label {label:?} is padded with spaces; give it the column instead&quot;</span></span>
+<span class="ln" id="L1677">            );</span>
+<span class="ln" id="L1678">        }</span>
+<span class="ln" id="L1679">    }</span>
+<span class="ln" id="L1680"></span>
+<span class="ln" id="L1681">    <span class="tok-com">/// **Marker 74.** The locked window explains nothing.</span></span>
+<span class="ln" id="L1682">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1683">    <span class="tok-com">/// It used to explain a great deal: what the lock is and is not worth,</span></span>
+<span class="ln" id="L1684">    <span class="tok-com">/// where its file lives, and that deleting that file starts over. All true,</span></span>
+<span class="ln" id="L1685">    <span class="tok-com">/// all addressed to the wrong person. The reader of a locked window is</span></span>
+<span class="ln" id="L1686">    <span class="tok-com">/// either its owner, who does not need any of it at that moment, or</span></span>
+<span class="ln" id="L1687">    <span class="tok-com">/// somebody who picked the machine up.</span></span>
+<span class="ln" id="L1688">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1689">    <span class="tok-com">/// This reads the source of `unlock_screen` rather than rendering it,</span></span>
+<span class="ln" id="L1690">    <span class="tok-com">/// because what is being held is that certain sentences are not reachable</span></span>
+<span class="ln" id="L1691">    <span class="tok-com">/// from that function at all. A rendering test would only prove they were</span></span>
+<span class="ln" id="L1692">    <span class="tok-com">/// absent from one frame.</span></span>
+<span class="ln" id="L1693">    <span class="tok-com">/// Marker 86. The passphrase is kept only for the mode that needs it.</span></span>
+<span class="ln" id="L1694">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1695">    <span class="tok-com">/// A user who has not asked for app-lock sealing must keep the old</span></span>
+<span class="ln" id="L1696">    <span class="tok-com">/// behaviour exactly: the passphrase is wiped the instant it has been</span></span>
+<span class="ln" id="L1697">    <span class="tok-com">/// checked. Holding it &quot;just in case&quot; would be a security regression paid</span></span>
+<span class="ln" id="L1698">    <span class="tok-com">/// for by everybody, to make a feature nobody switched on slightly more</span></span>
+<span class="ln" id="L1699">    <span class="tok-com">/// convenient.</span></span>
+<span class="ln" id="L1700">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1701">    <span class="tok-kw">fn</span> <span class="tok-fn">the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span>() {</span>
+<span class="ln" id="L1702">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1703">        <span class="tok-kw">let</span> poll = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn poll(&amp;mut self)&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;poll exists&quot;</span>);</span>
+<span class="ln" id="L1704">        <span class="tok-kw">let</span> end = source[poll..]</span>
+<span class="ln" id="L1705">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    fn wipe_form&quot;</span>)</span>
+<span class="ln" id="L1706">            .<span class="tok-fn">map</span>(|at| poll + at)</span>
+<span class="ln" id="L1707">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L1708">        <span class="tok-kw">let</span> body = &amp;source[poll..end];</span>
+<span class="ln" id="L1709">        assert!(</span>
+<span class="ln" id="L1710">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;if self.sealing == Sealing::AppLock&quot;</span>),</span>
+<span class="ln" id="L1711">            <span class="tok-str">&quot;the capture is unconditional, so every user now carries their \</span></span>
+<span class="ln" id="L1712"><span class="tok-str">             app-lock passphrase in memory for the session&quot;</span></span>
+<span class="ln" id="L1713">        );</span>
+<span class="ln" id="L1714">    }</span>
+<span class="ln" id="L1715"></span>
+<span class="ln" id="L1716">    <span class="tok-com">/// F-94. Changing the app-lock password must not leave the old one sealing</span></span>
+<span class="ln" id="L1717">    <span class="tok-com">/// new recordings. A user who changes their password and keeps working</span></span>
+<span class="ln" id="L1718">    <span class="tok-com">/// would otherwise produce files that open with a password they have just</span></span>
+<span class="ln" id="L1719">    <span class="tok-com">/// replaced, and be told nothing.</span></span>
+<span class="ln" id="L1720">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1721">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_the_password_drops_the_passphrase_that_was_sealing_with_it</span>() {</span>
+<span class="ln" id="L1722">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1723">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Ok(Op::Change) =&gt; {&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the arm exists&quot;</span>);</span>
+<span class="ln" id="L1724">        <span class="tok-com">// To the next arm rather than a fixed number of bytes: the first</span></span>
+<span class="ln" id="L1725">        <span class="tok-com">// version of this used 900 and reported a message that was there.</span></span>
+<span class="ln" id="L1726">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1727">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;Ok(Op::Remove)&quot;</span>)</span>
+<span class="ln" id="L1728">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1729">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L1730">        <span class="tok-kw">let</span> arm = &amp;source[start..end];</span>
+<span class="ln" id="L1731">        assert!(</span>
+<span class="ln" id="L1732">            arm.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.app_secret.take()&quot;</span>),</span>
+<span class="ln" id="L1733">            <span class="tok-str">&quot;the old passphrase survives a password change and keeps sealing \</span></span>
+<span class="ln" id="L1734"><span class="tok-str">             recordings with it&quot;</span></span>
+<span class="ln" id="L1735">        );</span>
+<span class="ln" id="L1736">        <span class="tok-com">// Two short phrases rather than one long one: the message is written</span></span>
+<span class="ln" id="L1737">        <span class="tok-com">// across several source lines with Rust&#x27;s string continuation, so the</span></span>
+<span class="ln" id="L1738">        <span class="tok-com">// sentence never appears contiguously in the file. The first version of</span></span>
+<span class="ln" id="L1739">        <span class="tok-com">// this searched for the whole sentence and failed on a message that was</span></span>
+<span class="ln" id="L1740">        <span class="tok-com">// there and correct.</span></span>
+<span class="ln" id="L1741">        <span class="tok-kw">for</span> phrase <span class="tok-kw">in</span> [<span class="tok-str">&quot;Lock and unlock&quot;</span>, <span class="tok-str">&quot;old password&quot;</span>] {</span>
+<span class="ln" id="L1742">            assert!(</span>
+<span class="ln" id="L1743">                arm.<span class="tok-fn">contains</span>(phrase),</span>
+<span class="ln" id="L1744">                <span class="tok-str">&quot;the message does not mention {phrase:?}: a user whose \</span></span>
+<span class="ln" id="L1745"><span class="tok-str">                 already-written recordings still use the previous password has \</span></span>
+<span class="ln" id="L1746"><span class="tok-str">                 to be told, or they will delete it&quot;</span></span>
+<span class="ln" id="L1747">            );</span>
+<span class="ln" id="L1748">        }</span>
+<span class="ln" id="L1749">    }</span>
+<span class="ln" id="L1750"></span>
+<span class="ln" id="L1751">    <span class="tok-com">/// Marker 86. Locking the window must put the state back where a fresh</span></span>
+<span class="ln" id="L1752">    <span class="tok-com">/// launch would leave it, or the lock is a picture of a lock.</span></span>
+<span class="ln" id="L1753">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1754">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_the_window_drops_the_sealing_passphrase</span>() {</span>
+<span class="ln" id="L1755">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1756">        <span class="tok-kw">let</span> wipe = source</span>
+<span class="ln" id="L1757">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn wipe_secrets(&amp;mut self)&quot;</span>)</span>
+<span class="ln" id="L1758">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;wipe_secrets exists&quot;</span>);</span>
+<span class="ln" id="L1759">        <span class="tok-kw">let</span> end = source[wipe..]</span>
+<span class="ln" id="L1760">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// &quot;</span>)</span>
+<span class="ln" id="L1761">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>() - wipe);</span>
+<span class="ln" id="L1762">        assert!(</span>
+<span class="ln" id="L1763">            source[wipe..wipe + end].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.app_secret = None&quot;</span>),</span>
+<span class="ln" id="L1764">            <span class="tok-str">&quot;the session copy of the app-lock passphrase outlives a lock&quot;</span></span>
+<span class="ln" id="L1765">        );</span>
+<span class="ln" id="L1766">    }</span>
+<span class="ln" id="L1767"></span>
+<span class="ln" id="L1768">    <span class="tok-com">/// Marker 86. The plan has to be a password plan, because that is what</span></span>
+<span class="ln" id="L1769">    <span class="tok-com">/// keeps the recordings openable after the lock is gone.</span></span>
+<span class="ln" id="L1770">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1771">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock_sealing_produces_a_container_that_outlives_the_lock</span>() {</span>
+<span class="ln" id="L1772">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1773">        security.encrypt_recordings = true;</span>
+<span class="ln" id="L1774">        security.sealing = Sealing::AppLock;</span>
+<span class="ln" id="L1775"></span>
+<span class="ln" id="L1776">        <span class="tok-com">// Nothing captured yet: refused rather than quietly written in clear.</span></span>
+<span class="ln" id="L1777">        assert!(matches!(security.<span class="tok-fn">plan</span>(), Plan::Missing));</span>
+<span class="ln" id="L1778">        assert!(!security.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L1779"></span>
+<span class="ln" id="L1780">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;the app lock passphrase&quot;</span>);</span>
+<span class="ln" id="L1781">        security.app_secret = <span class="tok-fn">Some</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed));</span>
+<span class="ln" id="L1782">        assert!(security.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L1783"></span>
+<span class="ln" id="L1784">        <span class="tok-kw">let</span> Plan::<span class="tok-fn">Password</span>(secret) = security.<span class="tok-fn">plan</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1785">            panic!(</span>
+<span class="ln" id="L1786">                <span class="tok-str">&quot;app-lock sealing must produce a password plan, so the file \</span></span>
+<span class="ln" id="L1787"><span class="tok-str">                    carries its own salt and needs no lock file to open&quot;</span></span>
+<span class="ln" id="L1788">            );</span>
+<span class="ln" id="L1789">        };</span>
+<span class="ln" id="L1790">        assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;the app lock passphrase&quot;</span>);</span>
+<span class="ln" id="L1791">    }</span>
+<span class="ln" id="L1792"></span>
+<span class="ln" id="L1793">    <span class="tok-com">/// The mode is only offered where there is a lock to seal with.</span></span>
+<span class="ln" id="L1794">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1795">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock_sealing_is_not_offered_without_a_lock</span>() {</span>
+<span class="ln" id="L1796">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1797">        assert!(</span>
+<span class="ln" id="L1798">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;if self.store.is_some() {&quot;</span>)</span>
+<span class="ln" id="L1799">                &amp;&amp; source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Sealing::AppLock, \&quot;app lock\&quot;&quot;</span>),</span>
+<span class="ln" id="L1800">            <span class="tok-str">&quot;the app-lock mode must be offered only when a lock exists&quot;</span></span>
+<span class="ln" id="L1801">        );</span>
+<span class="ln" id="L1802">    }</span>
+<span class="ln" id="L1803"></span>
+<span class="ln" id="L1804">    <span class="tok-com">/// Marker 76. The report has to be reachable from the tab and only from</span></span>
+<span class="ln" id="L1805">    <span class="tok-com">/// the tab, and clearing it has to go through the passphrase rather than</span></span>
+<span class="ln" id="L1806">    <span class="tok-com">/// through a flag the drawing code can set.</span></span>
+<span class="ln" id="L1807">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1808">    <span class="tok-kw">fn</span> <span class="tok-fn">the_interference_report_is_behind_the_lock_and_behind_the_passphrase</span>() {</span>
+<span class="ln" id="L1809">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1810">        <span class="tok-kw">let</span> tab = source</span>
+<span class="ln" id="L1811">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;    /// The security tab&quot;</span>)</span>
+<span class="ln" id="L1812">            .<span class="tok-fn">map</span>(|at| &amp;source[at..])</span>
+<span class="ln" id="L1813">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the tab has to exist&quot;</span>);</span>
+<span class="ln" id="L1814">        assert!(</span>
+<span class="ln" id="L1815">            tab.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.interference_banner(ui)&quot;</span>),</span>
+<span class="ln" id="L1816">            <span class="tok-str">&quot;the report has to be drawn somewhere its owner will see it&quot;</span></span>
+<span class="ln" id="L1817">        );</span>
+<span class="ln" id="L1818"></span>
+<span class="ln" id="L1819">        <span class="tok-kw">let</span> banner = source</span>
+<span class="ln" id="L1820">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn interference_banner&quot;</span>)</span>
+<span class="ln" id="L1821">            .<span class="tok-fn">map</span>(|at| &amp;source[at..])</span>
+<span class="ln" id="L1822">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the banner has to exist&quot;</span>);</span>
+<span class="ln" id="L1823">        assert!(</span>
+<span class="ln" id="L1824">            banner.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Op::Acknowledge&quot;</span>),</span>
+<span class="ln" id="L1825">            <span class="tok-str">&quot;clearing the report has to run the acknowledgement, which asks for \</span></span>
+<span class="ln" id="L1826"><span class="tok-str">             the passphrase, not just clear a flag&quot;</span></span>
+<span class="ln" id="L1827">        );</span>
+<span class="ln" id="L1828">        <span class="tok-kw">let</span> clears: usize = banner</span>
+<span class="ln" id="L1829">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn tab&quot;</span>)</span>
+<span class="ln" id="L1830">            .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L1831">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>)</span>
+<span class="ln" id="L1832">            .<span class="tok-fn">matches</span>(<span class="tok-str">&quot;self.tampered = false&quot;</span>)</span>
+<span class="ln" id="L1833">            .<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L1834">        assert_eq!(</span>
+<span class="ln" id="L1835">            clears, <span class="tok-num">0</span>,</span>
+<span class="ln" id="L1836">            <span class="tok-str">&quot;the banner must not clear the report itself; only the finished \</span></span>
+<span class="ln" id="L1837"><span class="tok-str">             acknowledgement may, and that has already proved the passphrase&quot;</span></span>
+<span class="ln" id="L1838">        );</span>
+<span class="ln" id="L1839">    }</span>
+<span class="ln" id="L1840"></span>
+<span class="ln" id="L1841">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1842">    <span class="tok-kw">fn</span> <span class="tok-fn">the_locked_window_tells_a_stranger_nothing</span>() {</span>
+<span class="ln" id="L1843">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1844">        <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1845">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>)</span>
+<span class="ln" id="L1846">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the unlock screen has to exist&quot;</span>);</span>
+<span class="ln" id="L1847">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1848">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// The standing report&quot;</span>)</span>
+<span class="ln" id="L1849">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1850">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L1851">        <span class="tok-com">// Comments stripped first. The first version of this flagged its own</span></span>
+<span class="ln" id="L1852">        <span class="tok-com">// explanation of why the count is not shown, which is the same honest</span></span>
+<span class="ln" id="L1853">        <span class="tok-com">// failure `veilvoice-priv`&#x27;s subprocess guard records: what matters is</span></span>
+<span class="ln" id="L1854">        <span class="tok-com">// what the function *draws*, so that is what is searched.</span></span>
+<span class="ln" id="L1855">        <span class="tok-kw">let</span> body: String = source[start..end]</span>
+<span class="ln" id="L1856">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1857">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
+<span class="ln" id="L1858">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L1859">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1860"></span>
+<span class="ln" id="L1861">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1862">            <span class="tok-str">&quot;lock::SCOPE&quot;</span>,</span>
+<span class="ln" id="L1863">            <span class="tok-str">&quot;path.display()&quot;</span>,</span>
+<span class="ln" id="L1864">            <span class="tok-str">&quot;Delete the lock file&quot;</span>,</span>
+<span class="ln" id="L1865">            <span class="tok-str">&quot;failed attempt&quot;</span>,</span>
+<span class="ln" id="L1866">            <span class="tok-com">// Marker 76. The interference report is the same mistake in a new</span></span>
+<span class="ln" id="L1867">            <span class="tok-com">// shape: telling whoever is holding the machine that their last</span></span>
+<span class="ln" id="L1868">            <span class="tok-com">// edit was noticed tells them to try a different one.</span></span>
+<span class="ln" id="L1869">            <span class="tok-str">&quot;interference_banner&quot;</span>,</span>
+<span class="ln" id="L1870">        ] {</span>
+<span class="ln" id="L1871">            assert!(</span>
+<span class="ln" id="L1872">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1873">                <span class="tok-str">&quot;the locked window mentions {forbidden:?}, which is for its owner \</span></span>
+<span class="ln" id="L1874"><span class="tok-str">                 and not for whoever is holding the machine&quot;</span></span>
+<span class="ln" id="L1875">            );</span>
+<span class="ln" id="L1876">        }</span>
+<span class="ln" id="L1877"></span>
+<span class="ln" id="L1878">        <span class="tok-com">// And the account itself has not simply been deleted: the tab, which</span></span>
+<span class="ln" id="L1879">        <span class="tok-com">// only an unlocked application draws, still carries it.</span></span>
+<span class="ln" id="L1880">        <span class="tok-kw">let</span> tab = source</span>
+<span class="ln" id="L1881">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn tab&quot;</span>)</span>
+<span class="ln" id="L1882">            .<span class="tok-fn">map</span>(|at| &amp;source[at..])</span>
+<span class="ln" id="L1883">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L1884">        assert!(</span>
+<span class="ln" id="L1885">            tab.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;lock::SCOPE&quot;</span>),</span>
+<span class="ln" id="L1886">            <span class="tok-str">&quot;what the lock is worth has to be somewhere its owner reads it&quot;</span></span>
+<span class="ln" id="L1887">        );</span>
+<span class="ln" id="L1888">    }</span>
+<span class="ln" id="L1889"></span>
+<span class="ln" id="L1890">    <span class="tok-com">/// Cheap on purpose: these tests exercise the plan, not Argon2.</span></span>
+<span class="ln" id="L1891">    <span class="tok-kw">fn</span> <span class="tok-fn">weak</span>() -&gt; kdf::KdfParams {</span>
+<span class="ln" id="L1892">        kdf::KdfParams::<span class="tok-fn">weak_for_tests</span>()</span>
+<span class="ln" id="L1893">    }</span>
+<span class="ln" id="L1894"></span>
+<span class="ln" id="L1895">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1896">    <span class="tok-kw">fn</span> <span class="tok-fn">encryption_at_rest_is_the_default</span>() {</span>
+<span class="ln" id="L1897">        <span class="tok-kw">let</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1898">        assert!(</span>
+<span class="ln" id="L1899">            s.encrypt_recordings,</span>
+<span class="ln" id="L1900">            <span class="tok-str">&quot;recordings must be encrypted unless the user says otherwise&quot;</span></span>
+<span class="ln" id="L1901">        );</span>
+<span class="ln" id="L1902">        assert!(!s.<span class="tok-fn">is_locked</span>(), <span class="tok-str">&quot;no lock file means no lock&quot;</span>);</span>
+<span class="ln" id="L1903">        assert!(!s.<span class="tok-fn">has_lock</span>());</span>
+<span class="ln" id="L1904">    }</span>
+<span class="ln" id="L1905"></span>
+<span class="ln" id="L1906">    <span class="tok-com">/// A job must not be able to start with encryption on and nothing to</span></span>
+<span class="ln" id="L1907">    <span class="tok-com">/// encrypt with, or the &quot;default&quot; would silently degrade to plaintext.</span></span>
+<span class="ln" id="L1908">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1909">    <span class="tok-kw">fn</span> <span class="tok-fn">a_job_is_blocked_until_there_is_something_to_encrypt_with</span>() {</span>
+<span class="ln" id="L1910">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1911">        assert!(!s.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L1912">        assert_eq!(s.<span class="tok-fn">blocked_reason</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;set a recording passphrase first&quot;</span>));</span>
+<span class="ln" id="L1913"></span>
+<span class="ln" id="L1914">        s.sealing = Sealing::PublicKey;</span>
+<span class="ln" id="L1915">        assert_eq!(</span>
+<span class="ln" id="L1916">            s.<span class="tok-fn">blocked_reason</span>(),</span>
+<span class="ln" id="L1917">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;choose a recipient public key first&quot;</span>)</span>
+<span class="ln" id="L1918">        );</span>
+<span class="ln" id="L1919">        s.public_key = <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;someone.pub&quot;</span>));</span>
+<span class="ln" id="L1920">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L1921"></span>
+<span class="ln" id="L1922">        <span class="tok-com">// Turning encryption off is the one way to proceed with nothing set.</span></span>
+<span class="ln" id="L1923">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1924">        s.encrypt_recordings = false;</span>
+<span class="ln" id="L1925">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L1926">        assert_eq!(s.<span class="tok-fn">blocked_reason</span>(), None);</span>
+<span class="ln" id="L1927">    }</span>
+<span class="ln" id="L1928"></span>
+<span class="ln" id="L1929">    <span class="tok-com">/// Unticking the box must not take effect until the warning is answered.</span></span>
+<span class="ln" id="L1930">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1931">    <span class="tok-kw">fn</span> <span class="tok-fn">disabling_encryption_needs_the_dialogue_to_be_answered</span>() {</span>
+<span class="ln" id="L1932">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1933">        s.confirm_disable = true;</span>
+<span class="ln" id="L1934">        assert!(</span>
+<span class="ln" id="L1935">            s.encrypt_recordings,</span>
+<span class="ln" id="L1936">            <span class="tok-str">&quot;encryption must stay on while the question is open&quot;</span></span>
+<span class="ln" id="L1937">        );</span>
+<span class="ln" id="L1938">        <span class="tok-com">// The dialogue&#x27;s destructive button is the only thing that clears it.</span></span>
+<span class="ln" id="L1939">        s.encrypt_recordings = false;</span>
+<span class="ln" id="L1940">        s.confirm_disable = false;</span>
+<span class="ln" id="L1941">        assert!(matches!(s.<span class="tok-fn">plan</span>(), Plan::Plaintext));</span>
+<span class="ln" id="L1942">    }</span>
+<span class="ln" id="L1943"></span>
+<span class="ln" id="L1944">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1945">    <span class="tok-kw">fn</span> <span class="tok-fn">the_warning_states_the_actual_consequence</span>() {</span>
+<span class="ln" id="L1946">        <span class="tok-kw">let</span> text = DISABLE_WARNING.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L1947">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;everything that was said&quot;</span>));</span>
+<span class="ln" id="L1948">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;deleting it afterwards is not a fix&quot;</span>));</span>
+<span class="ln" id="L1949">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;default&quot;</span>));</span>
+<span class="ln" id="L1950">        <span class="tok-kw">for</span> reassurance <span class="tok-kw">in</span> [<span class="tok-str">&quot;safe&quot;</span>, <span class="tok-str">&quot;secure&quot;</span>, <span class="tok-str">&quot;protected&quot;</span>] {</span>
+<span class="ln" id="L1951">            assert!(</span>
+<span class="ln" id="L1952">                !text.<span class="tok-fn">contains</span>(reassurance),</span>
+<span class="ln" id="L1953">                <span class="tok-str">&quot;reassuring word: {reassurance}&quot;</span></span>
+<span class="ln" id="L1954">            );</span>
+<span class="ln" id="L1955">        }</span>
+<span class="ln" id="L1956">    }</span>
+<span class="ln" id="L1957"></span>
+<span class="ln" id="L1958">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1959">    <span class="tok-kw">fn</span> <span class="tok-fn">turning_encryption_off_in_the_window_is_written_down_and_survives_a_restart</span>() {</span>
+<span class="ln" id="L1960">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1961">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>);</span>
+<span class="ln" id="L1962"></span>
+<span class="ln" id="L1963">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1964">        s.mandate_path = <span class="tok-fn">Some</span>(path.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L1965">        assert!(s.<span class="tok-fn">mandate_requires_encryption</span>(), <span class="tok-str">&quot;the default insists on it&quot;</span>);</span>
+<span class="ln" id="L1966">        assert!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L1967"></span>
+<span class="ln" id="L1968">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L1969">        assert!(!s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
+<span class="ln" id="L1970">        assert_eq!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1971">        assert!(s.mandate_problem.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, s.mandate_problem);</span>
+<span class="ln" id="L1972"></span>
+<span class="ln" id="L1973">        <span class="tok-com">// The point of writing it down: the command line, or the next launch,</span></span>
+<span class="ln" id="L1974">        <span class="tok-com">// reads the same relaxation rather than the strict default. Before</span></span>
+<span class="ln" id="L1975">        <span class="tok-com">// this, turning the checkbox off lasted until the process exited and</span></span>
+<span class="ln" id="L1976">        <span class="tok-com">// left no trace that it had ever happened.</span></span>
+<span class="ln" id="L1977">        <span class="tok-kw">let</span> again = Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;what was just written must parse&quot;</span>);</span>
+<span class="ln" id="L1978">        assert!(!again.<span class="tok-fn">requires_encryption</span>());</span>
+<span class="ln" id="L1979">        assert!(again.<span class="tok-fn">requires_app_lock</span>(), <span class="tok-str">&quot;only the one field was relaxed&quot;</span>);</span>
+<span class="ln" id="L1980">        assert_eq!(again.<span class="tok-fn">history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1981">        assert!(!again.<span class="tok-fn">history</span>()[<span class="tok-num">0</span>].to);</span>
+<span class="ln" id="L1982"></span>
+<span class="ln" id="L1983">        <span class="tok-com">// And the reverse direction is recorded too, so the log is a history</span></span>
+<span class="ln" id="L1984">        <span class="tok-com">// rather than a list of things that were switched off.</span></span>
+<span class="ln" id="L1985">        s.<span class="tok-fn">record</span>(MField::Encryption, true);</span>
+<span class="ln" id="L1986">        assert!(s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
+<span class="ln" id="L1987">        assert_eq!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L1988">        assert!(Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">requires_encryption</span>());</span>
+<span class="ln" id="L1989">    }</span>
+<span class="ln" id="L1990"></span>
+<span class="ln" id="L1991">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1992">    <span class="tok-kw">fn</span> <span class="tok-fn">redrawing_the_frame_does_not_fill_the_history_with_entries_nobody_made</span>() {</span>
+<span class="ln" id="L1993">        <span class="tok-com">// `recording_controls` runs every frame, sixty times a second. A record</span></span>
+<span class="ln" id="L1994">        <span class="tok-com">// call that logged the value it was already at would turn a minute of</span></span>
+<span class="ln" id="L1995">        <span class="tok-com">// an open window into thousands of entries and make the history</span></span>
+<span class="ln" id="L1996">        <span class="tok-com">// useless, which is the failure mode that matters here.</span></span>
+<span class="ln" id="L1997">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1998">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1999">        s.mandate_path = <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>));</span>
+<span class="ln" id="L2000"></span>
+<span class="ln" id="L2001">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L2002">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
+<span class="ln" id="L2003">            s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L2004">        }</span>
+<span class="ln" id="L2005">        assert_eq!(s.<span class="tok-fn">mandate_history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L2006">    }</span>
+<span class="ln" id="L2007"></span>
+<span class="ln" id="L2008">    <span class="tok-com">/// The text a panel renders, gathered by walking egui&#x27;s output.</span></span>
+<span class="ln" id="L2009">    <span class="tok-kw">fn</span> <span class="tok-fn">rendered_text</span>(</span>
+<span class="ln" id="L2010">        security: &amp;<span class="tok-kw">mut</span> Security,</span>
+<span class="ln" id="L2011">        draw: <span class="tok-kw">impl</span> <span class="tok-fn">Fn</span>(&amp;<span class="tok-kw">mut</span> Security, &amp;<span class="tok-kw">mut</span> egui::Ui),</span>
+<span class="ln" id="L2012">    ) -&gt; String {</span>
+<span class="ln" id="L2013">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2014">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
+<span class="ln" id="L2015">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
+<span class="ln" id="L2016">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L2017">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">480.0</span>),</span>
+<span class="ln" id="L2018">            )),</span>
+<span class="ln" id="L2019">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L2020">        };</span>
+<span class="ln" id="L2021">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L2022">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
+<span class="ln" id="L2023">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| <span class="tok-fn">draw</span>(security, ui));</span>
+<span class="ln" id="L2024">        });</span>
+<span class="ln" id="L2025">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> output.shapes {</span>
+<span class="ln" id="L2026">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::epaint::Shape::<span class="tok-fn">Text</span>(t) = shape.shape {</span>
+<span class="ln" id="L2027">                text.<span class="tok-fn">push_str</span>(t.galley.<span class="tok-fn">text</span>());</span>
+<span class="ln" id="L2028">                text.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
+<span class="ln" id="L2029">            }</span>
+<span class="ln" id="L2030">        }</span>
+<span class="ln" id="L2031">        text</span>
+<span class="ln" id="L2032">    }</span>
+<span class="ln" id="L2033"></span>
+<span class="ln" id="L2034">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2035">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_shows_the_history_the_command_line_would_print</span>() {</span>
+<span class="ln" id="L2036">        <span class="tok-com">// The &quot;with history&quot; half of the feature has to be visible in the</span></span>
+<span class="ln" id="L2037">        <span class="tok-com">// window too, or a relaxation made here is a change with no record a</span></span>
+<span class="ln" id="L2038">        <span class="tok-com">// person can see without opening a terminal. A collapsing header is</span></span>
+<span class="ln" id="L2039">        <span class="tok-com">// collapsed by default, so it is opened before the panel is read.</span></span>
+<span class="ln" id="L2040">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2041">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L2042">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_rows</span>(ui));</span>
+<span class="ln" id="L2043"></span>
+<span class="ln" id="L2044">        <span class="tok-com">// A timestamp (the exact date format is the policy crate&#x27;s to test) and</span></span>
+<span class="ln" id="L2045">        <span class="tok-com">// the change described in words, both drawn into the panel.</span></span>
+<span class="ln" id="L2046">        assert!(seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;UTC&quot;</span>), <span class="tok-str">&quot;no timestamp in the panel:\n{seen}&quot;</span>);</span>
+<span class="ln" id="L2047">        assert!(</span>
+<span class="ln" id="L2048">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped insisting&quot;</span>) &amp;&amp; seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;encryption&quot;</span>),</span>
+<span class="ln" id="L2049">            <span class="tok-str">&quot;the change is not described:\n{seen}&quot;</span></span>
+<span class="ln" id="L2050">        );</span>
+<span class="ln" id="L2051"></span>
+<span class="ln" id="L2052">        <span class="tok-com">// And the collapsed header still names the count, so the rows are</span></span>
+<span class="ln" id="L2053">        <span class="tok-com">// discoverable without a terminal.</span></span>
+<span class="ln" id="L2054">        <span class="tok-kw">let</span> header = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_panel</span>(ui));</span>
+<span class="ln" id="L2055">        assert!(</span>
+<span class="ln" id="L2056">            header.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one change to what is required&quot;</span>),</span>
+<span class="ln" id="L2057">            <span class="tok-str">&quot;the header does not summarise the history:\n{header}&quot;</span></span>
+<span class="ln" id="L2058">        );</span>
+<span class="ln" id="L2059">    }</span>
+<span class="ln" id="L2060"></span>
+<span class="ln" id="L2061">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2062">    <span class="tok-kw">fn</span> <span class="tok-fn">a_baseline_that_would_not_parse_is_said_in_the_window</span>() {</span>
+<span class="ln" id="L2063">        <span class="tok-com">// A silent fallback to the strict default would tell somebody their</span></span>
+<span class="ln" id="L2064">        <span class="tok-com">// relaxation is in force when it is not, or hide that a requirement</span></span>
+<span class="ln" id="L2065">        <span class="tok-com">// they set is being ignored. The CLI says so; the window must too.</span></span>
+<span class="ln" id="L2066">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2067">        s.mandate_problem = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;line 3: not a setting anyone wrote&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L2068">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
+<span class="ln" id="L2069">        assert!(</span>
+<span class="ln" id="L2070">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>),</span>
+<span class="ln" id="L2071">            <span class="tok-str">&quot;the parse problem is not surfaced:\n{seen}&quot;</span></span>
+<span class="ln" id="L2072">        );</span>
+<span class="ln" id="L2073">    }</span>
+<span class="ln" id="L2074"></span>
+<span class="ln" id="L2075">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2076">    <span class="tok-kw">fn</span> <span class="tok-fn">a_clean_baseline_shows_no_history_and_no_problem</span>() {</span>
+<span class="ln" id="L2077">        <span class="tok-com">// The common case: nobody has relaxed anything. Neither the history</span></span>
+<span class="ln" id="L2078">        <span class="tok-com">// header nor a problem line should appear, or the panel cries wolf.</span></span>
+<span class="ln" id="L2079">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2080">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
+<span class="ln" id="L2081">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
+<span class="ln" id="L2082">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;change to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
+<span class="ln" id="L2083">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;changes to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
+<span class="ln" id="L2084">    }</span>
+<span class="ln" id="L2085"></span>
+<span class="ln" id="L2086">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2087">    <span class="tok-kw">fn</span> <span class="tok-fn">a_test_built_security_never_writes_to_the_real_configuration</span>() {</span>
+<span class="ln" id="L2088">        <span class="tok-com">// `Security::default()` has no path, so `record` changes the value in</span></span>
+<span class="ln" id="L2089">        <span class="tok-com">// memory and writes nothing. Every other test in this file depends on</span></span>
+<span class="ln" id="L2090">        <span class="tok-com">// that being true.</span></span>
+<span class="ln" id="L2091">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2092">        assert!(s.mandate_path.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L2093">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L2094">        assert!(!s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
+<span class="ln" id="L2095">        assert!(s.mandate_problem.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L2096">    }</span>
+<span class="ln" id="L2097"></span>
+<span class="ln" id="L2098">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2099">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_nothing_set_refuses_rather_than_writing_plaintext</span>() {</span>
+<span class="ln" id="L2100">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2101">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
+<span class="ln" id="L2102">        assert!(Plan::Missing.<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L2103">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;nothing may be written on refusal&quot;</span>);</span>
+<span class="ln" id="L2104">    }</span>
+<span class="ln" id="L2105"></span>
+<span class="ln" id="L2106">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2107">    <span class="tok-kw">fn</span> <span class="tok-fn">a_password_plan_seals_beside_the_recording_and_leaves_no_plaintext</span>() {</span>
+<span class="ln" id="L2108">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2109">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>);</span>
+<span class="ln" id="L2110">        <span class="tok-kw">let</span> wav = b<span class="tok-str">&quot;RIFF....WAVEfake but recognisable&quot;</span>.<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L2111"></span>
+<span class="ln" id="L2112">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
+<span class="ln" id="L2113">        <span class="tok-kw">let</span> out = Plan::<span class="tok-fn">Password</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed))</span>
+<span class="ln" id="L2114">            .<span class="tok-fn">write</span>(&amp;path, &amp;wav, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2115">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2116">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
+<span class="ln" id="L2117">        assert_eq!(out, container::<span class="tok-fn">veil_path</span>(&amp;path));</span>
+<span class="ln" id="L2118">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the plaintext must never reach the disk&quot;</span>);</span>
+<span class="ln" id="L2119"></span>
+<span class="ln" id="L2120">        <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;out).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2121">        assert!(!sealed.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;RIFF&quot;</span>));</span>
+<span class="ln" id="L2122">        assert_eq!(</span>
+<span class="ln" id="L2123">            container::<span class="tok-fn">open_with_password</span>(b<span class="tok-str">&quot;a recording passphrase&quot;</span>, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L2124">            wav</span>
+<span class="ln" id="L2125">        );</span>
+<span class="ln" id="L2126">    }</span>
+<span class="ln" id="L2127"></span>
+<span class="ln" id="L2128">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2129">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_writes_the_file_as_asked</span>() {</span>
+<span class="ln" id="L2130">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2131">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
+<span class="ln" id="L2132">        <span class="tok-kw">let</span> out = Plan::Plaintext</span>
+<span class="ln" id="L2133">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2134">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2135">        assert_eq!(out, path);</span>
+<span class="ln" id="L2136">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;audio bytes&quot;</span>);</span>
+<span class="ln" id="L2137">    }</span>
+<span class="ln" id="L2138"></span>
+<span class="ln" id="L2139">    <span class="tok-com">/// An unencrypted recording is still readable only by this account.</span></span>
 <span class="ln" id="L2140">    <span class="tok-com">///</span></span>
-<span class="ln" id="L2141">    <span class="tok-com">/// `lock_now` refuses to lock when there is nothing to unlock with, which</span></span>
-<span class="ln" id="L2142">    <span class="tok-com">/// is the right behaviour and means these tests need an actual store.</span></span>
-<span class="ln" id="L2143">    <span class="tok-kw">fn</span> <span class="tok-fn">locked_security</span>() -&gt; (Security, tempfile::TempDir) {</span>
-<span class="ln" id="L2144">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2145">        <span class="tok-kw">let</span> store =</span>
-<span class="ln" id="L2146">            veilvoice_crypto::LockStore::<span class="tok-fn">create</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>), b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2147">                .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2148">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2149">        s.store = <span class="tok-fn">Some</span>(store);</span>
-<span class="ln" id="L2150">        (s, dir)</span>
-<span class="ln" id="L2151">    }</span>
-<span class="ln" id="L2152"></span>
-<span class="ln" id="L2153">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2154">    <span class="tok-kw">fn</span> <span class="tok-fn">a_deliberate_lock_and_an_idle_one_are_told_apart</span>() {</span>
-<span class="ln" id="L2155">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
-<span class="ln" id="L2156">        s.<span class="tok-fn">lock_now</span>();</span>
-<span class="ln" id="L2157">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
-<span class="ln" id="L2158">        assert!(</span>
-<span class="ln" id="L2159">            !s.auto_locked,</span>
-<span class="ln" id="L2160">            <span class="tok-str">&quot;somebody pressed Lock; the screen must not claim the window did it&quot;</span></span>
-<span class="ln" id="L2161">        );</span>
-<span class="ln" id="L2162"></span>
-<span class="ln" id="L2163">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
-<span class="ln" id="L2164">        s.<span class="tok-fn">lock_after_idle</span>();</span>
-<span class="ln" id="L2165">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
-<span class="ln" id="L2166">        assert!(s.auto_locked);</span>
-<span class="ln" id="L2167">    }</span>
-<span class="ln" id="L2168"></span>
-<span class="ln" id="L2169">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2170">    <span class="tok-kw">fn</span> <span class="tok-fn">the_auto_lock_note_is_not_shown_once_typing_starts</span>() {</span>
-<span class="ln" id="L2171">        <span class="tok-com">// The note is drawn under `self.auto_locked &amp;&amp; self.entry.is_empty()`.</span></span>
-<span class="ln" id="L2172">        <span class="tok-com">// Read from the source rather than by driving egui, which needs a</span></span>
-<span class="ln" id="L2173">        <span class="tok-com">// context this test suite does not build.</span></span>
-<span class="ln" id="L2174">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L2175">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2176">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
-<span class="ln" id="L2177">        assert!(</span>
-<span class="ln" id="L2178">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.auto_locked &amp;&amp; self.entry.is_empty()&quot;</span>),</span>
-<span class="ln" id="L2179">            <span class="tok-str">&quot;the note must disappear as soon as a character is typed&quot;</span></span>
-<span class="ln" id="L2180">        );</span>
-<span class="ln" id="L2181">    }</span>
-<span class="ln" id="L2182"></span>
-<span class="ln" id="L2183">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2184">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_screen_shows_the_mark_in_its_badge</span>() {</span>
-<span class="ln" id="L2185">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L2186">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2187">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
-<span class="ln" id="L2188">        assert!(</span>
-<span class="ln" id="L2189">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;soundbar::badge&quot;</span>),</span>
-<span class="ln" id="L2190">            <span class="tok-str">&quot;a locked window has one thing in it and it should be the logo&quot;</span></span>
-<span class="ln" id="L2191">        );</span>
-<span class="ln" id="L2192">    }</span>
-<span class="ln" id="L2193"></span>
-<span class="ln" id="L2194">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2195">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_wipes_the_session_passphrase</span>() {</span>
-<span class="ln" id="L2196">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2197">        s.passphrase = <span class="tok-str">&quot;a recording passphrase&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L2198">        s.passphrase_set = true;</span>
-<span class="ln" id="L2199">        s.<span class="tok-fn">wipe_secrets</span>();</span>
-<span class="ln" id="L2200">        assert!(s.passphrase.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L2201">        assert!(!s.passphrase_set);</span>
-<span class="ln" id="L2202">        assert!(!s.<span class="tok-fn">ready_to_write</span>(), <span class="tok-str">&quot;a wiped passphrase must block the job&quot;</span>);</span>
-<span class="ln" id="L2203">    }</span>
-<span class="ln" id="L2204"></span>
-<span class="ln" id="L2205">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2206">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_does_nothing_when_no_lock_is_configured</span>() {</span>
-<span class="ln" id="L2207">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2208">        s.<span class="tok-fn">lock_now</span>();</span>
-<span class="ln" id="L2209">        assert!(!s.<span class="tok-fn">is_locked</span>(), <span class="tok-str">&quot;there is nothing to unlock it with&quot;</span>);</span>
-<span class="ln" id="L2210">    }</span>
-<span class="ln" id="L2211">}</span>
+<span class="ln" id="L2141">    <span class="tok-com">/// `veilvoice anonymise --encrypt false` had written 0600 since it was</span></span>
+<span class="ln" id="L2142">    <span class="tok-com">/// written. This, the window&#x27;s version of the same decision, wrote 0644,</span></span>
+<span class="ln" id="L2143">    <span class="tok-com">/// so turning encryption off in the interface left the recording readable</span></span>
+<span class="ln" id="L2144">    <span class="tok-com">/// by every other account on the machine and turning it off on the command</span></span>
+<span class="ln" id="L2145">    <span class="tok-com">/// line did not.</span></span>
+<span class="ln" id="L2146">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L2147">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2148">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_still_writes_owner_only</span>() {</span>
+<span class="ln" id="L2149">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L2150">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2151">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
+<span class="ln" id="L2152">        Plan::Plaintext</span>
+<span class="ln" id="L2153">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2154">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2155">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L2156">        assert_eq!(</span>
+<span class="ln" id="L2157">            mode, 0o600,</span>
+<span class="ln" id="L2158">            <span class="tok-str">&quot;an unencrypted recording is {mode:o}, so anyone with an account here can play it&quot;</span></span>
+<span class="ln" id="L2159">        );</span>
+<span class="ln" id="L2160">    }</span>
+<span class="ln" id="L2161"></span>
+<span class="ln" id="L2162">    <span class="tok-com">/// The confirmed passphrase must not linger as ordinary heap bytes. It used</span></span>
+<span class="ln" id="L2163">    <span class="tok-com">/// to be kept as a `String` for the whole session; it is now moved into a</span></span>
+<span class="ln" id="L2164">    <span class="tok-com">/// page-locked `Secret` the moment it is confirmed, and the typing buffer</span></span>
+<span class="ln" id="L2165">    <span class="tok-com">/// is wiped.</span></span>
+<span class="ln" id="L2166">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2167">    <span class="tok-kw">fn</span> <span class="tok-fn">the_confirmed_passphrase_leaves_no_plaintext_buffer_behind</span>() {</span>
+<span class="ln" id="L2168">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
+<span class="ln" id="L2169">        <span class="tok-kw">let</span> secret = <span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed);</span>
+<span class="ln" id="L2170"></span>
+<span class="ln" id="L2171">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
+<span class="ln" id="L2172">        assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
+<span class="ln" id="L2173">        assert!(</span>
+<span class="ln" id="L2174">            format!(<span class="tok-str">&quot;{secret:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>),</span>
+<span class="ln" id="L2175">            <span class="tok-str">&quot;a secret must not be printable&quot;</span></span>
+<span class="ln" id="L2176">        );</span>
+<span class="ln" id="L2177">    }</span>
+<span class="ln" id="L2178"></span>
+<span class="ln" id="L2179">    <span class="tok-com">/// And the plan handed to the worker thread carries the `Secret`, not a</span></span>
+<span class="ln" id="L2180">    <span class="tok-com">/// copy of the text.</span></span>
+<span class="ln" id="L2181">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2182">    <span class="tok-kw">fn</span> <span class="tok-fn">the_plan_carries_page_locked_material_not_a_string</span>() {</span>
+<span class="ln" id="L2183">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2184">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;session passphrase&quot;</span>);</span>
+<span class="ln" id="L2185">        s.held = <span class="tok-fn">Some</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed));</span>
+<span class="ln" id="L2186">        s.passphrase_set = true;</span>
+<span class="ln" id="L2187"></span>
+<span class="ln" id="L2188">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L2189">        <span class="tok-kw">match</span> s.<span class="tok-fn">plan</span>() {</span>
+<span class="ln" id="L2190">            Plan::<span class="tok-fn">Password</span>(secret) =&gt; assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;session passphrase&quot;</span>),</span>
+<span class="ln" id="L2191">            other =&gt; panic!(<span class="tok-str">&quot;expected a password plan, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L2192">        }</span>
+<span class="ln" id="L2193">    }</span>
+<span class="ln" id="L2194"></span>
+<span class="ln" id="L2195">    <span class="tok-com">/// Locking must take the session passphrase with it, or &quot;locked&quot; would be</span></span>
+<span class="ln" id="L2196">    <span class="tok-com">/// a screen rather than a state.</span></span>
+<span class="ln" id="L2197">    <span class="tok-com">/// A real lock in a temporary directory, at test cost.</span></span>
+<span class="ln" id="L2198">    <span class="tok-com">///</span></span>
+<span class="ln" id="L2199">    <span class="tok-com">/// `lock_now` refuses to lock when there is nothing to unlock with, which</span></span>
+<span class="ln" id="L2200">    <span class="tok-com">/// is the right behaviour and means these tests need an actual store.</span></span>
+<span class="ln" id="L2201">    <span class="tok-kw">fn</span> <span class="tok-fn">locked_security</span>() -&gt; (Security, tempfile::TempDir) {</span>
+<span class="ln" id="L2202">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2203">        <span class="tok-kw">let</span> store =</span>
+<span class="ln" id="L2204">            veilvoice_crypto::LockStore::<span class="tok-fn">create</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>), b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2205">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2206">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2207">        s.store = <span class="tok-fn">Some</span>(store);</span>
+<span class="ln" id="L2208">        (s, dir)</span>
+<span class="ln" id="L2209">    }</span>
+<span class="ln" id="L2210"></span>
+<span class="ln" id="L2211">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2212">    <span class="tok-kw">fn</span> <span class="tok-fn">a_deliberate_lock_and_an_idle_one_are_told_apart</span>() {</span>
+<span class="ln" id="L2213">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
+<span class="ln" id="L2214">        s.<span class="tok-fn">lock_now</span>();</span>
+<span class="ln" id="L2215">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
+<span class="ln" id="L2216">        assert!(</span>
+<span class="ln" id="L2217">            !s.auto_locked,</span>
+<span class="ln" id="L2218">            <span class="tok-str">&quot;somebody pressed Lock; the screen must not claim the window did it&quot;</span></span>
+<span class="ln" id="L2219">        );</span>
+<span class="ln" id="L2220"></span>
+<span class="ln" id="L2221">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
+<span class="ln" id="L2222">        s.<span class="tok-fn">lock_after_idle</span>();</span>
+<span class="ln" id="L2223">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
+<span class="ln" id="L2224">        assert!(s.auto_locked);</span>
+<span class="ln" id="L2225">    }</span>
+<span class="ln" id="L2226"></span>
+<span class="ln" id="L2227">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2228">    <span class="tok-kw">fn</span> <span class="tok-fn">the_auto_lock_note_is_not_shown_once_typing_starts</span>() {</span>
+<span class="ln" id="L2229">        <span class="tok-com">// The note is drawn under `self.auto_locked &amp;&amp; self.entry.is_empty()`.</span></span>
+<span class="ln" id="L2230">        <span class="tok-com">// Read from the source rather than by driving egui, which needs a</span></span>
+<span class="ln" id="L2231">        <span class="tok-com">// context this test suite does not build.</span></span>
+<span class="ln" id="L2232">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L2233">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2234">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
+<span class="ln" id="L2235">        assert!(</span>
+<span class="ln" id="L2236">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.auto_locked &amp;&amp; self.entry.is_empty()&quot;</span>),</span>
+<span class="ln" id="L2237">            <span class="tok-str">&quot;the note must disappear as soon as a character is typed&quot;</span></span>
+<span class="ln" id="L2238">        );</span>
+<span class="ln" id="L2239">    }</span>
+<span class="ln" id="L2240"></span>
+<span class="ln" id="L2241">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2242">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_screen_shows_the_mark_in_its_badge</span>() {</span>
+<span class="ln" id="L2243">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L2244">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2245">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
+<span class="ln" id="L2246">        assert!(</span>
+<span class="ln" id="L2247">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;soundbar::badge&quot;</span>),</span>
+<span class="ln" id="L2248">            <span class="tok-str">&quot;a locked window has one thing in it and it should be the logo&quot;</span></span>
+<span class="ln" id="L2249">        );</span>
+<span class="ln" id="L2250">    }</span>
+<span class="ln" id="L2251"></span>
+<span class="ln" id="L2252">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2253">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_wipes_the_session_passphrase</span>() {</span>
+<span class="ln" id="L2254">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2255">        s.passphrase = <span class="tok-str">&quot;a recording passphrase&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L2256">        s.passphrase_set = true;</span>
+<span class="ln" id="L2257">        s.<span class="tok-fn">wipe_secrets</span>();</span>
+<span class="ln" id="L2258">        assert!(s.passphrase.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L2259">        assert!(!s.passphrase_set);</span>
+<span class="ln" id="L2260">        assert!(!s.<span class="tok-fn">ready_to_write</span>(), <span class="tok-str">&quot;a wiped passphrase must block the job&quot;</span>);</span>
+<span class="ln" id="L2261">    }</span>
+<span class="ln" id="L2262"></span>
+<span class="ln" id="L2263">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2264">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_does_nothing_when_no_lock_is_configured</span>() {</span>
+<span class="ln" id="L2265">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2266">        s.<span class="tok-fn">lock_now</span>();</span>
+<span class="ln" id="L2267">        assert!(!s.<span class="tok-fn">is_locked</span>(), <span class="tok-str">&quot;there is nothing to unlock it with&quot;</span>);</span>
+<span class="ln" id="L2268">    }</span>
+<span class="ln" id="L2269">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
