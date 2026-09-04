@@ -266,7 +266,11 @@ mod tests {
         let mut tape = Tape::new();
         tape.push(&vec![7u8; CHUNK]);
         assert_eq!(tape.len(), CHUNK);
-        assert_eq!(tape.chunk_count(), 1, "a full chunk is not yet a second one");
+        assert_eq!(
+            tape.chunk_count(),
+            1,
+            "a full chunk is not yet a second one"
+        );
 
         tape.push(&[9]);
         assert_eq!(tape.len(), CHUNK + 1);

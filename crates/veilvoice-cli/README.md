@@ -126,7 +126,7 @@ flowchart TD
     n_meter["meter.rs<br/>259 lines"]
     n_policy["policy.rs<br/>243 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
-    n_record["record.rs<br/>360 lines"]
+    n_record["record.rs<br/>359 lines"]
     n_sentry["sentry.rs<br/>384 lines"]
     n_theme["theme.rs<br/>144 lines"]
     n_accel --> n_sentry
@@ -207,7 +207,7 @@ flowchart TD
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 243 | veilvoice policy -- settings that can only be tightened. |
 | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
-| [`record.rs`](../../docs/files/veilvoice-cli/record.md) | 360 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
+| [`record.rs`](../../docs/files/veilvoice-cli/record.md) | 359 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 384 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 144 | Tokyo Night colouring for the terminal. |
 

@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/tape.rs</code></h1>
-<p style="color:var(--muted)"><a href="tape.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 346 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tape.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 350 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -341,84 +341,88 @@
 <span class="ln" id="L266">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L267">        tape.<span class="tok-fn">push</span>(&amp;vec![7u8; CHUNK]);</span>
 <span class="ln" id="L268">        assert_eq!(tape.<span class="tok-fn">len</span>(), CHUNK);</span>
-<span class="ln" id="L269">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;a full chunk is not yet a second one&quot;</span>);</span>
-<span class="ln" id="L270"></span>
-<span class="ln" id="L271">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">9</span>]);</span>
-<span class="ln" id="L272">        assert_eq!(tape.<span class="tok-fn">len</span>(), CHUNK + <span class="tok-num">1</span>);</span>
-<span class="ln" id="L273">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L274">    }</span>
-<span class="ln" id="L275"></span>
-<span class="ln" id="L276">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L277">    <span class="tok-kw">fn</span> <span class="tok-fn">pushing_nothing_changes_nothing</span>() {</span>
-<span class="ln" id="L278">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L279">        tape.<span class="tok-fn">push</span>(&amp;[]);</span>
-<span class="ln" id="L280">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">0</span>, <span class="tok-str">&quot;an empty push must not allocate&quot;</span>);</span>
-<span class="ln" id="L281">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]);</span>
-<span class="ln" id="L282">        tape.<span class="tok-fn">push</span>(&amp;[]);</span>
-<span class="ln" id="L283">        assert_eq!(tape.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>);</span>
-<span class="ln" id="L284">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L285">    }</span>
-<span class="ln" id="L286"></span>
-<span class="ln" id="L287">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L288">    <span class="tok-kw">fn</span> <span class="tok-fn">a_destination_of_the_wrong_size_is_refused_rather_than_part_filled</span>() {</span>
-<span class="ln" id="L289">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L290">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>]);</span>
-<span class="ln" id="L291"></span>
-<span class="ln" id="L292">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> too_small = vec![0u8; <span class="tok-num">3</span>];</span>
-<span class="ln" id="L293">        assert!(matches!(</span>
-<span class="ln" id="L294">            tape.<span class="tok-fn">copy_into</span>(&amp;<span class="tok-kw">mut</span> too_small),</span>
-<span class="ln" id="L295">            <span class="tok-fn">Err</span>(Error::TapeLength)</span>
-<span class="ln" id="L296">        ));</span>
-<span class="ln" id="L297">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> too_large = vec![0u8; <span class="tok-num">5</span>];</span>
-<span class="ln" id="L298">        assert!(matches!(</span>
-<span class="ln" id="L299">            tape.<span class="tok-fn">copy_into</span>(&amp;<span class="tok-kw">mut</span> too_large),</span>
-<span class="ln" id="L300">            <span class="tok-fn">Err</span>(Error::TapeLength)</span>
-<span class="ln" id="L301">        ));</span>
-<span class="ln" id="L302">        <span class="tok-com">// Neither attempt wrote anything.</span></span>
-<span class="ln" id="L303">        assert_eq!(too_small, vec![<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>]);</span>
-<span class="ln" id="L304">        assert_eq!(too_large, vec![<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>]);</span>
-<span class="ln" id="L305">    }</span>
-<span class="ln" id="L306"></span>
-<span class="ln" id="L307">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L308">    <span class="tok-kw">fn</span> <span class="tok-fn">wiping_leaves_an_empty_tape_that_still_works</span>() {</span>
-<span class="ln" id="L309">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L310">        tape.<span class="tok-fn">push</span>(&amp;vec![3u8; CHUNK * <span class="tok-num">2</span>]);</span>
-<span class="ln" id="L311">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L312"></span>
-<span class="ln" id="L313">        tape.<span class="tok-fn">wipe</span>();</span>
-<span class="ln" id="L314">        assert!(tape.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L315">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L269">        assert_eq!(</span>
+<span class="ln" id="L270">            tape.<span class="tok-fn">chunk_count</span>(),</span>
+<span class="ln" id="L271">            <span class="tok-num">1</span>,</span>
+<span class="ln" id="L272">            <span class="tok-str">&quot;a full chunk is not yet a second one&quot;</span></span>
+<span class="ln" id="L273">        );</span>
+<span class="ln" id="L274"></span>
+<span class="ln" id="L275">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">9</span>]);</span>
+<span class="ln" id="L276">        assert_eq!(tape.<span class="tok-fn">len</span>(), CHUNK + <span class="tok-num">1</span>);</span>
+<span class="ln" id="L277">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L278">    }</span>
+<span class="ln" id="L279"></span>
+<span class="ln" id="L280">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L281">    <span class="tok-kw">fn</span> <span class="tok-fn">pushing_nothing_changes_nothing</span>() {</span>
+<span class="ln" id="L282">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L283">        tape.<span class="tok-fn">push</span>(&amp;[]);</span>
+<span class="ln" id="L284">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">0</span>, <span class="tok-str">&quot;an empty push must not allocate&quot;</span>);</span>
+<span class="ln" id="L285">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]);</span>
+<span class="ln" id="L286">        tape.<span class="tok-fn">push</span>(&amp;[]);</span>
+<span class="ln" id="L287">        assert_eq!(tape.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>);</span>
+<span class="ln" id="L288">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L289">    }</span>
+<span class="ln" id="L290"></span>
+<span class="ln" id="L291">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L292">    <span class="tok-kw">fn</span> <span class="tok-fn">a_destination_of_the_wrong_size_is_refused_rather_than_part_filled</span>() {</span>
+<span class="ln" id="L293">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L294">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>]);</span>
+<span class="ln" id="L295"></span>
+<span class="ln" id="L296">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> too_small = vec![0u8; <span class="tok-num">3</span>];</span>
+<span class="ln" id="L297">        assert!(matches!(</span>
+<span class="ln" id="L298">            tape.<span class="tok-fn">copy_into</span>(&amp;<span class="tok-kw">mut</span> too_small),</span>
+<span class="ln" id="L299">            <span class="tok-fn">Err</span>(Error::TapeLength)</span>
+<span class="ln" id="L300">        ));</span>
+<span class="ln" id="L301">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> too_large = vec![0u8; <span class="tok-num">5</span>];</span>
+<span class="ln" id="L302">        assert!(matches!(</span>
+<span class="ln" id="L303">            tape.<span class="tok-fn">copy_into</span>(&amp;<span class="tok-kw">mut</span> too_large),</span>
+<span class="ln" id="L304">            <span class="tok-fn">Err</span>(Error::TapeLength)</span>
+<span class="ln" id="L305">        ));</span>
+<span class="ln" id="L306">        <span class="tok-com">// Neither attempt wrote anything.</span></span>
+<span class="ln" id="L307">        assert_eq!(too_small, vec![<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>]);</span>
+<span class="ln" id="L308">        assert_eq!(too_large, vec![<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>]);</span>
+<span class="ln" id="L309">    }</span>
+<span class="ln" id="L310"></span>
+<span class="ln" id="L311">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L312">    <span class="tok-kw">fn</span> <span class="tok-fn">wiping_leaves_an_empty_tape_that_still_works</span>() {</span>
+<span class="ln" id="L313">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L314">        tape.<span class="tok-fn">push</span>(&amp;vec![3u8; CHUNK * <span class="tok-num">2</span>]);</span>
+<span class="ln" id="L315">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">2</span>);</span>
 <span class="ln" id="L316"></span>
-<span class="ln" id="L317">        <span class="tok-com">// And it is reusable rather than poisoned.</span></span>
-<span class="ln" id="L318">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">8</span>, <span class="tok-num">8</span>]);</span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = vec![0u8; <span class="tok-num">2</span>];</span>
-<span class="ln" id="L320">        tape.<span class="tok-fn">copy_into</span>(&amp;<span class="tok-kw">mut</span> out).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L321">        assert_eq!(out, vec![<span class="tok-num">8</span>, <span class="tok-num">8</span>]);</span>
-<span class="ln" id="L322">    }</span>
-<span class="ln" id="L323"></span>
-<span class="ln" id="L324">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L325">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_count_never_claims_more_than_the_tape_holds</span>() {</span>
-<span class="ln" id="L326">        <span class="tok-com">// Locking is best-effort and the budget is small, so this asserts the</span></span>
-<span class="ln" id="L327">        <span class="tok-com">// relationship rather than a number: claiming more locked chunks than</span></span>
-<span class="ln" id="L328">        <span class="tok-com">// exist would be a report that cannot be true.</span></span>
-<span class="ln" id="L329">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L330">        tape.<span class="tok-fn">push</span>(&amp;vec![1u8; CHUNK * <span class="tok-num">2</span> + <span class="tok-num">10</span>]);</span>
-<span class="ln" id="L331">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">3</span>);</span>
-<span class="ln" id="L332">        assert!(tape.<span class="tok-fn">locked_chunks</span>() &lt;= tape.<span class="tok-fn">chunk_count</span>());</span>
-<span class="ln" id="L333">        assert_eq!(</span>
-<span class="ln" id="L334">            tape.<span class="tok-fn">fully_locked</span>(),</span>
-<span class="ln" id="L335">            tape.<span class="tok-fn">locked_chunks</span>() == tape.<span class="tok-fn">chunk_count</span>()</span>
-<span class="ln" id="L336">        );</span>
-<span class="ln" id="L337">    }</span>
-<span class="ln" id="L338"></span>
-<span class="ln" id="L339">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L340">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_tape_reports_no_unlocked_chunks</span>() {</span>
-<span class="ln" id="L341">        <span class="tok-kw">let</span> tape = Tape::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L342">        assert!(tape.<span class="tok-fn">fully_locked</span>());</span>
-<span class="ln" id="L343">        assert_eq!(tape.<span class="tok-fn">locked_chunks</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L344">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L345">    }</span>
-<span class="ln" id="L346">}</span>
+<span class="ln" id="L317">        tape.<span class="tok-fn">wipe</span>();</span>
+<span class="ln" id="L318">        assert!(tape.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L319">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L320"></span>
+<span class="ln" id="L321">        <span class="tok-com">// And it is reusable rather than poisoned.</span></span>
+<span class="ln" id="L322">        tape.<span class="tok-fn">push</span>(&amp;[<span class="tok-num">8</span>, <span class="tok-num">8</span>]);</span>
+<span class="ln" id="L323">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = vec![0u8; <span class="tok-num">2</span>];</span>
+<span class="ln" id="L324">        tape.<span class="tok-fn">copy_into</span>(&amp;<span class="tok-kw">mut</span> out).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L325">        assert_eq!(out, vec![<span class="tok-num">8</span>, <span class="tok-num">8</span>]);</span>
+<span class="ln" id="L326">    }</span>
+<span class="ln" id="L327"></span>
+<span class="ln" id="L328">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L329">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_count_never_claims_more_than_the_tape_holds</span>() {</span>
+<span class="ln" id="L330">        <span class="tok-com">// Locking is best-effort and the budget is small, so this asserts the</span></span>
+<span class="ln" id="L331">        <span class="tok-com">// relationship rather than a number: claiming more locked chunks than</span></span>
+<span class="ln" id="L332">        <span class="tok-com">// exist would be a report that cannot be true.</span></span>
+<span class="ln" id="L333">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tape = Tape::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L334">        tape.<span class="tok-fn">push</span>(&amp;vec![1u8; CHUNK * <span class="tok-num">2</span> + <span class="tok-num">10</span>]);</span>
+<span class="ln" id="L335">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">3</span>);</span>
+<span class="ln" id="L336">        assert!(tape.<span class="tok-fn">locked_chunks</span>() &lt;= tape.<span class="tok-fn">chunk_count</span>());</span>
+<span class="ln" id="L337">        assert_eq!(</span>
+<span class="ln" id="L338">            tape.<span class="tok-fn">fully_locked</span>(),</span>
+<span class="ln" id="L339">            tape.<span class="tok-fn">locked_chunks</span>() == tape.<span class="tok-fn">chunk_count</span>()</span>
+<span class="ln" id="L340">        );</span>
+<span class="ln" id="L341">    }</span>
+<span class="ln" id="L342"></span>
+<span class="ln" id="L343">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L344">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_tape_reports_no_unlocked_chunks</span>() {</span>
+<span class="ln" id="L345">        <span class="tok-kw">let</span> tape = Tape::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L346">        assert!(tape.<span class="tok-fn">fully_locked</span>());</span>
+<span class="ln" id="L347">        assert_eq!(tape.<span class="tok-fn">locked_chunks</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L348">        assert_eq!(tape.<span class="tok-fn">chunk_count</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L349">    }</span>
+<span class="ln" id="L350">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

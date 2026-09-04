@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-audio/src/record.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 416 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 534 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs)
 
 ## Contents
 
@@ -78,25 +78,26 @@ afterwards.
 
 ## What this file contains
 
-416 lines defining **11 functions** (10 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+534 lines defining **13 functions** (10 public), **2 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Sink` (line 78) -- The writing half, handed to the audio callback.
-- `struct Recorder` (line 100) -- The reading half: moves samples out of the ring and into locked memory.
+- `struct Sink` (line 91) -- The writing half, handed to the audio callback.
+- `struct Recorder` (line 113) -- The reading half: moves samples out of the ring and into locked memory.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Sink::write` (line 90) -- Take a block of veiled samples.
-- `start` (line 120) -- Start a recorder and the sink that feeds it.
-- `Recorder::samples` (line 170) -- Samples recorded so far, as of the last Recorder::drain.
-- `Recorder::seconds` (line 175) -- Length so far in seconds, as of the last Recorder::drain.
-- `Recorder::dropped` (line 187) -- Samples lost because the caller did not drain in time.
-- `Recorder::fully_locked` (line 197) -- Whether every page holding the recording is locked out of swap.
-- `Recorder::sample_rate` (line 202) -- The sample rate written into the WAV header.
-- `Recorder::wav` (line 217) -- Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed.
-  - reaches: `drain`, `write_header`
-- `Recorder::discard` (line 232) -- Wipe the recording held so far and start again from nothing.
+- `Sink::write` (line 103) -- Take a block of veiled samples.
+- `start` (line 133) -- Start a recorder and the sink that feeds it.
+- `Recorder::samples` (line 183) -- Samples recorded so far, as of the last Recorder::drain.
+- `Recorder::seconds` (line 188) -- Length so far in seconds, as of the last Recorder::drain.
+- `Recorder::dropped` (line 200) -- Samples lost because the caller did not drain in time.
+- `Recorder::fully_locked` (line 210) -- Whether every page holding the recording is locked out of swap.
+- `Recorder::sample_rate` (line 215) -- The sample rate written into the WAV header.
+- `Recorder::wav` (line 230) -- Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed.
+  - reaches: `drain`, `wipe_scratch`, `write_header`
+- `Recorder::discard` (line 251) -- Wipe the recording held so far and start again from nothing.
+  - reaches: `wipe_scratch`
 
 ## What calls what
 
@@ -118,36 +119,43 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_write(["Sink::write<br/>line 90"])
-    n_start(["start<br/>line 120"])
-    n_drain["Recorder::drain<br/>line 147"]
-    n_samples(["Recorder::samples<br/>line 170"])
-    n_seconds(["Recorder::seconds<br/>line 175"])
-    n_dropped(["Recorder::dropped<br/>line 187"])
-    n_fully_locked(["Recorder::fully_locked<br/>line 197"])
-    n_sample_rate(["Recorder::sample_rate<br/>line 202"])
-    n_wav(["Recorder::wav<br/>line 217"])
-    n_discard(["Recorder::discard<br/>line 232"])
-    n_write_header["write_header<br/>line 243"]
+    n_write(["Sink::write<br/>line 103"])
+    n_start(["start<br/>line 133"])
+    n_drain["Recorder::drain<br/>line 160"]
+    n_samples(["Recorder::samples<br/>line 183"])
+    n_seconds(["Recorder::seconds<br/>line 188"])
+    n_dropped(["Recorder::dropped<br/>line 200"])
+    n_fully_locked(["Recorder::fully_locked<br/>line 210"])
+    n_sample_rate(["Recorder::sample_rate<br/>line 215"])
+    n_wav(["Recorder::wav<br/>line 230"])
+    n_discard(["Recorder::discard<br/>line 251"])
+    n_wipe_scratch["Recorder::wipe_scratch<br/>line 263"]
+    n_drop["Recorder::drop<br/>line 287"]
+    n_write_header["write_header<br/>line 296"]
+    n_discard --> n_wipe_scratch
+    n_drop --> n_wipe_scratch
     n_wav --> n_drain
+    n_wav --> n_wipe_scratch
     n_wav --> n_write_header
-    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L90" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L120" "open the source"
-    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L147" "open the source"
-    click n_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L170" "open the source"
-    click n_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L175" "open the source"
-    click n_dropped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L187" "open the source"
-    click n_fully_locked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L197" "open the source"
-    click n_sample_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L202" "open the source"
-    click n_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L217" "open the source"
-    click n_discard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L232" "open the source"
-    click n_write_header href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L243" "open the source"
+    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L103" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L133" "open the source"
+    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L160" "open the source"
+    click n_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L183" "open the source"
+    click n_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L188" "open the source"
+    click n_dropped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L200" "open the source"
+    click n_fully_locked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L210" "open the source"
+    click n_sample_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L215" "open the source"
+    click n_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L230" "open the source"
+    click n_discard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L251" "open the source"
+    click n_wipe_scratch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L263" "open the source"
+    click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L287" "open the source"
+    click n_write_header href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L296" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_write,n_start,n_samples,n_seconds,n_dropped,n_fully_locked,n_sample_rate,n_wav,n_discard entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_drain api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_write_header helper
+    class n_wipe_scratch,n_drop,n_write_header helper
 ```
 
 </details>
@@ -157,20 +165,23 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `HEADER` <sub>const</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L63) | Bytes in a canonical 16-bit PCM WAV header. |
-| `SLACK_SECONDS` <sub>pub const</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L72) | How much audio the ring holds before samples are dropped, in seconds. |
-| `Sink` <sub>pub struct</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L78) | The writing half, handed to the audio callback. |
-| `Sink::write` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L90) | Take a block of veiled samples. |
-| `Recorder` <sub>pub struct</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L100) | The reading half: moves samples out of the ring and into locked memory. |
-| `start` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L120) | Start a recorder and the sink that feeds it. |
-| `Recorder::drain` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L147) | Move everything waiting in the ring into the tape. |
-| `Recorder::samples` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L170) | Samples recorded so far, as of the last Recorder::drain. |
-| `Recorder::seconds` <sub>pub fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L175) | Length so far in seconds, as of the last Recorder::drain. |
-| `Recorder::dropped` <sub>pub fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L187) | Samples lost because the caller did not drain in time. |
-| `Recorder::fully_locked` <sub>pub fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L197) | Whether every page holding the recording is locked out of swap. |
-| `Recorder::sample_rate` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L202) | The sample rate written into the WAV header. |
-| `Recorder::wav` <sub>pub fn</sub> | [217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L217) | Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed. |
-| `Recorder::discard` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L232) | Wipe the recording held so far and start again from nothing. |
-| `write_header` <sub>fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L243) | Write a canonical 44-byte mono 16-bit PCM WAV header into out. |
+| `WAV_MAX_DATA` <sub>const</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L76) | The most PCM data a RIFF/WAVE file can describe, in bytes. |
+| `SLACK_SECONDS` <sub>pub const</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L85) | How much audio the ring holds before samples are dropped, in seconds. |
+| `Sink` <sub>pub struct</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L91) | The writing half, handed to the audio callback. |
+| `Sink::write` <sub>pub fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L103) | Take a block of veiled samples. |
+| `Recorder` <sub>pub struct</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L113) | The reading half: moves samples out of the ring and into locked memory. |
+| `start` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L133) | Start a recorder and the sink that feeds it. |
+| `Recorder::drain` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L160) | Move everything waiting in the ring into the tape. |
+| `Recorder::samples` <sub>pub fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L183) | Samples recorded so far, as of the last Recorder::drain. |
+| `Recorder::seconds` <sub>pub fn</sub> | [188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L188) | Length so far in seconds, as of the last Recorder::drain. |
+| `Recorder::dropped` <sub>pub fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L200) | Samples lost because the caller did not drain in time. |
+| `Recorder::fully_locked` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L210) | Whether every page holding the recording is locked out of swap. |
+| `Recorder::sample_rate` <sub>pub fn</sub> | [215](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L215) | The sample rate written into the WAV header. |
+| `Recorder::wav` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L230) | Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed. |
+| `Recorder::discard` <sub>pub fn</sub> | [251](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L251) | Wipe the recording held so far and start again from nothing. |
+| `Recorder::wipe_scratch` <sub>fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L263) | Clear the drain scratch. |
+| `Recorder::drop` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L287) | Wipe the drain scratch. |
+| `write_header` <sub>fn</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L296) | Write a canonical 44-byte mono 16-bit PCM WAV header into out. |
 
 ---
 
