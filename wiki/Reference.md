@@ -118,6 +118,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`lock.rs`|File-veilvoice-crypto-lock]] &middot; The application lock: an Argon2id password verifier with a rate limit.
 - [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] &middot; Writing a file that only its owner can read.
 - [[`shred.rs`|File-veilvoice-crypto-shred]] &middot; Secure erasure, the self-destruct.
+- [[`studio.rs`|File-veilvoice-crypto-studio]] &middot; The studio vault: a key that exists only when both locks have been opened.
 - [[`tape.rs`|File-veilvoice-crypto-tape]] &middot; A recording held in locked, zeroizing memory while it is still being made.
 - [[`vault.rs`|File-veilvoice-crypto-vault]] &middot; Where the app lock is kept: two copies, unpredictable names, and a restore.
 - [[`weave.rs`|File-veilvoice-crypto-weave]] &middot; Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both.
