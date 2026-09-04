@@ -38,6 +38,47 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-ninth round: an optimisation pass that found little, and says so
+
+Read for the things that accumulate rather than the things that break: work
+repeated that could be done once, allocation in paths that run per sample or per
+frame, dependencies carried for one function, and anything the compiler is doing
+twice. Recorded including the parts that found nothing, because a pass that
+reports only what it changed is a pass nobody can tell apart from a pass that
+looked in the wrong places.
+
+**The realtime path does not allocate, and this checked rather than assumed it.**
+`chain::process`, the function the audio callback runs 187 times a second, holds
+no `vec!`, no `Vec::`, no `collect`, no `format!` and no `clone`. Neither does
+`Recorder::drain`, which converts and moves samples on a preallocated scratch
+buffer and a stack array. That is the single highest-value place an optimisation
+pass could find something, and it is already clean, which is the result rather
+than an absence of one.
+
+**The release profile is already at its limit.** `opt-level = 3`, `lto = "fat"`,
+`codegen-units = 1`, `panic = "abort"`, `strip = true`. There is no setting left
+to turn up, and every one of those was chosen rather than defaulted.
+
+**Duplicate dependency versions exist and are deliberately left alone.**
+`getrandom` resolves to three major versions and `rand`, `rand_chacha` and
+`rand_core` to two each. Most of that is transitive, arriving through the window
+toolkit, and is not this project's to collapse. The part that *is* ours is the
+workspace pinning `rand = "0.8"` while newer code pulls 0.9.
+
+It stays pinned, and the reason is the rule this pass was run under. The
+modulation stream is drawn from `rand_chacha`, and the seed schedule is what
+decides how far every frame's pitch and formants move. Changing that crate
+version risks changing the bytes that stream produces, which would change the
+veiled output of every recording. That is a behavioural change, and this pass
+allows none: the instruction was speed and size *without* altering functionality,
+and a smaller binary that veils differently is not the same program. It is
+recorded here as a known duplication with a stated reason rather than fixed
+quietly or left unmentioned.
+
+**What this round changed: nothing.** No code was altered for performance,
+because nothing measured wanted altering. Writing a change to have something to
+show would be the failure this document exists to prevent.
+
 ## The twenty-eighth round: the post-quantum surface, and two defects in the hour-old recorder
 
 A sweep of the whole tree for the two questions that get asked most about a
