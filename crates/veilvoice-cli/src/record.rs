@@ -43,11 +43,11 @@
 //! moment, so there is nothing to delete afterwards and nothing to recover from
 //! the disk.
 
+use crate::meter;
 use crate::theme::{colour, field, heading, ok, paint, warn};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use crate::meter;
 use veilvoice_audio::{devices, record};
 
 /// How the recording is to be protected once it is made.
@@ -87,8 +87,8 @@ pub fn run(
     // routing: nobody is on the other end of a cable waiting for it, and
     // sending it to one would put the recording into whatever is listening
     // there as well as into the file.
-    let out_device = devices::open(devices::Direction::Output, output.as_deref())
-        .map_err(|e| e.to_string())?;
+    let out_device =
+        devices::open(devices::Direction::Output, output.as_deref()).map_err(|e| e.to_string())?;
 
     println!("{}", heading("Record, veiled and encrypted"));
     println!("{}", field("Input", &devices::name_of(&in_device)));
@@ -110,7 +110,10 @@ pub fn run(
     } else if sealing.public_key.is_some() {
         println!("{}", field("Sealed to", "a recipient public key"));
     } else {
-        println!("{}", field("Sealed with", "a passphrase, asked for at the end"));
+        println!(
+            "{}",
+            field("Sealed with", "a passphrase, asked for at the end")
+        );
     }
     println!(
         "{}",
@@ -123,13 +126,9 @@ pub fn run(
     let config = crate::config(tuning);
     let rate = config.sample_rate as u32;
     let (mut recorder, sink) = record::start(rate);
-    let session = veilvoice_audio::LiveSession::start_recording(
-        &in_device,
-        &out_device,
-        config,
-        Some(sink),
-    )
-    .map_err(|e| e.to_string())?;
+    let session =
+        veilvoice_audio::LiveSession::start_recording(&in_device, &out_device, config, Some(sink))
+            .map_err(|e| e.to_string())?;
 
     println!();
     match seconds {
