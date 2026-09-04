@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/lib.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 223 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 234 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
 
 ## Contents
 
@@ -92,11 +92,11 @@ your machine and the key is made from your password each time.
 
 ## What this file contains
 
-223 lines defining **1 function** (0 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+234 lines defining **1 function** (0 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 102) -- Everything that can go wrong in this crate.
+- `enum Error` (line 104) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -118,8 +118,8 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_fmt["Error::fmt<br/>line 172"]
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L172" "open the source"
+    n_fmt["Error::fmt<br/>line 179"]
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L179" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_fmt helper
 ```
@@ -130,9 +130,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L93) | Crate version string, surfaced in the About panel. |
-| `Error` <sub>pub enum</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L102) | Everything that can go wrong in this crate. |
-| `Error::fmt` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L172) |  |
+| `VERSION` <sub>pub const</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L95) | Crate version string, surfaced in the About panel. |
+| `Error` <sub>pub enum</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L104) | Everything that can go wrong in this crate. |
+| `Error::fmt` <sub>fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L179) |  |
 
 ---
 
