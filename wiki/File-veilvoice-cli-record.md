@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/record.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 360 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 359 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs)
 
 ## Contents
 
@@ -60,7 +60,7 @@ the disk.
 
 ## What this file contains
 
-360 lines defining **5 functions** (1 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+359 lines defining **5 functions** (1 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -86,19 +86,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_run(["run<br/>line 65"])
-    n_report["report<br/>line 220"]
-    n_stop_signal["stop_signal<br/>line 264"]
-    n_destination["destination<br/>line 292"]
-    n_stamp["stamp<br/>line 307"]
+    n_report["report<br/>line 219"]
+    n_stop_signal["stop_signal<br/>line 263"]
+    n_destination["destination<br/>line 291"]
+    n_stamp["stamp<br/>line 306"]
     n_destination --> n_stamp
     n_run --> n_destination
     n_run --> n_report
     n_run --> n_stop_signal
     click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L65" "open the source"
-    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L220" "open the source"
-    click n_stop_signal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L264" "open the source"
-    click n_destination href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L292" "open the source"
-    click n_stamp href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L307" "open the source"
+    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L219" "open the source"
+    click n_stop_signal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L263" "open the source"
+    click n_destination href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L291" "open the source"
+    click n_stamp href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L306" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -113,7 +113,7 @@ flowchart TD
 |---|---:|---|
 | `Sealing` <sub>pub struct</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L54) | How the recording is to be protected once it is made. |
 | `run` <sub>pub fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L65) | Run a recording session and seal what it captured. |
-| `report` <sub>fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L220) | What was captured, and what was actually obtained for it. |
-| `stop_signal` <sub>fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L264) | A flag that becomes true when the recording should stop. |
-| `destination` <sub>fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L292) | Where the recording goes, defaulting to a timestamped name here. |
-| `stamp` <sub>fn</sub> | [307](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L307) | YYYYMMDD-HHMMSS in UTC, for a filename. |
+| `report` <sub>fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L219) | What was captured, and what was actually obtained for it. |
+| `stop_signal` <sub>fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L263) | A flag that becomes true when the recording should stop. |
+| `destination` <sub>fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L291) | Where the recording goes, defaulting to a timestamped name here. |
+| `stamp` <sub>fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs#L306) | YYYYMMDD-HHMMSS in UTC, for a filename. |

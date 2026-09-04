@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/record.svg" alt="record.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/record.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 416 lines &middot; <a href="record.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 534 lines &middot; <a href="record.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -75,30 +75,31 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>416 lines defining <strong>11 functions</strong> (10 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>534 lines defining <strong>13 functions</strong> (10 public), <strong>2 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Sink</code> <span style="color:var(--muted)">line 78</span> &middot; The writing half, handed to the audio callback.</li>
-<li><code>struct Recorder</code> <span style="color:var(--muted)">line 100</span> &middot; The reading half: moves samples out of the ring and into locked memory.</li>
+<li><code>struct Sink</code> <span style="color:var(--muted)">line 91</span> &middot; The writing half, handed to the audio callback.</li>
+<li><code>struct Recorder</code> <span style="color:var(--muted)">line 113</span> &middot; The reading half: moves samples out of the ring and into locked memory.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Sink::write</code> <span style="color:var(--muted)">line 90</span> &middot; Take a block of veiled samples.
+<li><code>Sink::write</code> <span style="color:var(--muted)">line 103</span> &middot; Take a block of veiled samples.
 </li>
-<li><code>start</code> <span style="color:var(--muted)">line 120</span> &middot; Start a recorder and the sink that feeds it.
+<li><code>start</code> <span style="color:var(--muted)">line 133</span> &middot; Start a recorder and the sink that feeds it.
 </li>
-<li><code>Recorder::samples</code> <span style="color:var(--muted)">line 170</span> &middot; Samples recorded so far, as of the last Recorder::drain.
+<li><code>Recorder::samples</code> <span style="color:var(--muted)">line 183</span> &middot; Samples recorded so far, as of the last Recorder::drain.
 </li>
-<li><code>Recorder::seconds</code> <span style="color:var(--muted)">line 175</span> &middot; Length so far in seconds, as of the last Recorder::drain.
+<li><code>Recorder::seconds</code> <span style="color:var(--muted)">line 188</span> &middot; Length so far in seconds, as of the last Recorder::drain.
 </li>
-<li><code>Recorder::dropped</code> <span style="color:var(--muted)">line 187</span> &middot; Samples lost because the caller did not drain in time.
+<li><code>Recorder::dropped</code> <span style="color:var(--muted)">line 200</span> &middot; Samples lost because the caller did not drain in time.
 </li>
-<li><code>Recorder::fully_locked</code> <span style="color:var(--muted)">line 197</span> &middot; Whether every page holding the recording is locked out of swap.
+<li><code>Recorder::fully_locked</code> <span style="color:var(--muted)">line 210</span> &middot; Whether every page holding the recording is locked out of swap.
 </li>
-<li><code>Recorder::sample_rate</code> <span style="color:var(--muted)">line 202</span> &middot; The sample rate written into the WAV header.
+<li><code>Recorder::sample_rate</code> <span style="color:var(--muted)">line 215</span> &middot; The sample rate written into the WAV header.
 </li>
-<li><code>Recorder::wav</code> <span style="color:var(--muted)">line 217</span> &middot; Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>drain</code>, <code>write_header</code></span>
+<li><code>Recorder::wav</code> <span style="color:var(--muted)">line 230</span> &middot; Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>drain</code>, <code>wipe_scratch</code>, <code>write_header</code></span>
 </li>
-<li><code>Recorder::discard</code> <span style="color:var(--muted)">line 232</span> &middot; Wipe the recording held so far and start again from nothing.
+<li><code>Recorder::discard</code> <span style="color:var(--muted)">line 251</span> &middot; Wipe the recording held so far and start again from nothing.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>wipe_scratch</code></span>
 </li>
 </ul>
 </section>
@@ -115,62 +116,75 @@
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
 <rect x="0" y="0" width="643" height="631" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M238.3 374.0 C 238.3 394.0, 246.3 400.0, 246.3 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M417.2 374.0 C 417.2 394.0, 246.3 400.0, 246.3 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M615.4 247.0 C 637.4 247.0, 637.4 47.0, 529.7 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M549.0 274.0 C 549.0 294.0, 321.7 400.0, 321.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M549.0 274.0 C 549.0 294.0, 246.3 400.0, 246.3 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M549.0 274.0 C 549.0 294.0, 437.3 400.0, 437.3 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="record.src.html#fn-sink-write">
 <rect x="116.7" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="175.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Sink::write</text>
-<text x="175.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
+<text x="175.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
 </a>
 <a href="record.src.html#fn-start">
 <rect x="259.3" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="305.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">start</text>
-<text x="305.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
+<text x="305.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
 </a>
 <a href="record.src.html#fn-recorder-drain">
 <rect x="377.8" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="452.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::drain</text>
-<text x="452.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+<text x="452.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 160</text>
 </a>
 <a href="record.src.html#fn-recorder-samples">
 <rect x="48.1" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="130.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::samples</text>
-<text x="130.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="130.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
 </a>
 <a href="record.src.html#fn-recorder-seconds">
 <rect x="239.2" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="321.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::seconds</text>
-<text x="321.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 175</text>
+<text x="321.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 188</text>
 </a>
 <a href="record.src.html#fn-recorder-dropped">
 <rect x="430.2" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="512.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::dropped</text>
-<text x="512.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
+<text x="512.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
 </a>
 <a href="record.src.html#fn-recorder-fully_locked">
 <rect x="28.0" y="220.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="130.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::fully_locked</text>
-<text x="130.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
+<text x="130.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
 </a>
 <a href="record.src.html#fn-recorder-sample_rate">
 <rect x="259.3" y="220.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="358.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::sample_rate</text>
-<text x="358.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
+<text x="358.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 215</text>
 </a>
 <a href="record.src.html#fn-recorder-wav">
 <rect x="482.6" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="549.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::wav</text>
-<text x="549.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
+<text x="549.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 230</text>
 </a>
 <a href="record.src.html#fn-recorder-discard">
-<rect x="239.2" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="321.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::discard</text>
-<text x="321.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
+<rect x="155.8" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="238.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::discard</text>
+<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 251</text>
+</a>
+<a href="record.src.html#fn-recorder-wipe_scratch">
+<rect x="143.7" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="246.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::wipe_scratch</text>
+<text x="246.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
+</a>
+<a href="record.src.html#fn-recorder-drop">
+<rect x="346.8" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="417.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Recorder::drop</text>
+<text x="417.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
 </a>
 <a href="record.src.html#fn-write_header">
-<rect x="259.3" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="321.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_header</text>
-<text x="321.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 243</text>
+<rect x="375.0" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="437.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_header</text>
+<text x="437.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 296</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -189,36 +203,43 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_write([&quot;Sink::write&lt;br/&gt;line 90&quot;])
-    n_start([&quot;start&lt;br/&gt;line 120&quot;])
-    n_drain[&quot;Recorder::drain&lt;br/&gt;line 147&quot;]
-    n_samples([&quot;Recorder::samples&lt;br/&gt;line 170&quot;])
-    n_seconds([&quot;Recorder::seconds&lt;br/&gt;line 175&quot;])
-    n_dropped([&quot;Recorder::dropped&lt;br/&gt;line 187&quot;])
-    n_fully_locked([&quot;Recorder::fully_locked&lt;br/&gt;line 197&quot;])
-    n_sample_rate([&quot;Recorder::sample_rate&lt;br/&gt;line 202&quot;])
-    n_wav([&quot;Recorder::wav&lt;br/&gt;line 217&quot;])
-    n_discard([&quot;Recorder::discard&lt;br/&gt;line 232&quot;])
-    n_write_header[&quot;write_header&lt;br/&gt;line 243&quot;]
+    n_write([&quot;Sink::write&lt;br/&gt;line 103&quot;])
+    n_start([&quot;start&lt;br/&gt;line 133&quot;])
+    n_drain[&quot;Recorder::drain&lt;br/&gt;line 160&quot;]
+    n_samples([&quot;Recorder::samples&lt;br/&gt;line 183&quot;])
+    n_seconds([&quot;Recorder::seconds&lt;br/&gt;line 188&quot;])
+    n_dropped([&quot;Recorder::dropped&lt;br/&gt;line 200&quot;])
+    n_fully_locked([&quot;Recorder::fully_locked&lt;br/&gt;line 210&quot;])
+    n_sample_rate([&quot;Recorder::sample_rate&lt;br/&gt;line 215&quot;])
+    n_wav([&quot;Recorder::wav&lt;br/&gt;line 230&quot;])
+    n_discard([&quot;Recorder::discard&lt;br/&gt;line 251&quot;])
+    n_wipe_scratch[&quot;Recorder::wipe_scratch&lt;br/&gt;line 263&quot;]
+    n_drop[&quot;Recorder::drop&lt;br/&gt;line 287&quot;]
+    n_write_header[&quot;write_header&lt;br/&gt;line 296&quot;]
+    n_discard --&gt; n_wipe_scratch
+    n_drop --&gt; n_wipe_scratch
     n_wav --&gt; n_drain
+    n_wav --&gt; n_wipe_scratch
     n_wav --&gt; n_write_header
-    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L90&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L120&quot; &quot;open the source&quot;
-    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L147&quot; &quot;open the source&quot;
-    click n_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L170&quot; &quot;open the source&quot;
-    click n_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L175&quot; &quot;open the source&quot;
-    click n_dropped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L187&quot; &quot;open the source&quot;
-    click n_fully_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L197&quot; &quot;open the source&quot;
-    click n_sample_rate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L202&quot; &quot;open the source&quot;
-    click n_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L217&quot; &quot;open the source&quot;
-    click n_discard href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L232&quot; &quot;open the source&quot;
-    click n_write_header href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L243&quot; &quot;open the source&quot;
+    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L103&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L133&quot; &quot;open the source&quot;
+    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L160&quot; &quot;open the source&quot;
+    click n_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L183&quot; &quot;open the source&quot;
+    click n_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L188&quot; &quot;open the source&quot;
+    click n_dropped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L200&quot; &quot;open the source&quot;
+    click n_fully_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L210&quot; &quot;open the source&quot;
+    click n_sample_rate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L215&quot; &quot;open the source&quot;
+    click n_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L230&quot; &quot;open the source&quot;
+    click n_discard href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L251&quot; &quot;open the source&quot;
+    click n_wipe_scratch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L263&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L287&quot; &quot;open the source&quot;
+    click n_write_header href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs#L296&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_write,n_start,n_samples,n_seconds,n_dropped,n_fully_locked,n_sample_rate,n_wav,n_discard entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_drain api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_write_header helper</code></pre>
+    class n_wipe_scratch,n_drop,n_write_header helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -226,20 +247,23 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>HEADER</code> <sub>const</sub></td><td><a href="record.src.html#fn-header">63</a></td><td>Bytes in a canonical 16-bit PCM WAV header.</td></tr>
-<tr><td><code>SLACK_SECONDS</code> <sub>pub const</sub></td><td><a href="record.src.html#fn-slack_seconds">72</a></td><td>How much audio the ring holds before samples are dropped, in seconds.</td></tr>
-<tr><td><code>Sink</code> <sub>pub struct</sub></td><td><a href="record.src.html#fn-sink">78</a></td><td>The writing half, handed to the audio callback.</td></tr>
-<tr><td><code>Sink::write</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-sink-write">90</a></td><td>Take a block of veiled samples.</td></tr>
-<tr><td><code>Recorder</code> <sub>pub struct</sub></td><td><a href="record.src.html#fn-recorder">100</a></td><td>The reading half: moves samples out of the ring and into locked memory.</td></tr>
-<tr><td><code>start</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-start">120</a></td><td>Start a recorder and the sink that feeds it.</td></tr>
-<tr><td><code>Recorder::drain</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-drain">147</a></td><td>Move everything waiting in the ring into the tape.</td></tr>
-<tr><td><code>Recorder::samples</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-samples">170</a></td><td>Samples recorded so far, as of the last Recorder::drain.</td></tr>
-<tr><td><code>Recorder::seconds</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-seconds">175</a></td><td>Length so far in seconds, as of the last Recorder::drain.</td></tr>
-<tr><td><code>Recorder::dropped</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-dropped">187</a></td><td>Samples lost because the caller did not drain in time.</td></tr>
-<tr><td><code>Recorder::fully_locked</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-fully_locked">197</a></td><td>Whether every page holding the recording is locked out of swap.</td></tr>
-<tr><td><code>Recorder::sample_rate</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-sample_rate">202</a></td><td>The sample rate written into the WAV header.</td></tr>
-<tr><td><code>Recorder::wav</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-wav">217</a></td><td>Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed.</td></tr>
-<tr><td><code>Recorder::discard</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-discard">232</a></td><td>Wipe the recording held so far and start again from nothing.</td></tr>
-<tr><td><code>write_header</code> <sub>fn</sub></td><td><a href="record.src.html#fn-write_header">243</a></td><td>Write a canonical 44-byte mono 16-bit PCM WAV header into out.</td></tr>
+<tr><td><code>WAV_MAX_DATA</code> <sub>const</sub></td><td><a href="record.src.html#fn-wav_max_data">76</a></td><td>The most PCM data a RIFF/WAVE file can describe, in bytes.</td></tr>
+<tr><td><code>SLACK_SECONDS</code> <sub>pub const</sub></td><td><a href="record.src.html#fn-slack_seconds">85</a></td><td>How much audio the ring holds before samples are dropped, in seconds.</td></tr>
+<tr><td><code>Sink</code> <sub>pub struct</sub></td><td><a href="record.src.html#fn-sink">91</a></td><td>The writing half, handed to the audio callback.</td></tr>
+<tr><td><code>Sink::write</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-sink-write">103</a></td><td>Take a block of veiled samples.</td></tr>
+<tr><td><code>Recorder</code> <sub>pub struct</sub></td><td><a href="record.src.html#fn-recorder">113</a></td><td>The reading half: moves samples out of the ring and into locked memory.</td></tr>
+<tr><td><code>start</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-start">133</a></td><td>Start a recorder and the sink that feeds it.</td></tr>
+<tr><td><code>Recorder::drain</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-drain">160</a></td><td>Move everything waiting in the ring into the tape.</td></tr>
+<tr><td><code>Recorder::samples</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-samples">183</a></td><td>Samples recorded so far, as of the last Recorder::drain.</td></tr>
+<tr><td><code>Recorder::seconds</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-seconds">188</a></td><td>Length so far in seconds, as of the last Recorder::drain.</td></tr>
+<tr><td><code>Recorder::dropped</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-dropped">200</a></td><td>Samples lost because the caller did not drain in time.</td></tr>
+<tr><td><code>Recorder::fully_locked</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-fully_locked">210</a></td><td>Whether every page holding the recording is locked out of swap.</td></tr>
+<tr><td><code>Recorder::sample_rate</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-sample_rate">215</a></td><td>The sample rate written into the WAV header.</td></tr>
+<tr><td><code>Recorder::wav</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-wav">230</a></td><td>Drain what is left and hand over the recording as a WAV, in a Secret, ready to be sealed.</td></tr>
+<tr><td><code>Recorder::discard</code> <sub>pub fn</sub></td><td><a href="record.src.html#fn-recorder-discard">251</a></td><td>Wipe the recording held so far and start again from nothing.</td></tr>
+<tr><td><code>Recorder::wipe_scratch</code> <sub>fn</sub></td><td><a href="record.src.html#fn-recorder-wipe_scratch">263</a></td><td>Clear the drain scratch.</td></tr>
+<tr><td><code>Recorder::drop</code> <sub>fn</sub></td><td><a href="record.src.html#fn-recorder-drop">287</a></td><td>Wipe the drain scratch.</td></tr>
+<tr><td><code>write_header</code> <sub>fn</sub></td><td><a href="record.src.html#fn-write_header">296</a></td><td>Write a canonical 44-byte mono 16-bit PCM WAV header into out.</td></tr>
 </tbody></table>
 </section>
 </div></div>

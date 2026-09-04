@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="security.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2208 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="security.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2211 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -2099,264 +2099,267 @@
 <span class="ln" id="L1948">    }</span>
 <span class="ln" id="L1949"></span>
 <span class="ln" id="L1950">    <span class="tok-com">/// The text a panel renders, gathered by walking egui&#x27;s output.</span></span>
-<span class="ln" id="L1951">    <span class="tok-kw">fn</span> <span class="tok-fn">rendered_text</span>(security: &amp;<span class="tok-kw">mut</span> Security, draw: <span class="tok-kw">impl</span> <span class="tok-fn">Fn</span>(&amp;<span class="tok-kw">mut</span> Security, &amp;<span class="tok-kw">mut</span> egui::Ui)) -&gt; String {</span>
-<span class="ln" id="L1952">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1953">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
-<span class="ln" id="L1954">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
-<span class="ln" id="L1955">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L1956">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">480.0</span>),</span>
-<span class="ln" id="L1957">            )),</span>
-<span class="ln" id="L1958">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1959">        };</span>
-<span class="ln" id="L1960">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1961">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
-<span class="ln" id="L1962">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| <span class="tok-fn">draw</span>(security, ui));</span>
-<span class="ln" id="L1963">        });</span>
-<span class="ln" id="L1964">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> output.shapes {</span>
-<span class="ln" id="L1965">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::epaint::Shape::<span class="tok-fn">Text</span>(t) = shape.shape {</span>
-<span class="ln" id="L1966">                text.<span class="tok-fn">push_str</span>(t.galley.<span class="tok-fn">text</span>());</span>
-<span class="ln" id="L1967">                text.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
-<span class="ln" id="L1968">            }</span>
-<span class="ln" id="L1969">        }</span>
-<span class="ln" id="L1970">        text</span>
-<span class="ln" id="L1971">    }</span>
-<span class="ln" id="L1972"></span>
-<span class="ln" id="L1973">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1974">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_shows_the_history_the_command_line_would_print</span>() {</span>
-<span class="ln" id="L1975">        <span class="tok-com">// The &quot;with history&quot; half of the feature has to be visible in the</span></span>
-<span class="ln" id="L1976">        <span class="tok-com">// window too, or a relaxation made here is a change with no record a</span></span>
-<span class="ln" id="L1977">        <span class="tok-com">// person can see without opening a terminal. A collapsing header is</span></span>
-<span class="ln" id="L1978">        <span class="tok-com">// collapsed by default, so it is opened before the panel is read.</span></span>
-<span class="ln" id="L1979">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1980">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L1981">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_rows</span>(ui));</span>
-<span class="ln" id="L1982"></span>
-<span class="ln" id="L1983">        <span class="tok-com">// A timestamp (the exact date format is the policy crate&#x27;s to test) and</span></span>
-<span class="ln" id="L1984">        <span class="tok-com">// the change described in words, both drawn into the panel.</span></span>
-<span class="ln" id="L1985">        assert!(seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;UTC&quot;</span>), <span class="tok-str">&quot;no timestamp in the panel:\n{seen}&quot;</span>);</span>
-<span class="ln" id="L1986">        assert!(</span>
-<span class="ln" id="L1987">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped insisting&quot;</span>) &amp;&amp; seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;encryption&quot;</span>),</span>
-<span class="ln" id="L1988">            <span class="tok-str">&quot;the change is not described:\n{seen}&quot;</span></span>
-<span class="ln" id="L1989">        );</span>
-<span class="ln" id="L1990"></span>
-<span class="ln" id="L1991">        <span class="tok-com">// And the collapsed header still names the count, so the rows are</span></span>
-<span class="ln" id="L1992">        <span class="tok-com">// discoverable without a terminal.</span></span>
-<span class="ln" id="L1993">        <span class="tok-kw">let</span> header = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_panel</span>(ui));</span>
-<span class="ln" id="L1994">        assert!(</span>
-<span class="ln" id="L1995">            header.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one change to what is required&quot;</span>),</span>
-<span class="ln" id="L1996">            <span class="tok-str">&quot;the header does not summarise the history:\n{header}&quot;</span></span>
-<span class="ln" id="L1997">        );</span>
-<span class="ln" id="L1998">    }</span>
-<span class="ln" id="L1999"></span>
-<span class="ln" id="L2000">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2001">    <span class="tok-kw">fn</span> <span class="tok-fn">a_baseline_that_would_not_parse_is_said_in_the_window</span>() {</span>
-<span class="ln" id="L2002">        <span class="tok-com">// A silent fallback to the strict default would tell somebody their</span></span>
-<span class="ln" id="L2003">        <span class="tok-com">// relaxation is in force when it is not, or hide that a requirement</span></span>
-<span class="ln" id="L2004">        <span class="tok-com">// they set is being ignored. The CLI says so; the window must too.</span></span>
-<span class="ln" id="L2005">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2006">        s.mandate_problem = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;line 3: not a setting anyone wrote&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L2007">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
-<span class="ln" id="L2008">        assert!(</span>
-<span class="ln" id="L2009">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>),</span>
-<span class="ln" id="L2010">            <span class="tok-str">&quot;the parse problem is not surfaced:\n{seen}&quot;</span></span>
-<span class="ln" id="L2011">        );</span>
-<span class="ln" id="L2012">    }</span>
-<span class="ln" id="L2013"></span>
-<span class="ln" id="L2014">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2015">    <span class="tok-kw">fn</span> <span class="tok-fn">a_clean_baseline_shows_no_history_and_no_problem</span>() {</span>
-<span class="ln" id="L2016">        <span class="tok-com">// The common case: nobody has relaxed anything. Neither the history</span></span>
-<span class="ln" id="L2017">        <span class="tok-com">// header nor a problem line should appear, or the panel cries wolf.</span></span>
-<span class="ln" id="L2018">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2019">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
-<span class="ln" id="L2020">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
-<span class="ln" id="L2021">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;change to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
-<span class="ln" id="L2022">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;changes to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
-<span class="ln" id="L2023">    }</span>
-<span class="ln" id="L2024"></span>
-<span class="ln" id="L2025">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2026">    <span class="tok-kw">fn</span> <span class="tok-fn">a_test_built_security_never_writes_to_the_real_configuration</span>() {</span>
-<span class="ln" id="L2027">        <span class="tok-com">// `Security::default()` has no path, so `record` changes the value in</span></span>
-<span class="ln" id="L2028">        <span class="tok-com">// memory and writes nothing. Every other test in this file depends on</span></span>
-<span class="ln" id="L2029">        <span class="tok-com">// that being true.</span></span>
-<span class="ln" id="L2030">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2031">        assert!(s.mandate_path.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L2032">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
-<span class="ln" id="L2033">        assert!(!s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
-<span class="ln" id="L2034">        assert!(s.mandate_problem.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L2035">    }</span>
-<span class="ln" id="L2036"></span>
-<span class="ln" id="L2037">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2038">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_nothing_set_refuses_rather_than_writing_plaintext</span>() {</span>
-<span class="ln" id="L2039">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2040">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
-<span class="ln" id="L2041">        assert!(Plan::Missing.<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L2042">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;nothing may be written on refusal&quot;</span>);</span>
-<span class="ln" id="L2043">    }</span>
-<span class="ln" id="L2044"></span>
-<span class="ln" id="L2045">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2046">    <span class="tok-kw">fn</span> <span class="tok-fn">a_password_plan_seals_beside_the_recording_and_leaves_no_plaintext</span>() {</span>
-<span class="ln" id="L2047">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2048">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>);</span>
-<span class="ln" id="L2049">        <span class="tok-kw">let</span> wav = b<span class="tok-str">&quot;RIFF....WAVEfake but recognisable&quot;</span>.<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L2050"></span>
-<span class="ln" id="L2051">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
-<span class="ln" id="L2052">        <span class="tok-kw">let</span> out = Plan::<span class="tok-fn">Password</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed))</span>
-<span class="ln" id="L2053">            .<span class="tok-fn">write</span>(&amp;path, &amp;wav, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2054">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2055">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
-<span class="ln" id="L2056">        assert_eq!(out, container::<span class="tok-fn">veil_path</span>(&amp;path));</span>
-<span class="ln" id="L2057">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the plaintext must never reach the disk&quot;</span>);</span>
-<span class="ln" id="L2058"></span>
-<span class="ln" id="L2059">        <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;out).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2060">        assert!(!sealed.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;RIFF&quot;</span>));</span>
-<span class="ln" id="L2061">        assert_eq!(</span>
-<span class="ln" id="L2062">            container::<span class="tok-fn">open_with_password</span>(b<span class="tok-str">&quot;a recording passphrase&quot;</span>, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L2063">            wav</span>
-<span class="ln" id="L2064">        );</span>
-<span class="ln" id="L2065">    }</span>
-<span class="ln" id="L2066"></span>
-<span class="ln" id="L2067">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2068">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_writes_the_file_as_asked</span>() {</span>
-<span class="ln" id="L2069">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2070">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
-<span class="ln" id="L2071">        <span class="tok-kw">let</span> out = Plan::Plaintext</span>
-<span class="ln" id="L2072">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2073">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2074">        assert_eq!(out, path);</span>
-<span class="ln" id="L2075">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;audio bytes&quot;</span>);</span>
-<span class="ln" id="L2076">    }</span>
-<span class="ln" id="L2077"></span>
-<span class="ln" id="L2078">    <span class="tok-com">/// An unencrypted recording is still readable only by this account.</span></span>
-<span class="ln" id="L2079">    <span class="tok-com">///</span></span>
-<span class="ln" id="L2080">    <span class="tok-com">/// `veilvoice anonymise --encrypt false` had written 0600 since it was</span></span>
-<span class="ln" id="L2081">    <span class="tok-com">/// written. This, the window&#x27;s version of the same decision, wrote 0644,</span></span>
-<span class="ln" id="L2082">    <span class="tok-com">/// so turning encryption off in the interface left the recording readable</span></span>
-<span class="ln" id="L2083">    <span class="tok-com">/// by every other account on the machine and turning it off on the command</span></span>
-<span class="ln" id="L2084">    <span class="tok-com">/// line did not.</span></span>
-<span class="ln" id="L2085">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L2086">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2087">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_still_writes_owner_only</span>() {</span>
-<span class="ln" id="L2088">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L2089">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2090">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
-<span class="ln" id="L2091">        Plan::Plaintext</span>
-<span class="ln" id="L2092">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2093">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2094">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
-<span class="ln" id="L2095">        assert_eq!(</span>
-<span class="ln" id="L2096">            mode, 0o600,</span>
-<span class="ln" id="L2097">            <span class="tok-str">&quot;an unencrypted recording is {mode:o}, so anyone with an account here can play it&quot;</span></span>
-<span class="ln" id="L2098">        );</span>
-<span class="ln" id="L2099">    }</span>
-<span class="ln" id="L2100"></span>
-<span class="ln" id="L2101">    <span class="tok-com">/// The confirmed passphrase must not linger as ordinary heap bytes. It used</span></span>
-<span class="ln" id="L2102">    <span class="tok-com">/// to be kept as a `String` for the whole session; it is now moved into a</span></span>
-<span class="ln" id="L2103">    <span class="tok-com">/// page-locked `Secret` the moment it is confirmed, and the typing buffer</span></span>
-<span class="ln" id="L2104">    <span class="tok-com">/// is wiped.</span></span>
-<span class="ln" id="L2105">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2106">    <span class="tok-kw">fn</span> <span class="tok-fn">the_confirmed_passphrase_leaves_no_plaintext_buffer_behind</span>() {</span>
-<span class="ln" id="L2107">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
-<span class="ln" id="L2108">        <span class="tok-kw">let</span> secret = <span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed);</span>
-<span class="ln" id="L2109"></span>
-<span class="ln" id="L2110">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
-<span class="ln" id="L2111">        assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
-<span class="ln" id="L2112">        assert!(</span>
-<span class="ln" id="L2113">            format!(<span class="tok-str">&quot;{secret:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>),</span>
-<span class="ln" id="L2114">            <span class="tok-str">&quot;a secret must not be printable&quot;</span></span>
-<span class="ln" id="L2115">        );</span>
-<span class="ln" id="L2116">    }</span>
-<span class="ln" id="L2117"></span>
-<span class="ln" id="L2118">    <span class="tok-com">/// And the plan handed to the worker thread carries the `Secret`, not a</span></span>
-<span class="ln" id="L2119">    <span class="tok-com">/// copy of the text.</span></span>
-<span class="ln" id="L2120">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2121">    <span class="tok-kw">fn</span> <span class="tok-fn">the_plan_carries_page_locked_material_not_a_string</span>() {</span>
-<span class="ln" id="L2122">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2123">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;session passphrase&quot;</span>);</span>
-<span class="ln" id="L2124">        s.held = <span class="tok-fn">Some</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed));</span>
-<span class="ln" id="L2125">        s.passphrase_set = true;</span>
-<span class="ln" id="L2126"></span>
-<span class="ln" id="L2127">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L2128">        <span class="tok-kw">match</span> s.<span class="tok-fn">plan</span>() {</span>
-<span class="ln" id="L2129">            Plan::<span class="tok-fn">Password</span>(secret) =&gt; assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;session passphrase&quot;</span>),</span>
-<span class="ln" id="L2130">            other =&gt; panic!(<span class="tok-str">&quot;expected a password plan, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L2131">        }</span>
-<span class="ln" id="L2132">    }</span>
-<span class="ln" id="L2133"></span>
-<span class="ln" id="L2134">    <span class="tok-com">/// Locking must take the session passphrase with it, or &quot;locked&quot; would be</span></span>
-<span class="ln" id="L2135">    <span class="tok-com">/// a screen rather than a state.</span></span>
-<span class="ln" id="L2136">    <span class="tok-com">/// A real lock in a temporary directory, at test cost.</span></span>
-<span class="ln" id="L2137">    <span class="tok-com">///</span></span>
-<span class="ln" id="L2138">    <span class="tok-com">/// `lock_now` refuses to lock when there is nothing to unlock with, which</span></span>
-<span class="ln" id="L2139">    <span class="tok-com">/// is the right behaviour and means these tests need an actual store.</span></span>
-<span class="ln" id="L2140">    <span class="tok-kw">fn</span> <span class="tok-fn">locked_security</span>() -&gt; (Security, tempfile::TempDir) {</span>
-<span class="ln" id="L2141">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2142">        <span class="tok-kw">let</span> store =</span>
-<span class="ln" id="L2143">            veilvoice_crypto::LockStore::<span class="tok-fn">create</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>), b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>())</span>
-<span class="ln" id="L2144">                .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2145">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2146">        s.store = <span class="tok-fn">Some</span>(store);</span>
-<span class="ln" id="L2147">        (s, dir)</span>
-<span class="ln" id="L2148">    }</span>
-<span class="ln" id="L2149"></span>
-<span class="ln" id="L2150">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2151">    <span class="tok-kw">fn</span> <span class="tok-fn">a_deliberate_lock_and_an_idle_one_are_told_apart</span>() {</span>
-<span class="ln" id="L2152">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
-<span class="ln" id="L2153">        s.<span class="tok-fn">lock_now</span>();</span>
-<span class="ln" id="L2154">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
-<span class="ln" id="L2155">        assert!(</span>
-<span class="ln" id="L2156">            !s.auto_locked,</span>
-<span class="ln" id="L2157">            <span class="tok-str">&quot;somebody pressed Lock; the screen must not claim the window did it&quot;</span></span>
-<span class="ln" id="L2158">        );</span>
-<span class="ln" id="L2159"></span>
-<span class="ln" id="L2160">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
-<span class="ln" id="L2161">        s.<span class="tok-fn">lock_after_idle</span>();</span>
-<span class="ln" id="L2162">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
-<span class="ln" id="L2163">        assert!(s.auto_locked);</span>
-<span class="ln" id="L2164">    }</span>
-<span class="ln" id="L2165"></span>
-<span class="ln" id="L2166">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2167">    <span class="tok-kw">fn</span> <span class="tok-fn">the_auto_lock_note_is_not_shown_once_typing_starts</span>() {</span>
-<span class="ln" id="L2168">        <span class="tok-com">// The note is drawn under `self.auto_locked &amp;&amp; self.entry.is_empty()`.</span></span>
-<span class="ln" id="L2169">        <span class="tok-com">// Read from the source rather than by driving egui, which needs a</span></span>
-<span class="ln" id="L2170">        <span class="tok-com">// context this test suite does not build.</span></span>
-<span class="ln" id="L2171">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L2172">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2173">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
-<span class="ln" id="L2174">        assert!(</span>
-<span class="ln" id="L2175">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.auto_locked &amp;&amp; self.entry.is_empty()&quot;</span>),</span>
-<span class="ln" id="L2176">            <span class="tok-str">&quot;the note must disappear as soon as a character is typed&quot;</span></span>
-<span class="ln" id="L2177">        );</span>
-<span class="ln" id="L2178">    }</span>
-<span class="ln" id="L2179"></span>
-<span class="ln" id="L2180">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2181">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_screen_shows_the_mark_in_its_badge</span>() {</span>
-<span class="ln" id="L2182">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L2183">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2184">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
-<span class="ln" id="L2185">        assert!(</span>
-<span class="ln" id="L2186">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;soundbar::badge&quot;</span>),</span>
-<span class="ln" id="L2187">            <span class="tok-str">&quot;a locked window has one thing in it and it should be the logo&quot;</span></span>
-<span class="ln" id="L2188">        );</span>
-<span class="ln" id="L2189">    }</span>
-<span class="ln" id="L2190"></span>
-<span class="ln" id="L2191">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2192">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_wipes_the_session_passphrase</span>() {</span>
-<span class="ln" id="L2193">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2194">        s.passphrase = <span class="tok-str">&quot;a recording passphrase&quot;</span>.<span class="tok-fn">into</span>();</span>
-<span class="ln" id="L2195">        s.passphrase_set = true;</span>
-<span class="ln" id="L2196">        s.<span class="tok-fn">wipe_secrets</span>();</span>
-<span class="ln" id="L2197">        assert!(s.passphrase.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L2198">        assert!(!s.passphrase_set);</span>
-<span class="ln" id="L2199">        assert!(!s.<span class="tok-fn">ready_to_write</span>(), <span class="tok-str">&quot;a wiped passphrase must block the job&quot;</span>);</span>
-<span class="ln" id="L2200">    }</span>
-<span class="ln" id="L2201"></span>
-<span class="ln" id="L2202">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2203">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_does_nothing_when_no_lock_is_configured</span>() {</span>
-<span class="ln" id="L2204">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L2205">        s.<span class="tok-fn">lock_now</span>();</span>
-<span class="ln" id="L2206">        assert!(!s.<span class="tok-fn">is_locked</span>(), <span class="tok-str">&quot;there is nothing to unlock it with&quot;</span>);</span>
-<span class="ln" id="L2207">    }</span>
-<span class="ln" id="L2208">}</span>
+<span class="ln" id="L1951">    <span class="tok-kw">fn</span> <span class="tok-fn">rendered_text</span>(</span>
+<span class="ln" id="L1952">        security: &amp;<span class="tok-kw">mut</span> Security,</span>
+<span class="ln" id="L1953">        draw: <span class="tok-kw">impl</span> <span class="tok-fn">Fn</span>(&amp;<span class="tok-kw">mut</span> Security, &amp;<span class="tok-kw">mut</span> egui::Ui),</span>
+<span class="ln" id="L1954">    ) -&gt; String {</span>
+<span class="ln" id="L1955">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1956">        <span class="tok-kw">let</span> input = egui::RawInput {</span>
+<span class="ln" id="L1957">            screen_rect: <span class="tok-fn">Some</span>(egui::Rect::<span class="tok-fn">from_min_size</span>(</span>
+<span class="ln" id="L1958">                egui::<span class="tok-fn">pos2</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L1959">                egui::<span class="tok-fn">vec2</span>(<span class="tok-num">640.0</span>, <span class="tok-num">480.0</span>),</span>
+<span class="ln" id="L1960">            )),</span>
+<span class="ln" id="L1961">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1962">        };</span>
+<span class="ln" id="L1963">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1964">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
+<span class="ln" id="L1965">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| <span class="tok-fn">draw</span>(security, ui));</span>
+<span class="ln" id="L1966">        });</span>
+<span class="ln" id="L1967">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> output.shapes {</span>
+<span class="ln" id="L1968">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::epaint::Shape::<span class="tok-fn">Text</span>(t) = shape.shape {</span>
+<span class="ln" id="L1969">                text.<span class="tok-fn">push_str</span>(t.galley.<span class="tok-fn">text</span>());</span>
+<span class="ln" id="L1970">                text.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
+<span class="ln" id="L1971">            }</span>
+<span class="ln" id="L1972">        }</span>
+<span class="ln" id="L1973">        text</span>
+<span class="ln" id="L1974">    }</span>
+<span class="ln" id="L1975"></span>
+<span class="ln" id="L1976">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1977">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_shows_the_history_the_command_line_would_print</span>() {</span>
+<span class="ln" id="L1978">        <span class="tok-com">// The &quot;with history&quot; half of the feature has to be visible in the</span></span>
+<span class="ln" id="L1979">        <span class="tok-com">// window too, or a relaxation made here is a change with no record a</span></span>
+<span class="ln" id="L1980">        <span class="tok-com">// person can see without opening a terminal. A collapsing header is</span></span>
+<span class="ln" id="L1981">        <span class="tok-com">// collapsed by default, so it is opened before the panel is read.</span></span>
+<span class="ln" id="L1982">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1983">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L1984">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_rows</span>(ui));</span>
+<span class="ln" id="L1985"></span>
+<span class="ln" id="L1986">        <span class="tok-com">// A timestamp (the exact date format is the policy crate&#x27;s to test) and</span></span>
+<span class="ln" id="L1987">        <span class="tok-com">// the change described in words, both drawn into the panel.</span></span>
+<span class="ln" id="L1988">        assert!(seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;UTC&quot;</span>), <span class="tok-str">&quot;no timestamp in the panel:\n{seen}&quot;</span>);</span>
+<span class="ln" id="L1989">        assert!(</span>
+<span class="ln" id="L1990">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped insisting&quot;</span>) &amp;&amp; seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;encryption&quot;</span>),</span>
+<span class="ln" id="L1991">            <span class="tok-str">&quot;the change is not described:\n{seen}&quot;</span></span>
+<span class="ln" id="L1992">        );</span>
+<span class="ln" id="L1993"></span>
+<span class="ln" id="L1994">        <span class="tok-com">// And the collapsed header still names the count, so the rows are</span></span>
+<span class="ln" id="L1995">        <span class="tok-com">// discoverable without a terminal.</span></span>
+<span class="ln" id="L1996">        <span class="tok-kw">let</span> header = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">mandate_history_panel</span>(ui));</span>
+<span class="ln" id="L1997">        assert!(</span>
+<span class="ln" id="L1998">            header.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one change to what is required&quot;</span>),</span>
+<span class="ln" id="L1999">            <span class="tok-str">&quot;the header does not summarise the history:\n{header}&quot;</span></span>
+<span class="ln" id="L2000">        );</span>
+<span class="ln" id="L2001">    }</span>
+<span class="ln" id="L2002"></span>
+<span class="ln" id="L2003">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2004">    <span class="tok-kw">fn</span> <span class="tok-fn">a_baseline_that_would_not_parse_is_said_in_the_window</span>() {</span>
+<span class="ln" id="L2005">        <span class="tok-com">// A silent fallback to the strict default would tell somebody their</span></span>
+<span class="ln" id="L2006">        <span class="tok-com">// relaxation is in force when it is not, or hide that a requirement</span></span>
+<span class="ln" id="L2007">        <span class="tok-com">// they set is being ignored. The CLI says so; the window must too.</span></span>
+<span class="ln" id="L2008">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2009">        s.mandate_problem = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;line 3: not a setting anyone wrote&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L2010">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
+<span class="ln" id="L2011">        assert!(</span>
+<span class="ln" id="L2012">            seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>),</span>
+<span class="ln" id="L2013">            <span class="tok-str">&quot;the parse problem is not surfaced:\n{seen}&quot;</span></span>
+<span class="ln" id="L2014">        );</span>
+<span class="ln" id="L2015">    }</span>
+<span class="ln" id="L2016"></span>
+<span class="ln" id="L2017">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2018">    <span class="tok-kw">fn</span> <span class="tok-fn">a_clean_baseline_shows_no_history_and_no_problem</span>() {</span>
+<span class="ln" id="L2019">        <span class="tok-com">// The common case: nobody has relaxed anything. Neither the history</span></span>
+<span class="ln" id="L2020">        <span class="tok-com">// header nor a problem line should appear, or the panel cries wolf.</span></span>
+<span class="ln" id="L2021">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2022">        <span class="tok-kw">let</span> seen = <span class="tok-fn">rendered_text</span>(&amp;<span class="tok-kw">mut</span> s, |s, ui| s.<span class="tok-fn">recording_controls</span>(ui));</span>
+<span class="ln" id="L2023">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not be read&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
+<span class="ln" id="L2024">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;change to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
+<span class="ln" id="L2025">        assert!(!seen.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;changes to what is required&quot;</span>), <span class="tok-str">&quot;{seen}&quot;</span>);</span>
+<span class="ln" id="L2026">    }</span>
+<span class="ln" id="L2027"></span>
+<span class="ln" id="L2028">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2029">    <span class="tok-kw">fn</span> <span class="tok-fn">a_test_built_security_never_writes_to_the_real_configuration</span>() {</span>
+<span class="ln" id="L2030">        <span class="tok-com">// `Security::default()` has no path, so `record` changes the value in</span></span>
+<span class="ln" id="L2031">        <span class="tok-com">// memory and writes nothing. Every other test in this file depends on</span></span>
+<span class="ln" id="L2032">        <span class="tok-com">// that being true.</span></span>
+<span class="ln" id="L2033">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2034">        assert!(s.mandate_path.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L2035">        s.<span class="tok-fn">record</span>(MField::Encryption, false);</span>
+<span class="ln" id="L2036">        assert!(!s.<span class="tok-fn">mandate_requires_encryption</span>());</span>
+<span class="ln" id="L2037">        assert!(s.mandate_problem.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L2038">    }</span>
+<span class="ln" id="L2039"></span>
+<span class="ln" id="L2040">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2041">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_nothing_set_refuses_rather_than_writing_plaintext</span>() {</span>
+<span class="ln" id="L2042">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2043">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
+<span class="ln" id="L2044">        assert!(Plan::Missing.<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L2045">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;nothing may be written on refusal&quot;</span>);</span>
+<span class="ln" id="L2046">    }</span>
+<span class="ln" id="L2047"></span>
+<span class="ln" id="L2048">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2049">    <span class="tok-kw">fn</span> <span class="tok-fn">a_password_plan_seals_beside_the_recording_and_leaves_no_plaintext</span>() {</span>
+<span class="ln" id="L2050">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2051">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.veiled.wav&quot;</span>);</span>
+<span class="ln" id="L2052">        <span class="tok-kw">let</span> wav = b<span class="tok-str">&quot;RIFF....WAVEfake but recognisable&quot;</span>.<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L2053"></span>
+<span class="ln" id="L2054">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
+<span class="ln" id="L2055">        <span class="tok-kw">let</span> out = Plan::<span class="tok-fn">Password</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed))</span>
+<span class="ln" id="L2056">            .<span class="tok-fn">write</span>(&amp;path, &amp;wav, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2057">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2058">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
+<span class="ln" id="L2059">        assert_eq!(out, container::<span class="tok-fn">veil_path</span>(&amp;path));</span>
+<span class="ln" id="L2060">        assert!(!path.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the plaintext must never reach the disk&quot;</span>);</span>
+<span class="ln" id="L2061"></span>
+<span class="ln" id="L2062">        <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;out).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2063">        assert!(!sealed.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;RIFF&quot;</span>));</span>
+<span class="ln" id="L2064">        assert_eq!(</span>
+<span class="ln" id="L2065">            container::<span class="tok-fn">open_with_password</span>(b<span class="tok-str">&quot;a recording passphrase&quot;</span>, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L2066">            wav</span>
+<span class="ln" id="L2067">        );</span>
+<span class="ln" id="L2068">    }</span>
+<span class="ln" id="L2069"></span>
+<span class="ln" id="L2070">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2071">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_writes_the_file_as_asked</span>() {</span>
+<span class="ln" id="L2072">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2073">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
+<span class="ln" id="L2074">        <span class="tok-kw">let</span> out = Plan::Plaintext</span>
+<span class="ln" id="L2075">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2076">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2077">        assert_eq!(out, path);</span>
+<span class="ln" id="L2078">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;audio bytes&quot;</span>);</span>
+<span class="ln" id="L2079">    }</span>
+<span class="ln" id="L2080"></span>
+<span class="ln" id="L2081">    <span class="tok-com">/// An unencrypted recording is still readable only by this account.</span></span>
+<span class="ln" id="L2082">    <span class="tok-com">///</span></span>
+<span class="ln" id="L2083">    <span class="tok-com">/// `veilvoice anonymise --encrypt false` had written 0600 since it was</span></span>
+<span class="ln" id="L2084">    <span class="tok-com">/// written. This, the window&#x27;s version of the same decision, wrote 0644,</span></span>
+<span class="ln" id="L2085">    <span class="tok-com">/// so turning encryption off in the interface left the recording readable</span></span>
+<span class="ln" id="L2086">    <span class="tok-com">/// by every other account on the machine and turning it off on the command</span></span>
+<span class="ln" id="L2087">    <span class="tok-com">/// line did not.</span></span>
+<span class="ln" id="L2088">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L2089">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2090">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plaintext_plan_still_writes_owner_only</span>() {</span>
+<span class="ln" id="L2091">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L2092">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2093">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;clip.wav&quot;</span>);</span>
+<span class="ln" id="L2094">        Plan::Plaintext</span>
+<span class="ln" id="L2095">            .<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;audio bytes&quot;</span>, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2096">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2097">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L2098">        assert_eq!(</span>
+<span class="ln" id="L2099">            mode, 0o600,</span>
+<span class="ln" id="L2100">            <span class="tok-str">&quot;an unencrypted recording is {mode:o}, so anyone with an account here can play it&quot;</span></span>
+<span class="ln" id="L2101">        );</span>
+<span class="ln" id="L2102">    }</span>
+<span class="ln" id="L2103"></span>
+<span class="ln" id="L2104">    <span class="tok-com">/// The confirmed passphrase must not linger as ordinary heap bytes. It used</span></span>
+<span class="ln" id="L2105">    <span class="tok-com">/// to be kept as a `String` for the whole session; it is now moved into a</span></span>
+<span class="ln" id="L2106">    <span class="tok-com">/// page-locked `Secret` the moment it is confirmed, and the typing buffer</span></span>
+<span class="ln" id="L2107">    <span class="tok-com">/// is wiped.</span></span>
+<span class="ln" id="L2108">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2109">    <span class="tok-kw">fn</span> <span class="tok-fn">the_confirmed_passphrase_leaves_no_plaintext_buffer_behind</span>() {</span>
+<span class="ln" id="L2110">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
+<span class="ln" id="L2111">        <span class="tok-kw">let</span> secret = <span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed);</span>
+<span class="ln" id="L2112"></span>
+<span class="ln" id="L2113">        assert!(typed.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the typing buffer must be wiped&quot;</span>);</span>
+<span class="ln" id="L2114">        assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;a recording passphrase&quot;</span>);</span>
+<span class="ln" id="L2115">        assert!(</span>
+<span class="ln" id="L2116">            format!(<span class="tok-str">&quot;{secret:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>),</span>
+<span class="ln" id="L2117">            <span class="tok-str">&quot;a secret must not be printable&quot;</span></span>
+<span class="ln" id="L2118">        );</span>
+<span class="ln" id="L2119">    }</span>
+<span class="ln" id="L2120"></span>
+<span class="ln" id="L2121">    <span class="tok-com">/// And the plan handed to the worker thread carries the `Secret`, not a</span></span>
+<span class="ln" id="L2122">    <span class="tok-com">/// copy of the text.</span></span>
+<span class="ln" id="L2123">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2124">    <span class="tok-kw">fn</span> <span class="tok-fn">the_plan_carries_page_locked_material_not_a_string</span>() {</span>
+<span class="ln" id="L2125">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2126">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> typed = String::<span class="tok-fn">from</span>(<span class="tok-str">&quot;session passphrase&quot;</span>);</span>
+<span class="ln" id="L2127">        s.held = <span class="tok-fn">Some</span>(<span class="tok-fn">into_secret</span>(&amp;<span class="tok-kw">mut</span> typed));</span>
+<span class="ln" id="L2128">        s.passphrase_set = true;</span>
+<span class="ln" id="L2129"></span>
+<span class="ln" id="L2130">        assert!(s.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L2131">        <span class="tok-kw">match</span> s.<span class="tok-fn">plan</span>() {</span>
+<span class="ln" id="L2132">            Plan::<span class="tok-fn">Password</span>(secret) =&gt; assert_eq!(secret.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;session passphrase&quot;</span>),</span>
+<span class="ln" id="L2133">            other =&gt; panic!(<span class="tok-str">&quot;expected a password plan, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L2134">        }</span>
+<span class="ln" id="L2135">    }</span>
+<span class="ln" id="L2136"></span>
+<span class="ln" id="L2137">    <span class="tok-com">/// Locking must take the session passphrase with it, or &quot;locked&quot; would be</span></span>
+<span class="ln" id="L2138">    <span class="tok-com">/// a screen rather than a state.</span></span>
+<span class="ln" id="L2139">    <span class="tok-com">/// A real lock in a temporary directory, at test cost.</span></span>
+<span class="ln" id="L2140">    <span class="tok-com">///</span></span>
+<span class="ln" id="L2141">    <span class="tok-com">/// `lock_now` refuses to lock when there is nothing to unlock with, which</span></span>
+<span class="ln" id="L2142">    <span class="tok-com">/// is the right behaviour and means these tests need an actual store.</span></span>
+<span class="ln" id="L2143">    <span class="tok-kw">fn</span> <span class="tok-fn">locked_security</span>() -&gt; (Security, tempfile::TempDir) {</span>
+<span class="ln" id="L2144">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2145">        <span class="tok-kw">let</span> store =</span>
+<span class="ln" id="L2146">            veilvoice_crypto::LockStore::<span class="tok-fn">create</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>), b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>())</span>
+<span class="ln" id="L2147">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2148">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2149">        s.store = <span class="tok-fn">Some</span>(store);</span>
+<span class="ln" id="L2150">        (s, dir)</span>
+<span class="ln" id="L2151">    }</span>
+<span class="ln" id="L2152"></span>
+<span class="ln" id="L2153">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2154">    <span class="tok-kw">fn</span> <span class="tok-fn">a_deliberate_lock_and_an_idle_one_are_told_apart</span>() {</span>
+<span class="ln" id="L2155">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
+<span class="ln" id="L2156">        s.<span class="tok-fn">lock_now</span>();</span>
+<span class="ln" id="L2157">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
+<span class="ln" id="L2158">        assert!(</span>
+<span class="ln" id="L2159">            !s.auto_locked,</span>
+<span class="ln" id="L2160">            <span class="tok-str">&quot;somebody pressed Lock; the screen must not claim the window did it&quot;</span></span>
+<span class="ln" id="L2161">        );</span>
+<span class="ln" id="L2162"></span>
+<span class="ln" id="L2163">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> s, _dir) = <span class="tok-fn">locked_security</span>();</span>
+<span class="ln" id="L2164">        s.<span class="tok-fn">lock_after_idle</span>();</span>
+<span class="ln" id="L2165">        assert!(s.<span class="tok-fn">is_locked</span>());</span>
+<span class="ln" id="L2166">        assert!(s.auto_locked);</span>
+<span class="ln" id="L2167">    }</span>
+<span class="ln" id="L2168"></span>
+<span class="ln" id="L2169">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2170">    <span class="tok-kw">fn</span> <span class="tok-fn">the_auto_lock_note_is_not_shown_once_typing_starts</span>() {</span>
+<span class="ln" id="L2171">        <span class="tok-com">// The note is drawn under `self.auto_locked &amp;&amp; self.entry.is_empty()`.</span></span>
+<span class="ln" id="L2172">        <span class="tok-com">// Read from the source rather than by driving egui, which needs a</span></span>
+<span class="ln" id="L2173">        <span class="tok-com">// context this test suite does not build.</span></span>
+<span class="ln" id="L2174">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L2175">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2176">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
+<span class="ln" id="L2177">        assert!(</span>
+<span class="ln" id="L2178">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.auto_locked &amp;&amp; self.entry.is_empty()&quot;</span>),</span>
+<span class="ln" id="L2179">            <span class="tok-str">&quot;the note must disappear as soon as a character is typed&quot;</span></span>
+<span class="ln" id="L2180">        );</span>
+<span class="ln" id="L2181">    }</span>
+<span class="ln" id="L2182"></span>
+<span class="ln" id="L2183">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2184">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_screen_shows_the_mark_in_its_badge</span>() {</span>
+<span class="ln" id="L2185">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L2186">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlock_screen&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2187">        <span class="tok-kw">let</span> body = &amp;source[start..start + <span class="tok-num">4000</span>];</span>
+<span class="ln" id="L2188">        assert!(</span>
+<span class="ln" id="L2189">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;soundbar::badge&quot;</span>),</span>
+<span class="ln" id="L2190">            <span class="tok-str">&quot;a locked window has one thing in it and it should be the logo&quot;</span></span>
+<span class="ln" id="L2191">        );</span>
+<span class="ln" id="L2192">    }</span>
+<span class="ln" id="L2193"></span>
+<span class="ln" id="L2194">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2195">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_wipes_the_session_passphrase</span>() {</span>
+<span class="ln" id="L2196">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2197">        s.passphrase = <span class="tok-str">&quot;a recording passphrase&quot;</span>.<span class="tok-fn">into</span>();</span>
+<span class="ln" id="L2198">        s.passphrase_set = true;</span>
+<span class="ln" id="L2199">        s.<span class="tok-fn">wipe_secrets</span>();</span>
+<span class="ln" id="L2200">        assert!(s.passphrase.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L2201">        assert!(!s.passphrase_set);</span>
+<span class="ln" id="L2202">        assert!(!s.<span class="tok-fn">ready_to_write</span>(), <span class="tok-str">&quot;a wiped passphrase must block the job&quot;</span>);</span>
+<span class="ln" id="L2203">    }</span>
+<span class="ln" id="L2204"></span>
+<span class="ln" id="L2205">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2206">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_does_nothing_when_no_lock_is_configured</span>() {</span>
+<span class="ln" id="L2207">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L2208">        s.<span class="tok-fn">lock_now</span>();</span>
+<span class="ln" id="L2209">        assert!(!s.<span class="tok-fn">is_locked</span>(), <span class="tok-str">&quot;there is nothing to unlock it with&quot;</span>);</span>
+<span class="ln" id="L2210">    }</span>
+<span class="ln" id="L2211">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

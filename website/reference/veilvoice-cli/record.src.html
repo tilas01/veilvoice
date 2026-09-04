@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/record.rs</code></h1>
-<p style="color:var(--muted)"><a href="record.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 360 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="record.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 359 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -94,11 +94,11 @@
 <span class="ln" id="L43"><span class="tok-com">//! moment, so there is nothing to delete afterwards and nothing to recover from</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! the disk.</span></span>
 <span class="ln" id="L45"></span>
-<span class="ln" id="L46"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, ok, paint, warn};</span>
-<span class="ln" id="L47"><span class="tok-kw">use</span> std::path::PathBuf;</span>
-<span class="ln" id="L48"><span class="tok-kw">use</span> std::sync::atomic::{AtomicBool, Ordering};</span>
-<span class="ln" id="L49"><span class="tok-kw">use</span> std::sync::Arc;</span>
-<span class="ln" id="L50"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::meter;</span>
+<span class="ln" id="L46"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::meter;</span>
+<span class="ln" id="L47"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, ok, paint, warn};</span>
+<span class="ln" id="L48"><span class="tok-kw">use</span> std::path::PathBuf;</span>
+<span class="ln" id="L49"><span class="tok-kw">use</span> std::sync::atomic::{AtomicBool, Ordering};</span>
+<span class="ln" id="L50"><span class="tok-kw">use</span> std::sync::Arc;</span>
 <span class="ln" id="L51"><span class="tok-kw">use</span> veilvoice_audio::{devices, record};</span>
 <span class="ln" id="L52"></span>
 <span class="src-item" id="fn-sealing">
@@ -141,8 +141,8 @@
 <span class="ln" id="L87">    <span class="tok-com">// routing: nobody is on the other end of a cable waiting for it, and</span></span>
 <span class="ln" id="L88">    <span class="tok-com">// sending it to one would put the recording into whatever is listening</span></span>
 <span class="ln" id="L89">    <span class="tok-com">// there as well as into the file.</span></span>
-<span class="ln" id="L90">    <span class="tok-kw">let</span> out_device = devices::<span class="tok-fn">open</span>(devices::Direction::Output, output.<span class="tok-fn">as_deref</span>())</span>
-<span class="ln" id="L91">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L90">    <span class="tok-kw">let</span> out_device =</span>
+<span class="ln" id="L91">        devices::<span class="tok-fn">open</span>(devices::Direction::Output, output.<span class="tok-fn">as_deref</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L92"></span>
 <span class="ln" id="L93">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Record, veiled and encrypted&quot;</span>));</span>
 <span class="ln" id="L94">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Input&quot;</span>, &amp;devices::<span class="tok-fn">name_of</span>(&amp;in_device)));</span>
@@ -164,263 +164,262 @@
 <span class="ln" id="L110">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> sealing.public_key.<span class="tok-fn">is_some</span>() {</span>
 <span class="ln" id="L111">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Sealed to&quot;</span>, <span class="tok-str">&quot;a recipient public key&quot;</span>));</span>
 <span class="ln" id="L112">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L113">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Sealed with&quot;</span>, <span class="tok-str">&quot;a passphrase, asked for at the end&quot;</span>));</span>
-<span class="ln" id="L114">    }</span>
-<span class="ln" id="L115">    println!(</span>
-<span class="ln" id="L116">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L117">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L118">            colour::MUTED,</span>
-<span class="ln" id="L119">            <span class="tok-str">&quot;  Use headphones: speakers plus a microphone is a feedback loop.&quot;</span></span>
-<span class="ln" id="L120">        )</span>
-<span class="ln" id="L121">    );</span>
-<span class="ln" id="L122"></span>
-<span class="ln" id="L123">    <span class="tok-kw">let</span> config = <span class="tok-kw">crate</span>::<span class="tok-fn">config</span>(tuning);</span>
-<span class="ln" id="L124">    <span class="tok-kw">let</span> rate = config.sample_rate <span class="tok-kw">as</span> u32;</span>
-<span class="ln" id="L125">    <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> recorder, sink) = record::<span class="tok-fn">start</span>(rate);</span>
-<span class="ln" id="L126">    <span class="tok-kw">let</span> session = veilvoice_audio::LiveSession::<span class="tok-fn">start_recording</span>(</span>
-<span class="ln" id="L127">        &amp;in_device,</span>
-<span class="ln" id="L128">        &amp;out_device,</span>
-<span class="ln" id="L129">        config,</span>
-<span class="ln" id="L130">        <span class="tok-fn">Some</span>(sink),</span>
-<span class="ln" id="L131">    )</span>
-<span class="ln" id="L132">    .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L133"></span>
-<span class="ln" id="L134">    println!();</span>
-<span class="ln" id="L135">    <span class="tok-kw">match</span> seconds {</span>
-<span class="ln" id="L136">        <span class="tok-fn">Some</span>(n) =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;recording for {n:.0} seconds&quot;</span>))),</span>
-<span class="ln" id="L137">        None =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;recording. Press Enter to stop and save.&quot;</span>)),</span>
-<span class="ln" id="L138">    }</span>
-<span class="ln" id="L139">    println!(</span>
-<span class="ln" id="L140">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L141">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L142">            colour::MUTED,</span>
-<span class="ln" id="L143">            <span class="tok-str">&quot;  Ctrl-C abandons it instead, keeping nothing.&quot;</span></span>
-<span class="ln" id="L144">        )</span>
-<span class="ln" id="L145">    );</span>
-<span class="ln" id="L146">    println!();</span>
-<span class="ln" id="L147"></span>
-<span class="ln" id="L148">    <span class="tok-kw">let</span> stop = <span class="tok-fn">stop_signal</span>(seconds);</span>
-<span class="ln" id="L149">    <span class="tok-kw">const</span> WIDTH: usize = <span class="tok-num">20</span>;</span>
-<span class="ln" id="L150">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> in_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L151">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L152"></span>
-<span class="ln" id="L153">    while !stop.<span class="tok-fn">load</span>(Ordering::Relaxed) {</span>
-<span class="ln" id="L154">        std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">50</span>));</span>
-<span class="ln" id="L155">        <span class="tok-com">// Draining is what moves the audio out of the ring and into locked</span></span>
-<span class="ln" id="L156">        <span class="tok-com">// memory. Skipping it while the meters draw would lose the recording a</span></span>
-<span class="ln" id="L157">        <span class="tok-com">// ring-length at a time, so it happens every tick regardless of whether</span></span>
-<span class="ln" id="L158">        <span class="tok-com">// anything is being drawn.</span></span>
-<span class="ln" id="L159">        recorder.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L160">        <span class="tok-kw">if</span> !monitor {</span>
-<span class="ln" id="L161">            continue;</span>
-<span class="ln" id="L162">        }</span>
-<span class="ln" id="L163">        <span class="tok-kw">let</span> s = session.<span class="tok-fn">stats</span>();</span>
-<span class="ln" id="L164">        <span class="tok-kw">let</span> lost = <span class="tok-kw">if</span> recorder.<span class="tok-fn">dropped</span>() &gt; <span class="tok-num">0</span> {</span>
-<span class="ln" id="L165">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L166">                colour::YELLOW,</span>
-<span class="ln" id="L167">                &amp;format!(<span class="tok-str">&quot;  lost {} samples&quot;</span>, recorder.<span class="tok-fn">dropped</span>()),</span>
-<span class="ln" id="L168">            )</span>
-<span class="ln" id="L169">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L170">            String::<span class="tok-fn">new</span>()</span>
-<span class="ln" id="L171">        };</span>
-<span class="ln" id="L172">        print!(</span>
-<span class="ln" id="L173">            <span class="tok-str">&quot;\r  {} {}   {} {}   {} {:&gt;6.1}s{}   &quot;</span>,</span>
-<span class="ln" id="L174">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot; in&quot;</span>),</span>
-<span class="ln" id="L175">            in_meter.<span class="tok-fn">update</span>(s.input_peak, WIDTH),</span>
-<span class="ln" id="L176">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;out&quot;</span>),</span>
-<span class="ln" id="L177">            out_meter.<span class="tok-fn">update</span>(s.output_peak, WIDTH),</span>
-<span class="ln" id="L178">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;length&quot;</span>),</span>
-<span class="ln" id="L179">            recorder.<span class="tok-fn">seconds</span>(),</span>
-<span class="ln" id="L180">            lost,</span>
-<span class="ln" id="L181">        );</span>
-<span class="ln" id="L182">        <span class="tok-kw">use</span> std::io::Write;</span>
-<span class="ln" id="L183">        <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>();</span>
-<span class="ln" id="L184">    }</span>
-<span class="ln" id="L185"></span>
-<span class="ln" id="L186">    <span class="tok-com">// Stop the audio before sealing. Argon2id takes a noticeable moment, and</span></span>
-<span class="ln" id="L187">    <span class="tok-com">// samples arriving during it would be recorded after the point the person</span></span>
-<span class="ln" id="L188">    <span class="tok-com">// asked it to stop.</span></span>
-<span class="ln" id="L189">    <span class="tok-fn">drop</span>(session);</span>
+<span class="ln" id="L113">        println!(</span>
+<span class="ln" id="L114">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L115">            <span class="tok-fn">field</span>(<span class="tok-str">&quot;Sealed with&quot;</span>, <span class="tok-str">&quot;a passphrase, asked for at the end&quot;</span>)</span>
+<span class="ln" id="L116">        );</span>
+<span class="ln" id="L117">    }</span>
+<span class="ln" id="L118">    println!(</span>
+<span class="ln" id="L119">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L120">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L121">            colour::MUTED,</span>
+<span class="ln" id="L122">            <span class="tok-str">&quot;  Use headphones: speakers plus a microphone is a feedback loop.&quot;</span></span>
+<span class="ln" id="L123">        )</span>
+<span class="ln" id="L124">    );</span>
+<span class="ln" id="L125"></span>
+<span class="ln" id="L126">    <span class="tok-kw">let</span> config = <span class="tok-kw">crate</span>::<span class="tok-fn">config</span>(tuning);</span>
+<span class="ln" id="L127">    <span class="tok-kw">let</span> rate = config.sample_rate <span class="tok-kw">as</span> u32;</span>
+<span class="ln" id="L128">    <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> recorder, sink) = record::<span class="tok-fn">start</span>(rate);</span>
+<span class="ln" id="L129">    <span class="tok-kw">let</span> session =</span>
+<span class="ln" id="L130">        veilvoice_audio::LiveSession::<span class="tok-fn">start_recording</span>(&amp;in_device, &amp;out_device, config, <span class="tok-fn">Some</span>(sink))</span>
+<span class="ln" id="L131">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L132"></span>
+<span class="ln" id="L133">    println!();</span>
+<span class="ln" id="L134">    <span class="tok-kw">match</span> seconds {</span>
+<span class="ln" id="L135">        <span class="tok-fn">Some</span>(n) =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;recording for {n:.0} seconds&quot;</span>))),</span>
+<span class="ln" id="L136">        None =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;recording. Press Enter to stop and save.&quot;</span>)),</span>
+<span class="ln" id="L137">    }</span>
+<span class="ln" id="L138">    println!(</span>
+<span class="ln" id="L139">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L140">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L141">            colour::MUTED,</span>
+<span class="ln" id="L142">            <span class="tok-str">&quot;  Ctrl-C abandons it instead, keeping nothing.&quot;</span></span>
+<span class="ln" id="L143">        )</span>
+<span class="ln" id="L144">    );</span>
+<span class="ln" id="L145">    println!();</span>
+<span class="ln" id="L146"></span>
+<span class="ln" id="L147">    <span class="tok-kw">let</span> stop = <span class="tok-fn">stop_signal</span>(seconds);</span>
+<span class="ln" id="L148">    <span class="tok-kw">const</span> WIDTH: usize = <span class="tok-num">20</span>;</span>
+<span class="ln" id="L149">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> in_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L150">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L151"></span>
+<span class="ln" id="L152">    while !stop.<span class="tok-fn">load</span>(Ordering::Relaxed) {</span>
+<span class="ln" id="L153">        std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">50</span>));</span>
+<span class="ln" id="L154">        <span class="tok-com">// Draining is what moves the audio out of the ring and into locked</span></span>
+<span class="ln" id="L155">        <span class="tok-com">// memory. Skipping it while the meters draw would lose the recording a</span></span>
+<span class="ln" id="L156">        <span class="tok-com">// ring-length at a time, so it happens every tick regardless of whether</span></span>
+<span class="ln" id="L157">        <span class="tok-com">// anything is being drawn.</span></span>
+<span class="ln" id="L158">        recorder.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L159">        <span class="tok-kw">if</span> !monitor {</span>
+<span class="ln" id="L160">            continue;</span>
+<span class="ln" id="L161">        }</span>
+<span class="ln" id="L162">        <span class="tok-kw">let</span> s = session.<span class="tok-fn">stats</span>();</span>
+<span class="ln" id="L163">        <span class="tok-kw">let</span> lost = <span class="tok-kw">if</span> recorder.<span class="tok-fn">dropped</span>() &gt; <span class="tok-num">0</span> {</span>
+<span class="ln" id="L164">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L165">                colour::YELLOW,</span>
+<span class="ln" id="L166">                &amp;format!(<span class="tok-str">&quot;  lost {} samples&quot;</span>, recorder.<span class="tok-fn">dropped</span>()),</span>
+<span class="ln" id="L167">            )</span>
+<span class="ln" id="L168">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L169">            String::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L170">        };</span>
+<span class="ln" id="L171">        print!(</span>
+<span class="ln" id="L172">            <span class="tok-str">&quot;\r  {} {}   {} {}   {} {:&gt;6.1}s{}   &quot;</span>,</span>
+<span class="ln" id="L173">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot; in&quot;</span>),</span>
+<span class="ln" id="L174">            in_meter.<span class="tok-fn">update</span>(s.input_peak, WIDTH),</span>
+<span class="ln" id="L175">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;out&quot;</span>),</span>
+<span class="ln" id="L176">            out_meter.<span class="tok-fn">update</span>(s.output_peak, WIDTH),</span>
+<span class="ln" id="L177">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;length&quot;</span>),</span>
+<span class="ln" id="L178">            recorder.<span class="tok-fn">seconds</span>(),</span>
+<span class="ln" id="L179">            lost,</span>
+<span class="ln" id="L180">        );</span>
+<span class="ln" id="L181">        <span class="tok-kw">use</span> std::io::Write;</span>
+<span class="ln" id="L182">        <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>();</span>
+<span class="ln" id="L183">    }</span>
+<span class="ln" id="L184"></span>
+<span class="ln" id="L185">    <span class="tok-com">// Stop the audio before sealing. Argon2id takes a noticeable moment, and</span></span>
+<span class="ln" id="L186">    <span class="tok-com">// samples arriving during it would be recorded after the point the person</span></span>
+<span class="ln" id="L187">    <span class="tok-com">// asked it to stop.</span></span>
+<span class="ln" id="L188">    <span class="tok-fn">drop</span>(session);</span>
+<span class="ln" id="L189">    println!();</span>
 <span class="ln" id="L190">    println!();</span>
-<span class="ln" id="L191">    println!();</span>
-<span class="ln" id="L192"></span>
-<span class="ln" id="L193">    <span class="tok-kw">let</span> length = recorder.<span class="tok-fn">seconds</span>();</span>
-<span class="ln" id="L194">    <span class="tok-kw">let</span> wav = recorder.<span class="tok-fn">wav</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L195">    <span class="tok-fn">report</span>(&amp;recorder, length, wav.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L196"></span>
-<span class="ln" id="L197">    <span class="tok-kw">if</span> sealing.plaintext {</span>
-<span class="ln" id="L198">        <span class="tok-kw">crate</span>::atrest::<span class="tok-fn">confirm_plaintext</span>(sealing.yes)?;</span>
-<span class="ln" id="L199">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;destination, wav.<span class="tok-fn">expose</span>())</span>
-<span class="ln" id="L200">            .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, destination.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L201">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;written&quot;</span>, &amp;destination.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L202">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">warn</span>(<span class="tok-str">&quot;unencrypted, as you asked&quot;</span>));</span>
-<span class="ln" id="L203">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L204">    }</span>
-<span class="ln" id="L205"></span>
-<span class="ln" id="L206">    <span class="tok-kw">let</span> recipient = <span class="tok-kw">match</span> &amp;sealing.public_key {</span>
-<span class="ln" id="L207">        <span class="tok-fn">Some</span>(path) =&gt; <span class="tok-kw">crate</span>::atrest::Recipient::<span class="tok-fn">PublicKey</span>(path),</span>
-<span class="ln" id="L208">        None =&gt; <span class="tok-kw">crate</span>::atrest::Recipient::Password,</span>
-<span class="ln" id="L209">    };</span>
-<span class="ln" id="L210">    <span class="tok-kw">let</span> out = <span class="tok-kw">crate</span>::atrest::<span class="tok-fn">seal_to_disk</span>(&amp;destination, wav.<span class="tok-fn">expose</span>(), recipient)?;</span>
-<span class="ln" id="L211">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;sealed to {}&quot;</span>, out.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L212">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L213">}</span>
+<span class="ln" id="L191"></span>
+<span class="ln" id="L192">    <span class="tok-kw">let</span> length = recorder.<span class="tok-fn">seconds</span>();</span>
+<span class="ln" id="L193">    <span class="tok-kw">let</span> wav = recorder.<span class="tok-fn">wav</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L194">    <span class="tok-fn">report</span>(&amp;recorder, length, wav.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L195"></span>
+<span class="ln" id="L196">    <span class="tok-kw">if</span> sealing.plaintext {</span>
+<span class="ln" id="L197">        <span class="tok-kw">crate</span>::atrest::<span class="tok-fn">confirm_plaintext</span>(sealing.yes)?;</span>
+<span class="ln" id="L198">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;destination, wav.<span class="tok-fn">expose</span>())</span>
+<span class="ln" id="L199">            .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, destination.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L200">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;written&quot;</span>, &amp;destination.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L201">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">warn</span>(<span class="tok-str">&quot;unencrypted, as you asked&quot;</span>));</span>
+<span class="ln" id="L202">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L203">    }</span>
+<span class="ln" id="L204"></span>
+<span class="ln" id="L205">    <span class="tok-kw">let</span> recipient = <span class="tok-kw">match</span> &amp;sealing.public_key {</span>
+<span class="ln" id="L206">        <span class="tok-fn">Some</span>(path) =&gt; <span class="tok-kw">crate</span>::atrest::Recipient::<span class="tok-fn">PublicKey</span>(path),</span>
+<span class="ln" id="L207">        None =&gt; <span class="tok-kw">crate</span>::atrest::Recipient::Password,</span>
+<span class="ln" id="L208">    };</span>
+<span class="ln" id="L209">    <span class="tok-kw">let</span> out = <span class="tok-kw">crate</span>::atrest::<span class="tok-fn">seal_to_disk</span>(&amp;destination, wav.<span class="tok-fn">expose</span>(), recipient)?;</span>
+<span class="ln" id="L210">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;sealed to {}&quot;</span>, out.<span class="tok-fn">display</span>())));</span>
+<span class="ln" id="L211">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L212">}</span>
 </span>
-<span class="ln" id="L214"></span>
+<span class="ln" id="L213"></span>
 <span class="src-item" id="fn-report">
-<span class="ln" id="L215"><span class="tok-com">/// What was captured, and what was actually obtained for it.</span></span>
-<span class="ln" id="L216"><span class="tok-com">///</span></span>
-<span class="ln" id="L217"><span class="tok-com">/// The locking line is the honest one: it says what the operating system</span></span>
-<span class="ln" id="L218"><span class="tok-com">/// granted rather than what was asked for, because [`veilvoice_crypto::tape`]</span></span>
-<span class="ln" id="L219"><span class="tok-com">/// cannot promise a lock and neither can this.</span></span>
-<span class="ln" id="L220"><span class="tok-kw">fn</span> <span class="tok-fn">report</span>(recorder: &amp;record::Recorder, seconds: f32, bytes: usize) {</span>
-<span class="ln" id="L221">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;length&quot;</span>, &amp;format!(<span class="tok-str">&quot;{seconds:.1} s&quot;</span>)));</span>
-<span class="ln" id="L222">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;size&quot;</span>, &amp;format!(<span class="tok-str">&quot;{} KiB&quot;</span>, bytes / <span class="tok-num">1024</span>)));</span>
-<span class="ln" id="L223">    <span class="tok-kw">if</span> recorder.<span class="tok-fn">dropped</span>() &gt; <span class="tok-num">0</span> {</span>
-<span class="ln" id="L224">        println!(</span>
-<span class="ln" id="L225">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L226">            <span class="tok-fn">warn</span>(&amp;format!(</span>
-<span class="ln" id="L227">                <span class="tok-str">&quot;{} samples were lost: the recording has a gap&quot;</span>,</span>
-<span class="ln" id="L228">                recorder.<span class="tok-fn">dropped</span>()</span>
-<span class="ln" id="L229">            ))</span>
-<span class="ln" id="L230">        );</span>
-<span class="ln" id="L231">    }</span>
-<span class="ln" id="L232">    <span class="tok-kw">if</span> recorder.<span class="tok-fn">fully_locked</span>() {</span>
-<span class="ln" id="L233">        println!(</span>
-<span class="ln" id="L234">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L235">            <span class="tok-fn">field</span>(<span class="tok-str">&quot;in memory&quot;</span>, <span class="tok-str">&quot;held locked out of the page file throughout&quot;</span>)</span>
-<span class="ln" id="L236">        );</span>
-<span class="ln" id="L237">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L238">        println!(</span>
-<span class="ln" id="L239">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L240">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;some of the recording could not be locked out of the page file&quot;</span>)</span>
-<span class="ln" id="L241">        );</span>
-<span class="ln" id="L242">        println!(</span>
-<span class="ln" id="L243">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L244">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L245">                colour::MUTED,</span>
-<span class="ln" id="L246">                <span class="tok-str">&quot;  The operating system limits how much a program may lock, and this&quot;</span></span>
-<span class="ln" id="L247">            )</span>
-<span class="ln" id="L248">        );</span>
-<span class="ln" id="L249">        println!(</span>
-<span class="ln" id="L250">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L251">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L252">                colour::MUTED,</span>
-<span class="ln" id="L253">                <span class="tok-str">&quot;  recording was larger than that limit. It was still wiped from memory.&quot;</span></span>
-<span class="ln" id="L254">            )</span>
-<span class="ln" id="L255">        );</span>
-<span class="ln" id="L256">    }</span>
-<span class="ln" id="L257">}</span>
+<span class="ln" id="L214"><span class="tok-com">/// What was captured, and what was actually obtained for it.</span></span>
+<span class="ln" id="L215"><span class="tok-com">///</span></span>
+<span class="ln" id="L216"><span class="tok-com">/// The locking line is the honest one: it says what the operating system</span></span>
+<span class="ln" id="L217"><span class="tok-com">/// granted rather than what was asked for, because [`veilvoice_crypto::tape`]</span></span>
+<span class="ln" id="L218"><span class="tok-com">/// cannot promise a lock and neither can this.</span></span>
+<span class="ln" id="L219"><span class="tok-kw">fn</span> <span class="tok-fn">report</span>(recorder: &amp;record::Recorder, seconds: f32, bytes: usize) {</span>
+<span class="ln" id="L220">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;length&quot;</span>, &amp;format!(<span class="tok-str">&quot;{seconds:.1} s&quot;</span>)));</span>
+<span class="ln" id="L221">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;size&quot;</span>, &amp;format!(<span class="tok-str">&quot;{} KiB&quot;</span>, bytes / <span class="tok-num">1024</span>)));</span>
+<span class="ln" id="L222">    <span class="tok-kw">if</span> recorder.<span class="tok-fn">dropped</span>() &gt; <span class="tok-num">0</span> {</span>
+<span class="ln" id="L223">        println!(</span>
+<span class="ln" id="L224">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L225">            <span class="tok-fn">warn</span>(&amp;format!(</span>
+<span class="ln" id="L226">                <span class="tok-str">&quot;{} samples were lost: the recording has a gap&quot;</span>,</span>
+<span class="ln" id="L227">                recorder.<span class="tok-fn">dropped</span>()</span>
+<span class="ln" id="L228">            ))</span>
+<span class="ln" id="L229">        );</span>
+<span class="ln" id="L230">    }</span>
+<span class="ln" id="L231">    <span class="tok-kw">if</span> recorder.<span class="tok-fn">fully_locked</span>() {</span>
+<span class="ln" id="L232">        println!(</span>
+<span class="ln" id="L233">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L234">            <span class="tok-fn">field</span>(<span class="tok-str">&quot;in memory&quot;</span>, <span class="tok-str">&quot;held locked out of the page file throughout&quot;</span>)</span>
+<span class="ln" id="L235">        );</span>
+<span class="ln" id="L236">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L237">        println!(</span>
+<span class="ln" id="L238">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L239">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;some of the recording could not be locked out of the page file&quot;</span>)</span>
+<span class="ln" id="L240">        );</span>
+<span class="ln" id="L241">        println!(</span>
+<span class="ln" id="L242">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L243">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L244">                colour::MUTED,</span>
+<span class="ln" id="L245">                <span class="tok-str">&quot;  The operating system limits how much a program may lock, and this&quot;</span></span>
+<span class="ln" id="L246">            )</span>
+<span class="ln" id="L247">        );</span>
+<span class="ln" id="L248">        println!(</span>
+<span class="ln" id="L249">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L250">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L251">                colour::MUTED,</span>
+<span class="ln" id="L252">                <span class="tok-str">&quot;  recording was larger than that limit. It was still wiped from memory.&quot;</span></span>
+<span class="ln" id="L253">            )</span>
+<span class="ln" id="L254">        );</span>
+<span class="ln" id="L255">    }</span>
+<span class="ln" id="L256">}</span>
 </span>
-<span class="ln" id="L258"></span>
+<span class="ln" id="L257"></span>
 <span class="src-item" id="fn-stop_signal">
-<span class="ln" id="L259"><span class="tok-com">/// A flag that becomes true when the recording should stop.</span></span>
-<span class="ln" id="L260"><span class="tok-com">///</span></span>
-<span class="ln" id="L261"><span class="tok-com">/// Either after `seconds`, or when Enter is pressed. The reading thread is</span></span>
-<span class="ln" id="L262"><span class="tok-com">/// detached and blocks on stdin: it is never joined, because a fixed-length</span></span>
-<span class="ln" id="L263"><span class="tok-com">/// recording must not wait for a keypress that is not coming.</span></span>
-<span class="ln" id="L264"><span class="tok-kw">fn</span> <span class="tok-fn">stop_signal</span>(seconds: Option&lt;f32&gt;) -&gt; Arc&lt;AtomicBool&gt; {</span>
-<span class="ln" id="L265">    <span class="tok-kw">let</span> stop = Arc::<span class="tok-fn">new</span>(AtomicBool::<span class="tok-fn">new</span>(false));</span>
-<span class="ln" id="L266">    <span class="tok-kw">match</span> seconds {</span>
-<span class="ln" id="L267">        <span class="tok-fn">Some</span>(n) =&gt; {</span>
-<span class="ln" id="L268">            <span class="tok-kw">let</span> stop = Arc::<span class="tok-fn">clone</span>(&amp;stop);</span>
-<span class="ln" id="L269">            <span class="tok-kw">let</span> millis = (n.<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>) * <span class="tok-num">1000.0</span>) <span class="tok-kw">as</span> u64;</span>
-<span class="ln" id="L270">            std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L271">                std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(millis));</span>
-<span class="ln" id="L272">                stop.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
-<span class="ln" id="L273">            });</span>
-<span class="ln" id="L274">        }</span>
-<span class="ln" id="L275">        None =&gt; {</span>
-<span class="ln" id="L276">            <span class="tok-kw">let</span> stop = Arc::<span class="tok-fn">clone</span>(&amp;stop);</span>
-<span class="ln" id="L277">            std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L278">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> line = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L279">                <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdin</span>().<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> line);</span>
-<span class="ln" id="L280">                stop.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
-<span class="ln" id="L281">            });</span>
-<span class="ln" id="L282">        }</span>
-<span class="ln" id="L283">    }</span>
-<span class="ln" id="L284">    stop</span>
-<span class="ln" id="L285">}</span>
+<span class="ln" id="L258"><span class="tok-com">/// A flag that becomes true when the recording should stop.</span></span>
+<span class="ln" id="L259"><span class="tok-com">///</span></span>
+<span class="ln" id="L260"><span class="tok-com">/// Either after `seconds`, or when Enter is pressed. The reading thread is</span></span>
+<span class="ln" id="L261"><span class="tok-com">/// detached and blocks on stdin: it is never joined, because a fixed-length</span></span>
+<span class="ln" id="L262"><span class="tok-com">/// recording must not wait for a keypress that is not coming.</span></span>
+<span class="ln" id="L263"><span class="tok-kw">fn</span> <span class="tok-fn">stop_signal</span>(seconds: Option&lt;f32&gt;) -&gt; Arc&lt;AtomicBool&gt; {</span>
+<span class="ln" id="L264">    <span class="tok-kw">let</span> stop = Arc::<span class="tok-fn">new</span>(AtomicBool::<span class="tok-fn">new</span>(false));</span>
+<span class="ln" id="L265">    <span class="tok-kw">match</span> seconds {</span>
+<span class="ln" id="L266">        <span class="tok-fn">Some</span>(n) =&gt; {</span>
+<span class="ln" id="L267">            <span class="tok-kw">let</span> stop = Arc::<span class="tok-fn">clone</span>(&amp;stop);</span>
+<span class="ln" id="L268">            <span class="tok-kw">let</span> millis = (n.<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>) * <span class="tok-num">1000.0</span>) <span class="tok-kw">as</span> u64;</span>
+<span class="ln" id="L269">            std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L270">                std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(millis));</span>
+<span class="ln" id="L271">                stop.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
+<span class="ln" id="L272">            });</span>
+<span class="ln" id="L273">        }</span>
+<span class="ln" id="L274">        None =&gt; {</span>
+<span class="ln" id="L275">            <span class="tok-kw">let</span> stop = Arc::<span class="tok-fn">clone</span>(&amp;stop);</span>
+<span class="ln" id="L276">            std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L277">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> line = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L278">                <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdin</span>().<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> line);</span>
+<span class="ln" id="L279">                stop.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
+<span class="ln" id="L280">            });</span>
+<span class="ln" id="L281">        }</span>
+<span class="ln" id="L282">    }</span>
+<span class="ln" id="L283">    stop</span>
+<span class="ln" id="L284">}</span>
 </span>
-<span class="ln" id="L286"></span>
+<span class="ln" id="L285"></span>
 <span class="src-item" id="fn-destination">
-<span class="ln" id="L287"><span class="tok-com">/// Where the recording goes, defaulting to a timestamped name here.</span></span>
-<span class="ln" id="L288"><span class="tok-com">///</span></span>
-<span class="ln" id="L289"><span class="tok-com">/// The default carries the moment it was made rather than a counter, so two</span></span>
-<span class="ln" id="L290"><span class="tok-com">/// recordings never race for the same name and the file says when it happened</span></span>
-<span class="ln" id="L291"><span class="tok-com">/// without depending on a filesystem timestamp that a copy would not preserve.</span></span>
-<span class="ln" id="L292"><span class="tok-kw">fn</span> <span class="tok-fn">destination</span>(to: Option&lt;PathBuf&gt;) -&gt; Result&lt;PathBuf, String&gt; {</span>
-<span class="ln" id="L293">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = to {</span>
-<span class="ln" id="L294">        <span class="tok-kw">if</span> path.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L295">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;the output path is empty&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L296">        }</span>
-<span class="ln" id="L297">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(path);</span>
-<span class="ln" id="L298">    }</span>
-<span class="ln" id="L299">    <span class="tok-fn">Ok</span>(PathBuf::<span class="tok-fn">from</span>(format!(<span class="tok-str">&quot;veilvoice-{}.wav&quot;</span>, <span class="tok-fn">stamp</span>())))</span>
-<span class="ln" id="L300">}</span>
+<span class="ln" id="L286"><span class="tok-com">/// Where the recording goes, defaulting to a timestamped name here.</span></span>
+<span class="ln" id="L287"><span class="tok-com">///</span></span>
+<span class="ln" id="L288"><span class="tok-com">/// The default carries the moment it was made rather than a counter, so two</span></span>
+<span class="ln" id="L289"><span class="tok-com">/// recordings never race for the same name and the file says when it happened</span></span>
+<span class="ln" id="L290"><span class="tok-com">/// without depending on a filesystem timestamp that a copy would not preserve.</span></span>
+<span class="ln" id="L291"><span class="tok-kw">fn</span> <span class="tok-fn">destination</span>(to: Option&lt;PathBuf&gt;) -&gt; Result&lt;PathBuf, String&gt; {</span>
+<span class="ln" id="L292">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = to {</span>
+<span class="ln" id="L293">        <span class="tok-kw">if</span> path.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L294">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;the output path is empty&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L295">        }</span>
+<span class="ln" id="L296">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(path);</span>
+<span class="ln" id="L297">    }</span>
+<span class="ln" id="L298">    <span class="tok-fn">Ok</span>(PathBuf::<span class="tok-fn">from</span>(format!(<span class="tok-str">&quot;veilvoice-{}.wav&quot;</span>, <span class="tok-fn">stamp</span>())))</span>
+<span class="ln" id="L299">}</span>
 </span>
-<span class="ln" id="L301"></span>
+<span class="ln" id="L300"></span>
 <span class="src-item" id="fn-stamp">
-<span class="ln" id="L302"><span class="tok-com">/// `YYYYMMDD-HHMMSS` in UTC, for a filename.</span></span>
-<span class="ln" id="L303"><span class="tok-com">///</span></span>
-<span class="ln" id="L304"><span class="tok-com">/// Built from the same civil-date arithmetic the mandate history uses, rather</span></span>
-<span class="ln" id="L305"><span class="tok-com">/// than from a date crate, for the reason recorded there: one line of output</span></span>
-<span class="ln" id="L306"><span class="tok-com">/// does not justify a dependency nobody has read.</span></span>
-<span class="ln" id="L307"><span class="tok-kw">fn</span> <span class="tok-fn">stamp</span>() -&gt; String {</span>
-<span class="ln" id="L308">    <span class="tok-kw">let</span> secs = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L309">        .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L310">        .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_secs</span>() <span class="tok-kw">as</span> i64)</span>
-<span class="ln" id="L311">        .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L312">    <span class="tok-kw">let</span> text = veilvoice_policy::<span class="tok-fn">utc</span>(secs);</span>
-<span class="ln" id="L313">    <span class="tok-com">// &quot;YYYY-MM-DD HH:MM:SS UTC&quot; to &quot;YYYYMMDD-HHMMSS&quot;.</span></span>
-<span class="ln" id="L314">    <span class="tok-kw">let</span> cleaned: String = text</span>
-<span class="ln" id="L315">        .<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&quot; UTC&quot;</span>)</span>
-<span class="ln" id="L316">        .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L317">        .<span class="tok-fn">filter</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>() || *c == <span class="tok-str">&#x27; &#x27;</span>)</span>
-<span class="ln" id="L318">        .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L319">    cleaned.<span class="tok-fn">replace</span>(<span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&quot;-&quot;</span>)</span>
-<span class="ln" id="L320">}</span>
+<span class="ln" id="L301"><span class="tok-com">/// `YYYYMMDD-HHMMSS` in UTC, for a filename.</span></span>
+<span class="ln" id="L302"><span class="tok-com">///</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// Built from the same civil-date arithmetic the mandate history uses, rather</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// than from a date crate, for the reason recorded there: one line of output</span></span>
+<span class="ln" id="L305"><span class="tok-com">/// does not justify a dependency nobody has read.</span></span>
+<span class="ln" id="L306"><span class="tok-kw">fn</span> <span class="tok-fn">stamp</span>() -&gt; String {</span>
+<span class="ln" id="L307">    <span class="tok-kw">let</span> secs = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L308">        .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L309">        .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_secs</span>() <span class="tok-kw">as</span> i64)</span>
+<span class="ln" id="L310">        .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L311">    <span class="tok-kw">let</span> text = veilvoice_policy::<span class="tok-fn">utc</span>(secs);</span>
+<span class="ln" id="L312">    <span class="tok-com">// &quot;YYYY-MM-DD HH:MM:SS UTC&quot; to &quot;YYYYMMDD-HHMMSS&quot;.</span></span>
+<span class="ln" id="L313">    <span class="tok-kw">let</span> cleaned: String = text</span>
+<span class="ln" id="L314">        .<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&quot; UTC&quot;</span>)</span>
+<span class="ln" id="L315">        .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L316">        .<span class="tok-fn">filter</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>() || *c == <span class="tok-str">&#x27; &#x27;</span>)</span>
+<span class="ln" id="L317">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L318">    cleaned.<span class="tok-fn">replace</span>(<span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&quot;-&quot;</span>)</span>
+<span class="ln" id="L319">}</span>
 </span>
-<span class="ln" id="L321"></span>
-<span class="ln" id="L322"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L323"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L324">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L325"></span>
-<span class="ln" id="L326">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L327">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_name_is_a_timestamp_a_filesystem_accepts</span>() {</span>
-<span class="ln" id="L328">        <span class="tok-kw">let</span> path = <span class="tok-fn">destination</span>(None).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L329">        <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L330">        assert!(name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;veilvoice-&quot;</span>), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L331">        assert!(name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.wav&quot;</span>), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L332">        <span class="tok-com">// Nothing a Windows path rejects, and nothing a shell would split on.</span></span>
-<span class="ln" id="L333">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&#x27;:&#x27;</span>, <span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;/&#x27;</span>, <span class="tok-str">&#x27;\\&#x27;</span>, <span class="tok-str">&#x27;*&#x27;</span>, <span class="tok-str">&#x27;?&#x27;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&#x27;&lt;&#x27;</span>, <span class="tok-str">&#x27;&gt;&#x27;</span>, <span class="tok-str">&#x27;|&#x27;</span>] {</span>
-<span class="ln" id="L334">            assert!(!name.<span class="tok-fn">contains</span>(bad), <span class="tok-str">&quot;{name} contains {bad:?}&quot;</span>);</span>
-<span class="ln" id="L335">        }</span>
-<span class="ln" id="L336">    }</span>
-<span class="ln" id="L337"></span>
-<span class="ln" id="L338">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L339">    <span class="tok-kw">fn</span> <span class="tok-fn">a_timestamp_is_the_shape_the_name_promises</span>() {</span>
-<span class="ln" id="L340">        <span class="tok-kw">let</span> s = <span class="tok-fn">stamp</span>();</span>
-<span class="ln" id="L341">        <span class="tok-kw">let</span> (date, time) = s.<span class="tok-fn">split_once</span>(<span class="tok-str">&#x27;-&#x27;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a date and a time&quot;</span>);</span>
-<span class="ln" id="L342">        assert_eq!(date.<span class="tok-fn">len</span>(), <span class="tok-num">8</span>, <span class="tok-str">&quot;{s}&quot;</span>);</span>
-<span class="ln" id="L343">        assert_eq!(time.<span class="tok-fn">len</span>(), <span class="tok-num">6</span>, <span class="tok-str">&quot;{s}&quot;</span>);</span>
-<span class="ln" id="L344">        assert!(s.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>), <span class="tok-str">&quot;{s}&quot;</span>);</span>
-<span class="ln" id="L345">    }</span>
-<span class="ln" id="L346"></span>
-<span class="ln" id="L347">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L348">    <span class="tok-kw">fn</span> <span class="tok-fn">an_explicit_destination_is_used_as_given</span>() {</span>
-<span class="ln" id="L349">        <span class="tok-kw">let</span> path = <span class="tok-fn">destination</span>(<span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;interview.wav&quot;</span>))).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L350">        assert_eq!(path, PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;interview.wav&quot;</span>));</span>
-<span class="ln" id="L351">    }</span>
-<span class="ln" id="L352"></span>
-<span class="ln" id="L353">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L354">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_destination_is_refused_rather_than_turned_into_a_default</span>() {</span>
-<span class="ln" id="L355">        <span class="tok-com">// Silently substituting a default would write the recording somewhere</span></span>
-<span class="ln" id="L356">        <span class="tok-com">// the person did not name, which for an encrypted file they then have</span></span>
-<span class="ln" id="L357">        <span class="tok-com">// to find is worse than an error.</span></span>
-<span class="ln" id="L358">        assert!(<span class="tok-fn">destination</span>(<span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">new</span>())).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L359">    }</span>
-<span class="ln" id="L360">}</span>
+<span class="ln" id="L320"></span>
+<span class="ln" id="L321"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L322"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L323">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L324"></span>
+<span class="ln" id="L325">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L326">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_name_is_a_timestamp_a_filesystem_accepts</span>() {</span>
+<span class="ln" id="L327">        <span class="tok-kw">let</span> path = <span class="tok-fn">destination</span>(None).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L328">        <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L329">        assert!(name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;veilvoice-&quot;</span>), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L330">        assert!(name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.wav&quot;</span>), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L331">        <span class="tok-com">// Nothing a Windows path rejects, and nothing a shell would split on.</span></span>
+<span class="ln" id="L332">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&#x27;:&#x27;</span>, <span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;/&#x27;</span>, <span class="tok-str">&#x27;\\&#x27;</span>, <span class="tok-str">&#x27;*&#x27;</span>, <span class="tok-str">&#x27;?&#x27;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&#x27;&lt;&#x27;</span>, <span class="tok-str">&#x27;&gt;&#x27;</span>, <span class="tok-str">&#x27;|&#x27;</span>] {</span>
+<span class="ln" id="L333">            assert!(!name.<span class="tok-fn">contains</span>(bad), <span class="tok-str">&quot;{name} contains {bad:?}&quot;</span>);</span>
+<span class="ln" id="L334">        }</span>
+<span class="ln" id="L335">    }</span>
+<span class="ln" id="L336"></span>
+<span class="ln" id="L337">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L338">    <span class="tok-kw">fn</span> <span class="tok-fn">a_timestamp_is_the_shape_the_name_promises</span>() {</span>
+<span class="ln" id="L339">        <span class="tok-kw">let</span> s = <span class="tok-fn">stamp</span>();</span>
+<span class="ln" id="L340">        <span class="tok-kw">let</span> (date, time) = s.<span class="tok-fn">split_once</span>(<span class="tok-str">&#x27;-&#x27;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a date and a time&quot;</span>);</span>
+<span class="ln" id="L341">        assert_eq!(date.<span class="tok-fn">len</span>(), <span class="tok-num">8</span>, <span class="tok-str">&quot;{s}&quot;</span>);</span>
+<span class="ln" id="L342">        assert_eq!(time.<span class="tok-fn">len</span>(), <span class="tok-num">6</span>, <span class="tok-str">&quot;{s}&quot;</span>);</span>
+<span class="ln" id="L343">        assert!(s.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>), <span class="tok-str">&quot;{s}&quot;</span>);</span>
+<span class="ln" id="L344">    }</span>
+<span class="ln" id="L345"></span>
+<span class="ln" id="L346">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L347">    <span class="tok-kw">fn</span> <span class="tok-fn">an_explicit_destination_is_used_as_given</span>() {</span>
+<span class="ln" id="L348">        <span class="tok-kw">let</span> path = <span class="tok-fn">destination</span>(<span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;interview.wav&quot;</span>))).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L349">        assert_eq!(path, PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;interview.wav&quot;</span>));</span>
+<span class="ln" id="L350">    }</span>
+<span class="ln" id="L351"></span>
+<span class="ln" id="L352">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L353">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_destination_is_refused_rather_than_turned_into_a_default</span>() {</span>
+<span class="ln" id="L354">        <span class="tok-com">// Silently substituting a default would write the recording somewhere</span></span>
+<span class="ln" id="L355">        <span class="tok-com">// the person did not name, which for an encrypted file they then have</span></span>
+<span class="ln" id="L356">        <span class="tok-com">// to find is worse than an error.</span></span>
+<span class="ln" id="L357">        assert!(<span class="tok-fn">destination</span>(<span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">new</span>())).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L358">    }</span>
+<span class="ln" id="L359">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

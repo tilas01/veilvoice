@@ -88,6 +88,10 @@ pub enum Error {
     /// Protected memory for a recording could not be prepared or filled.
     #[cfg(feature = "live")]
     Crypto(veilvoice_crypto::Error),
+    /// The recording is longer than a WAV file can describe. The payload is
+    /// how many bytes of audio it holds.
+    #[cfg(feature = "live")]
+    TooLong(usize),
 }
 
 impl From<std::io::Error> for Error {
@@ -115,6 +119,14 @@ impl std::fmt::Display for Error {
             Self::Engine(m) => write!(f, "de-identification engine error: {m}"),
             #[cfg(feature = "live")]
             Self::Crypto(e) => write!(f, "protected memory for the recording: {e}"),
+            #[cfg(feature = "live")]
+            Self::TooLong(bytes) => write!(
+                f,
+                "this recording holds {bytes} bytes of audio, and a WAV file states \
+                 its size in 32-bit fields, so it cannot describe more than {}. \
+                 Record in more than one part.",
+                u32::MAX as usize - 36
+            ),
         }
     }
 }

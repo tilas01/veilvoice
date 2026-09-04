@@ -38,6 +38,100 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twenty-eighth round: the post-quantum surface, and two defects in the hour-old recorder
+
+A sweep of the whole tree for the two questions that get asked most about a
+program like this: is any of the cryptography going to fall to a quantum
+computer, and does any secret outlive the code that was holding it. Both
+answers are mostly good, and the sweep is recorded here including the parts
+that found nothing, because "we looked and there was nothing" is a result.
+
+**Post-quantum.** X25519 appears in exactly one file, `hybrid.rs`, and never
+without ML-KEM-768 beside it. There is no classical-only asymmetric path
+anywhere in the tree to be found and forgotten. The two shared secrets are
+mixed with HKDF-SHA256 salted by a transcript of the encapsulation and the
+recipient's public key rather than concatenated, so breaking the result
+requires breaking both. Symmetric keys are 256-bit throughout, which is
+128-bit against Grover and is the reason no key length needed changing.
+
+**The one classical thing, said plainly.** Release signatures are OpenPGP, and
+OpenPGP signatures are not post-quantum. That is a supply-chain signature
+rather than confidentiality: a quantum adversary could forge a release
+signature in some future, but cannot use it to read a recording sealed today.
+It stays classical because there is no post-quantum OpenPGP anybody can verify
+with the GnuPG they already have, and shipping a signature nobody can check
+would be worse than shipping one that is honest about its horizon.
+
+**Memory safety.** All 27 crates carry `#![forbid(unsafe_code)]` and the tree
+contains no `unsafe` block at all, page locking included, which is what the
+`region` crate is for. Secrets compare in constant time, `Secret` renders as
+`Secret(N bytes, redacted)` so one cannot reach a log line through `{:?}`, and
+the container parser bounds-checks before indexing, uses `checked_add` for its
+one offset, constrains its only variable-length field to an exact expected
+size, and refuses a non-zero reserved byte rather than ignoring it. The
+memory-cost ceiling that stops a hostile container asking for gigabytes is
+applied before the derivation rather than after.
+
+Both defects this round are in `veilvoice-audio/src/record.rs`, which was
+written an hour earlier. That is not a coincidence and it is the argument for
+sweeping after writing rather than only before releasing.
+
+### F-147 -- a recording past twelve hours would have been silently short
+
+`veilvoice-audio/src/record.rs`.
+
+A WAV header states its sizes in unsigned 32-bit fields. `write_header` cast
+the data length into one with `as u32`, and computed the `RIFF` size as
+`36 + data_len` in the same width.
+
+Past `u32::MAX` bytes of audio, about twelve hours and twenty minutes at
+48 kHz 16-bit mono, both wrap. The file that comes out is not corrupt in any
+way a reader would reject: it opens, it plays, and it is a fraction of its real
+length, with the rest of the recording sitting in the file unreferenced. On a
+recording somebody made once and cannot make again, silently short is the worst
+shape a defect can take.
+
+Fixed by naming the format's own limit as `WAV_MAX_DATA` and refusing past it
+with `Error::TooLong`, which says what the limit is and that the recording
+should be made in parts. The check runs *before* the allocation, because a
+recording that long is already several gigabytes and reserving it in order to
+reject it would be its own defect. `write_header` now converts with
+`try_from(..).unwrap_or(u32::MAX)` and adds with `saturating_add`, so if that
+guard is ever moved or lost the header is obviously wrong rather than
+plausibly short. Two regression tests: one asserts the limit and brackets it
+in hours, the other drives `write_header` with `usize::MAX` and checks the
+result saturates.
+
+### F-148 -- abandoning a recording left the last block of audio in freed memory
+
+`veilvoice-audio/src/record.rs`.
+
+The recording itself is a `Tape`, every chunk of which is a `Secret`, so it
+wipes itself. The drain scratch is not: it is an ordinary `Vec<f32>` holding up
+to one drain's worth of veiled audio, and it was cleared in `wav` and in
+`discard` and nowhere else.
+
+Every other way out left it full. Ctrl-C during a recording, any error on the
+way to sealing, or simply dropping the recorder freed that buffer with the
+samples intact, after which the allocator is free to hand the same memory,
+contents unchanged, to anything else in the process. The module's own
+documentation claimed the recording never reaches unprotected memory it does
+not clean up, and for this buffer that was not true.
+
+Fixed with a `Drop` implementation. The wipe now lives in one private
+`wipe_scratch`, called by `wav`, by `discard` and by the destructor, so there
+is no second copy of the operation to drift; the regression test calls that
+same function rather than a mirror of it, which is what makes it a test of what
+the destructor actually runs.
+
+**What this does not reach, and the documentation now says so.** The lock-free
+ring between the audio callback and the recorder also holds veiled samples, up
+to eight seconds of them, and `ringbuf` exposes no way to clear its backing
+storage. Those bytes are freed unwiped and this module cannot prevent it. The
+exposure is veiled audio rather than key material, and it is the same audio the
+file holds, but it is not nothing, and a module claiming to wipe everything
+while leaving that would be making a false claim rather than an incomplete one.
+
 ## The twenty-seventh round: the sentences with a hole in the middle
 
 One class, found by reading every interface string in the tree rather than the
