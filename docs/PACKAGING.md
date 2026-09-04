@@ -274,9 +274,9 @@ wrong; v0.1.11 is the first release to carry an OpenBSD archive.
 | Linux x86_64 (gnu, musl) | yes | yes |
 | Linux arm64 (gnu, musl) | yes | yes |
 | Linux armv7 (Raspberry Pi) | yes | yes |
-| FreeBSD x86_64 | yes | **no**, built once in a VM |
-| OpenBSD x86_64 | yes, since v0.1.11 | not-verified (built once, in a VM) |
-| NetBSD x86_64 | yes | **no**, built once in a VM |
+| FreeBSD x86_64 | yes | yes, twice inside the VM |
+| OpenBSD x86_64 | yes, since v0.1.11 | yes, twice inside the VM |
+| NetBSD x86_64 | yes | yes, twice inside the VM |
 
 Windows 10 and 11 share one executable. They are not split, and will not be
 unless a measurement says they should be: shipping two identical binaries under
@@ -306,7 +306,18 @@ so by name, which is a better guard than a number nobody re-tests.
 
 The three BSD builds run in emulated VMs on a Linux runner, are the most
 fragile jobs in the workflow, and are allowed to fail without blocking a
-release. When one fails the release simply ships without that archive. Each is
-marked `not-verified` in its reproducibility report, because it is built once
-rather than twice. That is a statement about what was checked, not a suspicion
-about the binary.
+release. When one fails the release simply ships without that archive.
+
+**They are now built twice, like every other platform.** The second build runs
+inside the same VM, from a copy of the source at a different path, with the same
+`SOURCE_DATE_EPOCH` and the same `--remap-path-prefix` flags the other ten use,
+and the two binaries are compared byte for byte. The verdict each VM reaches is
+what its `repro-*.txt` says, so a BSD that stops reproducing is reported in
+those words rather than quietly losing the line. Until v0.1.18 these three said
+`not-verified (built once, in a VM)`, which was honest and was the only gap in
+the reproducibility claim.
+
+If a BSD job fails before the second build runs, the report says
+`not-verified (the second build did not run)`. That distinction matters: it is
+the difference between "we checked and it differed" and "we did not get to
+check", and collapsing the two would make the first look like the second.
