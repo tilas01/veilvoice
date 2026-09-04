@@ -341,6 +341,11 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+      # The VM has no git, and a build whose timestamp comes from the clock
+      # is a build that never reproduces. Written out here, where git
+      # exists, and read inside the VM.
+      - name: Pin the build timestamp for the VM
+        run: git log -1 --pretty=%ct > .source-date-epoch
       - name: Build the CLI in a FreeBSD VM
         uses: vmactions/freebsd-vm@v1
         with:
@@ -348,8 +353,40 @@ jobs:
           prepare: pkg install -y rust
           run: |
             set -e
+            # The same three things the other ten platforms do to make a build
+            # reproducible: pin the timestamp, remap the source path, and remap
+            # the cargo home. Without all three the second build below differs
+            # for reasons that have nothing to do with the source.
+            SOURCE_DATE_EPOCH="$(cat .source-date-epoch)"
+            export SOURCE_DATE_EPOCH
+            src_a="$(pwd -P)"
+            export RUSTFLAGS="--remap-path-prefix=$src_a=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
             cargo build --release --locked -p veilvoice-cli --no-default-features
             ./target/release/veilvoice info
+            cp target/release/veilvoice "$HOME/vv-first"
+
+            # Build again from a copy at a different path. This is the whole
+            # check: if the two differ, something in the build depends on where
+            # it happened or when, and "verify the binary matches the source"
+            # would be a claim nobody could act on.
+            rebuild="$HOME/vv-rebuild"
+            rm -rf "$rebuild"
+            cp -r "$src_a" "$rebuild"
+            cd "$rebuild"
+            src_b="$(pwd -P)"
+            export RUSTFLAGS="--remap-path-prefix=$src_b=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
+            cargo build --release --locked -p veilvoice-cli --no-default-features
+
+            if cmp -s "$HOME/vv-first" target/release/veilvoice; then
+              echo reproducible > "$src_a/.repro-verdict"
+            else
+              # Said in as many words rather than dropped: a platform that stops
+              # reproducing must be visible in the release, not silently absent.
+              echo "not-reproducible (two builds of the same source differ)" \
+                > "$src_a/.repro-verdict"
+              echo "::warning::the second build differs from the first"
+            fi
+            cd "$src_a"
       - name: Stage the archive
         run: |
           out="veilvoice-${{ env.VERSION_TAG }}-freebsd-x86_64"
@@ -374,7 +411,9 @@ jobs:
             echo "Run 'veilvoice info' to confirm what this binary supports."
           } > "dist/$out/FREEBSD-NOTES.txt"
           tar -C dist -czf "dist/$out.tar.gz" "$out"
-          echo "freebsd-x86_64: not-verified (built once, in a VM)" > dist/repro-freebsd-x86_64.txt
+          # The verdict the VM actually reached, not an assumption about it.
+          echo "freebsd-x86_64: $(cat .repro-verdict 2>/dev/null || echo 'not-verified (the second build did not run)')" \
+            > dist/repro-freebsd-x86_64.txt
       - uses: actions/upload-artifact@v4
         with:
           name: freebsd-x86_64
@@ -393,6 +432,11 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+      # The VM has no git, and a build whose timestamp comes from the clock
+      # is a build that never reproduces. Written out here, where git
+      # exists, and read inside the VM.
+      - name: Pin the build timestamp for the VM
+        run: git log -1 --pretty=%ct > .source-date-epoch
       - name: Build the CLI in a Openbsd VM
         uses: vmactions/openbsd-vm@v1
         with:
@@ -400,8 +444,40 @@ jobs:
           prepare: pkg_add rust
           run: |
             set -e
+            # The same three things the other ten platforms do to make a build
+            # reproducible: pin the timestamp, remap the source path, and remap
+            # the cargo home. Without all three the second build below differs
+            # for reasons that have nothing to do with the source.
+            SOURCE_DATE_EPOCH="$(cat .source-date-epoch)"
+            export SOURCE_DATE_EPOCH
+            src_a="$(pwd -P)"
+            export RUSTFLAGS="--remap-path-prefix=$src_a=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
             cargo build --release --locked -p veilvoice-cli --no-default-features
             ./target/release/veilvoice info
+            cp target/release/veilvoice "$HOME/vv-first"
+
+            # Build again from a copy at a different path. This is the whole
+            # check: if the two differ, something in the build depends on where
+            # it happened or when, and "verify the binary matches the source"
+            # would be a claim nobody could act on.
+            rebuild="$HOME/vv-rebuild"
+            rm -rf "$rebuild"
+            cp -r "$src_a" "$rebuild"
+            cd "$rebuild"
+            src_b="$(pwd -P)"
+            export RUSTFLAGS="--remap-path-prefix=$src_b=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
+            cargo build --release --locked -p veilvoice-cli --no-default-features
+
+            if cmp -s "$HOME/vv-first" target/release/veilvoice; then
+              echo reproducible > "$src_a/.repro-verdict"
+            else
+              # Said in as many words rather than dropped: a platform that stops
+              # reproducing must be visible in the release, not silently absent.
+              echo "not-reproducible (two builds of the same source differ)" \
+                > "$src_a/.repro-verdict"
+              echo "::warning::the second build differs from the first"
+            fi
+            cd "$src_a"
       - name: Stage the archive
         run: |
           out="veilvoice-${{ env.VERSION_TAG }}-openbsd-x86_64"
@@ -430,7 +506,9 @@ jobs:
           tar -C dist -czf "dist/$out.tar.gz" "$out"
           # Built once, in a VM, rather than twice in separate directories.
           # Reported as what it is rather than claimed.
-          echo "openbsd-x86_64: not-verified (built once, in a VM)" > dist/repro-openbsd-x86_64.txt
+          # The verdict the VM actually reached, not an assumption about it.
+          echo "openbsd-x86_64: $(cat .repro-verdict 2>/dev/null || echo 'not-verified (the second build did not run)')" \
+            > dist/repro-openbsd-x86_64.txt
       - uses: actions/upload-artifact@v4
         with:
           name: openbsd-x86_64
@@ -449,6 +527,11 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+      # The VM has no git, and a build whose timestamp comes from the clock
+      # is a build that never reproduces. Written out here, where git
+      # exists, and read inside the VM.
+      - name: Pin the build timestamp for the VM
+        run: git log -1 --pretty=%ct > .source-date-epoch
       - name: Build the CLI in a Netbsd VM
         uses: vmactions/netbsd-vm@v1
         with:
@@ -456,8 +539,40 @@ jobs:
           prepare: /usr/sbin/pkg_add rust
           run: |
             set -e
+            # The same three things the other ten platforms do to make a build
+            # reproducible: pin the timestamp, remap the source path, and remap
+            # the cargo home. Without all three the second build below differs
+            # for reasons that have nothing to do with the source.
+            SOURCE_DATE_EPOCH="$(cat .source-date-epoch)"
+            export SOURCE_DATE_EPOCH
+            src_a="$(pwd -P)"
+            export RUSTFLAGS="--remap-path-prefix=$src_a=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
             cargo build --release --locked -p veilvoice-cli --no-default-features
             ./target/release/veilvoice info
+            cp target/release/veilvoice "$HOME/vv-first"
+
+            # Build again from a copy at a different path. This is the whole
+            # check: if the two differ, something in the build depends on where
+            # it happened or when, and "verify the binary matches the source"
+            # would be a claim nobody could act on.
+            rebuild="$HOME/vv-rebuild"
+            rm -rf "$rebuild"
+            cp -r "$src_a" "$rebuild"
+            cd "$rebuild"
+            src_b="$(pwd -P)"
+            export RUSTFLAGS="--remap-path-prefix=$src_b=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
+            cargo build --release --locked -p veilvoice-cli --no-default-features
+
+            if cmp -s "$HOME/vv-first" target/release/veilvoice; then
+              echo reproducible > "$src_a/.repro-verdict"
+            else
+              # Said in as many words rather than dropped: a platform that stops
+              # reproducing must be visible in the release, not silently absent.
+              echo "not-reproducible (two builds of the same source differ)" \
+                > "$src_a/.repro-verdict"
+              echo "::warning::the second build differs from the first"
+            fi
+            cd "$src_a"
       - name: Stage the archive
         run: |
           out="veilvoice-${{ env.VERSION_TAG }}-netbsd-x86_64"
@@ -486,7 +601,9 @@ jobs:
           tar -C dist -czf "dist/$out.tar.gz" "$out"
           # Built once, in a VM, rather than twice in separate directories.
           # Reported as what it is rather than claimed.
-          echo "netbsd-x86_64: not-verified (built once, in a VM)" > dist/repro-netbsd-x86_64.txt
+          # The verdict the VM actually reached, not an assumption about it.
+          echo "netbsd-x86_64: $(cat .repro-verdict 2>/dev/null || echo 'not-verified (the second build did not run)')" \
+            > dist/repro-netbsd-x86_64.txt
       - uses: actions/upload-artifact@v4
         with:
           name: netbsd-x86_64
