@@ -917,7 +917,7 @@ impl Security {
             });
             let matched = !self.fresh.is_empty() && self.fresh == self.repeat;
 
-            ui.horizontal(|ui| {
+            button_column(ui, |ui| {
                 if ui
                     .add_enabled(
                         !busy && matched && !self.current.is_empty(),
@@ -966,10 +966,10 @@ impl Security {
                 password_row(ui, "repeat", &mut self.repeat);
             });
             let matched = !self.fresh.is_empty() && self.fresh == self.repeat;
-            if ui
-                .add_enabled(!busy && matched, egui::Button::new("set app lock"))
-                .clicked()
-            {
+            let set = button_column(ui, |ui| {
+                ui.add_enabled(!busy && matched, egui::Button::new("set app lock"))
+            });
+            if set.clicked() {
                 let fresh = std::mem::take(&mut self.fresh);
                 self.repeat.zeroize();
                 self.spawn(Op::Set, fresh, String::new());
@@ -1526,6 +1526,33 @@ const PASSWORD_LABEL_WIDTH: f32 = 82.0;
 /// x on every screen.
 ///
 /// Returns the field itself, so a caller, or a test, can ask where it landed.
+/// Draw `contents` in the same column the passphrase fields occupy.
+///
+/// The buttons under a passphrase field act on that field, and they were
+/// starting at the panel's left edge while the fields they belong to started
+/// one label-width in. The eye reads a left edge as a grouping, so the buttons
+/// looked like they belonged to the section rather than to the fields directly
+/// above them, and the further down the tab you went the more obviously the two
+/// columns disagreed.
+///
+/// Indented by the same [`PASSWORD_LABEL_WIDTH`] the labels reserve, so there
+/// is one column rather than two. Taking the width from that constant rather
+/// than repeating the number is what keeps them in step: changing the label
+/// column moves the buttons with it.
+fn button_column<R>(ui: &mut egui::Ui, contents: impl FnOnce(&mut egui::Ui) -> R) -> R {
+    ui.horizontal(|ui| {
+        // The label column *plus* the gap between it and the field. A field sits
+        // at `left + PASSWORD_LABEL_WIDTH + item_spacing`, because the row lays
+        // the label column and the field out as two items; a button indented by
+        // the width alone lands one gap short, which is the eight pixels this
+        // was out by. Read from the style rather than written as a number, so a
+        // theme with different spacing keeps the two in step.
+        ui.add_space(PASSWORD_LABEL_WIDTH + ui.spacing().item_spacing.x);
+        contents(ui)
+    })
+    .inner
+}
+
 fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) -> egui::Response {
     ui.horizontal(|ui| {
         ui.allocate_ui_with_layout(
@@ -1552,6 +1579,37 @@ fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) -> egui::Res
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The buttons under the passphrase fields start where the fields do.
+    ///
+    /// Measured rather than eyeballed: this renders a real `password_row` and a
+    /// real button in the same column and compares where each begins.
+    #[test]
+    fn a_lock_button_lines_up_with_the_field_above_it() {
+        let ctx = egui::Context::default();
+        let input = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(
+                egui::pos2(0.0, 0.0),
+                egui::vec2(640.0, 400.0),
+            )),
+            ..Default::default()
+        };
+        let mut field_x = 0.0f32;
+        let mut button_x = 0.0f32;
+        let _ = ctx.run(input, |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                let mut value = String::new();
+                field_x = password_row(ui, "current", &mut value).rect.left();
+                button_x = button_column(ui, |ui| ui.button("change password"))
+                    .rect
+                    .left();
+            });
+        });
+        assert!(
+            (field_x - button_x).abs() < 0.5,
+            "the field starts at {field_x} and the button under it at {button_x}"
+        );
+    }
 
     /// Every passphrase field starts at the same x, whatever its label says.
     ///
