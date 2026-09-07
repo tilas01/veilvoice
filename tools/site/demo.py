@@ -183,7 +183,7 @@ USECASES = [
 # it refuses to do. `tools/shots/sessions.py` records them; this is what each
 # one is for, which that file knows and no page can read out of it.
 SESSIONS = [
-    ("verify", "veilvoice-verify",
+    ("verify", "veilvoice",
      "Checking a download",
      "The published archive, its signed hash list, and the same question "
      "asked again of your own GnuPG."),

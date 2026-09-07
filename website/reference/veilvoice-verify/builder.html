@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/builder.svg" alt="builder.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/builder.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1148 lines &middot; <a href="builder.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1210 lines &middot; <a href="builder.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-question-this-answers-and-the-one-it-does-not">The question this answers, and the one it does not</a>
@@ -62,7 +62,7 @@
 <section id="s-about">
 <p>Build VeilVoice here, and compare what came out against what was published.</p>
 <h2 id="the-question-this-answers-and-the-one-it-does-not">The question this answers, and the one it does not</h2>
-<p><code>veilvoice-verify file</code> answers <em>is this download the one that was published</em>. This answers the harder one: <strong>is the published build the one this source produces</strong>. A signature says who made a file. Only a build says what the file is made of.</p>
+<p><code>veilvoice verify file</code> answers <em>is this download the one that was published</em>. This answers the harder one: <strong>is the published build the one this source produces</strong>. A signature says who made a file. Only a build says what the file is made of.</p>
 <p>It cannot answer it for anybody else. A build here proves something about this platform and this machine, and that is exactly how a reproducible-build claim is normally checked -- three machines give you three platforms verified. It is a real answer rather than a pretended one.</p>
 <h2 id="builds-for-every-operating-system-means-builds-for-the-one-it-is-on">&quot;Builds for every operating system&quot; means &quot;builds for the one it is on&quot;</h2>
 <p>A build needs that platform&#x27;s headers and linker. <code>veilvoice-cli</code> cannot be compiled for Linux from Windows because <code>alsa-sys</code> needs ALSA&#x27;s headers, and a macOS build needs Apple&#x27;s SDK, which Apple&#x27;s licence does not allow to be redistributed or run elsewhere. Every other crate cross-checks cleanly with <code>--target</code>, and that is a <em>type check</em>, not a binary anybody should install.</p>
@@ -76,37 +76,37 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1148 lines defining <strong>20 functions</strong> (16 public), <strong>3 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1210 lines defining <strong>20 functions</strong> (16 public), <strong>3 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Built</code> <span style="color:var(--muted)">line 73</span> &middot; What a build produced.</li>
-<li><code>struct Environment</code> <span style="color:var(--muted)">line 250</span> &middot; Everything that would otherwise differ between two builds of one source.</li>
-<li><code>enum Compared</code> <span style="color:var(--muted)">line 526</span> &middot; How a built file compared against the published list.</li>
+<li><code>struct Built</code> <span style="color:var(--muted)">line 79</span> &middot; What a build produced.</li>
+<li><code>struct Environment</code> <span style="color:var(--muted)">line 256</span> &middot; Everything that would otherwise differ between two builds of one source.</li>
+<li><code>enum Compared</code> <span style="color:var(--muted)">line 532</span> &middot; How a built file compared against the published list.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>looks_like_the_source</code> <span style="color:var(--muted)">line 88</span> &middot; Whether the source tree this is pointed at is really one.
+<li><code>looks_like_the_source</code> <span style="color:var(--muted)">line 94</span> &middot; Whether the source tree this is pointed at is really one.
 </li>
-<li><code>pinned_toolchain</code> <span style="color:var(--muted)">line 120</span> &middot; The compiler version the source tree pins itself to.
+<li><code>pinned_toolchain</code> <span style="color:var(--muted)">line 126</span> &middot; The compiler version the source tree pins itself to.
 </li>
-<li><code>Environment::describe</code> <span style="color:var(--muted)">line 272</span> &middot; The settings, for printing before a build.
+<li><code>Environment::describe</code> <span style="color:var(--muted)">line 278</span> &middot; The settings, for printing before a build.
 </li>
-<li><code>environment</code> <span style="color:var(--muted)">line 366</span> &middot; The environment the release is built in, for this tree on this machine.
+<li><code>environment</code> <span style="color:var(--muted)">line 372</span> &middot; The environment the release is built in, for this tree on this machine.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>as_the_compiler_sees_it</code>, <code>cargo_home</code>, <code>commit_date</code>, <code>host_triple</code>, <code>repro_link</code>, <code>target_directory</code>, <code>json_string_field</code></span>
 </li>
-<li><code>build</code> <span style="color:var(--muted)">line 417</span> &middot; Run the release build.
+<li><code>build</code> <span style="color:var(--muted)">line 423</span> &middot; Run the release build.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>target_directory</code>, <code>json_string_field</code></span>
 </li>
-<li><code>hash_what_was_built</code> <span style="color:var(--muted)">line 489</span> &middot; Hash every binary a release ships, from a directory a build left behind.
+<li><code>hash_what_was_built</code> <span style="color:var(--muted)">line 495</span> &middot; Hash every binary a release ships, from a directory a build left behind.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>with_platform_extension</code></span>
 </li>
-<li><code>compare</code> <span style="color:var(--muted)">line 559</span> &middot; Compare a build against a hash list.
+<li><code>compare</code> <span style="color:var(--muted)">line 565</span> &middot; Compare a build against a hash list.
 </li>
-<li><code>report_dependencies</code> <span style="color:var(--muted)">line 597</span> &middot; Report what a dependency check found.
+<li><code>report_dependencies</code> <span style="color:var(--muted)">line 603</span> &middot; Report what a dependency check found.
 </li>
-<li><code>install</code> <span style="color:var(--muted)">line 640</span> &middot; Run one install command, having been told yes.
+<li><code>install</code> <span style="color:var(--muted)">line 646</span> &middot; Run one install command, having been told yes.
 </li>
-<li><code>agreed</code> <span style="color:var(--muted)">line 666</span> &middot; Ask, and take only an unambiguous yes.
+<li><code>agreed</code> <span style="color:var(--muted)">line 672</span> &middot; Ask, and take only an unambiguous yes.
 </li>
-<li><code>status_for</code> <span style="color:var(--muted)">line 683</span> &middot; The status a comparison should exit with.
+<li><code>status_for</code> <span style="color:var(--muted)">line 689</span> &middot; The status a comparison should exit with.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all_matched</code></span>
 </li>
 </ul>
@@ -137,102 +137,102 @@
 <a href="builder.src.html#fn-looks_like_the_source">
 <rect x="38.9" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="137.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_like_the_source</text>
-<text x="137.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 88</text>
+<text x="137.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
 </a>
 <a href="builder.src.html#fn-pinned_toolchain">
 <rect x="262.2" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="340.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pinned_toolchain</text>
-<text x="340.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
+<text x="340.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
 </a>
 <a href="builder.src.html#fn-host_triple">
 <rect x="445.2" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="503.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">host_triple</text>
-<text x="503.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="503.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
 </a>
 <a href="builder.src.html#fn-target_directory">
 <rect x="43.0" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="121.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">target_directory</text>
-<text x="121.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<text x="121.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
 <a href="builder.src.html#fn-json_string_field">
 <rect x="98.2" y="620.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="180.7" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">json_string_field</text>
-<text x="180.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
+<text x="180.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
 <a href="builder.src.html#fn-environment-describe">
 <rect x="225.9" y="120.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="324.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Environment::describe</text>
-<text x="324.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
+<text x="324.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 278</text>
 </a>
 <a href="builder.src.html#fn-repro_link">
 <rect x="449.2" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="503.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">repro_link</text>
-<text x="503.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
+<text x="503.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 298</text>
 </a>
 <a href="builder.src.html#fn-cargo_home">
 <rect x="55.1" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="109.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cargo_home</text>
-<text x="109.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 307</text>
+<text x="109.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 313</text>
 </a>
 <a href="builder.src.html#fn-commit_date">
 <rect x="189.7" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="248.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">commit_date</text>
-<text x="248.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
+<text x="248.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 322</text>
 </a>
 <a href="builder.src.html#fn-as_the_compiler_sees_it">
 <rect x="332.3" y="220.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="439.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">as_the_compiler_sees_it</text>
-<text x="439.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
+<text x="439.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 347</text>
 </a>
 <a href="builder.src.html#fn-environment-2">
 <rect x="20.0" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="78.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">environment</text>
-<text x="78.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 366</text>
+<text x="78.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 372</text>
 </a>
 <a href="builder.src.html#fn-build">
 <rect x="162.7" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="208.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">build</text>
-<text x="208.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
+<text x="208.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
 </a>
 <a href="builder.src.html#fn-hash_what_was_built">
 <rect x="281.1" y="320.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="371.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hash_what_was_built</text>
-<text x="371.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 489</text>
+<text x="371.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 495</text>
 </a>
 <a href="builder.src.html#fn-with_platform_extension">
 <rect x="289.2" y="620.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="395.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">with_platform_extension</text>
-<text x="395.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 516</text>
+<text x="395.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 522</text>
 </a>
 <a href="builder.src.html#fn-compare">
 <rect x="488.3" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="534.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">compare</text>
-<text x="534.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 559</text>
+<text x="534.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 565</text>
 </a>
 <a href="builder.src.html#fn-all_matched">
 <rect x="20.0" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="78.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all_matched</text>
-<text x="78.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
+<text x="78.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 591</text>
 </a>
 <a href="builder.src.html#fn-report_dependencies">
 <rect x="162.7" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="253.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_dependencies</text>
-<text x="253.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 597</text>
+<text x="253.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 603</text>
 </a>
 <a href="builder.src.html#fn-install">
 <rect x="369.8" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="416.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 640</text>
+<text x="416.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 646</text>
 </a>
 <a href="builder.src.html#fn-agreed">
 <rect x="488.3" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="534.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">agreed</text>
-<text x="534.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 666</text>
+<text x="534.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 672</text>
 </a>
 <a href="builder.src.html#fn-status_for">
 <rect x="246.1" y="520.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="300.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status_for</text>
-<text x="300.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 683</text>
+<text x="300.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 689</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -251,26 +251,26 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_looks_like_the_source([&quot;looks_like_the_source&lt;br/&gt;line 88&quot;])
-    n_pinned_toolchain([&quot;pinned_toolchain&lt;br/&gt;line 120&quot;])
-    n_host_triple[&quot;host_triple&lt;br/&gt;line 133&quot;]
-    n_target_directory[&quot;target_directory&lt;br/&gt;line 162&quot;]
-    n_json_string_field[&quot;json_string_field&lt;br/&gt;line 193&quot;]
-    n_describe([&quot;Environment::describe&lt;br/&gt;line 272&quot;])
-    n_repro_link[&quot;repro_link&lt;br/&gt;line 292&quot;]
-    n_cargo_home[&quot;cargo_home&lt;br/&gt;line 307&quot;]
-    n_commit_date[&quot;commit_date&lt;br/&gt;line 316&quot;]
-    n_as_the_compiler_sees_it[&quot;as_the_compiler_sees_it&lt;br/&gt;line 341&quot;]
-    n_environment([&quot;environment&lt;br/&gt;line 366&quot;])
-    n_build([&quot;build&lt;br/&gt;line 417&quot;])
-    n_hash_what_was_built([&quot;hash_what_was_built&lt;br/&gt;line 489&quot;])
-    n_with_platform_extension[&quot;with_platform_extension&lt;br/&gt;line 516&quot;]
-    n_compare([&quot;compare&lt;br/&gt;line 559&quot;])
-    n_all_matched[&quot;all_matched&lt;br/&gt;line 585&quot;]
-    n_report_dependencies([&quot;report_dependencies&lt;br/&gt;line 597&quot;])
-    n_install([&quot;install&lt;br/&gt;line 640&quot;])
-    n_agreed([&quot;agreed&lt;br/&gt;line 666&quot;])
-    n_status_for([&quot;status_for&lt;br/&gt;line 683&quot;])
+    n_looks_like_the_source([&quot;looks_like_the_source&lt;br/&gt;line 94&quot;])
+    n_pinned_toolchain([&quot;pinned_toolchain&lt;br/&gt;line 126&quot;])
+    n_host_triple[&quot;host_triple&lt;br/&gt;line 139&quot;]
+    n_target_directory[&quot;target_directory&lt;br/&gt;line 168&quot;]
+    n_json_string_field[&quot;json_string_field&lt;br/&gt;line 199&quot;]
+    n_describe([&quot;Environment::describe&lt;br/&gt;line 278&quot;])
+    n_repro_link[&quot;repro_link&lt;br/&gt;line 298&quot;]
+    n_cargo_home[&quot;cargo_home&lt;br/&gt;line 313&quot;]
+    n_commit_date[&quot;commit_date&lt;br/&gt;line 322&quot;]
+    n_as_the_compiler_sees_it[&quot;as_the_compiler_sees_it&lt;br/&gt;line 347&quot;]
+    n_environment([&quot;environment&lt;br/&gt;line 372&quot;])
+    n_build([&quot;build&lt;br/&gt;line 423&quot;])
+    n_hash_what_was_built([&quot;hash_what_was_built&lt;br/&gt;line 495&quot;])
+    n_with_platform_extension[&quot;with_platform_extension&lt;br/&gt;line 522&quot;]
+    n_compare([&quot;compare&lt;br/&gt;line 565&quot;])
+    n_all_matched[&quot;all_matched&lt;br/&gt;line 591&quot;]
+    n_report_dependencies([&quot;report_dependencies&lt;br/&gt;line 603&quot;])
+    n_install([&quot;install&lt;br/&gt;line 646&quot;])
+    n_agreed([&quot;agreed&lt;br/&gt;line 672&quot;])
+    n_status_for([&quot;status_for&lt;br/&gt;line 689&quot;])
     n_build --&gt; n_target_directory
     n_environment --&gt; n_as_the_compiler_sees_it
     n_environment --&gt; n_cargo_home
@@ -281,26 +281,26 @@ flowchart TD
     n_hash_what_was_built --&gt; n_with_platform_extension
     n_status_for --&gt; n_all_matched
     n_target_directory --&gt; n_json_string_field
-    click n_looks_like_the_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L88&quot; &quot;open the source&quot;
-    click n_pinned_toolchain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L120&quot; &quot;open the source&quot;
-    click n_host_triple href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L133&quot; &quot;open the source&quot;
-    click n_target_directory href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L162&quot; &quot;open the source&quot;
-    click n_json_string_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L193&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L272&quot; &quot;open the source&quot;
-    click n_repro_link href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L292&quot; &quot;open the source&quot;
-    click n_cargo_home href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L307&quot; &quot;open the source&quot;
-    click n_commit_date href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L316&quot; &quot;open the source&quot;
-    click n_as_the_compiler_sees_it href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L341&quot; &quot;open the source&quot;
-    click n_environment href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L366&quot; &quot;open the source&quot;
-    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L417&quot; &quot;open the source&quot;
-    click n_hash_what_was_built href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L489&quot; &quot;open the source&quot;
-    click n_with_platform_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L516&quot; &quot;open the source&quot;
-    click n_compare href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L559&quot; &quot;open the source&quot;
-    click n_all_matched href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L585&quot; &quot;open the source&quot;
-    click n_report_dependencies href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L597&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L640&quot; &quot;open the source&quot;
-    click n_agreed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L666&quot; &quot;open the source&quot;
-    click n_status_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L683&quot; &quot;open the source&quot;
+    click n_looks_like_the_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L94&quot; &quot;open the source&quot;
+    click n_pinned_toolchain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L126&quot; &quot;open the source&quot;
+    click n_host_triple href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L139&quot; &quot;open the source&quot;
+    click n_target_directory href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L168&quot; &quot;open the source&quot;
+    click n_json_string_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L199&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L278&quot; &quot;open the source&quot;
+    click n_repro_link href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L298&quot; &quot;open the source&quot;
+    click n_cargo_home href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L313&quot; &quot;open the source&quot;
+    click n_commit_date href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L322&quot; &quot;open the source&quot;
+    click n_as_the_compiler_sees_it href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L347&quot; &quot;open the source&quot;
+    click n_environment href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L372&quot; &quot;open the source&quot;
+    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L423&quot; &quot;open the source&quot;
+    click n_hash_what_was_built href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L495&quot; &quot;open the source&quot;
+    click n_with_platform_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L522&quot; &quot;open the source&quot;
+    click n_compare href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L565&quot; &quot;open the source&quot;
+    click n_all_matched href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L591&quot; &quot;open the source&quot;
+    click n_report_dependencies href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L603&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L646&quot; &quot;open the source&quot;
+    click n_agreed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L672&quot; &quot;open the source&quot;
+    click n_status_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L689&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_looks_like_the_source,n_pinned_toolchain,n_describe,n_environment,n_build,n_hash_what_was_built,n_compare,n_report_dependencies,n_install,n_agreed,n_status_for entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -315,30 +315,30 @@ flowchart TD
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>RELEASE_ARGS</code> <sub>pub const</sub></td><td><a href="builder.src.html#fn-release_args">63</a></td><td>The profile a release is built with.</td></tr>
 <tr><td><code>RELEASE_DIR</code> <sub>pub const</sub></td><td><a href="builder.src.html#fn-release_dir">66</a></td><td>Where a release build leaves its binaries, relative to the target directory.</td></tr>
-<tr><td><code>SHIPPED</code> <sub>pub const</sub></td><td><a href="builder.src.html#fn-shipped">69</a></td><td>The binaries a release publishes, without any platform extension.</td></tr>
-<tr><td><code>Built</code> <sub>pub struct</sub></td><td><a href="builder.src.html#fn-built">73</a></td><td>What a build produced.</td></tr>
-<tr><td><code>looks_like_the_source</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-looks_like_the_source">88</a></td><td>Whether the source tree this is pointed at is really one.</td></tr>
-<tr><td><code>pinned_toolchain</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-pinned_toolchain">120</a></td><td>The compiler version the source tree pins itself to.</td></tr>
-<tr><td><code>host_triple</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-host_triple">133</a></td><td>The platform triple this build is for, as rustc names it.</td></tr>
-<tr><td><code>target_directory</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-target_directory">162</a></td><td>Where this workspace&#x27;s build output actually goes.</td></tr>
-<tr><td><code>json_string_field</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-json_string_field">193</a></td><td>One top-level string out of cargo&#x27;s JSON, without a JSON parser.</td></tr>
-<tr><td><code>Environment</code> <sub>pub struct</sub></td><td><a href="builder.src.html#fn-environment">250</a></td><td>Everything that would otherwise differ between two builds of one source.</td></tr>
-<tr><td><code>Environment::describe</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-environment-describe">272</a></td><td>The settings, for printing before a build.</td></tr>
-<tr><td><code>repro_link</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-repro_link">292</a></td><td>Flags that make this platform&#x27;s linker deterministic.</td></tr>
-<tr><td><code>cargo_home</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-cargo_home">307</a></td><td>Where cargo keeps downloaded crates, whose paths are also baked in.</td></tr>
-<tr><td><code>commit_date</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-commit_date">316</a></td><td>The date of the commit being built, as seconds since the epoch.</td></tr>
-<tr><td><code>as_the_compiler_sees_it</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-as_the_compiler_sees_it">341</a></td><td>A path as the compiler will see it, for the remapping to match.</td></tr>
-<tr><td><code>environment</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-environment-2">366</a></td><td>The environment the release is built in, for this tree on this machine.</td></tr>
-<tr><td><code>build</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-build">417</a></td><td>Run the release build.</td></tr>
-<tr><td><code>hash_what_was_built</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-hash_what_was_built">489</a></td><td>Hash every binary a release ships, from a directory a build left behind.</td></tr>
-<tr><td><code>with_platform_extension</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-with_platform_extension">516</a></td><td>A binary&#x27;s name on this platform.</td></tr>
-<tr><td><code>Compared</code> <sub>pub enum</sub></td><td><a href="builder.src.html#fn-compared">526</a></td><td>How a built file compared against the published list.</td></tr>
-<tr><td><code>compare</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-compare">559</a></td><td>Compare a build against a hash list.</td></tr>
-<tr><td><code>all_matched</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-all_matched">585</a></td><td>Whether every file that could be compared matched.</td></tr>
-<tr><td><code>report_dependencies</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-report_dependencies">597</a></td><td>Report what a dependency check found.</td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-install">640</a></td><td>Run one install command, having been told yes.</td></tr>
-<tr><td><code>agreed</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-agreed">666</a></td><td>Ask, and take only an unambiguous yes.</td></tr>
-<tr><td><code>status_for</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-status_for">683</a></td><td>The status a comparison should exit with.</td></tr>
+<tr><td><code>SHIPPED</code> <sub>pub const</sub></td><td><a href="builder.src.html#fn-shipped">75</a></td><td>The binaries a release publishes, without any platform extension.</td></tr>
+<tr><td><code>Built</code> <sub>pub struct</sub></td><td><a href="builder.src.html#fn-built">79</a></td><td>What a build produced.</td></tr>
+<tr><td><code>looks_like_the_source</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-looks_like_the_source">94</a></td><td>Whether the source tree this is pointed at is really one.</td></tr>
+<tr><td><code>pinned_toolchain</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-pinned_toolchain">126</a></td><td>The compiler version the source tree pins itself to.</td></tr>
+<tr><td><code>host_triple</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-host_triple">139</a></td><td>The platform triple this build is for, as rustc names it.</td></tr>
+<tr><td><code>target_directory</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-target_directory">168</a></td><td>Where this workspace&#x27;s build output actually goes.</td></tr>
+<tr><td><code>json_string_field</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-json_string_field">199</a></td><td>One top-level string out of cargo&#x27;s JSON, without a JSON parser.</td></tr>
+<tr><td><code>Environment</code> <sub>pub struct</sub></td><td><a href="builder.src.html#fn-environment">256</a></td><td>Everything that would otherwise differ between two builds of one source.</td></tr>
+<tr><td><code>Environment::describe</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-environment-describe">278</a></td><td>The settings, for printing before a build.</td></tr>
+<tr><td><code>repro_link</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-repro_link">298</a></td><td>Flags that make this platform&#x27;s linker deterministic.</td></tr>
+<tr><td><code>cargo_home</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-cargo_home">313</a></td><td>Where cargo keeps downloaded crates, whose paths are also baked in.</td></tr>
+<tr><td><code>commit_date</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-commit_date">322</a></td><td>The date of the commit being built, as seconds since the epoch.</td></tr>
+<tr><td><code>as_the_compiler_sees_it</code> <sub>fn</sub></td><td><a href="builder.src.html#fn-as_the_compiler_sees_it">347</a></td><td>A path as the compiler will see it, for the remapping to match.</td></tr>
+<tr><td><code>environment</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-environment-2">372</a></td><td>The environment the release is built in, for this tree on this machine.</td></tr>
+<tr><td><code>build</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-build">423</a></td><td>Run the release build.</td></tr>
+<tr><td><code>hash_what_was_built</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-hash_what_was_built">495</a></td><td>Hash every binary a release ships, from a directory a build left behind.</td></tr>
+<tr><td><code>with_platform_extension</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-with_platform_extension">522</a></td><td>A binary&#x27;s name on this platform.</td></tr>
+<tr><td><code>Compared</code> <sub>pub enum</sub></td><td><a href="builder.src.html#fn-compared">532</a></td><td>How a built file compared against the published list.</td></tr>
+<tr><td><code>compare</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-compare">565</a></td><td>Compare a build against a hash list.</td></tr>
+<tr><td><code>all_matched</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-all_matched">591</a></td><td>Whether every file that could be compared matched.</td></tr>
+<tr><td><code>report_dependencies</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-report_dependencies">603</a></td><td>Report what a dependency check found.</td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-install">646</a></td><td>Run one install command, having been told yes.</td></tr>
+<tr><td><code>agreed</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-agreed">672</a></td><td>Ask, and take only an unambiguous yes.</td></tr>
+<tr><td><code>status_for</code> <sub>pub fn</sub></td><td><a href="builder.src.html#fn-status_for">689</a></td><td>The status a comparison should exit with.</td></tr>
 </tbody></table>
 </section>
 </div></div>

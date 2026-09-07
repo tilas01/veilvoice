@@ -72,7 +72,7 @@ fn stage(root: &Path, name: &str) -> PathBuf {
     let release = root.join(name);
     std::fs::create_dir_all(release.join("docs")).unwrap();
     std::fs::write(release.join("veilvoice"), b"the command line").unwrap();
-    std::fs::write(release.join("veilvoice-verify"), b"the verifier").unwrap();
+    std::fs::write(release.join("veilvoice-gui"), b"the window").unwrap();
     std::fs::write(release.join("README.md"), b"# VeilVoice\n").unwrap();
     std::fs::write(release.join("docs/INSTALL.md"), b"install this\n").unwrap();
     // **F-102.** A name beginning with a dot. The generator used to normalise

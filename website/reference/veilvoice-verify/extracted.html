@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/extracted.svg" alt="extracted.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/extracted.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 312 lines &middot; <a href="extracted.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 316 lines &middot; <a href="extracted.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#this-used-to-be-the-honest-limit-and-it-is-not-the-limit-any-more">This used to be the honest limit, and it is not the limit any more</a>
@@ -77,19 +77,19 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>312 lines defining <strong>5 functions</strong> (4 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>316 lines defining <strong>5 functions</strong> (4 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Program</code> <span style="color:var(--muted)">line 70</span> &middot; One program found in an extracted directory.</li>
-<li><code>struct Extracted</code> <span style="color:var(--muted)">line 83</span> &middot; What an extracted directory turned out to hold.</li>
+<li><code>struct Program</code> <span style="color:var(--muted)">line 74</span> &middot; One program found in an extracted directory.</li>
+<li><code>struct Extracted</code> <span style="color:var(--muted)">line 87</span> &middot; What an extracted directory turned out to hold.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Extracted::is_empty</code> <span style="color:var(--muted)">line 92</span> &middot; Whether anything was found at all.
+<li><code>Extracted::is_empty</code> <span style="color:var(--muted)">line 96</span> &middot; Whether anything was found at all.
 </li>
-<li><code>Extracted::not_runnable</code> <span style="color:var(--muted)">line 97</span> &middot; The programs the operating system will not run.
+<li><code>Extracted::not_runnable</code> <span style="color:var(--muted)">line 101</span> &middot; The programs the operating system will not run.
 </li>
-<li><code>directory_for</code> <span style="color:var(--muted)">line 107</span> &middot; The directory an archive would extract into, by this project&#x27;s naming.
+<li><code>directory_for</code> <span style="color:var(--muted)">line 111</span> &middot; The directory an archive would extract into, by this project&#x27;s naming.
 </li>
-<li><code>look_in</code> <span style="color:var(--muted)">line 119</span> &middot; Look in directory for the programs a release carries.
+<li><code>look_in</code> <span style="color:var(--muted)">line 123</span> &middot; Look in directory for the programs a release carries.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>runnable</code></span>
 </li>
 </ul>
@@ -111,27 +111,27 @@
 <a href="extracted.src.html#fn-extracted-is_empty">
 <rect x="20.0" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="110.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Extracted::is_empty</text>
-<text x="110.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="110.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 96</text>
 </a>
 <a href="extracted.src.html#fn-extracted-not_runnable">
 <rect x="227.1" y="20.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="333.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Extracted::not_runnable</text>
-<text x="333.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
+<text x="333.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
 </a>
 <a href="extracted.src.html#fn-directory_for">
 <rect x="466.5" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="532.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">directory_for</text>
-<text x="532.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
+<text x="532.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
 <a href="extracted.src.html#fn-look_in">
 <rect x="263.4" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="309.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in</text>
-<text x="309.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 119</text>
+<text x="309.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
 </a>
 <a href="extracted.src.html#fn-runnable">
 <rect x="263.4" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="309.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">runnable</text>
-<text x="309.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
+<text x="309.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -148,17 +148,17 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_is_empty([&quot;Extracted::is_empty&lt;br/&gt;line 92&quot;])
-    n_not_runnable([&quot;Extracted::not_runnable&lt;br/&gt;line 97&quot;])
-    n_directory_for([&quot;directory_for&lt;br/&gt;line 107&quot;])
-    n_look_in([&quot;look_in&lt;br/&gt;line 119&quot;])
-    n_runnable[&quot;runnable&lt;br/&gt;line 140&quot;]
+    n_is_empty([&quot;Extracted::is_empty&lt;br/&gt;line 96&quot;])
+    n_not_runnable([&quot;Extracted::not_runnable&lt;br/&gt;line 101&quot;])
+    n_directory_for([&quot;directory_for&lt;br/&gt;line 111&quot;])
+    n_look_in([&quot;look_in&lt;br/&gt;line 123&quot;])
+    n_runnable[&quot;runnable&lt;br/&gt;line 144&quot;]
     n_look_in --&gt; n_runnable
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L92&quot; &quot;open the source&quot;
-    click n_not_runnable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L97&quot; &quot;open the source&quot;
-    click n_directory_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L107&quot; &quot;open the source&quot;
-    click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L119&quot; &quot;open the source&quot;
-    click n_runnable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L140&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L96&quot; &quot;open the source&quot;
+    click n_not_runnable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L101&quot; &quot;open the source&quot;
+    click n_directory_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111&quot; &quot;open the source&quot;
+    click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L123&quot; &quot;open the source&quot;
+    click n_runnable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L144&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_empty,n_not_runnable,n_directory_for,n_look_in entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -169,14 +169,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>PROGRAMS</code> <sub>pub const</sub></td><td><a href="extracted.src.html#fn-programs">66</a></td><td>The programs a release archive carries.</td></tr>
-<tr><td><code>Program</code> <sub>pub struct</sub></td><td><a href="extracted.src.html#fn-program">70</a></td><td>One program found in an extracted directory.</td></tr>
-<tr><td><code>Extracted</code> <sub>pub struct</sub></td><td><a href="extracted.src.html#fn-extracted">83</a></td><td>What an extracted directory turned out to hold.</td></tr>
-<tr><td><code>Extracted::is_empty</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-extracted-is_empty">92</a></td><td>Whether anything was found at all.</td></tr>
-<tr><td><code>Extracted::not_runnable</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-extracted-not_runnable">97</a></td><td>The programs the operating system will not run.</td></tr>
-<tr><td><code>directory_for</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-directory_for">107</a></td><td>The directory an archive would extract into, by this project&#x27;s naming.</td></tr>
-<tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-look_in">119</a></td><td>Look in directory for the programs a release carries.</td></tr>
-<tr><td><code>runnable</code> <sub>fn</sub></td><td><a href="extracted.src.html#fn-runnable">140</a></td><td>Whether the operating system will run this file.</td></tr>
+<tr><td><code>PROGRAMS</code> <sub>pub const</sub></td><td><a href="extracted.src.html#fn-programs">70</a></td><td>The programs a release archive carries.</td></tr>
+<tr><td><code>Program</code> <sub>pub struct</sub></td><td><a href="extracted.src.html#fn-program">74</a></td><td>One program found in an extracted directory.</td></tr>
+<tr><td><code>Extracted</code> <sub>pub struct</sub></td><td><a href="extracted.src.html#fn-extracted">87</a></td><td>What an extracted directory turned out to hold.</td></tr>
+<tr><td><code>Extracted::is_empty</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-extracted-is_empty">96</a></td><td>Whether anything was found at all.</td></tr>
+<tr><td><code>Extracted::not_runnable</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-extracted-not_runnable">101</a></td><td>The programs the operating system will not run.</td></tr>
+<tr><td><code>directory_for</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-directory_for">111</a></td><td>The directory an archive would extract into, by this project&#x27;s naming.</td></tr>
+<tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-look_in">123</a></td><td>Look in directory for the programs a release carries.</td></tr>
+<tr><td><code>runnable</code> <sub>fn</sub></td><td><a href="extracted.src.html#fn-runnable">144</a></td><td>Whether the operating system will run this file.</td></tr>
 </tbody></table>
 </section>
 </div></div>

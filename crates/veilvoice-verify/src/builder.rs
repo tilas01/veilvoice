@@ -3,7 +3,7 @@
 //!
 //! # The question this answers, and the one it does not
 //!
-//! `veilvoice-verify file` answers *is this download the one that was
+//! `veilvoice verify file` answers *is this download the one that was
 //! published*. This answers the harder one: **is the published build the one
 //! this source produces**. A signature says who made a file. Only a build says
 //! what the file is made of.
@@ -66,7 +66,13 @@ pub const RELEASE_ARGS: &[&str] = &["build", "--release", "--workspace", "--lock
 pub const RELEASE_DIR: &str = "release";
 
 /// The binaries a release publishes, without any platform extension.
-pub const SHIPPED: &[&str] = &["veilvoice", "veilvoice-gui", "veilvoice-verify"];
+///
+/// Two, not three. `veilvoice-verify` was a third executable until 0.1.18 and
+/// is now a library inside these two, reached as `veilvoice verify` and as the
+/// desktop application's Verify tab. Leaving it here made this report a file
+/// short on every platform: a name in `absent` that no release has published
+/// since, which reads as a build that failed to produce something.
+pub const SHIPPED: &[&str] = &["veilvoice", "veilvoice-gui"];
 
 /// What a build produced.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1144,5 +1150,61 @@ mod tests {
         for name in SHIPPED {
             assert!(why.contains(name), "{why}");
         }
+    }
+
+    /// The list of published binaries is read from the job that publishes them.
+    ///
+    /// Three copies of this list exist: here, in `extracted::PROGRAMS`, and in
+    /// `veilvoice-setup`'s installer. All three named `veilvoice-verify` for a
+    /// release after it stopped being a binary, which cost nothing visible and
+    /// was wrong in the same way in three places, because nothing tied them to
+    /// the one authority on the question.
+    ///
+    /// The authority is `.github/workflows/release.yml`, which stages exactly
+    /// what goes into an archive. Reading it rather than restating it means a
+    /// binary added or removed there fails here on the same commit, instead of
+    /// being noticed a release later by somebody reading a report.
+    #[test]
+    fn the_published_binaries_are_the_ones_the_release_job_stages() {
+        let workflow = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../.github/workflows/release.yml");
+        let text = std::fs::read_to_string(&workflow)
+            .unwrap_or_else(|e| panic!("{}: {e}", workflow.display()));
+
+        // The lines are `echo "BINARIES=veilvoice veilvoice-gui" >> ...`, and
+        // the names between the `=` and the closing quote are the answer.
+        //
+        // Every such line, unioned, rather than the first one: the job sets
+        // BINARIES twice, once for the targets where the window cannot be
+        // built and once for the rest, and `SHIPPED` is the list of everything
+        // a release can publish rather than what one platform got. A build
+        // missing a name it could have had is what `absent` is for.
+        let mut staged: Vec<&str> = Vec::new();
+        for line in text.lines() {
+            let Some(after) = line.split_once("BINARIES=") else {
+                continue;
+            };
+            let Some((names, _)) = after.1.split_once('"') else {
+                continue;
+            };
+            for name in names.split_whitespace() {
+                if !staged.contains(&name) {
+                    staged.push(name);
+                }
+            }
+        }
+        assert!(!staged.is_empty(), "release.yml sets BINARIES");
+        staged.sort_unstable();
+
+        let mut ours = SHIPPED.to_vec();
+        ours.sort_unstable();
+        assert_eq!(ours, staged, "release.yml stages {staged:?}");
+
+        let mut theirs = crate::extracted::PROGRAMS.to_vec();
+        theirs.sort_unstable();
+        assert_eq!(
+            ours, theirs,
+            "what a build produces and what an archive is searched for must match"
+        );
     }
 }

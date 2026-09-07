@@ -266,7 +266,7 @@ mod tests {
         let extracted = download.path().join("veilvoice-v0.1.15-linux-x86_64");
         std::fs::create_dir(&extracted).unwrap();
         touch(&extracted, "veilvoice");
-        touch(&extracted, "veilvoice-verify");
+        touch(&extracted, "veilvoice-gui");
 
         // Asked about the extracted folder, which is where the user is.
         let places = places(Some(&extracted));

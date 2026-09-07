@@ -585,3 +585,120 @@ fn no_interface_string_has_a_gap_where_a_line_continuation_belongs() {
          middle of it: {found:?}"
     );
 }
+
+/// Nothing a reader is meant to type still names a `veilvoice-verify` program.
+///
+/// The verifier was an executable of its own until 0.1.18 and is now part of
+/// `veilvoice` and of the desktop application. What was left behind was not one
+/// stale sentence but a scattering of them: three lists of the binaries a
+/// release ships, a recorded terminal session on the front page whose prompt
+/// showed a command that no longer runs, the front page's own "ships in every
+/// archive" paragraph, a Windows icon check looking for a third executable, and
+/// the help text this program prints when it cannot download.
+///
+/// Each was harmless on its own and the set of them told a reader to run
+/// something that does not exist. So the rule is checked rather than
+/// remembered: `veilvoice-verify` followed by a flag or a subcommand, or with a
+/// path in front of it, is an instruction to run a program, and there is no
+/// such program.
+///
+/// **What is deliberately not checked.** The crate is still called
+/// `veilvoice-verify` and naming it is correct. So is describing what the
+/// program used to do: `docs/AUDIT.md`, `CHANGELOG.md` and the release notes
+/// generated from it are records of what happened, and rewriting a record to
+/// match the present is how a project loses the ability to say when something
+/// changed. Those files are named here with that reason rather than skipped
+/// quietly.
+///
+/// # In plain words
+///
+/// Checks that no page tells you to run a program that was removed, while
+/// leaving the history that mentions it alone.
+#[test]
+fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
+    use std::path::{Path, PathBuf};
+
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../");
+
+    // Records of the past, which are allowed to describe it.
+    let history = [
+        "AUDIT.md",
+        "CHANGELOG.md",
+        "releases.html",
+        "search.html",
+        "search-index.json",
+    ];
+
+    // What follows the name when it is being run rather than named.
+    let invoked = [
+        " --", " -q", " auto", " file", " deps", " gnupg", " hash", " reproduce", " help",
+    ];
+
+    fn gather(dir: &Path, into: &mut Vec<PathBuf>) {
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                gather(&path, into);
+            } else if path.extension().is_some_and(|e| {
+                ["md", "html", "txt", "py", "sh", "ps1", "bat", "rs"]
+                    .contains(&e.to_string_lossy().as_ref())
+            }) {
+                into.push(path);
+            }
+        }
+    }
+
+    let mut files = Vec::new();
+    for place in ["README.md", "docs", "website", "packaging", "tools", "assets/screenshots"] {
+        let path = root.join(place);
+        if path.is_dir() {
+            gather(&path, &mut files);
+        } else if path.is_file() {
+            files.push(path);
+        }
+    }
+    assert!(files.len() > 50, "only {} files were read", files.len());
+
+    let mut wrong = Vec::new();
+    for path in &files {
+        let name = path.file_name().unwrap_or_default().to_string_lossy().into_owned();
+        if history.contains(&name.as_str()) {
+            continue;
+        }
+        // This test's own explanation names the thing it forbids.
+        if path.ends_with("tests.rs") {
+            continue;
+        }
+        let Ok(text) = std::fs::read_to_string(path) else {
+            continue;
+        };
+        for (number, line) in text.replace("\r\n", "\n").lines().enumerate() {
+            let Some(at) = line.find("veilvoice-verify") else {
+                continue;
+            };
+            let rest = &line[at + "veilvoice-verify".len()..];
+            // A path in front of it only counts when the name ends there.
+            // With another segment after it the line is naming a source file
+            // inside the crate; with nothing after it, a leading `./` or an
+            // absolute path makes it a command somebody is told to run.
+            let ends_here = rest.is_empty()
+                || rest.starts_with([' ', '`', '"', '\'', ',', '.', ')']);
+            let run = invoked.iter().any(|form| rest.starts_with(form))
+                || (line[..at].ends_with('/') && ends_here && !rest.starts_with('.'));
+            if run {
+                wrong.push(format!("{}:{}: {}", name, number + 1, line.trim()));
+            }
+        }
+    }
+
+    assert!(
+        wrong.is_empty(),
+        "these tell a reader to run `veilvoice-verify`, which has not been a \
+         program since 0.1.18. It is `veilvoice verify`, and the desktop \
+         application's Verify tab:\n{}",
+        wrong.join("\n")
+    );
+}
