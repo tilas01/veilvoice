@@ -111,6 +111,20 @@ CONTENTS_FROM = (0, 1, 15)
 
 VERIFIER_SOURCE = os.path.join("crates", "veilvoice-verify", "src", "lib.rs")
 
+# Where the Verify tab's capture goes. A line of its own in the Markdown, swapped
+# for markup after rendering.
+FIGURE = "<!--verify-tab-figure-->"
+FIGURE_HTML = (
+    '<figure class="shot">'
+    '<img src="assets/screenshots/gui-verify.png" '
+    'alt="the Verify tab, with a slot each for the archive, SHA256SUMS and '
+    'SHA256SUMS.asc" loading="lazy" width="1400" height="1000">'
+    "<figcaption><strong>The Verify tab.</strong> All three slots are shown "
+    "before anything is dropped, and each of the three answers is drawn on its "
+    "own.</figcaption>"
+    "</figure>"
+)
+
 # The signing key's fingerprint, read from the crate that carries it rather
 # than typed again. This is the one value in the whole chain that a person has
 # to compare by eye, so a wrong copy of it here would be the worst possible
@@ -393,6 +407,15 @@ def verify_markdown(version):
     add("")
     for index, step in enumerate(GUI_STEPS, 1):
         add("%d. %s" % (index, step))
+    add("")
+    # The tab itself, as a sentinel the builder replaces with markup: this
+    # renderer escapes raw HTML, which is right for it and means a picture has
+    # to be put in from outside.
+    #
+    # A capture rather than a drawing. The file is re-taken from the running
+    # window on every build, which is the difference between showing somebody
+    # the program and showing them what it used to look like.
+    add(FIGURE)
     add("")
 
     add("### Checking the source rather than the download")
@@ -720,7 +743,13 @@ def build():
     body = tutorial[tutorial.index("### With VeilVoice itself, no GnuPG required"):]
     preamble = tutorial[1:tutorial.index("### With VeilVoice itself, no GnuPG required")]
     out.extend(docs.doc_html(preamble, ids_for(preamble)))
-    out.extend(docs.doc_html(body, ids_for(body)))
+    # The capture sits between two rendered halves rather than inside either,
+    # because the renderer escapes markup and should go on doing so.
+    at = body.index(FIGURE)
+    before, after = body[:at], body[at + 1:]
+    out.extend(docs.doc_html(before, ids_for(before)))
+    out.append(FIGURE_HTML)
+    out.extend(docs.doc_html(after, ids_for(after)))
     out.append("</details>")
 
     pending = unreleased(text)
