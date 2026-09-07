@@ -131,6 +131,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>Press the button once. It checks the signature over the hash list, then the archive against that list, then every file extracted out of the archive against the signed contents list, and then runs the GnuPG on this machine over the same signature.</li>
 <li>Read the three answers, which are drawn separately on purpose so a pass on one is never mistaken for a pass on another. A release published before v0.1.15 carries no contents list and simply has no such row. A GnuPG that will not run on this machine is drawn quietly: that is a fact about the computer and says nothing about the download.</li>
 </ol>
+<figure class="shot"><img src="assets/screenshots/gui-verify.png" alt="the Verify tab, with a slot each for the archive, SHA256SUMS and SHA256SUMS.asc" loading="lazy" width="1400" height="1000"><figcaption><strong>The Verify tab.</strong> All three slots are shown before anything is dropped, and each of the three answers is drawn on its own.</figcaption></figure>
 <h4 id="checking-the-source-rather-than-the-download">Checking the source rather than the download</h4>
 <p><strong>What a build needs on this machine</strong></p>
 <pre><code>veilvoice verify deps</code></pre>
