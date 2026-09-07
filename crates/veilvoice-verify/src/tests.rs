@@ -631,7 +631,15 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
 
     // What follows the name when it is being run rather than named.
     let invoked = [
-        " --", " -q", " auto", " file", " deps", " gnupg", " hash", " reproduce", " help",
+        " --",
+        " -q",
+        " auto",
+        " file",
+        " deps",
+        " gnupg",
+        " hash",
+        " reproduce",
+        " help",
     ];
 
     fn gather(dir: &Path, into: &mut Vec<PathBuf>) {
@@ -652,7 +660,14 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
     }
 
     let mut files = Vec::new();
-    for place in ["README.md", "docs", "website", "packaging", "tools", "assets/screenshots"] {
+    for place in [
+        "README.md",
+        "docs",
+        "website",
+        "packaging",
+        "tools",
+        "assets/screenshots",
+    ] {
         let path = root.join(place);
         if path.is_dir() {
             gather(&path, &mut files);
@@ -664,7 +679,11 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
 
     let mut wrong = Vec::new();
     for path in &files {
-        let name = path.file_name().unwrap_or_default().to_string_lossy().into_owned();
+        let name = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .into_owned();
         if history.contains(&name.as_str()) {
             continue;
         }
@@ -684,8 +703,8 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
             // With another segment after it the line is naming a source file
             // inside the crate; with nothing after it, a leading `./` or an
             // absolute path makes it a command somebody is told to run.
-            let ends_here = rest.is_empty()
-                || rest.starts_with([' ', '`', '"', '\'', ',', '.', ')']);
+            let ends_here =
+                rest.is_empty() || rest.starts_with([' ', '`', '"', '\'', ',', '.', ')']);
             let run = invoked.iter().any(|form| rest.starts_with(form))
                 || (line[..at].ends_with('/') && ends_here && !rest.starts_with('.'));
             if run {
