@@ -41,7 +41,7 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..", "..");
 
 /** Anything a reader would call a button. */
-const BUTTON_CLASS = /\b(btn|demo-btn|demo-mode|demo-tab|demo-close)\b/;
+const BUTTON_CLASS = /\b(btn|term-btn|walk-tab)\b/;
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), "utf8");
