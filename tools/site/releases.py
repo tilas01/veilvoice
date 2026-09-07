@@ -326,6 +326,30 @@ def verify_markdown(version):
         "front page is the one step no program can do for you, because a "
         "program that came out of the download cannot vouch for the download.")
     add("")
+    add("**The chain, end to end.** Every check below is one link in this, and "
+        "each link is only worth anything if the one above it held:")
+    add("")
+    add("1. `SHA256SUMS.asc` is a detached OpenPGP signature, made with the "
+        "key above, **over `SHA256SUMS`**. Verifying it is what ties "
+        "everything under it to a person rather than to whoever served you "
+        "the files. Skip it and the hash list is numbers of unknown origin, "
+        "and comparing your file against numbers of unknown origin proves "
+        "nothing at all.")
+    add("2. `SHA256SUMS` holds the hash of **each archive** and the hash of "
+        "**`CONTENTS.sha256`**, so the contents list is signed as well, by "
+        "being covered by the list the signature is over.")
+    add("3. `CONTENTS.sha256` holds the hash of **every file inside each "
+        "archive**: `veilvoice`, `veilvoice-gui`, and everything shipped "
+        "beside them.")
+    add("")
+    add("So the hash of the binary you are about to run traces back, link by "
+        "link, to that one signature. Checking the archive stops at step 2 "
+        "and tells you the *zip* was published; going on to step 3 tells you "
+        "the *program* was, which is the question somebody actually has. "
+        "Releases before v0.1.15 publish no `CONTENTS.sha256` and stop at "
+        "step 2, and every command here says so at the time rather than "
+        "quietly checking less.")
+    add("")
 
     add("### With VeilVoice itself, no GnuPG required")
     add("")

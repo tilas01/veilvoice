@@ -81,6 +81,13 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <p>The signing key&#x27;s fingerprint is:</p>
 <pre><code>8101 FB3B B28D 02FB 239E 0CDF 9CC1 C7E7 A9B5 833A</code></pre>
 <p>Comparing that against the copy in <code>README.md</code> and the copy on the front page is the one step no program can do for you, because a program that came out of the download cannot vouch for the download.</p>
+<p><strong>The chain, end to end.</strong> Every check below is one link in this, and each link is only worth anything if the one above it held:</p>
+<ol>
+<li><code>SHA256SUMS.asc</code> is a detached OpenPGP signature, made with the key above, <strong>over <code>SHA256SUMS</code></strong>. Verifying it is what ties everything under it to a person rather than to whoever served you the files. Skip it and the hash list is numbers of unknown origin, and comparing your file against numbers of unknown origin proves nothing at all.</li>
+<li><code>SHA256SUMS</code> holds the hash of <strong>each archive</strong> and the hash of <strong><code>CONTENTS.sha256</code></strong>, so the contents list is signed as well, by being covered by the list the signature is over.</li>
+<li><code>CONTENTS.sha256</code> holds the hash of <strong>every file inside each archive</strong>: <code>veilvoice</code>, <code>veilvoice-gui</code>, and everything shipped beside them.</li>
+</ol>
+<p>So the hash of the binary you are about to run traces back, link by link, to that one signature. Checking the archive stops at step 2 and tells you the <em>zip</em> was published; going on to step 3 tells you the <em>program</em> was, which is the question somebody actually has. Releases before v0.1.15 publish no <code>CONTENTS.sha256</code> and stop at step 2, and every command here says so at the time rather than quietly checking less.</p>
 <h4 id="with-veilvoice-itself-no-gnupg-required">With VeilVoice itself, no GnuPG required</h4>
 <p>The verifier is part of <code>veilvoice</code>: it is not a separate download, and it carries the signing key compiled in, so it needs no GnuPG, no keyring and no network.</p>
 <p><strong>The whole check, in one command</strong></p>
@@ -118,7 +125,12 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p><code>gpg --verify</code> answers whether the hash list is the one that was signed with the key above. <code>sha256sum -c</code> answers whether your files match that list. Both have to pass, and in that order: a hash list nobody checked the signature of proves nothing at all. On macOS and the BSDs the last command is <code>shasum -a 256 -c SHA256SUMS</code> or <code>sha256 -c SHA256SUMS</code>; the first two are the same everywhere.</p>
 <h4 id="in-the-desktop-application">In the desktop application</h4>
 <p><code>veilvoice-gui</code> runs the same code with the same key, so the answer is the same one; only the typing is different.</p>
-<p>1. Open <strong>Verify</strong> in the desktop application. Three slots are shown before you drop anything, because verifying needs three files and an interface that discovers that after the drop teaches people it is fiddly. 2. Drop the <strong>archive</strong> you downloaded, the <strong><code>SHA256SUMS</code></strong> and the <strong><code>SHA256SUMS.asc</code></strong> on the window. A drop fills whichever slot the file&#x27;s name says it is, in any order. 3. Press the button once. It checks the signature over the hash list, then the archive against that list, then every file extracted out of the archive against the signed contents list, and then runs the GnuPG on this machine over the same signature. 4. Read the three answers, which are drawn separately on purpose so a pass on one is never mistaken for a pass on another. A release published before v0.1.15 carries no contents list and simply has no such row. A GnuPG that will not run on this machine is drawn quietly: that is a fact about the computer and says nothing about the download.</p>
+<ol>
+<li>Open <strong>Verify</strong> in the desktop application. Three slots are shown before you drop anything, because verifying needs three files and an interface that discovers that after the drop teaches people it is fiddly.</li>
+<li>Drop the <strong>archive</strong> you downloaded, the <strong><code>SHA256SUMS</code></strong> and the <strong><code>SHA256SUMS.asc</code></strong> on the window. A drop fills whichever slot the file&#x27;s name says it is, in any order.</li>
+<li>Press the button once. It checks the signature over the hash list, then the archive against that list, then every file extracted out of the archive against the signed contents list, and then runs the GnuPG on this machine over the same signature.</li>
+<li>Read the three answers, which are drawn separately on purpose so a pass on one is never mistaken for a pass on another. A release published before v0.1.15 carries no contents list and simply has no such row. A GnuPG that will not run on this machine is drawn quietly: that is a fact about the computer and says nothing about the download.</li>
+</ol>
 <h4 id="checking-the-source-rather-than-the-download">Checking the source rather than the download</h4>
 <p><strong>What a build needs on this machine</strong></p>
 <pre><code>veilvoice verify deps</code></pre>

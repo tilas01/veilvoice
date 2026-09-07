@@ -59,7 +59,13 @@
 <div>
 <section id="s-about">
 <p>Frequency-domain de-identification transform.</p>
-<p>For every STFT frame we: 1. take the magnitude spectrum and <strong>discard the measured phase</strong>. This is the irreversible step, it permanently erases the speaker&#x27;s waveform / micro-timing; 2. estimate a smooth spectral <strong>envelope</strong> (the vocal-tract / formant structure, i.e. the biometric identity) and the <strong>excitation</strong> residual (glottal source + phonetic detail that carries the words); 3. shift the excitation by a cryptographically-modulated <em>pitch</em> ratio and warp the envelope by an independent <em>formant</em> ratio, so the identity is moved somewhere it never was while the phonemes stay legible; 4. resynthesise a fresh phase, plus a fixed random per-bin offset.</p>
+<p>For every STFT frame we:</p>
+<ol>
+<li>take the magnitude spectrum and <strong>discard the measured phase</strong>. This is the irreversible step, it permanently erases the speaker&#x27;s waveform / micro-timing;</li>
+<li>estimate a smooth spectral <strong>envelope</strong> (the vocal-tract / formant structure, i.e. the biometric identity) and the <strong>excitation</strong> residual (glottal source + phonetic detail that carries the words);</li>
+<li>shift the excitation by a cryptographically-modulated <em>pitch</em> ratio and warp the envelope by an independent <em>formant</em> ratio, so the identity is moved somewhere it never was while the phonemes stay legible;</li>
+<li>resynthesise a fresh phase, plus a fixed random per-bin offset.</li>
+</ol>
 <h3 id="voiced-frames-an-explicit-harmonic-comb">Voiced frames: an explicit harmonic comb</h3>
 <p>Step 4 has two modes. On <strong>unvoiced</strong> frames each bin accumulates its own centre frequency, which is the classic channel-vocoder phase, exactly right for fricatives and noise.</p>
 <p>On <strong>voiced</strong> frames that alone is not enough, and it is audible. Bin centres are multiples of <code>sample_rate / n</code> (46.875 Hz at the default settings), and a harmonic peak spans several bins, so a plain channel vocoder turns each partial into a cluster of independent grid-frequency sinusoids with unrelated phases. A 210 Hz voice comes out beating around 187.5 and 234.4 Hz: metallic, and with a pitch that cannot be steered, which would make the canonical register <code>crate::accent</code> aims for unreachable.</p>

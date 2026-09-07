@@ -60,7 +60,11 @@
 <section id="s-about">
 <p>Which program checks the signature, and who decides.</p>
 <p>VeilVoice can check a release signature three ways, and the difference between them matters more than it looks.</p>
-<p>1. <strong>Built in.</strong> The check in this binary, written in Rust, with no external program involved. It always works, on every platform, with nothing installed. 2. <strong>A <code>gpg</code> on this machine.</strong> GnuPG itself, the reference implementation, run as a separate program. 3. <strong>A <code>gpg</code> inside WSL</strong>, on Windows. The same GnuPG, in a Linux distribution alongside Windows, reached through <code>wsl.exe</code>.</p>
+<ol>
+<li><strong>Built in.</strong> The check in this binary, written in Rust, with no external program involved. It always works, on every platform, with nothing installed.</li>
+<li><strong>A <code>gpg</code> on this machine.</strong> GnuPG itself, the reference implementation, run as a separate program.</li>
+<li><strong>A <code>gpg</code> inside WSL</strong>, on Windows. The same GnuPG, in a Linux distribution alongside Windows, reached through <code>wsl.exe</code>.</li>
+</ol>
 <h2 id="why-the-built-in-check-is-not-enough-on-its-own-and-why-it-is-the-default">Why the built-in check is not enough on its own, and why it is the default</h2>
 <p>Both things are true at once.</p>
 <p>The built-in check is the one telling you a download is genuine, and it came out of that download. A tampered release ships a tampered checker. That is not a hypothetical objection to fix by writing better code: no program can vouch for itself, and this one says so on the tab. GnuPG is a second opinion from software this project did not write, and having one is the entire point of running it.</p>
