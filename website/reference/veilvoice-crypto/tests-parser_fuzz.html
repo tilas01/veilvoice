@@ -63,7 +63,11 @@
 <h2 id="what-is-being-defended">What is being defended</h2>
 <p><code>container::Header::parse</code> reads a file somebody sent you. <code>lock::AppLock::parse</code> reads the app-lock file, which is worse: it is parsed <strong>before anyone has authenticated anything</strong>, so it is the first bytes the program touches on a locked machine.</p>
 <p>For a parser in a security tool the bar is not &quot;usually returns the right answer&quot;. It is:</p>
-<p>1. <strong>Never panic.</strong> A panic on hostile input is a denial of service, and in a <code>panic = &quot;abort&quot;</code> release profile it is the whole process. 2. <strong>Never hang.</strong> Every loop must be bounded by the input, not by a length field the input controls. 3. <strong>Never report success for something it did not fully understand.</strong> An <code>Ok</code> must come with offsets that are actually inside the buffer.</p>
+<ol>
+<li><strong>Never panic.</strong> A panic on hostile input is a denial of service, and in a <code>panic = &quot;abort&quot;</code> release profile it is the whole process.</li>
+<li><strong>Never hang.</strong> Every loop must be bounded by the input, not by a length field the input controls.</li>
+<li><strong>Never report success for something it did not fully understand.</strong> An <code>Ok</code> must come with offsets that are actually inside the buffer.</li>
+</ol>
 <h2 id="why-this-and-not-cargo-fuzz">Why this and not <code>cargo fuzz</code></h2>
 <p><code>cargo fuzz</code> needs nightly and libFuzzer, which is a poor fit for a project that pins a stable toolchain and wants every check runnable by anyone who cloned it. This is a deterministic campaign instead: a seeded PRNG, so a failure is reproducible from its seed rather than being a story about a run nobody can repeat, and structure-aware mutation, so the bytes spend their time near the interesting boundaries rather than being rejected at the magic number.</p>
 <p>It is <strong>not</strong> a substitute for a coverage-guided fuzzer and <code>docs/AUDIT.md</code> does not claim it is. It is the campaign that can actually be run on every commit, on every platform, by everybody.</p>

@@ -2519,12 +2519,18 @@ def doc_html(lines, anchors=None):
             out.append("<p>%s</p>" % inline_html(" ".join(paragraph)))
             del paragraph[:]
 
+    # Which kind of list is open. A one-element box rather than a plain name
+    # because the closures below assign to it.
+    ordered = [False]
+
     def flush_list():
         if listing:
-            out.append("<ul>")
+            tag = "ol" if ordered[0] else "ul"
+            out.append("<%s>" % tag)
             out.extend("<li>%s</li>" % inline_html(item) for item in listing)
-            out.append("</ul>")
+            out.append("</%s>" % tag)
             del listing[:]
+            ordered[0] = False
 
     for line in lines:
         stripped = line.strip()
@@ -2558,7 +2564,35 @@ def doc_html(lines, anchors=None):
         bullet = re.match(r"^[-*]\s+(.*)$", stripped)
         if bullet:
             flush_paragraph()
+            # A bullet after a numbered list is a different list, not an item
+            # of the one before it.
+            if ordered[0]:
+                flush_list()
             listing.append(bullet.group(1))
+            continue
+        # **Numbered lists.** This renderer read `- ` and nothing else, so
+        # every `1. ` `2. ` `3. ` list written in a doc comment, in `docs/`
+        # or in a release note was silently folded into one run-on paragraph:
+        # 28 lines of doc comment and 4 of the questions page, on every page
+        # generated from them, for as long as the renderer has existed.
+        #
+        # It read as prose that happened to have digits in it, which is worse
+        # than an unrendered list, because a reader cannot tell the author
+        # meant steps in an order. `chain.rs` describes what the veiling does
+        # to a frame as five ordered steps, and that is the one place in this
+        # project where the order is the whole meaning.
+        #
+        # The number a reader sees is the browser's, from `<ol>`, rather than
+        # the digits the author typed. That is deliberate: a hand-typed `3.`
+        # after an item is inserted above it is exactly the sort of stale
+        # number this repository has a rule about.
+        numbered = re.match(r"^\d+[.)]\s+(.*)$", stripped)
+        if numbered:
+            flush_paragraph()
+            if listing and not ordered[0]:
+                flush_list()
+            ordered[0] = True
+            listing.append(numbered.group(1))
             continue
         if not stripped:
             flush_paragraph()

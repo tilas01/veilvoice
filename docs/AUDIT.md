@@ -47,9 +47,10 @@ of every generated artefact; the documentation, the website, the packaging and
 the scripts; and the optimisation pass, because bloat that nobody measured is a
 claim nobody checked.
 
-**Eight defects, and seven of them are the same defect.** One is a real
-weakening of the Studio's central guarantee. The other seven are a repository
-saying things that used to be true: a binary that no longer ships, counts that
+**Ten defects, and eight of them are the same defect.** One is a real
+weakening of the Studio's central guarantee. One is a renderer that has been
+quietly flattening numbered lists since it was written. The other eight are a
+repository saying things that used to be true: a binary that no longer ships, counts that
 no longer match, a version that is no longer current, generated pages for a file
 that no longer exists. None of them is a bug in the ordinary sense. All of them
 would have been read by somebody as a statement of fact.
@@ -270,6 +271,56 @@ places, including the `V=` line in that very block. It watched the command and
 not the instruction above it. The sentence is now in the list, and breaking it
 deliberately makes the tool exit non-zero, which is how that was confirmed
 rather than assumed.
+
+### F-157 -- the documentation renderer silently flattened every numbered list
+
+`tools/docs/generate.py`. `doc_html` renders headings, paragraphs, fenced code
+and lists, and it read `- ` and `* ` and nothing else. A line beginning `1. `
+was not a list item to it, so it fell through to the paragraph accumulator and
+was joined to its neighbours with a space.
+
+Every numbered list written anywhere this renderer reaches came out as one
+run-on paragraph with digits scattered through it: 28 lines of doc comment
+across the crates and four in `docs/FAQ.md`, on every generated page, for as
+long as the renderer has existed.
+
+It is worse than an unrendered list. A reader cannot tell the author meant
+steps in an order, and the two worst-affected passages are the two where the
+order *is* the meaning. `chain.rs` describes what veiling does to a frame as
+five ordered steps, in the file that performs the irreversible transform. The
+questions page describes what verifying a download actually checks as four
+steps, each only worth anything if the one above it held, on the site whose
+argument is that a reader should not have to take anybody's word for anything.
+
+Ordered lists now render as `<ol>`, and the number a reader sees is the
+browser's rather than the digits the author typed, so an item inserted above
+another does not leave a stale number behind it.
+
+Found while adding the verification tutorial to the releases page, which needed
+one: a chain of links where each rests on the one before it is not a bulleted
+list, and writing it as digits produced a paragraph. Nine generated pages
+gained the list their source had always been written as.
+
+### F-158 -- two more places still counting three programs
+
+`veilvoice-cli/src/gui.rs`, and the third was in `ROADMAP.md`. The same defect
+as F-150 and F-151 and found the same way, one round later, which is the
+argument for the check rather than the sweep.
+
+The doc comment explaining where `veilvoice gui` looks for the desktop
+application said "a portable folder holds all three programs together", and the
+error message somebody sees when it is not found said "`veilvoice install` puts
+all three programs where your shell can find them". A release has published two
+since 0.1.18. The roadmap's summary of what v0.1.15 shipped said "a guide for
+each of the three programs" as a statement about now rather than about then,
+and now says which version it is about.
+
+The test added for F-151 catches an *instruction to run* `veilvoice-verify`. It
+cannot catch a count of how many programs there are, which is a different
+sentence with the same wrong fact behind it. Recorded rather than guarded,
+because a check for "the number three near the word programs" would fire on
+three files, three steps and three answers, all of which this project says
+correctly and often.
 
 ## The twenty-ninth round: an optimisation pass that found little, and says so
 
@@ -5556,7 +5607,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and fifty-six defects found and fixed (F-1 to F-156), across
+**One hundred and fifty-eight defects found and fixed (F-1 to F-158), across
 thirty rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

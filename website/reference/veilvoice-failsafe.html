@@ -66,7 +66,10 @@
 <p>Nobody notices that. It is not a mistake somebody makes through carelessness; it is a mistake the operating system makes on their behalf. Failsafe is on by default because the cost of it being off is that the one thing this whole project exists to prevent happens silently.</p>
 <h2 id="what-it-can-do-and-what-it-cannot">What it can do, and what it cannot</h2>
 <p>It <strong>watches</strong> which applications hold a microphone, and it knows which device VeilVoice is veiling. If another program picks up a <em>real</em> microphone while you are veiling, that is the accident, and Failsafe:</p>
-<p>1. says so, loudly, because a silent guard is not a guard; and 2. closes that program, if <code>Posture::CloseIt</code> is set, which it is by default, because a warning you have not read yet does not stop your voice going out.</p>
+<ol>
+<li>says so, loudly, because a silent guard is not a guard; and</li>
+<li>closes that program, if <code>Posture::CloseIt</code> is set, which it is by default, because a warning you have not read yet does not stop your voice going out.</li>
+</ol>
 <p>It <strong>cannot stop the operating system handing a microphone to another program in the first place.</strong> Doing that needs exclusive-mode capture of every input device, or a driver, and neither is something this project ships. See <code>CANNOT_PREVENT</code>, which is the wording a front end must show. What Failsafe does is notice within a second or so and act. That is a real difference from nothing, and it is a real difference from prevention, and both halves have to be said.</p>
 <h2 id="killing-another-program-is-a-serious-thing">Killing another program is a serious thing</h2>
 <p>So it is bounded rather than general:</p>

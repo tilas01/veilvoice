@@ -25,7 +25,7 @@ another program, which makes it a poor place to be relaxed about which.
 
 So the search is explicit and in a stated order:
 
-1. **Beside this binary.** A portable folder holds all three programs
+1. **Beside this binary.** A portable folder holds both programs
 together, and somebody who unpacked a release and typed `veilvoice gui`
 means the one they unpacked.
 2. **Where an installation puts it**, from `veilvoice_setup::install`.
