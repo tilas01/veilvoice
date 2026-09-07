@@ -108,3 +108,10 @@ flowchart TD
 | [[`lib.rs`|File-veilvoice-policy-lib]] | 167 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
 | [[`mandate.rs`|File-veilvoice-policy-mandate]] | 511 | The two things VeilVoice insists on unless you say otherwise. |
 | [[`policy.rs`|File-veilvoice-policy-policy]] | 984 | The policy itself: what can be required, and what requiring it does. |
+
+**1,143 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

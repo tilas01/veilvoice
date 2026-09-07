@@ -253,3 +253,10 @@ flowchart TD
 | [[`verify.rs`|File-veilvoice-gui-verify]] | 1592 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 417 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 244 | How big the window opens, and why it is not a constant. |
+
+**13,989 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

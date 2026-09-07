@@ -37,3 +37,10 @@ flowchart TD
 | [[`release_contents.rs`|File-fuzz-fuzz_targets-release_contents]] | 86 | The release contents list parser, coverage-guided. |
 | [[`wav_chunks.rs`|File-fuzz-fuzz_targets-wav_chunks]] | 46 | The RIFF chunk walker in veilvoice-meta, coverage-guided. |
 | [[`wav_preflight.rs`|File-fuzz-fuzz_targets-wav_preflight]] | 35 | The WAV pre-flight in veilvoice-audio, coverage-guided. |
+
+**165 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

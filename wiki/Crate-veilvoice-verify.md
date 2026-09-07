@@ -117,3 +117,10 @@ flowchart TD
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 704 | The verifier's own tests. |
 | [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] | 208 | Marker 97. |
+
+**3,935 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

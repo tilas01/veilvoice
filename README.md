@@ -517,6 +517,19 @@ writes with no extra work.
 - **Offline by construction.** Zero servers, enforced in CI.
 - **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
   including the page-locking path.
+- **51169 functional lines of Rust**, across 28 crates. A *functional line* is
+  a line holding code: blank lines and lines holding only a comment are not
+  counted, and a line with code and a trailing comment counts once. Each
+  crate's own README states its share of that total under **The files**.
+
+  It is a smaller number than the length of the tree, and deliberately so. This
+  project is written with a high comment-to-code ratio, and the per-file line
+  counts printed on the generated pages, in the artwork and in the reference
+  links are the other measure, the length of the file. Both are stated with
+  their definitions rather than one being quietly redefined to match the other,
+  and both come from `tools/loc/count.py`. The 28 includes `fuzz/`, the
+  harnesses, which is a Cargo project of its own rather than a workspace
+  member.
 - **Irreversible.** Each frame's measured phase is discarded and resynthesised,
   permanently destroying the speaker's waveform and micro-timing.
 - **Normalising, not just scrambling.** Pitch register, vocal-tract length and
@@ -566,8 +579,8 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.18: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1,215 tests across 27
-crates plus doctests, and 17 website suites, clippy clean, no `unsafe`), with
+destinations, CLI and GUI are implemented and tested (1389 tests across 27
+crates plus doctests, and 18 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
 targets and verified bit-for-bit reproducible on the eight that build twice;
@@ -579,7 +592,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Twenty-seven audit rounds have found and fixed **145 defects**.
+Twenty-nine audit rounds have found and fixed **148 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a

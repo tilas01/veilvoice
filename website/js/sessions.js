@@ -33,7 +33,7 @@
 // So the drawing is gone and this is what replaced it: the recordings, on the
 // page rather than behind a button, above the photographs of the window.
 //
-// # In plain words
+// In plain words
 //
 // Plays back real terminal sessions at typing speed, so you can see what the
 // program actually prints without installing it.

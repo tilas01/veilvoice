@@ -111,3 +111,10 @@ flowchart TD
 | [[`install.rs`|File-veilvoice-setup-install]] | 574 | Put this program somewhere the system can find it. |
 | [[`lib.rs`|File-veilvoice-setup-lib]] | 169 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [[`volumes.rs`|File-veilvoice-setup-volumes]] | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
+
+**1,414 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

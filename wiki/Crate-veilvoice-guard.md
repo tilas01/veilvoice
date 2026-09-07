@@ -107,3 +107,10 @@ flowchart TD
 | [[`blame.rs`|File-veilvoice-guard-blame]] | 421 | Best-effort attribution: which program changed a file. |
 | [[`lib.rs`|File-veilvoice-guard-lib]] | 150 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
 | [[`manifest.rs`|File-veilvoice-guard-manifest]] | 730 | The integrity manifest: what the files were, and what they are now. |
+
+**796 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

@@ -121,6 +121,13 @@ flowchart TD
 | [`lib.rs`](../../docs/files/veilvoice-guard/lib.md) | 150 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
 | [`manifest.rs`](../../docs/files/veilvoice-guard/manifest.md) | 730 | The integrity manifest: what the files were, and what they are now. |
 
+**796 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.
+
 ## Public items
 
 | Item | Where | What |

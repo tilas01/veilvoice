@@ -15,11 +15,26 @@ which machine produced the number in it, because a count with no platform
 beside it reads as a fact about the tree and is a fact about a computer. See
 F-77 in `docs/AUDIT.md`.
 
+**Functional lines are a different measure from the per-file line counts** in
+the generated pages, the artwork and the reference links. A functional line is
+a line holding code, so blank lines and lines holding only a comment are not
+counted, and a line with code and a trailing comment counts once. The per-file
+counts are the length of the file, blank lines and comments included, and are
+left exactly as they are: this project is written with a high comment-to-code
+ratio, so the two numbers are far apart, and quietly redefining one to match
+the other would alter every page and link that carries it.
+
+The line count covers **28 crates**, one more than the workspace row above:
+`fuzz/` is a separate Cargo project at the root holding the fuzzing harnesses,
+and it is Rust written and maintained here. `tools/docs/generate.py` documents
+it beside the workspace members for the same reason.
+
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 1324 |
+| Tests, measured by running them | 1389 |
 | Crates in the workspace | 27 |
-| Website suites | 17 |
-| Findings written up in the audit | 145 |
-| Highest finding number used | 145 |
+| Website suites | 18 |
+| Functional lines of Rust | 51169 |
+| Findings written up in the audit | 148 |
+| Highest finding number used | 148 |
 | Measured on | `x86_64-unknown-linux-gnu` |

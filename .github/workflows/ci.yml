@@ -234,6 +234,16 @@ jobs:
       - name: Committed roadmap must match ROADMAP.md
         run: python tools/site/roadmap.py --check
 
+      # The functional line count appears in README.md, in docs/MEASURED.md and
+      # in 28 crate documents, all of them written by one counter. A counter is
+      # a small thing that is easy to get subtly wrong -- `//` inside a string
+      # literal is not a comment, and Rust block comments nest -- so it is
+      # checked against the cases it has to get right before any of those
+      # numbers are believed. The site suite compares the numbers themselves
+      # against `docs/MEASURED.md`; this checks the tool that measured them.
+      - name: The line counter must be right about what a line is
+        run: python tools/loc/count.py --self-test
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a
