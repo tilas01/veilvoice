@@ -8,6 +8,84 @@ than a summary written afterwards.
 
 ## Unreleased
 
+## v0.1.19
+
+**The audited release.** No new features. The whole repository was read for
+security, memory safety, correctness, reproducibility, optimisation and
+accuracy, and everything it found was fixed. Eight defects, F-149 to F-156, are
+written up in `docs/AUDIT.md`.
+
+**A recording no longer passes through unprotected memory (F-155)**
+
+- The Studio vault decrypted a recording into an ordinary heap buffer and only
+  then copied it into locked memory. Between those two moments the whole
+  recording sat in memory the kernel is free to write to swap, in the one place
+  whose entire purpose is that this does not happen. It is now decrypted in
+  place inside protected memory, so there is nowhere else the plaintext has
+  been. A failed authentication check wipes the buffer rather than returning
+  partial plaintext.
+
+**It is `veilvoice verify`, and nine places still said otherwise (F-150, F-151)**
+
+- The verifier stopped being an executable of its own at 0.1.18. Three lists
+  inside the programs still named it, including the one the reproducible-build
+  report is built from, so every such report since 0.1.18 has named a file no
+  release publishes. The lists are now read from the job that publishes the
+  binaries rather than restated.
+- The front page said the verifier "ships in every archive and is a single
+  small program with no installer", the download-failure message printed a
+  command that does not exist, and the recorded terminal session on the front
+  page opened with a prompt its own recorder had already stopped producing.
+
+**The demonstration is on the page, and the drawing of the app is gone**
+
+- The website carried a hand-drawn model of the desktop application, in CSS,
+  opened from a button, sitting beside photographs of the same interface. The
+  drawing is removed rather than relabelled: it asked a reader to work out
+  which of the two to believe. What is left is the real thing, on the page and
+  not behind a button: five recorded terminal sessions that type themselves
+  out, then the window screen by screen from captures the build re-takes, then
+  every worked command checked against this build's own `--help`.
+- That removed 688 lines of JavaScript and 4,840 characters of CSS, and the
+  demonstration's data now downloads only on the page that uses it rather than
+  on all nine.
+
+**A roadmap page that is not fighting its own compositor (F-152)**
+
+- Every marker square in the roadmap picture held a GPU layer for as long as
+  the page was open, because a reveal animation was set to fill forwards and a
+  filling animation never finishes. 162 composited layers became 8, and the
+  scrolling film beside them stopped sharing a compositor with 146 things that
+  had finished moving in under half a second.
+
+**How much code this is, counted one way and said where it is used**
+
+- 51,272 functional lines of Rust across 28 crates, in the README and per crate
+  in each crate's own documentation, with the definition stated beside every
+  number: a line holding code, not a blank line and not a comment. It is a new
+  measure rather than a redefinition; the per-file line counts already on the
+  generated pages, in the artwork and in the reference links are the length of
+  the file and are unchanged.
+
+**Counts and versions that had drifted (F-153, F-156)**
+
+- The README said 1,215 tests and 17 website suites against a measured 1393 and
+  18, and repeated a defect count two rounds out of date. It is now checked
+  against the measured numbers, as the front page and the audit already were.
+- `docs/INSTALL.md` told a reader to substitute the previous release, four
+  lines above a block already carrying the current one.
+
+**Two more, and the rule behind them**
+
+- A boundary test in the recorder could not be *compiled* on a 32-bit target,
+  so CI had been red on every commit since the recorder was written (F-149).
+- Deleting a source file left seven generated pages behind describing it
+  (F-154).
+- `CLAUDE.md` now states the rule these have in common: a change is not
+  finished until everything that describes it has changed with it, a fact
+  appearing twice is derived or checked rather than repeated, and the only
+  exception is a record of the past.
+
 ## v0.1.18
 
 **The app lock now protects your files, not just the window**
