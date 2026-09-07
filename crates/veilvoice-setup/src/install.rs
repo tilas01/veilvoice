@@ -78,7 +78,11 @@ use std::path::{Path, PathBuf};
 pub const NAME: &str = "VeilVoice";
 
 /// Files that make up an installation, if they are beside the running binary.
-const PROGRAMS: &[&str] = &["veilvoice", "veilvoice-gui", "veilvoice-verify"];
+///
+/// The two the release publishes. A third, `veilvoice-verify`, existed until
+/// 0.1.18 and is now inside both, so looking for it here would only ever find
+/// a stale copy left behind by an older install.
+const PROGRAMS: &[&str] = &["veilvoice", "veilvoice-gui"];
 
 /// `reg.exe`, by absolute path.
 ///
@@ -203,9 +207,10 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
         let name = exe_name(stem);
         let from = source.join(&name);
         if !from.exists() {
-            // A portable folder may hold only some of the three. Copying what
-            // is there and saying so is more useful than refusing because the
-            // GUI was not unpacked.
+            // A portable folder may hold only one of the two: several
+            // platforms publish a command-line archive with no window in it.
+            // Copying what is there and saying so is more useful than refusing
+            // because the GUI was not unpacked.
             continue;
         }
         let to = into.join(&name);

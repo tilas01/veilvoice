@@ -191,7 +191,7 @@
 <span class="ln" id="L127">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">caveat</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
 <span class="ln" id="L128">        <span class="tok-str">&quot;This is a version number read off a public page. It is not a signature \</span></span>
 <span class="ln" id="L129"><span class="tok-str">         and nothing here has verified anything. Download a release and check it \</span></span>
-<span class="ln" id="L130"><span class="tok-str">         with veilvoice-verify before you run it.&quot;</span></span>
+<span class="ln" id="L130"><span class="tok-str">         with `veilvoice verify` before you run it.&quot;</span></span>
 <span class="ln" id="L131">    }</span>
 </span>
 <span class="ln" id="L132">}</span>
@@ -468,7 +468,7 @@
 <span class="ln" id="L378"><span class="tok-str">you or this machine. It does not download a release, install anything, or \</span></span>
 <span class="ln" id="L379"><span class="tok-str">restart the program -- it reports a version number, and every decision after \</span></span>
 <span class="ln" id="L380"><span class="tok-str">that is yours. A version number on a page is not a signature: check a download \</span></span>
-<span class="ln" id="L381"><span class="tok-str">with veilvoice-verify before running it.&quot;</span>;</span>
+<span class="ln" id="L381"><span class="tok-str">with `veilvoice verify` before running it.&quot;</span>;</span>
 </span>
 <span class="ln" id="L382"></span>
 <span class="ln" id="L383"><span class="tok-attr">#[cfg</span>(test)]</span>
@@ -649,7 +649,7 @@
 <span class="ln" id="L558">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_carries_what_the_answer_is_worth</span>() {</span>
 <span class="ln" id="L559">        <span class="tok-kw">let</span> caveat = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>).<span class="tok-fn">caveat</span>().<span class="tok-fn">to_lowercase</span>();</span>
 <span class="ln" id="L560">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not a signature&quot;</span>));</span>
-<span class="ln" id="L561">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice-verify&quot;</span>));</span>
+<span class="ln" id="L561">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice verify&quot;</span>));</span>
 <span class="ln" id="L562">    }</span>
 <span class="ln" id="L563"></span>
 <span class="ln" id="L564">    <span class="tok-com">/// Errors explain what to do instead rather than only that something</span></span>

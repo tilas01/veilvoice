@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/record.rs</code></h1>
-<p style="color:var(--muted)"><a href="record.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 534 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="record.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 543 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -567,58 +567,67 @@
 <span class="ln" id="L480">        <span class="tok-com">// Twelve hours fits; thirteen does not. Both are computed the way the</span></span>
 <span class="ln" id="L481">        <span class="tok-com">// recorder computes a length, so the boundary is checked in the units</span></span>
 <span class="ln" id="L482">        <span class="tok-com">// a caller thinks in.</span></span>
-<span class="ln" id="L483">        <span class="tok-kw">let</span> per_second = <span class="tok-num">48_000</span> * <span class="tok-num">2</span>;</span>
-<span class="ln" id="L484">        assert!(<span class="tok-num">12</span> * <span class="tok-num">3600</span> * per_second &lt; WAV_MAX_DATA);</span>
-<span class="ln" id="L485">        assert!(<span class="tok-num">13</span> * <span class="tok-num">3600</span> * per_second &gt; WAV_MAX_DATA);</span>
-<span class="ln" id="L486">    }</span>
-<span class="ln" id="L487"></span>
-<span class="ln" id="L488">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L489">    <span class="tok-kw">fn</span> <span class="tok-fn">the_header_stays_wrong_rather_than_plausible_if_the_guard_is_ever_lost</span>() {</span>
-<span class="ln" id="L490">        <span class="tok-com">// `write_header` is only reached after `wav` has refused an over-long</span></span>
-<span class="ln" id="L491">        <span class="tok-com">// recording. This asserts the second line of defence: were that guard</span></span>
-<span class="ln" id="L492">        <span class="tok-com">// moved or removed, the length written saturates rather than wrapping,</span></span>
-<span class="ln" id="L493">        <span class="tok-com">// so the file is obviously broken instead of quietly short.</span></span>
-<span class="ln" id="L494">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = [0u8; HEADER];</span>
-<span class="ln" id="L495">        <span class="tok-fn">write_header</span>(&amp;<span class="tok-kw">mut</span> out, <span class="tok-num">48_000</span>, usize::MAX);</span>
-<span class="ln" id="L496">        <span class="tok-kw">let</span> data = u32::<span class="tok-fn">from_le_bytes</span>(out[<span class="tok-num">40</span>..<span class="tok-num">44</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L497">        <span class="tok-kw">let</span> riff = u32::<span class="tok-fn">from_le_bytes</span>(out[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L498">        assert_eq!(data, u32::MAX, <span class="tok-str">&quot;a wrapped length would look plausible&quot;</span>);</span>
-<span class="ln" id="L499">        assert_eq!(riff, u32::MAX);</span>
-<span class="ln" id="L500">    }</span>
-<span class="ln" id="L501"></span>
-<span class="ln" id="L502">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L503">    <span class="tok-kw">fn</span> <span class="tok-fn">abandoning_a_recording_does_not_leave_the_scratch_buffer_full_of_audio</span>() {</span>
-<span class="ln" id="L504">        <span class="tok-com">// The tape wipes itself, chunk by chunk, because every chunk is a</span></span>
-<span class="ln" id="L505">        <span class="tok-com">// Secret. The scratch buffer is ordinary heap memory, and before this</span></span>
-<span class="ln" id="L506">        <span class="tok-com">// it was freed with the last drained block still in it: Ctrl-C, or any</span></span>
-<span class="ln" id="L507">        <span class="tok-com">// error on the way to sealing, handed that memory back to the</span></span>
-<span class="ln" id="L508">        <span class="tok-com">// allocator with the audio intact.</span></span>
-<span class="ln" id="L509">        <span class="tok-com">//</span></span>
-<span class="ln" id="L510">        <span class="tok-com">// Reading freed memory is not something a safe test can do, so this</span></span>
-<span class="ln" id="L511">        <span class="tok-com">// checks the state `drop` leaves rather than the heap afterwards: the</span></span>
-<span class="ln" id="L512">        <span class="tok-com">// same buffer, wiped by the same code path the destructor runs.</span></span>
-<span class="ln" id="L513">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> rec, <span class="tok-kw">mut</span> sink) = <span class="tok-fn">start</span>(<span class="tok-num">8_000</span>);</span>
-<span class="ln" id="L514">        sink.<span class="tok-fn">write</span>(&amp;vec![<span class="tok-num">0</span>.75f32; <span class="tok-num">2048</span>]);</span>
-<span class="ln" id="L515">        rec.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L516">        assert!(</span>
-<span class="ln" id="L517">            rec.scratch.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|&amp;s| s != <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L518">            <span class="tok-str">&quot;the drain left nothing in the scratch, so this proves nothing&quot;</span></span>
-<span class="ln" id="L519">        );</span>
-<span class="ln" id="L520"></span>
-<span class="ln" id="L521">        <span class="tok-com">// The very function the destructor calls, not a copy of it.</span></span>
-<span class="ln" id="L522">        rec.<span class="tok-fn">wipe_scratch</span>();</span>
-<span class="ln" id="L523">        assert!(</span>
-<span class="ln" id="L524">            rec.scratch.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|&amp;s| s == <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L525">            <span class="tok-str">&quot;audio survived in the scratch buffer&quot;</span></span>
-<span class="ln" id="L526">        );</span>
-<span class="ln" id="L527">    }</span>
-<span class="ln" id="L528"></span>
-<span class="ln" id="L529">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L530">    <span class="tok-kw">fn</span> <span class="tok-fn">a_zero_sample_rate_does_not_divide_by_it</span>() {</span>
-<span class="ln" id="L531">        <span class="tok-kw">let</span> (rec, _sink) = <span class="tok-fn">start</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L532">        assert_eq!(rec.<span class="tok-fn">seconds</span>(), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L533">    }</span>
-<span class="ln" id="L534">}</span>
+<span class="ln" id="L483">        <span class="tok-com">//</span></span>
+<span class="ln" id="L484">        <span class="tok-com">// In `u64` rather than `usize`, because thirteen hours at 48 kHz</span></span>
+<span class="ln" id="L485">        <span class="tok-com">// 16-bit mono is 4,492,800,000 bytes and a 32-bit `usize` stops at</span></span>
+<span class="ln" id="L486">        <span class="tok-com">// 4,294,967,295. Written in `usize` this line does not merely fail on</span></span>
+<span class="ln" id="L487">        <span class="tok-com">// a 32-bit target, it refuses to compile there: the multiplication is</span></span>
+<span class="ln" id="L488">        <span class="tok-com">// constant, so `arithmetic_overflow` rejects it before any test runs.</span></span>
+<span class="ln" id="L489">        <span class="tok-com">// The number being asserted is a property of the WAV format, not of</span></span>
+<span class="ln" id="L490">        <span class="tok-com">// the machine, so it is computed in a width that holds it everywhere.</span></span>
+<span class="ln" id="L491">        <span class="tok-kw">let</span> per_second: u64 = <span class="tok-num">48_000</span> * <span class="tok-num">2</span>;</span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> limit = WAV_MAX_DATA <span class="tok-kw">as</span> u64;</span>
+<span class="ln" id="L493">        assert!(<span class="tok-num">12</span> * <span class="tok-num">3600</span> * per_second &lt; limit);</span>
+<span class="ln" id="L494">        assert!(<span class="tok-num">13</span> * <span class="tok-num">3600</span> * per_second &gt; limit);</span>
+<span class="ln" id="L495">    }</span>
+<span class="ln" id="L496"></span>
+<span class="ln" id="L497">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L498">    <span class="tok-kw">fn</span> <span class="tok-fn">the_header_stays_wrong_rather_than_plausible_if_the_guard_is_ever_lost</span>() {</span>
+<span class="ln" id="L499">        <span class="tok-com">// `write_header` is only reached after `wav` has refused an over-long</span></span>
+<span class="ln" id="L500">        <span class="tok-com">// recording. This asserts the second line of defence: were that guard</span></span>
+<span class="ln" id="L501">        <span class="tok-com">// moved or removed, the length written saturates rather than wrapping,</span></span>
+<span class="ln" id="L502">        <span class="tok-com">// so the file is obviously broken instead of quietly short.</span></span>
+<span class="ln" id="L503">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = [0u8; HEADER];</span>
+<span class="ln" id="L504">        <span class="tok-fn">write_header</span>(&amp;<span class="tok-kw">mut</span> out, <span class="tok-num">48_000</span>, usize::MAX);</span>
+<span class="ln" id="L505">        <span class="tok-kw">let</span> data = u32::<span class="tok-fn">from_le_bytes</span>(out[<span class="tok-num">40</span>..<span class="tok-num">44</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L506">        <span class="tok-kw">let</span> riff = u32::<span class="tok-fn">from_le_bytes</span>(out[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L507">        assert_eq!(data, u32::MAX, <span class="tok-str">&quot;a wrapped length would look plausible&quot;</span>);</span>
+<span class="ln" id="L508">        assert_eq!(riff, u32::MAX);</span>
+<span class="ln" id="L509">    }</span>
+<span class="ln" id="L510"></span>
+<span class="ln" id="L511">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L512">    <span class="tok-kw">fn</span> <span class="tok-fn">abandoning_a_recording_does_not_leave_the_scratch_buffer_full_of_audio</span>() {</span>
+<span class="ln" id="L513">        <span class="tok-com">// The tape wipes itself, chunk by chunk, because every chunk is a</span></span>
+<span class="ln" id="L514">        <span class="tok-com">// Secret. The scratch buffer is ordinary heap memory, and before this</span></span>
+<span class="ln" id="L515">        <span class="tok-com">// it was freed with the last drained block still in it: Ctrl-C, or any</span></span>
+<span class="ln" id="L516">        <span class="tok-com">// error on the way to sealing, handed that memory back to the</span></span>
+<span class="ln" id="L517">        <span class="tok-com">// allocator with the audio intact.</span></span>
+<span class="ln" id="L518">        <span class="tok-com">//</span></span>
+<span class="ln" id="L519">        <span class="tok-com">// Reading freed memory is not something a safe test can do, so this</span></span>
+<span class="ln" id="L520">        <span class="tok-com">// checks the state `drop` leaves rather than the heap afterwards: the</span></span>
+<span class="ln" id="L521">        <span class="tok-com">// same buffer, wiped by the same code path the destructor runs.</span></span>
+<span class="ln" id="L522">        <span class="tok-kw">let</span> (<span class="tok-kw">mut</span> rec, <span class="tok-kw">mut</span> sink) = <span class="tok-fn">start</span>(<span class="tok-num">8_000</span>);</span>
+<span class="ln" id="L523">        sink.<span class="tok-fn">write</span>(&amp;vec![<span class="tok-num">0</span>.75f32; <span class="tok-num">2048</span>]);</span>
+<span class="ln" id="L524">        rec.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L525">        assert!(</span>
+<span class="ln" id="L526">            rec.scratch.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|&amp;s| s != <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L527">            <span class="tok-str">&quot;the drain left nothing in the scratch, so this proves nothing&quot;</span></span>
+<span class="ln" id="L528">        );</span>
+<span class="ln" id="L529"></span>
+<span class="ln" id="L530">        <span class="tok-com">// The very function the destructor calls, not a copy of it.</span></span>
+<span class="ln" id="L531">        rec.<span class="tok-fn">wipe_scratch</span>();</span>
+<span class="ln" id="L532">        assert!(</span>
+<span class="ln" id="L533">            rec.scratch.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|&amp;s| s == <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L534">            <span class="tok-str">&quot;audio survived in the scratch buffer&quot;</span></span>
+<span class="ln" id="L535">        );</span>
+<span class="ln" id="L536">    }</span>
+<span class="ln" id="L537"></span>
+<span class="ln" id="L538">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L539">    <span class="tok-kw">fn</span> <span class="tok-fn">a_zero_sample_rate_does_not_divide_by_it</span>() {</span>
+<span class="ln" id="L540">        <span class="tok-kw">let</span> (rec, _sink) = <span class="tok-fn">start</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L541">        assert_eq!(rec.<span class="tok-fn">seconds</span>(), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L542">    }</span>
+<span class="ln" id="L543">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

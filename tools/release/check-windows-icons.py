@@ -29,7 +29,10 @@ import sys
 # not go into it, which is a different failure with the same symptom.
 MINIMUM_RSRC_BYTES = 2000
 
-BINARIES = ("veilvoice-gui.exe", "veilvoice.exe", "veilvoice-verify.exe")
+# The two a release publishes. `veilvoice-verify.exe` was a third until
+# 0.1.18 and is now inside both, so looking for its icon would fail on a
+# file the build has no reason to produce.
+BINARIES = ("veilvoice-gui.exe", "veilvoice.exe")
 
 
 def rsrc_size(path):

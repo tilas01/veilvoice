@@ -1114,7 +1114,7 @@ fn explain_verification(
     println!();
     println!("  The signature check itself, in Rust, with the key above compiled");
     println!("  in. Nothing needs installing for it, on any platform. It is what");
-    println!("  `veilvoice-verify` uses, and it also checks every file extracted");
+    println!("  `veilvoice verify` uses, and it also checks every file extracted");
     println!("  out of the archive against a signed contents list.");
     println!();
     println!("  What it cannot do is vouch for itself. This program came out of");

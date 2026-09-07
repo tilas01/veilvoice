@@ -117,12 +117,13 @@ def sections(text):
     blocks = [(None, [])]
     for line in text.split("\n"):
         stripped = line.strip()
-        # Two heading styles, because the two binaries do not share one. clap
-        # writes `Commands:` and `Options:` in title case with a colon;
-        # `veilvoice-verify` hand-writes `USAGE` and `EXIT STATUS` in capitals
-        # with none. Matching only the first left the whole of the second
-        # binary's help inside DESCRIPTION, re-flowed into one paragraph that
-        # ran every command together.
+        # Two heading styles, because not every page here is written by clap.
+        # clap writes `Commands:` and `Options:` in title case with a colon;
+        # the verifier's help, which was `veilvoice-verify` until 0.1.18 and is
+        # `veilvoice verify` now, hand-writes `USAGE` and `EXIT STATUS` in
+        # capitals with none. Matching only the first left the whole of that
+        # help inside DESCRIPTION, re-flowed into one paragraph that ran every
+        # command together.
         if not line.startswith(" ") and (
             re.fullmatch(r"[A-Z][A-Za-z ]*:", stripped)
             or re.fullmatch(r"[A-Z][A-Z ]{2,}", stripped)
@@ -192,11 +193,10 @@ def page(binary, name, summary, version, date):
         # Everything else verbatim, between `.nf` and `.fi`.
         #
         # The first version reformatted these into `.TP` terms, which looked
-        # better for `veilvoice` and mangled `veilvoice-verify`: the two
-        # binaries do not share a help style, because only one of them uses
-        # clap. The hand-laid-out one has indented continuation lines carrying
-        # its meaning, and re-flowing them ran the whole thing into a single
-        # paragraph.
+        # better for clap's own pages and mangled the verifier's, because only
+        # one of the two is written by clap. The hand-laid-out one has indented
+        # continuation lines carrying its meaning, and re-flowing them ran the
+        # whole thing into a single paragraph.
         #
         # A page that reproduces `--help` exactly is worth more than one that
         # is prettier for one binary and wrong for the other, and it cannot go

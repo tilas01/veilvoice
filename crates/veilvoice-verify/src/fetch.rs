@@ -153,7 +153,7 @@ pub fn no_downloader_message() -> String {
          ships, and could not find it.\n\n\
          Download the files yourself from\n  {HOST}/{REPO}/releases\n\
          and pass them in:\n\n  \
-         veilvoice-verify file <ARCHIVE> --sums SHA256SUMS --sig SHA256SUMS.asc\n"
+         veilvoice verify file <ARCHIVE> --sums SHA256SUMS --sig SHA256SUMS.asc\n"
     )
 }
 

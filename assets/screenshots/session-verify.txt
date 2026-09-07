@@ -1,4 +1,4 @@
-$ veilvoice-verify auto .
+$ veilvoice verify auto .
 Checking what is in .
 
   ok    embedded key fingerprint 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
@@ -11,7 +11,7 @@ Checking what is in .
   That is not the same as knowing it was built from the published
   source -- the same person produced the binary and the list. For
   that, compare against a hash somebody else produced from their own
-  build:  veilvoice-verify --explain
+  build:  veilvoice verify --explain
 
 Checking it again with your own GnuPG
   found at /usr/bin/gpg

@@ -276,7 +276,7 @@ say ""
 say "binary                          rebuilt here"
 mismatch=0
 built=0
-for binary in veilvoice veilvoice-gui veilvoice-verify; do
+for binary in veilvoice veilvoice-gui; do
     [ -f "$work/src/target/release/$binary" ] || continue
     built=$((built + 1))
     mine=$({hash} "$work/src/target/release/$binary"{take})
@@ -399,7 +399,7 @@ if errorlevel 1 (echo FAILED: the build did not succeed. & cd /d %TEMP% & rmdir 
 
 echo.
 echo binary                          rebuilt here
-for %%b in (veilvoice.exe veilvoice-gui.exe veilvoice-verify.exe) do (
+for %%b in (veilvoice.exe veilvoice-gui.exe) do (
   if exist "target\release\%%b" (
     for /f "skip=1 tokens=*" %%h in ('certutil -hashfile "target\release\%%b" SHA256') do (
       if not defined DONE_%%b (

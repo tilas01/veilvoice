@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/extracted.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 312 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 316 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
 
 ## Contents
 
@@ -85,19 +85,19 @@ your system will run them, and it says so rather than implying more.
 
 ## What this file contains
 
-312 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+316 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Program` (line 70) -- One program found in an extracted directory.
-- `struct Extracted` (line 83) -- What an extracted directory turned out to hold.
+- `struct Program` (line 74) -- One program found in an extracted directory.
+- `struct Extracted` (line 87) -- What an extracted directory turned out to hold.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Extracted::is_empty` (line 92) -- Whether anything was found at all.
-- `Extracted::not_runnable` (line 97) -- The programs the operating system will not run.
-- `directory_for` (line 107) -- The directory an archive would extract into, by this project's naming.
-- `look_in` (line 119) -- Look in directory for the programs a release carries.
+- `Extracted::is_empty` (line 96) -- Whether anything was found at all.
+- `Extracted::not_runnable` (line 101) -- The programs the operating system will not run.
+- `directory_for` (line 111) -- The directory an archive would extract into, by this project's naming.
+- `look_in` (line 123) -- Look in directory for the programs a release carries.
   - reaches: `runnable`
 
 ## What calls what
@@ -120,17 +120,17 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_empty(["Extracted::is_empty<br/>line 92"])
-    n_not_runnable(["Extracted::not_runnable<br/>line 97"])
-    n_directory_for(["directory_for<br/>line 107"])
-    n_look_in(["look_in<br/>line 119"])
-    n_runnable["runnable<br/>line 140"]
+    n_is_empty(["Extracted::is_empty<br/>line 96"])
+    n_not_runnable(["Extracted::not_runnable<br/>line 101"])
+    n_directory_for(["directory_for<br/>line 111"])
+    n_look_in(["look_in<br/>line 123"])
+    n_runnable["runnable<br/>line 144"]
     n_look_in --> n_runnable
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L92" "open the source"
-    click n_not_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L97" "open the source"
-    click n_directory_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L107" "open the source"
-    click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L119" "open the source"
-    click n_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L140" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L96" "open the source"
+    click n_not_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L101" "open the source"
+    click n_directory_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111" "open the source"
+    click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L123" "open the source"
+    click n_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L144" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_empty,n_not_runnable,n_directory_for,n_look_in entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -143,14 +143,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `PROGRAMS` <sub>pub const</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L66) | The programs a release archive carries. |
-| `Program` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L70) | One program found in an extracted directory. |
-| `Extracted` <sub>pub struct</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L83) | What an extracted directory turned out to hold. |
-| `Extracted::is_empty` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L92) | Whether anything was found at all. |
-| `Extracted::not_runnable` <sub>pub fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L97) | The programs the operating system will not run. |
-| `directory_for` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L107) | The directory an archive would extract into, by this project's naming. |
-| `look_in` <sub>pub fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L119) | Look in directory for the programs a release carries. |
-| `runnable` <sub>fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L140) | Whether the operating system will run this file. |
+| `PROGRAMS` <sub>pub const</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L70) | The programs a release archive carries. |
+| `Program` <sub>pub struct</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L74) | One program found in an extracted directory. |
+| `Extracted` <sub>pub struct</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L87) | What an extracted directory turned out to hold. |
+| `Extracted::is_empty` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L96) | Whether anything was found at all. |
+| `Extracted::not_runnable` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L101) | The programs the operating system will not run. |
+| `directory_for` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111) | The directory an archive would extract into, by this project's naming. |
+| `look_in` <sub>pub fn</sub> | [123](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L123) | Look in directory for the programs a release carries. |
+| `runnable` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L144) | Whether the operating system will run this file. |
 
 ---
 
