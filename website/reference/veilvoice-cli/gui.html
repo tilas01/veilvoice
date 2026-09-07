@@ -63,7 +63,11 @@
 <h2 id="why-this-is-not-simply-commandnewveilvoice-gui">Why this is not simply <code>Command::new(&quot;veilvoice-gui&quot;)</code></h2>
 <p>A bare name is resolved through <code>PATH</code>, and on Windows the <strong>current directory is searched first</strong>. So <code>veilvoice gui</code>, run inside a downloads folder that happens to contain something called <code>veilvoice-gui.exe</code>, would start that instead. This is the one command whose whole job is to launch another program, which makes it a poor place to be relaxed about which.</p>
 <p>So the search is explicit and in a stated order:</p>
-<p>1. <strong>Beside this binary.</strong> A portable folder holds all three programs together, and somebody who unpacked a release and typed <code>veilvoice gui</code> means the one they unpacked. 2. <strong>Where an installation puts it</strong>, from <code>veilvoice_setup::install</code>. 3. <strong><code>PATH</code></strong>, last, and only through the system&#x27;s own resolver.</p>
+<ol>
+<li><strong>Beside this binary.</strong> A portable folder holds both programs together, and somebody who unpacked a release and typed <code>veilvoice gui</code> means the one they unpacked.</li>
+<li><strong>Where an installation puts it</strong>, from <code>veilvoice_setup::install</code>.</li>
+<li><strong><code>PATH</code></strong>, last, and only through the system&#x27;s own resolver.</li>
+</ol>
 <p>If none of those has it, that is said plainly with the places that were looked in, rather than a &quot;not found&quot; that leaves somebody guessing.</p>
 <h2 id="it-does-not-wait">It does not wait</h2>
 <p>The window is started and the command returns. A terminal held open for as long as a desktop application runs is a terminal somebody cannot use, and closing it would then close the window.</p>

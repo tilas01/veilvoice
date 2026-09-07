@@ -62,7 +62,7 @@
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! So the search is explicit and in a stated order:</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! 1. **Beside this binary.** A portable folder holds all three programs</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! 1. **Beside this binary.** A portable folder holds both programs</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!    together, and somebody who unpacked a release and typed `veilvoice gui`</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!    means the one they unpacked.</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! 2. **Where an installation puts it**, from `veilvoice_setup::install`.</span></span>
@@ -145,7 +145,7 @@
 <span class="ln" id="L89">    looked.<span class="tok-fn">push</span>(<span class="tok-str">&quot;  your PATH&quot;</span>.<span class="tok-fn">to_string</span>());</span>
 <span class="ln" id="L90">    <span class="tok-fn">Err</span>(format!(</span>
 <span class="ln" id="L91">        <span class="tok-str">&quot;the desktop application ({}) is not installed here. Looked in:\n{}\n\n\</span></span>
-<span class="ln" id="L92"><span class="tok-str">         `veilvoice install` puts all three programs where your shell can find them.&quot;</span>,</span>
+<span class="ln" id="L92"><span class="tok-str">         `veilvoice install` puts both programs where your shell can find them.&quot;</span>,</span>
 <span class="ln" id="L93">        <span class="tok-fn">gui_name</span>(),</span>
 <span class="ln" id="L94">        looked.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
 <span class="ln" id="L95">    ))</span>

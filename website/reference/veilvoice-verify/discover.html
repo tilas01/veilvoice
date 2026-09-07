@@ -65,7 +65,12 @@
 <p>Verifying a download used to require naming three files and knowing a tag. That is fine for somebody who has already read the instructions and is wrong for everybody else, and &quot;everybody else&quot; is precisely the population a verifier exists to serve. Somebody who has just downloaded an archive and wants to know whether it is the real one should be able to run this and be told.</p>
 <p>So: look in the obvious places, in an obvious order, and say what was found. Nothing here downloads, nothing here guesses at a hash, and nothing here reports &quot;verified&quot; on the strength of a filename.</p>
 <h2 id="where-it-looks-and-why-in-that-order">Where it looks, and why in that order</h2>
-<p>1. The directory given, if one was. 2. The current working directory, where somebody who has just <code>cd</code>-ed to their downloads will be. 3. The directory the running binary is in, where somebody who unpacked the archive and double-clicked the verifier inside it will be. 4. The usual download directories for the platform.</p>
+<ol>
+<li>The directory given, if one was.</li>
+<li>The current working directory, where somebody who has just <code>cd</code>-ed to their downloads will be.</li>
+<li>The directory the running binary is in, where somebody who unpacked the archive and double-clicked the verifier inside it will be.</li>
+<li>The usual download directories for the platform.</li>
+</ol>
 <p>Each is searched one level deep only. A recursive walk of a home directory is slow, surprising, and would let a verifier wander into places nobody asked it to look at.</p>
 <h2 id="what-counts-as-a-release-archive">What counts as a release archive</h2>
 <p>A file whose name starts <code>veilvoice-</code> and ends in one of the archive extensions this project publishes. That is a <strong>filename</strong> test and it proves nothing at all: it is how candidates are found, never how they are judged. Every candidate still has to survive the signature and the hash, and a file that merely looks the part fails exactly as loudly as one that does not.</p>
