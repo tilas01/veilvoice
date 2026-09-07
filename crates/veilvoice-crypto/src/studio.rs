@@ -259,10 +259,7 @@ impl Studio {
             return Err(Error::BadHeader);
         }
         let sealed = std::fs::read(self.dir.join(id)).map_err(|_| Error::AppLockStore)?;
-        let plain = self.unseal(&sealed, id.as_bytes())?;
-        let mut plain = plain;
-        let secret = Secret::new(&mut plain);
-        Ok(secret)
+        self.unseal_secret(&sealed, id.as_bytes())
     }
 
     /// Remove one recording and its index entry.
@@ -306,9 +303,34 @@ impl Studio {
         let key = self.secret_key();
         crate::aead::open(&key, &nonce, aad, &sealed[crate::aead::NONCE_LEN..])
     }
+
+    /// The same, decrypting straight into locked memory.
+    ///
+    /// A recording is the whole point of this vault and it is large. Going
+    /// through [`Self::unseal`] would put every byte of it into an ordinary
+    /// heap `Vec` first, where the kernel is free to page it out, and only then
+    /// copy it into a [`Secret`]. That window is not brief for a file of any
+    /// size, and it is exactly the window this vault exists to close, so the
+    /// index goes through `unseal` and the audio goes through here.
+    fn unseal_secret(&self, sealed: &[u8], aad: &[u8]) -> Result<Secret, Error> {
+        if sealed.len() < crate::aead::NONCE_LEN {
+            return Err(Error::Truncated);
+        }
+        let mut nonce = [0u8; crate::aead::NONCE_LEN];
+        nonce.copy_from_slice(&sealed[..crate::aead::NONCE_LEN]);
+        let key = self.secret_key();
+        crate::aead::open_secret(&key, &nonce, aad, &sealed[crate::aead::NONCE_LEN..])
+    }
 }
 
-/// A random, opaque identifier: 32 base32-ish characters that say nothing.
+/// A random, opaque identifier: 20 lower-case letters and digits that say
+/// nothing about what they name.
+///
+/// Twenty bytes are drawn and five bits of each are used, so the identifier
+/// carries 100 bits of entropy in 20 characters. That is far more than a vault
+/// will ever hold and it is not a compromise for space: the alphabet has 32
+/// letters in it, so five bits per character is exactly what one character
+/// holds, and taking more would need a base conversion for no benefit.
 fn new_id() -> Result<String, Error> {
     let mut raw = [0u8; 20];
     getrandom::getrandom(&mut raw).map_err(|_| Error::Random)?;
@@ -865,6 +887,43 @@ mod tests {
         let decoy = tempfile::tempdir().unwrap();
         make_decoy(decoy.path(), shape).unwrap();
         assert!(decoy.path().join(INDEX).exists());
+    }
+
+    /// A recording never passes through an ordinary heap buffer on its way out.
+    ///
+    /// `Studio::load` used to call `unseal`, which calls `aead::open`, which
+    /// hands back a plain `Vec<u8>`. The whole recording was decrypted into
+    /// pageable memory the kernel may write to swap, and only then copied into
+    /// a `Secret` and the vector wiped. Every test here passed: the bytes were
+    /// right and the wrong key still opened nothing. The defect was in where
+    /// the right bytes had been, which no round trip can see.
+    ///
+    /// So this reads the source. It is a blunt check and it is the only kind
+    /// that can express "and it never went anywhere else on the way".
+    #[test]
+    fn a_recording_is_decrypted_straight_into_locked_memory() {
+        let source = include_str!("studio.rs").replace("\r\n", "\n");
+        let body = source
+            .split("pub fn load(&self, id: &str)")
+            .nth(1)
+            .expect("Studio::load has to be findable");
+        let body = body.split("\n    /// ").next().unwrap_or(body);
+        assert!(
+            body.contains("unseal_secret"),
+            "Studio::load must decrypt into a Secret, not into a Vec: {body}"
+        );
+        assert!(
+            !body.contains("self.unseal("),
+            "Studio::load is back on the Vec path: {body}"
+        );
+
+        // And the two really are different routes, so the assertion above is
+        // about something rather than about a name.
+        let secret_route = source
+            .split("fn unseal_secret(")
+            .nth(1)
+            .expect("unseal_secret has to be findable");
+        assert!(secret_route.contains("open_secret("));
     }
 
     #[test]

@@ -38,6 +38,227 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirtieth round: the full sweep, and what a repository forgets
+
+The round the roadmap calls marker 127: no part of this repository is signed off
+until every part of it has been. Security, memory safety and the post-quantum
+surface; correctness and QA over every crate; reproducibility of the build and
+of every generated artefact; the documentation, the website, the packaging and
+the scripts; and the optimisation pass, because bloat that nobody measured is a
+claim nobody checked.
+
+**Eight defects, and seven of them are the same defect.** One is a real
+weakening of the Studio's central guarantee. The other seven are a repository
+saying things that used to be true: a binary that no longer ships, counts that
+no longer match, a version that is no longer current, generated pages for a file
+that no longer exists. None of them is a bug in the ordinary sense. All of them
+would have been read by somebody as a statement of fact.
+
+That is why the standing rule now lives in `CLAUDE.md` rather than in this
+document: **a change is not finished until everything that describes it has
+changed with it**, a fact appearing twice is derived or checked rather than
+repeated, and the only exception is a record of the past, which is
+`CHANGELOG.md` and this file and nothing else.
+
+**What the sweep found nothing in.** All 27 workspace crates and the fuzz
+harnesses carry `#![forbid(unsafe_code)]`, and the tree contains no `unsafe`
+block. There is no `TODO`, `FIXME`, `XXX` or `dbg!` anywhere in the crate
+sources. Outside test modules the tree holds nine `expect` calls and no
+`unwrap`, and each was read: the two FFT calls in `stft.rs` cannot fail because
+every buffer is sized once at construction, the two `try_into` calls in the RIFF
+walker are guarded by `pos + 8 <= end <= bytes.len()` before they run, and
+`Tape::push` pushes a chunk immediately above the `last_mut` it then unwraps. No
+production code creates a temporary file; every `tempfile` in the tree is a
+test. The 32-bit cast lints were read one by one, and the two that matter,
+`shred.rs` narrowing a file length and `lock.rs` converting a clock, are both
+already clamped in the wider type with the past defect that caused it named in a
+comment beside them.
+
+**Optimisation.** Re-run rather than assumed from the twenty-ninth round.
+`chain::process` and `Recorder::drain` still allocate nothing. The release
+profile is still at its limit. The duplicate dependency versions are still
+mostly the window toolkit's, and `rand` is still pinned at 0.8 on purpose: the
+modulation stream comes from `rand_chacha` and changing it risks changing the
+bytes every recording is veiled with, which this pass forbids. The one thing
+this round *did* find is F-152, and it is a hundred and fifty-four GPU layers
+rather than a line of Rust.
+
+### F-149 -- a test that could not be compiled on a target this project ships
+
+`veilvoice-audio/src/record.rs`. The recorder's boundary test asserted that
+thirteen hours of 48 kHz 16-bit mono exceeds what a WAV can address:
+
+    let per_second = 48_000 * 2;
+    assert!(13 * 3600 * per_second > WAV_MAX_DATA);
+
+Thirteen hours is 4,492,800,000 bytes. A 32-bit `usize` stops at 4,294,967,295,
+and because the multiplication is constant the compiler does not wait for the
+test to run: `arithmetic_overflow` is deny-by-default, so `veilvoice-audio`
+**failed to build at all** on `i686-unknown-linux-gnu`, which is precisely the
+job that exists to catch 32-bit arithmetic. CI had been red on every commit
+since the recorder was written.
+
+The number is a property of the WAV format rather than of the machine reading
+it, so it is now computed in `u64` and `WAV_MAX_DATA` is widened to compare
+against it, rather than the constant being narrowed to fit the machine, which is
+how the original defect this test guards against would be reintroduced inside
+the test itself. Nothing in the recorder changed: the guard already worked on
+32-bit, because `WAV_MAX_DATA` is `u32::MAX - 36` and no tape can be longer than
+the address space.
+
+### F-150 -- three lists named a binary that no release publishes
+
+`veilvoice-verify/src/builder.rs`, `veilvoice-verify/src/extracted.rs` and
+`veilvoice-setup/src/install.rs`. A release stopped shipping a
+`veilvoice-verify` executable at 0.1.18, when the verifier became a library
+inside `veilvoice` and the desktop application. Three separate lists went on
+naming it:
+
+- `builder::SHIPPED`, which hashes what a build produced, so every
+  reproducible-build report since 0.1.18 has carried a name in `absent` that no
+  release publishes, which reads as a build that failed to produce something.
+- `extracted::PROGRAMS`, which checks the folder somebody unzipped.
+- the installer's own list, which looked beside the running binary for a third
+  file that can only be a stale copy from an older install.
+
+The reproducible-build scripts for Unix and Windows looped over it too, and
+`tools/release/check-windows-icons.py` looked for its resource section.
+
+The lists are now read from the job that publishes the binaries.
+`.github/workflows/release.yml` sets `BINARIES` twice, once for the targets
+where the window cannot be built and once for the rest, and the test takes the
+union: a binary added or removed there fails on the same commit rather than
+being noticed a release later by somebody reading a report.
+
+### F-151 -- the front page told a reader to run it, and so did a recording
+
+`website/index.html`, `assets/screenshots/session-verify.txt`,
+`veilvoice-verify/src/fetch.rs` and five other places. The same change as F-150,
+in the half a reader actually sees.
+
+The front page said the verifier "ships in every archive and is a single small
+program with no installer" and told somebody to put it in their download folder
+and run it. The download-failure message printed
+`veilvoice-verify file <ARCHIVE> --sums SHA256SUMS --sig SHA256SUMS.asc`, which
+is a command that does not exist. And the recorded terminal session replayed on
+the front page opened with the prompt `$ veilvoice-verify auto .` while
+`tools/shots/sessions.py`, the recorder that produced it, had already been
+updated to `veilvoice verify auto .`: the transcript and its own generator had
+quietly parted company, and nothing compared them.
+
+A test now reads the repository the way a reader does. `veilvoice-verify`
+followed by a flag or a subcommand, or with a path in front of it, is an
+instruction to run something; the crate name on its own is not. This file,
+`CHANGELOG.md` and the release notes generated from it are exempt **by name and
+with the reason stated**: they are records of what happened, and editing a
+record to match the present is how a project loses the ability to say when it
+changed.
+
+### F-152 -- 146 permanent GPU layers for a picture that had stopped moving
+
+`assets/roadmap.svg`, via `tools/site/roadmap.py`. Reported as the roadmap film
+looking choppy. The film was not the problem, and measuring it first is the only
+reason the real cause was found.
+
+Measured through Chromium's animation timeline, the scrolling list holds a
+steady 16.7ms frame and a constant 0.70px step, composited, with no dropped
+frames. It keeps that on a 390x844 viewport at three times the device pixel
+ratio with the main thread throttled to a sixth of speed: a screencast of what
+the reader actually sees shows a new frame every 16.7ms throughout.
+
+The page it sits on was the problem. Every marker square in the still picture
+beside it carries a transform-and-opacity reveal, and the reveal was declared
+`animation-fill-mode: both`. A filling animation never finishes as far as the
+compositor is concerned, and a transform animation earns its element a layer, so
+all 146 squares held one for as long as the page was open. Chromium's layer tree
+reported **162 composited layers**, and the film was sharing a compositor with
+every one of them.
+
+`forwards` was never needed: the reveal ends at `opacity:1;transform:none`,
+which is the square's own state, so holding it changes nothing on screen and
+costs a texture each. `backwards` keeps the half that matters, the state before
+the animation starts, so a delayed square does not flash at full size first.
+
+**162 layers to 8.** `tools/site-tests/images.test.js` now fails on `both` or
+`forwards` in that animation, with the reasoning, so the next person to reach
+for a fill mode finds out why this one is what it is.
+
+### F-153 -- four counts had drifted, and the README was watched by nothing
+
+`README.md`, `website/index.html` and this file. The README said 1,215 tests and
+17 website suites; the tree measures 1389 and 18. The front page and this file
+said 1324 and 17. This file's own verdict said 145 defects across twenty-seven
+rounds while the document writes up 148 across twenty-nine, and the README
+repeated the 145.
+
+This is F-71 again, in the one document it had never covered. The check written
+after F-71 compares the front page and this file against `docs/MEASURED.md`,
+which is generated by running the tests and reading `Cargo.toml`, so neither
+number is typed by anybody. The README was not in that check, and it is the
+document most readers actually open.
+
+It is now, along with the functional line count added in the same pass. Four
+numbers rather than three, in three documents rather than two.
+
+### F-154 -- deleting a source file left seven pages describing it
+
+`docs/source/`, `website/reference/source/`, `assets/sources/` and `wiki/`.
+`website/js/demo.js` was deleted when the demonstration moved onto the page.
+`tools/docs/sources.py` was not re-run, so seven generated files stayed in the
+tree: a Markdown page, a website page, two drawings, two copies of those
+drawings and a wiki page, all describing a file that is gone.
+
+The generator's `--check` says "no longer produced" for exactly this, and it is
+run by `tools/verify.py` and not by CI. Found by running the full sweep by hand,
+which is the argument for the sweep.
+
+### F-155 -- the Studio decrypted a recording into ordinary heap memory
+
+`veilvoice-crypto/src/studio.rs`. The one defect this round that is a weakening
+rather than a staleness.
+
+`Studio::load` returns a `Secret`, and its documentation says the vault exists
+so that a recording "is never anywhere unprotected". It called `unseal`, which
+calls `aead::open`, which asks the `chacha20poly1305` crate for the plaintext
+and gets back a plain `Vec<u8>`. The whole recording was decrypted into ordinary
+pageable heap, and only then copied into a `Secret` and the vector wiped.
+
+Between those two moments the entire recording sat in memory the kernel is free
+to write to swap. For a passphrase that window is small. For a recording it is
+the whole recording, for as long as it takes to allocate and copy several
+megabytes, in the one place in this project whose entire purpose is that this
+does not happen.
+
+Every existing test passed, and they could not have failed: the bytes were
+right, the wrong key still opened nothing, and nothing readable was left on
+disk. The defect was in *where the right bytes had been on the way*, which no
+round trip can see.
+
+`aead::open_secret` now decrypts **in place** inside a buffer that is a `Secret`
+from the moment it is allocated, so it is page-locked where the operating system
+allows and wiped on drop, and there is nothing to copy afterwards because there
+is nowhere else the plaintext has been. A failed tag check drops the buffer, so
+partially decrypted bytes are wiped rather than returned. `open` is kept for the
+callers whose plaintext is small and immediately parsed, where a `Secret` around
+four bytes of header would be theatre; the vault's index still goes that way and
+the audio does not.
+
+The regression test reads the source, because "and it never went anywhere else
+on the way" is not a property a round trip can express.
+
+### F-156 -- the sentence introducing the example named the previous release
+
+`docs/INSTALL.md`. Four lines above a block that reads `V=v0.1.18`, the sentence
+introducing it said "Replace `v0.1.17` and the archive name with the release and
+build you want". Somebody following the prose literally fetches a release that
+is not the current one.
+
+`tools/release/version.py` exists precisely to stop this and checks eleven
+places, including the `V=` line in that very block. It watched the command and
+not the instruction above it. The sentence is now in the list, and breaking it
+deliberately makes the tool exit non-zero, which is how that was confirmed
+rather than assumed.
+
 ## The twenty-ninth round: an optimisation pass that found little, and says so
 
 Read for the things that accumulate rather than the things that break: work
@@ -3676,7 +3897,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1389 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1393 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -5323,8 +5544,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and forty-eight defects found and fixed (F-1 to F-148), across
-twenty-nine rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and fifty-six defects found and fixed (F-1 to F-156), across
+thirty rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven
