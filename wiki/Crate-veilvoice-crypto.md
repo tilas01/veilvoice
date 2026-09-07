@@ -96,7 +96,7 @@ your machine and the key is made from your password each time.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>234 lines"])
-    n_aead["aead.rs<br/>178 lines"]
+    n_aead["aead.rs<br/>276 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>535 lines"]
     n_hoard["hoard.rs<br/>1037 lines"]
@@ -105,7 +105,7 @@ flowchart TD
     n_lock["lock.rs<br/>1823 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
-    n_studio["studio.rs<br/>877 lines"]
+    n_studio["studio.rs<br/>936 lines"]
     n_tape["tape.rs<br/>350 lines"]
     n_vault["vault.rs<br/>615 lines"]
     n_weave["weave.rs<br/>1314 lines"]
@@ -142,7 +142,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`aead.rs`|File-veilvoice-crypto-aead]] | 178 | Authenticated encryption with XChaCha20-Poly1305. |
+| [[`aead.rs`|File-veilvoice-crypto-aead]] | 276 | Authenticated encryption with XChaCha20-Poly1305. |
 | [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] | 327 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [[`container.rs`|File-veilvoice-crypto-container]] | 535 | The .veil encrypted container format. |
 | [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 1037 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
@@ -152,7 +152,7 @@ flowchart TD
 | [[`lock.rs`|File-veilvoice-crypto-lock]] | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
-| [[`studio.rs`|File-veilvoice-crypto-studio]] | 877 | The studio vault: a key that exists only when both locks have been opened. |
+| [[`studio.rs`|File-veilvoice-crypto-studio]] | 936 | The studio vault: a key that exists only when both locks have been opened. |
 | [[`tape.rs`|File-veilvoice-crypto-tape]] | 350 | A recording held in locked, zeroizing memory while it is still being made. |
 | [[`vault.rs`|File-veilvoice-crypto-vault]] | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [[`weave.rs`|File-veilvoice-crypto-weave]] | 1314 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
@@ -160,7 +160,7 @@ flowchart TD
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |
 
-**5,707 functional lines of Rust** in this crate. A functional line is a line
+**5,791 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

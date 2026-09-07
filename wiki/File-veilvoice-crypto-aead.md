@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/aead.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 178 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 276 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs)
 
 ## Contents
 
@@ -36,7 +36,7 @@ any alteration at all means it will not open, and says so.
 
 ## What this file contains
 
-178 lines defining **4 functions** (3 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+276 lines defining **5 functions** (4 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -44,6 +44,8 @@ any alteration at all means it will not open, and says so.
 - `seal` (line 51) -- Encrypt plaintext, authenticating aad alongside it.
   - reaches: `cipher`
 - `open` (line 70) -- Decrypt and verify.
+  - reaches: `cipher`
+- `open_secret` (line 117) -- Decrypt and verify into protected memory, never into an ordinary Vec.
   - reaches: `cipher`
 
 ## What calls what
@@ -64,14 +66,17 @@ flowchart TD
     n_cipher["cipher<br/>line 41"]
     n_seal(["seal<br/>line 51"])
     n_open(["open<br/>line 70"])
+    n_open_secret(["open_secret<br/>line 117"])
     n_open --> n_cipher
+    n_open_secret --> n_cipher
     n_seal --> n_cipher
     click n_random_nonce href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L35" "open the source"
     click n_cipher href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41" "open the source"
     click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51" "open the source"
     click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70" "open the source"
+    click n_open_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L117" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_random_nonce,n_seal,n_open entry
+    class n_random_nonce,n_seal,n_open,n_open_secret entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_cipher helper
 ```
@@ -88,3 +93,4 @@ flowchart TD
 | `cipher` <sub>fn</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41) |  |
 | `seal` <sub>pub fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51) | Encrypt plaintext, authenticating aad alongside it. |
 | `open` <sub>pub fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70) | Decrypt and verify. |
+| `open_secret` <sub>pub fn</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L117) | Decrypt and verify into protected memory, never into an ordinary Vec. |
