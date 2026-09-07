@@ -480,9 +480,18 @@ mod tests {
         // Twelve hours fits; thirteen does not. Both are computed the way the
         // recorder computes a length, so the boundary is checked in the units
         // a caller thinks in.
-        let per_second = 48_000 * 2;
-        assert!(12 * 3600 * per_second < WAV_MAX_DATA);
-        assert!(13 * 3600 * per_second > WAV_MAX_DATA);
+        //
+        // In `u64` rather than `usize`, because thirteen hours at 48 kHz
+        // 16-bit mono is 4,492,800,000 bytes and a 32-bit `usize` stops at
+        // 4,294,967,295. Written in `usize` this line does not merely fail on
+        // a 32-bit target, it refuses to compile there: the multiplication is
+        // constant, so `arithmetic_overflow` rejects it before any test runs.
+        // The number being asserted is a property of the WAV format, not of
+        // the machine, so it is computed in a width that holds it everywhere.
+        let per_second: u64 = 48_000 * 2;
+        let limit = WAV_MAX_DATA as u64;
+        assert!(12 * 3600 * per_second < limit);
+        assert!(13 * 3600 * per_second > limit);
     }
 
     #[test]
