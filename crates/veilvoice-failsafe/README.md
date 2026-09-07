@@ -121,6 +121,13 @@ flowchart TD
 | [`act.rs`](../../docs/files/veilvoice-failsafe/act.md) | 516 | Actually closing a program, kept apart from deciding to. |
 | [`lib.rs`](../../docs/files/veilvoice-failsafe/lib.md) | 682 | Failsafe: nothing leaves this machine in your own voice by accident. |
 
+**752 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.
+
 ## Public items
 
 | Item | Where | What |

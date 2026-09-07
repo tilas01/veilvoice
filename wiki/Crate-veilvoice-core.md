@@ -144,3 +144,10 @@ flowchart TD
 | [[`spectrum_report.rs`|File-veilvoice-core-examples-spectrum_report]] | 107 | Where do the output partials actually land? |
 | [[`veil_a_buffer.rs`|File-veilvoice-core-examples-veil_a_buffer]] | 54 | _no module documentation yet_ |
 | [[`hostile_audio.rs`|File-veilvoice-core-tests-hostile_audio]] | 389 | The engine against input that is not well-behaved audio. |
+
+**3,089 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

@@ -86,3 +86,10 @@ flowchart TD
 | [[`linux.rs`|File-veilvoice-watch-linux]] | 201 | Linux detection, via open file handles in /proc. |
 | [[`windows.rs`|File-veilvoice-watch-windows]] | 606 | Windows detection, via the Capability Access Manager. |
 | [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] | 30 | Print what is using the microphone and camera right now. |
+
+**745 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

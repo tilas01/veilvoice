@@ -326,6 +326,7 @@ function run() {
   // `docs/AUDIT.md` is the authority: it is the document that has to be
   // correct for any of the rest to mean anything.
   const audit = fs.readFileSync(path.join(ROOT, "docs", "AUDIT.md"), "utf8");
+  const readme = fs.readFileSync(path.join(ROOT, "README.md"), "utf8");
 
   // F-71. This used to compare the front page against docs/AUDIT.md, and it
   // passed for four rounds while both were wrong: the page said 354 tests and
@@ -349,9 +350,10 @@ function run() {
     const trueTests = number("Tests, measured by running them");
     const trueCrates = number("Crates in the workspace");
     const trueSuites = number("Website suites");
+    const trueLines = number("Functional lines of Rust");
 
-    if (!trueTests || !trueCrates || !trueSuites) {
-      fail("docs/MEASURED.md does not carry the three numbers it should");
+    if (!trueTests || !trueCrates || !trueSuites || !trueLines) {
+      fail("docs/MEASURED.md does not carry the four numbers it should");
     } else {
       // Every place each number is claimed, against the measurement.
       const claims = [
@@ -366,7 +368,16 @@ function run() {
         // regex has found an older number further up the page.
         ["the audit's test count", /\| Test suite \| (\d+) tests across \d+ crates/.exec(audit), trueTests],
         ["the audit's crate count", /\| Test suite \| \d+ tests across (\d+) crates/.exec(audit), trueCrates],
-        ["the audit's suite count", /\| Test suite \|[^|]*?and (\d+) site-test suites/.exec(audit), trueSuites]
+        ["the audit's suite count", /\| Test suite \|[^|]*?and (\d+) site-test suites/.exec(audit), trueSuites],
+        // The README carries the same counts and nothing was watching them.
+        // They said 1,215 tests and 17 suites against a measured 1389 and 18:
+        // the front page and the audit were checked here from the day this
+        // file was written, and the document most readers actually open was
+        // not. Added with the line count rather than after it drifts too.
+        ["the README's test count", /\((\d+) tests across \d+\ncrates/.exec(readme), trueTests],
+        ["the README's crate count", /\(\d+ tests across (\d+)\ncrates/.exec(readme), trueCrates],
+        ["the README's suite count", /and (\d+) website suites/.exec(readme), trueSuites],
+        ["the README's line count", /\*\*(\d+) functional lines of Rust\*\*/.exec(readme), trueLines]
       ];
 
       let drifted = 0;
@@ -381,7 +392,8 @@ function run() {
       }
       if (drifted === 0) {
         pass(`every stated count matches the tree (${trueTests} tests, ` +
-             `${trueCrates} crates, ${trueSuites} suites)`);
+             `${trueCrates} crates, ${trueSuites} suites, ` +
+             `${trueLines} functional lines)`);
       }
 
       // A spelled-out number cannot be compared, so it is not allowed. "the

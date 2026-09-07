@@ -176,6 +176,8 @@ CHECKS = [
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
     ("measured numbers match the tree",
      [sys.executable, "tools/measured/generate.py", "--check"]),
+    ("the line counter is right about what a line is",
+     [sys.executable, "tools/loc/count.py", "--self-test"]),
     ("website suites", ["node", "tools/site-tests/run.js"]),
     ("the local site serves every page", [sys.executable, "tools/site/serve.py", "--check"]),
 ]

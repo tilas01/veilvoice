@@ -70,6 +70,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 
 # --- what is documented -----------------------------------------------------
 #
@@ -239,6 +240,46 @@ def palette(root):
 def repo_root():
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.abspath(os.path.join(here, "..", ".."))
+
+
+# The functional line count, from the one tool that counts it.
+#
+# Imported rather than reimplemented. Two counters would be two answers to the
+# same question, and the number appears in the README, in `docs/MEASURED.md`
+# and in 28 crate documents at once, so a second implementation would be 30
+# places quietly disagreeing.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "loc"))
+import count as loc  # noqa: E402
+
+
+def functional_lines_by_crate():
+    """Each crate's functional line count, measured once per run."""
+    if not hasattr(functional_lines_by_crate, "cache"):
+        functional_lines_by_crate.cache = loc.per_crate()
+    return functional_lines_by_crate.cache
+
+
+def functional_lines_note(crate, indent=""):
+    """The sentence that states a crate's functional line count, or nothing.
+
+    Two different numbers live near each other here and neither may be mistaken
+    for the other. The **Lines** column above is the length of each file, which
+    is what a reader gets scrolling it, and it counts blank lines and comments.
+    This is the other measure, and because this project is written with a very
+    high comment-to-code ratio the two are far apart. Both are stated with their
+    definitions rather than one being quietly redefined to match the other.
+    """
+    count = functional_lines_by_crate().get(crate)
+    if count is None:
+        return []
+    sentence = (
+        "**{:,} functional lines of Rust** in this crate. A functional line is "
+        "{}. That is a different measure from the **Lines** column above, which "
+        "is the length of each file and counts blank lines and comments too. "
+        "Both are produced by `tools/loc/count.py`."
+    ).format(count, loc.DEFINITION)
+    return [indent + line for line in textwrap.wrap(sentence, 78)] + [""]
 
 
 def read(path):
@@ -2198,6 +2239,7 @@ def markdown_crate(colours, model, links):
                    % (entry["name"], file_page_path(crate, entry["stem"]),
                       entry["lines"], summary))
     out.append("")
+    out.extend(functional_lines_note(crate))
 
     public = []
     for entry in model["files"]:
@@ -2876,6 +2918,7 @@ def wiki_crate(colours, model, links):
                    % (entry["name"], wiki_file_page(crate, entry["stem"]),
                       entry["lines"], summary))
     out.append("")
+    out.extend(functional_lines_note(crate))
     return tidy("\n".join(out))
 
 
