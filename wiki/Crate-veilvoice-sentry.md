@@ -117,3 +117,10 @@ flowchart TD
 | [[`canary.rs`|File-veilvoice-sentry-canary]] | 761 | Decoy files that should never change, and a record of what they were. |
 | [[`lib.rs`|File-veilvoice-sentry-lib]] | 247 | An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing. |
 | [[`rate.rs`|File-veilvoice-sentry-rate]] | 953 | How much of a directory tree changed, and how fast. |
+
+**1,320 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.

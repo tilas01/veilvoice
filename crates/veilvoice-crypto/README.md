@@ -173,6 +173,13 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
+**5,707 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.
+
 ## Public items
 
 | Item | Where | What |

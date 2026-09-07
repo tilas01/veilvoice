@@ -23,7 +23,7 @@
 // `assets/screenshots`, and every worked command checked against the program's
 // own `--help`. Nothing is typed here, so nothing here can drift.
 //
-// # In plain words
+// In plain words
 //
 // Lets you click through screenshots of the real app, and read what each
 // command line job actually does, without downloading anything.

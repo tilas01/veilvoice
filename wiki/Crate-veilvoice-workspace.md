@@ -96,3 +96,10 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-workspace-lib]] | 819 | Named profiles and saved projects. |
+
+**547 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.
