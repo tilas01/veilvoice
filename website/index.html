@@ -23,9 +23,6 @@
 <script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
-<script src="js/demo-data.js" defer></script>
-<script src="js/demo.js" defer></script>
-<script src="js/walkthrough.js" defer></script>
 </head>
 <body>
 
@@ -328,7 +325,7 @@
       </div>
       <div class="card">
         <h3>Verify a download without GnuPG</h3>
-        <p><code>veilvoice-verify</code> ships in every archive and carries the signing key compiled in. It checks the signature over the hash list and then the file, on a machine with no GnuPG and no network. It distinguishes a download being <em>intact</em> from a build being <em>reproducible</em>, because those are different claims.</p>
+        <p><code>veilvoice verify</code> is part of the program you downloaded, and the desktop application's Verify tab runs the same code. The signing key is compiled in, so it checks the signature over the hash list and then the file on a machine with no GnuPG and no network. It distinguishes a download being <em>intact</em> from a build being <em>reproducible</em>, because those are different claims.</p>
       </div>
     </div>
 
@@ -553,20 +550,11 @@
     layout does not jump when each one arrives -- a page that reflows under a
     reader who is mid-sentence is a worse fault than a slow image.
   -->
-  <!--
-    The buttons sit with the photographs on purpose. A picture of a window and
-    a recording of the program doing something answer two halves of one
-    question, and the demonstration used to live four screens further down
-    where somebody looking at the screenshots never met it.
-  -->
-  <div class="demo-open-row">
-    <button class="demo-btn demo-btn-strong" data-demo="session">watch it run</button>
-    <button class="demo-btn" data-demo="app">click through the application</button>
-    <button class="demo-btn" data-demo="cli">the command line</button>
-  </div>
-  <p class="demo-note" style="margin:8px 0 20px">Recordings of the real
-  programs, typed out at reading speed: what they wrote on a terminal, prompts
-  and all. The clickable application beside them is a drawing, and says so.</p>
+  <p class="lead" style="margin-bottom:20px">
+    Every one of these is below in the demonstration too, one at a time and
+    larger. <a href="#demo">Go there</a> to watch the command line type itself
+    out first.
+  </p>
 
   <div class="shots">
       <figure class="shot">
@@ -647,17 +635,6 @@
   <div class="wrap">
   <h2>WHAT IT SOUNDS LIKE, IN ONE PICTURE</h2>
 
-  <div class="demo-open-row">
-    <button class="demo-btn demo-btn-strong" data-demo="session">watch it run</button>
-    <button class="demo-btn" data-demo="app">try the application</button>
-    <button class="demo-btn" data-demo="cli">try the command line</button>
-    <button class="demo-btn" data-demo="both">both, side by side</button>
-  </div>
-  <p class="demo-note" style="margin-bottom:18px">Five recordings of the real
-  programs, and a model of the application you can click through, in this page,
-  without downloading anything. The recordings are what the programs wrote on a
-  terminal. The model is a drawing, and it says so when it opens.</p>
-
   <figure class="demo">
     <div class="demo-flow" aria-hidden="true">
       <div class="demo-side">
@@ -735,6 +712,36 @@
     </figcaption>
   </figure>
 
+  <!--
+    The demonstration proper, in two halves and both of them on the page.
+
+    First the command line, because it is the half that can be *shown*: these
+    are recordings of the real programs, replayed at typing speed, and every
+    byte in them is what the program wrote. Then the window, as photographs
+    the build re-takes, one per screen.
+
+    There used to be a third thing here, a model of the application drawn in
+    CSS and opened from a button. It is gone. It was a drawing of an interface
+    sitting beside photographs of the same interface, which asks a reader to
+    decide which to believe, and neither of them was behind a button any more
+    than a screenshot should be.
+  -->
+  <div class="walk">
+    <h3 class="walk-h walk-h-cli" id="cli-walkthrough">THE COMMAND LINE, TYPED OUT</h3>
+    <p class="walk-lede">Five sessions, recorded from the real programs on a
+    real terminal, prompts and passphrases included. Pick one and it types
+    itself out. The only invented thing is the speed: a session that arrives
+    all at once is a paste rather than a session.</p>
+
+    <div id="cli-demo" class="term"></div>
+    <noscript>
+      <p class="walk-lede">These play with scripts on. With scripts off, the
+      drawings of each help screen are <a href="#look">above</a>, and the same
+      transcripts are in <code>assets/screenshots/</code> in the
+      repository.</p>
+    </noscript>
+  </div>
+
   <div id="walkthrough" class="walk">
     <h3 class="walk-h">EVERY SCREEN, AND WHAT IT IS FOR</h3>
     <p class="walk-lede">Photographs of the real window, one per tab. Pick a
@@ -804,10 +811,11 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 
     <h3>Or let it do all of that for you</h3>
     <p class="lede">
-      <code>veilvoice-verify</code> ships in every release and is a single small
-      program with no installer. Put it in the folder you downloaded to and run
-      it, or open the desktop application's <strong>verify</strong> tab and drop
-      the archive on the window. One press does all four steps:
+      <code>veilvoice verify</code> is built into the program itself: it ships in
+      every release because <code>veilvoice</code> does, and it needs no installer
+      and no separate download. Open a terminal in the folder you downloaded to
+      and run it, or open the desktop application's <strong>verify</strong> tab
+      and drop the archive on the window. One press does all four steps:
     </p>
     <ol class="lede">
       <li>the signature over <code>SHA256SUMS</code>;</li>
@@ -973,6 +981,13 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </div>
 </footer>
 
+<!-- The demonstration's data and the two modules that read it. Down here
+     rather than in <head> so `tools/site/split.py` can see which pages
+     actually carry the markup: `demo-data.js` is the largest script on the
+     site and eight section pages used to download it to do nothing with. -->
+<script src="js/demo-data.js" defer></script>
+<script src="js/sessions.js" defer></script>
+<script src="js/walkthrough.js" defer></script>
 <script src="js/markdown.js"></script>
 <script src="js/verify.js"></script>
 <script src="js/repo.js"></script>

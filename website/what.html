@@ -26,9 +26,6 @@
 <script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
-<script src="js/demo-data.js" defer></script>
-<script src="js/demo.js" defer></script>
-<script src="js/walkthrough.js" defer></script>
 </head>
 <body>
 <header class="top">
@@ -120,7 +117,7 @@
       </div>
       <div class="card">
         <h3>Verify a download without GnuPG</h3>
-        <p><code>veilvoice-verify</code> ships in every archive and carries the signing key compiled in. It checks the signature over the hash list and then the file, on a machine with no GnuPG and no network. It distinguishes a download being <em>intact</em> from a build being <em>reproducible</em>, because those are different claims.</p>
+        <p><code>veilvoice verify</code> is part of the program you downloaded, and the desktop application's Verify tab runs the same code. The signing key is compiled in, so it checks the signature over the hash list and then the file on a machine with no GnuPG and no network. It distinguishes a download being <em>intact</em> from a build being <em>reproducible</em>, because those are different claims.</p>
       </div>
     </div>
 

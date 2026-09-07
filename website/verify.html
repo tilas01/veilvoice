@@ -26,9 +26,6 @@
 <script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
-<script src="js/demo-data.js" defer></script>
-<script src="js/demo.js" defer></script>
-<script src="js/walkthrough.js" defer></script>
 </head>
 <body>
 <header class="top">
@@ -120,10 +117,11 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 
     <h3>Or let it do all of that for you</h3>
     <p class="lede">
-      <code>veilvoice-verify</code> ships in every release and is a single small
-      program with no installer. Put it in the folder you downloaded to and run
-      it, or open the desktop application's <strong>verify</strong> tab and drop
-      the archive on the window. One press does all four steps:
+      <code>veilvoice verify</code> is built into the program itself: it ships in
+      every release because <code>veilvoice</code> does, and it needs no installer
+      and no separate download. Open a terminal in the folder you downloaded to
+      and run it, or open the desktop application's <strong>verify</strong> tab
+      and drop the archive on the window. One press does all four steps:
     </p>
     <ol class="lede">
       <li>the signature over <code>SHA256SUMS</code>;</li>

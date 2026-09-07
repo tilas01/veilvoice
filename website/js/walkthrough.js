@@ -1,30 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// The walkthrough: every screen of the application as a photograph you pick
-// between, and the command line as a list of jobs rather than a list of flags.
+// Every screen of the application as a photograph you pick between, and the
+// command line as a list of jobs rather than a list of flags.
 //
-// Why this exists beside the demonstration overlay
+// # What this is, and what it deliberately is not
 //
-// `demo.js` draws a working model of the application: it responds to clicks,
-// and it says in the reader's sight that it is a drawing. That is useful for
-// showing how the program behaves, and it is the wrong thing for showing what
-// the program looks like, because a drawing of an interface is exactly the
-// thing a reader cannot check.
+// Nothing here pretends to run. The pictures are captures of the real window,
+// taken by the build on every commit, and the only thing the reader drives is
+// which one they are looking at. That is a smaller claim than an interactive
+// model of the program, and it is one the page can actually keep.
 //
-// This is the other half. Nothing here is interactive in the sense of
-// pretending to run: the pictures are captures of the real window, taken by
-// the build, and the only thing the reader drives is which one they are
-// looking at. That is a deliberately smaller claim, and it is one the page
-// can actually keep.
+// There used to be such a model, drawn in CSS and opened from a button. It is
+// gone: a drawing of an interface is exactly the thing a reader cannot check,
+// and offering it beside photographs of the same interface asked somebody to
+// decide which of the two to believe. `js/sessions.js` replaced it with the
+// recorded terminal sessions, which are the real programs' real output.
 //
-// Where the content comes from
+// # Where the content comes from
 //
 // All of it is in `window.VEILVOICE_DEMO`, which `tools/site/demo.py` writes
 // from the source: the tab list out of `app.rs`, the pictures out of
 // `assets/screenshots`, and every worked command checked against the program's
 // own `--help`. Nothing is typed here, so nothing here can drift.
 //
-// In plain words
+// # In plain words
 //
 // Lets you click through screenshots of the real app, and read what each
 // command line job actually does, without downloading anything.
@@ -36,10 +35,10 @@
   var shots = data.shots || [];
   var cases = data.usecases || [];
 
-  var tabsEl = document.querySelector(".walk-tabs");
-  var imgEl = document.getElementById("walk-img");
-  var noteEl = document.getElementById("walk-note");
-  var casesEl = document.querySelector(".walk-cases");
+  var tabsEl = null;
+  var imgEl = null;
+  var noteEl = null;
+  var casesEl = null;
 
   var current = 0;
 
@@ -70,7 +69,7 @@
   }
 
   function buildTabs() {
-    if (!tabsEl || !shots.length) { return; }
+    if (!shots.length) { return; }
     shots.forEach(function (shot, index) {
       var button = document.createElement("button");
       button.type = "button";
@@ -102,7 +101,7 @@
   }
 
   function buildCases() {
-    if (!casesEl || !cases.length) { return; }
+    if (!cases.length) { return; }
     cases.forEach(function (item) {
       var row = document.createElement("div");
       row.className = "walk-case";
@@ -140,7 +139,19 @@
     }
   }
 
+  // The elements are looked up here rather than at load, and the handler stops
+  // if the ones it cannot work without are missing. `tools/site/split.py` reads
+  // this guard to decide which of the section pages need this file at all, so a
+  // page that carries none of this markup does not download it.
   document.addEventListener("DOMContentLoaded", function () {
+    var imgNode = document.getElementById("walk-img");
+    var noteNode = document.getElementById("walk-note");
+    if (!imgNode || !noteNode) { return; }
+    imgEl = imgNode;
+    noteEl = noteNode;
+    tabsEl = document.querySelector(".walk-tabs");
+    casesEl = document.querySelector(".walk-cases");
+    if (!tabsEl || !casesEl) { return; }
     buildTabs();
     buildCases();
     fromFragment();
