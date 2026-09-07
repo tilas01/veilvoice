@@ -31,13 +31,19 @@ tarball, and `rpmbuild -bb` produced two binary packages:
 `veilvoice-0.1.15-1.x86_64.rpm` and `veilvoice-gui-0.1.15-1.x86_64.rpm`.
 
 The thing a build proves that a parse cannot is that `%files` and `%install`
-agree. They do: the main package carries `/usr/bin/veilvoice`,
-`/usr/bin/veilvoice-verify`, the licence and the whole of `docs/`; the `gui`
-subpackage carries `/usr/bin/veilvoice-gui`, the desktop entry and the icon.
-Nothing is listed that is not installed and nothing is installed that is not
-listed, which is the classic spec defect and is the one that had never been
-looked for. Extracted with `rpm2cpio`, the packaged `veilvoice --version`,
-`veilvoice info` and `veilvoice-verify --version` all ran.
+agree. They do: the main package carries `/usr/bin/veilvoice`, the licence and
+the whole of `docs/`; the `gui` subpackage carries `/usr/bin/veilvoice-gui`,
+the desktop entry and the icon. Nothing is listed that is not installed and
+nothing is installed that is not listed, which is the classic spec defect and
+is the one that had never been looked for. Extracted with `rpm2cpio`, the
+packaged `veilvoice --version` and `veilvoice info` both ran.
+
+That build was made at 0.1.15, when a release also carried a third binary for
+verification. It does not any more: the verifier is a library inside the two
+above, reached as `veilvoice verify` and from the desktop application's Verify
+tab, and the spec has one fewer file in it. The paragraph above describes the
+packages as they are built today rather than as they were then, because a
+reader uses it to check a build rather than to date one.
 
 What it did not prove, and the gap is wider than the Debian one. **This was
 built on Ubuntu, not on Fedora or RHEL or openSUSE**, so `%{dist}`, the system
@@ -89,8 +95,8 @@ build.
 
 `dpkg-buildpackage -us -uc -b` produced `veilvoice_0.1.15-1_amd64.deb` and
 `veilvoice-gui_0.1.15-1_amd64.deb`. Both installed with `dpkg -i`, the
-installed `veilvoice --version` reported 0.1.15, `veilvoice info` and
-`veilvoice-verify --help` ran, and both packages removed cleanly. The release
+installed `veilvoice --version` reported 0.1.15, `veilvoice info` and the
+verifier's own help ran, and both packages removed cleanly. The release
 build and `cargo test --release --workspace` both ran as part of it, because
 that is what `debian/rules` does.
 
@@ -113,10 +119,12 @@ both `initial-upload-closes-no-bugs`, which asks the changelog to close an ITP
 bug and applies to a package being uploaded into Debian's own archive rather
 than one a project publishes itself.
 
-Verified rather than assumed: `dpkg -c` shows `veilvoice.1.gz` and
-`veilvoice-verify.1.gz` in the main package and `veilvoice-gui.1.gz` in the
-`gui` one, and each was installed and rendered with `groff`. That took one
-detour worth recording, because it looked like a packaging bug and was not:
+Verified rather than assumed: `dpkg -c` shows `veilvoice.1.gz` in the main
+package and `veilvoice-gui.1.gz` in the `gui` one, and each was installed and
+rendered with `groff`. At the time this was run there was a third page, for the
+verifier when it was still a binary; that binary is gone and so is its page,
+and the verifier's help now reaches a reader through `veilvoice`'s. That took
+one detour worth recording, because it looked like a packaging bug and was not:
 this build machine is a *minimized* Ubuntu image, which carries
 `path-exclude=/usr/share/man/*` in `/etc/dpkg/dpkg.cfg.d/excludes` and throws
 manual pages away as it installs them. The pages were in the packages the whole

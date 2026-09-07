@@ -175,7 +175,7 @@ IF YOU ONLY READ ONE LINE
   same check in its Verify tab, with the same code underneath.
 
 USAGE
-  veilvoice-verify
+  veilvoice verify
   veilvoice verify auto [DIRECTORY]
       Find a downloaded release near you and check all of it, with nothing
       else to type. Looks in the directory given, then the current one, then

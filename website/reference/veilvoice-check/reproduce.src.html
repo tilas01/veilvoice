@@ -348,7 +348,7 @@
 <span class="ln" id="L276"><span class="tok-str">say &quot;binary                          rebuilt here&quot;</span></span>
 <span class="ln" id="L277"><span class="tok-str">mismatch=0</span></span>
 <span class="ln" id="L278"><span class="tok-str">built=0</span></span>
-<span class="ln" id="L279"><span class="tok-str">for binary in veilvoice veilvoice-gui veilvoice-verify; do</span></span>
+<span class="ln" id="L279"><span class="tok-str">for binary in veilvoice veilvoice-gui; do</span></span>
 <span class="ln" id="L280"><span class="tok-str">    [ -f &quot;$work/src/target/release/$binary&quot; ] || continue</span></span>
 <span class="ln" id="L281"><span class="tok-str">    built=$((built + 1))</span></span>
 <span class="ln" id="L282"><span class="tok-str">    mine=$({hash} &quot;$work/src/target/release/$binary&quot;{take})</span></span>
@@ -473,7 +473,7 @@
 <span class="ln" id="L399"></span>
 <span class="ln" id="L400"><span class="tok-str">echo.</span></span>
 <span class="ln" id="L401"><span class="tok-str">echo binary                          rebuilt here</span></span>
-<span class="ln" id="L402"><span class="tok-str">for %%b in (veilvoice.exe veilvoice-gui.exe veilvoice-verify.exe) do (</span></span>
+<span class="ln" id="L402"><span class="tok-str">for %%b in (veilvoice.exe veilvoice-gui.exe) do (</span></span>
 <span class="ln" id="L403"><span class="tok-str">  if exist &quot;target\release\%%b&quot; (</span></span>
 <span class="ln" id="L404"><span class="tok-str">    for /f &quot;skip=1 tokens=*&quot; %%h in (&#x27;certutil -hashfile &quot;target\release\%%b&quot; SHA256&#x27;) do (</span></span>
 <span class="ln" id="L405"><span class="tok-str">      if not defined DONE_%%b (</span></span>

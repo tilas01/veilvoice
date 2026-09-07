@@ -127,7 +127,7 @@ impl Report {
     pub fn caveat(&self) -> &'static str {
         "This is a version number read off a public page. It is not a signature \
          and nothing here has verified anything. Download a release and check it \
-         with veilvoice-verify before you run it."
+         with `veilvoice verify` before you run it."
     }
 }
 
@@ -378,7 +378,7 @@ already ships and reads a public page anybody can open. It sends nothing about \
 you or this machine. It does not download a release, install anything, or \
 restart the program -- it reports a version number, and every decision after \
 that is yours. A version number on a page is not a signature: check a download \
-with veilvoice-verify before running it.";
+with `veilvoice verify` before running it.";
 
 #[cfg(test)]
 mod tests {
@@ -558,7 +558,7 @@ mod tests {
     fn a_report_carries_what_the_answer_is_worth() {
         let caveat = report("0.1.12", "0.2.0").caveat().to_lowercase();
         assert!(caveat.contains("not a signature"));
-        assert!(caveat.contains("veilvoice-verify"));
+        assert!(caveat.contains("veilvoice verify"));
     }
 
     /// Errors explain what to do instead rather than only that something
