@@ -94,6 +94,313 @@ WORKFLOW = os.path.join(".github", "workflows", "release.yml")
 CONTENTS_FROM = (0, 1, 15)
 
 
+# --- checking a download ----------------------------------------------------
+#
+# The releases page is where somebody lands with a file they have just
+# downloaded, and it was the one page that told them what changed without
+# telling them how to check it. `docs/INSTALL.md` has always carried the
+# instructions; a reader on this page had to know that and go and find it.
+#
+# So the tutorial is here as well, and it is **generated**, for the reason
+# everything else on this site is: two hand-kept copies of a command are two
+# copies that drift, and the copy on the page nobody edits is the one that goes
+# wrong. Every command below is checked against the verifier's own help text,
+# read out of `crates/veilvoice-verify/src/lib.rs`, when this page is built. A
+# subcommand that is renamed or dropped fails the build here rather than
+# teaching somebody to type something that no longer works.
+
+VERIFIER_SOURCE = os.path.join("crates", "veilvoice-verify", "src", "lib.rs")
+
+# The signing key's fingerprint, read from the crate that carries it rather
+# than typed again. This is the one value in the whole chain that a person has
+# to compare by eye, so a wrong copy of it here would be the worst possible
+# defect on a page about verification.
+FINGERPRINT_SOURCE = os.path.join("crates", "veilvoice-check", "src", "lib.rs")
+
+
+def verifier_usage():
+    """The verifier's own `--help` text, out of the source that prints it."""
+    source = read(os.path.join(ROOT, VERIFIER_SOURCE))
+    start = source.index('const USAGE: &str = "')
+    end = source.index('\n";', start)
+    return source[start:end]
+
+
+def fingerprint():
+    """The signing key fingerprint, from the constant the programs compare."""
+    source = read(os.path.join(ROOT, FINGERPRINT_SOURCE))
+    found = re.search(r'pub const FINGERPRINT: &str = "([0-9A-F]{40})";', source)
+    if not found:
+        raise SystemExit(
+            "%s no longer declares FINGERPRINT, so the page cannot state the "
+            "fingerprint without typing it again" % FINGERPRINT_SOURCE
+        )
+    digits = found.group(1)
+    return " ".join(digits[i:i + 4] for i in range(0, 40, 4))
+
+
+# Each step: the heading, the command, and what a pass actually proves.
+#
+# The order is the order somebody meets the problem in, not the order the help
+# lists them: the whole check first, then the pieces of it, then the parts that
+# are about the *source* rather than the download.
+VERIFY_CLI = [
+    (
+        "The whole check, in one command",
+        "veilvoice verify",
+        "Run it in the folder you downloaded to. It finds the release, checks "
+        "the OpenPGP signature over `SHA256SUMS`, checks every archive against "
+        "that list, checks `CONTENTS.sha256` against it as well, and then "
+        "checks **every file you extracted** against `CONTENTS.sha256`. Each "
+        "step runs only if the one before it passed. Entirely offline.",
+    ),
+    (
+        "The same, pointed at a folder",
+        "veilvoice verify auto ~/Downloads",
+        "A named directory is checked and nothing else is searched. A path "
+        "that is not there is refused by name rather than answered with a "
+        "verdict about somewhere else.",
+    ),
+    (
+        "The signature over the hash list, on its own",
+        "veilvoice verify sums SHA256SUMS SHA256SUMS.asc",
+        "This is the step everything else rests on. `SHA256SUMS` is a list of "
+        "numbers; `SHA256SUMS.asc` is the detached OpenPGP signature over it. "
+        "Until that signature checks out against the signing key, the list is "
+        "just numbers somebody sent you.",
+    ),
+    (
+        "One file, against the signed list",
+        "veilvoice verify file veilvoice-vVERSION-linux-x86_64.tar.gz "
+        "--sums SHA256SUMS --sig SHA256SUMS.asc",
+        "The signature is verified **first**, and the file is compared against "
+        "the list only after that passes. A pass means the download is "
+        "**INTACT**: byte for byte the file that was published, signed by the "
+        "VeilVoice key.",
+    ),
+    (
+        "One file, with no hash list at all",
+        "veilvoice verify file veilvoice-vVERSION-linux-x86_64.tar.gz "
+        "--sha256 THE_HASH_YOU_WERE_GIVEN",
+        "For when you have a hash rather than a signed list. What a match "
+        "proves depends entirely on where that hash came from, and only you "
+        "know that, so the tool says so instead of guessing. If it came from "
+        "somebody else's independent build of the same tag, a match means the "
+        "release is **REPRODUCIBLE**, which is the stronger claim.",
+    ),
+    (
+        "Just the hash, verifying nothing",
+        "veilvoice verify hash veilvoice-vVERSION-linux-x86_64.tar.gz",
+        "Prints the SHA-256 and checks nothing, for when you want to compare "
+        "it against something yourself.",
+    ),
+    (
+        "The same check through your own GnuPG",
+        "veilvoice verify gnupg",
+        "The one thing no program can do for itself: the tool telling you a "
+        "download is genuine came out of that download. This runs the `gpg` on "
+        "your machine over the same signature, says it added the public key "
+        "and how to remove it again, and prints the commands so you can run "
+        "them yourself.",
+    ),
+    (
+        "The key it is checking against",
+        "veilvoice verify key",
+        "Prints the signing key compiled into the program, and its "
+        "fingerprint. Compare it against the fingerprint at the top of this "
+        "section, against `README.md`, and against the website. It is the one "
+        "step nothing can do for you.",
+    ),
+    (
+        "What a pass actually proves",
+        "veilvoice verify --explain",
+        "INTACT and REPRODUCIBLE are different claims, and this is the "
+        "difference written out in full.",
+    ),
+]
+
+# The half about the source rather than the download. Separate because it
+# answers a different question and takes a great deal longer.
+VERIFY_BUILD = [
+    (
+        "What a build needs on this machine",
+        "veilvoice verify deps",
+        "What is required to build VeilVoice here and which of it is already "
+        "present. `--install` offers the missing pieces one at a time with the "
+        "exact command shown before each question.",
+    ),
+    (
+        "Build it, and compare against the published hashes",
+        "veilvoice verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc",
+        "A signature says who made a file. Only a build says what it is made "
+        "of. This compiles the workspace here and compares what came out "
+        "against the published hashes for this platform, with the signature "
+        "verified before any hash from the list is read. A difference is a "
+        "**finding**, not an accusation: both hashes are printed and the exit "
+        "status is deliberately not the one that means tampering.",
+    ),
+]
+
+# Doing it entirely with tools that are not VeilVoice's. Taken from the same
+# list `veilvoice verify gnupg` prints, in `veilvoice-gnupg`, so the page and
+# the program cannot come to say different things.
+BY_HAND = [
+    "gpg --import veilvoice-signing-key.asc",
+    "gpg --verify SHA256SUMS.asc SHA256SUMS",
+    "sha256sum -c SHA256SUMS --ignore-missing",
+]
+
+GUI_STEPS = [
+    "Open **Verify** in the desktop application. Three slots are shown before "
+    "you drop anything, because verifying needs three files and an interface "
+    "that discovers that after the drop teaches people it is fiddly.",
+    "Drop the **archive** you downloaded, the **`SHA256SUMS`** and the "
+    "**`SHA256SUMS.asc`** on the window. A drop fills whichever slot the "
+    "file's name says it is, in any order.",
+    "Press the button once. It checks the signature over the hash list, then "
+    "the archive against that list, then every file extracted out of the "
+    "archive against the signed contents list, and then runs the GnuPG on "
+    "this machine over the same signature.",
+    "Read the three answers, which are drawn separately on purpose so a pass "
+    "on one is never mistaken for a pass on another. A release published "
+    "before v0.1.15 carries no contents list and simply has no such row. A "
+    "GnuPG that will not run on this machine is drawn quietly: that is a fact "
+    "about the computer and says nothing about the download.",
+]
+
+
+def check_verify_commands():
+    """Every command shown on this page must exist in the verifier's help.
+
+    The page is generated and the help is the source, so a subcommand renamed
+    or dropped stops the build rather than leaving an instruction that fails
+    for somebody who followed it. `veilvoice-verify` was a separate program
+    until 0.1.18 and nine places went on saying so for a release; this is the
+    same class of drift, caught before it is published rather than after.
+    """
+    usage = verifier_usage()
+    missing = []
+    for _title, command, _why in VERIFY_CLI + VERIFY_BUILD:
+        words = command.split()
+        # `veilvoice verify <sub>`, which is what the help lists.
+        head = " ".join(words[:3])
+        if head not in usage:
+            missing.append(command)
+            continue
+        for word in words[3:]:
+            if word.startswith("--") and word not in usage:
+                missing.append("%s (the flag %s)" % (command, word))
+    if missing:
+        raise SystemExit(
+            "these commands are on the releases page and not in the "
+            "verifier's own help in %s:\n    %s\n"
+            "  Either the help changed and the page has not, or the page is "
+            "wrong. Fix whichever it is rather than removing this check."
+            % (VERIFIER_SOURCE, "\n    ".join(missing))
+        )
+
+
+def verify_markdown(version):
+    """The tutorial, as Markdown, for the same renderer the notes use."""
+    check_verify_commands()
+    out = []
+    add = out.append
+
+    add("## Check a download before you run it")
+    add("")
+    add("Every archive below is signed, and every release publishes the two "
+        "files that let you check it: `SHA256SUMS`, a list of hashes, and "
+        "`SHA256SUMS.asc`, the detached OpenPGP signature over that list. "
+        "From v0.1.15 there is a third, `CONTENTS.sha256`, which is itself "
+        "covered by `SHA256SUMS` and lists every file **inside** each archive, "
+        "so the binary you are about to run can be checked and not merely the "
+        "zip it arrived in.")
+    add("")
+    add("The signing key's fingerprint is:")
+    add("")
+    add("```")
+    add(fingerprint())
+    add("```")
+    add("")
+    add("Comparing that against the copy in `README.md` and the copy on the "
+        "front page is the one step no program can do for you, because a "
+        "program that came out of the download cannot vouch for the download.")
+    add("")
+
+    add("### With VeilVoice itself, no GnuPG required")
+    add("")
+    add("The verifier is part of `veilvoice`: it is not a separate download, "
+        "and it carries the signing key compiled in, so it needs no GnuPG, no "
+        "keyring and no network.")
+    add("")
+    for title, command, why in VERIFY_CLI:
+        add("**%s**" % title)
+        add("")
+        add("```")
+        add(command.replace("VERSION", version))
+        add("```")
+        add("")
+        add(why)
+        add("")
+
+    add("### The same thing, with your own GnuPG and nothing of ours")
+    add("")
+    add("Three commands, in the folder you downloaded to. This is what "
+        "`veilvoice verify gnupg` runs and prints, and it is worth typing "
+        "yourself: the second opinion is the whole point.")
+    add("")
+    add("```")
+    for command in BY_HAND:
+        add(command)
+    add("```")
+    add("")
+    add("`gpg --verify` answers whether the hash list is the one that was "
+        "signed with the key above. `sha256sum -c` answers whether your files "
+        "match that list. Both have to pass, and in that order: a hash list "
+        "nobody checked the signature of proves nothing at all. On macOS and "
+        "the BSDs the last command is `shasum -a 256 -c SHA256SUMS` or "
+        "`sha256 -c SHA256SUMS`; the first two are the same everywhere.")
+    add("")
+
+    add("### In the desktop application")
+    add("")
+    add("`veilvoice-gui` runs the same code with the same key, so the answer "
+        "is the same one; only the typing is different.")
+    add("")
+    for index, step in enumerate(GUI_STEPS, 1):
+        add("%d. %s" % (index, step))
+    add("")
+
+    add("### Checking the source rather than the download")
+    add("")
+    for title, command, why in VERIFY_BUILD:
+        add("**%s**" % title)
+        add("")
+        add("```")
+        add(command)
+        add("```")
+        add("")
+        add(why)
+        add("")
+
+    add("### What each answer is worth")
+    add("")
+    add("- **INTACT** means your file is byte for byte the one that was "
+        "published: not truncated, not corrupted in transit, not swapped by "
+        "whoever served it to you. The hash came from the signed list.")
+    add("- **REPRODUCIBLE** is the stronger claim and needs a hash from "
+        "somewhere else: somebody else's independent build of the same tagged "
+        "source. It says the published binary corresponds to the published "
+        "source, which a signature alone cannot.")
+    add("- **A GnuPG that will not run** is a fact about your computer. It is "
+        "not a failed check and nothing here treats it as one.")
+    add("")
+    add("Full instructions per platform, including Windows and the BSDs, are "
+        "in [`docs/INSTALL.md`](https://github.com/%s/blob/%s/docs/INSTALL.md)."
+        % (docs.REPO, docs.REF))
+    return out
+
+
 def archives():
     """Every archive a release publishes, as `(label, filename pattern)`.
 
@@ -371,6 +678,26 @@ def build():
         "which is where they are written." % (docs.REPO, docs.REF)
     )
     out.append("</p>")
+
+    # The tutorial, above the list. Somebody arrives here holding a file they
+    # have just downloaded, and "what changed" is the second question they have.
+    # Open by default rather than collapsed: a verification step behind a
+    # disclosure triangle is a verification step most people will not take.
+    newest = found[0]["version"]
+    tutorial = verify_markdown(newest)
+    out.append('<details class="release" id="verify-a-download" open>')
+    out.append(
+        "<summary><strong>Check a download</strong> "
+        '<span class="muted">the signature, the hashes, and the files inside '
+        "the archive, from the command line or the window</span></summary>"
+    )
+    # The tutorial's own `##` heading would repeat the summary above it, so the
+    # renderer is given the body from the first `###` down.
+    body = tutorial[tutorial.index("### With VeilVoice itself, no GnuPG required"):]
+    preamble = tutorial[1:tutorial.index("### With VeilVoice itself, no GnuPG required")]
+    out.extend(docs.doc_html(preamble, ids_for(preamble)))
+    out.extend(docs.doc_html(body, ids_for(body)))
+    out.append("</details>")
 
     pending = unreleased(text)
     # An `Unreleased` entry is worth showing when something is in it, and is
