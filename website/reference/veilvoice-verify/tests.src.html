@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 704 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 723 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -733,77 +733,96 @@
 <span class="ln" id="L631"></span>
 <span class="ln" id="L632">    <span class="tok-com">// What follows the name when it is being run rather than named.</span></span>
 <span class="ln" id="L633">    <span class="tok-kw">let</span> invoked = [</span>
-<span class="ln" id="L634">        <span class="tok-str">&quot; --&quot;</span>, <span class="tok-str">&quot; -q&quot;</span>, <span class="tok-str">&quot; auto&quot;</span>, <span class="tok-str">&quot; file&quot;</span>, <span class="tok-str">&quot; deps&quot;</span>, <span class="tok-str">&quot; gnupg&quot;</span>, <span class="tok-str">&quot; hash&quot;</span>, <span class="tok-str">&quot; reproduce&quot;</span>, <span class="tok-str">&quot; help&quot;</span>,</span>
-<span class="ln" id="L635">    ];</span>
-<span class="ln" id="L636"></span>
-<span class="ln" id="L637">    <span class="tok-kw">fn</span> <span class="tok-fn">gather</span>(dir: &amp;Path, into: &amp;<span class="tok-kw">mut</span> Vec&lt;PathBuf&gt;) {</span>
-<span class="ln" id="L638">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(dir) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L639">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L640">        };</span>
-<span class="ln" id="L641">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L642">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L643">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L644">                <span class="tok-fn">gather</span>(&amp;path, into);</span>
-<span class="ln" id="L645">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| {</span>
-<span class="ln" id="L646">                [<span class="tok-str">&quot;md&quot;</span>, <span class="tok-str">&quot;html&quot;</span>, <span class="tok-str">&quot;txt&quot;</span>, <span class="tok-str">&quot;py&quot;</span>, <span class="tok-str">&quot;sh&quot;</span>, <span class="tok-str">&quot;ps1&quot;</span>, <span class="tok-str">&quot;bat&quot;</span>, <span class="tok-str">&quot;rs&quot;</span>]</span>
-<span class="ln" id="L647">                    .<span class="tok-fn">contains</span>(&amp;e.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">as_ref</span>())</span>
-<span class="ln" id="L648">            }) {</span>
-<span class="ln" id="L649">                into.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L650">            }</span>
-<span class="ln" id="L651">        }</span>
-<span class="ln" id="L652">    }</span>
-<span class="ln" id="L653"></span>
-<span class="ln" id="L654">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> files = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L655">    <span class="tok-kw">for</span> place <span class="tok-kw">in</span> [<span class="tok-str">&quot;README.md&quot;</span>, <span class="tok-str">&quot;docs&quot;</span>, <span class="tok-str">&quot;website&quot;</span>, <span class="tok-str">&quot;packaging&quot;</span>, <span class="tok-str">&quot;tools&quot;</span>, <span class="tok-str">&quot;assets/screenshots&quot;</span>] {</span>
-<span class="ln" id="L656">        <span class="tok-kw">let</span> path = root.<span class="tok-fn">join</span>(place);</span>
-<span class="ln" id="L657">        <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L658">            <span class="tok-fn">gather</span>(&amp;path, &amp;<span class="tok-kw">mut</span> files);</span>
-<span class="ln" id="L659">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L660">            files.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L661">        }</span>
-<span class="ln" id="L662">    }</span>
-<span class="ln" id="L663">    assert!(files.<span class="tok-fn">len</span>() &gt; <span class="tok-num">50</span>, <span class="tok-str">&quot;only {} files were read&quot;</span>, files.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L664"></span>
-<span class="ln" id="L665">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L666">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;files {</span>
-<span class="ln" id="L667">        <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L668">        <span class="tok-kw">if</span> history.<span class="tok-fn">contains</span>(&amp;name.<span class="tok-fn">as_str</span>()) {</span>
-<span class="ln" id="L669">            continue;</span>
-<span class="ln" id="L670">        }</span>
-<span class="ln" id="L671">        <span class="tok-com">// This test&#x27;s own explanation names the thing it forbids.</span></span>
-<span class="ln" id="L672">        <span class="tok-kw">if</span> path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;tests.rs&quot;</span>) {</span>
-<span class="ln" id="L673">            continue;</span>
-<span class="ln" id="L674">        }</span>
-<span class="ln" id="L675">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(path) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L676">            continue;</span>
-<span class="ln" id="L677">        };</span>
-<span class="ln" id="L678">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>).<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L679">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(<span class="tok-str">&quot;veilvoice-verify&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L680">                continue;</span>
-<span class="ln" id="L681">            };</span>
-<span class="ln" id="L682">            <span class="tok-kw">let</span> rest = &amp;line[at + <span class="tok-str">&quot;veilvoice-verify&quot;</span>.<span class="tok-fn">len</span>()..];</span>
-<span class="ln" id="L683">            <span class="tok-com">// A path in front of it only counts when the name ends there.</span></span>
-<span class="ln" id="L684">            <span class="tok-com">// With another segment after it the line is naming a source file</span></span>
-<span class="ln" id="L685">            <span class="tok-com">// inside the crate; with nothing after it, a leading `./` or an</span></span>
-<span class="ln" id="L686">            <span class="tok-com">// absolute path makes it a command somebody is told to run.</span></span>
-<span class="ln" id="L687">            <span class="tok-kw">let</span> ends_here = rest.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L688">                || rest.<span class="tok-fn">starts_with</span>([<span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;`&#x27;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&#x27;\&#x27;&#x27;</span>, <span class="tok-str">&#x27;,&#x27;</span>, <span class="tok-str">&#x27;.&#x27;</span>, <span class="tok-str">&#x27;)&#x27;</span>]);</span>
-<span class="ln" id="L689">            <span class="tok-kw">let</span> run = invoked.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|form| rest.<span class="tok-fn">starts_with</span>(form))</span>
-<span class="ln" id="L690">                || (line[..at].<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;/&#x27;</span>) &amp;&amp; ends_here &amp;&amp; !rest.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>));</span>
-<span class="ln" id="L691">            <span class="tok-kw">if</span> run {</span>
-<span class="ln" id="L692">                wrong.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, name, number + <span class="tok-num">1</span>, line.<span class="tok-fn">trim</span>()));</span>
-<span class="ln" id="L693">            }</span>
-<span class="ln" id="L694">        }</span>
-<span class="ln" id="L695">    }</span>
-<span class="ln" id="L696"></span>
-<span class="ln" id="L697">    assert!(</span>
-<span class="ln" id="L698">        wrong.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L699">        <span class="tok-str">&quot;these tell a reader to run `veilvoice-verify`, which has not been a \</span></span>
-<span class="ln" id="L700"><span class="tok-str">         program since 0.1.18. It is `veilvoice verify`, and the desktop \</span></span>
-<span class="ln" id="L701"><span class="tok-str">         application&#x27;s Verify tab:\n{}&quot;</span>,</span>
-<span class="ln" id="L702">        wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L703">    );</span>
-<span class="ln" id="L704">}</span>
+<span class="ln" id="L634">        <span class="tok-str">&quot; --&quot;</span>,</span>
+<span class="ln" id="L635">        <span class="tok-str">&quot; -q&quot;</span>,</span>
+<span class="ln" id="L636">        <span class="tok-str">&quot; auto&quot;</span>,</span>
+<span class="ln" id="L637">        <span class="tok-str">&quot; file&quot;</span>,</span>
+<span class="ln" id="L638">        <span class="tok-str">&quot; deps&quot;</span>,</span>
+<span class="ln" id="L639">        <span class="tok-str">&quot; gnupg&quot;</span>,</span>
+<span class="ln" id="L640">        <span class="tok-str">&quot; hash&quot;</span>,</span>
+<span class="ln" id="L641">        <span class="tok-str">&quot; reproduce&quot;</span>,</span>
+<span class="ln" id="L642">        <span class="tok-str">&quot; help&quot;</span>,</span>
+<span class="ln" id="L643">    ];</span>
+<span class="ln" id="L644"></span>
+<span class="ln" id="L645">    <span class="tok-kw">fn</span> <span class="tok-fn">gather</span>(dir: &amp;Path, into: &amp;<span class="tok-kw">mut</span> Vec&lt;PathBuf&gt;) {</span>
+<span class="ln" id="L646">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(dir) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L647">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L648">        };</span>
+<span class="ln" id="L649">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L650">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L651">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L652">                <span class="tok-fn">gather</span>(&amp;path, into);</span>
+<span class="ln" id="L653">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| {</span>
+<span class="ln" id="L654">                [<span class="tok-str">&quot;md&quot;</span>, <span class="tok-str">&quot;html&quot;</span>, <span class="tok-str">&quot;txt&quot;</span>, <span class="tok-str">&quot;py&quot;</span>, <span class="tok-str">&quot;sh&quot;</span>, <span class="tok-str">&quot;ps1&quot;</span>, <span class="tok-str">&quot;bat&quot;</span>, <span class="tok-str">&quot;rs&quot;</span>]</span>
+<span class="ln" id="L655">                    .<span class="tok-fn">contains</span>(&amp;e.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">as_ref</span>())</span>
+<span class="ln" id="L656">            }) {</span>
+<span class="ln" id="L657">                into.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L658">            }</span>
+<span class="ln" id="L659">        }</span>
+<span class="ln" id="L660">    }</span>
+<span class="ln" id="L661"></span>
+<span class="ln" id="L662">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> files = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L663">    <span class="tok-kw">for</span> place <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L664">        <span class="tok-str">&quot;README.md&quot;</span>,</span>
+<span class="ln" id="L665">        <span class="tok-str">&quot;docs&quot;</span>,</span>
+<span class="ln" id="L666">        <span class="tok-str">&quot;website&quot;</span>,</span>
+<span class="ln" id="L667">        <span class="tok-str">&quot;packaging&quot;</span>,</span>
+<span class="ln" id="L668">        <span class="tok-str">&quot;tools&quot;</span>,</span>
+<span class="ln" id="L669">        <span class="tok-str">&quot;assets/screenshots&quot;</span>,</span>
+<span class="ln" id="L670">    ] {</span>
+<span class="ln" id="L671">        <span class="tok-kw">let</span> path = root.<span class="tok-fn">join</span>(place);</span>
+<span class="ln" id="L672">        <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L673">            <span class="tok-fn">gather</span>(&amp;path, &amp;<span class="tok-kw">mut</span> files);</span>
+<span class="ln" id="L674">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L675">            files.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L676">        }</span>
+<span class="ln" id="L677">    }</span>
+<span class="ln" id="L678">    assert!(files.<span class="tok-fn">len</span>() &gt; <span class="tok-num">50</span>, <span class="tok-str">&quot;only {} files were read&quot;</span>, files.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L679"></span>
+<span class="ln" id="L680">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L681">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;files {</span>
+<span class="ln" id="L682">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L683">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L684">            .<span class="tok-fn">unwrap_or_default</span>()</span>
+<span class="ln" id="L685">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L686">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L687">        <span class="tok-kw">if</span> history.<span class="tok-fn">contains</span>(&amp;name.<span class="tok-fn">as_str</span>()) {</span>
+<span class="ln" id="L688">            continue;</span>
+<span class="ln" id="L689">        }</span>
+<span class="ln" id="L690">        <span class="tok-com">// This test&#x27;s own explanation names the thing it forbids.</span></span>
+<span class="ln" id="L691">        <span class="tok-kw">if</span> path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;tests.rs&quot;</span>) {</span>
+<span class="ln" id="L692">            continue;</span>
+<span class="ln" id="L693">        }</span>
+<span class="ln" id="L694">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(path) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L695">            continue;</span>
+<span class="ln" id="L696">        };</span>
+<span class="ln" id="L697">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>).<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L698">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(<span class="tok-str">&quot;veilvoice-verify&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L699">                continue;</span>
+<span class="ln" id="L700">            };</span>
+<span class="ln" id="L701">            <span class="tok-kw">let</span> rest = &amp;line[at + <span class="tok-str">&quot;veilvoice-verify&quot;</span>.<span class="tok-fn">len</span>()..];</span>
+<span class="ln" id="L702">            <span class="tok-com">// A path in front of it only counts when the name ends there.</span></span>
+<span class="ln" id="L703">            <span class="tok-com">// With another segment after it the line is naming a source file</span></span>
+<span class="ln" id="L704">            <span class="tok-com">// inside the crate; with nothing after it, a leading `./` or an</span></span>
+<span class="ln" id="L705">            <span class="tok-com">// absolute path makes it a command somebody is told to run.</span></span>
+<span class="ln" id="L706">            <span class="tok-kw">let</span> ends_here =</span>
+<span class="ln" id="L707">                rest.<span class="tok-fn">is_empty</span>() || rest.<span class="tok-fn">starts_with</span>([<span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;`&#x27;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&#x27;\&#x27;&#x27;</span>, <span class="tok-str">&#x27;,&#x27;</span>, <span class="tok-str">&#x27;.&#x27;</span>, <span class="tok-str">&#x27;)&#x27;</span>]);</span>
+<span class="ln" id="L708">            <span class="tok-kw">let</span> run = invoked.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|form| rest.<span class="tok-fn">starts_with</span>(form))</span>
+<span class="ln" id="L709">                || (line[..at].<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;/&#x27;</span>) &amp;&amp; ends_here &amp;&amp; !rest.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>));</span>
+<span class="ln" id="L710">            <span class="tok-kw">if</span> run {</span>
+<span class="ln" id="L711">                wrong.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, name, number + <span class="tok-num">1</span>, line.<span class="tok-fn">trim</span>()));</span>
+<span class="ln" id="L712">            }</span>
+<span class="ln" id="L713">        }</span>
+<span class="ln" id="L714">    }</span>
+<span class="ln" id="L715"></span>
+<span class="ln" id="L716">    assert!(</span>
+<span class="ln" id="L717">        wrong.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L718">        <span class="tok-str">&quot;these tell a reader to run `veilvoice-verify`, which has not been a \</span></span>
+<span class="ln" id="L719"><span class="tok-str">         program since 0.1.18. It is `veilvoice verify`, and the desktop \</span></span>
+<span class="ln" id="L720"><span class="tok-str">         application&#x27;s Verify tab:\n{}&quot;</span>,</span>
+<span class="ln" id="L721">        wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L722">    );</span>
+<span class="ln" id="L723">}</span>
 </span>
 </code></pre>
 </main>
