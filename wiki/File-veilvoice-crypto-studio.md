@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/studio.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 877 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 936 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs)
 
 ## Contents
 
@@ -75,14 +75,14 @@ VeilVoice at the moment you type both.
 
 ## What this file contains
 
-877 lines defining **20 functions** (11 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+936 lines defining **21 functions** (11 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct StudioKey` (line 83) -- A key that exists only while both locks are open.
 - `struct Entry` (line 144) -- One recording in the vault.
 - `struct Studio` (line 175) -- A directory of recordings, sealed under a StudioKey.
-- `struct Shape` (line 376) -- What a decoy vault looks like from outside, so it looks like the real one.
+- `struct Shape` (line 398) -- What a decoy vault looks like from outside, so it looks like the real one.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -94,11 +94,11 @@ VeilVoice at the moment you type both.
 - `Studio::store` (line 228) -- Seal wav into the vault under name, returning its entry.
   - reaches: `list`, `new_id`, `seal`, `write_index`, `parse_index`, `unseal`, `secret_key`, `render_index`, `safe_id`
 - `Studio::load` (line 257) -- Open one recording into locked memory.
-  - reaches: `safe_id`, `unseal`, `secret_key`
-- `Studio::remove` (line 269) -- Remove one recording and its index entry.
+  - reaches: `safe_id`, `unseal_secret`, `secret_key`
+- `Studio::remove` (line 266) -- Remove one recording and its index entry.
   - reaches: `list`, `safe_id`, `write_index`, `parse_index`, `unseal`, `render_index`, `seal`, `secret_key`
-- `Shape::of` (line 385) -- Measure a real vault, to build decoys that match it.
-- `make_decoy` (line 428) -- Fill dir with a vault that never held anything.
+- `Shape::of` (line 407) -- Measure a real vault, to build decoys that match it.
+- `make_decoy` (line 450) -- Fill dir with a vault that never held anything.
   - reaches: `new_id`
 
 ## What calls what
@@ -125,20 +125,21 @@ flowchart TD
     n_list["Studio::list<br/>line 214"]
     n_store(["Studio::store<br/>line 228"])
     n_load(["Studio::load<br/>line 257"])
-    n_remove(["Studio::remove<br/>line 269"])
-    n_write_index["Studio::write_index<br/>line 282"]
-    n_seal["Studio::seal<br/>line 291"]
-    n_unseal["Studio::unseal<br/>line 300"]
-    n_new_id["new_id<br/>line 312"]
-    n_safe_id["safe_id<br/>line 327"]
-    n_render_index["render_index<br/>line 337"]
-    n_parse_index["parse_index<br/>line 346"]
-    n_of(["Shape::of<br/>line 385"])
-    n_make_decoy(["make_decoy<br/>line 428"])
+    n_remove(["Studio::remove<br/>line 266"])
+    n_write_index["Studio::write_index<br/>line 279"]
+    n_seal["Studio::seal<br/>line 288"]
+    n_unseal["Studio::unseal<br/>line 297"]
+    n_unseal_secret["Studio::unseal_secret<br/>line 315"]
+    n_new_id["new_id<br/>line 334"]
+    n_safe_id["safe_id<br/>line 349"]
+    n_render_index["render_index<br/>line 359"]
+    n_parse_index["parse_index<br/>line 368"]
+    n_of(["Shape::of<br/>line 407"])
+    n_make_decoy(["make_decoy<br/>line 450"])
     n_list --> n_parse_index
     n_list --> n_unseal
     n_load --> n_safe_id
-    n_load --> n_unseal
+    n_load --> n_unseal_secret
     n_make_decoy --> n_new_id
     n_parse_index --> n_safe_id
     n_remove --> n_list
@@ -150,6 +151,7 @@ flowchart TD
     n_store --> n_seal
     n_store --> n_write_index
     n_unseal --> n_secret_key
+    n_unseal_secret --> n_secret_key
     n_write_index --> n_render_index
     n_write_index --> n_seal
     click n_derive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L94" "open the source"
@@ -162,22 +164,23 @@ flowchart TD
     click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L214" "open the source"
     click n_store href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L228" "open the source"
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L257" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L269" "open the source"
-    click n_write_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L282" "open the source"
-    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L291" "open the source"
-    click n_unseal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L300" "open the source"
-    click n_new_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L312" "open the source"
-    click n_safe_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L327" "open the source"
-    click n_render_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L337" "open the source"
-    click n_parse_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L346" "open the source"
-    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L385" "open the source"
-    click n_make_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L428" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L266" "open the source"
+    click n_write_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L279" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L288" "open the source"
+    click n_unseal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L297" "open the source"
+    click n_unseal_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L315" "open the source"
+    click n_new_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L334" "open the source"
+    click n_safe_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L349" "open the source"
+    click n_render_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L359" "open the source"
+    click n_parse_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L368" "open the source"
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L407" "open the source"
+    click n_make_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L450" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_remove,n_of,n_make_decoy entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_list api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_fmt,n_secret_key,n_write_index,n_seal,n_unseal,n_new_id,n_safe_id,n_render_index,n_parse_index helper
+    class n_fmt,n_secret_key,n_write_index,n_seal,n_unseal,n_unseal_secret,n_new_id,n_safe_id,n_render_index,n_parse_index helper
 ```
 
 </details>
@@ -203,14 +206,15 @@ flowchart TD
 | `Studio::list` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L214) | Every recording in the vault, oldest first. |
 | `Studio::store` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L228) | Seal wav into the vault under name, returning its entry. |
 | `Studio::load` <sub>pub fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L257) | Open one recording into locked memory. |
-| `Studio::remove` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L269) | Remove one recording and its index entry. |
-| `Studio::write_index` <sub>fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L282) |  |
-| `Studio::seal` <sub>fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L291) | Seal with a fresh nonce, binding aad so a file cannot be moved to another identity inside the same vault and still open. |
-| `Studio::unseal` <sub>fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L300) |  |
-| `new_id` <sub>fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L312) | A random, opaque identifier: 32 base32-ish characters that say nothing. |
-| `safe_id` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L327) | Whether id is one this vault could have produced. |
-| `render_index` <sub>fn</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L337) | The index, as lines. |
-| `parse_index` <sub>fn</sub> | [346](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L346) |  |
-| `Shape` <sub>pub struct</sub> | [376](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L376) | What a decoy vault looks like from outside, so it looks like the real one. |
-| `Shape::of` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L385) | Measure a real vault, to build decoys that match it. |
-| `make_decoy` <sub>pub fn</sub> | [428](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L428) | Fill dir with a vault that never held anything. |
+| `Studio::remove` <sub>pub fn</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L266) | Remove one recording and its index entry. |
+| `Studio::write_index` <sub>fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L279) |  |
+| `Studio::seal` <sub>fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L288) | Seal with a fresh nonce, binding aad so a file cannot be moved to another identity inside the same vault and still open. |
+| `Studio::unseal` <sub>fn</sub> | [297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L297) |  |
+| `Studio::unseal_secret` <sub>fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L315) | The same, decrypting straight into locked memory. |
+| `new_id` <sub>fn</sub> | [334](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L334) | A random, opaque identifier: 20 lower-case letters and digits that say nothing about what they name. |
+| `safe_id` <sub>fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L349) | Whether id is one this vault could have produced. |
+| `render_index` <sub>fn</sub> | [359](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L359) | The index, as lines. |
+| `parse_index` <sub>fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L368) |  |
+| `Shape` <sub>pub struct</sub> | [398](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L398) | What a decoy vault looks like from outside, so it looks like the real one. |
+| `Shape::of` <sub>pub fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L407) | Measure a real vault, to build decoys that match it. |
+| `make_decoy` <sub>pub fn</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L450) | Fill dir with a vault that never held anything. |

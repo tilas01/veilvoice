@@ -23,8 +23,8 @@
 //! any alteration at all means it will not open, and says so.
 
 use crate::{Error, Secret};
-use chacha20poly1305::aead::{Aead, Payload};
-use chacha20poly1305::{KeyInit, XChaCha20Poly1305, XNonce};
+use chacha20poly1305::aead::{Aead, AeadInPlace, Payload};
+use chacha20poly1305::{KeyInit, Tag, XChaCha20Poly1305, XNonce};
 
 /// Nonce length for XChaCha20-Poly1305, in bytes.
 pub const NONCE_LEN: usize = 24;
@@ -84,6 +84,55 @@ pub fn open(
         .map_err(|_| Error::Decrypt)
 }
 
+/// Decrypt and verify **into protected memory**, never into an ordinary `Vec`.
+///
+/// # Why this exists beside `open`
+///
+/// `open` asks the `aead` crate for the plaintext and gets back a plain
+/// `Vec<u8>`. That vector is ordinary pageable heap: the kernel may write it to
+/// swap, and nothing wipes it until somebody copies it somewhere safer and
+/// wipes it by hand. For a passphrase-sized secret that window is small. For a
+/// recording it is the whole recording, in the clear, in memory the operating
+/// system is free to put on disk, for as long as it takes to copy several
+/// megabytes.
+///
+/// The Studio vault exists precisely so that a recording is never anywhere
+/// unprotected, and it was decrypting through `open`, so the guarantee had a
+/// hole in it the size of the file. This closes it: the buffer is a [`Secret`]
+/// from the start, so it is page-locked where the operating system allows and
+/// wiped on drop, and the ciphertext is decrypted **in place** inside it.
+/// Nothing is copied afterwards because there is nothing to copy from.
+///
+/// A failed tag check drops the buffer, so the partially decrypted bytes are
+/// wiped rather than returned or left lying about.
+///
+/// `open` is kept for the callers whose plaintext is small and immediately
+/// parsed, where a `Vec` is the honest shape and the protection this adds would
+/// be a `Secret` around four bytes of header.
+///
+/// # In plain words
+///
+/// The same decryption, writing the result straight into the protected memory
+/// rather than into ordinary memory and moving it afterwards.
+pub fn open_secret(
+    key: &Secret,
+    nonce: &[u8; NONCE_LEN],
+    aad: &[u8],
+    ciphertext: &[u8],
+) -> Result<Secret, Error> {
+    let split = ciphertext
+        .len()
+        .checked_sub(TAG_LEN)
+        .ok_or(Error::Decrypt)?;
+    let mut plain = Secret::zeroed(split);
+    plain.expose_mut().copy_from_slice(&ciphertext[..split]);
+    let tag = Tag::from_slice(&ciphertext[split..]);
+    cipher(key)?
+        .decrypt_in_place_detached(XNonce::from_slice(nonce), aad, plain.expose_mut(), tag)
+        .map_err(|_| Error::Decrypt)?;
+    Ok(plain)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -108,6 +157,55 @@ mod tests {
         let (k, n) = (key(), random_nonce().unwrap());
         let ct = seal(&k, &n, b"", b"").unwrap();
         assert_eq!(open(&k, &n, b"", &ct).unwrap(), b"");
+    }
+
+    #[test]
+    fn decrypting_into_protected_memory_gives_the_same_plaintext() {
+        let (k, n) = (key(), random_nonce().unwrap());
+        let msg = b"the quick brown fox";
+        let ct = seal(&k, &n, b"header", msg).unwrap();
+        let plain = open_secret(&k, &n, b"header", &ct).unwrap();
+        assert_eq!(plain.expose(), msg);
+        // And the same answer as the `Vec` route, so the two cannot diverge.
+        assert_eq!(plain.expose(), &open(&k, &n, b"header", &ct).unwrap()[..]);
+    }
+
+    #[test]
+    fn protected_decryption_refuses_the_same_things_the_other_one_does() {
+        let (k, n) = (key(), random_nonce().unwrap());
+        let mut ct = seal(&k, &n, b"h", b"secret payload").unwrap();
+
+        // Too short to hold a tag at all: refused rather than subtracting past
+        // zero. `checked_sub` is what stops that being a panic on the length.
+        assert!(matches!(
+            open_secret(&k, &n, b"h", &[]),
+            Err(Error::Decrypt)
+        ));
+        assert!(matches!(
+            open_secret(&k, &n, b"h", &ct[..TAG_LEN - 1]),
+            Err(Error::Decrypt)
+        ));
+
+        // Wrong associated data, and a flipped ciphertext bit.
+        assert!(matches!(
+            open_secret(&k, &n, b"other", &ct),
+            Err(Error::Decrypt)
+        ));
+        ct[3] ^= 1;
+        assert!(matches!(
+            open_secret(&k, &n, b"h", &ct),
+            Err(Error::Decrypt)
+        ));
+    }
+
+    #[test]
+    fn an_empty_plaintext_round_trips_through_protected_memory() {
+        // The tag alone, with nothing under it: the length arithmetic has to
+        // land on zero rather than on an error or a panic.
+        let (k, n) = (key(), random_nonce().unwrap());
+        let ct = seal(&k, &n, b"", b"").unwrap();
+        assert_eq!(ct.len(), TAG_LEN);
+        assert!(open_secret(&k, &n, b"", &ct).unwrap().expose().is_empty());
     }
 
     #[test]
