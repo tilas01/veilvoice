@@ -11,13 +11,22 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project, such as a platform's rules or a decision that
 has not been taken, that is written down rather than absorbed into a number.
 
-**Where we are now:** **v0.1.18 is released**, signed and published for
+**Where we are now:** **v0.1.19 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
 This line used to name v0.1.14 while three releases went out past it, which is
 why the version in it is now checked against `Cargo.toml` by
 `tools/release/version.py` along with every other copy of it.
+
+Since v0.1.18: the whole repository was read for security, memory safety,
+correctness, reproducibility, optimisation and accuracy, and everything it found
+was fixed. The Studio vault stopped decrypting a recording through unprotected
+memory on its way into locked memory; the demonstration on the website is the
+real programs on the page rather than a hand-drawn model behind a button; the
+roadmap page holds eight GPU layers instead of 162; and the counts, the versions
+and the binary names that had drifted are now derived or checked rather than
+repeated. Eight defects, F-149 to F-156.
 
 Since v0.1.16: the window is genuinely idle when nobody is touching it, and the
 cause of the frames it was drawing was found by asking the toolkit rather than
@@ -26,8 +35,9 @@ About tab reports the graphics driver that actually drew the window, and a
 crash caused by a missing system library names the library and the package that
 carries it.
 
-Since v0.1.15: a guide for each of the three programs, in the documentation, in
-the wiki and in every release archive; installing as a dropdown per system;
+Since v0.1.15: a guide for each program a release then shipped, three of them at
+the time and two since 0.1.18, in the documentation, in the wiki and in every
+release archive; installing as a dropdown per system;
 verification and reproducible-build scripts for Linux, macOS, WSL, the BSDs and
 Windows; and the website republished automatically after a release.
 
@@ -353,7 +363,7 @@ not claim to beat an adversary who already owns the machine.
 | 139 | **A video of who said what, from the Studio**: the video output already draws a circle per speaker in their own colour; this adds the bars, so each speaker has a level moving beside their name while they talk and the picture shows the shape of the conversation rather than just its cast. Names in a monospace face, which is the one that stays legible scaled down and does not reflow when a name is long. Single-person recordings get the same treatment as a group of eight, veiled or unveiled, because a solo take is a group of one and should not need a different path | **planned** | 8 |
 | 140 | **Resolutions somebody would actually pick**: 1080p as the default, with 1440p, 2160p and a custom size offered, rather than the 1280x720 the renderer starts at today. The size the display is actually running at is offered as a preset where the platform will say, and where it will not the list is simply the fixed ones: a guess about somebody's monitor is worse than a menu | **planned** | 3 |
 | 141 | **How much code this actually is, counted one way and said once**: a functional line count in the README, and the same count per crate in each crate's own documentation, with the definition stated where it is used: a line holding code, not a blank line and not a comment. Deliberately a **new** number rather than a redefinition of an existing one. The per-file line counts already printed on the generated pages, in the artwork and in the reference links are a different measure, counted differently, and are left exactly as they are: changing what an existing number means, everywhere it appears, to match a new definition would silently alter every page and link that carries one | **done** | - |
-| 138 | **v0.1.19, the audited release**: the full audit of marker 127 run over the whole repository, everything it finds fixed, and the tag cut on what came out. Not the code alone: the documentation, the website, the packaging, the scripts and the reproducibility, and the optimisation pass, because a release audited in part is a release described inaccurately. The Studio is deliberately **not** in it. A release named after a feature that is still being written is the thing this roadmap exists to prevent, so 0.1.19 is the release that says the tree is sound and 0.1.20 is the one that says what was built on it | **planned** | 12 |
+| 138 | **v0.1.19, the audited release**: the full audit of marker 127 run over the whole repository, everything it finds fixed, and the tag cut on what came out. Not the code alone: the documentation, the website, the packaging, the scripts and the reproducibility, and the optimisation pass, because a release audited in part is a release described inaccurately. The Studio is deliberately **not** in it. A release named after a feature that is still being written is the thing this roadmap exists to prevent, so 0.1.19 is the release that says the tree is sound and 0.1.20 is the one that says what was built on it | **done** | - |
 | 127 | **The full final audit, and what counts as complete**: no part of this repository is signed off until every part of it has been. Security, memory safety and the post-quantum surface; correctness and QA over every crate; reproducibility of the build and of every generated artefact; the documentation, the website, the packaging and the scripts; **and the optimisation pass above**, because bloat that nobody measured is a claim nobody checked. A round that covers the code and skips the documentation, or covers both and skips whether the thing still builds byte for byte, is not a final audit and is not to be described as one | **done** | - |
 | 142 | **The demonstration on the page, and the drawing of it gone**: the recorded terminal sessions and the photographs of the window both on the front page in the order somebody meets them, neither behind a button. The hand-drawn CSS model of the application is removed rather than relabelled: it sat beside photographs of the same interface and asked a reader to work out which to believe, on a site whose argument is that they should not have to take anybody's word for anything | **done** | - |
 | 143 | **`veilvoice verify`, said that way everywhere**: nine places still described a `veilvoice-verify` executable that stopped being published at 0.1.18, three of them lists the program itself reads. The lists are now taken from the job that publishes the binaries, and a test reads the repository the way a reader does and fails on anything telling somebody to run a program that is not there | **done** | - |
