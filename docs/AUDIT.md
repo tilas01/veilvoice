@@ -246,6 +246,18 @@ the audio does not.
 The regression test reads the source, because "and it never went anywhere else
 on the way" is not a property a round trip can express.
 
+**Two callers were looked at and deliberately left on the `Vec` path**, so that
+this is a decision rather than an omission. `hoard.rs` decrypts VeilVoice's own
+records, which are settings, measurements and an integrity list rather than a
+recording, and hands them straight to a decoder that allocates again; making
+that path protected end to end means changing the decoder too, which is a
+larger change than a release audit should carry. `container.rs` decrypts a
+`.veil` file for `veilvoice decrypt`, whose entire purpose is to write the
+plaintext to a file the person asked for, so protecting the buffer on the way
+there protects it for the length of one function and no longer. Both are worth
+doing and neither is what F-155 was: the Studio is the one place that *claimed*
+the plaintext never touched unprotected memory.
+
 ### F-156 -- the sentence introducing the example named the previous release
 
 `docs/INSTALL.md`. Four lines above a block that reads `V=v0.1.18`, the sentence
