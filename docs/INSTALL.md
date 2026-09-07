@@ -51,7 +51,7 @@ If the fingerprint you see anywhere disagrees with the one above, stop.
 ## 1. By hand
 
 Four commands, on any platform with GnuPG and a SHA-256 tool. Replace
-`v0.1.17` and the archive name with the release and build you want; the
+`v0.1.18` and the archive name with the release and build you want; the
 [releases page](https://github.com/tilas01/veilvoice/releases) lists them.
 
 ```bash

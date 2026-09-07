@@ -97,6 +97,13 @@ PLACES: list[tuple[str, str, str]] = [
     # release perfectly. The surrounding text does say "replace this with the
     # release you want", which is exactly the sentence people skip.
     ("docs/INSTALL.md", r"^V=v([0-9]+\.[0-9]+\.[0-9]+)$", "the by-hand verification example"),
+    # The sentence four lines above that block, which tells the reader which
+    # version to replace. It said v0.1.17 while the block under it said
+    # v0.1.18, because this list watched the command and not the instruction
+    # introducing it, and somebody following the prose literally would fetch
+    # the wrong release.
+    ("docs/INSTALL.md", r"^`v([0-9]+\.[0-9]+\.[0-9]+)` and the archive name",
+     "the sentence introducing the by-hand example"),
     ("docs/INSTALL.md", r"veilvoice-v([0-9]+\.[0-9]+\.[0-9]+)-windows-x86_64\.zip", "the PowerShell hash example"),
     ("docs/INSTALL.md", r"veilvoice-v([0-9]+\.[0-9]+\.[0-9]+)-linux-x86_64\.tar\.gz", "the verifier examples"),
     ("docs/INSTALL.md", r"`--version v([0-9]+\.[0-9]+\.[0-9]+)`", "the install-script option table"),
