@@ -125,6 +125,13 @@ flowchart TD
 | [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 575 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
 | [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 385 | The programs this build knows can capture a screen. |
 
+**845 functional lines of Rust** in this crate. A functional line is a line
+holding code: blank lines and lines holding only a comment are not counted,
+and a line with code and a trailing comment counts once. That is a different
+measure from the **Lines** column above, which is the length of each file and
+counts blank lines and comments too. Both are produced by
+`tools/loc/count.py`.
+
 ## Public items
 
 | Item | Where | What |
