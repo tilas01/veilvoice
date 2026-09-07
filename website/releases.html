@@ -75,6 +75,65 @@
 <p class="muted">
 Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
+<details class="release" id="verify-a-download" open>
+<summary><strong>Check a download</strong> <span class="muted">the signature, the hashes, and the files inside the archive, from the command line or the window</span></summary>
+<p>Every archive below is signed, and every release publishes the two files that let you check it: <code>SHA256SUMS</code>, a list of hashes, and <code>SHA256SUMS.asc</code>, the detached OpenPGP signature over that list. From v0.1.15 there is a third, <code>CONTENTS.sha256</code>, which is itself covered by <code>SHA256SUMS</code> and lists every file <strong>inside</strong> each archive, so the binary you are about to run can be checked and not merely the zip it arrived in.</p>
+<p>The signing key&#x27;s fingerprint is:</p>
+<pre><code>8101 FB3B B28D 02FB 239E 0CDF 9CC1 C7E7 A9B5 833A</code></pre>
+<p>Comparing that against the copy in <code>README.md</code> and the copy on the front page is the one step no program can do for you, because a program that came out of the download cannot vouch for the download.</p>
+<h4 id="with-veilvoice-itself-no-gnupg-required">With VeilVoice itself, no GnuPG required</h4>
+<p>The verifier is part of <code>veilvoice</code>: it is not a separate download, and it carries the signing key compiled in, so it needs no GnuPG, no keyring and no network.</p>
+<p><strong>The whole check, in one command</strong></p>
+<pre><code>veilvoice verify</code></pre>
+<p>Run it in the folder you downloaded to. It finds the release, checks the OpenPGP signature over <code>SHA256SUMS</code>, checks every archive against that list, checks <code>CONTENTS.sha256</code> against it as well, and then checks <strong>every file you extracted</strong> against <code>CONTENTS.sha256</code>. Each step runs only if the one before it passed. Entirely offline.</p>
+<p><strong>The same, pointed at a folder</strong></p>
+<pre><code>veilvoice verify auto ~/Downloads</code></pre>
+<p>A named directory is checked and nothing else is searched. A path that is not there is refused by name rather than answered with a verdict about somewhere else.</p>
+<p><strong>The signature over the hash list, on its own</strong></p>
+<pre><code>veilvoice verify sums SHA256SUMS SHA256SUMS.asc</code></pre>
+<p>This is the step everything else rests on. <code>SHA256SUMS</code> is a list of numbers; <code>SHA256SUMS.asc</code> is the detached OpenPGP signature over it. Until that signature checks out against the signing key, the list is just numbers somebody sent you.</p>
+<p><strong>One file, against the signed list</strong></p>
+<pre><code>veilvoice verify file veilvoice-v0.1.19-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
+<p>The signature is verified <strong>first</strong>, and the file is compared against the list only after that passes. A pass means the download is <strong>INTACT</strong>: byte for byte the file that was published, signed by the VeilVoice key.</p>
+<p><strong>One file, with no hash list at all</strong></p>
+<pre><code>veilvoice verify file veilvoice-v0.1.19-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
+<p>For when you have a hash rather than a signed list. What a match proves depends entirely on where that hash came from, and only you know that, so the tool says so instead of guessing. If it came from somebody else&#x27;s independent build of the same tag, a match means the release is <strong>REPRODUCIBLE</strong>, which is the stronger claim.</p>
+<p><strong>Just the hash, verifying nothing</strong></p>
+<pre><code>veilvoice verify hash veilvoice-v0.1.19-linux-x86_64.tar.gz</code></pre>
+<p>Prints the SHA-256 and checks nothing, for when you want to compare it against something yourself.</p>
+<p><strong>The same check through your own GnuPG</strong></p>
+<pre><code>veilvoice verify gnupg</code></pre>
+<p>The one thing no program can do for itself: the tool telling you a download is genuine came out of that download. This runs the <code>gpg</code> on your machine over the same signature, says it added the public key and how to remove it again, and prints the commands so you can run them yourself.</p>
+<p><strong>The key it is checking against</strong></p>
+<pre><code>veilvoice verify key</code></pre>
+<p>Prints the signing key compiled into the program, and its fingerprint. Compare it against the fingerprint at the top of this section, against <code>README.md</code>, and against the website. It is the one step nothing can do for you.</p>
+<p><strong>What a pass actually proves</strong></p>
+<pre><code>veilvoice verify --explain</code></pre>
+<p>INTACT and REPRODUCIBLE are different claims, and this is the difference written out in full.</p>
+<h4 id="the-same-thing-with-your-own-gnupg-and-nothing-of-ours">The same thing, with your own GnuPG and nothing of ours</h4>
+<p>Three commands, in the folder you downloaded to. This is what <code>veilvoice verify gnupg</code> runs and prints, and it is worth typing yourself: the second opinion is the whole point.</p>
+<pre><code>gpg --import veilvoice-signing-key.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing</code></pre>
+<p><code>gpg --verify</code> answers whether the hash list is the one that was signed with the key above. <code>sha256sum -c</code> answers whether your files match that list. Both have to pass, and in that order: a hash list nobody checked the signature of proves nothing at all. On macOS and the BSDs the last command is <code>shasum -a 256 -c SHA256SUMS</code> or <code>sha256 -c SHA256SUMS</code>; the first two are the same everywhere.</p>
+<h4 id="in-the-desktop-application">In the desktop application</h4>
+<p><code>veilvoice-gui</code> runs the same code with the same key, so the answer is the same one; only the typing is different.</p>
+<p>1. Open <strong>Verify</strong> in the desktop application. Three slots are shown before you drop anything, because verifying needs three files and an interface that discovers that after the drop teaches people it is fiddly. 2. Drop the <strong>archive</strong> you downloaded, the <strong><code>SHA256SUMS</code></strong> and the <strong><code>SHA256SUMS.asc</code></strong> on the window. A drop fills whichever slot the file&#x27;s name says it is, in any order. 3. Press the button once. It checks the signature over the hash list, then the archive against that list, then every file extracted out of the archive against the signed contents list, and then runs the GnuPG on this machine over the same signature. 4. Read the three answers, which are drawn separately on purpose so a pass on one is never mistaken for a pass on another. A release published before v0.1.15 carries no contents list and simply has no such row. A GnuPG that will not run on this machine is drawn quietly: that is a fact about the computer and says nothing about the download.</p>
+<h4 id="checking-the-source-rather-than-the-download">Checking the source rather than the download</h4>
+<p><strong>What a build needs on this machine</strong></p>
+<pre><code>veilvoice verify deps</code></pre>
+<p>What is required to build VeilVoice here and which of it is already present. <code>--install</code> offers the missing pieces one at a time with the exact command shown before each question.</p>
+<p><strong>Build it, and compare against the published hashes</strong></p>
+<pre><code>veilvoice verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
+<p>A signature says who made a file. Only a build says what it is made of. This compiles the workspace here and compares what came out against the published hashes for this platform, with the signature verified before any hash from the list is read. A difference is a <strong>finding</strong>, not an accusation: both hashes are printed and the exit status is deliberately not the one that means tampering.</p>
+<h4 id="what-each-answer-is-worth">What each answer is worth</h4>
+<ul>
+<li><strong>INTACT</strong> means your file is byte for byte the one that was published: not truncated, not corrupted in transit, not swapped by whoever served it to you. The hash came from the signed list.</li>
+<li><strong>REPRODUCIBLE</strong> is the stronger claim and needs a hash from somewhere else: somebody else&#x27;s independent build of the same tagged source. It says the published binary corresponds to the published source, which a signature alone cannot.</li>
+<li><strong>A GnuPG that will not run</strong> is a fact about your computer. It is not a failed check and nothing here treats it as one.</li>
+</ul>
+<p>Full instructions per platform, including Windows and the BSDs, are in <code>docs/INSTALL.md</code>(https://github.com/tilas01/veilvoice/blob/main/docs/INSTALL.md).</p>
+</details>
 <details class="release" id="v0.1.19" open>
 <summary><strong>v0.1.19</strong> <span class="muted">The audited release. No new features. The whole repository was read for...</span></summary>
 <p><strong>The audited release.</strong> No new features. The whole repository was read for security, memory safety, correctness, reproducibility, optimisation and accuracy, and everything it found was fixed. Eight defects, F-149 to F-156, are written up in <code>docs/AUDIT.md</code>.</p>
