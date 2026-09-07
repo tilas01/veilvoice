@@ -94,14 +94,15 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>1888 lines"])
-    n_builder["builder.rs<br/>1148 lines"]
+    n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>460 lines"]
-    n_extracted["extracted.rs<br/>312 lines"]
+    n_extracted["extracted.rs<br/>316 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
-    n_tests["tests.rs<br/>587 lines"]
+    n_tests["tests.rs<br/>704 lines"]
     n_builder --> n_deps
+    n_builder --> n_extracted
     n_builder --> n_report
     n_lib --> n_report
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" "open the source"
@@ -120,14 +121,14 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1148 | Build VeilVoice here, and compare what came out against what was published. |
+| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1210 | Build VeilVoice here, and compare what came out against what was published. |
 | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 650 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
-| [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 312 | What came out of the archive, and the GnuPG somebody already has. |
+| [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 316 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
 | [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 1888 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
-| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 587 | The verifier's own tests. |
+| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 704 | The verifier's own tests. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Marker 97. |
 
 ## Public items

@@ -63,7 +63,11 @@
 use std::path::{Path, PathBuf};
 
 /// The programs a release archive carries.
-pub const PROGRAMS: &[&str] = &["veilvoice", "veilvoice-verify", "veilvoice-gui"];
+///
+/// Two since 0.1.18, when the verifier stopped being an executable of its own
+/// and became part of both of them. An archive is not missing anything by not
+/// holding a third.
+pub const PROGRAMS: &[&str] = &["veilvoice", "veilvoice-gui"];
 
 /// One program found in an extracted directory.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -218,7 +222,7 @@ mod tests {
         use std::os::unix::fs::PermissionsExt;
         let dir = tempfile::tempdir().unwrap();
         let runnable = dir.path().join("veilvoice");
-        let inert = dir.path().join("veilvoice-verify");
+        let inert = dir.path().join("veilvoice-gui");
         std::fs::write(&runnable, b"#!/bin/sh\n").unwrap();
         std::fs::write(&inert, b"#!/bin/sh\n").unwrap();
         std::fs::set_permissions(&runnable, std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -228,7 +232,7 @@ mod tests {
         assert_eq!(found.programs.len(), 2);
         let stuck = found.not_runnable();
         assert_eq!(stuck.len(), 1, "one of the two is not runnable");
-        assert!(stuck[0].path.ends_with("veilvoice-verify"));
+        assert!(stuck[0].path.ends_with("veilvoice-gui"));
     }
 
     #[test]
