@@ -11,7 +11,7 @@
 //!
 //! So the search is explicit and in a stated order:
 //!
-//! 1. **Beside this binary.** A portable folder holds all three programs
+//! 1. **Beside this binary.** A portable folder holds both programs
 //!    together, and somebody who unpacked a release and typed `veilvoice gui`
 //!    means the one they unpacked.
 //! 2. **Where an installation puts it**, from `veilvoice_setup::install`.
@@ -89,7 +89,7 @@ pub fn find() -> Result<PathBuf, String> {
     looked.push("  your PATH".to_string());
     Err(format!(
         "the desktop application ({}) is not installed here. Looked in:\n{}\n\n\
-         `veilvoice install` puts all three programs where your shell can find them.",
+         `veilvoice install` puts both programs where your shell can find them.",
         gui_name(),
         looked.join("\n")
     ))

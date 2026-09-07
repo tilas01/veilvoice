@@ -67,7 +67,13 @@
 <p>Every other module in this crate does one job. This is the file that puts them in order and decides what happens to a block of samples, so it is the one to read first if you want to know what VeilVoice actually <em>does</em> to audio.</p>
 <h2 id="the-signal-path">The signal path</h2>
 <p><code>Deidentifier::process</code> takes a block of input and writes an equal-length block of output. Everything below happens inside it, per STFT frame:</p>
-<p>1. <strong>Roll the modulation stream</strong> if this frame is the one where the ratchet fires. See &quot;forward secrecy&quot; below. 2. <strong>Draw this frame&#x27;s modulation</strong> from the CSPRNG -- a pitch ratio and a formant ratio, glided toward fresh random targets rather than jumped, so the scrambling is inaudible as scrambling. 3. <strong>Track the fundamental</strong> from the newest hop of <em>time-domain</em> samples. This cannot be done in the frequency domain: at any frame size with usable latency, the FFT&#x27;s bin spacing cannot tell 100 Hz from 140 Hz. The tracker keeps its own longer history and is fed only what is new. 4. <strong>Let the accent neutraliser observe</strong> that estimate, so its long-term picture of the speaker stays current. 5. <strong>Transform the spectrum</strong> -- this is the irreversible step, and it lives in <code>crate::spectral</code>. Measured phase is discarded and resynthesised; pitch, vocal-tract scale and spectral tilt are mapped onto canonical values.</p>
+<ol>
+<li><strong>Roll the modulation stream</strong> if this frame is the one where the ratchet fires. See &quot;forward secrecy&quot; below.</li>
+<li><strong>Draw this frame&#x27;s modulation</strong> from the CSPRNG -- a pitch ratio and a formant ratio, glided toward fresh random targets rather than jumped, so the scrambling is inaudible as scrambling.</li>
+<li><strong>Track the fundamental</strong> from the newest hop of <em>time-domain</em> samples. This cannot be done in the frequency domain: at any frame size with usable latency, the FFT&#x27;s bin spacing cannot tell 100 Hz from 140 Hz. The tracker keeps its own longer history and is fed only what is new.</li>
+<li><strong>Let the accent neutraliser observe</strong> that estimate, so its long-term picture of the speaker stays current.</li>
+<li><strong>Transform the spectrum</strong> -- this is the irreversible step, and it lives in <code>crate::spectral</code>. Measured phase is discarded and resynthesised; pitch, vocal-tract scale and spectral tilt are mapped onto canonical values.</li>
+</ol>
 <p>Then, once per block rather than per frame, a short time-domain tail: soft clip, chorus, reverb. Those are cosmetic. <strong>They are not what makes the output unlinkable</strong> and nothing here should be read as though they were.</p>
 <h2 id="why-it-is-one-way-in-one-paragraph">Why it is one-way, in one paragraph</h2>
 <p>Two independent reasons, and both are needed:</p>
