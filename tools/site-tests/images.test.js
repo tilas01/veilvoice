@@ -381,6 +381,27 @@ function roadmapChecks(fail, pass) {
     pass("the roadmap reveal stops for anybody who asked for less movement");
   }
 
+  // A filling animation is never finished as far as the compositor is
+  // concerned, and a transform animation earns its element a GPU layer. The
+  // roadmap picture has one animated square per marker, so `both` gave the
+  // browser 146 permanent layers for a drawing that stops moving in under half
+  // a second. Measured through Chromium's own layer tree: 162 composited
+  // layers on the roadmap page with `both`, 8 with `backwards`, and the film
+  // scrolling beside them shares the compositor with every one of them.
+  //
+  // `forwards` is what costs the layer and it was never needed: the animation
+  // ends at `opacity:1;transform:none`, which is the square's own state, so
+  // holding it changes nothing on screen. `backwards` keeps the half that
+  // matters, the state before the animation starts.
+  if (/animation:\s*rm-in[^;}]*\b(both|forwards)\b/.test(svg)) {
+    fail(`${drawing} fills its reveal animation forwards, which keeps a GPU ` +
+         "layer alive per square for as long as the page is open. The end " +
+         "state is the square's own state, so use `backwards`");
+    failures += 1;
+  } else {
+    pass("the roadmap reveal releases its layers when it finishes");
+  }
+
   return failures;
 }
 

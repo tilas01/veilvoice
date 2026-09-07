@@ -287,9 +287,24 @@ def graphic(colours, groups, counts):
     # `transform-box: fill-box` is what makes `transform-origin: center` mean
     # the square's own centre rather than the origin of the whole drawing.
     # Without it every square flies in from the top-left corner.
+    #
+    # **The fill mode is `backwards`, and it used to be `both`.** A filling
+    # animation never finishes as far as the compositor is concerned, and a
+    # transform animation on an element gets that element its own GPU layer.
+    # With `both`, all 146 squares kept theirs for as long as the page was
+    # open: Chromium's layer tree showed 146 permanent 22x22 layers for a
+    # picture that had stopped moving in under half a second, and every one of
+    # them was a texture the compositor handled on every frame, next to the
+    # film beside it that actually was moving.
+    #
+    # `forwards` was never needed here. The animation ends at
+    # `opacity:1;transform:none`, which is the state the square has anyway, so
+    # holding it changes nothing on screen and costs a layer each. `backwards`
+    # keeps the part that matters, the state before the animation starts, so a
+    # delayed square does not flash at full size before flying in.
     add('<style>'
         '.rm-square{transform-box:fill-box;transform-origin:center;'
-        'animation:rm-in .45s cubic-bezier(.2,.8,.3,1) both;'
+        'animation:rm-in .45s cubic-bezier(.2,.8,.3,1) backwards;'
         'transition:filter .15s ease}'
         '.rm-square:hover{filter:brightness(1.35)}'
         '@keyframes rm-in{from{opacity:0;transform:scale(.4)}'
