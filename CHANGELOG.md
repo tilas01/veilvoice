@@ -6,6 +6,36 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## Unreleased
+
+**The Studio meters what it is doing, and the Browser can play**
+
+- Two bars while a take records, input and output. One output meter answers
+  "is something being recorded" and not "is it being veiled", which is the
+  question somebody at that tab is actually asking; seeing the two move
+  differently is the only thing on screen that shows the engine is between
+  them. The bar itself moved out of the window's private module into
+  `monitor`, so there is one of it rather than a second that would slowly stop
+  looking like the first.
+- A take in the Browser plays, straight out of locked memory. **Nothing is
+  written to the disk**, so there is no copy to remember to shred: the obvious
+  way to hear a WAV is to put it somewhere and hand over the path, and that
+  would leave an unencrypted recording lying about, which is what the vault
+  exists to prevent.
+- Said as built rather than as first imagined: the take is decrypted **whole**,
+  not in blocks. The container is sealed and authenticated as one piece, and an
+  encryption that let you open the first second without the rest would not be
+  authenticating anything. What that buys is no plaintext file at any point.
+  What it does not buy is a footprint smaller than the recording, and the
+  roadmap entry now says that instead of the other thing.
+- One take at a time, and starting a second releases the first: two decrypted
+  recordings in memory at once is twice as much of somebody's voice as the
+  reason for it. Locking the window releases whatever is playing, along with
+  the vault.
+- Playing at the wrong sample rate is refused rather than done. It would make a
+  voice sound higher or lower, and in a program whose whole point is that a
+  voice cannot be traced back, that is a wrong answer rather than a small one.
+
 ## v0.1.20
 
 **The offline claim is now proved by a machine, four ways**

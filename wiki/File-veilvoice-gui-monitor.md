@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/monitor.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 419 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 496 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs)
 
 ## Contents
 
@@ -72,7 +72,7 @@ wrong.
 
 ## What this file contains
 
-419 lines defining **9 functions** (7 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+496 lines defining **10 functions** (8 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -90,6 +90,7 @@ wrong.
 - `Levels::clear` (line 192) -- Back to nothing, for when a session stops.
 - `show` (line 318) -- Draw the monitor for this frame.
   - reaches: `row`, `bar`
+- `meter` (line 379) -- One level meter: a bar on the decibel scale, and the number beside it.
 
 ## What calls what
 
@@ -114,6 +115,7 @@ flowchart TD
     n_bar["bar<br/>line 203"]
     n_row["row<br/>line 273"]
     n_show(["show<br/>line 318"])
+    n_meter(["meter<br/>line 379"])
     n_row --> n_bar
     n_show --> n_row
     click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L75" "open the source"
@@ -125,8 +127,9 @@ flowchart TD
     click n_bar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L203" "open the source"
     click n_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273" "open the source"
     click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318" "open the source"
+    click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L379" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_label,n_note,n_key,n_from_key,n_update,n_clear,n_show entry
+    class n_label,n_note,n_key,n_from_key,n_update,n_clear,n_show,n_meter entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_bar,n_row helper
 ```
@@ -151,3 +154,4 @@ flowchart TD
 | `Action` <sub>pub enum</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L259) | What the reader did with the monitor this frame. |
 | `row` <sub>fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273) | Draw the row itself. |
 | `show` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318) | Draw the monitor for this frame. |
+| `meter` <sub>pub fn</sub> | [379](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L379) | One level meter: a bar on the decibel scale, and the number beside it. |

@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/studio.svg" alt="studio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/studio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1119 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1263 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-tabs-one-vault">Two tabs, one vault</a>
@@ -79,33 +79,33 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1119 lines defining <strong>29 functions</strong> (10 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1263 lines defining <strong>30 functions</strong> (10 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Phase</code> <span style="color:var(--muted)">line 83</span> &middot; What the Studio is doing.</li>
 <li><code>struct Studio</code> <span style="color:var(--muted)">line 99</span> &middot; The Studio and the Browser.</li>
-<li><code>enum Render</code> <span style="color:var(--muted)">line 919</span> &middot; What a take is to be turned into.</li>
-<li><code>enum Act</code> <span style="color:var(--muted)">line 987</span> &middot; Something a browser row asked for.</li>
+<li><code>enum Render</code> <span style="color:var(--muted)">line 1061</span> &middot; What a take is to be turned into.</li>
+<li><code>enum Act</code> <span style="color:var(--muted)">line 1129</span> &middot; Something a browser row asked for.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Studio::is_open</code> <span style="color:var(--muted)">line 134</span> &middot; Whether the vault is open.
+<li><code>Studio::is_open</code> <span style="color:var(--muted)">line 143</span> &middot; Whether the vault is open.
 </li>
-<li><code>Studio::is_recording</code> <span style="color:var(--muted)">line 142</span> &middot; Whether a recording is running.
+<li><code>Studio::is_recording</code> <span style="color:var(--muted)">line 151</span> &middot; Whether a recording is running.
 </li>
-<li><code>Studio::close</code> <span style="color:var(--muted)">line 161</span> &middot; Shut the vault and forget the key.
+<li><code>Studio::close</code> <span style="color:var(--muted)">line 170</span> &middot; Shut the vault and forget the key.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>finish_take</code>, <code>length</code></span>
 </li>
-<li><code>Studio::tab</code> <span style="color:var(--muted)">line 519</span> &middot; The Recording Studio tab.
+<li><code>Studio::tab</code> <span style="color:var(--muted)">line 586</span> &middot; The Recording Studio tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>finish_take</code>, <code>length</code>, <code>phase</code>, <code>say</code>, <code>shut_panel</code>, <code>start_take</code>, <code>take_form</code>, <code>unlock</code>, <code>default_dir</code>, <code>into_secret</code></span>
 </li>
-<li><code>Studio::browser</code> <span style="color:var(--muted)">line 589</span> &middot; The Recording Browser tab.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>apply</code>, <code>counted</code>, <code>export</code>, <code>made_on</code>, <code>say</code>, <code>shut_panel</code>, <code>size</code>, <code>refresh</code>, <code>plan_for</code>, <code>run_ffmpeg</code>, <code>safe_stem</code>, <code>wav_shape</code></span>
+<li><code>Studio::browser</code> <span style="color:var(--muted)">line 673</span> &middot; The Recording Browser tab.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>apply</code>, <code>counted</code>, <code>export</code>, <code>length</code>, <code>made_on</code>, <code>say</code>, <code>shut_panel</code>, <code>size</code>, <code>play</code>, <code>refresh</code>, <code>plan_for</code>, <code>run_ffmpeg</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 635 846" width="635" height="846" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 635 946" width="635" height="946" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -114,30 +114,32 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="635" height="846" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M487.6 447.0 C 509.6 447.0, 509.6 247.0, 236.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M476.4 274.0 C 476.4 294.0, 421.2 400.0, 421.2 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M476.4 274.0 C 476.4 294.0, 250.3 500.0, 250.3 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M550.9 247.0 C 593.0 247.0, 593.0 147.0, 574.0 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M476.4 274.0 C 476.4 294.0, 376.9 500.0, 376.9 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M476.4 274.0 C 476.4 294.0, 270.5 400.0, 270.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M476.4 274.0 C 476.4 294.0, 520.8 300.0, 520.8 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M476.4 274.0 C 476.4 294.0, 503.4 500.0, 503.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M539.7 74.0 C 539.7 94.0, 118.6 300.0, 118.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M500.6 174.0 C 500.6 194.0, 127.8 500.0, 127.8 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M500.6 174.0 C 500.6 194.0, 563.9 400.0, 563.9 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M500.6 174.0 C 500.6 194.0, 321.7 300.0, 321.7 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M118.6 374.0 C 118.6 394.0, 317.6 600.0, 317.6 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M607.3 347.0 C 629.3 347.0, 629.3 147.0, 208.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M317.6 274.0 C 317.6 294.0, 118.6 300.0, 118.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M317.6 274.0 C 317.6 294.0, 317.6 600.0, 317.6 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M376.0 247.0 C 469.3 247.0, 469.3 47.0, 450.3 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M317.6 274.0 C 317.6 294.0, 270.5 400.0, 270.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M317.6 274.0 C 317.6 294.0, 520.8 300.0, 520.8 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M376.0 247.0 C 426.2 247.0, 426.2 147.0, 407.2 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M317.6 274.0 C 317.6 294.0, 103.7 400.0, 103.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M205.1 147.0 C 310.5 147.0, 310.5 47.0, 291.5 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M205.1 147.0 C 227.1 147.0, 227.1 47.0, 148.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<rect x="0" y="0" width="635" height="946" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M487.6 547.0 C 585.0 547.0, 585.0 147.0, 566.0 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M487.6 547.0 C 509.6 547.0, 509.6 247.0, 407.2 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 421.2 500.0, 421.2 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 191.1 600.0, 191.1 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M392.1 347.0 C 414.1 347.0, 414.1 247.0, 232.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 317.6 700.0, 317.6 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 317.6 600.0, 317.6 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 270.5 500.0, 270.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 520.8 400.0, 520.8 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M317.6 374.0 C 317.6 394.0, 444.2 600.0, 444.2 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M539.7 74.0 C 539.7 94.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M158.9 274.0 C 158.9 294.0, 563.9 500.0, 563.9 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M158.9 274.0 C 158.9 294.0, 321.7 400.0, 321.7 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M118.6 474.0 C 118.6 494.0, 317.6 700.0, 317.6 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M500.6 174.0 C 500.6 194.0, 563.9 500.0, 563.9 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M607.3 447.0 C 629.3 447.0, 629.3 147.0, 216.2 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M488.5 274.0 C 488.5 294.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M488.5 274.0 C 488.5 294.0, 317.6 700.0, 317.6 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M546.8 247.0 C 568.8 247.0, 568.8 47.0, 450.3 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M488.5 274.0 C 488.5 294.0, 270.5 500.0, 270.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M488.5 274.0 C 488.5 294.0, 520.8 400.0, 520.8 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M546.8 247.0 C 568.8 247.0, 568.8 147.0, 415.2 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M488.5 274.0 C 488.5 294.0, 103.7 500.0, 103.7 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M213.2 147.0 C 310.5 147.0, 310.5 47.0, 291.5 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M213.2 147.0 C 235.2 147.0, 235.2 47.0, 148.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="studio.src.html#fn-into_secret">
 <rect x="29.2" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="87.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">into_secret</text>
@@ -151,156 +153,158 @@
 <a href="studio.src.html#fn-studio-phase">
 <rect x="314.5" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="380.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::phase</text>
-<text x="380.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+<text x="380.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
 </a>
 <a href="studio.src.html#fn-studio-close">
 <rect x="473.3" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="539.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::close</text>
-<text x="539.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+<text x="539.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
 </a>
 <a href="studio.src.html#fn-studio-unlock">
-<rect x="64.3" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="134.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unlock</text>
-<text x="134.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 178</text>
+<rect x="72.3" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="142.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unlock</text>
+<text x="142.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 190</text>
 </a>
 <a href="studio.src.html#fn-studio-start_take">
-<rect x="231.1" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="317.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::start_take</text>
-<text x="317.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
+<rect x="239.2" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="325.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::start_take</text>
+<text x="325.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 247</text>
 </a>
 <a href="studio.src.html#fn-studio-finish_take">
-<rect x="28.0" y="320.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="118.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::finish_take</text>
-<text x="118.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
+<rect x="28.0" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="118.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::finish_take</text>
+<text x="118.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+</a>
+<a href="studio.src.html#fn-studio-play">
+<rect x="438.2" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="500.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::play</text>
+<text x="500.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 373</text>
 </a>
 <a href="studio.src.html#fn-studio-export">
-<rect x="430.2" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="500.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::export</text>
-<text x="500.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 352</text>
+<rect x="88.4" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="158.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::export</text>
+<text x="158.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 419</text>
 </a>
 <a href="studio.src.html#fn-studio-write_page">
-<rect x="235.1" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="321.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::write_page</text>
-<text x="321.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 460</text>
+<rect x="235.1" y="420.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="321.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::write_page</text>
+<text x="321.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 527</text>
 </a>
 <a href="studio.src.html#fn-studio-refresh">
-<rect x="84.4" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="158.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::refresh</text>
-<text x="158.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 503</text>
+<rect x="255.3" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="329.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::refresh</text>
+<text x="329.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 570</text>
 </a>
 <a href="studio.src.html#fn-studio-tab">
-<rect x="259.3" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="317.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::tab</text>
-<text x="317.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 519</text>
+<rect x="430.2" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="488.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::tab</text>
+<text x="488.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 586</text>
 </a>
 <a href="studio.src.html#fn-studio-browser">
-<rect x="402.0" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="476.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::browser</text>
-<text x="476.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 589</text>
+<rect x="243.2" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="317.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::browser</text>
+<text x="317.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 673</text>
 </a>
 <a href="studio.src.html#fn-studio-shut_panel">
-<rect x="434.2" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="520.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::shut_panel</text>
-<text x="520.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 760</text>
+<rect x="434.2" y="420.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="520.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::shut_panel</text>
+<text x="520.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 894</text>
 </a>
 <a href="studio.src.html#fn-studio-take_form">
-<rect x="21.1" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="103.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::take_form</text>
-<text x="103.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 820</text>
+<rect x="21.1" y="520.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="103.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::take_form</text>
+<text x="103.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 954</text>
 </a>
 <a href="studio.src.html#fn-studio-say">
-<rect x="212.2" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="270.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::say</text>
-<text x="270.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 841</text>
+<rect x="212.2" y="520.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="270.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::say</text>
+<text x="270.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 975</text>
 </a>
 <a href="studio.src.html#fn-studio-apply">
-<rect x="354.8" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="421.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::apply</text>
-<text x="421.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 852</text>
+<rect x="354.8" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="421.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::apply</text>
+<text x="421.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 986</text>
 </a>
 <a href="studio.src.html#fn-wav_shape">
-<rect x="513.6" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="563.9" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav_shape</text>
-<text x="563.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 944</text>
-</a>
-<a href="studio.src.html#fn-plan_for">
-<rect x="81.6" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="127.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">plan_for</text>
-<text x="127.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 968</text>
+<rect x="513.6" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="563.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav_shape</text>
+<text x="563.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1086</text>
 </a>
 <a href="studio.src.html#fn-counted">
-<rect x="200.1" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="250.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">counted</text>
-<text x="250.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1000</text>
+<rect x="140.8" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="191.1" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">counted</text>
+<text x="191.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1144</text>
 </a>
 <a href="studio.src.html#fn-made_on">
-<rect x="326.6" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="376.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">made_on</text>
-<text x="376.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1013</text>
+<rect x="267.4" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="317.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">made_on</text>
+<text x="317.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1157</text>
 </a>
 <a href="studio.src.html#fn-length">
-<rect x="267.4" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="317.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">length</text>
-<text x="317.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1102</text>
+<rect x="267.4" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="317.6" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">length</text>
+<text x="317.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1246</text>
 </a>
 <a href="studio.src.html#fn-size">
-<rect x="453.2" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="503.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">size</text>
-<text x="503.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1108</text>
+<rect x="393.9" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="444.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">size</text>
+<text x="444.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1252</text>
 </a>
-<rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="720.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="729.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<rect x="20.0" y="736.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="745.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 29 functions are drawn; the diagram is bounded at 22 so it</text>
-<text x="20.0" y="828.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">stays readable.</text>
+<rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="820.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="829.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="836.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 856.5 L29.0 856.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="861.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
+<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 30 functions are drawn; the diagram is bounded at 22 so it</text>
+<text x="20.0" y="928.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 29 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 30 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_into_secret[&quot;into_secret&lt;br/&gt;line 67&quot;]
     n_default_dir[&quot;default_dir&lt;br/&gt;line 77&quot;]
-    n_phase[&quot;Studio::phase&lt;br/&gt;line 147&quot;]
-    n_close([&quot;Studio::close&lt;br/&gt;line 161&quot;])
-    n_unlock[&quot;Studio::unlock&lt;br/&gt;line 178&quot;]
-    n_start_take[&quot;Studio::start_take&lt;br/&gt;line 235&quot;]
-    n_finish_take[&quot;Studio::finish_take&lt;br/&gt;line 267&quot;]
-    n_export[&quot;Studio::export&lt;br/&gt;line 352&quot;]
-    n_write_page[&quot;Studio::write_page&lt;br/&gt;line 460&quot;]
-    n_refresh[&quot;Studio::refresh&lt;br/&gt;line 503&quot;]
-    n_tab([&quot;Studio::tab&lt;br/&gt;line 519&quot;])
-    n_browser([&quot;Studio::browser&lt;br/&gt;line 589&quot;])
-    n_shut_panel[&quot;Studio::shut_panel&lt;br/&gt;line 760&quot;]
-    n_take_form[&quot;Studio::take_form&lt;br/&gt;line 820&quot;]
-    n_say[&quot;Studio::say&lt;br/&gt;line 841&quot;]
-    n_apply[&quot;Studio::apply&lt;br/&gt;line 852&quot;]
-    n_wav_shape[&quot;wav_shape&lt;br/&gt;line 944&quot;]
-    n_plan_for[&quot;plan_for&lt;br/&gt;line 968&quot;]
-    n_counted[&quot;counted&lt;br/&gt;line 1000&quot;]
-    n_made_on[&quot;made_on&lt;br/&gt;line 1013&quot;]
-    n_length[&quot;length&lt;br/&gt;line 1102&quot;]
-    n_size[&quot;size&lt;br/&gt;line 1108&quot;]
+    n_phase[&quot;Studio::phase&lt;br/&gt;line 156&quot;]
+    n_close([&quot;Studio::close&lt;br/&gt;line 170&quot;])
+    n_unlock[&quot;Studio::unlock&lt;br/&gt;line 190&quot;]
+    n_start_take[&quot;Studio::start_take&lt;br/&gt;line 247&quot;]
+    n_finish_take[&quot;Studio::finish_take&lt;br/&gt;line 279&quot;]
+    n_play[&quot;Studio::play&lt;br/&gt;line 373&quot;]
+    n_export[&quot;Studio::export&lt;br/&gt;line 419&quot;]
+    n_write_page[&quot;Studio::write_page&lt;br/&gt;line 527&quot;]
+    n_refresh[&quot;Studio::refresh&lt;br/&gt;line 570&quot;]
+    n_tab([&quot;Studio::tab&lt;br/&gt;line 586&quot;])
+    n_browser([&quot;Studio::browser&lt;br/&gt;line 673&quot;])
+    n_shut_panel[&quot;Studio::shut_panel&lt;br/&gt;line 894&quot;]
+    n_take_form[&quot;Studio::take_form&lt;br/&gt;line 954&quot;]
+    n_say[&quot;Studio::say&lt;br/&gt;line 975&quot;]
+    n_apply[&quot;Studio::apply&lt;br/&gt;line 986&quot;]
+    n_wav_shape[&quot;wav_shape&lt;br/&gt;line 1086&quot;]
+    n_counted[&quot;counted&lt;br/&gt;line 1144&quot;]
+    n_made_on[&quot;made_on&lt;br/&gt;line 1157&quot;]
+    n_length[&quot;length&lt;br/&gt;line 1246&quot;]
+    n_size[&quot;size&lt;br/&gt;line 1252&quot;]
+    n_apply --&gt; n_play
     n_apply --&gt; n_refresh
     n_browser --&gt; n_apply
     n_browser --&gt; n_counted
     n_browser --&gt; n_export
+    n_browser --&gt; n_length
     n_browser --&gt; n_made_on
     n_browser --&gt; n_say
     n_browser --&gt; n_shut_panel
     n_browser --&gt; n_size
     n_close --&gt; n_finish_take
-    n_export --&gt; n_plan_for
     n_export --&gt; n_wav_shape
     n_export --&gt; n_write_page
     n_finish_take --&gt; n_length
+    n_play --&gt; n_wav_shape
     n_shut_panel --&gt; n_unlock
     n_tab --&gt; n_finish_take
     n_tab --&gt; n_length
@@ -313,32 +317,32 @@ flowchart TD
     n_unlock --&gt; n_into_secret
     click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L67&quot; &quot;open the source&quot;
     click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L77&quot; &quot;open the source&quot;
-    click n_phase href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L147&quot; &quot;open the source&quot;
-    click n_close href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L161&quot; &quot;open the source&quot;
-    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L178&quot; &quot;open the source&quot;
-    click n_start_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L235&quot; &quot;open the source&quot;
-    click n_finish_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L267&quot; &quot;open the source&quot;
-    click n_export href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L352&quot; &quot;open the source&quot;
-    click n_write_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L460&quot; &quot;open the source&quot;
-    click n_refresh href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L503&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L519&quot; &quot;open the source&quot;
-    click n_browser href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L589&quot; &quot;open the source&quot;
-    click n_shut_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L760&quot; &quot;open the source&quot;
-    click n_take_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L820&quot; &quot;open the source&quot;
-    click n_say href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L841&quot; &quot;open the source&quot;
-    click n_apply href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L852&quot; &quot;open the source&quot;
-    click n_wav_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L944&quot; &quot;open the source&quot;
-    click n_plan_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L968&quot; &quot;open the source&quot;
-    click n_counted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1000&quot; &quot;open the source&quot;
-    click n_made_on href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1013&quot; &quot;open the source&quot;
-    click n_length href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1102&quot; &quot;open the source&quot;
-    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1108&quot; &quot;open the source&quot;
+    click n_phase href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L156&quot; &quot;open the source&quot;
+    click n_close href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L170&quot; &quot;open the source&quot;
+    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L190&quot; &quot;open the source&quot;
+    click n_start_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L247&quot; &quot;open the source&quot;
+    click n_finish_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L279&quot; &quot;open the source&quot;
+    click n_play href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L373&quot; &quot;open the source&quot;
+    click n_export href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L419&quot; &quot;open the source&quot;
+    click n_write_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L527&quot; &quot;open the source&quot;
+    click n_refresh href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L570&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L586&quot; &quot;open the source&quot;
+    click n_browser href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L673&quot; &quot;open the source&quot;
+    click n_shut_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L894&quot; &quot;open the source&quot;
+    click n_take_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L954&quot; &quot;open the source&quot;
+    click n_say href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L975&quot; &quot;open the source&quot;
+    click n_apply href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L986&quot; &quot;open the source&quot;
+    click n_wav_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1086&quot; &quot;open the source&quot;
+    click n_counted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1144&quot; &quot;open the source&quot;
+    click n_made_on href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1157&quot; &quot;open the source&quot;
+    click n_length href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1246&quot; &quot;open the source&quot;
+    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1252&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_close,n_tab,n_browser entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_default_dir,n_counted,n_made_on,n_length,n_size api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_into_secret,n_phase,n_unlock,n_start_take,n_finish_take,n_export,n_write_page,n_refresh,n_shut_panel,n_take_form,n_say,n_apply,n_wav_shape,n_plan_for helper</code></pre>
+    class n_into_secret,n_phase,n_unlock,n_start_take,n_finish_take,n_play,n_export,n_write_page,n_refresh,n_shut_panel,n_take_form,n_say,n_apply,n_wav_shape helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -349,35 +353,36 @@ flowchart TD
 <tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-default_dir">77</a></td><td>Where the vault lives: beside the lock file, in this platform&#x27;s config directory.</td></tr>
 <tr><td><code>Phase</code> <sub>enum</sub></td><td><a href="studio.src.html#fn-phase">83</a></td><td>What the Studio is doing.</td></tr>
 <tr><td><code>Studio</code> <sub>pub struct</sub></td><td><a href="studio.src.html#fn-studio">99</a></td><td>The Studio and the Browser.</td></tr>
-<tr><td><code>Studio::is_open</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_open">134</a></td><td>Whether the vault is open.</td></tr>
-<tr><td><code>Studio::is_recording</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_recording">142</a></td><td>Whether a recording is running.</td></tr>
-<tr><td><code>Studio::phase</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-phase">147</a></td><td>What phase the tab is in.</td></tr>
-<tr><td><code>Studio::close</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-close">161</a></td><td>Shut the vault and forget the key.</td></tr>
-<tr><td><code>Studio::unlock</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unlock">178</a></td><td>Derive the key from both entries and open the vault.</td></tr>
-<tr><td><code>Studio::start_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-start_take">235</a></td><td>Start recording into the vault&#x27;s holding area.</td></tr>
-<tr><td><code>Studio::finish_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-finish_take">267</a></td><td>Stop recording and seal what was captured into the vault.</td></tr>
-<tr><td><code>Studio::export</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-export">352</a></td><td>Turn a take into a page, a video, or both, in into.</td></tr>
-<tr><td><code>Studio::write_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-write_page">460</a></td><td>The player page, its subtitles, and the drawing they sit in.</td></tr>
-<tr><td><code>Studio::refresh</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-refresh">503</a></td><td>Re-read the listing from the vault.</td></tr>
-<tr><td><code>Studio::tab</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tab">519</a></td><td>The Recording Studio tab.</td></tr>
-<tr><td><code>Studio::browser</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-browser">589</a></td><td>The Recording Browser tab.</td></tr>
-<tr><td><code>Studio::shut_panel</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-shut_panel">760</a></td><td>The panel shown while the vault is shut, in both tabs.</td></tr>
-<tr><td><code>Studio::take_form</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-take_form">820</a></td><td>The name field for the next take.</td></tr>
-<tr><td><code>Studio::say</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-say">841</a></td><td>Show the last message, if there is one.</td></tr>
-<tr><td><code>Studio::apply</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-apply">852</a></td><td>Carry out a row action.</td></tr>
-<tr><td><code>Render</code> <sub>pub enum</sub></td><td><a href="studio.src.html#fn-render">919</a></td><td>What a take is to be turned into.</td></tr>
-<tr><td><code>Render::wants_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_page">929</a></td><td></td></tr>
-<tr><td><code>Render::wants_video</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_video">933</a></td><td></td></tr>
-<tr><td><code>wav_shape</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-wav_shape">944</a></td><td>The sample rate and frame count a canonical WAV header states.</td></tr>
-<tr><td><code>plan_for</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-plan_for">968</a></td><td>A one-speaker plan spanning a take.</td></tr>
-<tr><td><code>Act</code> <sub>enum</sub></td><td><a href="studio.src.html#fn-act">987</a></td><td>Something a browser row asked for.</td></tr>
-<tr><td><code>counted</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted">1000</a></td><td>&quot;One recording&quot; or &quot;four recordings&quot;, so the interface does not say &quot;1 recordings&quot;.</td></tr>
-<tr><td><code>made_on</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-made_on">1013</a></td><td>A Unix time as a date somebody reads.</td></tr>
-<tr><td><code>pcm16</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-pcm16">1037</a></td><td>Sixteen-bit PCM from a WAV, as the waveform drawer wants it.</td></tr>
-<tr><td><code>safe_stem</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_stem">1052</a></td><td>A file name built from what somebody called a recording.</td></tr>
-<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-run_ffmpeg">1075</a></td><td>Run ffmpeg to put the audio in a video with a black picture.</td></tr>
-<tr><td><code>length</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-length">1102</a></td><td>A length in seconds, as m:ss, for somewhere a person reads.</td></tr>
-<tr><td><code>size</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-size">1108</a></td><td>A size in bytes, rounded to something a person can compare.</td></tr>
+<tr><td><code>Studio::is_open</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_open">143</a></td><td>Whether the vault is open.</td></tr>
+<tr><td><code>Studio::is_recording</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_recording">151</a></td><td>Whether a recording is running.</td></tr>
+<tr><td><code>Studio::phase</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-phase">156</a></td><td>What phase the tab is in.</td></tr>
+<tr><td><code>Studio::close</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-close">170</a></td><td>Shut the vault and forget the key.</td></tr>
+<tr><td><code>Studio::unlock</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unlock">190</a></td><td>Derive the key from both entries and open the vault.</td></tr>
+<tr><td><code>Studio::start_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-start_take">247</a></td><td>Start recording into the vault&#x27;s holding area.</td></tr>
+<tr><td><code>Studio::finish_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-finish_take">279</a></td><td>Stop recording and seal what was captured into the vault.</td></tr>
+<tr><td><code>Studio::play</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-play">373</a></td><td>Play a take, straight out of the vault and out of locked memory.</td></tr>
+<tr><td><code>Studio::export</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-export">419</a></td><td>Turn a take into a page, a video, or both, in into.</td></tr>
+<tr><td><code>Studio::write_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-write_page">527</a></td><td>The player page, its subtitles, and the drawing they sit in.</td></tr>
+<tr><td><code>Studio::refresh</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-refresh">570</a></td><td>Re-read the listing from the vault.</td></tr>
+<tr><td><code>Studio::tab</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tab">586</a></td><td>The Recording Studio tab.</td></tr>
+<tr><td><code>Studio::browser</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-browser">673</a></td><td>The Recording Browser tab.</td></tr>
+<tr><td><code>Studio::shut_panel</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-shut_panel">894</a></td><td>The panel shown while the vault is shut, in both tabs.</td></tr>
+<tr><td><code>Studio::take_form</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-take_form">954</a></td><td>The name field for the next take.</td></tr>
+<tr><td><code>Studio::say</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-say">975</a></td><td>Show the last message, if there is one.</td></tr>
+<tr><td><code>Studio::apply</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-apply">986</a></td><td>Carry out a row action.</td></tr>
+<tr><td><code>Render</code> <sub>pub enum</sub></td><td><a href="studio.src.html#fn-render">1061</a></td><td>What a take is to be turned into.</td></tr>
+<tr><td><code>Render::wants_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_page">1071</a></td><td></td></tr>
+<tr><td><code>Render::wants_video</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_video">1075</a></td><td></td></tr>
+<tr><td><code>wav_shape</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-wav_shape">1086</a></td><td>The sample rate and frame count a canonical WAV header states.</td></tr>
+<tr><td><code>plan_for</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-plan_for">1110</a></td><td>A one-speaker plan spanning a take.</td></tr>
+<tr><td><code>Act</code> <sub>enum</sub></td><td><a href="studio.src.html#fn-act">1129</a></td><td>Something a browser row asked for.</td></tr>
+<tr><td><code>counted</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted">1144</a></td><td>&quot;One recording&quot; or &quot;four recordings&quot;, so the interface does not say &quot;1 recordings&quot;.</td></tr>
+<tr><td><code>made_on</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-made_on">1157</a></td><td>A Unix time as a date somebody reads.</td></tr>
+<tr><td><code>pcm16</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-pcm16">1181</a></td><td>Sixteen-bit PCM from a WAV, as the waveform drawer wants it.</td></tr>
+<tr><td><code>safe_stem</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_stem">1196</a></td><td>A file name built from what somebody called a recording.</td></tr>
+<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-run_ffmpeg">1219</a></td><td>Run ffmpeg to put the audio in a video with a black picture.</td></tr>
+<tr><td><code>length</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-length">1246</a></td><td>A length in seconds, as m:ss, for somewhere a person reads.</td></tr>
+<tr><td><code>size</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-size">1252</a></td><td>A size in bytes, rounded to something a person can compare.</td></tr>
 </tbody></table>
 </section>
 </div></div>

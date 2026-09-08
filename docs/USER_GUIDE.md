@@ -330,6 +330,7 @@ sealed. It is never a plain file, not even briefly.
 | **call it** | What this take will be called. A name is a label and nothing veils a name; it is sealed with the recording, so it is not readable from the disk, and it is still the thing that says who this is. |
 | **start recording** | Begins, at the engine strength the rest of the window is set to. |
 | **stop and store** | Ends the take and seals it into the vault. Samples that were dropped are reported rather than passed over, because a recording that is quietly short is the failure this path exists to avoid. |
+| **the two bars** | What is going in, and what is coming out, while it happens. Two rather than one on purpose: a single output meter answers "is something being recorded" and not "is it being veiled", which is the question you are actually asking. Seeing the input move and the output move differently is the only thing on screen that shows the engine is between them. |
 
 Locking the window closes the vault. A take that is still recording when that
 happens is stopped and **stored** first, rather than discarded: the vault is
@@ -346,10 +347,19 @@ recording.
 |---|---|
 | **the list** | Each recording's name, size and the date it was made. The date and not the time: a listing open on a screen in an office already says enough. |
 | **rename** | Rewrites the index only. The audio is sealed under an identifier rather than a name, so renaming never re-encrypts anything and cannot lose a recording if it is interrupted. |
+| **play** | Plays it straight out of locked memory. **Nothing is written to the disk**, so there is no copy to remember to shred afterwards. Stopping releases the samples, and so does locking the window. |
 | **remove** | Asks first, and cannot be undone. |
 | **preview page** | Writes the audio, a self-contained player page and its captions into a folder you pick. The page plays the recording, draws its waveform and lights the speaker, and needs nothing installed. |
 | **render video** | Writes an MP4 with a black picture, for somewhere that will not accept an audio file. Needs `ffmpeg`, which VeilVoice does not ship and will not install: without it you get the exact command to run, and the audio it needs, rather than a promise. |
 | **both** | The page and the video. |
+
+Playback decrypts the take **whole**, into page-locked memory, rather than in
+pieces. That is a property of the container rather than a shortcut: it is
+sealed and authenticated as one thing, and an encryption that let you open the
+first second without the rest would not be authenticating anything. What it
+buys is the part that matters, which is that no plaintext file exists at any
+point. What it does not buy is a footprint smaller than the recording, and an
+hour of audio is an hour of audio in memory while it plays.
 
 Anything taken out is written **unsealed**, and the tab says so before you
 press anything. That is not a defect: a video nobody can open is not a video.

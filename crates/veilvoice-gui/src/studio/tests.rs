@@ -446,3 +446,77 @@ fn a_picker_open_when_the_vault_shuts_cannot_export_afterwards() {
     );
     assert!(!studio.is_open());
 }
+
+#[test]
+fn playing_a_take_that_is_not_there_says_so_and_starts_nothing() {
+    let (_dir, mut studio, _id) = studio_with_a_take("a take");
+    studio.play("0123456789abcdef");
+    assert!(
+        studio.playing.is_none(),
+        "something started for a missing take"
+    );
+    assert!(
+        studio.message.is_some(),
+        "nothing was said about the failure"
+    );
+}
+
+#[test]
+fn locking_the_window_stops_a_take_that_is_playing() {
+    // The buffer is a decrypted recording. It goes with the vault, rather than
+    // sitting in memory behind a lock screen.
+    let (_dir, mut studio, id) = studio_with_a_take("a take");
+    // No audio device in a test runner, so `play` will not start a stream.
+    // What is asserted is the shape: whatever `playing` holds, `close` empties
+    // it, and that is the line that would be forgotten in a later change.
+    studio.play(&id);
+    studio.close();
+    assert!(
+        studio.playing.is_none(),
+        "a decrypted take outlived the vault"
+    );
+}
+
+#[test]
+fn starting_one_take_releases_the_one_before_it() {
+    // Two decrypted recordings in memory at once is twice as much of somebody's
+    // voice as the reason for it. `play` drops the previous one first, and this
+    // is the assertion that keeps that first line in place.
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    let body = source
+        .split("fn play(&mut self, id: &str) {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n    }").next())
+        .expect("the play method has to be findable");
+    let first = body
+        .lines()
+        .map(str::trim)
+        .find(|line| !line.is_empty() && !line.starts_with("//"))
+        .unwrap_or("");
+    assert_eq!(
+        first, "self.playing = None;",
+        "the first thing `play` does must be to release whatever was playing, \
+         and it now starts with {first:?}"
+    );
+}
+
+#[test]
+fn the_studio_meters_what_goes_in_as_well_as_what_comes_out() {
+    // One output meter answers "is something being recorded" and not "is it
+    // being veiled", which is the question somebody at this tab is asking.
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    assert!(
+        source.contains(r#"meter(ui, "in ""#),
+        "the Studio does not draw an input meter"
+    );
+    assert!(
+        source.contains(r#"meter(ui, "out""#),
+        "the Studio does not draw an output meter"
+    );
+    // And through the shared one, rather than a second bar that would slowly
+    // stop looking like the first.
+    assert!(
+        source.contains("crate::monitor::meter"),
+        "the Studio draws its own meter instead of the shared one"
+    );
+}
