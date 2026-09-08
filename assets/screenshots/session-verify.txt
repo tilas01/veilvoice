@@ -3,9 +3,9 @@ Checking what is in .
 
   ok    embedded key fingerprint 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
   ok    signature over the hash list is good
-  ok    sha256 matches (d7814c9d7b40035f06d25eba5012bf4a62a4cee310e9b6eb3405baf2ef9c43b8)
+  ok    sha256 matches (9c4fe2a533b3d39d6dbfbeabf7ed36d941ae4a27ad64bf1f5024fb09fef4c248)
 
-  INTACT. veilvoice-v0.1.17-linux-x86_64.tar.gz is byte-for-byte what was published, signed by
+  INTACT. veilvoice-v0.1.20-linux-x86_64.tar.gz is byte-for-byte what was published, signed by
   8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.
 
   That is not the same as knowing it was built from the published

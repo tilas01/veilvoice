@@ -11,7 +11,7 @@
 //!
 //! So this takes the samples as they already are, in page-locked memory, and
 //! plays them from there. Nothing is written. When playback stops the buffer is
-//! dropped and [`Secret`](veilvoice_crypto::Secret) wipes itself.
+//! dropped and `veilvoice_crypto::Secret` wipes itself.
 //!
 //! # The samples are held, not streamed from the vault
 //!
