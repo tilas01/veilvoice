@@ -614,6 +614,68 @@ fn no_interface_string_has_a_gap_where_a_line_continuation_belongs() {
 ///
 /// Checks that no page tells you to run a program that was removed, while
 /// leaving the history that mentions it alone.
+/// The README's count of the window's tabs is the number of tabs there are.
+///
+/// It said "three modes" for as long as there had been nine, because a
+/// sentence written when the window had three was never revisited. A count is
+/// exactly the kind of fact this repository has a rule about: it appears in
+/// prose, nothing derives it, and it is wrong the moment a tab is added.
+///
+/// Counting the variants of `Tab` rather than the strings a reader sees,
+/// because the enum is what decides how many there are.
+#[test]
+fn the_readme_counts_the_window_tabs_the_window_actually_has() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .and_then(Path::parent)
+        .expect("the workspace root");
+
+    let app = std::fs::read_to_string(root.join("crates/veilvoice-gui/src/app.rs"))
+        .expect("the window's own source");
+    let body = app
+        .split("enum Tab {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n}").next())
+        .expect("`enum Tab` has to be findable");
+    // A variant is a bare capitalised name on its own line, ending in a comma.
+    // Doc comments and attributes are not variants.
+    let tabs = body
+        .lines()
+        .map(str::trim)
+        .filter(|line| {
+            line.ends_with(',')
+                && !line.starts_with("//")
+                && !line.starts_with('#')
+                && line[..line.len() - 1]
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric())
+                && line.starts_with(|c: char| c.is_ascii_uppercase())
+        })
+        .count();
+    assert!(tabs >= 2, "found {tabs} tabs, which cannot be right");
+
+    let words = [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+        "eleven", "twelve",
+    ];
+    let expected = words
+        .get(tabs)
+        .unwrap_or_else(|| panic!("no word for {tabs} tabs; add one"));
+
+    let readme = std::fs::read_to_string(root.join("README.md")).expect("README.md");
+    let claim = readme
+        .split(" tabs:")
+        .next()
+        .and_then(|before| before.rsplit('\n').next())
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .expect("README.md must say how many tabs the window has, as `N tabs:`");
+    assert!(
+        claim.to_ascii_lowercase().ends_with(*expected),
+        "README.md says `{claim} tabs`, the window has {tabs} ({expected})"
+    );
+}
+
 #[test]
 fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
     use std::path::{Path, PathBuf};
