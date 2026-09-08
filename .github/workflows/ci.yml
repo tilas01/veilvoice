@@ -244,6 +244,47 @@ jobs:
       - name: The line counter must be right about what a line is
         run: python tools/loc/count.py --self-test
 
+      # Ten more guards that existed and did not fail a build.
+      #
+      # Every one of these has a `--check`, every one was run by hand before a
+      # release, and none of them was here. That is the F-41 shape again, one
+      # level up: not a generated file drifting, but the *check for* a drifting
+      # file being advisory. Three of them caught real staleness in the round
+      # that added this block, which is how the gap was noticed at all:
+      #
+      #   * `demo.py` found two new tabs with no screenshot and no caption,
+      #   * `sources.py` found generated source pages behind their source,
+      #   * `terminal.py` found drawings disagreeing with the text they came
+      #     from.
+      #
+      # A run that catches drift only when somebody remembers to look is a run
+      # that catches drift eventually. None of these needs a built binary, so
+      # they belong in this job rather than one that waits on a compile.
+      - name: Generated source pages must match the source
+        run: python tools/docs/sources.py --check
+
+      - name: The releases page must match CHANGELOG.md
+        run: python tools/site/releases.py --check
+
+      - name: The walkthrough must match the tabs and commands that exist
+        run: python tools/site/demo.py --check
+
+      - name: Screenshots must be trimmed, fitted and rounded
+        run: |
+          python tools/shots/crop.py --check
+          python tools/shots/fit.py --check
+          python tools/shots/round.py --check
+          python tools/shots/attrs.py --check
+
+      - name: Terminal drawings must match their captured text
+        run: python tools/shots/terminal.py --check
+
+      - name: Every copy of the version must agree with the workspace
+        run: python tools/release/version.py --check
+
+      - name: Packaging definitions must match what a release publishes
+        run: python tools/release/packaging.py --check
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a
@@ -360,6 +401,155 @@ jobs:
           fi
 
           echo "no HTTP or WebSocket client; the five socket-capable crates are the expected ones"
+
+      # 3. The source names no network API.
+      #
+      #    The comment above has claimed since it was written that
+      #    "`std::net`, `TcpStream`, `UdpSocket` and `SocketAddr` appear
+      #    nowhere in `crates/`". That was true and it was a *comment*: a
+      #    sentence a reader is asked to believe, sitting inside a job whose
+      #    whole purpose is to replace belief with a check. This is the check.
+      #
+      #    The two matches that are allowed are tests which forbid these very
+      #    words, in the crash reporter and in the dependency report. A test
+      #    that names the thing it prohibits is not the thing.
+      - name: Fail if VeilVoice's own source names a network API
+        run: |
+          set -euo pipefail
+          PATTERN='std::net|TcpStream|TcpListener|UdpSocket|SocketAddr|to_socket_addrs|getaddrinfo'
+          hits=$(grep -rInE "$PATTERN" --include='*.rs' crates/ \
+            | grep -v 'crates/veilvoice-gui/src/crashreport.rs' \
+            | grep -v 'crates/veilvoice-verify/src/deps.rs' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::VeilVoice's own code names a network API"
+            echo "$hits"
+            exit 1
+          fi
+          echo "no network API named anywhere in crates/"
+
+  # Everything above reasons about the *source* and the dependency graph. This
+  # job asks the built program itself, three ways, because a reader who does
+  # not trust the author should not have to trust the author's reading either.
+  #
+  #   1. What the binary imports. A program that cannot call `socket` or
+  #      `connect` cannot open one, whatever its source says.
+  #   2. What it does with no network at all. `unshare -n` gives the process an
+  #      empty network namespace: no interfaces, not even loopback. A program
+  #      that needs the network fails there.
+  #   3. What syscalls it actually makes, under `strace`.
+  #
+  # The command line and the window are checked separately and claimed
+  # separately, because they are not the same program and the honest statements
+  # about them differ. The command line links no window and opens nothing. The
+  # window talks to the display server and the desktop portal, which are local
+  # sockets, and the claim there is the precise one: every socket it opens is
+  # `AF_UNIX`, and it never asks for an internet socket.
+  offline-runtime:
+    name: the built program opens no network socket
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Install the windowing headers and the tracers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libgtk-3-dev libxkbcommon-dev libwayland-dev \
+            libxkbcommon-x11-0 strace xvfb
+
+      - name: Build both binaries
+        run: cargo build --release --locked -p veilvoice-cli -p veilvoice-gui
+
+      # 1. Imports.
+      #
+      #    `socketpair` is the one that is allowed, and it is worth saying why
+      #    rather than listing it: it creates a connected pair of `AF_UNIX`
+      #    descriptors inside this process's own address space. It takes no
+      #    address, reaches no host, and is what the standard library uses to
+      #    talk between a parent and a child. It cannot carry a byte off the
+      #    machine.
+      - name: The command line imports no network function
+        run: |
+          set -euo pipefail
+          found=$(nm -D --undefined-only target/release/veilvoice \
+            | grep -oiE '\b(socket|connect|getaddrinfo|gethostbyname|sendto|recvfrom|bind|listen|accept)\b' \
+            | sort -u || true)
+          if [ -n "$found" ]; then
+            echo "::error::the command line binary imports a network function"
+            echo "$found"
+            exit 1
+          fi
+          echo "veilvoice imports no network function (socketpair, which is AF_UNIX and local, is not one)"
+
+      # 2. No network namespace at all.
+      - name: The command line does its work with no network namespace
+        run: |
+          set -euo pipefail
+          python3 - <<'WAV'
+          import struct, math, io
+          rate, seconds = 48000, 2
+          d = io.BytesIO()
+          for i in range(rate * seconds):
+              d.write(struct.pack('<h', int(9000 * math.sin(i / 40.0))))
+          raw = d.getvalue()
+          open('/tmp/offline.wav', 'wb').write(
+              b'RIFF' + struct.pack('<I', 36 + len(raw)) + b'WAVEfmt ' +
+              struct.pack('<IHHIIHH', 16, 1, 1, rate, rate * 2, 2, 16) +
+              b'data' + struct.pack('<I', len(raw)) + raw)
+          WAV
+          unshare -rn target/release/veilvoice anonymise /tmp/offline.wav \
+            -o /tmp/offline.veiled.wav --encrypt false --yes
+          test -s /tmp/offline.veiled.wav
+          echo "de-identified a recording inside an empty network namespace"
+
+      # 3. Syscalls.
+      - name: The command line makes no network syscall
+        run: |
+          set -euo pipefail
+          for args in \
+            "anonymise /tmp/offline.wav -o /tmp/traced.wav --encrypt false --yes" \
+            "verify --help" \
+            "--version"; do
+            strace -f -e trace=%network -o /tmp/trace.txt \
+              target/release/veilvoice $args >/dev/null 2>&1 || true
+            # strace writes one "+++ exited +++" line per process even when it
+            # traced nothing, so the test is for syscalls rather than for lines.
+            calls=$(grep -cE '^[0-9]+ +(socket|connect|bind|listen|accept|sendto|recvfrom|sendmsg|recvmsg)' /tmp/trace.txt || true)
+            if [ "$calls" != "0" ]; then
+              echo "::error::veilvoice $args made $calls network syscall(s)"
+              cat /tmp/trace.txt
+              exit 1
+            fi
+          done
+          echo "no network syscall from any command line invocation"
+
+      # 4. The window, and the precise claim about it.
+      - name: The window opens only local sockets, never an internet one
+        run: |
+          set -euo pipefail
+          Xvfb :95 -screen 0 800x600x24 >/dev/null 2>&1 &
+          sleep 3
+          DISPLAY=:95 LIBGL_ALWAYS_SOFTWARE=1 timeout 30 \
+            strace -f -e trace=%network -o /tmp/gui-trace.txt \
+            target/release/veilvoice-gui --tab about --size 800x600 >/dev/null 2>&1 || true
+
+          if [ ! -s /tmp/gui-trace.txt ]; then
+            echo "::error::the window produced no trace, so this proved nothing"
+            exit 1
+          fi
+
+          # Any internet socket at all, asked for or connected to, fails.
+          if grep -q 'AF_INET' /tmp/gui-trace.txt; then
+            echo "::error::the window asked for an internet socket"
+            grep 'AF_INET' /tmp/gui-trace.txt | head -20
+            exit 1
+          fi
+
+          families=$(grep -oE 'socket\(AF_[A-Z0-9_]+' /tmp/gui-trace.txt \
+            | grep -oE 'AF_[A-Z0-9_]+' | sort -u | tr '\n' ' ')
+          echo "socket families the window asked for: ${families:-none}"
+          echo "no AF_INET or AF_INET6 anywhere: the window's sockets are local""
 
   # `rsa` is in the dependency graph through `pgp`, and it carries
   # RUSTSEC-2023-0071 -- the Marvin attack, key recovery through a timing side

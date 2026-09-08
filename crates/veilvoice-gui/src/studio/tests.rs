@@ -78,6 +78,13 @@ fn a_length_reads_as_minutes_and_seconds() {
     assert_eq!(length(3_600.0), "60:00");
     // A negative length is not a thing, and must not print as one.
     assert_eq!(length(-5.0), "0:00");
+    // Neither can reach this from `wav_shape`, whose numerator is a `u32` and
+    // whose denominator is at least one, so both are finite. Asserted anyway:
+    // `length` is public, and a formatter that panics on a value it was never
+    // given is a trap for the next caller rather than a safeguard.
+    assert_eq!(length(f64::NAN), "0:00");
+    assert!(!length(f64::INFINITY).is_empty());
+    assert_eq!(length(f64::NEG_INFINITY), "0:00");
 }
 
 #[test]

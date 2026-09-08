@@ -177,19 +177,6 @@ pub struct Studio {
     key: StudioKey,
 }
 
-/// One line, with anything that would end it turned into a space.
-///
-/// A name is whatever somebody typed. A newline in it would be read back as
-/// the start of another entry, and an index that parses into the wrong shape
-/// loses a recording silently, which is worse than refusing the name.
-fn one_line(text: &str) -> String {
-    text.chars()
-        .map(|ch| if ch == '\n' || ch == '\r' { ' ' } else { ch })
-        .collect::<String>()
-        .trim()
-        .to_owned()
-}
-
 /// The index file's name. Fixed rather than derived: a vault whose index cannot
 /// be found is a vault nothing can open, and the directory already discloses
 /// that it is a vault by existing.
@@ -294,10 +281,15 @@ impl Studio {
         let Some(entry) = all.iter_mut().find(|e| e.id == id) else {
             return Err(Error::NoSuchTake);
         };
-        // The same cleaning the index parser needs: a newline in a name would
-        // be read back as the start of another entry, and an index that parses
-        // into the wrong shape loses a recording rather than refusing.
-        entry.name = one_line(name);
+        // Stored as given. `render_index` is the one place that knows the
+        // index format and is where a name is made safe for it, stripping the
+        // tab and the newline that would otherwise forge a field or an entry.
+        //
+        // This used to clean the name here as well, and that second copy was
+        // **weaker**: it stripped newlines and not tabs, in a format whose
+        // fields are tab separated. Two rules for one job, one of them wrong,
+        // is worse than one rule, so this defers to the writer.
+        entry.name = name.to_string();
         self.write_index(&all)
     }
 
@@ -568,10 +560,18 @@ mod tests {
         // read back as the start of another entry, and the vault would lose a
         // recording rather than refuse the name.
         let (_dir, vault, id) = vault_with_a_take();
-        vault.rename(&id, "quiet\nname  forged  1  2").unwrap();
+        vault.rename(&id, "quiet\nname\tforged\t1\t2").unwrap();
         let after = vault.list().unwrap();
         assert_eq!(after.len(), 1, "a name split the index into two entries");
-        assert!(!after[0].name.contains('\n'));
+        assert!(!after[0].name.contains('\n'), "a newline survived");
+        // And a tab, which is what separates the fields: a name carrying one
+        // would forge an identifier, a date and a size for an entry that does
+        // not exist.
+        assert!(
+            !after[0].name.contains('\t'),
+            "a tab survived: {:?}",
+            after[0].name
+        );
         assert_eq!(vault.load(&id).unwrap().expose(), b"RIFFfake");
     }
 

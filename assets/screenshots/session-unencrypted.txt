@@ -21,9 +21,9 @@ Input
 
 Result
   Written                veiled.wav
-  Speed                  123.0x realtime
+  Speed                  133.6x realtime
   Accent                 neutralised
-  Seed rolls             1280-1840 ms, drawn fresh before every roll -- no period to observe
+  Seed rolls             1099-1995 ms, drawn fresh before every roll -- no period to observe
   At rest                UNENCRYPTED
 
 ✓ done, and the voiceprint in this file is not recoverable
