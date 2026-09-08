@@ -168,6 +168,11 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>The verifier transcript, recorded against the published 0.1.20</strong></p>
+<ul>
+<li>It is the one recording that cannot be made before a release exists, because it verifies a real download: it fetches the published archive, the hash list and the signature, checks the embedded key&#x27;s fingerprint, checks the signature over the list, checks the archive against the list, and then does the whole thing again through the reader&#x27;s own GnuPG.</li>
+<li>The hash in the transcript is the hash GitHub reports for that asset. Nothing in it is staged.</li>
+</ul>
 <p><strong>The Studio meters what it is doing, and the Browser can play</strong></p>
 <ul>
 <li>Two bars while a take records, input and output. One output meter answers &quot;is something being recorded&quot; and not &quot;is it being veiled&quot;, which is the question somebody at that tab is actually asking; seeing the two move differently is the only thing on screen that shows the engine is between them. The bar itself moved out of the window&#x27;s private module into <code>monitor</code>, so there is one of it rather than a second that would slowly stop looking like the first.</li>

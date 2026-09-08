@@ -8,6 +8,16 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The verifier transcript, recorded against the published 0.1.20**
+
+- It is the one recording that cannot be made before a release exists, because
+  it verifies a real download: it fetches the published archive, the hash list
+  and the signature, checks the embedded key's fingerprint, checks the
+  signature over the list, checks the archive against the list, and then does
+  the whole thing again through the reader's own GnuPG.
+- The hash in the transcript is the hash GitHub reports for that asset. Nothing
+  in it is staged.
+
 **The Studio meters what it is doing, and the Browser can play**
 
 - Two bars while a take records, input and output. One output meter answers

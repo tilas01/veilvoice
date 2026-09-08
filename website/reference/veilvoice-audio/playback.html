@@ -62,7 +62,7 @@
 <p>Playing a recording that is only in memory, and never on disk.</p>
 <h2 id="what-this-is-for">What this is for</h2>
 <p>A take in the studio vault is sealed. Hearing it back means decrypting it, and the obvious way to hear a WAV is to write it somewhere and hand the path to something that plays files. That would put an unencrypted recording on the disk, which is the one thing the vault exists to prevent, and it would leave it there until somebody remembered to shred it.</p>
-<p>So this takes the samples as they already are, in page-locked memory, and plays them from there. Nothing is written. When playback stops the buffer is dropped and <code>Secret</code>(veilvoice_crypto::Secret) wipes itself.</p>
+<p>So this takes the samples as they already are, in page-locked memory, and plays them from there. Nothing is written. When playback stops the buffer is dropped and <code>veilvoice_crypto::Secret</code> wipes itself.</p>
 <h2 id="the-samples-are-held-not-streamed-from-the-vault">The samples are held, not streamed from the vault</h2>
 <p>Be plain about the shape rather than implying a stronger one. The whole take is decrypted into locked memory before a note is heard, because the container is sealed and authenticated as one piece: there is no way to open the first second of it without opening all of it, and an AEAD that let you would not be authenticating anything.</p>
 <p>What that buys is still the thing that matters: <strong>no plaintext file, at any point.</strong> What it does not buy is a smaller footprint than the recording, and an hour of audio is an hour of audio in RAM. A format sealed in blocks would change that and is not what the vault writes today.</p>
