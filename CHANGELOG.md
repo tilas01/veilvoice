@@ -8,6 +8,37 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The pictures of the window showed nine tabs, and there are eleven**
+
+- Both the README's table and the website's "what it looks like" grid were
+  hand-written lists. The Studio and the Browser shipped in 0.1.20 and appeared
+  in neither, so the whole section quietly described a different application
+  from the one released. Both now show all eleven, and a test reads the tab
+  keys out of the window's own source and fails if either page is missing one.
+- The count was already checked and the *list* was not, which is why this got
+  through: knowing there are eleven tabs does not notice that nine of them have
+  pictures.
+- The README also said the captures were taken on Windows 11 with `gui.ps1` and
+  `PrintWindow`. That stopped being true when they were recaptured headlessly
+  on Linux for this release. It now says which script took the committed ones
+  and what the other is for, and keeps the Windows 11 note as what it actually
+  is: the platform a person has run the application on, rather than the one a
+  script photographed it on.
+
+**The two lists of command line screens became one**
+
+- `tools/shots/terminal.py` takes the pictures and `tools/site/demo.py` names
+  them for the walkthrough, and each held its own copy of the same eleven
+  entries. The comment in the second justified this by saying the first holds
+  the command "in a form no page can read", which is a list of arguments, and
+  joining a list of arguments with spaces is not difficult.
+- They had already drifted: the note under `render` said "a plan, a recording
+  and a page" in one and "a plan, a recording, and a page" in the other. Adding
+  a screen to one of them left the other unable to draw it, which is how this
+  was found.
+- `veilvoice conversation fix --help` is now in the walkthrough, drawn from
+  what the built program prints.
+
 **The verifier transcript, recorded against the published 0.1.20**
 
 - It is the one recording that cannot be made before a release exists, because

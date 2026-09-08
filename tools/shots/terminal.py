@@ -98,6 +98,7 @@ COMMANDS = [
     ("conversation", ["conversation", "--help"], "several people in one recording"),
     ("render", ["conversation", "render", "--help"], "a plan, a recording, and a page"),
     ("preview", ["conversation", "preview", "--help"], "what the video will look like"),
+    ("fix", ["conversation", "fix", "--help"], "correcting a plan before rendering it"),
     ("companions", ["companions", "--help"], "software VeilVoice can use but never bundles"),
     ("capture", ["capture", "--help"], "which screen recorders are running"),
     ("guard", ["guard", "--help"], "noticing that a file changed"),

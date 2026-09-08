@@ -622,6 +622,59 @@ fn no_interface_string_has_a_gap_where_a_line_continuation_belongs() {
 ///
 /// Checks that no page tells you to run a program that was removed, while
 /// leaving the history that mentions it alone.
+/// Every tab the window shows has a picture in the README and on the website.
+///
+/// The count was checked and the *list* was not, so both carried a
+/// hand-written table of nine tabs and went on carrying it after there were
+/// eleven. The Studio and the Browser shipped in v0.1.20 and appeared in
+/// neither, which is the whole "what it looks like" section quietly describing
+/// a different application from the one released.
+///
+/// The keys come from `Tab::key` in the window's own source, so a tab added
+/// tomorrow fails this rather than being noticed by a reader.
+#[test]
+fn every_tab_has_a_picture_in_the_readme_and_on_the_website() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .and_then(Path::parent)
+        .expect("the workspace root");
+
+    let app = std::fs::read_to_string(root.join("crates/veilvoice-gui/src/app.rs"))
+        .expect("the window's own source");
+    let keys: Vec<String> = app
+        .split("pub fn key(self) -> &'static str {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n    }").next())
+        .expect("`Tab::key` has to be findable")
+        .lines()
+        .filter_map(|line| {
+            let (_, rest) = line.split_once("=> \"")?;
+            let (key, _) = rest.split_once('"')?;
+            Some(key.to_string())
+        })
+        .collect();
+    assert!(!keys.is_empty(), "no tab keys were found to check");
+
+    for (what, path) in [
+        ("README.md", root.join("README.md")),
+        ("website/index.html", root.join("website/index.html")),
+    ] {
+        let text = std::fs::read_to_string(&path).expect("a readable page");
+        let missing: Vec<&str> = keys
+            .iter()
+            .map(String::as_str)
+            .filter(|key| !text.contains(&format!("gui-{key}.png")))
+            .collect();
+        assert!(
+            missing.is_empty(),
+            "{what} shows no picture of these tabs: {}. Every tab the window \
+             has needs one, or the section describes a different application \
+             from the one that ships.",
+            missing.join(", ")
+        );
+    }
+}
+
 /// The README's count of the window's tabs is the number of tabs there are.
 ///
 /// It said "three modes" for as long as there had been nine, because a

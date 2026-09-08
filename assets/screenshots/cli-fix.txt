@@ -1,0 +1,24 @@
+Correct a plan before rendering it.
+
+A stretch of audio given to the wrong person is the one mistake here that **cannot be heard in the result**: every voice in a veiled recording is unfamiliar, so a listener has nothing to compare against and nobody notices. It has to be right before the render, which is what these are for.
+
+Every one of them rewrites the plan file in place and changes nothing else. The audio is not touched and nothing is rendered.
+
+Usage: veilvoice conversation fix <PLAN> <COMMAND>
+
+Commands:
+  reassign  Give the stretch of audio at a moment to a different speaker
+  split     Cut the stretch at a moment in two
+  merge     Join two neighbouring stretches of the same speaker
+  move      Move where a stretch starts and ends
+  name      Change what a speaker is called
+  colour    Change the colour a speaker is drawn in
+  help      Print this message or the help of the given subcommand(s)
+
+Arguments:
+  <PLAN>
+          The plan file to correct
+
+Options:
+  -h, --help
+          Print help (see a summary with '-h')

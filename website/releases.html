@@ -168,6 +168,18 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>The pictures of the window showed nine tabs, and there are eleven</strong></p>
+<ul>
+<li>Both the README&#x27;s table and the website&#x27;s &quot;what it looks like&quot; grid were hand-written lists. The Studio and the Browser shipped in 0.1.20 and appeared in neither, so the whole section quietly described a different application from the one released. Both now show all eleven, and a test reads the tab keys out of the window&#x27;s own source and fails if either page is missing one.</li>
+<li>The count was already checked and the <em>list</em> was not, which is why this got through: knowing there are eleven tabs does not notice that nine of them have pictures.</li>
+<li>The README also said the captures were taken on Windows 11 with <code>gui.ps1</code> and <code>PrintWindow</code>. That stopped being true when they were recaptured headlessly on Linux for this release. It now says which script took the committed ones and what the other is for, and keeps the Windows 11 note as what it actually is: the platform a person has run the application on, rather than the one a script photographed it on.</li>
+</ul>
+<p><strong>The two lists of command line screens became one</strong></p>
+<ul>
+<li><code>tools/shots/terminal.py</code> takes the pictures and <code>tools/site/demo.py</code> names them for the walkthrough, and each held its own copy of the same eleven entries. The comment in the second justified this by saying the first holds the command &quot;in a form no page can read&quot;, which is a list of arguments, and joining a list of arguments with spaces is not difficult.</li>
+<li>They had already drifted: the note under <code>render</code> said &quot;a plan, a recording and a page&quot; in one and &quot;a plan, a recording, and a page&quot; in the other. Adding a screen to one of them left the other unable to draw it, which is how this was found.</li>
+<li><code>veilvoice conversation fix --help</code> is now in the walkthrough, drawn from what the built program prints.</li>
+</ul>
 <p><strong>The verifier transcript, recorded against the published 0.1.20</strong></p>
 <ul>
 <li>It is the one recording that cannot be made before a release exists, because it verifies a real download: it fetches the published archive, the hash list and the signature, checks the embedded key&#x27;s fingerprint, checks the signature over the list, checks the archive against the list, and then does the whole thing again through the reader&#x27;s own GnuPG.</li>
