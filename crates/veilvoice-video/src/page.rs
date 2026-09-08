@@ -364,7 +364,15 @@ fn speaker_markup(
     ink: &str,
 ) -> (String, Vec<String>) {
     let speaker = &plan.speakers()[slot];
-    let colour = palette::speaker(slot);
+    // The speaker's own colour where somebody chose one, and their slot's
+    // otherwise. Almost every speaker has none and gets the palette, which is
+    // why the palette is still what decides the look of a picture nobody has
+    // edited; a chosen colour exists for the cases the palette cannot know
+    // about, such as two speakers a particular reader finds hard to tell apart.
+    //
+    // Already validated as `#rrggbb` by the time it reaches here: this is an
+    // SVG attribute, and a value that is not a colour would be text inside one.
+    let colour = plan.colour_of(slot, palette::speaker(slot));
     let radius = layout.radius;
     let y = layout.circles_y;
     let mut notes = Vec::new();
@@ -947,6 +955,7 @@ mod tests {
         plan.add_speaker(Speaker {
             name: "Sam".into(),
             picture: Some(PathBuf::from("no-such-file.png")),
+            colour: None,
         })
         .unwrap();
         plan.add_turn(Turn {

@@ -8,6 +8,31 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Correcting a plan before you render it**
+
+- A stretch of audio given to the wrong person is the one mistake in this
+  program that **cannot be heard in the result**. Every voice in a veiled
+  recording is unfamiliar, so a listener has nothing to compare against:
+  thirty seconds of one person rendered in another's voice sounds exactly like
+  that other person talking, and nobody notices. `veilvoice conversation fix`
+  is how it gets corrected before the render, which is the only time it can be.
+- `reassign --at 20 --to 2` gives the stretch at a moment to a different
+  speaker, leaving the timing exactly as it was. `split --at 18` cuts a stretch
+  in two where a hand-over was missed, so half of it can be reassigned.
+  `merge` joins two neighbouring stretches of one speaker back together.
+  `move` nudges a stretch's edges for a hand-over caught a second late.
+- Every one of them refuses rather than half-applying, so a mistyped command
+  leaves the plan byte for byte as it was. A half-edited plan looks fine and
+  renders somebody in the wrong voice, which is the failure being prevented.
+- Refusals name what is actually there: asking about a moment inside no stretch
+  reports the nearest one and when it runs, and joining two different speakers
+  names both of them and says to reassign one first.
+- Speakers can be given a colour, as `#rrggbb`, which the plan file carries and
+  every drawing uses. `None` is still the ordinary case and means the colour
+  their slot gets from the palette. A colour is stated to be a label like a
+  name, and no more part of the de-identification than a name is: the colour
+  somebody always uses identifies them.
+
 **Render settings that are actually settings**
 
 - The frame size is a choice for the first time. `monitor` is the default and

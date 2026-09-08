@@ -80,6 +80,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 
 Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles.
 
+- [[`edit.rs`|File-veilvoice-conversation-edit]] &middot; Correcting a plan: who is speaking when, what they are called, and in what colour.
 - [[`lib.rs`|File-veilvoice-conversation-lib]] &middot; Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names.
 - [[`mode.rs`|File-veilvoice-conversation-mode]] &middot; How many voices a group gets, and the trade between the two answers.
 - [[`plan.rs`|File-veilvoice-conversation-plan]] &middot; Who is in the recording, and who is speaking when.
