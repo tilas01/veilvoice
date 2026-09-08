@@ -741,9 +741,11 @@ destinations, CLI and GUI are implemented and tested (1393 tests across 27
 crates plus doctests, and 18 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
-targets and verified bit-for-bit reproducible on the eight that build twice;
-the three BSD archives are made once in a VM and are reported as
-`not-verified` rather than claimed.
+targets, each one built twice from a copy of the source at a different path and
+compared byte for byte. **At v0.1.19 all eleven reproduced**, the three BSDs
+included: those were the last three to be built only once, and the release
+notes carry the verdict each platform actually reached rather than a claim
+about all of them.
 
 **Audited by tilas01**, who wrote and reviewed it. Be clear about what that is
 worth: a maintainer audit catches what the author can see, and **no external
