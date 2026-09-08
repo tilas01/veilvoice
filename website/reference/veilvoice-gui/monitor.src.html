@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/monitor.rs</code></h1>
-<p style="color:var(--muted)"><a href="monitor.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 419 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="monitor.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 496 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -433,69 +433,148 @@
 <span class="ln" id="L355">}</span>
 </span>
 <span class="ln" id="L356"></span>
-<span class="ln" id="L357"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L358"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L359">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L360"></span>
-<span class="ln" id="L361">    <span class="tok-com">/// Every style survives a round trip through the settings file.</span></span>
-<span class="ln" id="L362">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L363">    <span class="tok-kw">fn</span> <span class="tok-fn">a_style_reads_back_as_itself</span>() {</span>
-<span class="ln" id="L364">        <span class="tok-kw">for</span> style <span class="tok-kw">in</span> Style::ALL {</span>
-<span class="ln" id="L365">            assert_eq!(Style::<span class="tok-fn">from_key</span>(style.<span class="tok-fn">key</span>()), *style);</span>
-<span class="ln" id="L366">        }</span>
-<span class="ln" id="L367">    }</span>
-<span class="ln" id="L368"></span>
-<span class="ln" id="L369">    <span class="tok-com">/// An unreadable setting shows the monitor rather than hiding it.</span></span>
-<span class="ln" id="L370">    <span class="tok-com">///</span></span>
-<span class="ln" id="L371">    <span class="tok-com">/// The same rule the notification style follows, for the same reason: of</span></span>
-<span class="ln" id="L372">    <span class="tok-com">/// the two ways to be wrong about a file this build cannot parse, the one</span></span>
-<span class="ln" id="L373">    <span class="tok-com">/// that hides the only picture of a live microphone is the worse one.</span></span>
-<span class="ln" id="L374">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L375">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_setting_still_shows_something</span>() {</span>
-<span class="ln" id="L376">        <span class="tok-kw">for</span> nonsense <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;TOOLBAR&quot;</span>, <span class="tok-str">&quot;left&quot;</span>, <span class="tok-str">&quot;off &quot;</span>, <span class="tok-str">&quot;1&quot;</span>] {</span>
-<span class="ln" id="L377">            assert_eq!(Style::<span class="tok-fn">from_key</span>(nonsense), Style::Toolbar, <span class="tok-str">&quot;{nonsense:?}&quot;</span>);</span>
-<span class="ln" id="L378">        }</span>
-<span class="ln" id="L379">        <span class="tok-com">// And the one value that does mean off still means off.</span></span>
-<span class="ln" id="L380">        assert_eq!(Style::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;off&quot;</span>), Style::Off);</span>
-<span class="ln" id="L381">    }</span>
-<span class="ln" id="L382"></span>
-<span class="ln" id="L383">    <span class="tok-com">/// Every style says what it is and what it costs.</span></span>
-<span class="ln" id="L384">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L385">    <span class="tok-kw">fn</span> <span class="tok-fn">every_style_explains_itself</span>() {</span>
-<span class="ln" id="L386">        <span class="tok-kw">for</span> style <span class="tok-kw">in</span> Style::ALL {</span>
-<span class="ln" id="L387">            assert!(!style.<span class="tok-fn">label</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L388">            assert!(style.<span class="tok-fn">note</span>().<span class="tok-fn">len</span>() &gt; <span class="tok-num">40</span>, <span class="tok-str">&quot;{}&quot;</span>, style.<span class="tok-fn">key</span>());</span>
-<span class="ln" id="L389">        }</span>
-<span class="ln" id="L390">    }</span>
-<span class="ln" id="L391"></span>
-<span class="ln" id="L392">    <span class="tok-com">/// Clipping stays reported once it has happened.</span></span>
-<span class="ln" id="L393">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L394">    <span class="tok-kw">fn</span> <span class="tok-fn">clipping_is_sticky_because_it_is_over_in_a_millisecond</span>() {</span>
-<span class="ln" id="L395">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> levels = Levels::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L396">        levels.<span class="tok-fn">update</span>(<span class="tok-num">1.0</span>, <span class="tok-num">0.1</span>);</span>
-<span class="ln" id="L397">        assert!(levels.clipped);</span>
-<span class="ln" id="L398">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
-<span class="ln" id="L399">            levels.<span class="tok-fn">update</span>(<span class="tok-num">0.01</span>, <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L400">        }</span>
-<span class="ln" id="L401">        assert!(</span>
-<span class="ln" id="L402">            levels.clipped,</span>
-<span class="ln" id="L403">            <span class="tok-str">&quot;a clip that scrolls past was never reported&quot;</span></span>
-<span class="ln" id="L404">        );</span>
-<span class="ln" id="L405">        levels.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L406">        assert!(!levels.clipped, <span class="tok-str">&quot;stopping the session starts again&quot;</span>);</span>
-<span class="ln" id="L407">    }</span>
-<span class="ln" id="L408"></span>
-<span class="ln" id="L409">    <span class="tok-com">/// The held peak is at least the current level, always.</span></span>
-<span class="ln" id="L410">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L411">    <span class="tok-kw">fn</span> <span class="tok-fn">the_hold_never_sits_below_the_bar_it_marks</span>() {</span>
-<span class="ln" id="L412">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> levels = Levels::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L413">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [<span class="tok-num">0</span>.1f32, <span class="tok-num">0.9</span>, <span class="tok-num">0.2</span>, <span class="tok-num">0.05</span>, <span class="tok-num">0.7</span>] {</span>
-<span class="ln" id="L414">            levels.<span class="tok-fn">update</span>(peak, peak / <span class="tok-num">2.0</span>);</span>
-<span class="ln" id="L415">            assert!(levels.hold_input &gt;= levels.input, <span class="tok-str">&quot;{levels:?}&quot;</span>);</span>
-<span class="ln" id="L416">            assert!(levels.hold_output &gt;= levels.output, <span class="tok-str">&quot;{levels:?}&quot;</span>);</span>
-<span class="ln" id="L417">        }</span>
-<span class="ln" id="L418">    }</span>
-<span class="ln" id="L419">}</span>
+<span class="src-item" id="fn-meter">
+<span class="ln" id="L357"><span class="tok-com">/// One level meter: a bar on the decibel scale, and the number beside it.</span></span>
+<span class="ln" id="L358"><span class="tok-com">///</span></span>
+<span class="ln" id="L359"><span class="tok-com">/// This was a **linear** bar with a decibel number printed next to it, which is</span></span>
+<span class="ln" id="L360"><span class="tok-com">/// a meter arguing with itself: the number said -12 dB and the bar showed a</span></span>
+<span class="ln" id="L361"><span class="tok-com">/// quarter. Ordinary speech at a sensible recording level peaks near -12 dBFS,</span></span>
+<span class="ln" id="L362"><span class="tok-com">/// so the bar read as near-silence and the only way to fill it was to clip.</span></span>
+<span class="ln" id="L363"><span class="tok-com">///</span></span>
+<span class="ln" id="L364"><span class="tok-com">/// The scale now comes from `veilvoice_audio::meter`, which is where the peaks</span></span>
+<span class="ln" id="L365"><span class="tok-com">/// come from, so this bar and the terminal&#x27;s are the same bar. `hold` is the</span></span>
+<span class="ln" id="L366"><span class="tok-com">/// highest level of the last moment or so, drawn as a mark: a transient is over</span></span>
+<span class="ln" id="L367"><span class="tok-com">/// before an eye finishes moving, and a bar showing only *now* cannot show one.</span></span>
+<span class="ln" id="L368"><span class="tok-com">///</span></span>
+<span class="ln" id="L369"><span class="tok-com">/// # Why it lives here</span></span>
+<span class="ln" id="L370"><span class="tok-com">///</span></span>
+<span class="ln" id="L371"><span class="tok-com">/// It was in `app.rs` and private there, so when the Studio needed to meter</span></span>
+<span class="ln" id="L372"><span class="tok-com">/// a take as it recorded there were two choices: reach into a private module,</span></span>
+<span class="ln" id="L373"><span class="tok-com">/// or draw a second bar that would slowly stop looking like the first. It</span></span>
+<span class="ln" id="L374"><span class="tok-com">/// belongs here, beside [`Levels`], which is the thing that smooths what it</span></span>
+<span class="ln" id="L375"><span class="tok-com">/// draws.</span></span>
+<span class="ln" id="L376"><span class="tok-com">///</span></span>
+<span class="ln" id="L377"><span class="tok-com">/// Below -40 dBFS the colour goes muted rather than green, so a quiet room does</span></span>
+<span class="ln" id="L378"><span class="tok-com">/// not read as a working microphone.</span></span>
+<span class="ln" id="L379"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">meter</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, peak: f32, hold: f32) {</span>
+<span class="ln" id="L380">    <span class="tok-kw">use</span> veilvoice_audio::meter;</span>
+<span class="ln" id="L381"></span>
+<span class="ln" id="L382">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L383">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L384">        <span class="tok-kw">let</span> (rect, _) = ui.<span class="tok-fn">allocate_exact_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">280.0</span>, <span class="tok-num">12.0</span>), egui::Sense::<span class="tok-fn">hover</span>());</span>
+<span class="ln" id="L385">        <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
+<span class="ln" id="L386">        painter.<span class="tok-fn">rect_filled</span>(rect, <span class="tok-num">2.0</span>, p::<span class="tok-fn">bg_dark</span>());</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">        <span class="tok-kw">let</span> db = meter::<span class="tok-fn">dbfs</span>(peak);</span>
+<span class="ln" id="L389">        <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> meter::<span class="tok-fn">clipping</span>(peak) {</span>
+<span class="ln" id="L390">            p::<span class="tok-fn">red</span>()</span>
+<span class="ln" id="L391">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> db &gt;= -<span class="tok-num">6.0</span> {</span>
+<span class="ln" id="L392">            p::<span class="tok-fn">yellow</span>()</span>
+<span class="ln" id="L393">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> db &gt;= -<span class="tok-num">40.0</span> {</span>
+<span class="ln" id="L394">            p::<span class="tok-fn">green</span>()</span>
+<span class="ln" id="L395">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L396">            <span class="tok-com">// Below -40 the signal is room tone rather than speech. Drawn muted,</span></span>
+<span class="ln" id="L397">            <span class="tok-com">// so a quiet room does not read as a working microphone.</span></span>
+<span class="ln" id="L398">            p::<span class="tok-fn">muted</span>()</span>
+<span class="ln" id="L399">        };</span>
+<span class="ln" id="L400">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> filled = rect;</span>
+<span class="ln" id="L401">        filled.<span class="tok-fn">set_width</span>(rect.<span class="tok-fn">width</span>() * meter::<span class="tok-fn">position</span>(peak));</span>
+<span class="ln" id="L402">        painter.<span class="tok-fn">rect_filled</span>(filled, <span class="tok-num">2.0</span>, colour);</span>
+<span class="ln" id="L403"></span>
+<span class="ln" id="L404">        <span class="tok-com">// The held peak, as a hairline. Only where the bar is empty: inside the</span></span>
+<span class="ln" id="L405">        <span class="tok-com">// fill it would be saying what the fill already says.</span></span>
+<span class="ln" id="L406">        <span class="tok-kw">if</span> meter::<span class="tok-fn">position</span>(hold) &gt; meter::<span class="tok-fn">position</span>(peak) {</span>
+<span class="ln" id="L407">            <span class="tok-kw">let</span> x = rect.<span class="tok-fn">left</span>() + rect.<span class="tok-fn">width</span>() * meter::<span class="tok-fn">position</span>(hold);</span>
+<span class="ln" id="L408">            painter.<span class="tok-fn">line_segment</span>(</span>
+<span class="ln" id="L409">                [egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">top</span>()), egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">bottom</span>())],</span>
+<span class="ln" id="L410">                egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.5</span>, p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L411">            );</span>
+<span class="ln" id="L412">        }</span>
+<span class="ln" id="L413"></span>
+<span class="ln" id="L414">        painter.<span class="tok-fn">rect_stroke</span>(</span>
+<span class="ln" id="L415">            rect,</span>
+<span class="ln" id="L416">            <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L417">            egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()),</span>
+<span class="ln" id="L418">            egui::StrokeKind::Inside,</span>
+<span class="ln" id="L419">        );</span>
+<span class="ln" id="L420"></span>
+<span class="ln" id="L421">        <span class="tok-kw">let</span> text = <span class="tok-kw">if</span> db &lt;= meter::FLOOR_DB {</span>
+<span class="ln" id="L422">            <span class="tok-str">&quot;  -inf dBFS&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L423">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L424">            format!(<span class="tok-str">&quot;{db:&gt;6.1} dBFS&quot;</span>)</span>
+<span class="ln" id="L425">        };</span>
+<span class="ln" id="L426">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(<span class="tok-kw">if</span> meter::<span class="tok-fn">clipping</span>(peak) {</span>
+<span class="ln" id="L427">            p::<span class="tok-fn">red</span>()</span>
+<span class="ln" id="L428">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L429">            p::<span class="tok-fn">muted</span>()</span>
+<span class="ln" id="L430">        }));</span>
+<span class="ln" id="L431">    });</span>
+<span class="ln" id="L432">}</span>
+</span>
+<span class="ln" id="L433"></span>
+<span class="ln" id="L434"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L435"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L436">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L437"></span>
+<span class="ln" id="L438">    <span class="tok-com">/// Every style survives a round trip through the settings file.</span></span>
+<span class="ln" id="L439">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L440">    <span class="tok-kw">fn</span> <span class="tok-fn">a_style_reads_back_as_itself</span>() {</span>
+<span class="ln" id="L441">        <span class="tok-kw">for</span> style <span class="tok-kw">in</span> Style::ALL {</span>
+<span class="ln" id="L442">            assert_eq!(Style::<span class="tok-fn">from_key</span>(style.<span class="tok-fn">key</span>()), *style);</span>
+<span class="ln" id="L443">        }</span>
+<span class="ln" id="L444">    }</span>
+<span class="ln" id="L445"></span>
+<span class="ln" id="L446">    <span class="tok-com">/// An unreadable setting shows the monitor rather than hiding it.</span></span>
+<span class="ln" id="L447">    <span class="tok-com">///</span></span>
+<span class="ln" id="L448">    <span class="tok-com">/// The same rule the notification style follows, for the same reason: of</span></span>
+<span class="ln" id="L449">    <span class="tok-com">/// the two ways to be wrong about a file this build cannot parse, the one</span></span>
+<span class="ln" id="L450">    <span class="tok-com">/// that hides the only picture of a live microphone is the worse one.</span></span>
+<span class="ln" id="L451">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L452">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_setting_still_shows_something</span>() {</span>
+<span class="ln" id="L453">        <span class="tok-kw">for</span> nonsense <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;TOOLBAR&quot;</span>, <span class="tok-str">&quot;left&quot;</span>, <span class="tok-str">&quot;off &quot;</span>, <span class="tok-str">&quot;1&quot;</span>] {</span>
+<span class="ln" id="L454">            assert_eq!(Style::<span class="tok-fn">from_key</span>(nonsense), Style::Toolbar, <span class="tok-str">&quot;{nonsense:?}&quot;</span>);</span>
+<span class="ln" id="L455">        }</span>
+<span class="ln" id="L456">        <span class="tok-com">// And the one value that does mean off still means off.</span></span>
+<span class="ln" id="L457">        assert_eq!(Style::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;off&quot;</span>), Style::Off);</span>
+<span class="ln" id="L458">    }</span>
+<span class="ln" id="L459"></span>
+<span class="ln" id="L460">    <span class="tok-com">/// Every style says what it is and what it costs.</span></span>
+<span class="ln" id="L461">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L462">    <span class="tok-kw">fn</span> <span class="tok-fn">every_style_explains_itself</span>() {</span>
+<span class="ln" id="L463">        <span class="tok-kw">for</span> style <span class="tok-kw">in</span> Style::ALL {</span>
+<span class="ln" id="L464">            assert!(!style.<span class="tok-fn">label</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L465">            assert!(style.<span class="tok-fn">note</span>().<span class="tok-fn">len</span>() &gt; <span class="tok-num">40</span>, <span class="tok-str">&quot;{}&quot;</span>, style.<span class="tok-fn">key</span>());</span>
+<span class="ln" id="L466">        }</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468"></span>
+<span class="ln" id="L469">    <span class="tok-com">/// Clipping stays reported once it has happened.</span></span>
+<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">clipping_is_sticky_because_it_is_over_in_a_millisecond</span>() {</span>
+<span class="ln" id="L472">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> levels = Levels::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L473">        levels.<span class="tok-fn">update</span>(<span class="tok-num">1.0</span>, <span class="tok-num">0.1</span>);</span>
+<span class="ln" id="L474">        assert!(levels.clipped);</span>
+<span class="ln" id="L475">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
+<span class="ln" id="L476">            levels.<span class="tok-fn">update</span>(<span class="tok-num">0.01</span>, <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L477">        }</span>
+<span class="ln" id="L478">        assert!(</span>
+<span class="ln" id="L479">            levels.clipped,</span>
+<span class="ln" id="L480">            <span class="tok-str">&quot;a clip that scrolls past was never reported&quot;</span></span>
+<span class="ln" id="L481">        );</span>
+<span class="ln" id="L482">        levels.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L483">        assert!(!levels.clipped, <span class="tok-str">&quot;stopping the session starts again&quot;</span>);</span>
+<span class="ln" id="L484">    }</span>
+<span class="ln" id="L485"></span>
+<span class="ln" id="L486">    <span class="tok-com">/// The held peak is at least the current level, always.</span></span>
+<span class="ln" id="L487">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L488">    <span class="tok-kw">fn</span> <span class="tok-fn">the_hold_never_sits_below_the_bar_it_marks</span>() {</span>
+<span class="ln" id="L489">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> levels = Levels::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L490">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [<span class="tok-num">0</span>.1f32, <span class="tok-num">0.9</span>, <span class="tok-num">0.2</span>, <span class="tok-num">0.05</span>, <span class="tok-num">0.7</span>] {</span>
+<span class="ln" id="L491">            levels.<span class="tok-fn">update</span>(peak, peak / <span class="tok-num">2.0</span>);</span>
+<span class="ln" id="L492">            assert!(levels.hold_input &gt;= levels.input, <span class="tok-str">&quot;{levels:?}&quot;</span>);</span>
+<span class="ln" id="L493">            assert!(levels.hold_output &gt;= levels.output, <span class="tok-str">&quot;{levels:?}&quot;</span>);</span>
+<span class="ln" id="L494">        }</span>
+<span class="ln" id="L495">    }</span>
+<span class="ln" id="L496">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

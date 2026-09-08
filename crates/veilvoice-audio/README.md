@@ -80,18 +80,21 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>243 lines"])
+    n_lib(["lib.rs<br/>244 lines"])
     n_devices["devices.rs<br/>243 lines"]
     n_io["io.rs<br/>569 lines"]
     n_live["live.rs<br/>281 lines"]
     n_meter["meter.rs<br/>166 lines"]
+    n_playback["playback.rs<br/>212 lines"]
     n_record["record.rs<br/>543 lines"]
     n_live --> n_record
+    n_playback --> n_devices
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
     click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
     click n_io href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" "open the source"
     click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" "open the source"
     click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs" "open the source"
+    click n_playback href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs" "open the source"
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" "open the source"
 ```
 
@@ -103,12 +106,13 @@ flowchart TD
 |---|---:|---|
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 243 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 569 | Reading and writing audio files. |
-| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 243 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 244 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 281 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
+| [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 212 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
 
-**1,188 functional lines of Rust** in this crate. A functional line is a line
+**1,313 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -141,6 +145,8 @@ counts blank lines and comments too. Both are produced by
 | `fn dbfs` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | Level in decibels relative to full scale. |
 | `fn position` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | Where a level sits along a bar: 0.0 at the floor, 1.0 at full scale. |
 | `fn clipping` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | Whether a reading counts as clipping. |
+| `struct Playing` | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | A take being played, for as long as this is held. |
+| `fn start` | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | Start playing samples at rate on the default output device. |
 | `const SLACK_SECONDS` | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | How much audio the ring holds before samples are dropped, in seconds. |
 | `struct Sink` | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | The writing half, handed to the audio callback. |
 | `struct Recorder` | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | The reading half: moves samples out of the ring and into locked memory. |
