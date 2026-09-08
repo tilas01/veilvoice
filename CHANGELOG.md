@@ -40,6 +40,34 @@ than a summary written afterwards.
   their dates. Hiding the count and the sizes means padding and decoys, which
   is a different trade and is what the program folder's own storage does.
 
+**Taking a recording back out: a page, a video, or both**
+
+- Any take in the Browser can be written out as a self-contained player page,
+  as an MP4 with a black picture, or as both. The page is the one from
+  `conversation render`, so it plays the audio, draws the waveform, lights the
+  speaker and carries its own captions, and it needs nothing installed.
+- The plan the renderer wants is built rather than stored. A take is one person
+  at a microphone, so it is one speaker and one turn spanning the recording; a
+  plan kept beside each take would be a second description of something the
+  audio already says, and the two would disagree the first time a take was
+  trimmed. The length comes from the recording's own WAV header, because the
+  recorder writes the rate the **device agreed to**, which is not always the
+  rate that was asked for.
+- Without `ffmpeg` the exact command is printed, along with the audio it needs,
+  which is what the command line already does. VeilVoice does not ship it and
+  will not install it.
+- **Anything taken out is unsealed, and the tab says so before the button is
+  pressed** rather than in a note afterwards. That is not a defect: a video
+  nobody can open is not a video. The voice in it is still veiled, because it
+  was veiled before it was ever stored.
+- A take is called whatever somebody typed, and here that name reaches a path.
+  Everything that is not a letter, a digit, a dash or an underscore becomes a
+  dash, so a recording called `../../etc/passwd` writes `etc-passwd` inside the
+  folder that was chosen and nowhere else.
+- The folder is asked for every time rather than remembered, because a
+  remembered one is how the second export lands somewhere the first was
+  deliberately kept out of.
+
 **The screenshot scripts no longer keep their own list of tabs**
 
 - `veilvoice-gui --tabs` prints the tab names from the window's own list, and

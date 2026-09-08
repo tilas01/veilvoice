@@ -33,7 +33,7 @@
 //! # What is recorded is what comes out, never what went in
 //!
 //! The Studio records through
-//! [`LiveSession::start_recording`](veilvoice_audio::LiveSession::start_recording),
+//! `veilvoice_audio::LiveSession::start_recording`,
 //! which is the same path the command line uses, so the samples that reach the
 //! recorder are the **veiled** ones. There is no code path here that captures
 //! the microphone before the engine has been through it, because a path that
@@ -41,7 +41,7 @@
 //! recording of somebody's real voice sitting in a vault they believed was
 //! safe.
 //!
-//! The recording is assembled inside a [`Secret`](veilvoice_crypto::Secret) and
+//! The recording is assembled inside a `veilvoice_crypto::Secret` and
 //! handed straight to the vault to be sealed. It is never a plain file, not
 //! even briefly.
 //!
@@ -120,6 +120,10 @@ pub struct Studio {
     renaming: Option<(String, String)>,
     /// The take a removal is waiting to be confirmed for.
     confirm_remove: Option<String>,
+    /// The folder picker, while it is open.
+    picker: crate::dialog::Pending,
+    /// What the picker is open for: which take, and what to make of it.
+    choosing: Option<(String, Render)>,
 
     /// The last thing worth saying, and the colour to say it in.
     message: Option<(String, Color32)>,
@@ -163,6 +167,9 @@ impl Studio {
         self.selected = None;
         self.renaming = None;
         self.confirm_remove = None;
+        // A picker still open belongs to a vault that is now shut. Its answer
+        // must not arrive later and export from a vault nobody opened.
+        self.choosing = None;
         self.app_entry.zeroize();
         self.rest_entry.zeroize();
     }
@@ -331,6 +338,167 @@ impl Studio {
         }
     }
 
+    /// Turn a take into a page, a video, or both, in `into`.
+    ///
+    /// # Leaving the vault is the point, and is said out loud
+    ///
+    /// Everything written here is **outside** the vault and is not sealed. That
+    /// is not a defect: a video nobody can open is not a video. It is the one
+    /// thing somebody doing this needs to have understood, so the tab says it
+    /// before the button is pressed rather than in a note afterwards.
+    ///
+    /// The audio is still veiled, because it was veiled before it was ever
+    /// stored. What leaves is a recording of a voice that is not anybody's.
+    fn export(&mut self, id: &str, what: Render, into: &std::path::Path) {
+        let Some(vault) = &self.vault else {
+            return;
+        };
+        let Some(entry) = self.entries.iter().find(|e| e.id == id).cloned() else {
+            self.message = Some((
+                "That recording is not in the listing any more.".into(),
+                p::red(),
+            ));
+            return;
+        };
+
+        let wav = match vault.load(id) {
+            Ok(wav) => wav,
+            Err(error) => {
+                self.message = Some((error.to_string(), p::red()));
+                return;
+            }
+        };
+        let Some((_rate, seconds)) = wav_shape(wav.expose()) else {
+            self.message = Some((
+                "That recording does not have a WAV header this can read, so its \
+                 length is unknown and nothing was written."
+                    .into(),
+                p::red(),
+            ));
+            return;
+        };
+
+        let stem = safe_stem(&entry.name);
+        let audio_path = into.join(format!("{stem}.wav"));
+        let plan = match plan_for(&entry.name, seconds) {
+            Ok(plan) => plan,
+            Err(why) => {
+                self.message = Some((why, p::red()));
+                return;
+            }
+        };
+
+        // The audio first, because both outputs need it and neither is worth
+        // writing without it.
+        if let Err(error) =
+            veilvoice_crypto::privatefile::write_owner_only(&audio_path, wav.expose())
+        {
+            self.message = Some((error.to_string(), p::red()));
+            return;
+        }
+
+        let mut wrote = vec![audio_path.clone()];
+
+        if what.wants_page() {
+            match self.write_page(&plan, wav.expose(), &stem, into, &audio_path) {
+                Ok(mut paths) => wrote.append(&mut paths),
+                Err(why) => {
+                    self.message = Some((why, p::red()));
+                    return;
+                }
+            }
+        }
+
+        if what.wants_video() {
+            let video = into.join(format!("{stem}.mp4"));
+            match veilvoice_video::ffmpeg::found() {
+                Some(_) => match run_ffmpeg(&audio_path, &video) {
+                    Ok(()) => wrote.push(video),
+                    Err(why) => {
+                        self.message = Some((why, p::red()));
+                        return;
+                    }
+                },
+                // The same answer the command line gives: the exact command,
+                // rather than an offer to fetch a program this does not ship.
+                None => {
+                    let argv = veilvoice_video::ffmpeg::black_command(
+                        &audio_path,
+                        &video,
+                        veilvoice_video::ffmpeg::Encoding::default(),
+                    );
+                    self.message = Some((
+                        format!(
+                            "The audio and the page are written. `ffmpeg` is not on this \
+                             machine, and VeilVoice does not ship or install it, so the \
+                             video is not. This is the command:\n\n{}",
+                            veilvoice_video::ffmpeg::command_line(&argv)
+                        ),
+                        p::yellow(),
+                    ));
+                    return;
+                }
+            }
+        }
+
+        let names: Vec<String> = wrote
+            .iter()
+            .filter_map(|path| path.file_name().map(|n| n.to_string_lossy().into_owned()))
+            .collect();
+        self.message = Some((
+            format!(
+                "Wrote {} into {}. None of it is sealed: what leaves the vault is \
+                 an ordinary file, and the voice in it is still a voice nobody owns.",
+                names.join(", "),
+                into.display()
+            ),
+            p::green(),
+        ));
+    }
+
+    /// The player page, its subtitles, and the drawing they sit in.
+    fn write_page(
+        &self,
+        plan: &veilvoice_conversation::Conversation,
+        wav: &[u8],
+        stem: &str,
+        into: &std::path::Path,
+        audio: &std::path::Path,
+    ) -> Result<Vec<std::path::PathBuf>, String> {
+        use veilvoice_conversation::subtitles::{self, Format};
+        use veilvoice_video::{page, waveform};
+
+        let samples = pcm16(wav);
+        let envelope = waveform::envelope(&samples, 900);
+        let vtt = subtitles::write(plan, Format::WebVtt);
+
+        let audio_name = audio
+            .file_name()
+            .map(|n| n.to_string_lossy().into_owned())
+            .unwrap_or_default();
+
+        let drawn = page::player(
+            plan,
+            &envelope,
+            &page::Look::default(),
+            &audio_name,
+            // Carried in the page rather than fetched: a browser treats every
+            // `file:` URL as its own origin, so a track read from the file
+            // beside the page is refused and the captions silently do not
+            // appear.
+            &page::inline_vtt(&vtt),
+        )
+        .map_err(|error| error.to_string())?;
+
+        let html = into.join(format!("{stem}.html"));
+        let vtt_path = into.join(format!("{stem}.vtt"));
+        veilvoice_crypto::privatefile::write_owner_only(&html, drawn.markup.as_bytes())
+            .map_err(|error| error.to_string())?;
+        veilvoice_crypto::privatefile::write_owner_only(&vtt_path, vtt.as_bytes())
+            .map_err(|error| error.to_string())?;
+        Ok(vec![html, vtt_path])
+    }
+
     /// Re-read the listing from the vault.
     fn refresh(&mut self) {
         if let Some(vault) = &self.vault {
@@ -420,6 +588,18 @@ impl Studio {
     /// The Recording Browser tab.
     pub fn browser(&mut self, ui: &mut Ui) {
         ui.add_space(4.0);
+
+        // The folder picker's answer, if it has arrived. Polled rather than
+        // waited for, so the window keeps running while it is open.
+        if let Some(answer) = self.picker.poll() {
+            if let Some((id, what)) = self.choosing.take() {
+                match answer {
+                    Some(into) => self.export(&id, what, &into),
+                    // Cancelled. Not an error, and not worth a message.
+                    None => self.message = None,
+                }
+            }
+        }
 
         if self.vault.is_none() {
             self.shut_panel(ui);
@@ -516,6 +696,43 @@ impl Studio {
                                     act = Some(Act::AskRemove(entry.id.clone()));
                                 }
                             });
+                            ui.add_space(4.0);
+                            ui.horizontal(|ui| {
+                                ui.label(RichText::new("take it out:").color(p::muted()).small());
+                                if ui
+                                    .button("preview page")
+                                    .on_hover_text(
+                                        "A page that plays it, draws the waveform and \
+                                         carries its own captions. Opens in a browser \
+                                         with nothing installed.",
+                                    )
+                                    .clicked()
+                                {
+                                    act = Some(Act::Export(entry.id.clone(), Render::Preview));
+                                }
+                                if ui
+                                    .button("render video")
+                                    .on_hover_text(
+                                        "An MP4 with a black picture, for somewhere that \
+                                         will not accept an audio file. Needs ffmpeg, \
+                                         which VeilVoice does not ship.",
+                                    )
+                                    .clicked()
+                                {
+                                    act = Some(Act::Export(entry.id.clone(), Render::Video));
+                                }
+                                if ui.button("both").clicked() {
+                                    act = Some(Act::Export(entry.id.clone(), Render::Both));
+                                }
+                            });
+                            ui.label(
+                                RichText::new(
+                                    "Anything taken out is written unsealed. The voice in \
+                                     it is still veiled; the file is an ordinary file.",
+                                )
+                                .color(p::yellow())
+                                .small(),
+                            );
                         });
                     }
                 }
@@ -661,6 +878,18 @@ impl Studio {
                 self.confirm_remove = Some(id);
             }
             Act::CancelRemove => self.confirm_remove = None,
+            Act::Export(id, what) => {
+                // Off the render loop. `rfd`'s blocking picker freezes the
+                // window until it is answered, which `dialog` exists to avoid
+                // and which a test in that module forbids.
+                //
+                // Asked for every time rather than remembered: this writes an
+                // unsealed copy of something that is in a vault, and a
+                // remembered folder is how the second one lands somewhere the
+                // first was deliberately kept out of.
+                self.choosing = Some((id, what));
+                self.picker.start(crate::dialog::Ask::Folder);
+            }
             Act::Remove(id) => {
                 if let Some(vault) = &self.vault {
                     match vault.remove(&id) {
@@ -680,7 +909,81 @@ impl Studio {
     }
 }
 
+/// What a take is to be turned into.
+///
+/// Three, because the two useful things are genuinely separate and doing both
+/// is the common case: the page is something to look at now, the video is
+/// something to send somewhere that will not take an audio file, and somebody
+/// who wants the second usually wants to check the first.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Render {
+    /// The self-contained player page, and the audio and subtitles beside it.
+    Preview,
+    /// An MP4, through `ffmpeg`.
+    Video,
+    /// Both.
+    Both,
+}
+
+impl Render {
+    fn wants_page(self) -> bool {
+        matches!(self, Render::Preview | Render::Both)
+    }
+
+    fn wants_video(self) -> bool {
+        matches!(self, Render::Video | Render::Both)
+    }
+}
+
+/// The sample rate and frame count a canonical WAV header states.
+///
+/// Read from the recording's own header rather than assumed, because the
+/// recorder writes the rate the **device agreed to**, which is not always the
+/// rate that was asked for. A duration computed from the wrong rate puts every
+/// subtitle in the wrong place, and the video would be the wrong length.
+fn wav_shape(wav: &[u8]) -> Option<(u32, f64)> {
+    if wav.len() < 44 || &wav[0..4] != b"RIFF" || &wav[8..12] != b"WAVE" {
+        return None;
+    }
+    let rate = u32::from_le_bytes(wav[24..28].try_into().ok()?);
+    let bytes_per_sample = u16::from_le_bytes(wav[34..36].try_into().ok()?) as u32 / 8;
+    let data = u32::from_le_bytes(wav[40..44].try_into().ok()?) as f64;
+    let channels = u16::from_le_bytes(wav[22..24].try_into().ok()?) as u32;
+    let per_second = rate
+        .checked_mul(bytes_per_sample.max(1))?
+        .checked_mul(channels.max(1))?;
+    if per_second == 0 {
+        return None;
+    }
+    Some((rate, data / per_second as f64))
+}
+
+/// A one-speaker plan spanning a take.
+///
+/// A studio take is one person at a microphone, so the plan the renderer wants
+/// is a single turn from nothing to the end. Built rather than stored: a plan
+/// kept beside each take would be a second description of a fact the audio
+/// already carries, and the two would disagree the first time a take was
+/// trimmed.
+fn plan_for(name: &str, seconds: f64) -> Result<veilvoice_conversation::Conversation, String> {
+    use veilvoice_conversation::{Speaker, Turn};
+
+    let mut plan = veilvoice_conversation::Conversation::new();
+    plan.title = Some(name.to_string());
+    plan.add_speaker(Speaker::named(name))
+        .map_err(|e| e.to_string())?;
+    plan.add_turn(Turn {
+        start: 0.0,
+        end: seconds,
+        speaker: 0,
+        text: None,
+    })
+    .map_err(|e| e.to_string())?;
+    Ok(plan)
+}
+
 /// Something a browser row asked for.
+#[derive(Debug, PartialEq)]
 enum Act {
     Select(String),
     StartRename(String, String),
@@ -689,6 +992,7 @@ enum Act {
     AskRemove(String),
     CancelRemove,
     Remove(String),
+    Export(String, Render),
 }
 
 /// "One recording" or "four recordings", so the interface does not say
@@ -722,6 +1026,76 @@ pub fn made_on(unix: i64) -> String {
     let m = if mp < 10 { mp + 3 } else { mp - 9 };
     let y = if m <= 2 { y + 1 } else { y };
     format!("{y:04}-{m:02}-{d:02}")
+}
+
+/// Sixteen-bit PCM from a WAV, as the waveform drawer wants it.
+///
+/// The header is skipped rather than parsed a second time: [`wav_shape`] has
+/// already established this is a canonical 44-byte header, and a reader that
+/// disagreed with it about where the data starts would draw a waveform offset
+/// from the audio it is meant to describe.
+fn pcm16(wav: &[u8]) -> Vec<f32> {
+    wav.get(44..)
+        .unwrap_or(&[])
+        .chunks_exact(2)
+        .map(|pair| i16::from_le_bytes([pair[0], pair[1]]) as f32 / 32_768.0)
+        .collect()
+}
+
+/// A file name built from what somebody called a recording.
+///
+/// A name is whatever was typed, and it reaches a **path** here. Everything
+/// that is not a letter, a digit, a dash or an underscore becomes a dash, so a
+/// take called `../../etc/passwd` or `a/b` cannot write outside the folder that
+/// was chosen. Empty after that, and it is `take`: a file called nothing is not
+/// a file.
+fn safe_stem(name: &str) -> String {
+    let cleaned: String = name
+        .chars()
+        .map(|ch| {
+            if ch.is_ascii_alphanumeric() || ch == '-' || ch == '_' {
+                ch
+            } else {
+                '-'
+            }
+        })
+        .collect();
+    let trimmed = cleaned.trim_matches('-');
+    if trimmed.is_empty() {
+        "take".to_string()
+    } else {
+        // A long name makes a path some systems refuse, and the name is a
+        // label rather than an identifier, so shortening loses nothing that
+        // is not still in the vault.
+        trimmed.chars().take(60).collect()
+    }
+}
+
+/// Run `ffmpeg` to put the audio in a video with a black picture.
+fn run_ffmpeg(audio: &std::path::Path, video: &std::path::Path) -> Result<(), String> {
+    let argv = veilvoice_video::ffmpeg::black_command(
+        audio,
+        video,
+        veilvoice_video::ffmpeg::Encoding::default(),
+    );
+    let Some(program) = veilvoice_video::ffmpeg::found() else {
+        return Err("`ffmpeg` went away between the check and the run.".into());
+    };
+    let output = std::process::Command::new(program)
+        .args(argv.iter().skip(1))
+        .output()
+        .map_err(|error| error.to_string())?;
+    if output.status.success() {
+        return Ok(());
+    }
+    // The last line of ffmpeg's complaint, which is the one that says what
+    // was wrong. The whole of it is pages of build configuration.
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let last = stderr.lines().rev().find(|line| !line.trim().is_empty());
+    Err(format!(
+        "`ffmpeg` refused: {}",
+        last.unwrap_or("it gave no reason").trim()
+    ))
 }
 
 /// A length in seconds, as `m:ss`, for somewhere a person reads.
