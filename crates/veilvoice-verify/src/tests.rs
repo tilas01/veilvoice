@@ -557,7 +557,15 @@ fn no_interface_string_has_a_gap_where_a_line_continuation_belongs() {
             // An escape is not a word. Without this the `n` of a `\n` reads as
             // the letter before a gap, and a needle that searches this
             // repository's own indented source looks like broken prose.
-            let line = line.replace("\\n", "..").replace("\\t", "..");
+            //
+            // **Replaced with `~`, not with `.`.** A full stop is in the set
+            // that opens a gap below, so a `\n` followed by the indentation of
+            // an embedded script read as a sentence with a hole in it. Every
+            // line of the player's inline JavaScript has that shape, and the
+            // only reason this did not fire years ago is that those lines were
+            // under the length threshold. `~` is in no set here and cannot
+            // start or end a gap.
+            let line = line.replace("\\n", "~~").replace("\\t", "~~");
             // The gap has to sit between two words to be prose rather than a
             // column: three spaces after a letter or a comma, and a letter
             // after them.

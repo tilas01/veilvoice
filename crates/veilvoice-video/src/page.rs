@@ -305,6 +305,28 @@ pub fn data_uri(path: &Path) -> Result<String, Error> {
     Ok(format!("data:{media};base64,{}", base64(&bytes)))
 }
 
+/// A WebVTT track as a `data:` URI, so a page opened from disk still has it.
+///
+/// # The defect this fixes
+///
+/// The page referenced the subtitles by file name, beside the audio, and said
+/// in its own `<noscript>` that "the captions still appear". Opened from a
+/// folder, which is how somebody who has just rendered one opens it, **they do
+/// not**: a browser treats every `file:` URL as its own origin, so a caption
+/// track loaded from the file next to the page is a cross-origin request and
+/// is refused. Chromium says so in the console and shows no captions; nothing
+/// in the page said anything at all.
+///
+/// The audio is unaffected, because a media element is allowed what a text
+/// track is not, which is why this was invisible: the page played, the circles
+/// lit, and only the captions were missing.
+///
+/// Inlined, they are part of the page and no request is made. The separate
+/// `.vtt` file is still written, because it is what every other player wants.
+pub fn inline_vtt(vtt: &str) -> String {
+    format!("data:text/vtt;base64,{}", base64(vtt.as_bytes()))
+}
+
 /// The background element, and anything worth telling the user about it.
 fn background_markup(look: &Look, width: u32, height: u32) -> (String, Vec<String>) {
     match &look.background {
@@ -352,6 +374,253 @@ fn background_markup(look: &Look, width: u32, height: u32) -> (String, Vec<Strin
             ),
         },
     }
+}
+
+/// The document head and the stylesheet.
+///
+/// Split out of [`player`] because the page grew transport controls and a
+/// correction panel, and one `format!` holding a whole document is a thing
+/// nobody can read or change safely.
+fn player_head(title: &str, look: &Look) -> String {
+    format!(
+        "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n\
+         <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
+         <title>{title}</title>\n<style>\n\
+         :root {{ color-scheme: dark; }}\n\
+         html, body {{ margin: 0; background: {bg}; color: {fg};\n  \
+           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}\n\
+         main {{ max-width: 100%; margin: 0 auto; padding: 1rem; box-sizing: border-box; }}\n\
+         svg {{ width: 100%; height: auto; display: block; }}\n\
+         audio {{ width: 100%; margin-top: 1rem; }}\n\
+         .speaker {{ transition: opacity 120ms linear; }}\n\
+         .note {{ color: {muted}; font-size: 0.85rem; line-height: 1.5; }}\n\
+         .bar {{ display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;\n  \
+           margin-top: 0.75rem; }}\n\
+         .bar button, .bar select {{ font: inherit; font-size: 0.85rem;\n  \
+           color: {fg}; background: {bg}; border: 1px solid {muted};\n  \
+           border-radius: 6px; padding: 0.35rem 0.7rem; cursor: pointer; }}\n\
+         .bar button:hover {{ border-color: {accent}; color: {accent}; }}\n\
+         .bar .who {{ margin-left: auto; color: {muted}; font-size: 0.85rem; }}\n\
+         .bar .who b {{ color: {fg}; font-weight: 600; }}\n\
+         .fixing {{ margin-top: 0.75rem; padding: 0.75rem; border: 1px dashed {muted};\n  \
+           border-radius: 8px; }}\n\
+         .fixing[hidden] {{ display: none; }}\n\
+         .who-buttons {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }}\n\
+         .who-buttons button {{ font: inherit; font-size: 0.85rem; cursor: pointer;\n  \
+           border-radius: 6px; padding: 0.3rem 0.6rem; border: 1px solid; }}\n\
+         .fixes {{ white-space: pre-wrap; word-break: break-all; font-size: 0.8rem;\n  \
+           color: {fg}; margin: 0.5rem 0 0; }}\n\
+         @media (prefers-reduced-motion: reduce) {{ .speaker {{ transition: none; }} }}\n\
+         </style>\n</head>\n",
+        title = title,
+        bg = look.palette.bg,
+        fg = look.palette.fg,
+        muted = look.palette.muted,
+        accent = look.palette.accent,
+    )
+}
+
+/// The visible page: the drawing, the audio, the transport and the panel.
+///
+/// # Why there are transport controls at all
+///
+/// The browser's own audio element has a scrubber and a play button, and for
+/// listening that is enough. This page is not only for listening: it is where
+/// somebody checks a plan before rendering it, and checking means going back
+/// ten seconds because the wrong circle lit up, and going through a long
+/// recording faster than it was spoken.
+///
+/// Speed goes to five. Past that the audio is unintelligible and the point of
+/// playing it at all is gone; five is fast enough to cross an hour in twelve
+/// minutes and still hear where the voices change.
+fn player_body(plan: &Conversation, svg: &str, audio_href: &str, subtitles_href: &str) -> String {
+    let mut buttons = String::new();
+    for (slot, speaker) in plan.speakers().iter().enumerate() {
+        let colour = plan.colour_of(slot, palette::speaker(slot));
+        buttons.push_str(&format!(
+            "<button type=\"button\" data-slot=\"{slot}\" \
+             style=\"border-color:{colour};color:{colour};background:transparent\">\
+             {name}</button>",
+            slot = slot,
+            colour = escape(&colour),
+            name = escape(&speaker.name),
+        ));
+    }
+
+    format!(
+        "<body>\n<main>\n{svg}\n\
+         <audio id=\"audio\" controls preload=\"metadata\" src=\"{audio}\">\n\
+         <track kind=\"captions\" srclang=\"en\" label=\"Speakers\" src=\"{vtt}\" default>\n\
+         </audio>\n\
+         <div class=\"bar\" id=\"bar\" hidden>\n\
+         <button type=\"button\" id=\"back\" title=\"back ten seconds\">&#8592; 10s</button>\n\
+         <button type=\"button\" id=\"forward\" title=\"forward ten seconds\">10s &#8594;</button>\n\
+         <label>speed <select id=\"speed\">\
+         <option value=\"1\">1x</option><option value=\"1.5\">1.5x</option>\
+         <option value=\"2\">2x</option><option value=\"3\">3x</option>\
+         <option value=\"4\">4x</option><option value=\"5\">5x</option>\
+         </select></label>\n\
+         <button type=\"button\" id=\"fixing\">wrong person?</button>\n\
+         <span class=\"who\" id=\"who\">nobody is speaking</span>\n\
+         </div>\n\
+         <div class=\"fixing\" id=\"panel\" hidden>\n\
+         <p class=\"note\">If the circle lighting up is the wrong person, say who \
+         it should be. Nothing here changes the plan or the audio: it writes out \
+         the commands that do, so the change goes through VeilVoice's own \
+         checking rather than through a web page.</p>\n\
+         <div class=\"who-buttons\">{buttons}</div>\n\
+         <p class=\"note\">Corrections so far, to run in the folder holding the \
+         plan:</p>\n\
+         <pre class=\"fixes\" id=\"fixes\">nothing corrected yet</pre>\n\
+         <button type=\"button\" id=\"copy\">copy the commands</button>\n\
+         <button type=\"button\" id=\"clear\">start again</button>\n\
+         </div>\n\
+         <noscript><p class=\"note\">This page uses a small script, held in the page \
+         itself, only to light up whichever speaker is talking and to offer the \
+         controls above. Without it the audio still plays, the captions still \
+         appear and the waveform is still drawn.</p>\
+         </noscript>\n\
+         <p class=\"note\">Every voice here has been replaced. The names are labels \
+         somebody typed; nothing veils a name.</p>\n</main>\n",
+        svg = svg,
+        audio = escape(audio_href),
+        vtt = escape(subtitles_href),
+        buttons = buttons,
+    )
+}
+
+/// The script: lighting the right circle, the transport, and the corrections.
+///
+/// # It suggests, it does not apply
+///
+/// The correction panel writes `veilvoice conversation fix` commands and
+/// nothing else. It could have rewritten the plan file's text in the browser
+/// and offered it as a download, and that would have meant a second
+/// implementation of the plan format, in JavaScript, able to drift from the one
+/// in `veilvoice-conversation` that every other reader uses. A plan produced by
+/// the drifted copy would look right and render somebody in the wrong voice,
+/// which is the failure the corrections exist to prevent.
+///
+/// So the page says what to run, the program does it, and the validation is the
+/// same validation everything else goes through.
+fn player_script(plan: &Conversation, look: &Look, turns: &str) -> String {
+    format!(
+        "<script>\n(function () {{\n  \
+         var turns = [{turns}];\n  \
+         var names = {names};\n  \
+         var audio = document.getElementById('audio');\n  \
+         var head = document.getElementById('playhead');\n  \
+         var bar = document.getElementById('bar');\n  \
+         var who = document.getElementById('who');\n  \
+         var panel = document.getElementById('panel');\n  \
+         var fixes = document.getElementById('fixes');\n  \
+         var corrections = [];\n  \
+         var CMD = 'veilvoice conversation fix PLAN';\n  \
+         var groups = [];\n  \
+         for (var i = 0; ; i++) {{\n    \
+           var g = document.getElementById('speaker' + i);\n    \
+           if (!g) break;\n    groups.push(g);\n  }}\n  \
+         var left = {wave_x}, span = {wave_width}, total = {duration};\n  \
+         if (bar) bar.hidden = false;\n  \
+         function speaking(t) {{\n    \
+           for (var j = 0; j < turns.length; j++) {{\n      \
+             if (t >= turns[j][1] && t < turns[j][2]) return turns[j];\n    }}\n    \
+           return null;\n  }}\n  \
+         function tick() {{\n    \
+           var t = audio.currentTime;\n    \
+           for (var i = 0; i < groups.length; i++) groups[i].setAttribute('opacity', '0.35');\n    \
+           for (var j = 0; j < turns.length; j++) {{\n      \
+             if (t >= turns[j][1] && t < turns[j][2] && groups[turns[j][0]]) {{\n        \
+               groups[turns[j][0]].setAttribute('opacity', '1');\n      }}\n    }}\n    \
+           if (head && total > 0) {{\n      \
+             var x = left + span * Math.min(1, Math.max(0, t / total));\n      \
+             head.setAttribute('x1', x); head.setAttribute('x2', x);\n    }}\n    \
+           if (who) {{\n      \
+             var now = speaking(t);\n      \
+             who.innerHTML = now\n        \
+               ? 'now: <b></b>' : 'nobody is speaking';\n      \
+             if (now) who.querySelector('b').textContent = names[now[0]] || '?';\n    }}\n  }}\n  \
+         function nudge(by) {{\n    \
+           var to = audio.currentTime + by;\n    \
+           audio.currentTime = Math.min(total || audio.duration || to, Math.max(0, to));\n    \
+           tick();\n  }}\n  \
+         var back = document.getElementById('back');\n  \
+         var forward = document.getElementById('forward');\n  \
+         if (back) back.addEventListener('click', function () {{ nudge(-10); }});\n  \
+         if (forward) forward.addEventListener('click', function () {{ nudge(10); }});\n  \
+         var speed = document.getElementById('speed');\n  \
+         if (speed) speed.addEventListener('change', function () {{\n    \
+           audio.playbackRate = parseFloat(speed.value) || 1;\n  }});\n  \
+         var toggle = document.getElementById('fixing');\n  \
+         if (toggle && panel) toggle.addEventListener('click', function () {{\n    \
+           panel.hidden = !panel.hidden;\n  }});\n  \
+         function show() {{\n    \
+           fixes.textContent = corrections.length\n      \
+             ? corrections.join('\\n') : 'nothing corrected yet';\n  }}\n  \
+         var picks = document.querySelectorAll('.who-buttons button');\n  \
+         for (var k = 0; k < picks.length; k++) {{\n    \
+           picks[k].addEventListener('click', function () {{\n      \
+             var slot = this.getAttribute('data-slot');\n      \
+             var at = audio.currentTime.toFixed(3);\n      \
+             var now = speaking(audio.currentTime);\n      \
+             if (!now) {{\n        \
+               corrections.push('# nothing is assigned at ' + at + ' s');\n      }} else {{\n        \
+               corrections.push(CMD + ' reassign --at ' + at + ' --to ' + slot);\n      }}\n      \
+             show();\n    }});\n  }}\n  \
+         var copy = document.getElementById('copy');\n  \
+         if (copy) copy.addEventListener('click', function () {{\n    \
+           if (navigator.clipboard) navigator.clipboard.writeText(fixes.textContent);\n  }});\n  \
+         var clear = document.getElementById('clear');\n  \
+         if (clear) clear.addEventListener('click', function () {{\n    \
+           corrections = []; show();\n  }});\n  \
+         audio.addEventListener('timeupdate', tick);\n  \
+         audio.addEventListener('seeked', tick);\n  \
+         tick();\n}})();\n</script>\n</body>\n</html>\n",
+        turns = turns,
+        names = names_array(plan),
+        wave_x = layout(look, plan.len()).wave_x,
+        wave_width = layout(look, plan.len()).wave_width,
+        duration = plan.duration(),
+    )
+}
+
+/// The speakers' names as a JavaScript array literal.
+///
+/// Escaped for a **string inside a script**, which is a different job from
+/// escaping for markup: `</script>` inside a JavaScript string ends the element
+/// as far as the parser is concerned, whatever the quotes around it say. Every
+/// character that could do that is written as an escape.
+fn names_array(plan: &Conversation) -> String {
+    let items: Vec<String> = plan
+        .speakers()
+        .iter()
+        .map(|speaker| format!("\"{}\"", js_string(&speaker.name)))
+        .collect();
+    format!("[{}]", items.join(","))
+}
+
+/// One name, safe to sit inside a double-quoted JavaScript string in HTML.
+fn js_string(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for ch in text.chars() {
+        match ch {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            // `<` and `>` cannot appear raw: `</script>` in a string still ends
+            // the element, and `<!--` starts a comment the HTML parser honours.
+            '<' => out.push_str("\\u003c"),
+            '>' => out.push_str("\\u003e"),
+            '&' => out.push_str("\\u0026"),
+            // A line separator is a line break to a JavaScript parser and not
+            // to an HTML one, which is how a string breaks a script silently.
+            '\u{2028}' => out.push_str("\\u2028"),
+            '\u{2029}' => out.push_str("\\u2029"),
+            _ => out.push(ch),
+        }
+    }
+    out
 }
 
 /// One speaker's circle and name, as SVG.
@@ -570,59 +839,10 @@ pub fn player(
 
     let title = escape(plan.title.as_deref().unwrap_or("A veiled conversation"));
     let markup = format!(
-        "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n\
-         <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
-         <title>{title}</title>\n<style>\n\
-         :root {{ color-scheme: dark; }}\n\
-         html, body {{ margin: 0; background: {bg}; color: {fg};\n  \
-           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}\n\
-         main {{ max-width: 100%; margin: 0 auto; padding: 1rem; box-sizing: border-box; }}\n\
-         svg {{ width: 100%; height: auto; display: block; }}\n\
-         audio {{ width: 100%; margin-top: 1rem; }}\n\
-         .speaker {{ transition: opacity 120ms linear; }}\n\
-         .note {{ color: {muted}; font-size: 0.85rem; line-height: 1.5; }}\n\
-         @media (prefers-reduced-motion: reduce) {{ .speaker {{ transition: none; }} }}\n\
-         </style>\n</head>\n<body>\n<main>\n{svg}\n\
-         <audio id=\"audio\" controls preload=\"metadata\" src=\"{audio}\">\n\
-         <track kind=\"captions\" srclang=\"en\" label=\"Speakers\" src=\"{vtt}\" default>\n\
-         </audio>\n\
-         <noscript><p class=\"note\">This page uses a small script, held in the page \
-         itself, only to light up whichever speaker is talking. Without it the audio \
-         still plays, the captions still appear and the waveform is still drawn.</p>\
-         </noscript>\n\
-         <p class=\"note\">Every voice here has been replaced. The names are labels \
-         somebody typed; nothing veils a name.</p>\n</main>\n\
-         <script>\n(function () {{\n  \
-         var turns = [{turns}];\n  \
-         var audio = document.getElementById('audio');\n  \
-         var head = document.getElementById('playhead');\n  \
-         var groups = [];\n  \
-         for (var i = 0; ; i++) {{\n    \
-           var g = document.getElementById('speaker' + i);\n    \
-           if (!g) break;\n    groups.push(g);\n  }}\n  \
-         var box = head && head.getAttribute('x1');\n  \
-         var left = {wave_x}, span = {wave_width}, total = {duration};\n  \
-         function tick() {{\n    \
-           var t = audio.currentTime;\n    \
-           for (var i = 0; i < groups.length; i++) groups[i].setAttribute('opacity', '0.35');\n    \
-           for (var j = 0; j < turns.length; j++) {{\n      \
-             if (t >= turns[j][1] && t < turns[j][2] && groups[turns[j][0]]) {{\n        \
-               groups[turns[j][0]].setAttribute('opacity', '1');\n      }}\n    }}\n    \
-           if (head && total > 0) {{\n      \
-             var x = left + span * Math.min(1, Math.max(0, t / total));\n      \
-             head.setAttribute('x1', x); head.setAttribute('x2', x);\n    }}\n  }}\n  \
-         audio.addEventListener('timeupdate', tick);\n  \
-         audio.addEventListener('seeked', tick);\n  \
-         void box;\n  tick();\n}})();\n</script>\n</body>\n</html>\n",
-        bg = look.palette.bg,
-        fg = look.palette.fg,
-        muted = look.palette.muted,
-        svg = drawn.markup,
-        audio = escape(audio_href),
-        vtt = escape(subtitles_href),
-        wave_x = layout(look, plan.len()).wave_x,
-        wave_width = layout(look, plan.len()).wave_width,
-        duration = plan.duration(),
+        "{head}{body}{script}",
+        head = player_head(&title, look),
+        body = player_body(plan, &drawn.markup, audio_href, subtitles_href),
+        script = player_script(plan, look, &turns),
     );
 
     Ok(Drawn {
@@ -1035,5 +1255,186 @@ mod tests {
         let drawn = still(&Conversation::new(), &envelope(), &Look::default(), 0.0).unwrap();
         assert!(drawn.markup.contains("<path d=\"M"));
         assert!(!drawn.markup.contains("id=\"speaker0\""));
+    }
+}
+
+#[cfg(test)]
+mod player_tests {
+    use super::*;
+    use veilvoice_conversation::{Speaker, Turn};
+
+    fn plan() -> Conversation {
+        let mut plan = Conversation::new();
+        plan.add_speaker(Speaker::named("Ada")).unwrap();
+        plan.add_speaker(Speaker::named("Grace")).unwrap();
+        plan.add_turn(Turn {
+            start: 0.0,
+            end: 10.0,
+            speaker: 0,
+            text: None,
+        })
+        .unwrap();
+        plan.add_turn(Turn {
+            start: 10.0,
+            end: 20.0,
+            speaker: 1,
+            text: None,
+        })
+        .unwrap();
+        plan
+    }
+
+    /// A short signal with something in it, so the waveform is not a flat line.
+    fn envelope() -> Envelope {
+        let samples: Vec<f32> = (0..48_000)
+            .map(|i| (i as f32 / 200.0).sin() * 0.7)
+            .collect();
+        waveform::envelope(&samples, 400)
+    }
+
+    fn page() -> String {
+        let plan = plan();
+        let envelope = envelope();
+        player(&plan, &envelope, &Look::default(), "out.wav", "out.vtt")
+            .unwrap()
+            .markup
+    }
+
+    #[test]
+    fn the_transport_is_there_and_stops_at_five_times() {
+        let page = page();
+        assert!(page.contains("id=\"back\""), "no way back");
+        assert!(page.contains("id=\"forward\""), "no way forward");
+        for rate in ["1", "1.5", "2", "3", "4", "5"] {
+            assert!(
+                page.contains(&format!("value=\"{rate}\"")),
+                "speed {rate} is missing"
+            );
+        }
+        // Past five the audio is unintelligible and playing it stops being the
+        // point, so six is not offered and must not creep back in.
+        assert!(!page.contains("value=\"6\""), "six times is offered");
+        assert!(!page.contains(">10x<"), "ten times is offered");
+    }
+
+    #[test]
+    fn the_page_names_who_is_speaking_and_offers_the_others() {
+        let page = page();
+        assert!(page.contains("id=\"who\""));
+        // One correction button per speaker, each carrying its slot.
+        assert!(page.contains("data-slot=\"0\""));
+        assert!(page.contains("data-slot=\"1\""));
+        assert!(
+            !page.contains("data-slot=\"2\""),
+            "a speaker who is not there"
+        );
+    }
+
+    #[test]
+    fn a_correction_is_a_command_rather_than_an_edit() {
+        let page = page();
+        // The panel writes the command that VeilVoice would run, so the change
+        // goes through the same validation as every other route into a plan.
+        assert!(
+            page.contains("veilvoice conversation fix"),
+            "the panel does not name the command"
+        );
+        assert!(
+            page.contains("reassign --at"),
+            "the command has no timestamp"
+        );
+        // And it does not try to write a plan file itself, which would be a
+        // second implementation of the format in JavaScript.
+        assert!(
+            !page.contains("VEILCONV1"),
+            "the page is rebuilding the plan format in the browser"
+        );
+    }
+
+    #[test]
+    fn a_name_cannot_end_the_script_element_it_sits_in() {
+        let mut plan = plan();
+        // Every shape that closes a script from inside a string.
+        plan.set_name(0, "</script><img src=x onerror=alert(1)>")
+            .unwrap();
+        let envelope = envelope();
+        let page = player(&plan, &envelope, &Look::default(), "a.wav", "a.vtt")
+            .unwrap()
+            .markup;
+
+        // Exactly one script element opens and one closes it.
+        assert_eq!(page.matches("<script>").count(), 1, "{page:.400}");
+        assert_eq!(page.matches("</script>").count(), 1);
+        // No element from the name survives as an element. `<` is escaped as
+        // `&lt;` in the markup and as `\\u003c` in the script, so the payload is
+        // present as *text* in both places, which is the correct outcome: the
+        // name is shown, and it is inert.
+        assert!(
+            !page.contains("<img"),
+            "a tag from the name reached the markup"
+        );
+        assert!(
+            page.contains("&lt;/script&gt;"),
+            "the name was dropped from the markup rather than escaped"
+        );
+        assert!(
+            page.contains("\\u003c/script"),
+            "the name was dropped from the script rather than escaped"
+        );
+    }
+
+    #[test]
+    fn the_awkward_characters_in_a_name_are_escaped_for_a_script() {
+        assert_eq!(js_string("a\"b"), "a\\\"b");
+        assert_eq!(js_string("a\\b"), "a\\\\b");
+        assert_eq!(js_string("<>&"), "\\u003c\\u003e\\u0026");
+        // A line separator is a newline to a JavaScript parser and not to an
+        // HTML one, so a name holding one would break the script silently.
+        assert_eq!(js_string("a\u{2028}b"), "a\\u2028b");
+        assert_eq!(js_string("a\u{2029}b"), "a\\u2029b");
+        assert_eq!(js_string("Ada"), "Ada");
+    }
+
+    #[test]
+    fn a_chosen_colour_reaches_the_correction_buttons() {
+        let mut plan = plan();
+        plan.set_colour(1, Some("#9ece6a")).unwrap();
+        let envelope = envelope();
+        let page = player(&plan, &envelope, &Look::default(), "a.wav", "a.vtt")
+            .unwrap()
+            .markup;
+        assert!(page.contains("#9ece6a"), "the chosen colour is not drawn");
+    }
+
+    #[test]
+    fn captions_can_be_carried_in_the_page_rather_than_fetched() {
+        let vtt = "WEBVTT\n\n00:00.000 --> 00:10.000\n<v Ada>Hello there.\n";
+        let uri = inline_vtt(vtt);
+        assert!(uri.starts_with("data:text/vtt;base64,"), "{uri:.40}");
+
+        let plan = plan();
+        let page = player(&plan, &envelope(), &Look::default(), "a.wav", &uri)
+            .unwrap()
+            .markup;
+        assert!(
+            page.contains("data:text/vtt;base64,"),
+            "the track is not inlined"
+        );
+        // A browser treats every `file:` URL as its own origin, so a track
+        // fetched from the file beside the page is refused and the captions
+        // silently do not appear. Nothing may go back to naming a file.
+        assert!(
+            !page.contains("src=\"a.vtt\""),
+            "the track is fetched by name again"
+        );
+    }
+
+    #[test]
+    fn the_page_still_says_what_it_does_without_a_script() {
+        let page = page();
+        let at = page.find("<noscript>").expect("no noscript");
+        let text = &page[at..page.find("</noscript>").unwrap()];
+        assert!(text.contains("audio still plays"), "{text}");
+        assert!(text.contains("captions still appear"), "{text}");
     }
 }
