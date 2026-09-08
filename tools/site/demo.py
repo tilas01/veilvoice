@@ -65,20 +65,23 @@ TAB_ROW = re.compile(r"\(Tab::(?P<variant>\w+),\s*\"(?P<label>[^\"]+)\"\)")
 # And the key each variant is stored under: `Self::File => "file",`.
 TAB_KEY = re.compile(r"Self::(?P<variant>\w+) => \"(?P<key>[a-z]+)\",")
 
-# What each command line capture is a picture of. The captures themselves are
-# named by `tools/shots/terminal.py`; this is the command a reader types to get
-# them, which that file knows and does not write down anywhere a page can read.
+# What each command line capture is a picture of.
+#
+# Read from `tools/shots/terminal.py`, which is the thing that takes them.
+#
+# This was a second list, with the same names and the same sentences written
+# out again, and the comment here justified it by saying terminal.py holds the
+# command "in a form no page can read". That form is a list of arguments, and
+# joining a list of arguments with spaces is not difficult; what the second copy
+# actually did was drift. The note under `render` said "a plan, a recording and
+# a page" in one file and "a plan, a recording, and a page" in the other, and
+# adding a screen to one of them left the other unable to draw it.
+sys.path.insert(0, os.path.join(ROOT, "tools", "shots"))
+import terminal as _terminal  # noqa: E402
+
 COMMANDS = [
-    ("help", "veilvoice --help", "everything the command line offers"),
-    ("anonymise", "veilvoice anonymise --help", "veiling one recording"),
-    ("live", "veilvoice live --help", "scrambling a microphone as it runs"),
-    ("conversation", "veilvoice conversation --help", "several people in one recording"),
-    ("render", "veilvoice conversation render --help", "a plan, a recording and a page"),
-    ("preview", "veilvoice conversation preview --help", "what the video will look like"),
-    ("companions", "veilvoice companions --help", "software VeilVoice uses and never bundles"),
-    ("capture", "veilvoice capture --help", "which screen recorders are running"),
-    ("guard", "veilvoice guard --help", "noticing that a file changed"),
-    ("clean", "veilvoice clean --help", "metadata, EXIF and GPS"),
+    (name, "veilvoice " + " ".join(argv), note)
+    for name, argv, note in _terminal.COMMANDS
 ]
 
 
@@ -156,6 +159,13 @@ USECASES = [
      "veilvoice conversation render --plan interview.toml",
      "Give each speaker their own destination voice so a question can still be "
      "told from its answer, with every voiceprint destroyed just as thoroughly."),
+    ("Fix a stretch given to the wrong person",
+     "veilvoice conversation fix interview.toml reassign --at 20 --to 2",
+     "The one mistake here that cannot be heard in the result: every voice in a "
+     "veiled recording is unfamiliar, so nobody notices one person rendered in "
+     "another's voice. Corrected before the render, which is the only time it "
+     "can be, and keyed on the moment you heard it rather than on a span "
+     "number you would have to go and count."),
     ("Check a download before running it",
      "veilvoice verify auto",
      "Looks in Downloads, checks the signature over the hash list, then checks "
