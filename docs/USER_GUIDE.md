@@ -1142,7 +1142,7 @@ Rebuild the release from source and compare:
 
 ```bash
 veilvoice verify --build-script > reproduce-veilvoice.sh
-sh reproduce-veilvoice.sh v0.1.19
+sh reproduce-veilvoice.sh v0.1.20
 ```
 
 A hash proves the file is the one whose hash was signed, and says nothing about

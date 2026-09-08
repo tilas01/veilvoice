@@ -6,7 +6,7 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
-## Unreleased
+## v0.1.20
 
 **The offline claim is now proved by a machine, four ways**
 
