@@ -100,13 +100,13 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <pre><code>veilvoice verify sums SHA256SUMS SHA256SUMS.asc</code></pre>
 <p>This is the step everything else rests on. <code>SHA256SUMS</code> is a list of numbers; <code>SHA256SUMS.asc</code> is the detached OpenPGP signature over it. Until that signature checks out against the signing key, the list is just numbers somebody sent you.</p>
 <p><strong>One file, against the signed list</strong></p>
-<pre><code>veilvoice verify file veilvoice-v0.1.19-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
+<pre><code>veilvoice verify file veilvoice-v0.1.20-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
 <p>The signature is verified <strong>first</strong>, and the file is compared against the list only after that passes. A pass means the download is <strong>INTACT</strong>: byte for byte the file that was published, signed by the VeilVoice key.</p>
 <p><strong>One file, with no hash list at all</strong></p>
-<pre><code>veilvoice verify file veilvoice-v0.1.19-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
+<pre><code>veilvoice verify file veilvoice-v0.1.20-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
 <p>For when you have a hash rather than a signed list. What a match proves depends entirely on where that hash came from, and only you know that, so the tool says so instead of guessing. If it came from somebody else&#x27;s independent build of the same tag, a match means the release is <strong>REPRODUCIBLE</strong>, which is the stronger claim.</p>
 <p><strong>Just the hash, verifying nothing</strong></p>
-<pre><code>veilvoice verify hash veilvoice-v0.1.19-linux-x86_64.tar.gz</code></pre>
+<pre><code>veilvoice verify hash veilvoice-v0.1.20-linux-x86_64.tar.gz</code></pre>
 <p>Prints the SHA-256 and checks nothing, for when you want to compare it against something yourself.</p>
 <p><strong>The same check through your own GnuPG</strong></p>
 <pre><code>veilvoice verify gnupg</code></pre>
@@ -166,8 +166,31 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </tbody></table>
 <p class="muted">The generated reference for every crate and every source file is under <a href="wiki.html">the reference</a>, and the same pages are in <a href="https://github.com/tilas01/veilvoice/wiki" rel="noopener noreferrer">the wiki</a>.</p>
 </details>
-<details class="release">
-<summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<details class="release" id="v0.1.20">
+<summary><strong>v0.1.20</strong> <span class="muted">The offline claim is now proved by a machine, four ways</span></summary>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.20-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.20-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.20-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.20-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.20-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.20-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.20-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.20" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+<details class="notes">
+<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.20, in full</span></summary>
 <p><strong>The offline claim is now proved by a machine, four ways</strong></p>
 <ul>
 <li>The front page says VeilVoice never touches the network. CI checked the dependency graph for HTTP clients, and then a <em>comment</em> in that job said the source names no network API anywhere. True, and a sentence a reader was asked to believe, inside a job whose purpose is to replace belief with a check.</li>
@@ -232,6 +255,8 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><code>veilvoice video</code> and <code>veilvoice conversation preview</code> now print how many frames the render will draw and roughly how much scratch space they want, before it starts. A minute of conversation at 4K and 60 frames a second is 3,660 frames and about 7 GiB of temporary files, which is worth knowing in advance rather than when the disk fills.</li>
 <li><code>veilvoice video</code> accepted no size at all and <code>black_command</code> had <code>1280x720</code> written into it, so asking for a larger frame was not possible and would have been ignored if it were. <code>--width</code> and <code>--height</code> are replaced by <code>--size</code>, which is one way to say one thing and cannot be set to a pair that describes no picture.</li>
 </ul>
+<p class="muted">The same notes are in <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md" rel="noopener noreferrer"><code>CHANGELOG.md</code></a>, where they are written, and at the top of <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.20" rel="noopener noreferrer">this release on GitHub</a>.</p>
+</details>
 </details>
 <details class="release" id="v0.1.19">
 <summary><strong>v0.1.19</strong> <span class="muted">The audited release. No new features. The whole repository was read for...</span></summary>
