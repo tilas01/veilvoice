@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/page.rs</code></h1>
-<p style="color:var(--muted)"><a href="page.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1030 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="page.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1039 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -442,677 +442,686 @@
 <span class="ln" id="L364">    ink: &amp;str,</span>
 <span class="ln" id="L365">) -&gt; (String, Vec&lt;String&gt;) {</span>
 <span class="ln" id="L366">    <span class="tok-kw">let</span> speaker = &amp;plan.<span class="tok-fn">speakers</span>()[slot];</span>
-<span class="ln" id="L367">    <span class="tok-kw">let</span> colour = palette::<span class="tok-fn">speaker</span>(slot);</span>
-<span class="ln" id="L368">    <span class="tok-kw">let</span> radius = layout.radius;</span>
-<span class="ln" id="L369">    <span class="tok-kw">let</span> y = layout.circles_y;</span>
-<span class="ln" id="L370">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> notes = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L371"></span>
-<span class="ln" id="L372">    <span class="tok-com">// Dim unless speaking. The lit state is a class the script toggles; the</span></span>
-<span class="ln" id="L373">    <span class="tok-com">// still renders whichever state it was asked for.</span></span>
-<span class="ln" id="L374">    <span class="tok-kw">let</span> opacity = <span class="tok-kw">if</span> active { <span class="tok-str">&quot;1&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;0.35&quot;</span> };</span>
-<span class="ln" id="L375"></span>
-<span class="ln" id="L376">    <span class="tok-kw">let</span> body = <span class="tok-kw">match</span> &amp;speaker.picture {</span>
-<span class="ln" id="L377">        <span class="tok-fn">Some</span>(picture) =&gt; <span class="tok-kw">match</span> <span class="tok-fn">data_uri</span>(picture) {</span>
-<span class="ln" id="L378">            <span class="tok-fn">Ok</span>(uri) =&gt; format!(</span>
-<span class="ln" id="L379">                <span class="tok-str">&quot;&lt;clipPath id=\&quot;clip{slot}\&quot;&gt;&lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; \</span></span>
-<span class="ln" id="L380"><span class="tok-str">                 r=\&quot;{r:.1}\&quot;/&gt;&lt;/clipPath&gt;\</span></span>
-<span class="ln" id="L381"><span class="tok-str">                 &lt;image href=\&quot;{uri}\&quot; x=\&quot;{ix:.1}\&quot; y=\&quot;{iy:.1}\&quot; width=\&quot;{d:.1}\&quot; \</span></span>
-<span class="ln" id="L382"><span class="tok-str">                 height=\&quot;{d:.1}\&quot; preserveAspectRatio=\&quot;xMidYMid slice\&quot; \</span></span>
-<span class="ln" id="L383"><span class="tok-str">                 clip-path=\&quot;url(#clip{slot})\&quot;/&gt;\</span></span>
-<span class="ln" id="L384"><span class="tok-str">                 &lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; r=\&quot;{r:.1}\&quot; fill=\&quot;none\&quot; \</span></span>
-<span class="ln" id="L385"><span class="tok-str">                 stroke=\&quot;{colour}\&quot; stroke-width=\&quot;{stroke:.1}\&quot;/&gt;&quot;</span>,</span>
-<span class="ln" id="L386">                uri = <span class="tok-fn">escape</span>(&amp;uri),</span>
-<span class="ln" id="L387">                r = radius,</span>
-<span class="ln" id="L388">                ix = centre_x - radius,</span>
-<span class="ln" id="L389">                iy = y - radius,</span>
-<span class="ln" id="L390">                d = radius * <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L391">                stroke = (radius * <span class="tok-num">0.14</span>).<span class="tok-fn">max</span>(<span class="tok-num">2.0</span>),</span>
-<span class="ln" id="L392">            ),</span>
-<span class="ln" id="L393">            <span class="tok-fn">Err</span>(error) =&gt; {</span>
-<span class="ln" id="L394">                notes.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L395">                    <span class="tok-str">&quot;{}&#x27;s picture was not used: {error}. A plain circle was drawn instead.&quot;</span>,</span>
-<span class="ln" id="L396">                    speaker.name</span>
-<span class="ln" id="L397">                ));</span>
-<span class="ln" id="L398">                format!(</span>
-<span class="ln" id="L399">                    <span class="tok-str">&quot;&lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; r=\&quot;{radius:.1}\&quot; \</span></span>
-<span class="ln" id="L400"><span class="tok-str">                     fill=\&quot;{colour}\&quot;/&gt;&quot;</span></span>
-<span class="ln" id="L401">                )</span>
-<span class="ln" id="L402">            }</span>
-<span class="ln" id="L403">        },</span>
-<span class="ln" id="L404">        None =&gt; format!(</span>
-<span class="ln" id="L405">            <span class="tok-str">&quot;&lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; r=\&quot;{radius:.1}\&quot; fill=\&quot;{colour}\&quot;/&gt;&quot;</span></span>
-<span class="ln" id="L406">        ),</span>
-<span class="ln" id="L407">    };</span>
-<span class="ln" id="L408"></span>
-<span class="ln" id="L409">    <span class="tok-kw">let</span> label_y = y + radius + (radius * <span class="tok-num">0.55</span>).<span class="tok-fn">max</span>(<span class="tok-num">18.0</span>);</span>
-<span class="ln" id="L410">    <span class="tok-kw">let</span> font = (radius * <span class="tok-num">0.36</span>).<span class="tok-fn">clamp</span>(<span class="tok-num">11.0</span>, <span class="tok-num">34.0</span>);</span>
-<span class="ln" id="L411">    (</span>
-<span class="ln" id="L412">        format!(</span>
-<span class="ln" id="L413">            <span class="tok-str">&quot;&lt;g class=\&quot;speaker\&quot; id=\&quot;speaker{slot}\&quot; opacity=\&quot;{opacity}\&quot;&gt;{body}\</span></span>
-<span class="ln" id="L414"><span class="tok-str">             &lt;text x=\&quot;{centre_x:.1}\&quot; y=\&quot;{label_y:.1}\&quot; text-anchor=\&quot;middle\&quot; \</span></span>
-<span class="ln" id="L415"><span class="tok-str">             font-family=\&quot;ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\&quot; \</span></span>
-<span class="ln" id="L416"><span class="tok-str">             font-size=\&quot;{font:.1}\&quot; fill=\&quot;{}\&quot;&gt;{}&lt;/text&gt;&lt;/g&gt;&quot;</span>,</span>
-<span class="ln" id="L417">            ink,</span>
-<span class="ln" id="L418">            <span class="tok-fn">escape</span>(&amp;speaker.name)</span>
-<span class="ln" id="L419">        ),</span>
-<span class="ln" id="L420">        notes,</span>
-<span class="ln" id="L421">    )</span>
-<span class="ln" id="L422">}</span>
+<span class="ln" id="L367">    <span class="tok-com">// The speaker&#x27;s own colour where somebody chose one, and their slot&#x27;s</span></span>
+<span class="ln" id="L368">    <span class="tok-com">// otherwise. Almost every speaker has none and gets the palette, which is</span></span>
+<span class="ln" id="L369">    <span class="tok-com">// why the palette is still what decides the look of a picture nobody has</span></span>
+<span class="ln" id="L370">    <span class="tok-com">// edited; a chosen colour exists for the cases the palette cannot know</span></span>
+<span class="ln" id="L371">    <span class="tok-com">// about, such as two speakers a particular reader finds hard to tell apart.</span></span>
+<span class="ln" id="L372">    <span class="tok-com">//</span></span>
+<span class="ln" id="L373">    <span class="tok-com">// Already validated as `#rrggbb` by the time it reaches here: this is an</span></span>
+<span class="ln" id="L374">    <span class="tok-com">// SVG attribute, and a value that is not a colour would be text inside one.</span></span>
+<span class="ln" id="L375">    <span class="tok-kw">let</span> colour = plan.<span class="tok-fn">colour_of</span>(slot, palette::<span class="tok-fn">speaker</span>(slot));</span>
+<span class="ln" id="L376">    <span class="tok-kw">let</span> radius = layout.radius;</span>
+<span class="ln" id="L377">    <span class="tok-kw">let</span> y = layout.circles_y;</span>
+<span class="ln" id="L378">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> notes = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L379"></span>
+<span class="ln" id="L380">    <span class="tok-com">// Dim unless speaking. The lit state is a class the script toggles; the</span></span>
+<span class="ln" id="L381">    <span class="tok-com">// still renders whichever state it was asked for.</span></span>
+<span class="ln" id="L382">    <span class="tok-kw">let</span> opacity = <span class="tok-kw">if</span> active { <span class="tok-str">&quot;1&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;0.35&quot;</span> };</span>
+<span class="ln" id="L383"></span>
+<span class="ln" id="L384">    <span class="tok-kw">let</span> body = <span class="tok-kw">match</span> &amp;speaker.picture {</span>
+<span class="ln" id="L385">        <span class="tok-fn">Some</span>(picture) =&gt; <span class="tok-kw">match</span> <span class="tok-fn">data_uri</span>(picture) {</span>
+<span class="ln" id="L386">            <span class="tok-fn">Ok</span>(uri) =&gt; format!(</span>
+<span class="ln" id="L387">                <span class="tok-str">&quot;&lt;clipPath id=\&quot;clip{slot}\&quot;&gt;&lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; \</span></span>
+<span class="ln" id="L388"><span class="tok-str">                 r=\&quot;{r:.1}\&quot;/&gt;&lt;/clipPath&gt;\</span></span>
+<span class="ln" id="L389"><span class="tok-str">                 &lt;image href=\&quot;{uri}\&quot; x=\&quot;{ix:.1}\&quot; y=\&quot;{iy:.1}\&quot; width=\&quot;{d:.1}\&quot; \</span></span>
+<span class="ln" id="L390"><span class="tok-str">                 height=\&quot;{d:.1}\&quot; preserveAspectRatio=\&quot;xMidYMid slice\&quot; \</span></span>
+<span class="ln" id="L391"><span class="tok-str">                 clip-path=\&quot;url(#clip{slot})\&quot;/&gt;\</span></span>
+<span class="ln" id="L392"><span class="tok-str">                 &lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; r=\&quot;{r:.1}\&quot; fill=\&quot;none\&quot; \</span></span>
+<span class="ln" id="L393"><span class="tok-str">                 stroke=\&quot;{colour}\&quot; stroke-width=\&quot;{stroke:.1}\&quot;/&gt;&quot;</span>,</span>
+<span class="ln" id="L394">                uri = <span class="tok-fn">escape</span>(&amp;uri),</span>
+<span class="ln" id="L395">                r = radius,</span>
+<span class="ln" id="L396">                ix = centre_x - radius,</span>
+<span class="ln" id="L397">                iy = y - radius,</span>
+<span class="ln" id="L398">                d = radius * <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L399">                stroke = (radius * <span class="tok-num">0.14</span>).<span class="tok-fn">max</span>(<span class="tok-num">2.0</span>),</span>
+<span class="ln" id="L400">            ),</span>
+<span class="ln" id="L401">            <span class="tok-fn">Err</span>(error) =&gt; {</span>
+<span class="ln" id="L402">                notes.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L403">                    <span class="tok-str">&quot;{}&#x27;s picture was not used: {error}. A plain circle was drawn instead.&quot;</span>,</span>
+<span class="ln" id="L404">                    speaker.name</span>
+<span class="ln" id="L405">                ));</span>
+<span class="ln" id="L406">                format!(</span>
+<span class="ln" id="L407">                    <span class="tok-str">&quot;&lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; r=\&quot;{radius:.1}\&quot; \</span></span>
+<span class="ln" id="L408"><span class="tok-str">                     fill=\&quot;{colour}\&quot;/&gt;&quot;</span></span>
+<span class="ln" id="L409">                )</span>
+<span class="ln" id="L410">            }</span>
+<span class="ln" id="L411">        },</span>
+<span class="ln" id="L412">        None =&gt; format!(</span>
+<span class="ln" id="L413">            <span class="tok-str">&quot;&lt;circle cx=\&quot;{centre_x:.1}\&quot; cy=\&quot;{y:.1}\&quot; r=\&quot;{radius:.1}\&quot; fill=\&quot;{colour}\&quot;/&gt;&quot;</span></span>
+<span class="ln" id="L414">        ),</span>
+<span class="ln" id="L415">    };</span>
+<span class="ln" id="L416"></span>
+<span class="ln" id="L417">    <span class="tok-kw">let</span> label_y = y + radius + (radius * <span class="tok-num">0.55</span>).<span class="tok-fn">max</span>(<span class="tok-num">18.0</span>);</span>
+<span class="ln" id="L418">    <span class="tok-kw">let</span> font = (radius * <span class="tok-num">0.36</span>).<span class="tok-fn">clamp</span>(<span class="tok-num">11.0</span>, <span class="tok-num">34.0</span>);</span>
+<span class="ln" id="L419">    (</span>
+<span class="ln" id="L420">        format!(</span>
+<span class="ln" id="L421">            <span class="tok-str">&quot;&lt;g class=\&quot;speaker\&quot; id=\&quot;speaker{slot}\&quot; opacity=\&quot;{opacity}\&quot;&gt;{body}\</span></span>
+<span class="ln" id="L422"><span class="tok-str">             &lt;text x=\&quot;{centre_x:.1}\&quot; y=\&quot;{label_y:.1}\&quot; text-anchor=\&quot;middle\&quot; \</span></span>
+<span class="ln" id="L423"><span class="tok-str">             font-family=\&quot;ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\&quot; \</span></span>
+<span class="ln" id="L424"><span class="tok-str">             font-size=\&quot;{font:.1}\&quot; fill=\&quot;{}\&quot;&gt;{}&lt;/text&gt;&lt;/g&gt;&quot;</span>,</span>
+<span class="ln" id="L425">            ink,</span>
+<span class="ln" id="L426">            <span class="tok-fn">escape</span>(&amp;speaker.name)</span>
+<span class="ln" id="L427">        ),</span>
+<span class="ln" id="L428">        notes,</span>
+<span class="ln" id="L429">    )</span>
+<span class="ln" id="L430">}</span>
 </span>
-<span class="ln" id="L423"></span>
+<span class="ln" id="L431"></span>
 <span class="src-item" id="fn-drawn">
-<span class="ln" id="L424"><span class="tok-com">/// What a render produced, and anything the user should know about it.</span></span>
-<span class="ln" id="L425"><span class="tok-attr">#[derive</span>(Clone, Debug)]</span>
-<span class="ln" id="L426"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Drawn {</span>
-<span class="ln" id="L427">    <span class="tok-com">/// The markup.</span></span>
-<span class="ln" id="L428">    <span class="tok-kw">pub</span> markup: String,</span>
-<span class="ln" id="L429">    <span class="tok-com">/// Anything worth saying: a picture that could not be used, a page that</span></span>
-<span class="ln" id="L430">    <span class="tok-com">/// grew large because an image was embedded in it.</span></span>
-<span class="ln" id="L431">    <span class="tok-kw">pub</span> notes: Vec&lt;String&gt;,</span>
-<span class="ln" id="L432">}</span>
+<span class="ln" id="L432"><span class="tok-com">/// What a render produced, and anything the user should know about it.</span></span>
+<span class="ln" id="L433"><span class="tok-attr">#[derive</span>(Clone, Debug)]</span>
+<span class="ln" id="L434"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Drawn {</span>
+<span class="ln" id="L435">    <span class="tok-com">/// The markup.</span></span>
+<span class="ln" id="L436">    <span class="tok-kw">pub</span> markup: String,</span>
+<span class="ln" id="L437">    <span class="tok-com">/// Anything worth saying: a picture that could not be used, a page that</span></span>
+<span class="ln" id="L438">    <span class="tok-com">/// grew large because an image was embedded in it.</span></span>
+<span class="ln" id="L439">    <span class="tok-kw">pub</span> notes: Vec&lt;String&gt;,</span>
+<span class="ln" id="L440">}</span>
 </span>
-<span class="ln" id="L433"></span>
+<span class="ln" id="L441"></span>
 <span class="src-item" id="fn-still">
-<span class="ln" id="L434"><span class="tok-com">/// A single frame, as standalone SVG.</span></span>
-<span class="ln" id="L435"><span class="tok-com">///</span></span>
-<span class="ln" id="L436"><span class="tok-com">/// `at_secs` decides which speaker is lit and where the playhead sits. This is</span></span>
-<span class="ln" id="L437"><span class="tok-com">/// the preview: it is the same layout function and the same drawing code the</span></span>
-<span class="ln" id="L438"><span class="tok-com">/// page uses, so what it shows is what will be produced rather than something</span></span>
-<span class="ln" id="L439"><span class="tok-com">/// that resembles it.</span></span>
-<span class="ln" id="L440"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L441">    plan: &amp;Conversation,</span>
-<span class="ln" id="L442">    envelope: &amp;Envelope,</span>
-<span class="ln" id="L443">    look: &amp;Look,</span>
-<span class="ln" id="L444">    at_secs: f64,</span>
-<span class="ln" id="L445">) -&gt; Result&lt;Drawn, Error&gt; {</span>
-<span class="ln" id="L446">    look.<span class="tok-fn">checked</span>()?;</span>
-<span class="ln" id="L447">    <span class="tok-kw">let</span> layout = <span class="tok-fn">layout</span>(look, plan.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L448">    <span class="tok-kw">let</span> (width, height) = (look.width, look.height);</span>
-<span class="ln" id="L449">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> notes = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L450"></span>
-<span class="ln" id="L451">    <span class="tok-kw">let</span> (background, background_notes) = <span class="tok-fn">background_markup</span>(look, width, height);</span>
-<span class="ln" id="L452">    notes.<span class="tok-fn">extend</span>(background_notes);</span>
-<span class="ln" id="L453"></span>
-<span class="ln" id="L454">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = format!(</span>
-<span class="ln" id="L455">        <span class="tok-str">&quot;&lt;svg xmlns=\&quot;http://www.w3.org/2000/svg\&quot; viewBox=\&quot;0 0 {width} {height}\&quot; \</span></span>
-<span class="ln" id="L456"><span class="tok-str">         width=\&quot;{width}\&quot; height=\&quot;{height}\&quot; role=\&quot;img\&quot; aria-label=\&quot;{}\&quot;&gt;{background}&quot;</span>,</span>
-<span class="ln" id="L457">        <span class="tok-fn">escape</span>(plan.title.<span class="tok-fn">as_deref</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;a veiled conversation&quot;</span>))</span>
-<span class="ln" id="L458">    );</span>
-<span class="ln" id="L459"></span>
-<span class="ln" id="L460">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(title) = &amp;plan.title {</span>
-<span class="ln" id="L461">        <span class="tok-kw">let</span> font = (look.height <span class="tok-kw">as</span> f32 * <span class="tok-num">0.055</span>).<span class="tok-fn">clamp</span>(<span class="tok-num">14.0</span>, <span class="tok-num">64.0</span>);</span>
-<span class="ln" id="L462">        out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
-<span class="ln" id="L463">            <span class="tok-str">&quot;&lt;text x=\&quot;{x:.1}\&quot; y=\&quot;{y:.1}\&quot; text-anchor=\&quot;middle\&quot; \</span></span>
-<span class="ln" id="L464"><span class="tok-str">             font-family=\&quot;ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\&quot; \</span></span>
-<span class="ln" id="L465"><span class="tok-str">             font-size=\&quot;{font:.1}\&quot; fill=\&quot;{fg}\&quot;&gt;{}&lt;/text&gt;&quot;</span>,</span>
-<span class="ln" id="L466">            <span class="tok-fn">escape</span>(title),</span>
-<span class="ln" id="L467">            x = width <span class="tok-kw">as</span> f32 / <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L468">            y = layout.title_y,</span>
-<span class="ln" id="L469">            fg = look.palette.fg,</span>
-<span class="ln" id="L470">        ));</span>
-<span class="ln" id="L471">    }</span>
-<span class="ln" id="L472"></span>
-<span class="ln" id="L473">    <span class="tok-com">// Who is speaking at this moment. More than one is possible and all of them</span></span>
-<span class="ln" id="L474">    <span class="tok-com">// are lit: an interruption is two people talking, and dimming one of them</span></span>
-<span class="ln" id="L475">    <span class="tok-com">// would be choosing a winner the audio did not.</span></span>
-<span class="ln" id="L476">    <span class="tok-kw">let</span> speaking: Vec&lt;usize&gt; = plan</span>
-<span class="ln" id="L477">        .<span class="tok-fn">turns</span>()</span>
-<span class="ln" id="L478">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L479">        .<span class="tok-fn">filter</span>(|turn| at_secs &gt;= turn.start &amp;&amp; at_secs &lt; turn.end)</span>
-<span class="ln" id="L480">        .<span class="tok-fn">map</span>(|turn| turn.speaker)</span>
-<span class="ln" id="L481">        .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L482"></span>
-<span class="ln" id="L483">    <span class="tok-kw">let</span> count = plan.<span class="tok-fn">len</span>().<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
-<span class="ln" id="L484">    <span class="tok-kw">let</span> step = layout.wave_width / count <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L485">    <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..plan.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L486">        <span class="tok-kw">let</span> centre_x = layout.wave_x + step * (slot <span class="tok-kw">as</span> f32 + <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L487">        <span class="tok-kw">let</span> (markup, speaker_notes) = <span class="tok-fn">speaker_markup</span>(</span>
-<span class="ln" id="L488">            plan,</span>
-<span class="ln" id="L489">            slot,</span>
-<span class="ln" id="L490">            centre_x,</span>
-<span class="ln" id="L491">            &amp;layout,</span>
-<span class="ln" id="L492">            speaking.<span class="tok-fn">contains</span>(&amp;slot),</span>
-<span class="ln" id="L493">            look.palette.fg,</span>
-<span class="ln" id="L494">        );</span>
-<span class="ln" id="L495">        out.<span class="tok-fn">push_str</span>(&amp;markup);</span>
-<span class="ln" id="L496">        notes.<span class="tok-fn">extend</span>(speaker_notes);</span>
-<span class="ln" id="L497">    }</span>
-<span class="ln" id="L498"></span>
-<span class="ln" id="L499">    <span class="tok-com">// The waveform, then the playhead over it.</span></span>
-<span class="ln" id="L500">    out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
-<span class="ln" id="L501">        <span class="tok-str">&quot;&lt;rect x=\&quot;{:.1}\&quot; y=\&quot;{:.1}\&quot; width=\&quot;{:.1}\&quot; height=\&quot;{:.1}\&quot; rx=\&quot;4\&quot; \</span></span>
-<span class="ln" id="L502"><span class="tok-str">         fill=\&quot;{}\&quot; stroke=\&quot;{}\&quot;/&gt;&quot;</span>,</span>
-<span class="ln" id="L503">        layout.wave_x,</span>
-<span class="ln" id="L504">        layout.wave_y,</span>
-<span class="ln" id="L505">        layout.wave_width,</span>
-<span class="ln" id="L506">        layout.wave_height,</span>
-<span class="ln" id="L507">        look.palette.bg_inset,</span>
-<span class="ln" id="L508">        look.palette.border,</span>
-<span class="ln" id="L509">    ));</span>
-<span class="ln" id="L510">    <span class="tok-kw">let</span> path = waveform::<span class="tok-fn">svg_path</span>(</span>
-<span class="ln" id="L511">        envelope,</span>
-<span class="ln" id="L512">        layout.wave_x,</span>
-<span class="ln" id="L513">        layout.wave_y,</span>
-<span class="ln" id="L514">        layout.wave_width,</span>
-<span class="ln" id="L515">        layout.wave_height,</span>
-<span class="ln" id="L516">    );</span>
-<span class="ln" id="L517">    <span class="tok-kw">if</span> !path.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L518">        out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
-<span class="ln" id="L519">            <span class="tok-str">&quot;&lt;path d=\&quot;{path}\&quot; fill=\&quot;{}\&quot; opacity=\&quot;0.85\&quot;/&gt;&quot;</span>,</span>
-<span class="ln" id="L520">            look.palette.muted</span>
-<span class="ln" id="L521">        ));</span>
-<span class="ln" id="L522">    }</span>
-<span class="ln" id="L523">    <span class="tok-kw">let</span> duration = plan.<span class="tok-fn">duration</span>().<span class="tok-fn">max</span>(1e-<span class="tok-num">9</span>);</span>
-<span class="ln" id="L524">    <span class="tok-kw">let</span> progress = (at_secs / duration).<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>) <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L525">    <span class="tok-kw">let</span> head_x = layout.wave_x + layout.wave_width * progress;</span>
-<span class="ln" id="L526">    out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
-<span class="ln" id="L527">        <span class="tok-str">&quot;&lt;line id=\&quot;playhead\&quot; x1=\&quot;{head_x:.1}\&quot; y1=\&quot;{:.1}\&quot; x2=\&quot;{head_x:.1}\&quot; \</span></span>
-<span class="ln" id="L528"><span class="tok-str">         y2=\&quot;{:.1}\&quot; stroke=\&quot;{}\&quot; stroke-width=\&quot;2\&quot;/&gt;&quot;</span>,</span>
-<span class="ln" id="L529">        layout.wave_y,</span>
-<span class="ln" id="L530">        layout.wave_y + layout.wave_height,</span>
-<span class="ln" id="L531">        palette::SPEAKERS[<span class="tok-num">0</span>],</span>
-<span class="ln" id="L532">    ));</span>
-<span class="ln" id="L533"></span>
-<span class="ln" id="L534">    out.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;&lt;/svg&gt;&quot;</span>);</span>
-<span class="ln" id="L535">    <span class="tok-fn">Ok</span>(Drawn { markup: out, notes })</span>
-<span class="ln" id="L536">}</span>
+<span class="ln" id="L442"><span class="tok-com">/// A single frame, as standalone SVG.</span></span>
+<span class="ln" id="L443"><span class="tok-com">///</span></span>
+<span class="ln" id="L444"><span class="tok-com">/// `at_secs` decides which speaker is lit and where the playhead sits. This is</span></span>
+<span class="ln" id="L445"><span class="tok-com">/// the preview: it is the same layout function and the same drawing code the</span></span>
+<span class="ln" id="L446"><span class="tok-com">/// page uses, so what it shows is what will be produced rather than something</span></span>
+<span class="ln" id="L447"><span class="tok-com">/// that resembles it.</span></span>
+<span class="ln" id="L448"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L449">    plan: &amp;Conversation,</span>
+<span class="ln" id="L450">    envelope: &amp;Envelope,</span>
+<span class="ln" id="L451">    look: &amp;Look,</span>
+<span class="ln" id="L452">    at_secs: f64,</span>
+<span class="ln" id="L453">) -&gt; Result&lt;Drawn, Error&gt; {</span>
+<span class="ln" id="L454">    look.<span class="tok-fn">checked</span>()?;</span>
+<span class="ln" id="L455">    <span class="tok-kw">let</span> layout = <span class="tok-fn">layout</span>(look, plan.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L456">    <span class="tok-kw">let</span> (width, height) = (look.width, look.height);</span>
+<span class="ln" id="L457">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> notes = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L458"></span>
+<span class="ln" id="L459">    <span class="tok-kw">let</span> (background, background_notes) = <span class="tok-fn">background_markup</span>(look, width, height);</span>
+<span class="ln" id="L460">    notes.<span class="tok-fn">extend</span>(background_notes);</span>
+<span class="ln" id="L461"></span>
+<span class="ln" id="L462">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = format!(</span>
+<span class="ln" id="L463">        <span class="tok-str">&quot;&lt;svg xmlns=\&quot;http://www.w3.org/2000/svg\&quot; viewBox=\&quot;0 0 {width} {height}\&quot; \</span></span>
+<span class="ln" id="L464"><span class="tok-str">         width=\&quot;{width}\&quot; height=\&quot;{height}\&quot; role=\&quot;img\&quot; aria-label=\&quot;{}\&quot;&gt;{background}&quot;</span>,</span>
+<span class="ln" id="L465">        <span class="tok-fn">escape</span>(plan.title.<span class="tok-fn">as_deref</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;a veiled conversation&quot;</span>))</span>
+<span class="ln" id="L466">    );</span>
+<span class="ln" id="L467"></span>
+<span class="ln" id="L468">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(title) = &amp;plan.title {</span>
+<span class="ln" id="L469">        <span class="tok-kw">let</span> font = (look.height <span class="tok-kw">as</span> f32 * <span class="tok-num">0.055</span>).<span class="tok-fn">clamp</span>(<span class="tok-num">14.0</span>, <span class="tok-num">64.0</span>);</span>
+<span class="ln" id="L470">        out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
+<span class="ln" id="L471">            <span class="tok-str">&quot;&lt;text x=\&quot;{x:.1}\&quot; y=\&quot;{y:.1}\&quot; text-anchor=\&quot;middle\&quot; \</span></span>
+<span class="ln" id="L472"><span class="tok-str">             font-family=\&quot;ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\&quot; \</span></span>
+<span class="ln" id="L473"><span class="tok-str">             font-size=\&quot;{font:.1}\&quot; fill=\&quot;{fg}\&quot;&gt;{}&lt;/text&gt;&quot;</span>,</span>
+<span class="ln" id="L474">            <span class="tok-fn">escape</span>(title),</span>
+<span class="ln" id="L475">            x = width <span class="tok-kw">as</span> f32 / <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L476">            y = layout.title_y,</span>
+<span class="ln" id="L477">            fg = look.palette.fg,</span>
+<span class="ln" id="L478">        ));</span>
+<span class="ln" id="L479">    }</span>
+<span class="ln" id="L480"></span>
+<span class="ln" id="L481">    <span class="tok-com">// Who is speaking at this moment. More than one is possible and all of them</span></span>
+<span class="ln" id="L482">    <span class="tok-com">// are lit: an interruption is two people talking, and dimming one of them</span></span>
+<span class="ln" id="L483">    <span class="tok-com">// would be choosing a winner the audio did not.</span></span>
+<span class="ln" id="L484">    <span class="tok-kw">let</span> speaking: Vec&lt;usize&gt; = plan</span>
+<span class="ln" id="L485">        .<span class="tok-fn">turns</span>()</span>
+<span class="ln" id="L486">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L487">        .<span class="tok-fn">filter</span>(|turn| at_secs &gt;= turn.start &amp;&amp; at_secs &lt; turn.end)</span>
+<span class="ln" id="L488">        .<span class="tok-fn">map</span>(|turn| turn.speaker)</span>
+<span class="ln" id="L489">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L490"></span>
+<span class="ln" id="L491">    <span class="tok-kw">let</span> count = plan.<span class="tok-fn">len</span>().<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
+<span class="ln" id="L492">    <span class="tok-kw">let</span> step = layout.wave_width / count <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L493">    <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..plan.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L494">        <span class="tok-kw">let</span> centre_x = layout.wave_x + step * (slot <span class="tok-kw">as</span> f32 + <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L495">        <span class="tok-kw">let</span> (markup, speaker_notes) = <span class="tok-fn">speaker_markup</span>(</span>
+<span class="ln" id="L496">            plan,</span>
+<span class="ln" id="L497">            slot,</span>
+<span class="ln" id="L498">            centre_x,</span>
+<span class="ln" id="L499">            &amp;layout,</span>
+<span class="ln" id="L500">            speaking.<span class="tok-fn">contains</span>(&amp;slot),</span>
+<span class="ln" id="L501">            look.palette.fg,</span>
+<span class="ln" id="L502">        );</span>
+<span class="ln" id="L503">        out.<span class="tok-fn">push_str</span>(&amp;markup);</span>
+<span class="ln" id="L504">        notes.<span class="tok-fn">extend</span>(speaker_notes);</span>
+<span class="ln" id="L505">    }</span>
+<span class="ln" id="L506"></span>
+<span class="ln" id="L507">    <span class="tok-com">// The waveform, then the playhead over it.</span></span>
+<span class="ln" id="L508">    out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
+<span class="ln" id="L509">        <span class="tok-str">&quot;&lt;rect x=\&quot;{:.1}\&quot; y=\&quot;{:.1}\&quot; width=\&quot;{:.1}\&quot; height=\&quot;{:.1}\&quot; rx=\&quot;4\&quot; \</span></span>
+<span class="ln" id="L510"><span class="tok-str">         fill=\&quot;{}\&quot; stroke=\&quot;{}\&quot;/&gt;&quot;</span>,</span>
+<span class="ln" id="L511">        layout.wave_x,</span>
+<span class="ln" id="L512">        layout.wave_y,</span>
+<span class="ln" id="L513">        layout.wave_width,</span>
+<span class="ln" id="L514">        layout.wave_height,</span>
+<span class="ln" id="L515">        look.palette.bg_inset,</span>
+<span class="ln" id="L516">        look.palette.border,</span>
+<span class="ln" id="L517">    ));</span>
+<span class="ln" id="L518">    <span class="tok-kw">let</span> path = waveform::<span class="tok-fn">svg_path</span>(</span>
+<span class="ln" id="L519">        envelope,</span>
+<span class="ln" id="L520">        layout.wave_x,</span>
+<span class="ln" id="L521">        layout.wave_y,</span>
+<span class="ln" id="L522">        layout.wave_width,</span>
+<span class="ln" id="L523">        layout.wave_height,</span>
+<span class="ln" id="L524">    );</span>
+<span class="ln" id="L525">    <span class="tok-kw">if</span> !path.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L526">        out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
+<span class="ln" id="L527">            <span class="tok-str">&quot;&lt;path d=\&quot;{path}\&quot; fill=\&quot;{}\&quot; opacity=\&quot;0.85\&quot;/&gt;&quot;</span>,</span>
+<span class="ln" id="L528">            look.palette.muted</span>
+<span class="ln" id="L529">        ));</span>
+<span class="ln" id="L530">    }</span>
+<span class="ln" id="L531">    <span class="tok-kw">let</span> duration = plan.<span class="tok-fn">duration</span>().<span class="tok-fn">max</span>(1e-<span class="tok-num">9</span>);</span>
+<span class="ln" id="L532">    <span class="tok-kw">let</span> progress = (at_secs / duration).<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>) <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L533">    <span class="tok-kw">let</span> head_x = layout.wave_x + layout.wave_width * progress;</span>
+<span class="ln" id="L534">    out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
+<span class="ln" id="L535">        <span class="tok-str">&quot;&lt;line id=\&quot;playhead\&quot; x1=\&quot;{head_x:.1}\&quot; y1=\&quot;{:.1}\&quot; x2=\&quot;{head_x:.1}\&quot; \</span></span>
+<span class="ln" id="L536"><span class="tok-str">         y2=\&quot;{:.1}\&quot; stroke=\&quot;{}\&quot; stroke-width=\&quot;2\&quot;/&gt;&quot;</span>,</span>
+<span class="ln" id="L537">        layout.wave_y,</span>
+<span class="ln" id="L538">        layout.wave_y + layout.wave_height,</span>
+<span class="ln" id="L539">        palette::SPEAKERS[<span class="tok-num">0</span>],</span>
+<span class="ln" id="L540">    ));</span>
+<span class="ln" id="L541"></span>
+<span class="ln" id="L542">    out.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;&lt;/svg&gt;&quot;</span>);</span>
+<span class="ln" id="L543">    <span class="tok-fn">Ok</span>(Drawn { markup: out, notes })</span>
+<span class="ln" id="L544">}</span>
 </span>
-<span class="ln" id="L537"></span>
+<span class="ln" id="L545"></span>
 <span class="src-item" id="fn-player">
-<span class="ln" id="L538"><span class="tok-com">/// The self-contained page that plays.</span></span>
-<span class="ln" id="L539"><span class="tok-com">///</span></span>
-<span class="ln" id="L540"><span class="tok-com">/// `audio_href` and `subtitles_href` are written into the page as they are</span></span>
-<span class="ln" id="L541"><span class="tok-com">/// given: relative names, so the three files can be moved together. Embedding</span></span>
-<span class="ln" id="L542"><span class="tok-com">/// the audio would double the size of a recording somebody already has on disk</span></span>
-<span class="ln" id="L543"><span class="tok-com">/// beside it.</span></span>
-<span class="ln" id="L544"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">player</span>(</span>
-<span class="ln" id="L545">    plan: &amp;Conversation,</span>
-<span class="ln" id="L546">    envelope: &amp;Envelope,</span>
-<span class="ln" id="L547">    look: &amp;Look,</span>
-<span class="ln" id="L548">    audio_href: &amp;str,</span>
-<span class="ln" id="L549">    subtitles_href: &amp;str,</span>
-<span class="ln" id="L550">) -&gt; Result&lt;Drawn, Error&gt; {</span>
-<span class="ln" id="L551">    <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(plan, envelope, look, -<span class="tok-num">1.0</span>)?;</span>
-<span class="ln" id="L552"></span>
-<span class="ln" id="L553">    <span class="tok-com">// Turn boundaries for the script: slot, start, end. Numbers only -- the</span></span>
-<span class="ln" id="L554">    <span class="tok-com">// names are already in the markup and there is no reason to put them in a</span></span>
-<span class="ln" id="L555">    <span class="tok-com">// second place where they could disagree.</span></span>
-<span class="ln" id="L556">    <span class="tok-kw">let</span> turns = plan</span>
-<span class="ln" id="L557">        .<span class="tok-fn">turns</span>()</span>
-<span class="ln" id="L558">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L559">        .<span class="tok-fn">map</span>(|turn| format!(<span class="tok-str">&quot;[{},{:.3},{:.3}]&quot;</span>, turn.speaker, turn.start, turn.end))</span>
-<span class="ln" id="L560">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L561">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;,&quot;</span>);</span>
-<span class="ln" id="L562"></span>
-<span class="ln" id="L563">    <span class="tok-kw">let</span> title = <span class="tok-fn">escape</span>(plan.title.<span class="tok-fn">as_deref</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;A veiled conversation&quot;</span>));</span>
-<span class="ln" id="L564">    <span class="tok-kw">let</span> markup = format!(</span>
-<span class="ln" id="L565">        <span class="tok-str">&quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=\&quot;en\&quot;&gt;\n&lt;head&gt;\n&lt;meta charset=\&quot;utf-8\&quot;&gt;\n\</span></span>
-<span class="ln" id="L566"><span class="tok-str">         &lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width, initial-scale=1\&quot;&gt;\n\</span></span>
-<span class="ln" id="L567"><span class="tok-str">         &lt;title&gt;{title}&lt;/title&gt;\n&lt;style&gt;\n\</span></span>
-<span class="ln" id="L568"><span class="tok-str">         :root {{ color-scheme: dark; }}\n\</span></span>
-<span class="ln" id="L569"><span class="tok-str">         html, body {{ margin: 0; background: {bg}; color: {fg};\n  \</span></span>
-<span class="ln" id="L570"><span class="tok-str">           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}\n\</span></span>
-<span class="ln" id="L571"><span class="tok-str">         main {{ max-width: 100%; margin: 0 auto; padding: 1rem; box-sizing: border-box; }}\n\</span></span>
-<span class="ln" id="L572"><span class="tok-str">         svg {{ width: 100%; height: auto; display: block; }}\n\</span></span>
-<span class="ln" id="L573"><span class="tok-str">         audio {{ width: 100%; margin-top: 1rem; }}\n\</span></span>
-<span class="ln" id="L574"><span class="tok-str">         .speaker {{ transition: opacity 120ms linear; }}\n\</span></span>
-<span class="ln" id="L575"><span class="tok-str">         .note {{ color: {muted}; font-size: 0.85rem; line-height: 1.5; }}\n\</span></span>
-<span class="ln" id="L576"><span class="tok-str">         @media (prefers-reduced-motion: reduce) {{ .speaker {{ transition: none; }} }}\n\</span></span>
-<span class="ln" id="L577"><span class="tok-str">         &lt;/style&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;main&gt;\n{svg}\n\</span></span>
-<span class="ln" id="L578"><span class="tok-str">         &lt;audio id=\&quot;audio\&quot; controls preload=\&quot;metadata\&quot; src=\&quot;{audio}\&quot;&gt;\n\</span></span>
-<span class="ln" id="L579"><span class="tok-str">         &lt;track kind=\&quot;captions\&quot; srclang=\&quot;en\&quot; label=\&quot;Speakers\&quot; src=\&quot;{vtt}\&quot; default&gt;\n\</span></span>
-<span class="ln" id="L580"><span class="tok-str">         &lt;/audio&gt;\n\</span></span>
-<span class="ln" id="L581"><span class="tok-str">         &lt;noscript&gt;&lt;p class=\&quot;note\&quot;&gt;This page uses a small script, held in the page \</span></span>
-<span class="ln" id="L582"><span class="tok-str">         itself, only to light up whichever speaker is talking. Without it the audio \</span></span>
-<span class="ln" id="L583"><span class="tok-str">         still plays, the captions still appear and the waveform is still drawn.&lt;/p&gt;\</span></span>
-<span class="ln" id="L584"><span class="tok-str">         &lt;/noscript&gt;\n\</span></span>
-<span class="ln" id="L585"><span class="tok-str">         &lt;p class=\&quot;note\&quot;&gt;Every voice here has been replaced. The names are labels \</span></span>
-<span class="ln" id="L586"><span class="tok-str">         somebody typed; nothing veils a name.&lt;/p&gt;\n&lt;/main&gt;\n\</span></span>
-<span class="ln" id="L587"><span class="tok-str">         &lt;script&gt;\n(function () {{\n  \</span></span>
-<span class="ln" id="L588"><span class="tok-str">         var turns = [{turns}];\n  \</span></span>
-<span class="ln" id="L589"><span class="tok-str">         var audio = document.getElementById(&#x27;audio&#x27;);\n  \</span></span>
-<span class="ln" id="L590"><span class="tok-str">         var head = document.getElementById(&#x27;playhead&#x27;);\n  \</span></span>
-<span class="ln" id="L591"><span class="tok-str">         var groups = [];\n  \</span></span>
-<span class="ln" id="L592"><span class="tok-str">         for (var i = 0; ; i++) {{\n    \</span></span>
-<span class="ln" id="L593"><span class="tok-str">           var g = document.getElementById(&#x27;speaker&#x27; + i);\n    \</span></span>
-<span class="ln" id="L594"><span class="tok-str">           if (!g) break;\n    groups.push(g);\n  }}\n  \</span></span>
-<span class="ln" id="L595"><span class="tok-str">         var box = head &amp;&amp; head.getAttribute(&#x27;x1&#x27;);\n  \</span></span>
-<span class="ln" id="L596"><span class="tok-str">         var left = {wave_x}, span = {wave_width}, total = {duration};\n  \</span></span>
-<span class="ln" id="L597"><span class="tok-str">         function tick() {{\n    \</span></span>
-<span class="ln" id="L598"><span class="tok-str">           var t = audio.currentTime;\n    \</span></span>
-<span class="ln" id="L599"><span class="tok-str">           for (var i = 0; i &lt; groups.length; i++) groups[i].setAttribute(&#x27;opacity&#x27;, &#x27;0.35&#x27;);\n    \</span></span>
-<span class="ln" id="L600"><span class="tok-str">           for (var j = 0; j &lt; turns.length; j++) {{\n      \</span></span>
-<span class="ln" id="L601"><span class="tok-str">             if (t &gt;= turns[j][1] &amp;&amp; t &lt; turns[j][2] &amp;&amp; groups[turns[j][0]]) {{\n        \</span></span>
-<span class="ln" id="L602"><span class="tok-str">               groups[turns[j][0]].setAttribute(&#x27;opacity&#x27;, &#x27;1&#x27;);\n      }}\n    }}\n    \</span></span>
-<span class="ln" id="L603"><span class="tok-str">           if (head &amp;&amp; total &gt; 0) {{\n      \</span></span>
-<span class="ln" id="L604"><span class="tok-str">             var x = left + span * Math.min(1, Math.max(0, t / total));\n      \</span></span>
-<span class="ln" id="L605"><span class="tok-str">             head.setAttribute(&#x27;x1&#x27;, x); head.setAttribute(&#x27;x2&#x27;, x);\n    }}\n  }}\n  \</span></span>
-<span class="ln" id="L606"><span class="tok-str">         audio.addEventListener(&#x27;timeupdate&#x27;, tick);\n  \</span></span>
-<span class="ln" id="L607"><span class="tok-str">         audio.addEventListener(&#x27;seeked&#x27;, tick);\n  \</span></span>
-<span class="ln" id="L608"><span class="tok-str">         void box;\n  tick();\n}})();\n&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n&quot;</span>,</span>
-<span class="ln" id="L609">        bg = look.palette.bg,</span>
-<span class="ln" id="L610">        fg = look.palette.fg,</span>
-<span class="ln" id="L611">        muted = look.palette.muted,</span>
-<span class="ln" id="L612">        svg = drawn.markup,</span>
-<span class="ln" id="L613">        audio = <span class="tok-fn">escape</span>(audio_href),</span>
-<span class="ln" id="L614">        vtt = <span class="tok-fn">escape</span>(subtitles_href),</span>
-<span class="ln" id="L615">        wave_x = <span class="tok-fn">layout</span>(look, plan.<span class="tok-fn">len</span>()).wave_x,</span>
-<span class="ln" id="L616">        wave_width = <span class="tok-fn">layout</span>(look, plan.<span class="tok-fn">len</span>()).wave_width,</span>
-<span class="ln" id="L617">        duration = plan.<span class="tok-fn">duration</span>(),</span>
-<span class="ln" id="L618">    );</span>
-<span class="ln" id="L619"></span>
-<span class="ln" id="L620">    <span class="tok-fn">Ok</span>(Drawn {</span>
-<span class="ln" id="L621">        markup,</span>
-<span class="ln" id="L622">        notes: drawn.notes,</span>
-<span class="ln" id="L623">    })</span>
-<span class="ln" id="L624">}</span>
+<span class="ln" id="L546"><span class="tok-com">/// The self-contained page that plays.</span></span>
+<span class="ln" id="L547"><span class="tok-com">///</span></span>
+<span class="ln" id="L548"><span class="tok-com">/// `audio_href` and `subtitles_href` are written into the page as they are</span></span>
+<span class="ln" id="L549"><span class="tok-com">/// given: relative names, so the three files can be moved together. Embedding</span></span>
+<span class="ln" id="L550"><span class="tok-com">/// the audio would double the size of a recording somebody already has on disk</span></span>
+<span class="ln" id="L551"><span class="tok-com">/// beside it.</span></span>
+<span class="ln" id="L552"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">player</span>(</span>
+<span class="ln" id="L553">    plan: &amp;Conversation,</span>
+<span class="ln" id="L554">    envelope: &amp;Envelope,</span>
+<span class="ln" id="L555">    look: &amp;Look,</span>
+<span class="ln" id="L556">    audio_href: &amp;str,</span>
+<span class="ln" id="L557">    subtitles_href: &amp;str,</span>
+<span class="ln" id="L558">) -&gt; Result&lt;Drawn, Error&gt; {</span>
+<span class="ln" id="L559">    <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(plan, envelope, look, -<span class="tok-num">1.0</span>)?;</span>
+<span class="ln" id="L560"></span>
+<span class="ln" id="L561">    <span class="tok-com">// Turn boundaries for the script: slot, start, end. Numbers only -- the</span></span>
+<span class="ln" id="L562">    <span class="tok-com">// names are already in the markup and there is no reason to put them in a</span></span>
+<span class="ln" id="L563">    <span class="tok-com">// second place where they could disagree.</span></span>
+<span class="ln" id="L564">    <span class="tok-kw">let</span> turns = plan</span>
+<span class="ln" id="L565">        .<span class="tok-fn">turns</span>()</span>
+<span class="ln" id="L566">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L567">        .<span class="tok-fn">map</span>(|turn| format!(<span class="tok-str">&quot;[{},{:.3},{:.3}]&quot;</span>, turn.speaker, turn.start, turn.end))</span>
+<span class="ln" id="L568">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L569">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;,&quot;</span>);</span>
+<span class="ln" id="L570"></span>
+<span class="ln" id="L571">    <span class="tok-kw">let</span> title = <span class="tok-fn">escape</span>(plan.title.<span class="tok-fn">as_deref</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;A veiled conversation&quot;</span>));</span>
+<span class="ln" id="L572">    <span class="tok-kw">let</span> markup = format!(</span>
+<span class="ln" id="L573">        <span class="tok-str">&quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=\&quot;en\&quot;&gt;\n&lt;head&gt;\n&lt;meta charset=\&quot;utf-8\&quot;&gt;\n\</span></span>
+<span class="ln" id="L574"><span class="tok-str">         &lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width, initial-scale=1\&quot;&gt;\n\</span></span>
+<span class="ln" id="L575"><span class="tok-str">         &lt;title&gt;{title}&lt;/title&gt;\n&lt;style&gt;\n\</span></span>
+<span class="ln" id="L576"><span class="tok-str">         :root {{ color-scheme: dark; }}\n\</span></span>
+<span class="ln" id="L577"><span class="tok-str">         html, body {{ margin: 0; background: {bg}; color: {fg};\n  \</span></span>
+<span class="ln" id="L578"><span class="tok-str">           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}\n\</span></span>
+<span class="ln" id="L579"><span class="tok-str">         main {{ max-width: 100%; margin: 0 auto; padding: 1rem; box-sizing: border-box; }}\n\</span></span>
+<span class="ln" id="L580"><span class="tok-str">         svg {{ width: 100%; height: auto; display: block; }}\n\</span></span>
+<span class="ln" id="L581"><span class="tok-str">         audio {{ width: 100%; margin-top: 1rem; }}\n\</span></span>
+<span class="ln" id="L582"><span class="tok-str">         .speaker {{ transition: opacity 120ms linear; }}\n\</span></span>
+<span class="ln" id="L583"><span class="tok-str">         .note {{ color: {muted}; font-size: 0.85rem; line-height: 1.5; }}\n\</span></span>
+<span class="ln" id="L584"><span class="tok-str">         @media (prefers-reduced-motion: reduce) {{ .speaker {{ transition: none; }} }}\n\</span></span>
+<span class="ln" id="L585"><span class="tok-str">         &lt;/style&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;main&gt;\n{svg}\n\</span></span>
+<span class="ln" id="L586"><span class="tok-str">         &lt;audio id=\&quot;audio\&quot; controls preload=\&quot;metadata\&quot; src=\&quot;{audio}\&quot;&gt;\n\</span></span>
+<span class="ln" id="L587"><span class="tok-str">         &lt;track kind=\&quot;captions\&quot; srclang=\&quot;en\&quot; label=\&quot;Speakers\&quot; src=\&quot;{vtt}\&quot; default&gt;\n\</span></span>
+<span class="ln" id="L588"><span class="tok-str">         &lt;/audio&gt;\n\</span></span>
+<span class="ln" id="L589"><span class="tok-str">         &lt;noscript&gt;&lt;p class=\&quot;note\&quot;&gt;This page uses a small script, held in the page \</span></span>
+<span class="ln" id="L590"><span class="tok-str">         itself, only to light up whichever speaker is talking. Without it the audio \</span></span>
+<span class="ln" id="L591"><span class="tok-str">         still plays, the captions still appear and the waveform is still drawn.&lt;/p&gt;\</span></span>
+<span class="ln" id="L592"><span class="tok-str">         &lt;/noscript&gt;\n\</span></span>
+<span class="ln" id="L593"><span class="tok-str">         &lt;p class=\&quot;note\&quot;&gt;Every voice here has been replaced. The names are labels \</span></span>
+<span class="ln" id="L594"><span class="tok-str">         somebody typed; nothing veils a name.&lt;/p&gt;\n&lt;/main&gt;\n\</span></span>
+<span class="ln" id="L595"><span class="tok-str">         &lt;script&gt;\n(function () {{\n  \</span></span>
+<span class="ln" id="L596"><span class="tok-str">         var turns = [{turns}];\n  \</span></span>
+<span class="ln" id="L597"><span class="tok-str">         var audio = document.getElementById(&#x27;audio&#x27;);\n  \</span></span>
+<span class="ln" id="L598"><span class="tok-str">         var head = document.getElementById(&#x27;playhead&#x27;);\n  \</span></span>
+<span class="ln" id="L599"><span class="tok-str">         var groups = [];\n  \</span></span>
+<span class="ln" id="L600"><span class="tok-str">         for (var i = 0; ; i++) {{\n    \</span></span>
+<span class="ln" id="L601"><span class="tok-str">           var g = document.getElementById(&#x27;speaker&#x27; + i);\n    \</span></span>
+<span class="ln" id="L602"><span class="tok-str">           if (!g) break;\n    groups.push(g);\n  }}\n  \</span></span>
+<span class="ln" id="L603"><span class="tok-str">         var box = head &amp;&amp; head.getAttribute(&#x27;x1&#x27;);\n  \</span></span>
+<span class="ln" id="L604"><span class="tok-str">         var left = {wave_x}, span = {wave_width}, total = {duration};\n  \</span></span>
+<span class="ln" id="L605"><span class="tok-str">         function tick() {{\n    \</span></span>
+<span class="ln" id="L606"><span class="tok-str">           var t = audio.currentTime;\n    \</span></span>
+<span class="ln" id="L607"><span class="tok-str">           for (var i = 0; i &lt; groups.length; i++) groups[i].setAttribute(&#x27;opacity&#x27;, &#x27;0.35&#x27;);\n    \</span></span>
+<span class="ln" id="L608"><span class="tok-str">           for (var j = 0; j &lt; turns.length; j++) {{\n      \</span></span>
+<span class="ln" id="L609"><span class="tok-str">             if (t &gt;= turns[j][1] &amp;&amp; t &lt; turns[j][2] &amp;&amp; groups[turns[j][0]]) {{\n        \</span></span>
+<span class="ln" id="L610"><span class="tok-str">               groups[turns[j][0]].setAttribute(&#x27;opacity&#x27;, &#x27;1&#x27;);\n      }}\n    }}\n    \</span></span>
+<span class="ln" id="L611"><span class="tok-str">           if (head &amp;&amp; total &gt; 0) {{\n      \</span></span>
+<span class="ln" id="L612"><span class="tok-str">             var x = left + span * Math.min(1, Math.max(0, t / total));\n      \</span></span>
+<span class="ln" id="L613"><span class="tok-str">             head.setAttribute(&#x27;x1&#x27;, x); head.setAttribute(&#x27;x2&#x27;, x);\n    }}\n  }}\n  \</span></span>
+<span class="ln" id="L614"><span class="tok-str">         audio.addEventListener(&#x27;timeupdate&#x27;, tick);\n  \</span></span>
+<span class="ln" id="L615"><span class="tok-str">         audio.addEventListener(&#x27;seeked&#x27;, tick);\n  \</span></span>
+<span class="ln" id="L616"><span class="tok-str">         void box;\n  tick();\n}})();\n&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n&quot;</span>,</span>
+<span class="ln" id="L617">        bg = look.palette.bg,</span>
+<span class="ln" id="L618">        fg = look.palette.fg,</span>
+<span class="ln" id="L619">        muted = look.palette.muted,</span>
+<span class="ln" id="L620">        svg = drawn.markup,</span>
+<span class="ln" id="L621">        audio = <span class="tok-fn">escape</span>(audio_href),</span>
+<span class="ln" id="L622">        vtt = <span class="tok-fn">escape</span>(subtitles_href),</span>
+<span class="ln" id="L623">        wave_x = <span class="tok-fn">layout</span>(look, plan.<span class="tok-fn">len</span>()).wave_x,</span>
+<span class="ln" id="L624">        wave_width = <span class="tok-fn">layout</span>(look, plan.<span class="tok-fn">len</span>()).wave_width,</span>
+<span class="ln" id="L625">        duration = plan.<span class="tok-fn">duration</span>(),</span>
+<span class="ln" id="L626">    );</span>
+<span class="ln" id="L627"></span>
+<span class="ln" id="L628">    <span class="tok-fn">Ok</span>(Drawn {</span>
+<span class="ln" id="L629">        markup,</span>
+<span class="ln" id="L630">        notes: drawn.notes,</span>
+<span class="ln" id="L631">    })</span>
+<span class="ln" id="L632">}</span>
 </span>
-<span class="ln" id="L625"></span>
-<span class="ln" id="L626"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L627"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L628">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L629">    <span class="tok-kw">use</span> veilvoice_conversation::{Speaker, Turn};</span>
-<span class="ln" id="L630"></span>
-<span class="ln" id="L631">    <span class="tok-kw">fn</span> <span class="tok-fn">plan</span>() -&gt; Conversation {</span>
-<span class="ln" id="L632">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L633">        plan.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Two people&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L634">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L635">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Sam&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L636">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L637">            start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L638">            end: <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L639">            speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L640">            text: None,</span>
-<span class="ln" id="L641">        })</span>
-<span class="ln" id="L642">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L643">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L644">            start: <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L645">            end: <span class="tok-num">4.0</span>,</span>
-<span class="ln" id="L646">            speaker: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L647">            text: None,</span>
-<span class="ln" id="L648">        })</span>
-<span class="ln" id="L649">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L650">        plan</span>
-<span class="ln" id="L651">    }</span>
-<span class="ln" id="L652"></span>
-<span class="ln" id="L653">    <span class="tok-kw">fn</span> <span class="tok-fn">envelope</span>() -&gt; Envelope {</span>
-<span class="ln" id="L654">        <span class="tok-kw">let</span> samples: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">48_000</span>)</span>
-<span class="ln" id="L655">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 / <span class="tok-num">200.0</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.7</span>)</span>
-<span class="ln" id="L656">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L657">        waveform::<span class="tok-fn">envelope</span>(&amp;samples, <span class="tok-num">400</span>)</span>
-<span class="ln" id="L658">    }</span>
-<span class="ln" id="L659"></span>
-<span class="ln" id="L660">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L661">    <span class="tok-kw">fn</span> <span class="tok-fn">a_still_is_well_formed_svg_with_everything_in_it</span>() {</span>
-<span class="ln" id="L662">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L663">        assert!(drawn.markup.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;&lt;svg &quot;</span>));</span>
-<span class="ln" id="L664">        assert!(drawn.markup.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;&lt;/svg&gt;&quot;</span>));</span>
-<span class="ln" id="L665">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Two people&quot;</span>), <span class="tok-str">&quot;the title&quot;</span>);</span>
-<span class="ln" id="L666">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Alex&lt;&quot;</span>), <span class="tok-str">&quot;a name&quot;</span>);</span>
-<span class="ln" id="L667">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Sam&lt;&quot;</span>), <span class="tok-str">&quot;the other name&quot;</span>);</span>
-<span class="ln" id="L668">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;path d=\&quot;M&quot;</span>), <span class="tok-str">&quot;the waveform&quot;</span>);</span>
-<span class="ln" id="L669">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id=\&quot;playhead\&quot;&quot;</span>));</span>
-<span class="ln" id="L670">        assert!(drawn.notes.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L671">    }</span>
-<span class="ln" id="L672"></span>
-<span class="ln" id="L673">    <span class="tok-com">/// **The engine&#x27;s settings are for the person operating it, not for the</span></span>
-<span class="ln" id="L674">    <span class="tok-com">/// recording.**</span></span>
-<span class="ln" id="L675">    <span class="tok-com">///</span></span>
-<span class="ln" id="L676">    <span class="tok-com">/// The desktop application shows each destination voice as &quot;low register,</span></span>
-<span class="ln" id="L677">    <span class="tok-com">/// narrow tract (94 Hz, 620 Hz)&quot;, which is exactly what somebody choosing</span></span>
-<span class="ln" id="L678">    <span class="tok-com">/// between them needs. None of it belongs in the file that gets shared: it</span></span>
-<span class="ln" id="L679">    <span class="tok-com">/// describes the *destination* rather than the speaker, so it leaks nothing</span></span>
-<span class="ln" id="L680">    <span class="tok-com">/// about who was recorded, but it is noise to a viewer and it invites a</span></span>
-<span class="ln" id="L681">    <span class="tok-com">/// reader to think the numbers say something about the people.</span></span>
-<span class="ln" id="L682">    <span class="tok-com">///</span></span>
-<span class="ln" id="L683">    <span class="tok-com">/// What a viewer needs is who is talking, which is the name and the lit</span></span>
-<span class="ln" id="L684">    <span class="tok-com">/// circle. This checks the picture carries the first and not the second.</span></span>
-<span class="ln" id="L685">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L686">    <span class="tok-kw">fn</span> <span class="tok-fn">a_rendered_page_carries_names_and_no_engine_detail</span>() {</span>
-<span class="ln" id="L687">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L688">        <span class="tok-kw">let</span> markup = drawn.markup.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L689"></span>
-<span class="ln" id="L690">        <span class="tok-com">// Who is talking: present.</span></span>
-<span class="ln" id="L691">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Alex&lt;&quot;</span>));</span>
-<span class="ln" id="L692">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Sam&lt;&quot;</span>));</span>
-<span class="ln" id="L693"></span>
-<span class="ln" id="L694">        <span class="tok-com">// The engine&#x27;s own vocabulary: absent.</span></span>
-<span class="ln" id="L695">        <span class="tok-kw">for</span> detail <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L696">            <span class="tok-str">&quot; hz&quot;</span>,</span>
-<span class="ln" id="L697">            <span class="tok-str">&quot;register&quot;</span>,</span>
-<span class="ln" id="L698">            <span class="tok-str">&quot;tract&quot;</span>,</span>
-<span class="ln" id="L699">            <span class="tok-str">&quot;formant&quot;</span>,</span>
-<span class="ln" id="L700">            <span class="tok-str">&quot;centroid&quot;</span>,</span>
-<span class="ln" id="L701">            <span class="tok-str">&quot;intensity&quot;</span>,</span>
-<span class="ln" id="L702">            <span class="tok-str">&quot;reseed&quot;</span>,</span>
-<span class="ln" id="L703">            <span class="tok-str">&quot;ratchet&quot;</span>,</span>
-<span class="ln" id="L704">        ] {</span>
-<span class="ln" id="L705">            assert!(</span>
-<span class="ln" id="L706">                !markup.<span class="tok-fn">contains</span>(detail),</span>
-<span class="ln" id="L707">                <span class="tok-str">&quot;{detail:?} describes the engine and does not belong in a file somebody \</span></span>
-<span class="ln" id="L708"><span class="tok-str">                 shares&quot;</span></span>
-<span class="ln" id="L709">            );</span>
-<span class="ln" id="L710">        }</span>
-<span class="ln" id="L711">    }</span>
-<span class="ln" id="L712"></span>
-<span class="ln" id="L713">    <span class="tok-com">/// The circle that is lit must be the one whose turn it is.</span></span>
-<span class="ln" id="L714">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L715">    <span class="tok-kw">fn</span> <span class="tok-fn">the_speaker_who_is_talking_is_the_one_that_is_lit</span>() {</span>
-<span class="ln" id="L716">        <span class="tok-kw">let</span> first = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
-<span class="ln" id="L717">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L718">            .markup;</span>
-<span class="ln" id="L719">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L720">        assert!(</span>
-<span class="ln" id="L721">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
-<span class="ln" id="L722">            <span class="tok-str">&quot;slot 0 at 1 s&quot;</span></span>
-<span class="ln" id="L723">        );</span>
-<span class="ln" id="L724">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L725">        assert!(</span>
-<span class="ln" id="L726">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;0.35\&quot;&quot;</span>),</span>
-<span class="ln" id="L727">            <span class="tok-str">&quot;slot 1 at 1 s&quot;</span></span>
-<span class="ln" id="L728">        );</span>
-<span class="ln" id="L729"></span>
-<span class="ln" id="L730">        <span class="tok-kw">let</span> later = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">3.0</span>)</span>
-<span class="ln" id="L731">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L732">            .markup;</span>
-<span class="ln" id="L733">        <span class="tok-kw">let</span> at = later.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L734">        assert!(</span>
-<span class="ln" id="L735">            later[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
-<span class="ln" id="L736">            <span class="tok-str">&quot;slot 1 at 3 s&quot;</span></span>
-<span class="ln" id="L737">        );</span>
-<span class="ln" id="L738">    }</span>
-<span class="ln" id="L739"></span>
-<span class="ln" id="L740">    <span class="tok-com">/// An interruption is two people talking, and dimming one would be</span></span>
-<span class="ln" id="L741">    <span class="tok-com">/// choosing a winner the audio did not.</span></span>
-<span class="ln" id="L742">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L743">    <span class="tok-kw">fn</span> <span class="tok-fn">two_people_talking_at_once_are_both_lit</span>() {</span>
-<span class="ln" id="L744">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">plan</span>();</span>
-<span class="ln" id="L745">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L746">            start: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L747">            end: <span class="tok-num">1.5</span>,</span>
-<span class="ln" id="L748">            speaker: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L749">            text: None,</span>
-<span class="ln" id="L750">        })</span>
-<span class="ln" id="L751">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L752">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
-<span class="ln" id="L753">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L754">            .markup;</span>
-<span class="ln" id="L755">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L756">            <span class="tok-kw">let</span> at = markup.<span class="tok-fn">find</span>(&amp;format!(<span class="tok-str">&quot;id=\&quot;speaker{slot}\&quot;&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L757">            assert!(</span>
-<span class="ln" id="L758">                markup[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
-<span class="ln" id="L759">                <span class="tok-str">&quot;slot {slot} should be lit during an interruption&quot;</span></span>
-<span class="ln" id="L760">            );</span>
-<span class="ln" id="L761">        }</span>
-<span class="ln" id="L762">    }</span>
-<span class="ln" id="L763"></span>
-<span class="ln" id="L764">    <span class="tok-com">/// A name containing markup must not end the element it is in.</span></span>
-<span class="ln" id="L765">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L766">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_break_out_of_the_markup</span>() {</span>
-<span class="ln" id="L767">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L768">        plan.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L769">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>))</span>
-<span class="ln" id="L770">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L771">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L772">            start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L773">            end: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L774">            speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L775">            text: None,</span>
-<span class="ln" id="L776">        })</span>
-<span class="ln" id="L777">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L778">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>)</span>
-<span class="ln" id="L779">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L780">            .markup;</span>
-<span class="ln" id="L781">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;&quot;</span>), <span class="tok-str">&quot;a script element survived&quot;</span>);</span>
-<span class="ln" id="L782">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>), <span class="tok-str">&quot;an element survived&quot;</span>);</span>
-<span class="ln" id="L783">        assert!(markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&amp;lt;/text&amp;gt;&quot;</span>), <span class="tok-str">&quot;it must be escaped&quot;</span>);</span>
-<span class="ln" id="L784"></span>
-<span class="ln" id="L785">        <span class="tok-kw">let</span> page = <span class="tok-fn">player</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;a.wav&quot;</span>, <span class="tok-str">&quot;a.vtt&quot;</span>)</span>
-<span class="ln" id="L786">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L787">            .markup;</span>
-<span class="ln" id="L788">        assert!(</span>
-<span class="ln" id="L789">            !page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>),</span>
-<span class="ln" id="L790">            <span class="tok-str">&quot;the title escaped into the page&quot;</span></span>
-<span class="ln" id="L791">        );</span>
-<span class="ln" id="L792">    }</span>
-<span class="ln" id="L793"></span>
-<span class="ln" id="L794">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L795">    <span class="tok-kw">fn</span> <span class="tok-fn">escaping_covers_every_character_that_matters</span>() {</span>
-<span class="ln" id="L796">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;a&amp;b&quot;</span>), <span class="tok-str">&quot;a&amp;amp;b&quot;</span>);</span>
-<span class="ln" id="L797">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;&lt;b&gt;&quot;</span>), <span class="tok-str">&quot;&amp;lt;b&amp;gt;&quot;</span>);</span>
-<span class="ln" id="L798">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;\&quot;&#x27;&quot;</span>), <span class="tok-str">&quot;&amp;quot;&amp;#39;&quot;</span>);</span>
-<span class="ln" id="L799">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;plain&quot;</span>), <span class="tok-str">&quot;plain&quot;</span>);</span>
+<span class="ln" id="L633"></span>
+<span class="ln" id="L634"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L635"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L636">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L637">    <span class="tok-kw">use</span> veilvoice_conversation::{Speaker, Turn};</span>
+<span class="ln" id="L638"></span>
+<span class="ln" id="L639">    <span class="tok-kw">fn</span> <span class="tok-fn">plan</span>() -&gt; Conversation {</span>
+<span class="ln" id="L640">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L641">        plan.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Two people&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L642">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L643">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Sam&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L644">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L645">            start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L646">            end: <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L647">            speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L648">            text: None,</span>
+<span class="ln" id="L649">        })</span>
+<span class="ln" id="L650">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L651">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L652">            start: <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L653">            end: <span class="tok-num">4.0</span>,</span>
+<span class="ln" id="L654">            speaker: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L655">            text: None,</span>
+<span class="ln" id="L656">        })</span>
+<span class="ln" id="L657">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L658">        plan</span>
+<span class="ln" id="L659">    }</span>
+<span class="ln" id="L660"></span>
+<span class="ln" id="L661">    <span class="tok-kw">fn</span> <span class="tok-fn">envelope</span>() -&gt; Envelope {</span>
+<span class="ln" id="L662">        <span class="tok-kw">let</span> samples: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">48_000</span>)</span>
+<span class="ln" id="L663">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 / <span class="tok-num">200.0</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.7</span>)</span>
+<span class="ln" id="L664">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L665">        waveform::<span class="tok-fn">envelope</span>(&amp;samples, <span class="tok-num">400</span>)</span>
+<span class="ln" id="L666">    }</span>
+<span class="ln" id="L667"></span>
+<span class="ln" id="L668">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L669">    <span class="tok-kw">fn</span> <span class="tok-fn">a_still_is_well_formed_svg_with_everything_in_it</span>() {</span>
+<span class="ln" id="L670">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L671">        assert!(drawn.markup.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;&lt;svg &quot;</span>));</span>
+<span class="ln" id="L672">        assert!(drawn.markup.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;&lt;/svg&gt;&quot;</span>));</span>
+<span class="ln" id="L673">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Two people&quot;</span>), <span class="tok-str">&quot;the title&quot;</span>);</span>
+<span class="ln" id="L674">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Alex&lt;&quot;</span>), <span class="tok-str">&quot;a name&quot;</span>);</span>
+<span class="ln" id="L675">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Sam&lt;&quot;</span>), <span class="tok-str">&quot;the other name&quot;</span>);</span>
+<span class="ln" id="L676">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;path d=\&quot;M&quot;</span>), <span class="tok-str">&quot;the waveform&quot;</span>);</span>
+<span class="ln" id="L677">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id=\&quot;playhead\&quot;&quot;</span>));</span>
+<span class="ln" id="L678">        assert!(drawn.notes.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L679">    }</span>
+<span class="ln" id="L680"></span>
+<span class="ln" id="L681">    <span class="tok-com">/// **The engine&#x27;s settings are for the person operating it, not for the</span></span>
+<span class="ln" id="L682">    <span class="tok-com">/// recording.**</span></span>
+<span class="ln" id="L683">    <span class="tok-com">///</span></span>
+<span class="ln" id="L684">    <span class="tok-com">/// The desktop application shows each destination voice as &quot;low register,</span></span>
+<span class="ln" id="L685">    <span class="tok-com">/// narrow tract (94 Hz, 620 Hz)&quot;, which is exactly what somebody choosing</span></span>
+<span class="ln" id="L686">    <span class="tok-com">/// between them needs. None of it belongs in the file that gets shared: it</span></span>
+<span class="ln" id="L687">    <span class="tok-com">/// describes the *destination* rather than the speaker, so it leaks nothing</span></span>
+<span class="ln" id="L688">    <span class="tok-com">/// about who was recorded, but it is noise to a viewer and it invites a</span></span>
+<span class="ln" id="L689">    <span class="tok-com">/// reader to think the numbers say something about the people.</span></span>
+<span class="ln" id="L690">    <span class="tok-com">///</span></span>
+<span class="ln" id="L691">    <span class="tok-com">/// What a viewer needs is who is talking, which is the name and the lit</span></span>
+<span class="ln" id="L692">    <span class="tok-com">/// circle. This checks the picture carries the first and not the second.</span></span>
+<span class="ln" id="L693">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L694">    <span class="tok-kw">fn</span> <span class="tok-fn">a_rendered_page_carries_names_and_no_engine_detail</span>() {</span>
+<span class="ln" id="L695">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L696">        <span class="tok-kw">let</span> markup = drawn.markup.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L697"></span>
+<span class="ln" id="L698">        <span class="tok-com">// Who is talking: present.</span></span>
+<span class="ln" id="L699">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Alex&lt;&quot;</span>));</span>
+<span class="ln" id="L700">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&gt;Sam&lt;&quot;</span>));</span>
+<span class="ln" id="L701"></span>
+<span class="ln" id="L702">        <span class="tok-com">// The engine&#x27;s own vocabulary: absent.</span></span>
+<span class="ln" id="L703">        <span class="tok-kw">for</span> detail <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L704">            <span class="tok-str">&quot; hz&quot;</span>,</span>
+<span class="ln" id="L705">            <span class="tok-str">&quot;register&quot;</span>,</span>
+<span class="ln" id="L706">            <span class="tok-str">&quot;tract&quot;</span>,</span>
+<span class="ln" id="L707">            <span class="tok-str">&quot;formant&quot;</span>,</span>
+<span class="ln" id="L708">            <span class="tok-str">&quot;centroid&quot;</span>,</span>
+<span class="ln" id="L709">            <span class="tok-str">&quot;intensity&quot;</span>,</span>
+<span class="ln" id="L710">            <span class="tok-str">&quot;reseed&quot;</span>,</span>
+<span class="ln" id="L711">            <span class="tok-str">&quot;ratchet&quot;</span>,</span>
+<span class="ln" id="L712">        ] {</span>
+<span class="ln" id="L713">            assert!(</span>
+<span class="ln" id="L714">                !markup.<span class="tok-fn">contains</span>(detail),</span>
+<span class="ln" id="L715">                <span class="tok-str">&quot;{detail:?} describes the engine and does not belong in a file somebody \</span></span>
+<span class="ln" id="L716"><span class="tok-str">                 shares&quot;</span></span>
+<span class="ln" id="L717">            );</span>
+<span class="ln" id="L718">        }</span>
+<span class="ln" id="L719">    }</span>
+<span class="ln" id="L720"></span>
+<span class="ln" id="L721">    <span class="tok-com">/// The circle that is lit must be the one whose turn it is.</span></span>
+<span class="ln" id="L722">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L723">    <span class="tok-kw">fn</span> <span class="tok-fn">the_speaker_who_is_talking_is_the_one_that_is_lit</span>() {</span>
+<span class="ln" id="L724">        <span class="tok-kw">let</span> first = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
+<span class="ln" id="L725">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L726">            .markup;</span>
+<span class="ln" id="L727">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L728">        assert!(</span>
+<span class="ln" id="L729">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
+<span class="ln" id="L730">            <span class="tok-str">&quot;slot 0 at 1 s&quot;</span></span>
+<span class="ln" id="L731">        );</span>
+<span class="ln" id="L732">        <span class="tok-kw">let</span> at = first.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L733">        assert!(</span>
+<span class="ln" id="L734">            first[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;0.35\&quot;&quot;</span>),</span>
+<span class="ln" id="L735">            <span class="tok-str">&quot;slot 1 at 1 s&quot;</span></span>
+<span class="ln" id="L736">        );</span>
+<span class="ln" id="L737"></span>
+<span class="ln" id="L738">        <span class="tok-kw">let</span> later = <span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">3.0</span>)</span>
+<span class="ln" id="L739">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L740">            .markup;</span>
+<span class="ln" id="L741">        <span class="tok-kw">let</span> at = later.<span class="tok-fn">find</span>(<span class="tok-str">&quot;id=\&quot;speaker1\&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L742">        assert!(</span>
+<span class="ln" id="L743">            later[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
+<span class="ln" id="L744">            <span class="tok-str">&quot;slot 1 at 3 s&quot;</span></span>
+<span class="ln" id="L745">        );</span>
+<span class="ln" id="L746">    }</span>
+<span class="ln" id="L747"></span>
+<span class="ln" id="L748">    <span class="tok-com">/// An interruption is two people talking, and dimming one would be</span></span>
+<span class="ln" id="L749">    <span class="tok-com">/// choosing a winner the audio did not.</span></span>
+<span class="ln" id="L750">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L751">    <span class="tok-kw">fn</span> <span class="tok-fn">two_people_talking_at_once_are_both_lit</span>() {</span>
+<span class="ln" id="L752">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">plan</span>();</span>
+<span class="ln" id="L753">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L754">            start: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L755">            end: <span class="tok-num">1.5</span>,</span>
+<span class="ln" id="L756">            speaker: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L757">            text: None,</span>
+<span class="ln" id="L758">        })</span>
+<span class="ln" id="L759">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L760">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">1.0</span>)</span>
+<span class="ln" id="L761">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L762">            .markup;</span>
+<span class="ln" id="L763">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L764">            <span class="tok-kw">let</span> at = markup.<span class="tok-fn">find</span>(&amp;format!(<span class="tok-str">&quot;id=\&quot;speaker{slot}\&quot;&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L765">            assert!(</span>
+<span class="ln" id="L766">                markup[at..at + <span class="tok-num">60</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;opacity=\&quot;1\&quot;&quot;</span>),</span>
+<span class="ln" id="L767">                <span class="tok-str">&quot;slot {slot} should be lit during an interruption&quot;</span></span>
+<span class="ln" id="L768">            );</span>
+<span class="ln" id="L769">        }</span>
+<span class="ln" id="L770">    }</span>
+<span class="ln" id="L771"></span>
+<span class="ln" id="L772">    <span class="tok-com">/// A name containing markup must not end the element it is in.</span></span>
+<span class="ln" id="L773">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L774">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_break_out_of_the_markup</span>() {</span>
+<span class="ln" id="L775">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L776">        plan.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L777">        plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;&lt;/text&gt;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>))</span>
+<span class="ln" id="L778">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L779">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L780">            start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L781">            end: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L782">            speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L783">            text: None,</span>
+<span class="ln" id="L784">        })</span>
+<span class="ln" id="L785">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L786">        <span class="tok-kw">let</span> markup = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>)</span>
+<span class="ln" id="L787">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L788">            .markup;</span>
+<span class="ln" id="L789">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;&quot;</span>), <span class="tok-str">&quot;a script element survived&quot;</span>);</span>
+<span class="ln" id="L790">        assert!(!markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;g fill=\&quot;red\&quot;&gt;&quot;</span>), <span class="tok-str">&quot;an element survived&quot;</span>);</span>
+<span class="ln" id="L791">        assert!(markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&amp;lt;/text&amp;gt;&quot;</span>), <span class="tok-str">&quot;it must be escaped&quot;</span>);</span>
+<span class="ln" id="L792"></span>
+<span class="ln" id="L793">        <span class="tok-kw">let</span> page = <span class="tok-fn">player</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;a.wav&quot;</span>, <span class="tok-str">&quot;a.vtt&quot;</span>)</span>
+<span class="ln" id="L794">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L795">            .markup;</span>
+<span class="ln" id="L796">        assert!(</span>
+<span class="ln" id="L797">            !page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>),</span>
+<span class="ln" id="L798">            <span class="tok-str">&quot;the title escaped into the page&quot;</span></span>
+<span class="ln" id="L799">        );</span>
 <span class="ln" id="L800">    }</span>
 <span class="ln" id="L801"></span>
 <span class="ln" id="L802">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L803">    <span class="tok-kw">fn</span> <span class="tok-fn">the_player_is_a_whole_page_that_needs_nothing_else</span>() {</span>
-<span class="ln" id="L804">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">player</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;out.wav&quot;</span>, <span class="tok-str">&quot;out.vtt&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L805">        <span class="tok-kw">let</span> page = &amp;drawn.markup;</span>
-<span class="ln" id="L806">        assert!(page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;&lt;!DOCTYPE html&gt;&quot;</span>));</span>
-<span class="ln" id="L807">        assert!(page.<span class="tok-fn">trim_end</span>().<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;&lt;/html&gt;&quot;</span>));</span>
-<span class="ln" id="L808">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;svg &quot;</span>), <span class="tok-str">&quot;the picture is inline&quot;</span>);</span>
-<span class="ln" id="L809">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.wav\&quot;&quot;</span>));</span>
-<span class="ln" id="L810">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.vtt\&quot;&quot;</span>));</span>
-<span class="ln" id="L811">        assert!(</span>
-<span class="ln" id="L812">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;noscript&gt;&quot;</span>),</span>
-<span class="ln" id="L813">            <span class="tok-str">&quot;the script must explain itself&quot;</span></span>
-<span class="ln" id="L814">        );</span>
-<span class="ln" id="L815">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing veils a name&quot;</span>));</span>
-<span class="ln" id="L816">        <span class="tok-com">// Nothing may be fetched from anywhere. The SVG namespace is a URI and</span></span>
-<span class="ln" id="L817">        <span class="tok-com">// not a URL -- no browser resolves it, and every SVG document must</span></span>
-<span class="ln" id="L818">        <span class="tok-com">// declare it -- so it is excluded by name rather than by pretending</span></span>
-<span class="ln" id="L819">        <span class="tok-com">// the string is not there.</span></span>
-<span class="ln" id="L820">        <span class="tok-kw">let</span> fetchable = page.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;http://www.w3.org/2000/svg&quot;</span>, <span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L821">        <span class="tok-kw">for</span> scheme <span class="tok-kw">in</span> [<span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;https://&quot;</span>] {</span>
-<span class="ln" id="L822">            assert!(</span>
-<span class="ln" id="L823">                !fetchable.<span class="tok-fn">contains</span>(scheme),</span>
-<span class="ln" id="L824">                <span class="tok-str">&quot;the page reaches the network: {:?}&quot;</span>,</span>
-<span class="ln" id="L825">                fetchable</span>
-<span class="ln" id="L826">                    .<span class="tok-fn">find</span>(scheme)</span>
-<span class="ln" id="L827">                    .<span class="tok-fn">map</span>(|at| &amp;fetchable[at..(at + <span class="tok-num">60</span>).<span class="tok-fn">min</span>(fetchable.<span class="tok-fn">len</span>())])</span>
-<span class="ln" id="L828">            );</span>
-<span class="ln" id="L829">        }</span>
-<span class="ln" id="L830">        assert!(</span>
-<span class="ln" id="L831">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;width=device-width&quot;</span>),</span>
-<span class="ln" id="L832">            <span class="tok-str">&quot;it must work on a phone&quot;</span></span>
-<span class="ln" id="L833">        );</span>
-<span class="ln" id="L834">    }</span>
-<span class="ln" id="L835"></span>
-<span class="ln" id="L836">    <span class="tok-com">/// A look that cannot be drawn is refused rather than producing an</span></span>
-<span class="ln" id="L837">    <span class="tok-com">/// illegible picture that looks like a design decision.</span></span>
-<span class="ln" id="L838">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L839">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_look_is_refused</span>() {</span>
-<span class="ln" id="L840">        <span class="tok-kw">for</span> look <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L841">            Look {</span>
-<span class="ln" id="L842">                width: <span class="tok-num">100</span>,</span>
-<span class="ln" id="L843">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L844">            },</span>
-<span class="ln" id="L845">            Look {</span>
-<span class="ln" id="L846">                height: <span class="tok-num">100</span>,</span>
-<span class="ln" id="L847">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L848">            },</span>
+<span class="ln" id="L803">    <span class="tok-kw">fn</span> <span class="tok-fn">escaping_covers_every_character_that_matters</span>() {</span>
+<span class="ln" id="L804">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;a&amp;b&quot;</span>), <span class="tok-str">&quot;a&amp;amp;b&quot;</span>);</span>
+<span class="ln" id="L805">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;&lt;b&gt;&quot;</span>), <span class="tok-str">&quot;&amp;lt;b&amp;gt;&quot;</span>);</span>
+<span class="ln" id="L806">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;\&quot;&#x27;&quot;</span>), <span class="tok-str">&quot;&amp;quot;&amp;#39;&quot;</span>);</span>
+<span class="ln" id="L807">        assert_eq!(<span class="tok-fn">escape</span>(<span class="tok-str">&quot;plain&quot;</span>), <span class="tok-str">&quot;plain&quot;</span>);</span>
+<span class="ln" id="L808">    }</span>
+<span class="ln" id="L809"></span>
+<span class="ln" id="L810">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L811">    <span class="tok-kw">fn</span> <span class="tok-fn">the_player_is_a_whole_page_that_needs_nothing_else</span>() {</span>
+<span class="ln" id="L812">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">player</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-str">&quot;out.wav&quot;</span>, <span class="tok-str">&quot;out.vtt&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L813">        <span class="tok-kw">let</span> page = &amp;drawn.markup;</span>
+<span class="ln" id="L814">        assert!(page.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;&lt;!DOCTYPE html&gt;&quot;</span>));</span>
+<span class="ln" id="L815">        assert!(page.<span class="tok-fn">trim_end</span>().<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;&lt;/html&gt;&quot;</span>));</span>
+<span class="ln" id="L816">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;svg &quot;</span>), <span class="tok-str">&quot;the picture is inline&quot;</span>);</span>
+<span class="ln" id="L817">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.wav\&quot;&quot;</span>));</span>
+<span class="ln" id="L818">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;src=\&quot;out.vtt\&quot;&quot;</span>));</span>
+<span class="ln" id="L819">        assert!(</span>
+<span class="ln" id="L820">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;noscript&gt;&quot;</span>),</span>
+<span class="ln" id="L821">            <span class="tok-str">&quot;the script must explain itself&quot;</span></span>
+<span class="ln" id="L822">        );</span>
+<span class="ln" id="L823">        assert!(page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing veils a name&quot;</span>));</span>
+<span class="ln" id="L824">        <span class="tok-com">// Nothing may be fetched from anywhere. The SVG namespace is a URI and</span></span>
+<span class="ln" id="L825">        <span class="tok-com">// not a URL -- no browser resolves it, and every SVG document must</span></span>
+<span class="ln" id="L826">        <span class="tok-com">// declare it -- so it is excluded by name rather than by pretending</span></span>
+<span class="ln" id="L827">        <span class="tok-com">// the string is not there.</span></span>
+<span class="ln" id="L828">        <span class="tok-kw">let</span> fetchable = page.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;http://www.w3.org/2000/svg&quot;</span>, <span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L829">        <span class="tok-kw">for</span> scheme <span class="tok-kw">in</span> [<span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;https://&quot;</span>] {</span>
+<span class="ln" id="L830">            assert!(</span>
+<span class="ln" id="L831">                !fetchable.<span class="tok-fn">contains</span>(scheme),</span>
+<span class="ln" id="L832">                <span class="tok-str">&quot;the page reaches the network: {:?}&quot;</span>,</span>
+<span class="ln" id="L833">                fetchable</span>
+<span class="ln" id="L834">                    .<span class="tok-fn">find</span>(scheme)</span>
+<span class="ln" id="L835">                    .<span class="tok-fn">map</span>(|at| &amp;fetchable[at..(at + <span class="tok-num">60</span>).<span class="tok-fn">min</span>(fetchable.<span class="tok-fn">len</span>())])</span>
+<span class="ln" id="L836">            );</span>
+<span class="ln" id="L837">        }</span>
+<span class="ln" id="L838">        assert!(</span>
+<span class="ln" id="L839">            page.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;width=device-width&quot;</span>),</span>
+<span class="ln" id="L840">            <span class="tok-str">&quot;it must work on a phone&quot;</span></span>
+<span class="ln" id="L841">        );</span>
+<span class="ln" id="L842">    }</span>
+<span class="ln" id="L843"></span>
+<span class="ln" id="L844">    <span class="tok-com">/// A look that cannot be drawn is refused rather than producing an</span></span>
+<span class="ln" id="L845">    <span class="tok-com">/// illegible picture that looks like a design decision.</span></span>
+<span class="ln" id="L846">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L847">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_look_is_refused</span>() {</span>
+<span class="ln" id="L848">        <span class="tok-kw">for</span> look <span class="tok-kw">in</span> [</span>
 <span class="ln" id="L849">            Look {</span>
-<span class="ln" id="L850">                width: <span class="tok-num">9000</span>,</span>
+<span class="ln" id="L850">                width: <span class="tok-num">100</span>,</span>
 <span class="ln" id="L851">                ..Look::<span class="tok-fn">default</span>()</span>
 <span class="ln" id="L852">            },</span>
 <span class="ln" id="L853">            Look {</span>
-<span class="ln" id="L854">                padding: <span class="tok-num">600</span>,</span>
+<span class="ln" id="L854">                height: <span class="tok-num">100</span>,</span>
 <span class="ln" id="L855">                ..Look::<span class="tok-fn">default</span>()</span>
 <span class="ln" id="L856">            },</span>
 <span class="ln" id="L857">            Look {</span>
-<span class="ln" id="L858">                background: Background::<span class="tok-fn">Colour</span>(<span class="tok-str">&quot;nonsense&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L858">                width: <span class="tok-num">9000</span>,</span>
 <span class="ln" id="L859">                ..Look::<span class="tok-fn">default</span>()</span>
 <span class="ln" id="L860">            },</span>
-<span class="ln" id="L861">        ] {</span>
-<span class="ln" id="L862">            assert!(look.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{look:?} should be refused&quot;</span>);</span>
-<span class="ln" id="L863">            assert!(<span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;look, <span class="tok-num">0.0</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L864">        }</span>
-<span class="ln" id="L865">        Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L866">            .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L867">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the default must be drawable&quot;</span>);</span>
-<span class="ln" id="L868">        Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L869">            .<span class="tok-fn">black</span>()</span>
-<span class="ln" id="L870">            .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L871">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;black must be drawable&quot;</span>);</span>
-<span class="ln" id="L872">    }</span>
-<span class="ln" id="L873"></span>
-<span class="ln" id="L874">    <span class="tok-com">/// Padding is a setting because the same picture is wanted at very</span></span>
-<span class="ln" id="L875">    <span class="tok-com">/// different sizes, so it has to actually move things.</span></span>
-<span class="ln" id="L876">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L877">    <span class="tok-kw">fn</span> <span class="tok-fn">more_padding_leaves_less_room_for_the_waveform</span>() {</span>
-<span class="ln" id="L878">        <span class="tok-kw">let</span> tight = <span class="tok-fn">layout</span>(</span>
-<span class="ln" id="L879">            &amp;Look {</span>
-<span class="ln" id="L880">                padding: <span class="tok-num">8</span>,</span>
-<span class="ln" id="L881">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L882">            },</span>
-<span class="ln" id="L883">            <span class="tok-num">2</span>,</span>
-<span class="ln" id="L884">        );</span>
-<span class="ln" id="L885">        <span class="tok-kw">let</span> loose = <span class="tok-fn">layout</span>(</span>
-<span class="ln" id="L886">            &amp;Look {</span>
-<span class="ln" id="L887">                padding: <span class="tok-num">120</span>,</span>
-<span class="ln" id="L888">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L889">            },</span>
-<span class="ln" id="L890">            <span class="tok-num">2</span>,</span>
-<span class="ln" id="L891">        );</span>
-<span class="ln" id="L892">        assert!(loose.wave_width &lt; tight.wave_width);</span>
-<span class="ln" id="L893">        assert!(loose.wave_x &gt; tight.wave_x);</span>
-<span class="ln" id="L894">    }</span>
-<span class="ln" id="L895"></span>
-<span class="ln" id="L896">    <span class="tok-com">/// Everything must stay inside the picture, at any speaker count.</span></span>
-<span class="ln" id="L897">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L898">    <span class="tok-kw">fn</span> <span class="tok-fn">the_layout_stays_inside_the_frame_for_every_speaker_count</span>() {</span>
-<span class="ln" id="L899">        <span class="tok-kw">let</span> look = Look::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L900">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">10</span> {</span>
-<span class="ln" id="L901">            <span class="tok-kw">let</span> layout = <span class="tok-fn">layout</span>(&amp;look, speakers);</span>
-<span class="ln" id="L902">            assert!(layout.wave_x &gt;= look.padding <span class="tok-kw">as</span> f32 - <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L903">            assert!(layout.wave_x + layout.wave_width &lt;= (look.width - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L904">            assert!(</span>
-<span class="ln" id="L905">                layout.wave_y + layout.wave_height &lt;= (look.height - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span></span>
-<span class="ln" id="L906">            );</span>
-<span class="ln" id="L907">            assert!(layout.circles_y - layout.radius &gt; layout.title_y);</span>
-<span class="ln" id="L908">            assert!(</span>
-<span class="ln" id="L909">                layout.circles_y + layout.radius &lt; layout.wave_y,</span>
-<span class="ln" id="L910">                <span class="tok-str">&quot;{speakers} speakers: the circles overlap the waveform&quot;</span></span>
-<span class="ln" id="L911">            );</span>
-<span class="ln" id="L912">            assert!(layout.radius &gt;= <span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L913">        }</span>
-<span class="ln" id="L914">    }</span>
-<span class="ln" id="L915"></span>
-<span class="ln" id="L916">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L917">    <span class="tok-kw">fn</span> <span class="tok-fn">base64_matches_the_standard_including_its_padding</span>() {</span>
-<span class="ln" id="L918">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;&quot;</span>), <span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L919">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;f&quot;</span>), <span class="tok-str">&quot;Zg==&quot;</span>);</span>
-<span class="ln" id="L920">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fo&quot;</span>), <span class="tok-str">&quot;Zm8=&quot;</span>);</span>
-<span class="ln" id="L921">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foo&quot;</span>), <span class="tok-str">&quot;Zm9v&quot;</span>);</span>
-<span class="ln" id="L922">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foob&quot;</span>), <span class="tok-str">&quot;Zm9vYg==&quot;</span>);</span>
-<span class="ln" id="L923">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fooba&quot;</span>), <span class="tok-str">&quot;Zm9vYmE=&quot;</span>);</span>
-<span class="ln" id="L924">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foobar&quot;</span>), <span class="tok-str">&quot;Zm9vYmFy&quot;</span>);</span>
-<span class="ln" id="L925">    }</span>
-<span class="ln" id="L926"></span>
-<span class="ln" id="L927">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L928">    <span class="tok-kw">fn</span> <span class="tok-fn">an_image_becomes_a_data_uri_and_an_unknown_one_is_refused</span>() {</span>
-<span class="ln" id="L929">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L930">        <span class="tok-kw">let</span> png = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.png&quot;</span>);</span>
-<span class="ln" id="L931">        std::fs::<span class="tok-fn">write</span>(&amp;png, b<span class="tok-str">&quot;not really a png, but the bytes go through&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L932">        <span class="tok-kw">let</span> uri = <span class="tok-fn">data_uri</span>(&amp;png).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L933">        assert!(uri.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>), <span class="tok-str">&quot;{uri}&quot;</span>);</span>
+<span class="ln" id="L861">            Look {</span>
+<span class="ln" id="L862">                padding: <span class="tok-num">600</span>,</span>
+<span class="ln" id="L863">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L864">            },</span>
+<span class="ln" id="L865">            Look {</span>
+<span class="ln" id="L866">                background: Background::<span class="tok-fn">Colour</span>(<span class="tok-str">&quot;nonsense&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L867">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L868">            },</span>
+<span class="ln" id="L869">        ] {</span>
+<span class="ln" id="L870">            assert!(look.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{look:?} should be refused&quot;</span>);</span>
+<span class="ln" id="L871">            assert!(<span class="tok-fn">still</span>(&amp;<span class="tok-fn">plan</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;look, <span class="tok-num">0.0</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L872">        }</span>
+<span class="ln" id="L873">        Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L874">            .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L875">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the default must be drawable&quot;</span>);</span>
+<span class="ln" id="L876">        Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L877">            .<span class="tok-fn">black</span>()</span>
+<span class="ln" id="L878">            .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L879">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;black must be drawable&quot;</span>);</span>
+<span class="ln" id="L880">    }</span>
+<span class="ln" id="L881"></span>
+<span class="ln" id="L882">    <span class="tok-com">/// Padding is a setting because the same picture is wanted at very</span></span>
+<span class="ln" id="L883">    <span class="tok-com">/// different sizes, so it has to actually move things.</span></span>
+<span class="ln" id="L884">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L885">    <span class="tok-kw">fn</span> <span class="tok-fn">more_padding_leaves_less_room_for_the_waveform</span>() {</span>
+<span class="ln" id="L886">        <span class="tok-kw">let</span> tight = <span class="tok-fn">layout</span>(</span>
+<span class="ln" id="L887">            &amp;Look {</span>
+<span class="ln" id="L888">                padding: <span class="tok-num">8</span>,</span>
+<span class="ln" id="L889">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L890">            },</span>
+<span class="ln" id="L891">            <span class="tok-num">2</span>,</span>
+<span class="ln" id="L892">        );</span>
+<span class="ln" id="L893">        <span class="tok-kw">let</span> loose = <span class="tok-fn">layout</span>(</span>
+<span class="ln" id="L894">            &amp;Look {</span>
+<span class="ln" id="L895">                padding: <span class="tok-num">120</span>,</span>
+<span class="ln" id="L896">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L897">            },</span>
+<span class="ln" id="L898">            <span class="tok-num">2</span>,</span>
+<span class="ln" id="L899">        );</span>
+<span class="ln" id="L900">        assert!(loose.wave_width &lt; tight.wave_width);</span>
+<span class="ln" id="L901">        assert!(loose.wave_x &gt; tight.wave_x);</span>
+<span class="ln" id="L902">    }</span>
+<span class="ln" id="L903"></span>
+<span class="ln" id="L904">    <span class="tok-com">/// Everything must stay inside the picture, at any speaker count.</span></span>
+<span class="ln" id="L905">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L906">    <span class="tok-kw">fn</span> <span class="tok-fn">the_layout_stays_inside_the_frame_for_every_speaker_count</span>() {</span>
+<span class="ln" id="L907">        <span class="tok-kw">let</span> look = Look::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L908">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> <span class="tok-num">1</span>..=<span class="tok-num">10</span> {</span>
+<span class="ln" id="L909">            <span class="tok-kw">let</span> layout = <span class="tok-fn">layout</span>(&amp;look, speakers);</span>
+<span class="ln" id="L910">            assert!(layout.wave_x &gt;= look.padding <span class="tok-kw">as</span> f32 - <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L911">            assert!(layout.wave_x + layout.wave_width &lt;= (look.width - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L912">            assert!(</span>
+<span class="ln" id="L913">                layout.wave_y + layout.wave_height &lt;= (look.height - look.padding) <span class="tok-kw">as</span> f32 + <span class="tok-num">0.01</span></span>
+<span class="ln" id="L914">            );</span>
+<span class="ln" id="L915">            assert!(layout.circles_y - layout.radius &gt; layout.title_y);</span>
+<span class="ln" id="L916">            assert!(</span>
+<span class="ln" id="L917">                layout.circles_y + layout.radius &lt; layout.wave_y,</span>
+<span class="ln" id="L918">                <span class="tok-str">&quot;{speakers} speakers: the circles overlap the waveform&quot;</span></span>
+<span class="ln" id="L919">            );</span>
+<span class="ln" id="L920">            assert!(layout.radius &gt;= <span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L921">        }</span>
+<span class="ln" id="L922">    }</span>
+<span class="ln" id="L923"></span>
+<span class="ln" id="L924">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L925">    <span class="tok-kw">fn</span> <span class="tok-fn">base64_matches_the_standard_including_its_padding</span>() {</span>
+<span class="ln" id="L926">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;&quot;</span>), <span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L927">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;f&quot;</span>), <span class="tok-str">&quot;Zg==&quot;</span>);</span>
+<span class="ln" id="L928">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fo&quot;</span>), <span class="tok-str">&quot;Zm8=&quot;</span>);</span>
+<span class="ln" id="L929">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foo&quot;</span>), <span class="tok-str">&quot;Zm9v&quot;</span>);</span>
+<span class="ln" id="L930">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foob&quot;</span>), <span class="tok-str">&quot;Zm9vYg==&quot;</span>);</span>
+<span class="ln" id="L931">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;fooba&quot;</span>), <span class="tok-str">&quot;Zm9vYmE=&quot;</span>);</span>
+<span class="ln" id="L932">        assert_eq!(<span class="tok-fn">base64</span>(b<span class="tok-str">&quot;foobar&quot;</span>), <span class="tok-str">&quot;Zm9vYmFy&quot;</span>);</span>
+<span class="ln" id="L933">    }</span>
 <span class="ln" id="L934"></span>
-<span class="ln" id="L935">        <span class="tok-kw">let</span> bmp = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.bmp&quot;</span>);</span>
-<span class="ln" id="L936">        std::fs::<span class="tok-fn">write</span>(&amp;bmp, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L937">        <span class="tok-kw">let</span> error = <span class="tok-fn">data_uri</span>(&amp;bmp).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unknown type must be refused&quot;</span>);</span>
-<span class="ln" id="L938">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not an image this can embed&quot;</span>));</span>
-<span class="ln" id="L939">        assert!(<span class="tok-fn">data_uri</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;missing.png&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L940">    }</span>
-<span class="ln" id="L941"></span>
-<span class="ln" id="L942">    <span class="tok-com">/// A picture that cannot be used must draw the plain circle and say so,</span></span>
-<span class="ln" id="L943">    <span class="tok-com">/// rather than leaving a broken image that looks like a crash.</span></span>
-<span class="ln" id="L944">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L945">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unusable_picture_falls_back_and_is_reported</span>() {</span>
-<span class="ln" id="L946">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L947">        plan.<span class="tok-fn">add_speaker</span>(Speaker {</span>
-<span class="ln" id="L948">            name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L949">            picture: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;no-such-file.png&quot;</span>)),</span>
-<span class="ln" id="L950">        })</span>
-<span class="ln" id="L951">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L952">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L953">            start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L954">            end: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L955">            speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L956">            text: None,</span>
-<span class="ln" id="L957">        })</span>
-<span class="ln" id="L958">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L959">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L960">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;circle&quot;</span>), <span class="tok-str">&quot;the fallback circle&quot;</span>);</span>
-<span class="ln" id="L961">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;image &quot;</span>), <span class="tok-str">&quot;no broken image&quot;</span>);</span>
-<span class="ln" id="L962">        <span class="tok-kw">let</span> notes = drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
-<span class="ln" id="L963">        assert!(notes.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Sam&#x27;s picture was not used&quot;</span>), <span class="tok-str">&quot;{notes}&quot;</span>);</span>
-<span class="ln" id="L964">    }</span>
-<span class="ln" id="L965"></span>
-<span class="ln" id="L966">    <span class="tok-com">/// A background image is embedded so the page stays one file, and a large</span></span>
-<span class="ln" id="L967">    <span class="tok-com">/// one is reported rather than silently producing a huge page.</span></span>
-<span class="ln" id="L968">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L969">    <span class="tok-kw">fn</span> <span class="tok-fn">a_background_image_is_embedded_and_a_large_one_is_mentioned</span>() {</span>
-<span class="ln" id="L970">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L971">        <span class="tok-kw">let</span> small = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;bg.png&quot;</span>);</span>
-<span class="ln" id="L972">        std::fs::<span class="tok-fn">write</span>(&amp;small, vec![0u8; <span class="tok-num">64</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L973">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L974">            &amp;<span class="tok-fn">plan</span>(),</span>
-<span class="ln" id="L975">            &amp;<span class="tok-fn">envelope</span>(),</span>
-<span class="ln" id="L976">            &amp;Look {</span>
-<span class="ln" id="L977">                background: Background::<span class="tok-fn">Image</span>(small),</span>
-<span class="ln" id="L978">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L979">            },</span>
-<span class="ln" id="L980">            <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L981">        )</span>
-<span class="ln" id="L982">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L983">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>));</span>
-<span class="ln" id="L984">        assert!(drawn.notes.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;a small image needs no comment&quot;</span>);</span>
-<span class="ln" id="L985"></span>
-<span class="ln" id="L986">        <span class="tok-kw">let</span> big = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;big.png&quot;</span>);</span>
-<span class="ln" id="L987">        std::fs::<span class="tok-fn">write</span>(&amp;big, vec![0u8; <span class="tok-num">3</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L988">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L989">            &amp;<span class="tok-fn">plan</span>(),</span>
-<span class="ln" id="L990">            &amp;<span class="tok-fn">envelope</span>(),</span>
-<span class="ln" id="L991">            &amp;Look {</span>
-<span class="ln" id="L992">                background: Background::<span class="tok-fn">Image</span>(big),</span>
-<span class="ln" id="L993">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L994">            },</span>
-<span class="ln" id="L995">            <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L996">        )</span>
-<span class="ln" id="L997">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L998">        assert!(</span>
-<span class="ln" id="L999">            drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;adds about&quot;</span>),</span>
-<span class="ln" id="L1000">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
-<span class="ln" id="L1001">            drawn.notes</span>
-<span class="ln" id="L1002">        );</span>
-<span class="ln" id="L1003">    }</span>
-<span class="ln" id="L1004"></span>
-<span class="ln" id="L1005">    <span class="tok-com">/// A missing background must not stop the picture being drawn.</span></span>
-<span class="ln" id="L1006">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1007">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_background_falls_back_and_says_so</span>() {</span>
-<span class="ln" id="L1008">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
-<span class="ln" id="L1009">            &amp;<span class="tok-fn">plan</span>(),</span>
-<span class="ln" id="L1010">            &amp;<span class="tok-fn">envelope</span>(),</span>
-<span class="ln" id="L1011">            &amp;Look {</span>
-<span class="ln" id="L1012">                background: Background::<span class="tok-fn">Image</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;nowhere.png&quot;</span>)),</span>
-<span class="ln" id="L1013">                ..Look::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1014">            },</span>
-<span class="ln" id="L1015">            <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L1016">        )</span>
-<span class="ln" id="L1017">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1018">        assert!(drawn.markup.<span class="tok-fn">contains</span>(palette::BG));</span>
-<span class="ln" id="L1019">        assert!(drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;was not used&quot;</span>));</span>
-<span class="ln" id="L1020">    }</span>
-<span class="ln" id="L1021"></span>
-<span class="ln" id="L1022">    <span class="tok-com">/// An empty plan still draws: a recording with nobody assigned is a</span></span>
-<span class="ln" id="L1023">    <span class="tok-com">/// picture of a waveform, which is better than an error at this stage.</span></span>
-<span class="ln" id="L1024">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1025">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_no_speakers_still_draws_the_waveform</span>() {</span>
-<span class="ln" id="L1026">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;Conversation::<span class="tok-fn">new</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.0</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1027">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;path d=\&quot;M&quot;</span>));</span>
-<span class="ln" id="L1028">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>));</span>
+<span class="ln" id="L935">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L936">    <span class="tok-kw">fn</span> <span class="tok-fn">an_image_becomes_a_data_uri_and_an_unknown_one_is_refused</span>() {</span>
+<span class="ln" id="L937">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L938">        <span class="tok-kw">let</span> png = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.png&quot;</span>);</span>
+<span class="ln" id="L939">        std::fs::<span class="tok-fn">write</span>(&amp;png, b<span class="tok-str">&quot;not really a png, but the bytes go through&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L940">        <span class="tok-kw">let</span> uri = <span class="tok-fn">data_uri</span>(&amp;png).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L941">        assert!(uri.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>), <span class="tok-str">&quot;{uri}&quot;</span>);</span>
+<span class="ln" id="L942"></span>
+<span class="ln" id="L943">        <span class="tok-kw">let</span> bmp = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;portrait.bmp&quot;</span>);</span>
+<span class="ln" id="L944">        std::fs::<span class="tok-fn">write</span>(&amp;bmp, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L945">        <span class="tok-kw">let</span> error = <span class="tok-fn">data_uri</span>(&amp;bmp).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unknown type must be refused&quot;</span>);</span>
+<span class="ln" id="L946">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not an image this can embed&quot;</span>));</span>
+<span class="ln" id="L947">        assert!(<span class="tok-fn">data_uri</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;missing.png&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L948">    }</span>
+<span class="ln" id="L949"></span>
+<span class="ln" id="L950">    <span class="tok-com">/// A picture that cannot be used must draw the plain circle and say so,</span></span>
+<span class="ln" id="L951">    <span class="tok-com">/// rather than leaving a broken image that looks like a crash.</span></span>
+<span class="ln" id="L952">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L953">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unusable_picture_falls_back_and_is_reported</span>() {</span>
+<span class="ln" id="L954">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L955">        plan.<span class="tok-fn">add_speaker</span>(Speaker {</span>
+<span class="ln" id="L956">            name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L957">            picture: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;no-such-file.png&quot;</span>)),</span>
+<span class="ln" id="L958">            colour: None,</span>
+<span class="ln" id="L959">        })</span>
+<span class="ln" id="L960">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L961">        plan.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L962">            start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L963">            end: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L964">            speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L965">            text: None,</span>
+<span class="ln" id="L966">        })</span>
+<span class="ln" id="L967">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L968">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;plan, &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.5</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L969">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;circle&quot;</span>), <span class="tok-str">&quot;the fallback circle&quot;</span>);</span>
+<span class="ln" id="L970">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;image &quot;</span>), <span class="tok-str">&quot;no broken image&quot;</span>);</span>
+<span class="ln" id="L971">        <span class="tok-kw">let</span> notes = drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
+<span class="ln" id="L972">        assert!(notes.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Sam&#x27;s picture was not used&quot;</span>), <span class="tok-str">&quot;{notes}&quot;</span>);</span>
+<span class="ln" id="L973">    }</span>
+<span class="ln" id="L974"></span>
+<span class="ln" id="L975">    <span class="tok-com">/// A background image is embedded so the page stays one file, and a large</span></span>
+<span class="ln" id="L976">    <span class="tok-com">/// one is reported rather than silently producing a huge page.</span></span>
+<span class="ln" id="L977">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L978">    <span class="tok-kw">fn</span> <span class="tok-fn">a_background_image_is_embedded_and_a_large_one_is_mentioned</span>() {</span>
+<span class="ln" id="L979">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L980">        <span class="tok-kw">let</span> small = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;bg.png&quot;</span>);</span>
+<span class="ln" id="L981">        std::fs::<span class="tok-fn">write</span>(&amp;small, vec![0u8; <span class="tok-num">64</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L982">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L983">            &amp;<span class="tok-fn">plan</span>(),</span>
+<span class="ln" id="L984">            &amp;<span class="tok-fn">envelope</span>(),</span>
+<span class="ln" id="L985">            &amp;Look {</span>
+<span class="ln" id="L986">                background: Background::<span class="tok-fn">Image</span>(small),</span>
+<span class="ln" id="L987">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L988">            },</span>
+<span class="ln" id="L989">            <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L990">        )</span>
+<span class="ln" id="L991">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L992">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;data:image/png;base64,&quot;</span>));</span>
+<span class="ln" id="L993">        assert!(drawn.notes.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;a small image needs no comment&quot;</span>);</span>
+<span class="ln" id="L994"></span>
+<span class="ln" id="L995">        <span class="tok-kw">let</span> big = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;big.png&quot;</span>);</span>
+<span class="ln" id="L996">        std::fs::<span class="tok-fn">write</span>(&amp;big, vec![0u8; <span class="tok-num">3</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L997">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L998">            &amp;<span class="tok-fn">plan</span>(),</span>
+<span class="ln" id="L999">            &amp;<span class="tok-fn">envelope</span>(),</span>
+<span class="ln" id="L1000">            &amp;Look {</span>
+<span class="ln" id="L1001">                background: Background::<span class="tok-fn">Image</span>(big),</span>
+<span class="ln" id="L1002">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1003">            },</span>
+<span class="ln" id="L1004">            <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L1005">        )</span>
+<span class="ln" id="L1006">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1007">        assert!(</span>
+<span class="ln" id="L1008">            drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;adds about&quot;</span>),</span>
+<span class="ln" id="L1009">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
+<span class="ln" id="L1010">            drawn.notes</span>
+<span class="ln" id="L1011">        );</span>
+<span class="ln" id="L1012">    }</span>
+<span class="ln" id="L1013"></span>
+<span class="ln" id="L1014">    <span class="tok-com">/// A missing background must not stop the picture being drawn.</span></span>
+<span class="ln" id="L1015">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1016">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_background_falls_back_and_says_so</span>() {</span>
+<span class="ln" id="L1017">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(</span>
+<span class="ln" id="L1018">            &amp;<span class="tok-fn">plan</span>(),</span>
+<span class="ln" id="L1019">            &amp;<span class="tok-fn">envelope</span>(),</span>
+<span class="ln" id="L1020">            &amp;Look {</span>
+<span class="ln" id="L1021">                background: Background::<span class="tok-fn">Image</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;nowhere.png&quot;</span>)),</span>
+<span class="ln" id="L1022">                ..Look::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1023">            },</span>
+<span class="ln" id="L1024">            <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L1025">        )</span>
+<span class="ln" id="L1026">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1027">        assert!(drawn.markup.<span class="tok-fn">contains</span>(palette::BG));</span>
+<span class="ln" id="L1028">        assert!(drawn.notes.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;was not used&quot;</span>));</span>
 <span class="ln" id="L1029">    }</span>
-<span class="ln" id="L1030">}</span>
+<span class="ln" id="L1030"></span>
+<span class="ln" id="L1031">    <span class="tok-com">/// An empty plan still draws: a recording with nobody assigned is a</span></span>
+<span class="ln" id="L1032">    <span class="tok-com">/// picture of a waveform, which is better than an error at this stage.</span></span>
+<span class="ln" id="L1033">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1034">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_with_no_speakers_still_draws_the_waveform</span>() {</span>
+<span class="ln" id="L1035">        <span class="tok-kw">let</span> drawn = <span class="tok-fn">still</span>(&amp;Conversation::<span class="tok-fn">new</span>(), &amp;<span class="tok-fn">envelope</span>(), &amp;Look::<span class="tok-fn">default</span>(), <span class="tok-num">0.0</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1036">        assert!(drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&lt;path d=\&quot;M&quot;</span>));</span>
+<span class="ln" id="L1037">        assert!(!drawn.markup.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id=\&quot;speaker0\&quot;&quot;</span>));</span>
+<span class="ln" id="L1038">    }</span>
+<span class="ln" id="L1039">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

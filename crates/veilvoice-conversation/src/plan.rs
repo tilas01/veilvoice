@@ -80,6 +80,20 @@ pub struct Speaker {
     /// `None` means a plain filled circle in their colour, which is what most
     /// people will use, and which reveals nothing, unlike a photograph.
     pub picture: Option<PathBuf>,
+    /// The colour to draw them in, as `#rrggbb`, if somebody chose one.
+    ///
+    /// `None` is the ordinary case and means the colour their slot gets from
+    /// the palette, which is what every speaker starts with and what nine out
+    /// of ten will keep. A chosen colour is for the cases the palette cannot
+    /// know about: two speakers whose default colours are hard to tell apart
+    /// for a particular reader, or a recording that has to match something
+    /// else's branding.
+    ///
+    /// **A colour is not de-identification.** It labels a circle, exactly as
+    /// [`Speaker::name`] labels it, and neither is part of what the veiling
+    /// does. Choosing the colour somebody always uses is as identifying as
+    /// writing their name in.
+    pub colour: Option<String>,
 }
 
 impl Speaker {
@@ -88,6 +102,7 @@ impl Speaker {
         Self {
             name: name.trim().to_string(),
             picture: None,
+            colour: None,
         }
     }
 }
@@ -168,9 +183,17 @@ impl Conversation {
                     .into(),
             ));
         }
+        // The colour is validated on the way in, exactly as the name is, so a
+        // plan cannot hold a value that would land in an SVG attribute as text.
+        let colour = speaker
+            .colour
+            .as_deref()
+            .map(crate::edit::check_colour)
+            .transpose()?;
         self.speakers.push(Speaker {
             name: speaker.name.trim().to_string(),
             picture: speaker.picture,
+            colour,
         });
         Ok(self.speakers.len() - 1)
     }
@@ -289,6 +312,40 @@ impl Conversation {
     /// Whether there is nobody in the plan.
     pub fn is_empty(&self) -> bool {
         self.speakers.is_empty()
+    }
+
+    /// The speakers, for an edit that has already checked what it is doing.
+    ///
+    /// `pub(crate)` on purpose. Everything outside this crate reaches speakers
+    /// through [`Conversation::speakers`], which cannot change them, or through
+    /// [`crate::edit`], which validates first. Handing out a mutable slice
+    /// would let a caller write an empty name or a colour that is not one, and
+    /// the point of the validation is that there is no way round it.
+    pub(crate) fn speakers_mut(&mut self) -> &mut Vec<Speaker> {
+        &mut self.speakers
+    }
+
+    /// The spans, for an edit that has already checked what it is doing.
+    ///
+    /// `pub(crate)` for the same reason, and with one extra rule: **anything
+    /// that changes a start time has to keep the list sorted**, because
+    /// rendering, the subtitles and every report read it in order and none of
+    /// them sorts for itself. Going through [`Conversation::add_turn`] does
+    /// that; changing `start` in place does not.
+    pub(crate) fn turns_mut(&mut self) -> &mut Vec<Turn> {
+        &mut self.turns
+    }
+
+    /// The colour to draw a speaker in, chosen or from the palette.
+    ///
+    /// `palette` is the slot colour to fall back to, which the caller supplies
+    /// because this crate draws nothing and does not know which scheme is in
+    /// force.
+    pub fn colour_of(&self, speaker: usize, palette: &str) -> String {
+        self.speakers
+            .get(speaker)
+            .and_then(|s| s.colour.clone())
+            .unwrap_or_else(|| palette.to_string())
     }
 
     /// The destination voice for a speaker.
@@ -415,6 +472,13 @@ impl Conversation {
                 )),
                 None => out.push_str(&format!("speaker  {index}  {}\n", speaker.name)),
             }
+            // A line of its own rather than a fourth field on `speaker`. A name
+            // may contain two spaces, which is what separates the fields there,
+            // so a fourth one would be ambiguous exactly for the names most
+            // likely to have been typed by hand.
+            if let Some(colour) = &speaker.colour {
+                out.push_str(&format!("colour  {index}  {colour}\n"));
+            }
         }
         for turn in &self.turns {
             match &turn.text {
@@ -476,6 +540,31 @@ impl Conversation {
             };
             match keyword {
                 "title" => conversation.title = Some(rest.trim().to_string()),
+                "colour" => {
+                    // Follows the speaker it names, so the index is checked
+                    // against the speakers already read rather than against a
+                    // count nobody has yet. A colour for a speaker that has not
+                    // been declared is a hand-edited file with the lines the
+                    // wrong way round, and saying so beats applying it to
+                    // whoever ends up in that slot.
+                    let (declared, value) = split_word(rest).unwrap_or((rest, ""));
+                    let declared: usize = declared.trim().parse().map_err(|_| {
+                        Error::Malformed(format!(
+                            "line {number}: bad speaker index {:?} on a colour",
+                            declared.trim()
+                        ))
+                    })?;
+                    let speaker = conversation.speakers.get_mut(declared).ok_or_else(|| {
+                        Error::Malformed(format!(
+                            "line {number}: colour for speaker {declared}, who has not \
+                             been declared. A colour line follows its speaker."
+                        ))
+                    })?;
+                    speaker.colour = Some(
+                        crate::edit::check_colour(value.trim())
+                            .map_err(|e| Error::Malformed(format!("line {number}: {e}")))?,
+                    );
+                }
                 "speaker" => {
                     // The index is a number and cannot hold a space; the
                     // name can, so the name and the optional picture path are
@@ -506,6 +595,7 @@ impl Conversation {
                     conversation.add_speaker(Speaker {
                         name: name.to_string(),
                         picture,
+                        colour: None,
                     })?;
                 }
                 "turn" => {
@@ -823,6 +913,7 @@ mod tests {
             .add_speaker(Speaker {
                 name: "Sam".into(),
                 picture: Some(PathBuf::from("portraits/sam.png")),
+                colour: None,
             })
             .unwrap();
         let read_back = Conversation::parse(&conversation.to_text()).unwrap();

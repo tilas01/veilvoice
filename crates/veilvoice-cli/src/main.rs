@@ -708,6 +708,109 @@ enum Command {
 }
 
 /// What `veilvoice conversation` can do.
+impl From<FixCommand> for conversation::Fix {
+    fn from(command: FixCommand) -> Self {
+        match command {
+            FixCommand::Reassign { at, to } => conversation::Fix::Reassign { at, to },
+            FixCommand::Split { at } => conversation::Fix::Split { at },
+            FixCommand::Merge { at, with } => conversation::Fix::Merge { at, with },
+            FixCommand::Move { at, start, end } => conversation::Fix::Move { at, start, end },
+            FixCommand::Name { speaker, to } => conversation::Fix::Name { speaker, to },
+            // `--clear` and `--to` cannot both be given: clap refuses that
+            // pair, so `clear` here means the colour is being taken away.
+            FixCommand::Colour { speaker, to, clear } => conversation::Fix::Colour {
+                speaker,
+                to: if clear { None } else { to },
+            },
+        }
+    }
+}
+
+/// The corrections `veilvoice conversation fix` can make.
+#[derive(Subcommand)]
+enum FixCommand {
+    /// Give the stretch of audio at a moment to a different speaker.
+    ///
+    /// The wrong-voice fix. The timing is untouched.
+    Reassign {
+        /// A moment inside the stretch that is wrong, in seconds.
+        #[arg(long)]
+        at: f64,
+        /// Which speaker it should be, numbered from zero.
+        #[arg(long)]
+        to: usize,
+    },
+
+    /// Cut the stretch at a moment in two.
+    ///
+    /// For a hand-over that was missed, where one stretch holds two people.
+    /// Both halves keep the speaker, so follow this with `reassign` on
+    /// whichever half was wrong. The words stay with the first half: there is
+    /// no way to know where in a sentence a moment falls.
+    Split {
+        /// Where to cut, in seconds.
+        #[arg(long)]
+        at: f64,
+    },
+
+    /// Join two neighbouring stretches of the same speaker.
+    ///
+    /// For when a split was wrong, or a detector chopped one sentence into
+    /// three. They have to be the same speaker and to touch.
+    Merge {
+        /// A moment inside the first stretch, in seconds.
+        #[arg(long)]
+        at: f64,
+        /// A moment inside the second, in seconds.
+        #[arg(long)]
+        with: f64,
+    },
+
+    /// Move where a stretch starts and ends.
+    ///
+    /// For a hand-over caught a second late.
+    Move {
+        /// A moment inside the stretch to move, in seconds.
+        #[arg(long)]
+        at: f64,
+        /// The new start, in seconds.
+        #[arg(long)]
+        start: f64,
+        /// The new end, in seconds.
+        #[arg(long)]
+        end: f64,
+    },
+
+    /// Change what a speaker is called.
+    ///
+    /// A label for a human and **not** part of the de-identification: writing
+    /// somebody's real name here puts their real name in the subtitles.
+    Name {
+        /// Which speaker, numbered from zero.
+        #[arg(long)]
+        speaker: usize,
+        /// The new name.
+        #[arg(long)]
+        to: String,
+    },
+
+    /// Change the colour a speaker is drawn in.
+    ///
+    /// `#rrggbb`. Also not part of the de-identification: the colour somebody
+    /// always uses is as identifying as their name.
+    Colour {
+        /// Which speaker, numbered from zero.
+        #[arg(long)]
+        speaker: usize,
+        /// The colour, as `#rrggbb`.
+        #[arg(long, conflicts_with = "clear")]
+        to: Option<String>,
+        /// Go back to the colour their slot gets from the palette.
+        #[arg(long)]
+        clear: bool,
+    },
+}
+
 #[derive(Subcommand)]
 enum ConversationCommand {
     /// Describe a plan: who is in it, which voice each gets, and any overlaps.
@@ -716,6 +819,23 @@ enum ConversationCommand {
     Inspect {
         /// The plan file.
         plan: PathBuf,
+    },
+
+    /// Correct a plan before rendering it.
+    ///
+    /// A stretch of audio given to the wrong person is the one mistake here
+    /// that **cannot be heard in the result**: every voice in a veiled
+    /// recording is unfamiliar, so a listener has nothing to compare against
+    /// and nobody notices. It has to be right before the render, which is what
+    /// these are for.
+    ///
+    /// Every one of them rewrites the plan file in place and changes nothing
+    /// else. The audio is not touched and nothing is rendered.
+    Fix {
+        /// The plan file to correct.
+        plan: PathBuf,
+        #[command(subcommand)]
+        what: FixCommand,
     },
 
     /// Render a recording according to a plan.
@@ -1429,6 +1549,7 @@ fn run(command: Command) -> Result<(), String> {
 
         Command::Conversation { what } => match what {
             ConversationCommand::Inspect { plan } => conversation::inspect(&plan),
+            ConversationCommand::Fix { plan, what } => conversation::fix(&plan, what.into()),
             ConversationCommand::Render {
                 plan,
                 input,

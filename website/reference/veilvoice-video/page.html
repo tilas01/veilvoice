@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/page.svg" alt="page.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/page.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1030 lines &middot; <a href="page.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1039 lines &middot; <a href="page.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-page-rather-than-a-video-file">Why a page rather than a video file</a>
@@ -78,12 +78,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1030 lines defining <strong>13 functions</strong> (8 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1039 lines defining <strong>13 functions</strong> (8 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Look</code> <span style="color:var(--muted)">line 62</span> &middot; What the picture looks like.</li>
 <li><code>enum Background</code> <span style="color:var(--muted)">line 94</span> &middot; What sits behind the picture.</li>
 <li><code>struct Layout</code> <span style="color:var(--muted)">line 175</span> &middot; Where each part of the picture goes.</li>
-<li><code>struct Drawn</code> <span style="color:var(--muted)">line 426</span> &middot; What a render produced, and anything the user should know about it.</li>
+<li><code>struct Drawn</code> <span style="color:var(--muted)">line 434</span> &middot; What a render produced, and anything the user should know about it.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Look::black</code> <span style="color:var(--muted)">line 103</span> &middot; Black, for somebody who wants the plainest possible picture.
@@ -92,7 +92,7 @@
 </li>
 <li><code>Look::checked</code> <span style="color:var(--muted)">line 137</span> &middot; Whether these numbers describe a picture that can be drawn.
 </li>
-<li><code>player</code> <span style="color:var(--muted)">line 544</span> &middot; The self-contained page that plays.
+<li><code>player</code> <span style="color:var(--muted)">line 552</span> &middot; The self-contained page that plays.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>escape</code>, <code>layout</code>, <code>still</code>, <code>background_markup</code>, <code>speaker_markup</code>, <code>data_uri</code>, <code>base64</code>, <code>media_type</code></span>
 </li>
 </ul>
@@ -181,12 +181,12 @@
 <a href="page.src.html#fn-still">
 <rect x="392.7" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="439.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">still</text>
-<text x="439.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 440</text>
+<text x="439.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 448</text>
 </a>
 <a href="page.src.html#fn-player">
 <rect x="511.2" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="557.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">player</text>
-<text x="557.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 544</text>
+<text x="557.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 552</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -216,8 +216,8 @@ flowchart TD
     n_data_uri[&quot;data_uri&lt;br/&gt;line 297&quot;]
     n_background_markup[&quot;background_markup&lt;br/&gt;line 309&quot;]
     n_speaker_markup[&quot;speaker_markup&lt;br/&gt;line 358&quot;]
-    n_still[&quot;still&lt;br/&gt;line 440&quot;]
-    n_player([&quot;player&lt;br/&gt;line 544&quot;])
+    n_still[&quot;still&lt;br/&gt;line 448&quot;]
+    n_player([&quot;player&lt;br/&gt;line 552&quot;])
     n_background_markup --&gt; n_data_uri
     n_background_markup --&gt; n_escape
     n_data_uri --&gt; n_base64
@@ -242,8 +242,8 @@ flowchart TD
     click n_data_uri href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L297&quot; &quot;open the source&quot;
     click n_background_markup href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L309&quot; &quot;open the source&quot;
     click n_speaker_markup href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L358&quot; &quot;open the source&quot;
-    click n_still href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L440&quot; &quot;open the source&quot;
-    click n_player href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L544&quot; &quot;open the source&quot;
+    click n_still href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L448&quot; &quot;open the source&quot;
+    click n_player href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L552&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_black,n_themed,n_checked,n_player entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -270,9 +270,9 @@ flowchart TD
 <tr><td><code>data_uri</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-data_uri">297</a></td><td>Read an image and turn it into a data: URI.</td></tr>
 <tr><td><code>background_markup</code> <sub>fn</sub></td><td><a href="page.src.html#fn-background_markup">309</a></td><td>The background element, and anything worth telling the user about it.</td></tr>
 <tr><td><code>speaker_markup</code> <sub>fn</sub></td><td><a href="page.src.html#fn-speaker_markup">358</a></td><td>One speaker&#x27;s circle and name, as SVG.</td></tr>
-<tr><td><code>Drawn</code> <sub>pub struct</sub></td><td><a href="page.src.html#fn-drawn">426</a></td><td>What a render produced, and anything the user should know about it.</td></tr>
-<tr><td><code>still</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-still">440</a></td><td>A single frame, as standalone SVG.</td></tr>
-<tr><td><code>player</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-player">544</a></td><td>The self-contained page that plays.</td></tr>
+<tr><td><code>Drawn</code> <sub>pub struct</sub></td><td><a href="page.src.html#fn-drawn">434</a></td><td>What a render produced, and anything the user should know about it.</td></tr>
+<tr><td><code>still</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-still">448</a></td><td>A single frame, as standalone SVG.</td></tr>
+<tr><td><code>player</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-player">552</a></td><td>The self-contained page that plays.</td></tr>
 </tbody></table>
 </section>
 </div></div>
