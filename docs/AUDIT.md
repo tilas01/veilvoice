@@ -38,6 +38,193 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-first round: the guards that did not guard
+
+The round before 0.1.20, covering everything the thirtieth round covered and
+the features added since it: the render settings, the plan corrections, the
+preview player, the Studio, the Browser and the export. Security and memory
+safety; the post-quantum surface; correctness; hostile input; dependency risk;
+optimisation; and documentation coverage.
+
+**The largest finding is not a defect in the program.** It is that eleven of
+this repository's own drift checks were advisory. Every one has a `--check`,
+every one is run by hand before a release, and none of them failed a build.
+
+`CLAUDE.md` states the rule they exist to enforce: a fact that appears twice is
+derived or checked, and *"anything that cannot be derived is checked in CI, so
+drift fails a build rather than being noticed later by a reader"*. Eleven
+checks were the second half of that sentence and were not wired to it.
+
+Three of them caught real staleness during this round, which is the only reason
+the gap was noticed:
+
+* `tools/site/demo.py` found the two new tabs with no screenshot and no
+  caption, and would have shipped a walkthrough with a heading over nothing.
+* `tools/docs/sources.py` found generated source pages behind their source.
+* `tools/shots/terminal.py` found drawings disagreeing with the text they were
+  drawn from.
+
+Ten are now steps in the `assets` job. The eleventh, `tools/shots/sessions.py`,
+needs a downloaded release to check the verifier transcript against, so it
+stays a release-time check and this says so rather than leaving it looking
+forgotten.
+
+### F-159: a second, weaker copy of a sanitising rule
+
+`Studio::rename`, written this round, cleaned a recording's name before storing
+it: newlines became spaces, so a name could not forge a second entry in the
+index.
+
+`render_index`, which is the function that actually writes the index, already
+did that **and also stripped tabs**, which is what separates the fields.
+
+So there were two rules for one job and the newer one was weaker. Nothing was
+exploitable, because the writer runs last and its rule is the strict one. What
+was wrong is the shape: a reader of `rename` would conclude the name is clean,
+and a later change trusting that conclusion would have been wrong. The renamer
+now stores what it was given and defers to the writer, which is the one place
+that knows the format. The regression test carries a tab as well as a newline.
+
+### What the mechanical passes found
+
+* **`cargo audit`**: 583 dependencies against 1242 advisories, no findings
+  beyond the three argued exceptions in `.cargo/audit.toml`, each re-read this
+  round and still true.
+* **Panics**: eleven `expect`/`panic` calls in non-test code, every one on a
+  documented invariant. The WAV parser's two are inside a `while pos + 8 <= end`
+  bound that makes the `try_into` infallible. The one in the KEM's RNG bridge
+  is the `rand_core` trait's own contract, where the alternative is returning
+  zeros from something a key is drawn from.
+* **Hostile input**: no allocation anywhere is sized from a parsed length. Every
+  `with_capacity` and `vec![0; n]` takes a constant or an already-materialised
+  length.
+* **Timing**: every secret comparison goes through `subtle::ConstantTimeEq`.
+  The one `==` against exposed key bytes is a test asserting a key does *not*
+  appear in a buffer.
+* **Optimisation**: clippy's `perf`, `correctness`, `suspicious`, `complexity`,
+  `redundant_clone` and `unnecessary_wraps` over the workspace. Eleven redundant
+  clones, ten of them in test code where the clone is clarity rather than cost.
+  The one in shipped code is gone. The twenty-five `needless_pass_by_value` and
+  twelve `unnecessary_wraps` findings are all deliberate: command handlers share
+  one signature so `main` can dispatch over them, and the `cfg`-split
+  `add_to_path` pair matches a Windows counterpart that genuinely can fail.
+  Churning those would trade a real property for a lint.
+* **Documentation**: `veilvoice-verify` was the one crate without
+  `#![warn(missing_docs)]`. Adding it produced **zero** warnings, so nothing was
+  undocumented; the lint that keeps it that way simply was not there. It is now.
+  Every other crate already had it, and the workspace builds with no
+  missing-documentation warning anywhere.
+
+### Three defects the guards caught in the work of this round
+
+Recorded because they were found by the repository's own tests rather than by
+reading, which is the outcome those tests exist for:
+
+* `every_tab_has_a_stable_unique_name` asserted the tab count was nine, which
+  is a number typed beside a list. The test three lines below it forbids
+  exactly that in the user guide, for exactly this reason. It failed the moment
+  two tabs were added.
+* Five interface strings in the new Studio had their line continuations eaten
+  and would have rendered with source indentation in the middle of a sentence.
+* `tools/site/demo.py` told a reader to run `tools/shots/gui.py`, a program
+  that does not exist.
+
+### The offline claim, moved from a comment into a machine
+
+The front page says VeilVoice never touches the network. The `offline` job
+checked the dependency graph for HTTP clients and pinned the set of
+socket-capable crates, and then a **comment** in that job said the source names
+no network API anywhere. True, and a sentence a reader was asked to believe,
+sitting inside a job whose whole purpose is to replace belief with a check.
+
+A reader who does not trust the author should not have to trust the author's
+reading either. There are now four independent layers, each of which a stranger
+can re-run from the workflow file:
+
+1. **The dependency graph.** No HTTP or WebSocket client, and the five
+   socket-capable crates are pinned by name, so a new one fails the job rather
+   than joining a list quietly. Unchanged from before.
+2. **The source.** `std::net`, `TcpStream`, `TcpListener`, `UdpSocket`,
+   `SocketAddr`, `to_socket_addrs` and `getaddrinfo` appear nowhere in
+   `crates/`. The two files excepted are tests which forbid those very words.
+   This is the comment, made executable.
+3. **The built binary.** `veilvoice` imports no network function at all.
+   `socketpair` is the only thing that looks like one, and it is not: it makes
+   a connected pair of `AF_UNIX` descriptors inside this process, takes no
+   address, and cannot carry a byte off the machine.
+4. **The running program.** The command line de-identifies a recording inside
+   an empty network namespace, with no interfaces and not even loopback, and
+   `strace` records **zero** network syscalls across three invocations.
+
+The window is claimed separately, because it is a different program and the
+honest statement about it is different. It talks to the display server and the
+desktop portal, and those are sockets. Traced under Xvfb it opens exactly two,
+both `AF_UNIX`, and asks for no internet socket at any point: `AF_INET` and
+`AF_INET6` appear nowhere in the trace. That is the precise claim, and it is
+checked rather than asserted.
+
+Each guard was tested against a case that should fail it. The source check
+catches an injected `TcpStream`; the syscall counter registers 146 network
+calls from `curl`. A guard that has never failed is a guard nobody has tested.
+
+### The cryptography, reviewed end to end
+
+Every mechanism, and every place it is used.
+
+* **Password hashing.** Argon2id at 256 MiB, three passes, four lanes. Well
+  above current OWASP guidance. Parameters read from a `.veil` header are
+  bounded before use, and the bounds are argued in `kdf.rs` in terms of what
+  they cost a person waiting versus what they cost an attacker.
+* **The AEAD.** XChaCha20-Poly1305, chosen over RFC 8439's 96-bit nonce so that
+  nonces can be drawn at random with no practical collision risk. Every one of
+  the four seal sites draws a fresh nonce from the OS CSPRNG; there is no code
+  path that reuses one.
+* **What is authenticated.** The **entire container header** is the AEAD's
+  associated data, so the Argon2 parameters, the salt, the nonce and the
+  version cannot be edited without the open failing. A downgrade of the KDF
+  cost is not available to an attacker holding the file.
+* **The hybrid KEM.** X25519 and ML-KEM-768. Both shared secrets are the HKDF
+  input keying material, and the **full transcript** is the salt: the ephemeral
+  X25519 public key, the ML-KEM ciphertext and the recipient's static public
+  key. That binding is what stops an attacker who can replace one half of the
+  exchange from influencing the derived key. Every field is fixed length, so
+  the concatenation cannot be read two ways. Both raw secrets are zeroized
+  after derivation, including the ML-KEM one, whose crate does not do it.
+* **Domain separation.** Ten distinct strings, all under a `veilvoice/`
+  namespace, so no two derivations of different purposes can collide. The
+  studio vault additionally binds the *length* of its first secret, because
+  there the two halves are variable and `("ab","c")` would otherwise key the
+  same vault as `("a","bc")`.
+* **Constant time.** Every comparison of secret material goes through
+  `subtle::ConstantTimeEq`, including `Secret`'s own equality. The single `==`
+  against exposed key bytes is a test asserting a key does *not* appear in a
+  buffer.
+* **Memory.** `Secret` allocates page-aligned, calls `mlock`/`VirtualLock`,
+  reports rather than assumes success, zeroizes on drop, and wipes the buffer
+  it was constructed from. No key material anywhere in the workspace lives in a
+  plain `Vec` or array.
+* **Randomness.** One source, `getrandom`, everywhere. The `RngCore` bridge the
+  KEM crates require panics on failure because the trait has no error return,
+  and the alternative is handing predictable bytes to a key derivation. That is
+  now written where the panic is, rather than left for a reader to work out.
+* **Nothing home-rolled.** No MD5, SHA-1, RC4, DES, ECB or CBC anywhere. No
+  hardcoded key or password. The thirty-one storage encodings in `weave.rs` are
+  obfuscation and say so in their own first paragraph: *"This adds no
+  cryptographic strength."*
+
+No finding. The construction is the one the literature recommends, the
+parameters are above guidance rather than at it, and the places where a
+shortcut would be tempting are the places with the longest comments explaining
+why it was not taken.
+
+### Verdict
+
+Nothing found this round changes what VeilVoice is worth against an adversary.
+The one code finding is a shape problem in a week-old function, fixed before it
+had a chance to matter. The finding that will pay for itself is the eleventh:
+a check nobody runs is a check that does not exist, and eleven of them are now
+run by a machine that does not forget.
+
 ## The thirtieth round: the full sweep, and what a repository forgets
 
 The round the roadmap calls marker 127: no part of this repository is signed off

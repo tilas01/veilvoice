@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/main.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 3409 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 3411 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
 
 ## Contents
 
@@ -85,7 +85,7 @@ thousand times.
 
 ## What this file contains
 
-3409 lines defining **28 functions** (0 public), **13 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+3411 lines defining **28 functions** (0 public), **13 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -132,15 +132,15 @@ flowchart TD
     n_describe_reseed_range["describe_reseed_range<br/>line 2226"]
     n_describe_reseed["describe_reseed<br/>line 2236"]
     n_anonymise["anonymise<br/>line 2254"]
-    n_live["live<br/>line 2393"]
-    n_list_devices["list_devices<br/>line 2613"]
-    n_read_named["read_named<br/>line 2664"]
-    n_video_plan["video_plan<br/>line 2679"]
-    n_write_named["write_named<br/>line 2696"]
-    n_clean["clean<br/>line 2700"]
-    n_encrypt["encrypt<br/>line 2717"]
-    n_decrypt["decrypt<br/>line 2746"]
-    n_load_secret_key["load_secret_key<br/>line 2778"]
+    n_live["live<br/>line 2395"]
+    n_list_devices["list_devices<br/>line 2615"]
+    n_read_named["read_named<br/>line 2666"]
+    n_video_plan["video_plan<br/>line 2681"]
+    n_write_named["write_named<br/>line 2698"]
+    n_clean["clean<br/>line 2702"]
+    n_encrypt["encrypt<br/>line 2719"]
+    n_decrypt["decrypt<br/>line 2748"]
+    n_load_secret_key["load_secret_key<br/>line 2780"]
     n_anonymise --> n_config
     n_anonymise --> n_describe_reseed_range
     n_clean --> n_read_named
@@ -182,15 +182,15 @@ flowchart TD
     click n_describe_reseed_range href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2226" "open the source"
     click n_describe_reseed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2236" "open the source"
     click n_anonymise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2254" "open the source"
-    click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2393" "open the source"
-    click n_list_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2613" "open the source"
-    click n_read_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2664" "open the source"
-    click n_video_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2679" "open the source"
-    click n_write_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2696" "open the source"
-    click n_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2700" "open the source"
-    click n_encrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2717" "open the source"
-    click n_decrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2746" "open the source"
-    click n_load_secret_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2778" "open the source"
+    click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2395" "open the source"
+    click n_list_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2615" "open the source"
+    click n_read_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2666" "open the source"
+    click n_video_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2681" "open the source"
+    click n_write_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2698" "open the source"
+    click n_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2702" "open the source"
+    click n_encrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2719" "open the source"
+    click n_decrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2748" "open the source"
+    click n_load_secret_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2780" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_explain_verification,n_main,n_run,n_run_ffmpeg,n_list_volumes,n_list_companions,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_read_named,n_video_plan,n_write_named,n_clean,n_encrypt,n_decrypt,n_load_secret_key helper
 ```
@@ -229,16 +229,16 @@ flowchart TD
 | `describe_reseed` <sub>fn</sub> | [2236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2236) | How the seed-rolling setting reads in the output. |
 | `AtRest` <sub>struct</sub> | [2245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2245) | What to do with the result once it exists. |
 | `anonymise` <sub>fn</sub> | [2254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2254) |  |
-| `live` <sub>fn</sub> | [2393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2393) |  |
-| `list_devices` <sub>fn</sub> | [2613](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2613) |  |
-| `read_named` <sub>pub(crate) fn</sub> | [2664](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2664) | Read a file, naming it if that fails. |
-| `video_plan` <sub>pub(crate) fn</sub> | [2679](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2679) | Read a --size and an --fps into a render plan, saying what was decided. |
-| `write_named` <sub>pub(crate) fn</sub> | [2696](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2696) | Write a file, naming it if that fails. |
-| `clean` <sub>fn</sub> | [2700](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2700) |  |
-| `encrypt` <sub>fn</sub> | [2717](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2717) |  |
-| `decrypt` <sub>fn</sub> | [2746](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2746) |  |
-| `load_secret_key` <sub>fn</sub> | [2778](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2778) | Load a private key file, which is itself a password-locked container. |
-| `keygen` <sub>fn</sub> | [2786](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2786) |  |
-| `watch` <sub>fn</sub> | [2862](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2862) | Report, and keep reporting, what is using the microphone and camera. |
-| `shred` <sub>fn</sub> | [2952](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2952) | Destroy a file's contents, then delete it. |
-| `info` <sub>fn</sub> | [3020](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L3020) |  |
+| `live` <sub>fn</sub> | [2395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2395) |  |
+| `list_devices` <sub>fn</sub> | [2615](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2615) |  |
+| `read_named` <sub>pub(crate) fn</sub> | [2666](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2666) | Read a file, naming it if that fails. |
+| `video_plan` <sub>pub(crate) fn</sub> | [2681](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2681) | Read a --size and an --fps into a render plan, saying what was decided. |
+| `write_named` <sub>pub(crate) fn</sub> | [2698](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2698) | Write a file, naming it if that fails. |
+| `clean` <sub>fn</sub> | [2702](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2702) |  |
+| `encrypt` <sub>fn</sub> | [2719](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2719) |  |
+| `decrypt` <sub>fn</sub> | [2748](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2748) |  |
+| `load_secret_key` <sub>fn</sub> | [2780](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2780) | Load a private key file, which is itself a password-locked container. |
+| `keygen` <sub>fn</sub> | [2788](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2788) |  |
+| `watch` <sub>fn</sub> | [2864](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2864) | Report, and keep reporting, what is using the microphone and camera. |
+| `shred` <sub>fn</sub> | [2954](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2954) | Destroy a file's contents, then delete it. |
+| `info` <sub>fn</sub> | [3022](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L3022) |  |

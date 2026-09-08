@@ -42,15 +42,12 @@ Options:
           
           The waveform, a circle per speaker that lights when they speak, and the subtitles. It reads the audio and the WebVTT track by name from the same directory, so move all of them or none.
 
-      --width <WIDTH>
-          Picture width in pixels
+      --size <SIZE>
+          Frame size: monitor, 720p, 1080p, 1440p, 4k, or 1920x1080.
           
-          [default: 1280]
-
-      --height <HEIGHT>
-          Picture height in pixels
+          Read whether or not `--page` was given, so a size that describes no picture fails the same way with and without it.
           
-          [default: 720]
+          [default: monitor]
 
       --padding <PADDING>
           Margin around everything, in pixels

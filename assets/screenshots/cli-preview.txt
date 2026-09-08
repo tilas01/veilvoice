@@ -23,15 +23,17 @@ Options:
       --ffmpeg
           Print the ffmpeg command, and whether ffmpeg is installed
 
-      --width <WIDTH>
-          Picture width in pixels
+      --size <SIZE>
+          Frame size: monitor, 720p, 1080p, 1440p, 4k, or 1920x1080.
           
-          [default: 1280]
+          This replaces the old `--width` and `--height`, which were two ways to say one thing and could be set to a pair no video can be made from. `monitor` matches this display where the platform will say what it is, and says so and uses 1080p where it will not.
+          
+          [default: monitor]
 
-      --height <HEIGHT>
-          Picture height in pixels
+      --fps <FPS>
+          Frames per second for the printed ffmpeg command, from 5 to 60
           
-          [default: 720]
+          [default: 30]
 
       --padding <PADDING>
           Margin around everything, in pixels

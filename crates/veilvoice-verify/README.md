@@ -93,7 +93,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>1888 lines"])
+    n_lib(["lib.rs<br/>1889 lines"])
     n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>460 lines"]
@@ -126,12 +126,12 @@ flowchart TD
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 316 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 1888 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 1889 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 793 | The verifier's own tests. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Marker 97. |
 
-**4,001 functional lines of Rust** in this crate. A functional line is a line
+**4,002 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

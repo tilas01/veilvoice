@@ -8,6 +8,49 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The offline claim is now proved by a machine, four ways**
+
+- The front page says VeilVoice never touches the network. CI checked the
+  dependency graph for HTTP clients, and then a *comment* in that job said the
+  source names no network API anywhere. True, and a sentence a reader was asked
+  to believe, inside a job whose purpose is to replace belief with a check.
+- Four independent layers now, each re-runnable by a stranger from the workflow
+  file: the dependency graph as before; the **source**, which names no network
+  API; the **built binary**, which imports no network function at all; and the
+  **running program**, which de-identifies a recording inside an empty network
+  namespace with no interfaces and not even loopback, and makes zero network
+  syscalls under `strace`.
+- The window is claimed separately, because it is a different program and the
+  honest statement differs. It talks to the display server and the desktop
+  portal. Traced, it opens exactly two sockets, both local, and asks for no
+  internet socket at any point.
+- Each guard was tested against a case that should fail it. A guard that has
+  never failed is a guard nobody has tested.
+
+**Ten drift checks that existed and did not fail a build**
+
+- Every one has a `--check`, every one was run by hand before a release, and
+  none was in CI. The rule they enforce is written down: drift fails a build
+  rather than being noticed later by a reader. They were the half of that
+  sentence nobody wired up.
+- Three caught real staleness in this round, which is how the gap was noticed:
+  the walkthrough had two new tabs with no picture and no caption, generated
+  source pages were behind their source, and terminal drawings disagreed with
+  the text they came from.
+
+**A cryptographic review, end to end**
+
+- Every mechanism and every place it is used. Argon2id at 256 MiB is above
+  current guidance rather than at it; the whole container header is the AEAD's
+  associated data, so KDF parameters cannot be downgraded by editing a file;
+  the hybrid KEM binds the full transcript, so an attacker who replaces one
+  half of the exchange cannot influence the derived key; every secret
+  comparison is constant time; no key material anywhere lives outside locked,
+  self-wiping memory.
+- No finding. The one change is a comment: the RNG bridge the KEM crates
+  require panics when the OS random source fails, and now says why, because the
+  alternative is handing predictable bytes to a key derivation.
+
 **A Studio to record into, and a Browser for what is in it**
 
 - Two new tabs, and the vault they share. `veilvoice-crypto::studio` had the
