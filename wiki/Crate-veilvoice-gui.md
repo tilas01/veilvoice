@@ -81,9 +81,9 @@ another thread, so the window keeps answering while it is busy.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>93 lines"])
-    n_main(["main.rs<br/>190 lines"])
-    n_app["app.rs<br/>2879 lines"]
+    n_lib(["lib.rs<br/>104 lines"])
+    n_main(["main.rs<br/>205 lines"])
+    n_app["app.rs<br/>2915 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
@@ -105,8 +105,9 @@ flowchart TD
     n_setup["setup.rs<br/>758 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
+    n_studio["studio.rs<br/>745 lines"]
     n_theme["theme.rs<br/>784 lines"]
-    n_tour["tour.rs<br/>289 lines"]
+    n_tour["tour.rs<br/>303 lines"]
     n_updates["updates.rs<br/>246 lines"]
     n_vault_store["vault_store.rs<br/>601 lines"]
     n_verify["verify.rs<br/>1592 lines"]
@@ -130,6 +131,7 @@ flowchart TD
     n_app --> n_setup
     n_app --> n_soundbar
     n_app --> n_storage
+    n_app --> n_studio
     n_app --> n_theme
     n_app --> n_tour
     n_app --> n_updates
@@ -177,6 +179,7 @@ flowchart TD
     n_soundbar --> n_theme
     n_storage --> n_dialog
     n_storage --> n_theme
+    n_studio --> n_theme
     n_theme --> n_palettes
     n_tour --> n_theme
     n_updates --> n_theme
@@ -207,6 +210,7 @@ flowchart TD
     click n_setup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" "open the source"
     click n_soundbar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" "open the source"
     click n_storage href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs" "open the source"
+    click n_studio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" "open the source"
     click n_tour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" "open the source"
     click n_updates href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs" "open the source"
@@ -222,7 +226,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 2879 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 2915 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`autolock.rs`|File-veilvoice-gui-autolock]] | 369 | Locking the window again after a period of no use. |
 | [[`avnotice.rs`|File-veilvoice-gui-avnotice]] | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 447 | Make a failure that produces no output produce some. |
@@ -233,8 +237,8 @@ flowchart TD
 | [[`group.rs`|File-veilvoice-gui-group]] | 1745 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`integrity.rs`|File-veilvoice-gui-integrity]] | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [[`layout.rs`|File-veilvoice-gui-layout]] | 280 | Centring a row of widgets, which egui does not do by nesting. |
-| [[`lib.rs`|File-veilvoice-gui-lib]] | 93 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
-| [[`main.rs`|File-veilvoice-gui-main]] | 190 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
+| [[`lib.rs`|File-veilvoice-gui-lib]] | 104 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [[`main.rs`|File-veilvoice-gui-main]] | 205 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`monitor.rs`|File-veilvoice-gui-monitor]] | 419 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [[`notify.rs`|File-veilvoice-gui-notify]] | 460 | How the application tells you something, and the three ways to be told. |
 | [[`palettes.rs`|File-veilvoice-gui-palettes]] | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
@@ -246,15 +250,16 @@ flowchart TD
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 758 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 766 | The animated mark: a row of bars that rise and fall. |
 | [[`storage.rs`|File-veilvoice-gui-storage]] | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
+| [[`studio.rs`|File-veilvoice-gui-studio]] | 745 | The Recording Studio and the Recording Browser. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 784 | Colour schemes for the desktop app. |
-| [[`tour.rs`|File-veilvoice-gui-tour]] | 289 | The short tour on a first run, and after an upgrade. |
+| [[`tour.rs`|File-veilvoice-gui-tour]] | 303 | The short tour on a first run, and after an upgrade. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
 | [[`vault_store.rs`|File-veilvoice-gui-vault_store]] | 601 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [[`verify.rs`|File-veilvoice-gui-verify]] | 1592 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 417 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 244 | How big the window opens, and why it is not a constant. |
 
-**13,989 functional lines of Rust** in this crate. A functional line is a line
+**14,678 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

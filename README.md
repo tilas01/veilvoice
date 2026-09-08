@@ -371,10 +371,11 @@ Also: [installing in detail](docs/INSTALL.md),
 veilvoice-gui
 ```
 
-Nine tabs: anonymise a file, scramble live, group conversations, who is using
-the microphone and camera, the app lock, verify a download, settings, portable
-or installed, and an about panel that states the scope. Nine palettes, or your
-own, and every screen is captured under
+Eleven tabs: anonymise a file, scramble live, group conversations, record into
+the vault, browse what is in it, who is using the microphone and camera, the
+app lock, verify a download, settings, portable or installed, and an about
+panel that states the scope. Nine palettes, or your own, and every screen is
+captured under
 [What it looks like](#what-it-looks-like).
 
 ### Command line

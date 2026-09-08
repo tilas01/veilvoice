@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/tour.svg" alt="tour.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/tour.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 289 lines &middot; <a href="tour.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 303 lines &middot; <a href="tour.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-it-is-for">What it is for</a>
@@ -71,20 +71,20 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>289 lines defining <strong>6 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>303 lines defining <strong>6 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Tour</code> <span style="color:var(--muted)">line 109</span> &middot; Where the tour is up to.</li>
+<li><code>struct Tour</code> <span style="color:var(--muted)">line 123</span> &middot; Where the tour is up to.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>all_keys</code> <span style="color:var(--muted)">line 117</span> &middot; Every tab key the tour knows, for storing once it has run.
+<li><code>all_keys</code> <span style="color:var(--muted)">line 131</span> &middot; Every tab key the tour knows, for storing once it has run.
 </li>
-<li><code>Tour::start</code> <span style="color:var(--muted)">line 123</span> &middot; Start the tour from the beginning, showing every card.
+<li><code>Tour::start</code> <span style="color:var(--muted)">line 137</span> &middot; Start the tour from the beginning, showing every card.
 </li>
-<li><code>Tour::start_new_only</code> <span style="color:var(--muted)">line 132</span> &middot; Start it showing only the cards whose tabs are not in known.
+<li><code>Tour::start_new_only</code> <span style="color:var(--muted)">line 146</span> &middot; Start it showing only the cards whose tabs are not in known.
 </li>
-<li><code>Tour::running</code> <span style="color:var(--muted)">line 147</span> &middot; Whether the tour is on screen.
+<li><code>Tour::running</code> <span style="color:var(--muted)">line 161</span> &middot; Whether the tour is on screen.
 </li>
-<li><code>Tour::panel</code> <span style="color:var(--muted)">line 161</span> &middot; Draw the current card.
+<li><code>Tour::panel</code> <span style="color:var(--muted)">line 175</span> &middot; Draw the current card.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>stop</code></span>
 </li>
 </ul>
@@ -106,32 +106,32 @@
 <a href="tour.src.html#fn-all_keys">
 <rect x="20.0" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="66.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all_keys</text>
-<text x="66.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+<text x="66.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
 </a>
 <a href="tour.src.html#fn-tour-start">
 <rect x="138.5" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="196.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::start</text>
-<text x="196.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
+<text x="196.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
 </a>
 <a href="tour.src.html#fn-tour-start_new_only">
 <rect x="281.1" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="375.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::start_new_only</text>
-<text x="375.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
+<text x="375.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
 </a>
 <a href="tour.src.html#fn-tour-running">
 <rect x="40.2" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="106.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::running</text>
-<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
 </a>
 <a href="tour.src.html#fn-tour-stop">
 <rect x="198.9" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="253.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::stop</text>
-<text x="253.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
+<text x="253.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 166</text>
 </a>
 <a href="tour.src.html#fn-tour-panel">
 <rect x="333.5" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="391.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::panel</text>
-<text x="391.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+<text x="391.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 175</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -148,19 +148,19 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_all_keys([&quot;all_keys&lt;br/&gt;line 117&quot;])
-    n_start([&quot;Tour::start&lt;br/&gt;line 123&quot;])
-    n_start_new_only([&quot;Tour::start_new_only&lt;br/&gt;line 132&quot;])
-    n_running([&quot;Tour::running&lt;br/&gt;line 147&quot;])
-    n_stop[&quot;Tour::stop&lt;br/&gt;line 152&quot;]
-    n_panel([&quot;Tour::panel&lt;br/&gt;line 161&quot;])
+    n_all_keys([&quot;all_keys&lt;br/&gt;line 131&quot;])
+    n_start([&quot;Tour::start&lt;br/&gt;line 137&quot;])
+    n_start_new_only([&quot;Tour::start_new_only&lt;br/&gt;line 146&quot;])
+    n_running([&quot;Tour::running&lt;br/&gt;line 161&quot;])
+    n_stop[&quot;Tour::stop&lt;br/&gt;line 166&quot;]
+    n_panel([&quot;Tour::panel&lt;br/&gt;line 175&quot;])
     n_panel --&gt; n_stop
-    click n_all_keys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L117&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L123&quot; &quot;open the source&quot;
-    click n_start_new_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L132&quot; &quot;open the source&quot;
-    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L147&quot; &quot;open the source&quot;
-    click n_stop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L152&quot; &quot;open the source&quot;
-    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L161&quot; &quot;open the source&quot;
+    click n_all_keys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L131&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L137&quot; &quot;open the source&quot;
+    click n_start_new_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L146&quot; &quot;open the source&quot;
+    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L161&quot; &quot;open the source&quot;
+    click n_stop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L166&quot; &quot;open the source&quot;
+    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L175&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_all_keys,n_start,n_start_new_only,n_running,n_panel entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -172,13 +172,13 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>CARDS</code> <sub>pub const</sub></td><td><a href="tour.src.html#fn-cards">46</a></td><td>One card: the tab it is about, and what that tab is for.</td></tr>
-<tr><td><code>Tour</code> <sub>pub struct</sub></td><td><a href="tour.src.html#fn-tour">109</a></td><td>Where the tour is up to.</td></tr>
-<tr><td><code>all_keys</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-all_keys">117</a></td><td>Every tab key the tour knows, for storing once it has run.</td></tr>
-<tr><td><code>Tour::start</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start">123</a></td><td>Start the tour from the beginning, showing every card.</td></tr>
-<tr><td><code>Tour::start_new_only</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start_new_only">132</a></td><td>Start it showing only the cards whose tabs are not in known.</td></tr>
-<tr><td><code>Tour::running</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-running">147</a></td><td>Whether the tour is on screen.</td></tr>
-<tr><td><code>Tour::stop</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-stop">152</a></td><td>Stop it.</td></tr>
-<tr><td><code>Tour::panel</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-panel">161</a></td><td>Draw the current card.</td></tr>
+<tr><td><code>Tour</code> <sub>pub struct</sub></td><td><a href="tour.src.html#fn-tour">123</a></td><td>Where the tour is up to.</td></tr>
+<tr><td><code>all_keys</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-all_keys">131</a></td><td>Every tab key the tour knows, for storing once it has run.</td></tr>
+<tr><td><code>Tour::start</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start">137</a></td><td>Start the tour from the beginning, showing every card.</td></tr>
+<tr><td><code>Tour::start_new_only</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start_new_only">146</a></td><td>Start it showing only the cards whose tabs are not in known.</td></tr>
+<tr><td><code>Tour::running</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-running">161</a></td><td>Whether the tour is on screen.</td></tr>
+<tr><td><code>Tour::stop</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-stop">166</a></td><td>Stop it.</td></tr>
+<tr><td><code>Tour::panel</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-panel">175</a></td><td>Draw the current card.</td></tr>
 </tbody></table>
 </section>
 </div></div>

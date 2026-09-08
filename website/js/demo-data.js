@@ -163,6 +163,18 @@ window.VEILVOICE_DEMO = {
       "note": "One recording with several people in it. Each speaker is given their own destination voice, and every voiceprint is destroyed."
     },
     {
+      "image": "assets/screenshots/gui-studio.png",
+      "key": "studio",
+      "label": "Studio",
+      "note": "Record straight into a locked vault, veiled on the way in. The vault opens with both passphrases at once, and with neither on its own."
+    },
+    {
+      "image": "assets/screenshots/gui-browser.png",
+      "key": "browser",
+      "label": "Browser",
+      "note": "What is in the vault, listed without opening any of it. Rename and remove; the names and dates are sealed with the recordings."
+    },
+    {
       "image": "assets/screenshots/gui-monitor.png",
       "key": "monitor",
       "label": "Monitor",
@@ -211,6 +223,14 @@ window.VEILVOICE_DEMO = {
     {
       "key": "group",
       "label": "Group"
+    },
+    {
+      "key": "studio",
+      "label": "Studio"
+    },
+    {
+      "key": "browser",
+      "label": "Browser"
     },
     {
       "key": "monitor",

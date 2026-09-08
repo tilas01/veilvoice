@@ -116,18 +116,35 @@ done
 #                   tab differ. Stilled here, which is a setting the
 #                   application already has for people who want it.
 #   animated_icon   the same, for the window icon.
+#   toured_tabs     every tab, so the first-run tour does not open over the
+#                   panel being photographed. Built from the same `--tabs`
+#                   list, so a tab added tomorrow is covered without anybody
+#                   remembering to add it: a hand-written list here would
+#                   leave the tour open on exactly the new tab whose picture
+#                   was the reason for running this.
+# The tab names, asked of the application rather than written down here.
+#
+# This was a hand-written list, and a hand-written list of another list is a
+# copy: it went stale the first time a tab was added, and it did it silently.
+# The run succeeded, every picture it took was correct, and the new tab simply
+# had none. `--tabs` prints `Tab::ALL`, so there is one list and this reads it.
+mapfile -t tabs < <("$exe" --tabs)
+if [ "${#tabs[@]}" -eq 0 ]; then
+  echo "the application listed no tabs, so there is nothing to photograph" >&2
+  exit 1
+fi
+
+# Every tab, comma separated, for `toured_tabs` below.
+toured="$(IFS=,; echo "${tabs[*]}")"
+
 mkdir -p "$work/config/veilvoice"
-cat > "$work/config/veilvoice/settings.conf" <<'CONF'
+cat > "$work/config/veilvoice/settings.conf" <<CONF
 configured = true
 always_group = true
 animations = false
 animated_icon = false
+toured_tabs = $toured
 CONF
-
-# The tab names the application answers to: `Tab::key` in
-# crates/veilvoice-gui/src/app.rs, where a test keeps them unique and stable,
-# because each one is also a file name the README links.
-tabs=(file live group monitor lock verify settings install about)
 
 problems=()
 declare -A prints=()

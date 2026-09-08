@@ -177,6 +177,19 @@ pub struct Studio {
     key: StudioKey,
 }
 
+/// One line, with anything that would end it turned into a space.
+///
+/// A name is whatever somebody typed. A newline in it would be read back as
+/// the start of another entry, and an index that parses into the wrong shape
+/// loses a recording silently, which is worse than refusing the name.
+fn one_line(text: &str) -> String {
+    text.chars()
+        .map(|ch| if ch == '\n' || ch == '\r' { ' ' } else { ch })
+        .collect::<String>()
+        .trim()
+        .to_owned()
+}
+
 /// The index file's name. Fixed rather than derived: a vault whose index cannot
 /// be found is a vault nothing can open, and the directory already discloses
 /// that it is a vault by existing.
@@ -260,6 +273,32 @@ impl Studio {
         }
         let sealed = std::fs::read(self.dir.join(id)).map_err(|_| Error::AppLockStore)?;
         self.unseal_secret(&sealed, id.as_bytes())
+    }
+
+    /// Change what a recording is called.
+    ///
+    /// Only the index is rewritten. The audio is sealed under the recording's
+    /// identifier rather than its name, so renaming does not re-encrypt
+    /// anything and cannot lose the recording if it is interrupted: either the
+    /// new index lands or the old one stays.
+    ///
+    /// A name that is not in the vault is an error rather than a silent
+    /// no-operation. Somebody renaming a recording that is not there has a
+    /// wrong identifier, and telling them so is more use than appearing to
+    /// succeed.
+    pub fn rename(&self, id: &str, name: &str) -> Result<(), Error> {
+        if !safe_id(id) {
+            return Err(Error::BadHeader);
+        }
+        let mut all = self.list()?;
+        let Some(entry) = all.iter_mut().find(|e| e.id == id) else {
+            return Err(Error::NoSuchTake);
+        };
+        // The same cleaning the index parser needs: a newline in a name would
+        // be read back as the start of another entry, and an index that parses
+        // into the wrong shape loses a recording rather than refusing.
+        entry.name = one_line(name);
+        self.write_index(&all)
     }
 
     /// Remove one recording and its index entry.
@@ -490,6 +529,68 @@ mod tests {
     fn secret(bytes: &[u8]) -> Secret {
         let mut copy = bytes.to_vec();
         Secret::new(&mut copy)
+    }
+
+    /// A vault in a temporary directory, with a take already in it.
+    fn vault_with_a_take() -> (tempfile::TempDir, Studio, String) {
+        let dir = tempfile::tempdir().expect("a temporary directory");
+        let key = StudioKey::derive(&secret(b"app-lock"), &secret(b"at-rest")).unwrap();
+        let vault = Studio::open(dir.path(), key).unwrap();
+        let entry = vault
+            .store("first name", 1_700_000_000, b"RIFFfake")
+            .unwrap();
+        let id = entry.id.clone();
+        (dir, vault, id)
+    }
+
+    #[test]
+    fn renaming_changes_the_name_and_nothing_else() {
+        let (_dir, vault, id) = vault_with_a_take();
+        let before = vault.list().unwrap();
+        vault.rename(&id, "second name").unwrap();
+        let after = vault.list().unwrap();
+
+        assert_eq!(after.len(), 1);
+        assert_eq!(after[0].name, "second name");
+        // The identifier, the date and the size are untouched: renaming
+        // rewrites the index and never re-seals the audio.
+        assert_eq!(after[0].id, before[0].id);
+        assert_eq!(after[0].made, before[0].made);
+        assert_eq!(after[0].bytes, before[0].bytes);
+        // And the recording still opens, which is the thing a rename must not
+        // be able to break.
+        assert_eq!(vault.load(&id).unwrap().expose(), b"RIFFfake");
+    }
+
+    #[test]
+    fn a_newline_in_a_name_cannot_forge_a_second_entry() {
+        // The index is one entry per line. A name carrying a newline would be
+        // read back as the start of another entry, and the vault would lose a
+        // recording rather than refuse the name.
+        let (_dir, vault, id) = vault_with_a_take();
+        vault.rename(&id, "quiet\nname  forged  1  2").unwrap();
+        let after = vault.list().unwrap();
+        assert_eq!(after.len(), 1, "a name split the index into two entries");
+        assert!(!after[0].name.contains('\n'));
+        assert_eq!(vault.load(&id).unwrap().expose(), b"RIFFfake");
+    }
+
+    #[test]
+    fn renaming_something_that_is_not_there_is_refused() {
+        let (_dir, vault, _id) = vault_with_a_take();
+        // A well-formed identifier that is simply not in this vault.
+        assert!(matches!(
+            vault.rename("0123456789abcdef", "new"),
+            Err(Error::NoSuchTake)
+        ));
+        // And one that is not an identifier at all: a rename must not be a
+        // route to writing outside the vault directory.
+        assert!(matches!(
+            vault.rename("../../etc/passwd", "new"),
+            Err(Error::BadHeader)
+        ));
+        // Neither attempt disturbed what is there.
+        assert_eq!(vault.list().unwrap()[0].name, "first name");
     }
 
     #[test]

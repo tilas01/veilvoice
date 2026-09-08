@@ -58,6 +58,16 @@
 #![warn(missing_docs)]
 
 mod app;
+
+/// The name of every tab the window shows, in the order it shows them.
+///
+/// Exported so that `veilvoice-gui --tabs` can print them and the screenshot
+/// scripts can read them, rather than each carrying a copy of a list that goes
+/// stale the first time a tab is added. When it went stale the failure was
+/// silent: the run succeeded and the new tab simply had no picture.
+pub fn tabs() -> impl Iterator<Item = &'static str> {
+    app::Tab::ALL.iter().map(|tab| tab.key())
+}
 pub mod autolock;
 pub mod avnotice;
 pub mod crashlog;
@@ -79,6 +89,7 @@ pub mod settings;
 pub mod setup;
 pub mod soundbar;
 pub mod storage;
+pub mod studio;
 pub mod theme;
 pub mod tour;
 pub mod updates;

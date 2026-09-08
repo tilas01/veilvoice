@@ -94,6 +94,12 @@ TAB_NOTES = {
             "programs can hear. The meters say sound is arriving and leaving.",
     "group": "One recording with several people in it. Each speaker is given "
              "their own destination voice, and every voiceprint is destroyed.",
+    "studio": "Record straight into a locked vault, veiled on the way in. The "
+              "vault opens with both passphrases at once, and with neither on "
+              "its own.",
+    "browser": "What is in the vault, listed without opening any of it. Rename "
+               "and remove; the names and dates are sealed with the "
+               "recordings.",
     "monitor": "Which programs are holding the microphone and camera right "
                "now, and which screen recorders are running.",
     "lock": "The password for VeilVoice itself, what that lock is worth, and "
@@ -320,7 +326,7 @@ def shots():
             raise SystemExit(
                 "the application has a %r tab and %s does not exist, so the\n"
                 "  walkthrough would show a heading with nothing under it.\n"
-                "  Run: python tools/shots/gui.py --capture"
+                "  Run: tools/shots/gui.sh on Linux, or tools/shots/gui.ps1 on Windows"
                 % (key, os.path.relpath(path, ROOT)))
         note = TAB_NOTES.get(key)
         if not note:

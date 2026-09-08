@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 93 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 104 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -67,12 +67,39 @@ download, and change how it looks.
 Nine colour schemes, and your own if you write one. It does the slow work on
 another thread, so the window keeps answering while it is busy.
 
+## What this file contains
+
+104 lines defining **1 function** (1 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `tabs` (line 68) -- The name of every tab the window shows, in the order it shows them.
+
 ## What calls what
 
-This file defines no functions of its own.
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it._
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-gui/lib.svg" alt="what calls what in lib.rs" width="640">
+</p>
+
+<details>
+<summary>The same graph as Mermaid source</summary>
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_tabs(["tabs<br/>line 68"])
+    click n_tabs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68" "open the source"
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_tabs entry
+```
+
+</details>
 
 ## Items
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L93) | Crate version string, surfaced in the About panel. |
+| `tabs` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68) | The name of every tab the window shows, in the order it shows them. |
+| `VERSION` <sub>pub const</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L104) | Crate version string, surfaced in the About panel. |

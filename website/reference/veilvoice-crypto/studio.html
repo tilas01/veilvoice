@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/studio.svg" alt="studio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/studio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 936 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1037 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-one-thing-this-adds">The one thing this adds</a>
@@ -80,12 +80,12 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>936 lines defining <strong>21 functions</strong> (11 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1037 lines defining <strong>23 functions</strong> (12 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct StudioKey</code> <span style="color:var(--muted)">line 83</span> &middot; A key that exists only while both locks are open.</li>
 <li><code>struct Entry</code> <span style="color:var(--muted)">line 144</span> &middot; One recording in the vault.</li>
 <li><code>struct Studio</code> <span style="color:var(--muted)">line 175</span> &middot; A directory of recordings, sealed under a StudioKey.</li>
-<li><code>struct Shape</code> <span style="color:var(--muted)">line 398</span> &middot; What a decoy vault looks like from outside, so it looks like the real one.</li>
+<li><code>struct Shape</code> <span style="color:var(--muted)">line 437</span> &middot; What a decoy vault looks like from outside, so it looks like the real one.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>StudioKey::derive</code> <span style="color:var(--muted)">line 94</span> &middot; Derive the vault key from both secrets.
@@ -94,22 +94,25 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 </li>
 <li><code>StudioKey::is_locked</code> <span style="color:var(--muted)">line 134</span> &middot; Whether the operating system agreed to keep this key out of swap.
 </li>
-<li><code>Studio::open</code> <span style="color:var(--muted)">line 187</span> &middot; Open the vault in dir, creating the directory if it is not there.
+<li><code>Studio::open</code> <span style="color:var(--muted)">line 200</span> &middot; Open the vault in dir, creating the directory if it is not there.
 </li>
-<li><code>Studio::dir</code> <span style="color:var(--muted)">line 194</span> &middot; Where the vault lives.
+<li><code>Studio::dir</code> <span style="color:var(--muted)">line 207</span> &middot; Where the vault lives.
 </li>
-<li><code>Studio::store</code> <span style="color:var(--muted)">line 228</span> &middot; Seal wav into the vault under name, returning its entry.
+<li><code>Studio::store</code> <span style="color:var(--muted)">line 241</span> &middot; Seal wav into the vault under name, returning its entry.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>list</code>, <code>new_id</code>, <code>seal</code>, <code>write_index</code>, <code>parse_index</code>, <code>unseal</code>, <code>secret_key</code>, <code>render_index</code>, <code>safe_id</code></span>
 </li>
-<li><code>Studio::load</code> <span style="color:var(--muted)">line 257</span> &middot; Open one recording into locked memory.
+<li><code>Studio::load</code> <span style="color:var(--muted)">line 270</span> &middot; Open one recording into locked memory.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>safe_id</code>, <code>unseal_secret</code>, <code>secret_key</code></span>
 </li>
-<li><code>Studio::remove</code> <span style="color:var(--muted)">line 266</span> &middot; Remove one recording and its index entry.
+<li><code>Studio::rename</code> <span style="color:var(--muted)">line 289</span> &middot; Change what a recording is called.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>list</code>, <code>one_line</code>, <code>safe_id</code>, <code>write_index</code>, <code>parse_index</code>, <code>unseal</code>, <code>render_index</code>, <code>seal</code>, <code>secret_key</code></span>
+</li>
+<li><code>Studio::remove</code> <span style="color:var(--muted)">line 305</span> &middot; Remove one recording and its index entry.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>list</code>, <code>safe_id</code>, <code>write_index</code>, <code>parse_index</code>, <code>unseal</code>, <code>render_index</code>, <code>seal</code>, <code>secret_key</code></span>
 </li>
-<li><code>Shape::of</code> <span style="color:var(--muted)">line 407</span> &middot; Measure a real vault, to build decoys that match it.
+<li><code>Shape::of</code> <span style="color:var(--muted)">line 446</span> &middot; Measure a real vault, to build decoys that match it.
 </li>
-<li><code>make_decoy</code> <span style="color:var(--muted)">line 450</span> &middot; Fill dir with a vault that never held anything.
+<li><code>make_decoy</code> <span style="color:var(--muted)">line 489</span> &middot; Fill dir with a vault that never held anything.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new_id</code></span>
 </li>
 </ul>
@@ -117,7 +120,7 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 627 831" width="627" height="831" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 641 846" width="641" height="846" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -126,129 +129,138 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="627" height="831" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M333.8 274.0 C 333.8 294.0, 432.1 500.0, 432.1 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M333.8 274.0 C 333.8 294.0, 305.6 400.0, 305.6 417.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M99.6 374.0 C 99.6 394.0, 301.5 500.0, 301.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M99.6 374.0 C 99.6 394.0, 500.6 400.0, 500.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M535.7 374.0 C 535.7 394.0, 183.1 500.0, 183.1 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M490.4 547.0 C 512.4 547.0, 512.4 547.0, 350.8 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M328.8 347.0 C 418.1 347.0, 418.1 247.0, 399.1 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M258.4 374.0 C 258.4 394.0, 301.5 500.0, 301.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M258.4 374.0 C 258.4 394.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M300.6 647.0 C 322.6 647.0, 322.6 247.0, 248.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M554.9 247.0 C 576.9 247.0, 576.9 247.0, 399.1 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M488.5 274.0 C 488.5 294.0, 183.1 500.0, 183.1 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M488.5 274.0 C 488.5 294.0, 238.3 600.0, 238.3 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M488.5 274.0 C 488.5 294.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M376.0 447.0 C 398.0 447.0, 398.0 247.0, 248.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M599.2 447.0 C 621.2 447.0, 621.2 247.0, 248.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M118.6 474.0 C 118.6 494.0, 389.0 600.0, 389.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M118.6 474.0 C 118.6 494.0, 238.3 600.0, 238.3 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<rect x="0" y="0" width="641" height="846" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M165.7 274.0 C 165.7 294.0, 439.0 500.0, 439.0 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M165.7 274.0 C 165.7 294.0, 312.4 400.0, 312.4 417.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M475.2 274.0 C 475.2 294.0, 308.4 500.0, 308.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M475.2 274.0 C 475.2 294.0, 507.5 400.0, 507.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M550.6 374.0 C 550.6 394.0, 189.9 500.0, 189.9 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M497.3 547.0 C 519.3 547.0, 519.3 547.0, 357.6 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M343.7 347.0 C 365.7 347.0, 365.7 247.0, 231.1 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M273.3 374.0 C 273.3 394.0, 308.4 500.0, 308.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M273.3 374.0 C 273.3 394.0, 125.4 400.0, 125.4 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M176.9 347.0 C 250.1 347.0, 250.1 247.0, 231.1 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M176.9 347.0 C 198.9 347.0, 198.9 147.0, 123.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M106.5 374.0 C 106.5 394.0, 308.4 500.0, 308.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M106.5 374.0 C 106.5 394.0, 125.4 400.0, 125.4 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M307.5 647.0 C 634.9 647.0, 634.9 147.0, 615.9 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M386.9 247.0 C 408.9 247.0, 408.9 247.0, 231.1 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M320.5 274.0 C 320.5 294.0, 189.9 500.0, 189.9 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M320.5 274.0 C 320.5 294.0, 245.1 600.0, 245.1 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M320.5 274.0 C 320.5 294.0, 125.4 400.0, 125.4 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M382.8 447.0 C 634.9 447.0, 634.9 147.0, 615.9 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M606.1 447.0 C 634.9 447.0, 634.9 147.0, 615.9 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M125.4 474.0 C 125.4 494.0, 395.8 600.0, 395.8 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M125.4 474.0 C 125.4 494.0, 245.1 600.0, 245.1 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <a href="studio.src.html#fn-studiokey-derive">
-<rect x="28.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="110.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StudioKey::derive</text>
-<text x="110.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+<rect x="34.9" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="117.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StudioKey::derive</text>
+<text x="117.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
 </a>
 <a href="studio.src.html#fn-studiokey-expose">
-<rect x="219.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="301.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StudioKey::expose</text>
-<text x="301.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
+<rect x="225.9" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="308.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StudioKey::expose</text>
+<text x="308.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
 </a>
 <a href="studio.src.html#fn-studiokey-is_locked">
-<rect x="410.0" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="504.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StudioKey::is_locked</text>
-<text x="504.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
+<rect x="416.9" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="511.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StudioKey::is_locked</text>
+<text x="511.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
-<a href="studio.src.html#fn-entry-fmt">
-<rect x="112.6" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="166.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Entry::fmt</text>
-<text x="166.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
+<a href="studio.src.html#fn-one_line">
+<rect x="28.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="74.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">one_line</text>
+<text x="74.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
 </a>
 <a href="studio.src.html#fn-studio-open">
-<rect x="247.2" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="309.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::open</text>
-<text x="309.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
+<rect x="146.5" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="208.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::open</text>
+<text x="208.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
 </a>
 <a href="studio.src.html#fn-studio-dir">
-<rect x="398.0" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="456.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::dir</text>
-<text x="456.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
+<rect x="297.2" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="355.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::dir</text>
+<text x="355.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 207</text>
 </a>
 <a href="studio.src.html#fn-studio-secret_key">
-<rect x="72.3" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="158.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::secret_key</text>
-<text x="158.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
+<rect x="439.9" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="526.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::secret_key</text>
+<text x="526.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 216</text>
 </a>
 <a href="studio.src.html#fn-studio-list">
-<rect x="271.4" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="333.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::list</text>
-<text x="333.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
+<rect x="103.4" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="165.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::list</text>
+<text x="165.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
 </a>
 <a href="studio.src.html#fn-studio-store">
-<rect x="422.1" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="488.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::store</text>
-<text x="488.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<rect x="254.1" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="320.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::store</text>
+<text x="320.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
 </a>
 <a href="studio.src.html#fn-studio-load">
-<rect x="37.3" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="99.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::load</text>
-<text x="99.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<rect x="412.9" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="475.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::load</text>
+<text x="475.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
+</a>
+<a href="studio.src.html#fn-studio-rename">
+<rect x="36.1" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="106.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::rename</text>
+<text x="106.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
 </a>
 <a href="studio.src.html#fn-studio-remove">
-<rect x="188.0" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="258.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::remove</text>
-<text x="258.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 266</text>
+<rect x="202.9" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="273.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::remove</text>
+<text x="273.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 305</text>
 </a>
 <a href="studio.src.html#fn-studio-write_index">
-<rect x="28.0" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="118.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::write_index</text>
-<text x="118.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+<rect x="34.9" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="125.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::write_index</text>
+<text x="125.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 318</text>
 </a>
 <a href="studio.src.html#fn-studio-seal">
-<rect x="175.9" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="238.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::seal</text>
-<text x="238.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+<rect x="182.8" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="245.1" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::seal</text>
+<text x="245.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
 </a>
 <a href="studio.src.html#fn-studio-unseal">
-<rect x="235.1" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="305.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unseal</text>
-<text x="305.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 297</text>
+<rect x="242.0" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="312.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unseal</text>
+<text x="312.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
 </a>
 <a href="studio.src.html#fn-studio-unseal_secret">
-<rect x="402.0" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="500.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unseal_secret</text>
-<text x="500.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
+<rect x="408.8" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="507.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unseal_secret</text>
+<text x="507.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 354</text>
 </a>
 <a href="studio.src.html#fn-new_id">
-<rect x="136.8" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="183.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">new_id</text>
-<text x="183.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 334</text>
+<rect x="143.7" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="189.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">new_id</text>
+<text x="189.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 373</text>
 </a>
 <a href="studio.src.html#fn-safe_id">
-<rect x="255.3" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="301.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">safe_id</text>
-<text x="301.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 349</text>
+<rect x="262.1" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="308.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">safe_id</text>
+<text x="308.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 388</text>
 </a>
 <a href="studio.src.html#fn-render_index">
-<rect x="326.6" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="389.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render_index</text>
-<text x="389.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 359</text>
+<rect x="333.5" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="395.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render_index</text>
+<text x="395.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 398</text>
 </a>
 <a href="studio.src.html#fn-parse_index">
-<rect x="373.8" y="520.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="432.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_index</text>
-<text x="432.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 368</text>
+<rect x="380.6" y="520.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="439.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_index</text>
+<text x="439.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 407</text>
 </a>
 <a href="studio.src.html#fn-shape-of">
-<rect x="354.8" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="405.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Shape::of</text>
-<text x="405.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 407</text>
+<rect x="369.7" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="420.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Shape::of</text>
+<text x="420.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 446</text>
 </a>
 <a href="studio.src.html#fn-make_decoy">
-<rect x="481.4" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="535.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">make_decoy</text>
-<text x="535.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 450</text>
+<rect x="496.3" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="550.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">make_decoy</text>
+<text x="550.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 489</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -258,36 +270,38 @@ key  = HKDF-SHA256(ikm, salt, info)</code></pre>
 <text x="35.0" y="745.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
 <path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
+<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 23 functions are drawn; the diagram is bounded at 22 so it</text>
+<text x="20.0" y="828.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 23 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_derive([&quot;StudioKey::derive&lt;br/&gt;line 94&quot;])
     n_expose([&quot;StudioKey::expose&lt;br/&gt;line 124&quot;])
     n_is_locked([&quot;StudioKey::is_locked&lt;br/&gt;line 134&quot;])
-    n_fmt[&quot;Entry::fmt&lt;br/&gt;line 159&quot;]
-    n_open([&quot;Studio::open&lt;br/&gt;line 187&quot;])
-    n_dir([&quot;Studio::dir&lt;br/&gt;line 194&quot;])
-    n_secret_key[&quot;Studio::secret_key&lt;br/&gt;line 203&quot;]
-    n_list[&quot;Studio::list&lt;br/&gt;line 214&quot;]
-    n_store([&quot;Studio::store&lt;br/&gt;line 228&quot;])
-    n_load([&quot;Studio::load&lt;br/&gt;line 257&quot;])
-    n_remove([&quot;Studio::remove&lt;br/&gt;line 266&quot;])
-    n_write_index[&quot;Studio::write_index&lt;br/&gt;line 279&quot;]
-    n_seal[&quot;Studio::seal&lt;br/&gt;line 288&quot;]
-    n_unseal[&quot;Studio::unseal&lt;br/&gt;line 297&quot;]
-    n_unseal_secret[&quot;Studio::unseal_secret&lt;br/&gt;line 315&quot;]
-    n_new_id[&quot;new_id&lt;br/&gt;line 334&quot;]
-    n_safe_id[&quot;safe_id&lt;br/&gt;line 349&quot;]
-    n_render_index[&quot;render_index&lt;br/&gt;line 359&quot;]
-    n_parse_index[&quot;parse_index&lt;br/&gt;line 368&quot;]
-    n_of([&quot;Shape::of&lt;br/&gt;line 407&quot;])
-    n_make_decoy([&quot;make_decoy&lt;br/&gt;line 450&quot;])
+    n_one_line[&quot;one_line&lt;br/&gt;line 185&quot;]
+    n_open([&quot;Studio::open&lt;br/&gt;line 200&quot;])
+    n_dir([&quot;Studio::dir&lt;br/&gt;line 207&quot;])
+    n_secret_key[&quot;Studio::secret_key&lt;br/&gt;line 216&quot;]
+    n_list[&quot;Studio::list&lt;br/&gt;line 227&quot;]
+    n_store([&quot;Studio::store&lt;br/&gt;line 241&quot;])
+    n_load([&quot;Studio::load&lt;br/&gt;line 270&quot;])
+    n_rename([&quot;Studio::rename&lt;br/&gt;line 289&quot;])
+    n_remove([&quot;Studio::remove&lt;br/&gt;line 305&quot;])
+    n_write_index[&quot;Studio::write_index&lt;br/&gt;line 318&quot;]
+    n_seal[&quot;Studio::seal&lt;br/&gt;line 327&quot;]
+    n_unseal[&quot;Studio::unseal&lt;br/&gt;line 336&quot;]
+    n_unseal_secret[&quot;Studio::unseal_secret&lt;br/&gt;line 354&quot;]
+    n_new_id[&quot;new_id&lt;br/&gt;line 373&quot;]
+    n_safe_id[&quot;safe_id&lt;br/&gt;line 388&quot;]
+    n_render_index[&quot;render_index&lt;br/&gt;line 398&quot;]
+    n_parse_index[&quot;parse_index&lt;br/&gt;line 407&quot;]
+    n_of([&quot;Shape::of&lt;br/&gt;line 446&quot;])
+    n_make_decoy([&quot;make_decoy&lt;br/&gt;line 489&quot;])
     n_list --&gt; n_parse_index
     n_list --&gt; n_unseal
     n_load --&gt; n_safe_id
@@ -297,6 +311,10 @@ flowchart TD
     n_remove --&gt; n_list
     n_remove --&gt; n_safe_id
     n_remove --&gt; n_write_index
+    n_rename --&gt; n_list
+    n_rename --&gt; n_one_line
+    n_rename --&gt; n_safe_id
+    n_rename --&gt; n_write_index
     n_seal --&gt; n_secret_key
     n_store --&gt; n_list
     n_store --&gt; n_new_id
@@ -309,30 +327,31 @@ flowchart TD
     click n_derive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L94&quot; &quot;open the source&quot;
     click n_expose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L124&quot; &quot;open the source&quot;
     click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L134&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L159&quot; &quot;open the source&quot;
-    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L187&quot; &quot;open the source&quot;
-    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L194&quot; &quot;open the source&quot;
-    click n_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L203&quot; &quot;open the source&quot;
-    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L214&quot; &quot;open the source&quot;
-    click n_store href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L228&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L257&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L266&quot; &quot;open the source&quot;
-    click n_write_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L279&quot; &quot;open the source&quot;
-    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L288&quot; &quot;open the source&quot;
-    click n_unseal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L297&quot; &quot;open the source&quot;
-    click n_unseal_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L315&quot; &quot;open the source&quot;
-    click n_new_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L334&quot; &quot;open the source&quot;
-    click n_safe_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L349&quot; &quot;open the source&quot;
-    click n_render_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L359&quot; &quot;open the source&quot;
-    click n_parse_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L368&quot; &quot;open the source&quot;
-    click n_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L407&quot; &quot;open the source&quot;
-    click n_make_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L450&quot; &quot;open the source&quot;
+    click n_one_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L185&quot; &quot;open the source&quot;
+    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L200&quot; &quot;open the source&quot;
+    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L207&quot; &quot;open the source&quot;
+    click n_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L216&quot; &quot;open the source&quot;
+    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L227&quot; &quot;open the source&quot;
+    click n_store href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L241&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L270&quot; &quot;open the source&quot;
+    click n_rename href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L289&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L305&quot; &quot;open the source&quot;
+    click n_write_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L318&quot; &quot;open the source&quot;
+    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L327&quot; &quot;open the source&quot;
+    click n_unseal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L336&quot; &quot;open the source&quot;
+    click n_unseal_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L354&quot; &quot;open the source&quot;
+    click n_new_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L373&quot; &quot;open the source&quot;
+    click n_safe_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L388&quot; &quot;open the source&quot;
+    click n_render_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L398&quot; &quot;open the source&quot;
+    click n_parse_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L407&quot; &quot;open the source&quot;
+    click n_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L446&quot; &quot;open the source&quot;
+    click n_make_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L489&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_remove,n_of,n_make_decoy entry
+    class n_derive,n_expose,n_is_locked,n_open,n_dir,n_store,n_load,n_rename,n_remove,n_of,n_make_decoy entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_list api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_fmt,n_secret_key,n_write_index,n_seal,n_unseal,n_unseal_secret,n_new_id,n_safe_id,n_render_index,n_parse_index helper</code></pre>
+    class n_one_line,n_secret_key,n_write_index,n_seal,n_unseal,n_unseal_secret,n_new_id,n_safe_id,n_render_index,n_parse_index helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -349,25 +368,27 @@ flowchart TD
 <tr><td><code>Entry</code> <sub>pub struct</sub></td><td><a href="studio.src.html#fn-entry">144</a></td><td>One recording in the vault.</td></tr>
 <tr><td><code>Entry::fmt</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-entry-fmt">159</a></td><td></td></tr>
 <tr><td><code>Studio</code> <sub>pub struct</sub></td><td><a href="studio.src.html#fn-studio">175</a></td><td>A directory of recordings, sealed under a StudioKey.</td></tr>
-<tr><td><code>INDEX</code> <sub>const</sub></td><td><a href="studio.src.html#fn-index">183</a></td><td>The index file&#x27;s name.</td></tr>
-<tr><td><code>Studio::open</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-open">187</a></td><td>Open the vault in dir, creating the directory if it is not there.</td></tr>
-<tr><td><code>Studio::dir</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-dir">194</a></td><td>Where the vault lives.</td></tr>
-<tr><td><code>Studio::secret_key</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-secret_key">203</a></td><td>The vault key as a Secret, for the AEAD.</td></tr>
-<tr><td><code>Studio::list</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-list">214</a></td><td>Every recording in the vault, oldest first.</td></tr>
-<tr><td><code>Studio::store</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-store">228</a></td><td>Seal wav into the vault under name, returning its entry.</td></tr>
-<tr><td><code>Studio::load</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-load">257</a></td><td>Open one recording into locked memory.</td></tr>
-<tr><td><code>Studio::remove</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-remove">266</a></td><td>Remove one recording and its index entry.</td></tr>
-<tr><td><code>Studio::write_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-write_index">279</a></td><td></td></tr>
-<tr><td><code>Studio::seal</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-seal">288</a></td><td>Seal with a fresh nonce, binding aad so a file cannot be moved to another identity inside the same vault and still open.</td></tr>
-<tr><td><code>Studio::unseal</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unseal">297</a></td><td></td></tr>
-<tr><td><code>Studio::unseal_secret</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unseal_secret">315</a></td><td>The same, decrypting straight into locked memory.</td></tr>
-<tr><td><code>new_id</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-new_id">334</a></td><td>A random, opaque identifier: 20 lower-case letters and digits that say nothing about what they name.</td></tr>
-<tr><td><code>safe_id</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_id">349</a></td><td>Whether id is one this vault could have produced.</td></tr>
-<tr><td><code>render_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render_index">359</a></td><td>The index, as lines.</td></tr>
-<tr><td><code>parse_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-parse_index">368</a></td><td></td></tr>
-<tr><td><code>Shape</code> <sub>pub struct</sub></td><td><a href="studio.src.html#fn-shape">398</a></td><td>What a decoy vault looks like from outside, so it looks like the real one.</td></tr>
-<tr><td><code>Shape::of</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-shape-of">407</a></td><td>Measure a real vault, to build decoys that match it.</td></tr>
-<tr><td><code>make_decoy</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-make_decoy">450</a></td><td>Fill dir with a vault that never held anything.</td></tr>
+<tr><td><code>one_line</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-one_line">185</a></td><td>One line, with anything that would end it turned into a space.</td></tr>
+<tr><td><code>INDEX</code> <sub>const</sub></td><td><a href="studio.src.html#fn-index">196</a></td><td>The index file&#x27;s name.</td></tr>
+<tr><td><code>Studio::open</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-open">200</a></td><td>Open the vault in dir, creating the directory if it is not there.</td></tr>
+<tr><td><code>Studio::dir</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-dir">207</a></td><td>Where the vault lives.</td></tr>
+<tr><td><code>Studio::secret_key</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-secret_key">216</a></td><td>The vault key as a Secret, for the AEAD.</td></tr>
+<tr><td><code>Studio::list</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-list">227</a></td><td>Every recording in the vault, oldest first.</td></tr>
+<tr><td><code>Studio::store</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-store">241</a></td><td>Seal wav into the vault under name, returning its entry.</td></tr>
+<tr><td><code>Studio::load</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-load">270</a></td><td>Open one recording into locked memory.</td></tr>
+<tr><td><code>Studio::rename</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-rename">289</a></td><td>Change what a recording is called.</td></tr>
+<tr><td><code>Studio::remove</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-remove">305</a></td><td>Remove one recording and its index entry.</td></tr>
+<tr><td><code>Studio::write_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-write_index">318</a></td><td></td></tr>
+<tr><td><code>Studio::seal</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-seal">327</a></td><td>Seal with a fresh nonce, binding aad so a file cannot be moved to another identity inside the same vault and still open.</td></tr>
+<tr><td><code>Studio::unseal</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unseal">336</a></td><td></td></tr>
+<tr><td><code>Studio::unseal_secret</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unseal_secret">354</a></td><td>The same, decrypting straight into locked memory.</td></tr>
+<tr><td><code>new_id</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-new_id">373</a></td><td>A random, opaque identifier: 20 lower-case letters and digits that say nothing about what they name.</td></tr>
+<tr><td><code>safe_id</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_id">388</a></td><td>Whether id is one this vault could have produced.</td></tr>
+<tr><td><code>render_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render_index">398</a></td><td>The index, as lines.</td></tr>
+<tr><td><code>parse_index</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-parse_index">407</a></td><td></td></tr>
+<tr><td><code>Shape</code> <sub>pub struct</sub></td><td><a href="studio.src.html#fn-shape">437</a></td><td>What a decoy vault looks like from outside, so it looks like the real one.</td></tr>
+<tr><td><code>Shape::of</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-shape-of">446</a></td><td>Measure a real vault, to build decoys that match it.</td></tr>
+<tr><td><code>make_decoy</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-make_decoy">489</a></td><td>Fill dir with a vault that never held anything.</td></tr>
 </tbody></table>
 </section>
 </div></div>

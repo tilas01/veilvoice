@@ -173,6 +173,11 @@ pub enum Error {
     /// falling back to a single secret is the failure that construction exists
     /// to prevent.
     StudioNeedsBoth,
+    /// A studio vault was asked to change a recording that is not in it.
+    /// An error rather than a silent no-operation: somebody renaming a
+    /// recording that is not there has the wrong identifier, and being told so
+    /// is more use than appearing to succeed.
+    NoSuchTake,
 }
 
 impl std::fmt::Display for Error {
@@ -226,6 +231,7 @@ impl std::fmt::Display for Error {
                 "the studio vault needs both the app lock and the at-rest passphrase, and \
                  only one was given"
             }
+            Self::NoSuchTake => "there is no recording with that identifier in this vault",
         };
         f.write_str(msg)
     }
