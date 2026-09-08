@@ -1787,6 +1787,41 @@ details {
 }
 summary { cursor: pointer; color: var(--accent); }
 
+/* ---------- the releases page ---------- */
+
+/* Every release is a closed row until somebody opens it, so the list reads as
+ * a list of versions rather than as one release with the rest of the page
+ * behind it. The summary carries the version and a one-line description, and
+ * has to look like a row you can click rather than a paragraph that happens to
+ * be blue. */
+.release > summary {
+  font-size: 15px;
+  padding: 4px 0;
+  /* The version and its description sit on one line at any width the line
+   * fits, and wrap as a block rather than around the marker when it does not. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+}
+.release > summary .muted { font-weight: 400; font-size: 13.5px; }
+.release > summary strong { color: var(--fg); }
+
+/* The notes inside a release: a second, quieter box. The files are above it
+ * because they are what somebody came for, and several hundred lines of prose
+ * in front of a download link is several hundred lines of scrolling. */
+.notes {
+  background: transparent;
+  border-style: dashed;
+  margin-top: 14px;
+}
+.notes > summary { font-size: 14px; }
+.notes > summary strong { color: var(--fg); }
+
+/* The tables of files and of documentation scroll inside themselves rather
+ * than pushing the page sideways on a phone. */
+.release table { display: block; overflow-x: auto; max-width: 100%; }
+
 /* ---------- footer ---------- */
 
 footer {
