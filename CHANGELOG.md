@@ -8,6 +8,48 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**A Studio to record into, and a Browser for what is in it**
+
+- Two new tabs, and the vault they share. `veilvoice-crypto::studio` had the
+  vault already, tested and unused: a key derived from the app lock **and** the
+  at-rest passphrase, and from neither alone. Nothing reached it. These two
+  tabs are what reaches it.
+- The Studio records straight into the vault, veiled on the way in. What gets
+  to the recorder is what the engine produced, never the microphone, and there
+  is no path here that captures the original: a path that existed would
+  eventually be taken, and the file it left would be somebody's real voice in a
+  vault they believed was safe. The recording is assembled in page-locked
+  memory and handed straight to the vault. It is never a plain file, not even
+  briefly.
+- Both passphrases are asked for here, every time, rather than borrowed from
+  whatever the rest of the application is holding. The app-lock secret is only
+  kept for the session when app-lock sealing is chosen, so reading it when it
+  happens to be there and prompting when it is not would make the vault's
+  strength depend on an unrelated setting, and nobody would know which they
+  had. Both typing buffers are wiped the moment the key is derived.
+- Locking the window closes the vault. A take still recording at that moment is
+  stopped and **stored** first, not discarded: the vault is still open, and
+  throwing away a recording because an idle timer fired would be the worst
+  thing the tab could do.
+- The Browser lists what is in the vault without opening any of it, and can
+  rename and remove. Renaming rewrites the sealed index only, because the audio
+  is sealed under an identifier rather than a name, so it never re-encrypts
+  anything and cannot lose a recording if it is interrupted.
+- Said plainly rather than implied: a vault on a disk gives away how many
+  recordings there are and roughly how large each is. Not their names, not
+  their dates. Hiding the count and the sizes means padding and decoys, which
+  is a different trade and is what the program folder's own storage does.
+
+**The screenshot scripts no longer keep their own list of tabs**
+
+- `veilvoice-gui --tabs` prints the tab names from the window's own list, and
+  both capture scripts read it. They each carried a copy, and a copy of a list
+  goes stale the first time a tab is added: the run succeeds, every picture it
+  takes is correct, and the new tab simply has none.
+- The same list marks the first-run tour as seen, so the tour does not open
+  over the panel being photographed. Written by hand, that would have left the
+  tour covering exactly the new tab whose picture was the reason for the run.
+
 **The preview page can be driven, and corrected from inside it**
 
 - The self-contained player gains a transport: back ten seconds, forward ten

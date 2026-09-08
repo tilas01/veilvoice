@@ -108,7 +108,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>234 lines"])
+    n_lib(["lib.rs<br/>240 lines"])
     n_aead["aead.rs<br/>276 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>535 lines"]
@@ -118,7 +118,7 @@ flowchart TD
     n_lock["lock.rs<br/>1823 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
-    n_studio["studio.rs<br/>936 lines"]
+    n_studio["studio.rs<br/>1037 lines"]
     n_tape["tape.rs<br/>350 lines"]
     n_vault["vault.rs<br/>615 lines"]
     n_weave["weave.rs<br/>1314 lines"]
@@ -161,11 +161,11 @@ flowchart TD
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1037 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 234 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 308 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure, the self-destruct. |
-| [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 936 | The studio vault: a key that exists only when both locks have been opened. |
+| [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1037 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 350 | A recording held in locked, zeroizing memory while it is still being made. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1314 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
@@ -173,7 +173,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**5,791 functional lines of Rust** in this crate. A functional line is a line
+**5,856 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

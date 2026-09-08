@@ -65,6 +65,20 @@ pub const CARDS: &[(&str, &str, &str)] = &[
          destroyed just as thoroughly.",
     ),
     (
+        "studio",
+        "Studio",
+        "Record straight into a locked vault, veiled on the way in. The vault \
+         opens with both of your passphrases at once, the one on this \
+         application and the one on your recordings, and neither on its own.",
+    ),
+    (
+        "browser",
+        "Browser",
+        "What is in the vault. The names and dates are sealed with the \
+         recordings, so a disk shows how many files there are and roughly how \
+         large, and nothing about what any of them is.",
+    ),
+    (
         "monitor",
         "Monitor",
         "Not a level meter. It watches for another program picking up a real \
