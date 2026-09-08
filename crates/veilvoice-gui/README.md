@@ -273,7 +273,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**15,195 functional lines of Rust** in this crate. A functional line is a line
+**15,198 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

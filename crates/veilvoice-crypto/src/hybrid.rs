@@ -294,6 +294,18 @@ impl rand_core::RngCore for OsRng {
         self.fill_bytes(&mut b);
         u64::from_le_bytes(b)
     }
+    /// # Why this one panics
+    ///
+    /// `RngCore::fill_bytes` has no error return: the trait's contract is that
+    /// it either fills the buffer or does not come back. The alternatives are
+    /// worse than a panic. Leaving `dest` as it was, or zeroing it, hands
+    /// predictable bytes to whatever is drawing a key from them, silently, and
+    /// a key derived from a buffer of zeros is not a key.
+    ///
+    /// `try_fill_bytes` below is the fallible form, and every caller in this
+    /// crate that can report a failure uses `getrandom` directly rather than
+    /// coming through here. This exists for the KEM crates, which take an
+    /// `RngCore` and nothing else.
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         getrandom::getrandom(dest).expect("OS CSPRNG unavailable");
     }

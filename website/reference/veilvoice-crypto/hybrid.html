@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/hybrid.svg" alt="hybrid.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/hybrid.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 448 lines &middot; <a href="hybrid.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 460 lines &middot; <a href="hybrid.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-hybrid">Why hybrid</a>
@@ -72,7 +72,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>448 lines defining <strong>15 functions</strong> (10 public), <strong>4 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>460 lines defining <strong>15 functions</strong> (10 public), <strong>4 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct PublicKey</code> <span style="color:var(--muted)">line 76</span> &middot; A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</li>
 <li><code>struct SecretKey</code> <span style="color:var(--muted)">line 82</span> &middot; A recipient&#x27;s private key.</li>
@@ -189,12 +189,12 @@
 <a href="hybrid.src.html#fn-osrng-fill_bytes">
 <rect x="270.3" y="620.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="352.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::fill_bytes</text>
-<text x="352.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 297</text>
+<text x="352.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
 </a>
 <a href="hybrid.src.html#fn-osrng-try_fill_bytes">
 <rect x="369.8" y="520.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="468.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::try_fill_bytes</text>
-<text x="468.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
+<text x="468.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 312</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -224,8 +224,8 @@ flowchart TD
     n_combine[&quot;combine&lt;br/&gt;line 251&quot;]
     n_next_u32[&quot;OsRng::next_u32&lt;br/&gt;line 287&quot;]
     n_next_u64[&quot;OsRng::next_u64&lt;br/&gt;line 292&quot;]
-    n_fill_bytes[&quot;OsRng::fill_bytes&lt;br/&gt;line 297&quot;]
-    n_try_fill_bytes[&quot;OsRng::try_fill_bytes&lt;br/&gt;line 300&quot;]
+    n_fill_bytes[&quot;OsRng::fill_bytes&lt;br/&gt;line 309&quot;]
+    n_try_fill_bytes[&quot;OsRng::try_fill_bytes&lt;br/&gt;line 312&quot;]
     n_decapsulate --&gt; n_combine
     n_encapsulate --&gt; n_combine
     n_next_u32 --&gt; n_fill_bytes
@@ -243,8 +243,8 @@ flowchart TD
     click n_combine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L251&quot; &quot;open the source&quot;
     click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287&quot; &quot;open the source&quot;
     click n_next_u64 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292&quot; &quot;open the source&quot;
-    click n_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L297&quot; &quot;open the source&quot;
-    click n_try_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L300&quot; &quot;open the source&quot;
+    click n_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L309&quot; &quot;open the source&quot;
+    click n_try_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L312&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_from_bytes,n_to_bytes,n_from_bytes,n_generate,n_to_bytes,n_from_bytes,n_public_key,n_decapsulate,n_encapsulate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -283,8 +283,8 @@ flowchart TD
 <tr><td><code>OsRng</code> <sub>struct</sub></td><td><a href="hybrid.src.html#fn-osrng">284</a></td><td>Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</td></tr>
 <tr><td><code>OsRng::next_u32</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-next_u32">287</a></td><td></td></tr>
 <tr><td><code>OsRng::next_u64</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-next_u64">292</a></td><td></td></tr>
-<tr><td><code>OsRng::fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-fill_bytes">297</a></td><td></td></tr>
-<tr><td><code>OsRng::try_fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-try_fill_bytes">300</a></td><td></td></tr>
+<tr><td><code>OsRng::fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-fill_bytes">309</a></td><td>RngCore::fill_bytes has no error return: the trait&#x27;s contract is that it either fills the buffer or does not come back.</td></tr>
+<tr><td><code>OsRng::try_fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-try_fill_bytes">312</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

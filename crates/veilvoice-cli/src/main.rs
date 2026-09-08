@@ -2318,7 +2318,9 @@ fn anonymise(
         // consolation.
         veilvoice_crypto::privatefile::write_owner_only(&out_path, &wav)
             .map_err(|e| format!("{}: {e}", out_path.display()))?;
-        out_path.clone()
+        // Moved rather than cloned: this is the last use of `out_path`, and
+        // the path can be long.
+        out_path
     };
 
     println!();

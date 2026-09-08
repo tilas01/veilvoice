@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/hybrid.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 448 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 460 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs)
 
 ## Contents
 
@@ -63,7 +63,7 @@ if the old one falls to a quantum computer, the newer one still holds.
 
 ## What this file contains
 
-448 lines defining **15 functions** (10 public), **4 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+460 lines defining **15 functions** (10 public), **4 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -120,8 +120,8 @@ flowchart TD
     n_combine["combine<br/>line 251"]
     n_next_u32["OsRng::next_u32<br/>line 287"]
     n_next_u64["OsRng::next_u64<br/>line 292"]
-    n_fill_bytes["OsRng::fill_bytes<br/>line 297"]
-    n_try_fill_bytes["OsRng::try_fill_bytes<br/>line 300"]
+    n_fill_bytes["OsRng::fill_bytes<br/>line 309"]
+    n_try_fill_bytes["OsRng::try_fill_bytes<br/>line 312"]
     n_decapsulate --> n_combine
     n_encapsulate --> n_combine
     n_next_u32 --> n_fill_bytes
@@ -139,8 +139,8 @@ flowchart TD
     click n_combine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L251" "open the source"
     click n_next_u32 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287" "open the source"
     click n_next_u64 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292" "open the source"
-    click n_fill_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L297" "open the source"
-    click n_try_fill_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L300" "open the source"
+    click n_fill_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L309" "open the source"
+    click n_try_fill_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L312" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_from_bytes,n_to_bytes,n_from_bytes,n_generate,n_to_bytes,n_from_bytes,n_public_key,n_decapsulate,n_encapsulate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -181,8 +181,8 @@ flowchart TD
 | `OsRng` <sub>struct</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L284) | Bridges the OS CSPRNG to the rand_core traits the KEM crates expect. |
 | `OsRng::next_u32` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287) |  |
 | `OsRng::next_u64` <sub>fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292) |  |
-| `OsRng::fill_bytes` <sub>fn</sub> | [297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L297) |  |
-| `OsRng::try_fill_bytes` <sub>fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L300) |  |
+| `OsRng::fill_bytes` <sub>fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L309) | RngCore::fill_bytes has no error return: the trait's contract is that it either fills the buffer or does not come back. |
+| `OsRng::try_fill_bytes` <sub>fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L312) |  |
 
 ---
 
