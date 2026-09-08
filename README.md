@@ -115,9 +115,10 @@ talk to no servers at all.
 ## What it looks like
 
 Every picture below is of this build. The window captures are taken by
-`tools/shots/gui.ps1`, which drives the release build and photographs each tab;
-the terminal drawings are generated from the command output committed beside
-them, and CI fails if a drawing and its output disagree. See
+`tools/shots/gui.sh` on Linux or `tools/shots/gui.ps1` on Windows, either of
+which drives the release build and photographs each tab; the terminal drawings
+are generated from the command output committed beside them, and CI fails if a
+drawing and its output disagree. See
 [`assets/screenshots/README.md`](assets/screenshots/README.md) for why those two
 are different kinds of thing.
 
@@ -127,8 +128,10 @@ are different kinds of thing.
 |---|---|
 | **Anonymise a file.** One recording, veiled, encrypted at rest by default. | **Live scramble.** A microphone in, a voice that is not yours out. |
 | ![anonymise a file](assets/screenshots/gui-file.png) | ![live scramble](assets/screenshots/gui-live.png) |
-| **Group mode.** Several people, a name and a colour each. | **Monitor.** Who is using the microphone and camera. |
-| ![group mode](assets/screenshots/gui-group.png) | ![monitor](assets/screenshots/gui-monitor.png) |
+| **Group mode.** Several people, a name and a colour each. | **Recording Studio.** Record into a locked vault, veiled on the way in. |
+| ![group mode](assets/screenshots/gui-group.png) | ![recording studio](assets/screenshots/gui-studio.png) |
+| **Recording Browser.** What is in the vault, played out of locked memory. | **Monitor.** Who is using the microphone and camera. |
+| ![recording browser](assets/screenshots/gui-browser.png) | ![monitor](assets/screenshots/gui-monitor.png) |
 | **Lock.** The app lock, and what it is and is not worth. | **Verify.** Drop a download on the window and be told what it is. |
 | ![the app lock](assets/screenshots/gui-lock.png) | ![verify a download](assets/screenshots/gui-verify.png) |
 | **Settings.** Nine palettes, motion, Failsafe, and which tabs are shown. | **Install.** Offered only to a portable copy. |
@@ -136,14 +139,23 @@ are different kinds of thing.
 | **About.** Versions, scope, and the update check you press. | |
 | ![about](assets/screenshots/gui-about.png) | |
 
-Every one of these is taken by `tools/shots/gui.ps1`, which starts the
-application once per tab with `--tab <name>`, maximises the window and
-photographs it with `PrintWindow`. There is no clicking and there are no
-coordinates, so a picture cannot quietly end up showing the wrong tab. They are
-captured at the full resolution of the screen they were taken on.
+Both scripts start the application once per tab with `--tab <name>` and
+photograph it. There is no clicking and there are no coordinates, so a picture
+cannot quietly end up showing the wrong tab. Neither script keeps a list of the
+tabs either. `veilvoice-gui --tabs` prints them from the window's own, so one
+added tomorrow is photographed without anybody remembering to add it.
 
-**Confirmed on Windows 11.** That is the one this application has actually been
-run and photographed on, and these pictures come from it.
+**The pictures committed here were taken on Linux**, by `tools/shots/gui.sh`,
+which runs the application under Xvfb with no window manager. Without one the
+window is mapped at the origin at exactly the size it asks for, so the X root
+window is the application window pixel for pixel and no cropping can include a
+strip of desktop.
+
+`tools/shots/gui.ps1` is the Windows counterpart and takes the same pictures
+with `PrintWindow`. It is what produced the captures up to v0.1.19.
+
+**Confirmed on Windows 11.** That is the one this application has been run on
+by a person, rather than photographed by a script.
 
 **Windows 10 is supported and not yet confirmed**, which is a different
 sentence and is meant to be. Nothing in the desktop application needs anything

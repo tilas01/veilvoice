@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 793 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 846 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -38,11 +38,11 @@ whether it says no.
 
 ## What this file contains
 
-793 lines defining **27 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+846 lines defining **28 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
-_22 of 27 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 28 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **helper** -- private to this file._
 
@@ -136,5 +136,6 @@ flowchart TD
 | `a_gnupg_that_cannot_run_is_never_counted_against_the_release` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L436) | Marker 97. |
 | `a_named_directory_that_is_not_there_is_refused_before_anything_is_searched` <sub>fn</sub> | [472](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L472) | F-108. |
 | `no_interface_string_has_a_gap_where_a_line_continuation_belongs` <sub>fn</sub> | [522](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L522) | No interface string carries a run of spaces left behind by its own source indentation. |
-| `the_readme_counts_the_window_tabs_the_window_actually_has` <sub>fn</sub> | [635](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L635) | Nothing a reader is meant to type still names a veilvoice-verify program. |
-| `no_page_tells_a_reader_to_run_a_program_that_no_longer_exists` <sub>fn</sub> | [688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L688) |  |
+| `every_tab_has_a_picture_in_the_readme_and_on_the_website` <sub>fn</sub> | [636](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L636) | Nothing a reader is meant to type still names a veilvoice-verify program. |
+| `the_readme_counts_the_window_tabs_the_window_actually_has` <sub>fn</sub> | [688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L688) | The README's count of the window's tabs is the number of tabs there are. |
+| `no_page_tells_a_reader_to_run_a_program_that_no_longer_exists` <sub>fn</sub> | [741](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L741) |  |
