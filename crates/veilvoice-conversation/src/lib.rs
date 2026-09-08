@@ -65,11 +65,13 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod edit;
 pub mod mode;
 pub mod plan;
 pub mod render;
 pub mod subtitles;
 
+pub use edit::check_colour;
 pub use mode::{TooMany, VoiceMode};
 pub use plan::{Conversation, Speaker, Turn};
 

@@ -77,6 +77,174 @@ use veilvoice_video::{ffmpeg, page, waveform};
 /// scales it to whatever width was asked for.
 const WAVE_COLUMNS: usize = 640;
 
+/// One correction to make to a plan.
+///
+/// A plain enum rather than the clap type, so this module is testable without
+/// building a command line. `main.rs` converts.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Fix {
+    /// Give the stretch at `at` to `to`.
+    Reassign { at: f64, to: usize },
+    /// Cut the stretch at `at` in two.
+    Split { at: f64 },
+    /// Join the stretch at `at` with the one at `with`.
+    Merge { at: f64, with: f64 },
+    /// Move the edges of the stretch at `at`.
+    Move { at: f64, start: f64, end: f64 },
+    /// Rename a speaker.
+    Name { speaker: usize, to: String },
+    /// Recolour a speaker, or return them to the palette.
+    Colour { speaker: usize, to: Option<String> },
+}
+
+/// Correct a plan in place, and say exactly what changed.
+///
+/// # Written back only after it worked
+///
+/// The plan is read, changed in memory, and only then written. A correction
+/// that is refused leaves the file byte for byte as it was, so a mistyped
+/// command cannot leave a plan half-edited. A half-edited plan is the worst
+/// outcome available here: it looks fine, and it renders somebody in the wrong
+/// voice, which nobody can hear.
+///
+/// # What is printed
+///
+/// The before and the after, for the spans that changed. A correction that says
+/// only "done" leaves somebody to open the file and check, and the whole point
+/// of these commands is that checking by ear is not possible.
+pub fn fix(path: &Path, what: Fix) -> Result<(), String> {
+    let mut plan = load_plan(path)?;
+    let names: Vec<String> = plan.speakers().iter().map(|s| s.name.clone()).collect();
+    let before = describe(&plan);
+
+    match &what {
+        Fix::Reassign { at, to } => {
+            let turn = plan.reassign_at(*at, *to).map_err(|e| e.to_string())?;
+            let span = &plan.turns()[turn];
+            println!(
+                "{}",
+                ok(&format!(
+                    "{:.3} s to {:.3} s is now {}, and was {}",
+                    span.start,
+                    span.end,
+                    names.get(*to).map(String::as_str).unwrap_or("?"),
+                    before
+                        .get(turn)
+                        .map(String::as_str)
+                        .unwrap_or("something else")
+                ))
+            );
+        }
+        Fix::Split { at } => {
+            let (first, second) = plan.split_at(*at).map_err(|e| e.to_string())?;
+            let (a, b) = (&plan.turns()[first], &plan.turns()[second]);
+            println!(
+                "{}",
+                ok(&format!(
+                    "cut at {at:.3} s into {:.3}-{:.3} and {:.3}-{:.3}, both still {}",
+                    a.start,
+                    a.end,
+                    b.start,
+                    b.end,
+                    names.get(a.speaker).map(String::as_str).unwrap_or("?")
+                ))
+            );
+            println!(
+                "{}",
+                warn(
+                    "both halves are still the same speaker. Reassign whichever \
+                     one is wrong."
+                )
+            );
+        }
+        Fix::Merge { at, with } => {
+            let first = plan
+                .turn_at(*at)
+                .ok_or_else(|| format!("nothing is assigned at {at} s"))?;
+            let second = plan
+                .turn_at(*with)
+                .ok_or_else(|| format!("nothing is assigned at {with} s"))?;
+            let joined = plan.merge(first, second).map_err(|e| e.to_string())?;
+            let span = &plan.turns()[joined];
+            println!(
+                "{}",
+                ok(&format!(
+                    "joined into {:.3} s to {:.3} s, {}",
+                    span.start,
+                    span.end,
+                    names.get(span.speaker).map(String::as_str).unwrap_or("?")
+                ))
+            );
+        }
+        Fix::Move { at, start, end } => {
+            let turn = plan
+                .turn_at(*at)
+                .ok_or_else(|| format!("nothing is assigned at {at} s"))?;
+            let was = before.get(turn).cloned().unwrap_or_default();
+            plan.move_edges(turn, *start, *end)
+                .map_err(|e| e.to_string())?;
+            println!(
+                "{}",
+                ok(&format!("{was} now runs {start:.3} s to {end:.3} s"))
+            );
+        }
+        Fix::Name { speaker, to } => {
+            let was = names.get(*speaker).cloned().unwrap_or_default();
+            plan.set_name(*speaker, to).map_err(|e| e.to_string())?;
+            println!(
+                "{}",
+                ok(&format!("speaker {speaker} was {was:?}, now {to:?}"))
+            );
+            println!(
+                "{}",
+                warn(
+                    "a name is a label and not part of the veiling. A real name \
+                     here is a real name in the subtitles."
+                )
+            );
+        }
+        Fix::Colour { speaker, to } => {
+            plan.set_colour(*speaker, to.as_deref())
+                .map_err(|e| e.to_string())?;
+            match to {
+                Some(colour) => println!(
+                    "{}",
+                    ok(&format!("speaker {speaker} is now drawn in {colour}"))
+                ),
+                None => println!(
+                    "{}",
+                    ok(&format!(
+                        "speaker {speaker} is back to the colour their slot is given"
+                    ))
+                ),
+            }
+        }
+    }
+
+    plan.save(path)
+        .map_err(|e| format!("{}: {e}", path.display()))?;
+    println!("{}", field("written", &path.display().to_string()));
+    Ok(())
+}
+
+/// Every span as `speaker, start to end`, for reporting what a change replaced.
+fn describe(plan: &Conversation) -> Vec<String> {
+    plan.turns()
+        .iter()
+        .map(|turn| {
+            format!(
+                "{} at {:.3}-{:.3} s",
+                plan.speakers()
+                    .get(turn.speaker)
+                    .map(|s| s.name.as_str())
+                    .unwrap_or("?"),
+                turn.start,
+                turn.end
+            )
+        })
+        .collect()
+}
+
 /// Turn the picture flags into a [`Look`], or explain why they do not describe
 /// a picture that can be drawn.
 ///
@@ -452,7 +620,7 @@ pub fn preview(
                 &format!(
                     "{} -- {}",
                     plan.voice(index).describe(),
-                    veilvoice_video::palette::speaker(index)
+                    plan.colour_of(index, veilvoice_video::palette::speaker(index))
                 )
             )
         );
