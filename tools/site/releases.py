@@ -114,6 +114,30 @@ VERIFIER_SOURCE = os.path.join("crates", "veilvoice-verify", "src", "lib.rs")
 # Where the Verify tab's capture goes. A line of its own in the Markdown, swapped
 # for markup after rendering.
 FIGURE = "<!--verify-tab-figure-->"
+
+# Where the documentation is, linked twice: to the file on GitHub, which is
+# where it is written and where somebody with a checkout already has it, and to
+# the page on this site that covers the same ground where there is one.
+#
+# Two links rather than a choice between them. The file is the source and reads
+# the same in a terminal, a checkout and a release archive; the page is styled,
+# searchable and does not require leaving the site. A reader wants whichever of
+# those they are already in the middle of.
+DOCS = [
+    ("USER_GUIDE.md", "The whole application, screen by screen", "guide.html"),
+    ("GUIDE_CLI.md", "Every command line command, with worked examples", None),
+    ("GUIDE_GUI.md", "The desktop application on its own", None),
+    ("GUIDE_VERIFY.md", "Checking a download, at length", "verify.html"),
+    ("INSTALL.md", "Installing and verifying, per operating system", "download.html"),
+    ("FAQ.md", "The questions people actually ask", "faq.html"),
+    ("WHITEPAPER.md", "What the veiling does and why it cannot be undone",
+     "crypto.html"),
+    ("REPRODUCIBLE_BUILDS.md", "Building it yourself and comparing", None),
+    ("SELF_SIGNING.md", "The code-signing certificate, and importing it", None),
+    ("PACKAGING.md", "The deb, the RPM, the AUR recipe and the rest", None),
+    ("USING_THE_CRATES.md", "Using VeilVoice as a library", None),
+    ("AUDIT.md", "Every defect found and fixed, in order", None),
+]
 FIGURE_HTML = (
     '<figure class="shot">'
     '<img src="assets/screenshots/gui-verify.png" '
@@ -448,6 +472,49 @@ def verify_markdown(version):
     return out
 
 
+def docs_html():
+    """Where every document is, on GitHub and on this site.
+
+    A release archive ships `docs/` inside it, the repository holds the same
+    files, and this website renders several of them. Somebody who has just
+    downloaded VeilVoice has all three and no reason to know that, so the list
+    is here, with both links where both exist.
+    """
+    out = []
+    out.append('<details class="release" id="the-documentation">')
+    out.append(
+        "<summary><strong>The documentation</strong> "
+        '<span class="muted">every guide, on GitHub and on this site, and in '
+        "the archive you just downloaded</span></summary>"
+    )
+    out.append(
+        '<p class="muted">Each of these is a file in <code>docs/</code>. Every '
+        "release archive carries the whole folder, so once you have unpacked "
+        "one you have all of it offline. The first link is the file as it is "
+        "written; the second, where there is one, is the same ground covered "
+        "as a page of this site.</p>"
+    )
+    out.append("<table><thead><tr><th>Document</th><th>What it covers</th>"
+               "<th>On this site</th></tr></thead><tbody>")
+    for name, what, page in DOCS:
+        here = ('<a href="%s">%s</a>' % (page, page[:-5])) if page else "&mdash;"
+        out.append(
+            '<tr><td><a href="https://github.com/%s/blob/%s/docs/%s" '
+            'rel="noopener noreferrer"><code>%s</code></a></td>'
+            "<td>%s</td><td>%s</td></tr>"
+            % (docs.REPO, docs.REF, name, name, docs.esc(what), here)
+        )
+    out.append("</tbody></table>")
+    out.append(
+        '<p class="muted">The generated reference for every crate and every '
+        'source file is under <a href="wiki.html">the reference</a>, and the '
+        'same pages are in <a href="https://github.com/%s/wiki" '
+        'rel="noopener noreferrer">the wiki</a>.</p>' % docs.REPO
+    )
+    out.append("</details>")
+    return out
+
+
 def archives():
     """Every archive a release publishes, as `(label, filename pattern)`.
 
@@ -602,6 +669,14 @@ def summary(body):
     at a sentence. A bullet keeps its text and loses its marker: for those
     releases the first bullet genuinely is the first thing said.
     """
+    # A block that is nothing but a bold label is a heading written in bold
+    # rather than with hashes, and saying nothing more than that. `v0.1.17`
+    # opens `**In short**`, and taking it gave a row in the list reading
+    # "v0.1.17  In short", which is a label that labels nothing. Skip those and
+    # take the block under them. Now that every release on the page is closed
+    # by default, this line is all a reader has to go on.
+    LABEL = re.compile(r"^\*\*[^*]{1,40}\*\*[.:]?$")
+
     block = []
     for line in body:
         text = line.strip()
@@ -609,7 +684,7 @@ def summary(body):
             if block:
                 break
             continue
-        if text.startswith(("#", "|", ">", "```")):
+        if text.startswith(("#", "|", ">", "```")) or LABEL.match(text):
             if block:
                 break
             continue
@@ -752,6 +827,8 @@ def build():
     out.extend(docs.doc_html(after, ids_for(after)))
     out.append("</details>")
 
+    out.extend(docs_html())
+
     pending = unreleased(text)
     # An `Unreleased` entry is worth showing when something is in it, and is
     # noise when it holds the placeholder that sits there between releases:
@@ -768,24 +845,51 @@ def build():
         out.extend(docs.doc_html(pending, ids_for(pending)))
         out.append("</details>")
 
-    for index, release in enumerate(found):
+    for release in found:
         version = release["version"]
-        # The newest one opens by default: somebody arriving here almost always
-        # wants the one they are about to install.
-        attrs = ' open' if index == 0 else ""
-        out.append('<details class="release" id="v%s"%s>' % (version, attrs))
+        # **Every release is closed, including the newest.**
+        #
+        # The newest used to open by default, on the reasoning that somebody
+        # arriving here wants the one they are about to install. That was true
+        # about *which* release they want and wrong about what they want from
+        # it. These notes run to hundreds of lines, so an open newest release
+        # put a wall of prose between the top of the page and everything else
+        # on it: the older releases, and the files.
+        #
+        # Closed, the page is a list of versions a reader can see the whole of,
+        # and opening one is a decision rather than the default.
+        out.append('<details class="release" id="v%s">' % version)
         line = summary(release["body"])
         out.append(
             "<summary><strong>v%s</strong> <span class=\"muted\">%s</span></summary>"
             % (version, docs.inline_html(line))
         )
-        # The notes first and the files last, so opening a release shows what
-        # changed in it rather than a wall of links. Somebody who came for the
-        # download scrolls past the notes to reach them, which is the right way
-        # round: the notes are what this page is for, and the release page on
-        # GitHub is one click away for anybody who only wants a file.
-        out.extend(docs.doc_html(release["body"], ids_for(release["body"])))
+        # **The files first, the notes under them.**
+        #
+        # This was the other way round, with a comment arguing that the notes
+        # are what the page is for. They are what the page is *made of*; the
+        # files are what somebody came for. Putting several hundred lines of
+        # prose in front of the download links means scrolling past all of it
+        # to reach them, every time, which is a poor trade for making a point
+        # about what the page is for.
         out.extend(files_html(version))
+        out.append('<details class="notes">')
+        out.append(
+            "<summary><strong>Release notes</strong> "
+            '<span class="muted">everything that changed in v%s, in '
+            "full</span></summary>" % version
+        )
+        out.extend(docs.doc_html(release["body"], ids_for(release["body"])))
+        out.append(
+            '<p class="muted">The same notes are in '
+            '<a href="https://github.com/%s/blob/%s/CHANGELOG.md" '
+            'rel="noopener noreferrer"><code>CHANGELOG.md</code></a>, where '
+            "they are written, and at the top of "
+            '<a href="https://github.com/%s/releases/tag/v%s" '
+            'rel="noopener noreferrer">this release on GitHub</a>.</p>'
+            % (docs.REPO, docs.REF, docs.REPO, version)
+        )
+        out.append("</details>")
         out.append("</details>")
 
     # Every version that predates the first section with notes of its own. They
