@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 140 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 149 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -106,101 +106,110 @@
 <span class="ln" id="L55"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> ffmpeg;</span>
 <span class="ln" id="L56"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> page;</span>
 <span class="ln" id="L57"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> palette;</span>
-<span class="ln" id="L58"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> waveform;</span>
-<span class="ln" id="L59"></span>
+<span class="ln" id="L58"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> size;</span>
+<span class="ln" id="L59"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> waveform;</span>
+<span class="ln" id="L60"></span>
 <span class="src-item" id="fn-version">
-<span class="ln" id="L60"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
-<span class="ln" id="L61"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
+<span class="ln" id="L61"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
+<span class="ln" id="L62"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
 </span>
-<span class="ln" id="L62"></span>
+<span class="ln" id="L63"></span>
 <span class="src-item" id="fn-scope">
-<span class="ln" id="L63"><span class="tok-com">/// What a rendered video is worth, in the words a front end should show.</span></span>
-<span class="ln" id="L64"><span class="tok-com">///</span></span>
-<span class="ln" id="L65"><span class="tok-com">/// Single-sourced and asserted by the tests, exactly as every other scope note</span></span>
-<span class="ln" id="L66"><span class="tok-com">/// in this project is, so it cannot quietly turn into a promise.</span></span>
-<span class="ln" id="L67"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SCOPE: &amp;str =</span>
-<span class="ln" id="L68">    <span class="tok-str">&quot;The picture is drawn from the veiled audio, not from the original. A waveform carries \</span></span>
-<span class="ln" id="L69"><span class="tok-str">     no formants and no phase, so it is not a voiceprint -- but it does show silences, \</span></span>
-<span class="ln" id="L70"><span class="tok-str">     rhythm and loudness, which is the same turn-taking structure the audio already \</span></span>
-<span class="ln" id="L71"><span class="tok-str">     keeps. Names and portraits are not veiled by anything: a photograph beside a veiled \</span></span>
-<span class="ln" id="L72"><span class="tok-str">     voice identifies the person completely, which is why the default is a plain coloured \</span></span>
-<span class="ln" id="L73"><span class="tok-str">     circle. A video file needs ffmpeg, which VeilVoice will not download or run for you; \</span></span>
-<span class="ln" id="L74"><span class="tok-str">     the page it writes needs nothing installed.&quot;</span>;</span>
+<span class="ln" id="L64"><span class="tok-com">/// What a rendered video is worth, in the words a front end should show.</span></span>
+<span class="ln" id="L65"><span class="tok-com">///</span></span>
+<span class="ln" id="L66"><span class="tok-com">/// Single-sourced and asserted by the tests, exactly as every other scope note</span></span>
+<span class="ln" id="L67"><span class="tok-com">/// in this project is, so it cannot quietly turn into a promise.</span></span>
+<span class="ln" id="L68"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SCOPE: &amp;str =</span>
+<span class="ln" id="L69">    <span class="tok-str">&quot;The picture is drawn from the veiled audio, not from the original. A waveform carries \</span></span>
+<span class="ln" id="L70"><span class="tok-str">     no formants and no phase, so it is not a voiceprint -- but it does show silences, \</span></span>
+<span class="ln" id="L71"><span class="tok-str">     rhythm and loudness, which is the same turn-taking structure the audio already \</span></span>
+<span class="ln" id="L72"><span class="tok-str">     keeps. Names and portraits are not veiled by anything: a photograph beside a veiled \</span></span>
+<span class="ln" id="L73"><span class="tok-str">     voice identifies the person completely, which is why the default is a plain coloured \</span></span>
+<span class="ln" id="L74"><span class="tok-str">     circle. A video file needs ffmpeg, which VeilVoice will not download or run for you; \</span></span>
+<span class="ln" id="L75"><span class="tok-str">     the page it writes needs nothing installed.&quot;</span>;</span>
 </span>
-<span class="ln" id="L75"></span>
+<span class="ln" id="L76"></span>
 <span class="src-item" id="fn-error">
-<span class="ln" id="L76"><span class="tok-com">/// Everything that can go wrong in this crate.</span></span>
-<span class="ln" id="L77"><span class="tok-attr">#[derive</span>(Debug)]</span>
-<span class="ln" id="L78"><span class="tok-attr">#[non_exhaustive</span>]</span>
-<span class="ln" id="L79"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
-<span class="ln" id="L80">    <span class="tok-com">/// A file could not be read or written.</span></span>
-<span class="ln" id="L81">    <span class="tok-fn">Io</span>(std::io::Error),</span>
-<span class="ln" id="L82">    <span class="tok-com">/// Something about the request does not make sense.</span></span>
-<span class="ln" id="L83">    <span class="tok-fn">Malformed</span>(String),</span>
-<span class="ln" id="L84">}</span>
+<span class="ln" id="L77"><span class="tok-com">/// Everything that can go wrong in this crate.</span></span>
+<span class="ln" id="L78"><span class="tok-attr">#[derive</span>(Debug)]</span>
+<span class="ln" id="L79"><span class="tok-attr">#[non_exhaustive</span>]</span>
+<span class="ln" id="L80"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
+<span class="ln" id="L81">    <span class="tok-com">/// A file could not be read or written.</span></span>
+<span class="ln" id="L82">    <span class="tok-fn">Io</span>(std::io::Error),</span>
+<span class="ln" id="L83">    <span class="tok-com">/// Something about the request does not make sense.</span></span>
+<span class="ln" id="L84">    <span class="tok-fn">Malformed</span>(String),</span>
+<span class="ln" id="L85">    <span class="tok-com">/// A frame size or frame rate a video cannot be rendered at.</span></span>
+<span class="ln" id="L86">    <span class="tok-com">///</span></span>
+<span class="ln" id="L87">    <span class="tok-com">/// Separate from [`Error::Malformed`] because it is the one error here a</span></span>
+<span class="ln" id="L88">    <span class="tok-com">/// person routinely causes by typing, and a front end wants to offer the</span></span>
+<span class="ln" id="L89">    <span class="tok-com">/// nearest thing that works rather than only report a refusal. The message</span></span>
+<span class="ln" id="L90">    <span class="tok-com">/// always names both the rule and the value that would have obeyed it.</span></span>
+<span class="ln" id="L91">    <span class="tok-fn">Size</span>(String),</span>
+<span class="ln" id="L92">}</span>
 </span>
-<span class="ln" id="L85"></span>
-<span class="ln" id="L86"><span class="tok-kw">impl</span> From&lt;std::io::Error&gt; <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L93"></span>
+<span class="ln" id="L94"><span class="tok-kw">impl</span> From&lt;std::io::Error&gt; <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-from">
-<span class="ln" id="L87">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(error: std::io::Error) -&gt; Self {</span>
-<span class="ln" id="L88">        Self::<span class="tok-fn">Io</span>(error)</span>
-<span class="ln" id="L89">    }</span>
+<span class="ln" id="L95">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(error: std::io::Error) -&gt; Self {</span>
+<span class="ln" id="L96">        Self::<span class="tok-fn">Io</span>(error)</span>
+<span class="ln" id="L97">    }</span>
 </span>
-<span class="ln" id="L90">}</span>
-<span class="ln" id="L91"></span>
-<span class="ln" id="L92"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L98">}</span>
+<span class="ln" id="L99"></span>
+<span class="ln" id="L100"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-fmt">
-<span class="ln" id="L93">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L94">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L95">            Self::<span class="tok-fn">Io</span>(error) =&gt; write!(f, <span class="tok-str">&quot;input/output error: {error}&quot;</span>),</span>
-<span class="ln" id="L96">            Self::<span class="tok-fn">Malformed</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
-<span class="ln" id="L97">        }</span>
-<span class="ln" id="L98">    }</span>
-</span>
-<span class="ln" id="L99">}</span>
-<span class="ln" id="L100"></span>
-<span class="ln" id="L101"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {</span>
-<span class="src-item" id="fn-error-source">
-<span class="ln" id="L102">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;(<span class="tok-kw">dyn</span> std::error::Error + &#x27;<span class="tok-kw">static</span>)&gt; {</span>
-<span class="ln" id="L103">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L104">            Self::<span class="tok-fn">Io</span>(error) =&gt; <span class="tok-fn">Some</span>(error),</span>
-<span class="ln" id="L105">            _ =&gt; None,</span>
+<span class="ln" id="L101">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L102">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L103">            Self::<span class="tok-fn">Io</span>(error) =&gt; write!(f, <span class="tok-str">&quot;input/output error: {error}&quot;</span>),</span>
+<span class="ln" id="L104">            Self::<span class="tok-fn">Malformed</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
+<span class="ln" id="L105">            Self::<span class="tok-fn">Size</span>(what) =&gt; write!(f, <span class="tok-str">&quot;{what}&quot;</span>),</span>
 <span class="ln" id="L106">        }</span>
 <span class="ln" id="L107">    }</span>
 </span>
 <span class="ln" id="L108">}</span>
 <span class="ln" id="L109"></span>
-<span class="ln" id="L110"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L111"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L112">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L113"></span>
-<span class="ln" id="L114">    <span class="tok-com">/// The claim must keep stating what a picture does and does not hide.</span></span>
-<span class="ln" id="L115">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L116">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_states_the_limits_rather_than_a_guarantee</span>() {</span>
-<span class="ln" id="L117">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L118">        assert!(</span>
-<span class="ln" id="L119">            scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not from the original&quot;</span>),</span>
-<span class="ln" id="L120">            <span class="tok-str">&quot;which audio the picture is of is the first thing to say&quot;</span></span>
-<span class="ln" id="L121">        );</span>
-<span class="ln" id="L122">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;it is not a voiceprint&quot;</span>));</span>
-<span class="ln" id="L123">        assert!(</span>
-<span class="ln" id="L124">            scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;photograph beside a veiled voice identifies the person&quot;</span>),</span>
-<span class="ln" id="L125">            <span class="tok-str">&quot;the portrait trap must be stated plainly&quot;</span></span>
-<span class="ln" id="L126">        );</span>
-<span class="ln" id="L127">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;will not download or run for you&quot;</span>));</span>
-<span class="ln" id="L128">        <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;anonymous&quot;</span>, <span class="tok-str">&quot;guarantee&quot;</span>, <span class="tok-str">&quot;impossible to&quot;</span>, <span class="tok-str">&quot;untraceable&quot;</span>] {</span>
-<span class="ln" id="L129">            assert!(!scope.<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;overclaim: {boast}&quot;</span>);</span>
-<span class="ln" id="L130">        }</span>
-<span class="ln" id="L131">    }</span>
-<span class="ln" id="L132"></span>
-<span class="ln" id="L133">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L134">    <span class="tok-kw">fn</span> <span class="tok-fn">an_io_error_displays_and_keeps_its_source</span>() {</span>
-<span class="ln" id="L135">        <span class="tok-kw">let</span> error = Error::<span class="tok-fn">from</span>(std::io::Error::<span class="tok-fn">new</span>(std::io::ErrorKind::NotFound, <span class="tok-str">&quot;gone&quot;</span>));</span>
-<span class="ln" id="L136">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;gone&quot;</span>));</span>
-<span class="ln" id="L137">        assert!(std::error::Error::<span class="tok-fn">source</span>(&amp;error).<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L138">        assert!(Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;x&quot;</span>));</span>
-<span class="ln" id="L139">    }</span>
-<span class="ln" id="L140">}</span>
+<span class="ln" id="L110"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {</span>
+<span class="src-item" id="fn-error-source">
+<span class="ln" id="L111">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;(<span class="tok-kw">dyn</span> std::error::Error + &#x27;<span class="tok-kw">static</span>)&gt; {</span>
+<span class="ln" id="L112">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L113">            Self::<span class="tok-fn">Io</span>(error) =&gt; <span class="tok-fn">Some</span>(error),</span>
+<span class="ln" id="L114">            _ =&gt; None,</span>
+<span class="ln" id="L115">        }</span>
+<span class="ln" id="L116">    }</span>
+</span>
+<span class="ln" id="L117">}</span>
+<span class="ln" id="L118"></span>
+<span class="ln" id="L119"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L120"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L121">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L122"></span>
+<span class="ln" id="L123">    <span class="tok-com">/// The claim must keep stating what a picture does and does not hide.</span></span>
+<span class="ln" id="L124">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L125">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_states_the_limits_rather_than_a_guarantee</span>() {</span>
+<span class="ln" id="L126">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L127">        assert!(</span>
+<span class="ln" id="L128">            scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not from the original&quot;</span>),</span>
+<span class="ln" id="L129">            <span class="tok-str">&quot;which audio the picture is of is the first thing to say&quot;</span></span>
+<span class="ln" id="L130">        );</span>
+<span class="ln" id="L131">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;it is not a voiceprint&quot;</span>));</span>
+<span class="ln" id="L132">        assert!(</span>
+<span class="ln" id="L133">            scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;photograph beside a veiled voice identifies the person&quot;</span>),</span>
+<span class="ln" id="L134">            <span class="tok-str">&quot;the portrait trap must be stated plainly&quot;</span></span>
+<span class="ln" id="L135">        );</span>
+<span class="ln" id="L136">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;will not download or run for you&quot;</span>));</span>
+<span class="ln" id="L137">        <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;anonymous&quot;</span>, <span class="tok-str">&quot;guarantee&quot;</span>, <span class="tok-str">&quot;impossible to&quot;</span>, <span class="tok-str">&quot;untraceable&quot;</span>] {</span>
+<span class="ln" id="L138">            assert!(!scope.<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;overclaim: {boast}&quot;</span>);</span>
+<span class="ln" id="L139">        }</span>
+<span class="ln" id="L140">    }</span>
+<span class="ln" id="L141"></span>
+<span class="ln" id="L142">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L143">    <span class="tok-kw">fn</span> <span class="tok-fn">an_io_error_displays_and_keeps_its_source</span>() {</span>
+<span class="ln" id="L144">        <span class="tok-kw">let</span> error = Error::<span class="tok-fn">from</span>(std::io::Error::<span class="tok-fn">new</span>(std::io::ErrorKind::NotFound, <span class="tok-str">&quot;gone&quot;</span>));</span>
+<span class="ln" id="L145">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;gone&quot;</span>));</span>
+<span class="ln" id="L146">        assert!(std::error::Error::<span class="tok-fn">source</span>(&amp;error).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L147">        assert!(Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;x&quot;</span>));</span>
+<span class="ln" id="L148">    }</span>
+<span class="ln" id="L149">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

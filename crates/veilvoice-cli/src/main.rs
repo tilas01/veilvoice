@@ -665,6 +665,16 @@ enum Command {
         /// `.mp4`.
         #[arg(short, long)]
         output: Option<PathBuf>,
+        /// Frame size: monitor, 720p, 1080p, 1440p, 4k, or 1920x1080.
+        ///
+        /// `monitor` matches the display this is running on where the platform
+        /// will say what that is, and says so and uses 1080p where it will not,
+        /// which on a machine with no display server is the ordinary case.
+        #[arg(long, default_value = "monitor")]
+        size: String,
+        /// Frames per second, from 5 to 60.
+        #[arg(long, default_value_t = 30)]
+        fps: u32,
         /// Print the command rather than running it.
         #[arg(long)]
         dry_run: bool,
@@ -755,12 +765,12 @@ enum ConversationCommand {
         /// the same directory, so move all of them or none.
         #[arg(long)]
         page: bool,
-        /// Picture width in pixels.
-        #[arg(long, default_value_t = 1280)]
-        width: u32,
-        /// Picture height in pixels.
-        #[arg(long, default_value_t = 720)]
-        height: u32,
+        /// Frame size: monitor, 720p, 1080p, 1440p, 4k, or 1920x1080.
+        ///
+        /// Read whether or not `--page` was given, so a size that describes no
+        /// picture fails the same way with and without it.
+        #[arg(long, default_value = "monitor")]
+        size: String,
         /// Margin around everything, in pixels.
         #[arg(long, default_value_t = 48)]
         padding: u32,
@@ -809,12 +819,17 @@ enum ConversationCommand {
         /// Print the ffmpeg command, and whether ffmpeg is installed.
         #[arg(long)]
         ffmpeg: bool,
-        /// Picture width in pixels.
-        #[arg(long, default_value_t = 1280)]
-        width: u32,
-        /// Picture height in pixels.
-        #[arg(long, default_value_t = 720)]
-        height: u32,
+        /// Frame size: monitor, 720p, 1080p, 1440p, 4k, or 1920x1080.
+        ///
+        /// This replaces the old `--width` and `--height`, which were two ways
+        /// to say one thing and could be set to a pair no video can be made
+        /// from. `monitor` matches this display where the platform will say
+        /// what it is, and says so and uses 1080p where it will not.
+        #[arg(long, default_value = "monitor")]
+        size: String,
+        /// Frames per second for the printed ffmpeg command, from 5 to 60.
+        #[arg(long, default_value_t = 30)]
+        fps: u32,
         /// Margin around everything, in pixels.
         #[arg(long, default_value_t = 48)]
         padding: u32,
@@ -1423,8 +1438,7 @@ fn run(command: Command) -> Result<(), String> {
                 reseed_secs,
                 reseed_range,
                 page,
-                width,
-                height,
+                size,
                 padding,
                 background,
                 black,
@@ -1432,12 +1446,19 @@ fn run(command: Command) -> Result<(), String> {
                 one_voice,
             } => {
                 // The picture flags are read whether or not `--page` was given,
-                // so `--width 40 --page` and `--width 40` fail the same way.
-                // Accepting numbers that describe nothing, silently, because
-                // the page happened not to be asked for, is how a flag comes to
-                // mean two different things.
-                let look =
-                    conversation::look_from(width, height, padding, background, black, theme)?;
+                // so `--size 40x40 --page` and `--size 40x40` fail the same
+                // way. Accepting a size that describes nothing, silently,
+                // because the page happened not to be asked for, is how a flag
+                // comes to mean two different things.
+                let render = video_plan(&size, 30)?;
+                let look = conversation::look_from(
+                    render.size.width(),
+                    render.size.height(),
+                    padding,
+                    background,
+                    black,
+                    theme,
+                )?;
                 conversation::run(
                     &plan,
                     &input,
@@ -1458,22 +1479,32 @@ fn run(command: Command) -> Result<(), String> {
                 at,
                 output,
                 ffmpeg,
-                width,
-                height,
+                size,
+                fps,
                 padding,
                 background,
                 black,
                 theme,
                 one_voice,
-            } => conversation::preview(
-                &plan,
-                audio,
-                at,
-                conversation::look_from(width, height, padding, background, black, theme)?,
-                output,
-                ffmpeg,
-                one_voice,
-            ),
+            } => {
+                let render = video_plan(&size, fps)?;
+                conversation::preview(
+                    &plan,
+                    audio,
+                    at,
+                    conversation::look_from(
+                        render.size.width(),
+                        render.size.height(),
+                        padding,
+                        background,
+                        black,
+                        theme,
+                    )?,
+                    output,
+                    ffmpeg.then_some(render),
+                    one_voice,
+                )
+            }
         },
 
         Command::Failsafe { veiling } => failsafe::show(veiling.as_deref()),
@@ -1707,13 +1738,19 @@ fn run(command: Command) -> Result<(), String> {
         Command::Video {
             audio,
             output,
+            size,
+            fps,
             dry_run,
         } => {
             let out = output.unwrap_or_else(|| audio.with_extension("mp4"));
+            let plan = video_plan(&size, fps)?;
             let argv = veilvoice_video::ffmpeg::black_command(
                 &audio,
                 &out,
-                veilvoice_video::ffmpeg::Encoding::default(),
+                veilvoice_video::ffmpeg::Encoding {
+                    plan,
+                    ..Default::default()
+                },
             );
             run_ffmpeg("Video", &argv, &out, dry_run)
         }
@@ -2505,6 +2542,29 @@ fn list_devices() -> Result<(), String> {
 /// how the copies got out of step in the first place.
 pub(crate) fn read_named(path: &std::path::Path) -> Result<Vec<u8>, String> {
     std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))
+}
+
+/// Read a `--size` and an `--fps` into a render plan, saying what was decided.
+///
+/// **The note is printed rather than swallowed.** `monitor` on a machine with
+/// no display server silently became 1080p otherwise, which reads as a
+/// detection and is a fallback. Somebody rendering on a server should be told
+/// that the size they got is a default and not a measurement of anything.
+///
+/// The display is not asked here at all: a command line has no window, and the
+/// platform interfaces that answer this question want one. The window passes
+/// its own display size to the same resolver, so both front ends share the
+/// arithmetic and differ only in whether there is a screen to ask.
+pub(crate) fn video_plan(size: &str, fps: u32) -> Result<veilvoice_video::size::Plan, String> {
+    use veilvoice_video::size::{Choice, FrameRate, Plan};
+
+    let choice = Choice::parse(size).map_err(|e| e.to_string())?;
+    let fps = FrameRate::new(fps).map_err(|e| e.to_string())?;
+    let resolved = choice.resolve(None);
+    if let Some(note) = &resolved.note {
+        println!("{}", crate::theme::warn(note));
+    }
+    Ok(Plan::new(resolved.size, fps))
 }
 
 /// Write a file, naming it if that fails.

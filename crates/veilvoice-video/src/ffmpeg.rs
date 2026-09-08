@@ -38,6 +38,7 @@
 //! command for `ffmpeg`, which many people already have, and leaves running it to
 //! you.
 
+use crate::size;
 use std::path::{Path, PathBuf};
 
 /// Where `ffmpeg` is, if this machine has one.
@@ -66,8 +67,17 @@ pub fn found() -> Option<PathBuf> {
 /// How to render the file.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Encoding {
-    /// Frames per second.
-    pub fps: u32,
+    /// The frame size and the frame rate.
+    ///
+    /// **This used to be a bare `fps: u32` and a `1280x720` written into the
+    /// command**, which meant the size was not a setting at all: a conversation
+    /// rendered for a 4K screen came out at 720p and upscaled, and nothing in
+    /// the interface or on the command line could say otherwise.
+    ///
+    /// A [`size::Plan`] rather than two numbers, because the two are only
+    /// meaningful together: what a render costs is the product of them, and
+    /// [`size::Plan::estimate`] is what a front end asks before it starts.
+    pub plan: size::Plan,
     /// Constant rate factor: lower is better quality and a larger file.
     pub crf: u32,
     /// The video encoder to ask `ffmpeg` for.
@@ -86,9 +96,13 @@ pub struct Encoding {
 impl Default for Encoding {
     fn default() -> Self {
         Self {
-            // Thirty is enough for a waveform and a circle that lights up.
-            // Sixty would double the file for motion that is not there.
-            fps: 30,
+            // 1080p at thirty. Thirty is enough for a waveform and a circle
+            // that brightens, and sixty would double the file for motion that
+            // is not there. The *interactive* default is the display this is
+            // running on, which is `size::Choice::Monitor` and is resolved by a
+            // front end that has a display to ask; this is what a plan is when
+            // nobody has chosen one.
+            plan: size::Plan::default(),
             // Visually lossless for flat colour and text, which is all this is.
             crf: 20,
             // The software encoder, which every copy of ffmpeg has. Choosing
@@ -124,7 +138,7 @@ pub fn command(
         // directory they may have put something else in.
         "-n".to_string(),
         "-framerate".to_string(),
-        encoding.fps.to_string(),
+        encoding.plan.fps.get().to_string(),
         "-i".to_string(),
         input.display().to_string(),
         "-i".to_string(),
@@ -143,6 +157,17 @@ pub fn command(
             "-crf".to_string()
         },
         encoding.crf.to_string(),
+        // Scale to the chosen size. The frames are drawn at it, so this is
+        // normally a no-op, and it is here for the case where they are not: a
+        // page rendered once and encoded twice at two sizes should not need
+        // redrawing, and a frame that arrives at the wrong size should be
+        // resized rather than making ffmpeg refuse the whole run.
+        "-vf".to_string(),
+        format!(
+            "scale={}:{}:flags=lanczos",
+            encoding.plan.size.width(),
+            encoding.plan.size.height()
+        ),
         // The pixel format every player and every phone accepts. Without it
         // ffmpeg picks yuv444p for RGB input, which a great many devices
         // silently refuse to play -- and "it produces a file nothing opens" is
@@ -173,9 +198,10 @@ pub fn command(
 /// temporary directory holding thousands of PNGs, and no wait proportional to
 /// the length of the recording beyond the encode itself.
 ///
-/// `720p` because it is the smallest size every platform accepts without
-/// re-encoding it again, and a larger frame of solid black costs bytes and buys
-/// nothing.
+/// The size comes from `encoding` like every other render. A frame of solid
+/// black costs almost nothing at any size, so there is no reason for this one
+/// to disagree with the rest of the settings: it used to be pinned at 720p,
+/// which meant asking for 4K and getting 720p with no mention of it.
 pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<String> {
     vec![
         "ffmpeg".to_string(),
@@ -185,7 +211,11 @@ pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<Str
         "-f".to_string(),
         "lavfi".to_string(),
         "-i".to_string(),
-        format!("color=c=black:s=1280x720:r={}", encoding.fps),
+        format!(
+            "color=c=black:s={}:r={}",
+            encoding.plan.size.geometry(),
+            encoding.plan.fps.get()
+        ),
         "-i".to_string(),
         audio.display().to_string(),
         "-c:v".to_string(),
@@ -419,13 +449,54 @@ mod tests {
     #[test]
     fn the_frame_rate_and_quality_are_the_documented_defaults() {
         let encoding = Encoding::default();
-        assert_eq!(encoding.fps, 30);
+        assert_eq!(encoding.plan.fps.get(), 30);
+        assert_eq!(encoding.plan.size, size::Preset::Hd1080.size());
         assert_eq!(encoding.crf, 20);
         let argv = argv();
         let at = argv.iter().position(|part| part == "-framerate").unwrap();
         assert_eq!(argv[at + 1], "30");
         let at = argv.iter().position(|part| part == "-crf").unwrap();
         assert_eq!(argv[at + 1], "20");
+    }
+
+    /// The chosen size reaches both commands.
+    ///
+    /// `black_command` had `1280x720` written into it, so a person who asked
+    /// for 4K got 720p and was told nothing. Both are checked here because they
+    /// build their arguments separately and only one of them was wrong.
+    #[test]
+    fn the_chosen_size_reaches_the_command_rather_than_a_written_in_one() {
+        let encoding = Encoding {
+            plan: size::Plan::new(
+                size::Preset::Uhd2160.size(),
+                size::FrameRate::new(60).unwrap(),
+            ),
+            ..Encoding::default()
+        };
+
+        let frames = command(
+            Path::new("/frames"),
+            "frame-%05d.png",
+            Path::new("/audio.wav"),
+            Path::new("/out.mp4"),
+            encoding.clone(),
+        );
+        let at = frames.iter().position(|part| part == "-vf").unwrap();
+        assert!(frames[at + 1].contains("3840:2160"), "{:?}", frames[at + 1]);
+        let at = frames.iter().position(|part| part == "-framerate").unwrap();
+        assert_eq!(frames[at + 1], "60");
+
+        let black = black_command(Path::new("/audio.wav"), Path::new("/out.mp4"), encoding);
+        let source = black
+            .iter()
+            .find(|part| part.starts_with("color="))
+            .unwrap();
+        assert!(source.contains("s=3840x2160"), "{source}");
+        assert!(source.contains("r=60"), "{source}");
+        assert!(
+            !black.iter().any(|part| part.contains("1280x720")),
+            "the written-in 720p is back: {black:?}"
+        );
     }
 
     /// A path with a space in it is the ordinary case on two of the three
