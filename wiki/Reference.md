@@ -282,6 +282,7 @@ A watchable version of a veiled conversation: a waveform, a circle per speaker, 
 - [[`lib.rs`|File-veilvoice-video-lib]] &middot; A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background.
 - [[`page.rs`|File-veilvoice-video-page]] &middot; The picture: one still for a preview, and one page that plays.
 - [[`palette.rs`|File-veilvoice-video-palette]] &middot; Colours: the site's own tokens, and one per speaker.
+- [[`size.rs`|File-veilvoice-video-size]] &middot; The size and frame rate a video is rendered at.
 - [[`waveform.rs`|File-veilvoice-video-waveform]] &middot; The shape of the audio, reduced to something a page can draw.
 
 ## [[veilvoice-watch|Crate-veilvoice-watch]]

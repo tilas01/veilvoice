@@ -387,7 +387,7 @@ pub fn preview(
     at_secs: f64,
     look: Look,
     output: Option<PathBuf>,
-    show_ffmpeg: bool,
+    show_ffmpeg: Option<veilvoice_video::size::Plan>,
     one_voice: bool,
 ) -> Result<(), String> {
     let mut plan = load_plan(plan_path)?;
@@ -458,15 +458,46 @@ pub fn preview(
         );
     }
 
-    if show_ffmpeg {
+    if let Some(render) = show_ffmpeg {
         println!();
         println!("{}", heading("Making a video of it"));
+        // The command printed is the one for the size and rate that were asked
+        // for, not a default. Printing a command that would produce a different
+        // video from the picture above it is the sort of thing somebody copies
+        // and only notices afterwards.
+        let estimate = render.estimate(plan.duration());
+        println!(
+            "{}",
+            field(
+                "frames to draw",
+                &format!(
+                    "{} at {}, {} frames a second",
+                    estimate.frames,
+                    render.size.label(),
+                    render.fps.get()
+                )
+            )
+        );
+        println!(
+            "{}",
+            field(
+                "scratch space",
+                &format!(
+                    "about {}",
+                    veilvoice_video::size::human_bytes(estimate.scratch_bytes)
+                )
+            )
+        );
+        println!();
         let argv = ffmpeg::command(
             Path::new("frames"),
             "frame-%05d.png",
             Path::new("out.veiled.wav"),
             Path::new("out.mp4"),
-            ffmpeg::Encoding::default(),
+            ffmpeg::Encoding {
+                plan: render,
+                ..Default::default()
+            },
         );
         println!("  {}", ffmpeg::command_line(&argv));
         println!();
@@ -819,7 +850,7 @@ mod tests {
             0.0,
             look_from(1280, 720, 48, None, false, Some("gruvbox".into())).unwrap(),
             Some(gruvbox.clone()),
-            false,
+            None,
             false,
         )
         .unwrap();
@@ -848,7 +879,7 @@ mod tests {
             0.25,
             Look::default(),
             Some(out.clone()),
-            false,
+            None,
             false,
         )
         .expect("a preview needs no audio");

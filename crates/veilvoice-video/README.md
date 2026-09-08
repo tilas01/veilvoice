@@ -90,17 +90,20 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>140 lines"])
-    n_ffmpeg["ffmpeg.rs<br/>491 lines"]
+    n_lib(["lib.rs<br/>149 lines"])
+    n_ffmpeg["ffmpeg.rs<br/>562 lines"]
     n_page["page.rs<br/>1030 lines"]
     n_palette["palette.rs<br/>747 lines"]
+    n_size["size.rs<br/>732 lines"]
     n_waveform["waveform.rs<br/>259 lines"]
+    n_ffmpeg --> n_size
     n_page --> n_palette
     n_page --> n_waveform
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" "open the source"
     click n_ffmpeg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" "open the source"
     click n_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" "open the source"
     click n_palette href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs" "open the source"
+    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/size.rs" "open the source"
     click n_waveform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs" "open the source"
 ```
 
@@ -110,13 +113,14 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 491 | The video file, which needs a codec this project does not ship. |
-| [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 140 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 562 | The video file, which needs a codec this project does not ship. |
+| [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 149 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1030 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
+| [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 259 | The shape of the audio, reduced to something a page can draw. |
 
-**1,863 functional lines of Rust** in this crate. A functional line is a line
+**2,372 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -166,6 +170,18 @@ counts blank lines and comments too. Both are produced by
 | `fn luminance` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Relative luminance, as WCAG defines it, from 0.0 to 1.0. |
 | `fn contrast` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | The contrast ratio between two colours, from 1.0 to 21.0. |
 | `fn ink_on` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Black or white, whichever is readable on background. |
+| `const MIN_EDGE` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | The shortest edge a render may have, in pixels. |
+| `const MAX_EDGE` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | The longest edge a render may have, in pixels. |
+| `const MAX_FPS` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | The most frames a second a render may have. |
+| `const MIN_FPS` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | The fewest frames a second a render may have. |
+| `struct Size` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | A frame size in pixels, known to be one a render can actually use. |
+| `enum Preset` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | The sizes offered by name. |
+| `enum Choice` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | What the user asked for, before anything has looked at the display. |
+| `struct Resolved` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | A size, and why it is that size. |
+| `struct FrameRate` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | Frames per second, known to be inside the range a render allows. |
+| `struct Plan` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | A size and a frame rate together, with what they will cost. |
+| `struct Estimate` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | What a render is going to want before it is started. |
+| `fn human_bytes` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | A byte count, in the units a person reads. |
 | `struct Envelope` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | The peak envelope of a signal: one minimum and one maximum per column. |
 | `fn envelope` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | Reduce samples to columns peak pairs. |
 | `fn svg_path` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | The envelope as an SVG path, filled, inside a box. |
