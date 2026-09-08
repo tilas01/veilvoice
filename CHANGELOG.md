@@ -8,6 +8,34 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The preview page can be driven, and corrected from inside it**
+
+- The self-contained player gains a transport: back ten seconds, forward ten
+  seconds, and playback from 1x to 5x. Checking a plan means going back because
+  the wrong circle lit up, and crossing a long recording faster than it was
+  spoken. Five is the ceiling: past it the audio is unintelligible and playing
+  it at all stops being the point.
+- The page names who it thinks is speaking, live, beside the transport.
+- **A correction panel for when that is the wrong person.** Press the speaker it
+  should have been and the page writes the `veilvoice conversation fix` command
+  that moves it, with the timestamp filled in. It does not edit the plan: doing
+  that in the browser would mean a second implementation of the plan format, in
+  JavaScript, able to drift from the one every other reader uses, and a plan
+  produced by the drifted copy would look right and render somebody in the
+  wrong voice. The page suggests, the program applies, and the change goes
+  through the same checking as every other route into a plan.
+- **The captions now work when the page is opened from a folder**, which is how
+  somebody who has just rendered one opens it. A browser treats every `file:`
+  URL as its own origin, so the caption track fetched from the file beside the
+  page was refused and no captions appeared, in a page whose own text promised
+  they would. They are carried in the page now. The separate `.vtt` is still
+  written, for every other player.
+- A speaker's name reaches the page inside a script as well as inside the
+  markup, and those need different escaping: `</script>` inside a JavaScript
+  string ends the element whatever quotes surround it. Both are escaped, and a
+  name holding a line separator, which is a newline to a JavaScript parser and
+  not to an HTML one, no longer breaks the script silently.
+
 **Correcting a plan before you render it**
 
 - A stretch of audio given to the wrong person is the one mistake in this

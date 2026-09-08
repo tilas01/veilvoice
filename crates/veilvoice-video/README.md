@@ -92,7 +92,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>149 lines"])
     n_ffmpeg["ffmpeg.rs<br/>562 lines"]
-    n_page["page.rs<br/>1039 lines"]
+    n_page["page.rs<br/>1440 lines"]
     n_palette["palette.rs<br/>747 lines"]
     n_size["size.rs<br/>732 lines"]
     n_waveform["waveform.rs<br/>259 lines"]
@@ -115,12 +115,12 @@ flowchart TD
 |---|---:|---|
 | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 562 | The video file, which needs a codec this project does not ship. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 149 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1039 | The picture: one still for a preview, and one page that plays. |
+| [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1440 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 259 | The shape of the audio, reduced to something a page can draw. |
 
-**2,373 functional lines of Rust** in this crate. A functional line is a line
+**2,673 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -149,6 +149,7 @@ counts blank lines and comments too. Both are produced by
 | `fn layout` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | Work out the layout for a look and a number of speakers. |
 | `fn escape` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | Escape text for markup. |
 | `fn data_uri` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | Read an image and turn it into a data: URI. |
+| `fn inline_vtt` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | A WebVTT track as a data: URI, so a page opened from disk still has it. |
 | `struct Drawn` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | What a render produced, and anything the user should know about it. |
 | `fn still` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | A single frame, as standalone SVG. |
 | `fn player` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | The self-contained page that plays. |

@@ -168,6 +168,14 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>The preview page can be driven, and corrected from inside it</strong></p>
+<ul>
+<li>The self-contained player gains a transport: back ten seconds, forward ten seconds, and playback from 1x to 5x. Checking a plan means going back because the wrong circle lit up, and crossing a long recording faster than it was spoken. Five is the ceiling: past it the audio is unintelligible and playing it at all stops being the point.</li>
+<li>The page names who it thinks is speaking, live, beside the transport.</li>
+<li><strong>A correction panel for when that is the wrong person.</strong> Press the speaker it should have been and the page writes the <code>veilvoice conversation fix</code> command that moves it, with the timestamp filled in. It does not edit the plan: doing that in the browser would mean a second implementation of the plan format, in JavaScript, able to drift from the one every other reader uses, and a plan produced by the drifted copy would look right and render somebody in the wrong voice. The page suggests, the program applies, and the change goes through the same checking as every other route into a plan.</li>
+<li><strong>The captions now work when the page is opened from a folder</strong>, which is how somebody who has just rendered one opens it. A browser treats every <code>file:</code> URL as its own origin, so the caption track fetched from the file beside the page was refused and no captions appeared, in a page whose own text promised they would. They are carried in the page now. The separate <code>.vtt</code> is still written, for every other player.</li>
+<li>A speaker&#x27;s name reaches the page inside a script as well as inside the markup, and those need different escaping: <code>&lt;/script&gt;</code> inside a JavaScript string ends the element whatever quotes surround it. Both are escaped, and a name holding a line separator, which is a newline to a JavaScript parser and not to an HTML one, no longer breaks the script silently.</li>
+</ul>
 <p><strong>Correcting a plan before you render it</strong></p>
 <ul>
 <li>A stretch of audio given to the wrong person is the one mistake in this program that <strong>cannot be heard in the result</strong>. Every voice in a veiled recording is unfamiliar, so a listener has nothing to compare against: thirty seconds of one person rendered in another&#x27;s voice sounds exactly like that other person talking, and nobody notices. <code>veilvoice conversation fix</code> is how it gets corrected before the render, which is the only time it can be.</li>
