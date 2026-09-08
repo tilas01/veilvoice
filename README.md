@@ -371,8 +371,11 @@ Also: [installing in detail](docs/INSTALL.md),
 veilvoice-gui
 ```
 
-Three modes, being anonymise a file, scramble live, and an about panel that states
-the scope. Tokyo Night, monospace, dark.
+Nine tabs: anonymise a file, scramble live, group conversations, who is using
+the microphone and camera, the app lock, verify a download, settings, portable
+or installed, and an about panel that states the scope. Nine palettes, or your
+own, and every screen is captured under
+[What it looks like](#what-it-looks-like).
 
 ### Command line
 
@@ -426,6 +429,161 @@ Windows reads the same records that drive the OS privacy indicator; Linux reads
 open handles under `/proc`. **macOS exposes no public interface for this**, so
 nothing is reported there rather than something guessed: the tool tells you it
 cannot see, because an empty list from a blind monitor is a false reassurance.
+
+---
+
+## Route it into a call
+
+Live mode veils your microphone and writes the result to an output device. To
+put that into a call, the call has to be able to *read* that output, and an
+operating system will not normally let one program's output be another's input.
+A **virtual audio cable** is a device that exists only in software: VeilVoice
+writes to one end, and Zoom, Discord, OBS or anything else picks its microphone
+as the other.
+
+None of these is written by this project, none is bundled, and each is under
+its own licence. Install whichever your system uses, then in VeilVoice choose
+your real microphone as the input and the cable as the output, and in the call
+choose the cable as the microphone.
+
+**Where this does not apply.** The FreeBSD, OpenBSD and NetBSD archives have no
+live microphone mode at all, because `cpal`, the audio device library, has no
+backend for them. The BSD sections below are there so that somebody on one of
+those systems knows that rather than hunting for a cable that would not help.
+Run `veilvoice info` on any platform and it says what that build supports.
+
+<details>
+<summary><b>Windows 10 and 11</b></summary>
+
+**[VB-CABLE](https://vb-audio.com/Cable/)** by VB-Audio Software. Proprietary
+donationware, free to use. One cable, and the usual choice.
+
+1. Download from [vb-audio.com/Cable](https://vb-audio.com/Cable/) and unzip it.
+2. Right-click `VBCABLE_Setup_x64.exe` and choose **Run as administrator**. It
+   needs that to install a driver.
+3. Reboot. Windows will not show the device until you do.
+4. In VeilVoice: input **your microphone**, output **CABLE Input (VB-Audio
+   Virtual Cable)**.
+5. In the call: microphone **CABLE Output (VB-Audio Virtual Cable)**.
+
+To hear yourself while you talk, turn on *Listen to this device* for CABLE
+Output in Windows sound settings and point it at your headphones.
+
+**[Voicemeeter](https://vb-audio.com/Voicemeeter/)**, by the same author, is
+the larger version: several cables plus a mixer, for feeding more than one
+program at once. Same licence.
+
+**[Virtual Audio Cable](https://vac.muzychenko.net/en/)** by Eugene Muzychenko
+is the long-standing commercial alternative, with a trial that adds a spoken
+reminder to the audio.
+
+`veilvoice install` on Windows takes a `-WithVBCable` switch, which opens the
+VB-CABLE download page in your browser. It downloads nothing itself and
+installs nothing: VeilVoice does not install other people's drivers.
+
+</details>
+
+<details>
+<summary><b>macOS</b> (Intel and Apple Silicon)</summary>
+
+**[BlackHole](https://existential.audio/blackhole/)** by Existential Audio.
+MIT licensed, open source, and a universal binary, so the same installer covers
+both Intel and Apple Silicon.
+
+1. Install it with Homebrew:
+
+   ```bash
+   brew install blackhole-2ch
+   ```
+
+   or download the signed installer from
+   [existential.audio/blackhole](https://existential.audio/blackhole/). The
+   source is at
+   [github.com/ExistentialAudio/BlackHole](https://github.com/ExistentialAudio/BlackHole).
+2. In VeilVoice: input **your microphone**, output **BlackHole 2ch**.
+3. In the call: microphone **BlackHole 2ch**.
+
+To hear yourself as well, open **Audio MIDI Setup**, create a **Multi-Output
+Device** containing BlackHole and your headphones, and send VeilVoice there
+instead.
+
+The 16-channel and 64-channel builds (`blackhole-16ch`, `blackhole-64ch`) exist
+for larger routing setups and are installed the same way. Two channels is what
+a call needs.
+
+**[Loopback](https://rogueamoeba.com/loopback/)** by Rogue Amoeba is the
+commercial option, with a graphical patchbay and a free trial that degrades the
+audio after twenty minutes. Soundflower, which older guides still recommend, is
+unmaintained and is not a good choice on a current macOS.
+
+macOS will ask for microphone permission the first time. That is the real
+microphone, not the cable.
+
+</details>
+
+<details>
+<summary><b>Linux</b> (any distribution)</summary>
+
+**[PipeWire](https://pipewire.org/)** is almost certainly already running:
+it is the default on Fedora, Ubuntu since 22.10, Debian 12, Arch and most
+others. Nothing to install, and the cable is one command.
+
+1. Create the cable:
+
+   ```bash
+   pw-loopback --capture-props='media.class=Audio/Sink node.name=veilvoice_cable' \
+               --playback-props='media.class=Audio/Source node.name=veilvoice_cable_out'
+   ```
+
+   Leave that running. It disappears when you stop it, which is the tidy way
+   round: nothing is installed and nothing survives a reboot.
+2. In VeilVoice: input **your microphone**, output **veilvoice_cable**.
+3. In the call: microphone **veilvoice_cable_out**.
+
+A graphical patchbay makes the wiring visible and is worth having:
+[**qpwgraph**](https://gitlab.freedesktop.org/rncbc/qpwgraph) or
+[**Helvum**](https://gitlab.freedesktop.org/pipewire/helvum), both packaged
+nearly everywhere.
+
+**On PulseAudio**, if your distribution still uses it:
+
+```bash
+pactl load-module module-null-sink sink_name=veilvoice_cable \
+      sink_properties=device.description=VeilVoice_Cable
+```
+
+VeilVoice outputs to `VeilVoice_Cable`; the call takes `Monitor of
+VeilVoice_Cable` as its microphone. `pactl unload-module` with the number that
+command printed removes it again.
+
+**On [JACK](https://jackaudio.org/)**, connect VeilVoice's output port to the
+call's input port in `qjackctl` or Carla. PipeWire provides a JACK interface,
+so this works without running JACK itself.
+
+</details>
+
+<details>
+<summary><b>FreeBSD, OpenBSD and NetBSD</b></summary>
+
+**The BSD builds have no live mode**, so no cable will make one appear. `cpal`
+has no BSD backend, which the archive's own notes and `veilvoice info` both
+say. Everything else works: anonymise, clean, encrypt, decrypt, keygen,
+conversation rendering and verification.
+
+Recorded on the roadmap as a real gap rather than a decision. If you want to
+route audio on these systems for other reasons, this is what people use:
+
+- **FreeBSD**: [`virtual_oss`](https://github.com/freebsd/virtual_oss), in
+  ports as `audio/virtual_oss`, creates virtual devices in front of a real
+  one. PulseAudio and PipeWire are both in ports as well.
+- **OpenBSD**: [**sndio**](https://sndio.org/), which is part of the base
+  system. `sndiod` sub-devices route audio between programs with no third-party
+  driver at all.
+- **NetBSD**: the [`pad(4)`](https://man.netbsd.org/pad.4) pseudo-device, again
+  in the base system, presents an audio device whose output another program can
+  read.
+
+</details>
 
 ---
 
@@ -624,6 +782,7 @@ the open, rather than scattered through the commit log.
 
 GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 
-Virtual audio routing on Windows is usually provided by
-[VB-CABLE](https://vb-audio.com/Cable/), which is proprietary donationware and
-is **not** bundled here: install it separately if you want it.
+None of the virtual audio cables listed under
+[Route it into a call](#route-it-into-a-call) is bundled here, and none of them
+is ours. Each is somebody else's software under its own licence, named there
+with what that licence is.
