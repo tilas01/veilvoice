@@ -127,3 +127,315 @@ fn the_vault_lives_beside_the_lock_rather_than_somewhere_of_its_own() {
         assert_eq!(vault.file_name().unwrap(), "studio");
     }
 }
+
+#[test]
+fn a_name_cannot_write_outside_the_folder_that_was_chosen() {
+    // A take is called whatever somebody typed, and here that name reaches a
+    // path. This is the whole reason `safe_stem` exists.
+    assert_eq!(safe_stem("../../etc/passwd"), "etc-passwd");
+    assert_eq!(safe_stem("a/b"), "a-b");
+    assert_eq!(safe_stem("..\\..\\windows"), "windows");
+    assert_eq!(safe_stem("/absolute"), "absolute");
+    for awkward in ["../../etc/passwd", "a/b", "..\\..\\windows", "/absolute"] {
+        let stem = safe_stem(awkward);
+        assert!(!stem.contains('/'), "{stem:?} still has a separator");
+        assert!(!stem.contains('\\'), "{stem:?} still has a separator");
+        assert!(!stem.contains(".."), "{stem:?} can still climb");
+    }
+}
+
+#[test]
+fn a_name_that_is_all_punctuation_still_makes_a_file() {
+    // Empty is not a file name, and neither is a string of dashes.
+    assert_eq!(safe_stem(""), "take");
+    assert_eq!(safe_stem("..."), "take");
+    assert_eq!(safe_stem("///"), "take");
+    assert_eq!(safe_stem("   "), "take");
+}
+
+#[test]
+fn a_very_long_name_is_shortened_rather_than_refused() {
+    // Some systems refuse a path component past 255 bytes. The name is a label
+    // and the full one is still in the vault, so shortening loses nothing.
+    let stem = safe_stem(&"a".repeat(500));
+    assert_eq!(stem.chars().count(), 60);
+}
+
+#[test]
+fn an_ordinary_name_is_left_recognisable() {
+    // Cleaning must not make every file called "take": somebody has to be able
+    // to find what they exported.
+    assert_eq!(safe_stem("interview-2"), "interview-2");
+    assert_eq!(safe_stem("Ada and Grace"), "Ada-and-Grace");
+}
+
+#[test]
+fn a_wav_header_gives_up_its_rate_and_length() {
+    // 48 kHz, mono, 16-bit, one second of audio.
+    let mut wav = Vec::new();
+    wav.extend_from_slice(b"RIFF");
+    wav.extend_from_slice(&(36u32 + 96_000).to_le_bytes());
+    wav.extend_from_slice(b"WAVEfmt ");
+    wav.extend_from_slice(&16u32.to_le_bytes());
+    wav.extend_from_slice(&1u16.to_le_bytes()); // PCM
+    wav.extend_from_slice(&1u16.to_le_bytes()); // channels
+    wav.extend_from_slice(&48_000u32.to_le_bytes());
+    wav.extend_from_slice(&96_000u32.to_le_bytes());
+    wav.extend_from_slice(&2u16.to_le_bytes());
+    wav.extend_from_slice(&16u16.to_le_bytes()); // bits
+    wav.extend_from_slice(b"data");
+    wav.extend_from_slice(&96_000u32.to_le_bytes());
+    wav.resize(44 + 96_000, 0);
+
+    let (rate, seconds) = wav_shape(&wav).expect("a canonical header should read");
+    assert_eq!(rate, 48_000);
+    assert!((seconds - 1.0).abs() < 1e-9, "{seconds}");
+}
+
+#[test]
+fn something_that_is_not_a_wav_is_refused_rather_than_guessed() {
+    // A length guessed from the wrong header puts every subtitle in the wrong
+    // place and makes the video the wrong length.
+    assert!(wav_shape(b"").is_none());
+    assert!(wav_shape(b"RIFF").is_none());
+    assert!(wav_shape(&[0u8; 44]).is_none());
+    // Right length, right magic, but a rate of zero: a division waiting to
+    // happen.
+    let mut zero_rate = vec![0u8; 44];
+    zero_rate[0..4].copy_from_slice(b"RIFF");
+    zero_rate[8..12].copy_from_slice(b"WAVE");
+    assert!(wav_shape(&zero_rate).is_none());
+}
+
+#[test]
+fn a_plan_for_a_take_is_one_speaker_for_the_whole_of_it() {
+    let plan = plan_for("Ada", 12.5).expect("a plan");
+    assert_eq!(plan.speakers().len(), 1);
+    assert_eq!(plan.speakers()[0].name, "Ada");
+    assert_eq!(plan.turns().len(), 1);
+    assert_eq!(plan.turns()[0].start, 0.0);
+    assert_eq!(plan.turns()[0].end, 12.5);
+    assert_eq!(plan.turns()[0].speaker, 0);
+    assert_eq!(plan.title.as_deref(), Some("Ada"));
+}
+
+#[test]
+fn what_each_render_choice_asks_for() {
+    assert!(Render::Preview.wants_page() && !Render::Preview.wants_video());
+    assert!(!Render::Video.wants_page() && Render::Video.wants_video());
+    assert!(Render::Both.wants_page() && Render::Both.wants_video());
+}
+
+#[test]
+fn sixteen_bit_samples_come_back_in_range() {
+    let mut wav = vec![0u8; 44];
+    wav.extend_from_slice(&i16::MAX.to_le_bytes());
+    wav.extend_from_slice(&i16::MIN.to_le_bytes());
+    wav.extend_from_slice(&0i16.to_le_bytes());
+    let pcm = pcm16(&wav);
+    assert_eq!(pcm.len(), 3);
+    assert!(pcm[0] > 0.99 && pcm[0] <= 1.0, "{}", pcm[0]);
+    assert_eq!(pcm[1], -1.0);
+    assert_eq!(pcm[2], 0.0);
+    // A trailing odd byte is dropped rather than read past.
+    let pcm = pcm16(&[vec![0u8; 44], vec![1u8]].concat());
+    assert!(pcm.is_empty());
+}
+
+/// A canonical mono 16-bit WAV of `seconds`, with something audible in it.
+fn a_wav(seconds: f64) -> Vec<u8> {
+    let rate = 48_000u32;
+    let frames = (rate as f64 * seconds) as usize;
+    let data = frames * 2;
+    let mut wav = Vec::with_capacity(44 + data);
+    wav.extend_from_slice(b"RIFF");
+    wav.extend_from_slice(&(36 + data as u32).to_le_bytes());
+    wav.extend_from_slice(b"WAVEfmt ");
+    wav.extend_from_slice(&16u32.to_le_bytes());
+    wav.extend_from_slice(&1u16.to_le_bytes());
+    wav.extend_from_slice(&1u16.to_le_bytes());
+    wav.extend_from_slice(&rate.to_le_bytes());
+    wav.extend_from_slice(&(rate * 2).to_le_bytes());
+    wav.extend_from_slice(&2u16.to_le_bytes());
+    wav.extend_from_slice(&16u16.to_le_bytes());
+    wav.extend_from_slice(b"data");
+    wav.extend_from_slice(&(data as u32).to_le_bytes());
+    for i in 0..frames {
+        let v = ((i as f32 / 90.0).sin() * 12_000.0) as i16;
+        wav.extend_from_slice(&v.to_le_bytes());
+    }
+    wav
+}
+
+/// A Studio with an open vault holding one take.
+fn studio_with_a_take(name: &str) -> (tempfile::TempDir, Studio, String) {
+    use veilvoice_crypto::studio::{Studio as Vault, StudioKey};
+
+    let dir = tempfile::tempdir().expect("a temporary directory");
+    let secret = |b: &[u8]| {
+        let mut copy = b.to_vec();
+        veilvoice_crypto::Secret::new(&mut copy)
+    };
+    let key = StudioKey::derive(&secret(b"app-lock"), &secret(b"at-rest")).unwrap();
+    let vault = Vault::open(dir.path().join("vault"), key).unwrap();
+    let entry = vault.store(name, 1_700_000_000, &a_wav(2.0)).unwrap();
+
+    let id = entry.id.clone();
+    let studio = Studio {
+        entries: vault.list().unwrap(),
+        vault: Some(vault),
+        ..Default::default()
+    };
+    (dir, studio, id)
+}
+
+#[test]
+fn a_preview_writes_the_audio_the_page_and_the_captions() {
+    let (dir, mut studio, id) = studio_with_a_take("interview one");
+    let into = dir.path().join("out");
+    std::fs::create_dir_all(&into).unwrap();
+
+    studio.export(&id, Render::Preview, &into);
+
+    let wav = into.join("interview-one.wav");
+    let html = into.join("interview-one.html");
+    let vtt = into.join("interview-one.vtt");
+    assert!(wav.is_file(), "no audio: {:?}", studio.message);
+    assert!(html.is_file(), "no page: {:?}", studio.message);
+    assert!(vtt.is_file(), "no captions: {:?}", studio.message);
+
+    // No video was asked for and none was written.
+    assert!(!into.join("interview-one.mp4").exists());
+
+    let page = std::fs::read_to_string(&html).unwrap();
+    // The captions are carried, not fetched: a page opened from a folder
+    // cannot load a track from the file beside it.
+    assert!(
+        page.contains("data:text/vtt;base64,"),
+        "captions are not inlined"
+    );
+    assert!(!page.contains("src=\"interview-one.vtt\""));
+    // The audio is referenced by relative name, so the files move together.
+    assert!(page.contains("interview-one.wav"));
+    assert!(
+        !page.contains(&into.display().to_string()),
+        "an absolute path leaked in"
+    );
+    // And the speaker is the take, named.
+    assert!(page.contains("interview one"));
+
+    // What was said afterwards has to include the warning, because this is the
+    // moment a sealed thing became an unsealed one.
+    let (said, _) = studio.message.clone().expect("something should be said");
+    assert!(
+        said.contains("None of it is sealed"),
+        "the moment a sealed thing becomes an unsealed one has to be said, and \
+         this said: {said}"
+    );
+    assert!(said.contains("interview-one.wav"), "{said}");
+}
+
+#[test]
+fn a_take_whose_name_is_a_path_is_written_inside_the_chosen_folder() {
+    let (dir, mut studio, id) = studio_with_a_take("../escape");
+    let into = dir.path().join("out");
+    std::fs::create_dir_all(&into).unwrap();
+
+    studio.export(&id, Render::Preview, &into);
+
+    assert!(
+        into.join("escape.wav").is_file(),
+        "not written where it was asked for: {:?}",
+        studio.message
+    );
+    // Nothing landed beside the chosen folder.
+    assert!(
+        !dir.path().join("escape.wav").exists(),
+        "the name climbed out of the folder it was given"
+    );
+}
+
+#[test]
+fn exporting_something_that_is_not_in_the_vault_writes_nothing() {
+    let (dir, mut studio, _id) = studio_with_a_take("a take");
+    let into = dir.path().join("out");
+    std::fs::create_dir_all(&into).unwrap();
+
+    studio.export("0123456789abcdef", Render::Both, &into);
+
+    assert_eq!(
+        std::fs::read_dir(&into).unwrap().count(),
+        0,
+        "something was written for a take that is not there"
+    );
+}
+
+#[test]
+fn without_ffmpeg_the_command_is_printed_rather_than_the_video_promised() {
+    // VeilVoice does not ship or install ffmpeg, so the honest answer when it
+    // is missing is the exact command, which is what the command line gives.
+    // This runs whichever way the machine is set up: with ffmpeg the video is
+    // written, without it the command is offered, and neither is a silent
+    // nothing.
+    let (dir, mut studio, id) = studio_with_a_take("a take");
+    let into = dir.path().join("out");
+    std::fs::create_dir_all(&into).unwrap();
+
+    studio.export(&id, Render::Video, &into);
+    let (said, _) = studio.message.clone().expect("something should be said");
+
+    if veilvoice_video::ffmpeg::found().is_some() {
+        assert!(into.join("a-take.mp4").is_file(), "{said}");
+    } else {
+        assert!(
+            said.contains("ffmpeg") && said.contains("does not ship"),
+            "the missing tool has to be named, and this said: {said}"
+        );
+        assert!(
+            said.contains("-i") || said.contains("ffmpeg "),
+            "the command has to be there to copy, and this said: {said}"
+        );
+        // The audio was still written: it is the input the printed command
+        // needs, so offering the command and not the file would be useless.
+        assert!(into.join("a-take.wav").is_file(), "{said}");
+    }
+}
+
+#[test]
+fn asking_where_to_put_it_does_not_block_the_window() {
+    // The export button opens a folder picker. Opened the blocking way it
+    // freezes the window until it is answered, which is what `dialog` exists
+    // to avoid; this checks the tab goes through it rather than around it.
+    let (_dir, mut studio, id) = studio_with_a_take("a take");
+    assert!(!studio.picker.is_open());
+
+    studio.apply(Act::Export(id.clone(), Render::Both));
+
+    assert!(
+        studio.picker.is_open(),
+        "the export did not open a picker through `dialog`"
+    );
+    assert_eq!(
+        studio.choosing,
+        Some((id, Render::Both)),
+        "the picker was opened without recording what it is for, so its answer \
+         would arrive with nothing to do"
+    );
+}
+
+#[test]
+fn a_picker_open_when_the_vault_shuts_cannot_export_afterwards() {
+    // Locking the window closes the vault. An answer arriving after that must
+    // not export from a vault nobody has opened.
+    let (_dir, mut studio, id) = studio_with_a_take("a take");
+    studio.apply(Act::Export(id, Render::Preview));
+    assert!(studio.choosing.is_some());
+
+    studio.close();
+
+    assert!(
+        studio.choosing.is_none(),
+        "the pending export outlived the vault it was going to read from"
+    );
+    assert!(!studio.is_open());
+}

@@ -177,6 +177,15 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>The Browser lists what is in the vault without opening any of it, and can rename and remove. Renaming rewrites the sealed index only, because the audio is sealed under an identifier rather than a name, so it never re-encrypts anything and cannot lose a recording if it is interrupted.</li>
 <li>Said plainly rather than implied: a vault on a disk gives away how many recordings there are and roughly how large each is. Not their names, not their dates. Hiding the count and the sizes means padding and decoys, which is a different trade and is what the program folder&#x27;s own storage does.</li>
 </ul>
+<p><strong>Taking a recording back out: a page, a video, or both</strong></p>
+<ul>
+<li>Any take in the Browser can be written out as a self-contained player page, as an MP4 with a black picture, or as both. The page is the one from <code>conversation render</code>, so it plays the audio, draws the waveform, lights the speaker and carries its own captions, and it needs nothing installed.</li>
+<li>The plan the renderer wants is built rather than stored. A take is one person at a microphone, so it is one speaker and one turn spanning the recording; a plan kept beside each take would be a second description of something the audio already says, and the two would disagree the first time a take was trimmed. The length comes from the recording&#x27;s own WAV header, because the recorder writes the rate the <strong>device agreed to</strong>, which is not always the rate that was asked for.</li>
+<li>Without <code>ffmpeg</code> the exact command is printed, along with the audio it needs, which is what the command line already does. VeilVoice does not ship it and will not install it.</li>
+<li><strong>Anything taken out is unsealed, and the tab says so before the button is pressed</strong> rather than in a note afterwards. That is not a defect: a video nobody can open is not a video. The voice in it is still veiled, because it was veiled before it was ever stored.</li>
+<li>A take is called whatever somebody typed, and here that name reaches a path. Everything that is not a letter, a digit, a dash or an underscore becomes a dash, so a recording called <code>../../etc/passwd</code> writes <code>etc-passwd</code> inside the folder that was chosen and nowhere else.</li>
+<li>The folder is asked for every time rather than remembered, because a remembered one is how the second export lands somewhere the first was deliberately kept out of.</li>
+</ul>
 <p><strong>The screenshot scripts no longer keep their own list of tabs</strong></p>
 <ul>
 <li><code>veilvoice-gui --tabs</code> prints the tab names from the window&#x27;s own list, and both capture scripts read it. They each carried a copy, and a copy of a list goes stale the first time a tab is added: the run succeeds, every picture it takes is correct, and the new tab simply has none.</li>
