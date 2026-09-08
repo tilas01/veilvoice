@@ -8,6 +8,32 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Render settings that are actually settings**
+
+- The frame size is a choice for the first time. `monitor` is the default and
+  matches the display VeilVoice is running on, resolved when the render starts
+  rather than stored, so it stays true when the monitor changes. Where nothing
+  can say what the display is running at, which on a machine with no display
+  server is the ordinary case, it uses 1080p and **says that it is a fallback
+  rather than a measurement**. 720p, 1080p, 1440p and 4K are offered by name,
+  and any size can be typed.
+- Frames per second is adjustable from 5 to 60. Thirty stays the default: the
+  picture is a waveform, some circles and words, and sixty doubles the render
+  time and the file for motion that is not there.
+- A size that no video can be made from is refused with the size that can.
+  `1921x1080` reports that H.264 cannot store an odd side in yuv420p and offers
+  1920x1080; a typo that would fill a disk is refused against an 8K ceiling.
+- `veilvoice video` and `veilvoice conversation preview` now print how many
+  frames the render will draw and roughly how much scratch space they want,
+  before it starts. A minute of conversation at 4K and 60 frames a second is
+  3,660 frames and about 7 GiB of temporary files, which is worth knowing in
+  advance rather than when the disk fills.
+- `veilvoice video` accepted no size at all and `black_command` had `1280x720`
+  written into it, so asking for a larger frame was not possible and would have
+  been ignored if it were. `--width` and `--height` are replaced by `--size`,
+  which is one way to say one thing and cannot be set to a pair that describes
+  no picture.
+
 ## v0.1.19
 
 **The audited release.** No new features. The whole repository was read for

@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/ffmpeg.svg" alt="ffmpeg.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/ffmpeg.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 491 lines &middot; <a href="ffmpeg.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 562 lines &middot; <a href="ffmpeg.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-there-is-no-encoder-here">Why there is no encoder here</a>
@@ -74,22 +74,22 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>491 lines defining <strong>8 functions</strong> (7 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>562 lines defining <strong>8 functions</strong> (7 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Encoding</code> <span style="color:var(--muted)">line 68</span> &middot; How to render the file.</li>
+<li><code>struct Encoding</code> <span style="color:var(--muted)">line 69</span> &middot; How to render the file.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>command</code> <span style="color:var(--muted)">line 112</span> &middot; The command that turns a directory of numbered frames and a WAV into a video file.
+<li><code>command</code> <span style="color:var(--muted)">line 126</span> &middot; The command that turns a directory of numbered frames and a WAV into a video file.
 </li>
-<li><code>black_command</code> <span style="color:var(--muted)">line 179</span> &middot; The command that turns a veiled recording into a video with a black frame.
+<li><code>black_command</code> <span style="color:var(--muted)">line 205</span> &middot; The command that turns a veiled recording into a video with a black frame.
 </li>
-<li><code>extract_command</code> <span style="color:var(--muted)">line 230</span> &middot; The command that takes the sound out of a recording made somewhere else.
+<li><code>extract_command</code> <span style="color:var(--muted)">line 260</span> &middot; The command that takes the sound out of a recording made somewhere else.
 </li>
-<li><code>is_container</code> <span style="color:var(--muted)">line 261</span> &middot; Whether a file looks like something extract_command should be offered for.
+<li><code>is_container</code> <span style="color:var(--muted)">line 291</span> &middot; Whether a file looks like something extract_command should be offered for.
 </li>
-<li><code>command_line</code> <span style="color:var(--muted)">line 272</span> &middot; The command as one line, for printing.
+<li><code>command_line</code> <span style="color:var(--muted)">line 302</span> &middot; The command as one line, for printing.
 </li>
-<li><code>describe</code> <span style="color:var(--muted)">line 286</span> &middot; What to tell the user about their machine&#x27;s ffmpeg.
+<li><code>describe</code> <span style="color:var(--muted)">line 316</span> &middot; What to tell the user about their machine&#x27;s ffmpeg.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>found</code></span>
 </li>
 </ul>
@@ -111,42 +111,42 @@
 <a href="ffmpeg.src.html#fn-found">
 <rect x="36.1" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="78.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">found</text>
-<text x="78.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 48</text>
+<text x="78.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 49</text>
 </a>
 <a href="ffmpeg.src.html#fn-encoding-default">
 <rect x="146.5" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="229.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encoding::default</text>
-<text x="229.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+<text x="229.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
 </a>
 <a href="ffmpeg.src.html#fn-command">
 <rect x="337.5" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="383.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command</text>
-<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
+<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
 </a>
 <a href="ffmpeg.src.html#fn-black_command">
 <rect x="456.0" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="522.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">black_command</text>
-<text x="522.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
+<text x="522.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 205</text>
 </a>
 <a href="ffmpeg.src.html#fn-extract_command">
 <rect x="28.0" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">extract_command</text>
-<text x="102.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 230</text>
+<text x="102.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
 </a>
 <a href="ffmpeg.src.html#fn-is_container">
 <rect x="202.9" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="265.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">is_container</text>
-<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 261</text>
+<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
 </a>
 <a href="ffmpeg.src.html#fn-command_line">
 <rect x="353.6" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_line</text>
-<text x="416.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
+<text x="416.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 302</text>
 </a>
 <a href="ffmpeg.src.html#fn-describe">
 <rect x="504.3" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="550.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe</text>
-<text x="550.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 286</text>
+<text x="550.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -165,23 +165,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_found[&quot;found&lt;br/&gt;line 48&quot;]
-    n_default[&quot;Encoding::default&lt;br/&gt;line 87&quot;]
-    n_command([&quot;command&lt;br/&gt;line 112&quot;])
-    n_black_command([&quot;black_command&lt;br/&gt;line 179&quot;])
-    n_extract_command([&quot;extract_command&lt;br/&gt;line 230&quot;])
-    n_is_container([&quot;is_container&lt;br/&gt;line 261&quot;])
-    n_command_line([&quot;command_line&lt;br/&gt;line 272&quot;])
-    n_describe([&quot;describe&lt;br/&gt;line 286&quot;])
+    n_found[&quot;found&lt;br/&gt;line 49&quot;]
+    n_default[&quot;Encoding::default&lt;br/&gt;line 97&quot;]
+    n_command([&quot;command&lt;br/&gt;line 126&quot;])
+    n_black_command([&quot;black_command&lt;br/&gt;line 205&quot;])
+    n_extract_command([&quot;extract_command&lt;br/&gt;line 260&quot;])
+    n_is_container([&quot;is_container&lt;br/&gt;line 291&quot;])
+    n_command_line([&quot;command_line&lt;br/&gt;line 302&quot;])
+    n_describe([&quot;describe&lt;br/&gt;line 316&quot;])
     n_describe --&gt; n_found
-    click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L48&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L87&quot; &quot;open the source&quot;
-    click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L112&quot; &quot;open the source&quot;
-    click n_black_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L179&quot; &quot;open the source&quot;
-    click n_extract_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L230&quot; &quot;open the source&quot;
-    click n_is_container href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L261&quot; &quot;open the source&quot;
-    click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L272&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L286&quot; &quot;open the source&quot;
+    click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L49&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L97&quot; &quot;open the source&quot;
+    click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L126&quot; &quot;open the source&quot;
+    click n_black_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L205&quot; &quot;open the source&quot;
+    click n_extract_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L260&quot; &quot;open the source&quot;
+    click n_is_container href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L291&quot; &quot;open the source&quot;
+    click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L302&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L316&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_command,n_black_command,n_extract_command,n_is_container,n_command_line,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -194,16 +194,16 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>found</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-found">48</a></td><td>Where ffmpeg is, if this machine has one.</td></tr>
-<tr><td><code>Encoding</code> <sub>pub struct</sub></td><td><a href="ffmpeg.src.html#fn-encoding">68</a></td><td>How to render the file.</td></tr>
-<tr><td><code>Encoding::default</code> <sub>fn</sub></td><td><a href="ffmpeg.src.html#fn-encoding-default">87</a></td><td></td></tr>
-<tr><td><code>command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command">112</a></td><td>The command that turns a directory of numbered frames and a WAV into a video file.</td></tr>
-<tr><td><code>black_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-black_command">179</a></td><td>The command that turns a veiled recording into a video with a black frame.</td></tr>
-<tr><td><code>extract_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-extract_command">230</a></td><td>The command that takes the sound out of a recording made somewhere else.</td></tr>
-<tr><td><code>OBS_CONTAINERS</code> <sub>pub const</sub></td><td><a href="ffmpeg.src.html#fn-obs_containers">254</a></td><td>Containers OBS writes, which extract_command can take the sound out of.</td></tr>
-<tr><td><code>is_container</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-is_container">261</a></td><td>Whether a file looks like something extract_command should be offered for.</td></tr>
-<tr><td><code>command_line</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command_line">272</a></td><td>The command as one line, for printing.</td></tr>
-<tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-describe">286</a></td><td>What to tell the user about their machine&#x27;s ffmpeg.</td></tr>
+<tr><td><code>found</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-found">49</a></td><td>Where ffmpeg is, if this machine has one.</td></tr>
+<tr><td><code>Encoding</code> <sub>pub struct</sub></td><td><a href="ffmpeg.src.html#fn-encoding">69</a></td><td>How to render the file.</td></tr>
+<tr><td><code>Encoding::default</code> <sub>fn</sub></td><td><a href="ffmpeg.src.html#fn-encoding-default">97</a></td><td></td></tr>
+<tr><td><code>command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command">126</a></td><td>The command that turns a directory of numbered frames and a WAV into a video file.</td></tr>
+<tr><td><code>black_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-black_command">205</a></td><td>The command that turns a veiled recording into a video with a black frame.</td></tr>
+<tr><td><code>extract_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-extract_command">260</a></td><td>The command that takes the sound out of a recording made somewhere else.</td></tr>
+<tr><td><code>OBS_CONTAINERS</code> <sub>pub const</sub></td><td><a href="ffmpeg.src.html#fn-obs_containers">284</a></td><td>Containers OBS writes, which extract_command can take the sound out of.</td></tr>
+<tr><td><code>is_container</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-is_container">291</a></td><td>Whether a file looks like something extract_command should be offered for.</td></tr>
+<tr><td><code>command_line</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command_line">302</a></td><td>The command as one line, for printing.</td></tr>
+<tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-describe">316</a></td><td>What to tell the user about their machine&#x27;s ffmpeg.</td></tr>
 </tbody></table>
 </section>
 </div></div>

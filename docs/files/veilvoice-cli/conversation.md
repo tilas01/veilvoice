@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-cli/src/conversation.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 868 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 899 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
 
 ## Contents
 
@@ -86,7 +86,7 @@ you typed, prints what it is about to do, and reports what it wrote.
 
 ## What this file contains
 
-868 lines defining **8 functions** (4 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+899 lines defining **8 functions** (4 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -122,10 +122,10 @@ flowchart TD
     n_inspect(["inspect<br/>line 134"])
     n_run(["run<br/>line 197"])
     n_preview(["preview<br/>line 384"])
-    n_file_name["file_name<br/>line 497"]
-    n_load_plan["load_plan<br/>line 504"]
-    n_write_private["write_private<br/>line 520"]
-    n_with_extension["with_extension<br/>line 525"]
+    n_file_name["file_name<br/>line 528"]
+    n_load_plan["load_plan<br/>line 535"]
+    n_write_private["write_private<br/>line 551"]
+    n_with_extension["with_extension<br/>line 556"]
     n_inspect --> n_load_plan
     n_preview --> n_load_plan
     n_preview --> n_with_extension
@@ -138,10 +138,10 @@ flowchart TD
     click n_inspect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L134" "open the source"
     click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L197" "open the source"
     click n_preview href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L384" "open the source"
-    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L497" "open the source"
-    click n_load_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L504" "open the source"
-    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L520" "open the source"
-    click n_with_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L525" "open the source"
+    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L528" "open the source"
+    click n_load_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L535" "open the source"
+    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L551" "open the source"
+    click n_with_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L556" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_look_from,n_inspect,n_run,n_preview entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -159,10 +159,10 @@ flowchart TD
 | `inspect` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L134) | Show a plan without rendering anything. |
 | `run` <sub>pub fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L197) | Render a recording according to a plan. |
 | `preview` <sub>pub fn</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L384) | A still of what the page will look like, and the command that would make a video of it. |
-| `file_name` <sub>fn</sub> | [497](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L497) | The last component of a path, for writing into a page as a relative link. |
-| `load_plan` <sub>fn</sub> | [504](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L504) | Read a plan, and say where it went wrong rather than only that it did. |
-| `write_private` <sub>fn</sub> | [520](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L520) | Replace the last extension, keeping any .veiled before it. |
-| `with_extension` <sub>fn</sub> | [525](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L525) |  |
+| `file_name` <sub>fn</sub> | [528](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L528) | The last component of a path, for writing into a page as a relative link. |
+| `load_plan` <sub>fn</sub> | [535](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L535) | Read a plan, and say where it went wrong rather than only that it did. |
+| `write_private` <sub>fn</sub> | [551](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L551) | Replace the last extension, keeping any .veiled before it. |
+| `with_extension` <sub>fn</sub> | [556](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L556) |  |
 
 ---
 

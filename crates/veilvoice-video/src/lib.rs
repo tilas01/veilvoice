@@ -55,6 +55,7 @@
 pub mod ffmpeg;
 pub mod page;
 pub mod palette;
+pub mod size;
 pub mod waveform;
 
 /// Crate version string, surfaced in the About panel.
@@ -81,6 +82,13 @@ pub enum Error {
     Io(std::io::Error),
     /// Something about the request does not make sense.
     Malformed(String),
+    /// A frame size or frame rate a video cannot be rendered at.
+    ///
+    /// Separate from [`Error::Malformed`] because it is the one error here a
+    /// person routinely causes by typing, and a front end wants to offer the
+    /// nearest thing that works rather than only report a refusal. The message
+    /// always names both the rule and the value that would have obeyed it.
+    Size(String),
 }
 
 impl From<std::io::Error> for Error {
@@ -94,6 +102,7 @@ impl std::fmt::Display for Error {
         match self {
             Self::Io(error) => write!(f, "input/output error: {error}"),
             Self::Malformed(what) => write!(f, "{what}"),
+            Self::Size(what) => write!(f, "{what}"),
         }
     }
 }

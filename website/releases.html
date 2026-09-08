@@ -166,6 +166,17 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </tbody></table>
 <p class="muted">The generated reference for every crate and every source file is under <a href="wiki.html">the reference</a>, and the same pages are in <a href="https://github.com/tilas01/veilvoice/wiki" rel="noopener noreferrer">the wiki</a>.</p>
 </details>
+<details class="release">
+<summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Render settings that are actually settings</strong></p>
+<ul>
+<li>The frame size is a choice for the first time. <code>monitor</code> is the default and matches the display VeilVoice is running on, resolved when the render starts rather than stored, so it stays true when the monitor changes. Where nothing can say what the display is running at, which on a machine with no display server is the ordinary case, it uses 1080p and <strong>says that it is a fallback rather than a measurement</strong>. 720p, 1080p, 1440p and 4K are offered by name, and any size can be typed.</li>
+<li>Frames per second is adjustable from 5 to 60. Thirty stays the default: the picture is a waveform, some circles and words, and sixty doubles the render time and the file for motion that is not there.</li>
+<li>A size that no video can be made from is refused with the size that can. <code>1921x1080</code> reports that H.264 cannot store an odd side in yuv420p and offers 1920x1080; a typo that would fill a disk is refused against an 8K ceiling.</li>
+<li><code>veilvoice video</code> and <code>veilvoice conversation preview</code> now print how many frames the render will draw and roughly how much scratch space they want, before it starts. A minute of conversation at 4K and 60 frames a second is 3,660 frames and about 7 GiB of temporary files, which is worth knowing in advance rather than when the disk fills.</li>
+<li><code>veilvoice video</code> accepted no size at all and <code>black_command</code> had <code>1280x720</code> written into it, so asking for a larger frame was not possible and would have been ignored if it were. <code>--width</code> and <code>--height</code> are replaced by <code>--size</code>, which is one way to say one thing and cannot be set to a pair that describes no picture.</li>
+</ul>
+</details>
 <details class="release" id="v0.1.19">
 <summary><strong>v0.1.19</strong> <span class="muted">The audited release. No new features. The whole repository was read for...</span></summary>
 <div class="release-files">
