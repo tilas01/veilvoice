@@ -118,7 +118,7 @@ flowchart TD
     n_setup["setup.rs<br/>758 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_studio["studio.rs<br/>745 lines"]
+    n_studio["studio.rs<br/>1119 lines"]
     n_theme["theme.rs<br/>784 lines"]
     n_tour["tour.rs<br/>303 lines"]
     n_updates["updates.rs<br/>246 lines"]
@@ -192,6 +192,7 @@ flowchart TD
     n_soundbar --> n_theme
     n_storage --> n_dialog
     n_storage --> n_theme
+    n_studio --> n_dialog
     n_studio --> n_theme
     n_theme --> n_palettes
     n_tour --> n_theme
@@ -263,7 +264,7 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 758 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 766 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 745 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1119 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 784 | Colour schemes for the desktop app. |
 | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 303 | The short tour on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
@@ -272,7 +273,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**14,678 functional lines of Rust** in this crate. A functional line is a line
+**15,195 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -369,6 +370,7 @@ counts blank lines and comments too. Both are produced by
 | `fn panel` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | The encrypted-storage panel, drawn on the security tab. |
 | `fn default_dir` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Where the vault lives: beside the lock file, in this platform's config directory. |
 | `struct Studio` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | The Studio and the Browser. |
+| `enum Render` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | What a take is to be turned into. |
 | `fn counted` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | "One recording" or "four recordings", so the interface does not say "1 recordings". |
 | `fn made_on` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A Unix time as a date somebody reads. |
 | `fn length` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A length in seconds, as m:ss, for somewhere a person reads. |

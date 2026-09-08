@@ -347,6 +347,18 @@ recording.
 | **the list** | Each recording's name, size and the date it was made. The date and not the time: a listing open on a screen in an office already says enough. |
 | **rename** | Rewrites the index only. The audio is sealed under an identifier rather than a name, so renaming never re-encrypts anything and cannot lose a recording if it is interrupted. |
 | **remove** | Asks first, and cannot be undone. |
+| **preview page** | Writes the audio, a self-contained player page and its captions into a folder you pick. The page plays the recording, draws its waveform and lights the speaker, and needs nothing installed. |
+| **render video** | Writes an MP4 with a black picture, for somewhere that will not accept an audio file. Needs `ffmpeg`, which VeilVoice does not ship and will not install: without it you get the exact command to run, and the audio it needs, rather than a promise. |
+| **both** | The page and the video. |
+
+Anything taken out is written **unsealed**, and the tab says so before you
+press anything. That is not a defect: a video nobody can open is not a video.
+The voice in it is still veiled, because it was veiled before it was ever
+stored; what leaves is an ordinary file of a voice that is not anybody's.
+
+The folder is asked for every time rather than remembered. A remembered folder
+is how the second export goes somewhere the first one was deliberately kept out
+of.
 
 What a vault sitting on a disk gives away is how many recordings there are and
 roughly how large each one is. Not their names, not their dates, and not what
