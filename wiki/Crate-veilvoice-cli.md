@@ -102,7 +102,7 @@ flowchart TD
     n_appctl["appctl.rs<br/>286 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
     n_capture["capture.rs<br/>330 lines"]
-    n_conversation["conversation.rs<br/>1067 lines"]
+    n_conversation["conversation.rs<br/>1090 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
     n_guard["guard.rs<br/>346 lines"]
@@ -183,7 +183,7 @@ flowchart TD
 | [[`appctl.rs`|File-veilvoice-cli-appctl]] | 286 | veilvoice appctl learns what normally runs, so it can notice what does not. |
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [[`capture.rs`|File-veilvoice-cli-capture]] | 330 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
-| [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1067 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
+| [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1090 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [[`decoy.rs`|File-veilvoice-cli-decoy]] | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe is the safety catch. |
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 346 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
@@ -199,7 +199,7 @@ flowchart TD
 | [[`sentry.rs`|File-veilvoice-cli-sentry]] | 384 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 144 | Tokyo Night colouring for the terminal. |
 
-**6,018 functional lines of Rust** in this crate. A functional line is a line
+**6,030 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

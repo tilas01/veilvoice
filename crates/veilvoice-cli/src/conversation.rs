@@ -495,7 +495,8 @@ pub fn run(
 
     let vtt = with_extension(&out_path, Format::WebVtt.extension());
     let srt = with_extension(&out_path, Format::SubRip.extension());
-    write_private(&vtt, subtitles::write(&plan, Format::WebVtt).as_bytes())?;
+    let vtt_text = subtitles::write(&plan, Format::WebVtt);
+    write_private(&vtt, vtt_text.as_bytes())?;
     write_private(&srt, subtitles::write(&plan, Format::SubRip).as_bytes())?;
 
     // The page is written from the *veiled* audio, so its waveform is the
@@ -505,12 +506,17 @@ pub fn run(
     let mut page_path = None;
     if let Some(look) = &look {
         let envelope = waveform::envelope(&veiled.samples, WAVE_COLUMNS);
+        // The captions are inlined rather than referenced. A browser treats
+        // every `file:` URL as its own origin, so a track loaded from the file
+        // beside the page is refused when somebody opens the page from a
+        // folder, which is how they open it. The separate `.vtt` is still
+        // written for every other player.
         let drawn = page::player(
             &plan,
             &envelope,
             look,
             &file_name(&out_path),
-            &file_name(&vtt),
+            &page::inline_vtt(&vtt_text),
         )
         .map_err(|error| error.to_string())?;
         let html = with_extension(&out_path, "html");
@@ -527,8 +533,8 @@ pub fn run(
     println!("{}", ok(&format!("wrote {}", srt.display())));
     if let Some(html) = &page_path {
         println!("{}", ok(&format!("wrote {}", html.display())));
-        println!("  The page reads the audio and the WebVTT track by name from the same");
-        println!("  directory. Move all of them, or none.");
+        println!("  The page carries its own captions and reads the audio by name from");
+        println!("  the same directory. Move both, or neither.");
     }
     println!();
     println!(
@@ -908,14 +914,31 @@ mod tests {
 
         let html = dir.path().join("input.veiled.html");
         let markup = std::fs::read_to_string(&html).expect("the page should be written");
-        // Relative names, so the four files move together. An absolute path
-        // here would break the moment somebody copied the directory, which is
-        // the one thing this arrangement exists to survive.
+        // The audio by relative name, so the two files move together. An
+        // absolute path here would break the moment somebody copied the
+        // directory, which is the one thing this arrangement exists to survive.
         assert!(markup.contains("input.veiled.wav"), "{markup:.400}");
-        assert!(markup.contains("input.veiled.vtt"), "{markup:.400}");
         assert!(
             !markup.contains(&dir.path().display().to_string()),
             "the page must not carry an absolute path"
+        );
+
+        // The captions are **carried**, not named. A browser treats every
+        // `file:` URL as its own origin, so a track fetched from the file
+        // beside the page is refused and the captions silently do not appear,
+        // in a page whose own text promises they will. The separate `.vtt` is
+        // still written, for every other player.
+        assert!(
+            markup.contains("data:text/vtt;base64,"),
+            "the captions are not in the page"
+        );
+        assert!(
+            !markup.contains("src=\"input.veiled.vtt\""),
+            "the captions are fetched by name again"
+        );
+        assert!(
+            dir.path().join("input.veiled.vtt").is_file(),
+            "the separate subtitle file should still be written"
         );
     }
 
