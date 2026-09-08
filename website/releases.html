@@ -168,6 +168,20 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>A Studio to record into, and a Browser for what is in it</strong></p>
+<ul>
+<li>Two new tabs, and the vault they share. <code>veilvoice-crypto::studio</code> had the vault already, tested and unused: a key derived from the app lock <strong>and</strong> the at-rest passphrase, and from neither alone. Nothing reached it. These two tabs are what reaches it.</li>
+<li>The Studio records straight into the vault, veiled on the way in. What gets to the recorder is what the engine produced, never the microphone, and there is no path here that captures the original: a path that existed would eventually be taken, and the file it left would be somebody&#x27;s real voice in a vault they believed was safe. The recording is assembled in page-locked memory and handed straight to the vault. It is never a plain file, not even briefly.</li>
+<li>Both passphrases are asked for here, every time, rather than borrowed from whatever the rest of the application is holding. The app-lock secret is only kept for the session when app-lock sealing is chosen, so reading it when it happens to be there and prompting when it is not would make the vault&#x27;s strength depend on an unrelated setting, and nobody would know which they had. Both typing buffers are wiped the moment the key is derived.</li>
+<li>Locking the window closes the vault. A take still recording at that moment is stopped and <strong>stored</strong> first, not discarded: the vault is still open, and throwing away a recording because an idle timer fired would be the worst thing the tab could do.</li>
+<li>The Browser lists what is in the vault without opening any of it, and can rename and remove. Renaming rewrites the sealed index only, because the audio is sealed under an identifier rather than a name, so it never re-encrypts anything and cannot lose a recording if it is interrupted.</li>
+<li>Said plainly rather than implied: a vault on a disk gives away how many recordings there are and roughly how large each is. Not their names, not their dates. Hiding the count and the sizes means padding and decoys, which is a different trade and is what the program folder&#x27;s own storage does.</li>
+</ul>
+<p><strong>The screenshot scripts no longer keep their own list of tabs</strong></p>
+<ul>
+<li><code>veilvoice-gui --tabs</code> prints the tab names from the window&#x27;s own list, and both capture scripts read it. They each carried a copy, and a copy of a list goes stale the first time a tab is added: the run succeeds, every picture it takes is correct, and the new tab simply has none.</li>
+<li>The same list marks the first-run tour as seen, so the tour does not open over the panel being photographed. Written by hand, that would have left the tour covering exactly the new tab whose picture was the reason for the run.</li>
+</ul>
 <p><strong>The preview page can be driven, and corrected from inside it</strong></p>
 <ul>
 <li>The self-contained player gains a transport: back ten seconds, forward ten seconds, and playback from 1x to 5x. Checking a plan means going back because the wrong circle lit up, and crossing a long recording faster than it was spoken. Five is the ceiling: past it the audio is unintelligible and playing it at all stops being the point.</li>

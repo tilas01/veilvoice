@@ -313,6 +313,47 @@ VeilVoice does not guess who is speaking. Turns come from a plan file or from
 one microphone per person, and that is a deliberate limit: guessing wrongly
 would put one person's words under another person's name.
 
+### studio
+
+Record straight into a locked vault, veiled on the way in. What reaches the
+recorder is the voice the engine produced, never the microphone: there is no
+path here that captures the original, because a path that existed would
+eventually be taken, and the file it left behind would be somebody's real voice
+sitting in a vault they believed was safe.
+
+The recording is assembled in page-locked memory and handed to the vault to be
+sealed. It is never a plain file, not even briefly.
+
+| Control | What it is |
+|---|---|
+| **app lock / at rest** | The two passphrases that open the vault. Both, every time. Neither on its own opens anything, and an empty one is refused rather than treated as "no second factor". |
+| **call it** | What this take will be called. A name is a label and nothing veils a name; it is sealed with the recording, so it is not readable from the disk, and it is still the thing that says who this is. |
+| **start recording** | Begins, at the engine strength the rest of the window is set to. |
+| **stop and store** | Ends the take and seals it into the vault. Samples that were dropped are reported rather than passed over, because a recording that is quietly short is the failure this path exists to avoid. |
+
+Locking the window closes the vault. A take that is still recording when that
+happens is stopped and **stored** first, rather than discarded: the vault is
+still open at that moment, and throwing away a recording because an idle timer
+fired would be the worst thing the tab could do.
+
+### browser
+
+What is in the vault, without opening any of it. The listing comes from a
+sealed index, so reading it decrypts one small file rather than every
+recording.
+
+| Control | What it is |
+|---|---|
+| **the list** | Each recording's name, size and the date it was made. The date and not the time: a listing open on a screen in an office already says enough. |
+| **rename** | Rewrites the index only. The audio is sealed under an identifier rather than a name, so renaming never re-encrypts anything and cannot lose a recording if it is interrupted. |
+| **remove** | Asks first, and cannot be undone. |
+
+What a vault sitting on a disk gives away is how many recordings there are and
+roughly how large each one is. Not their names, not their dates, and not what
+any of them is. That is stated rather than implied: hiding the count and the
+sizes means padding and decoys, which is a different trade and is what the
+program folder's own storage does.
+
 ### verify
 
 Check that a download is the one that was published, without leaving the

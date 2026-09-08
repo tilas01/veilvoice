@@ -80,10 +80,13 @@ Usage:
 Options:
   --tab <NAME>  Open on a named tab rather than the last one used.
                 Names are the ones the tabs carry: file, live, group,
-                monitor, lock, verify, settings, install, about.
+                studio, browser, monitor, lock, verify, settings,
+                install, about.
   --size <W>x<H>  Open at this size in logical pixels rather than the
                 default 1100x720. Both are clamped to the window's
                 minimum of 720x520.
+  --tabs        List the tab names, one per line, and exit. What the
+                screenshot scripts read so they need no copy of the list.
   -h, --help    Print this message.
   -V, --version Print the version.
 
@@ -114,6 +117,18 @@ fn answered_without_a_window() -> bool {
         }
         if arg == "-V" || arg == "--version" {
             println!("veilvoice-gui {}", env!("CARGO_PKG_VERSION"));
+            return true;
+        }
+        // The tab names, one per line, read from the window's own list.
+        //
+        // For `tools/shots/gui.sh` and `gui.ps1`, which photograph every tab
+        // and used to carry a hand-written copy of this list. A copy goes
+        // stale the first time a tab is added, and the way it goes stale is
+        // silent: the run succeeds, and the new tab simply has no picture.
+        if arg == "--tabs" {
+            for tab in veilvoice_gui::tabs() {
+                println!("{tab}");
+            }
             return true;
         }
     }

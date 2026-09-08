@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 234 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 240 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -227,68 +227,74 @@
 <span class="ln" id="L173">    <span class="tok-com">/// falling back to a single secret is the failure that construction exists</span></span>
 <span class="ln" id="L174">    <span class="tok-com">/// to prevent.</span></span>
 <span class="ln" id="L175">    StudioNeedsBoth,</span>
-<span class="ln" id="L176">}</span>
+<span class="ln" id="L176">    <span class="tok-com">/// A studio vault was asked to change a recording that is not in it.</span></span>
+<span class="ln" id="L177">    <span class="tok-com">/// An error rather than a silent no-operation: somebody renaming a</span></span>
+<span class="ln" id="L178">    <span class="tok-com">/// recording that is not there has the wrong identifier, and being told so</span></span>
+<span class="ln" id="L179">    <span class="tok-com">/// is more use than appearing to succeed.</span></span>
+<span class="ln" id="L180">    NoSuchTake,</span>
+<span class="ln" id="L181">}</span>
 </span>
-<span class="ln" id="L177"></span>
-<span class="ln" id="L178"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L182"></span>
+<span class="ln" id="L183"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-fmt">
-<span class="ln" id="L179">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L180">        <span class="tok-kw">let</span> msg = <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L181">            Self::Random =&gt; <span class="tok-str">&quot;the operating system random number generator is unavailable&quot;</span>,</span>
-<span class="ln" id="L182">            Self::KdfParams =&gt; <span class="tok-str">&quot;invalid key-derivation parameters&quot;</span>,</span>
-<span class="ln" id="L183">            Self::KdfCostRefused { requested, ceiling } =&gt; {</span>
-<span class="ln" id="L184">                <span class="tok-kw">return</span> write!(</span>
-<span class="ln" id="L185">                    f,</span>
-<span class="ln" id="L186">                    <span class="tok-str">&quot;this file asks for {requested} KiB of memory to open, above the \</span></span>
-<span class="ln" id="L187"><span class="tok-str">                     {ceiling} KiB ceiling this caller allows&quot;</span></span>
-<span class="ln" id="L188">                )</span>
-<span class="ln" id="L189">            }</span>
-<span class="ln" id="L190">            Self::Kdf =&gt; <span class="tok-str">&quot;key derivation failed&quot;</span>,</span>
-<span class="ln" id="L191">            Self::KeyLength =&gt; <span class="tok-str">&quot;key has the wrong length&quot;</span>,</span>
-<span class="ln" id="L192">            Self::Encrypt =&gt; <span class="tok-str">&quot;encryption failed&quot;</span>,</span>
-<span class="ln" id="L193">            Self::Decrypt =&gt; <span class="tok-str">&quot;decryption failed: wrong key, or the data was altered&quot;</span>,</span>
-<span class="ln" id="L194">            Self::Encapsulate =&gt; <span class="tok-str">&quot;key encapsulation failed&quot;</span>,</span>
-<span class="ln" id="L195">            Self::Decapsulate =&gt; <span class="tok-str">&quot;key decapsulation failed&quot;</span>,</span>
-<span class="ln" id="L196">            Self::BadKeyEncoding =&gt; <span class="tok-str">&quot;malformed key or encapsulation&quot;</span>,</span>
-<span class="ln" id="L197">            Self::BadMagic =&gt; <span class="tok-str">&quot;not a VeilVoice container&quot;</span>,</span>
-<span class="ln" id="L198">            Self::BadHeader =&gt; <span class="tok-str">&quot;malformed container header&quot;</span>,</span>
-<span class="ln" id="L199">            Self::Truncated =&gt; <span class="tok-str">&quot;container is truncated&quot;</span>,</span>
-<span class="ln" id="L200">            Self::<span class="tok-fn">UnsupportedVersion</span>(v) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container version {v}&quot;</span>),</span>
-<span class="ln" id="L201">            Self::<span class="tok-fn">UnsupportedMode</span>(m) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container mode {m}&quot;</span>),</span>
-<span class="ln" id="L202">            Self::WrongMode =&gt; <span class="tok-str">&quot;container is locked with a different method&quot;</span>,</span>
-<span class="ln" id="L203">            Self::Shred =&gt; <span class="tok-str">&quot;could not securely erase the file&quot;</span>,</span>
-<span class="ln" id="L204">            Self::ShredSymlink =&gt; {</span>
-<span class="ln" id="L205">                <span class="tok-str">&quot;that path is a symbolic link, so erasing it would destroy whatever it \</span></span>
-<span class="ln" id="L206"><span class="tok-str">                 points at and delete only the link; name the real file instead&quot;</span></span>
-<span class="ln" id="L207">            }</span>
-<span class="ln" id="L208">            Self::AppLockRejected =&gt; <span class="tok-str">&quot;wrong app-lock password&quot;</span>,</span>
-<span class="ln" id="L209">            Self::<span class="tok-fn">AppLockCooldown</span>(secs) =&gt; {</span>
-<span class="ln" id="L210">                <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;too many attempts, so wait {secs}s before trying again&quot;</span>)</span>
-<span class="ln" id="L211">            }</span>
-<span class="ln" id="L212">            Self::AppLockStore =&gt; <span class="tok-str">&quot;could not read or write the app-lock file&quot;</span>,</span>
-<span class="ln" id="L213">            Self::AppLockExists =&gt; {</span>
-<span class="ln" id="L214">                <span class="tok-str">&quot;an app lock is already set on this machine. Change its password \</span></span>
-<span class="ln" id="L215"><span class="tok-str">                 from the security tab, or remove it there first&quot;</span></span>
+<span class="ln" id="L184">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L185">        <span class="tok-kw">let</span> msg = <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L186">            Self::Random =&gt; <span class="tok-str">&quot;the operating system random number generator is unavailable&quot;</span>,</span>
+<span class="ln" id="L187">            Self::KdfParams =&gt; <span class="tok-str">&quot;invalid key-derivation parameters&quot;</span>,</span>
+<span class="ln" id="L188">            Self::KdfCostRefused { requested, ceiling } =&gt; {</span>
+<span class="ln" id="L189">                <span class="tok-kw">return</span> write!(</span>
+<span class="ln" id="L190">                    f,</span>
+<span class="ln" id="L191">                    <span class="tok-str">&quot;this file asks for {requested} KiB of memory to open, above the \</span></span>
+<span class="ln" id="L192"><span class="tok-str">                     {ceiling} KiB ceiling this caller allows&quot;</span></span>
+<span class="ln" id="L193">                )</span>
+<span class="ln" id="L194">            }</span>
+<span class="ln" id="L195">            Self::Kdf =&gt; <span class="tok-str">&quot;key derivation failed&quot;</span>,</span>
+<span class="ln" id="L196">            Self::KeyLength =&gt; <span class="tok-str">&quot;key has the wrong length&quot;</span>,</span>
+<span class="ln" id="L197">            Self::Encrypt =&gt; <span class="tok-str">&quot;encryption failed&quot;</span>,</span>
+<span class="ln" id="L198">            Self::Decrypt =&gt; <span class="tok-str">&quot;decryption failed: wrong key, or the data was altered&quot;</span>,</span>
+<span class="ln" id="L199">            Self::Encapsulate =&gt; <span class="tok-str">&quot;key encapsulation failed&quot;</span>,</span>
+<span class="ln" id="L200">            Self::Decapsulate =&gt; <span class="tok-str">&quot;key decapsulation failed&quot;</span>,</span>
+<span class="ln" id="L201">            Self::BadKeyEncoding =&gt; <span class="tok-str">&quot;malformed key or encapsulation&quot;</span>,</span>
+<span class="ln" id="L202">            Self::BadMagic =&gt; <span class="tok-str">&quot;not a VeilVoice container&quot;</span>,</span>
+<span class="ln" id="L203">            Self::BadHeader =&gt; <span class="tok-str">&quot;malformed container header&quot;</span>,</span>
+<span class="ln" id="L204">            Self::Truncated =&gt; <span class="tok-str">&quot;container is truncated&quot;</span>,</span>
+<span class="ln" id="L205">            Self::<span class="tok-fn">UnsupportedVersion</span>(v) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container version {v}&quot;</span>),</span>
+<span class="ln" id="L206">            Self::<span class="tok-fn">UnsupportedMode</span>(m) =&gt; <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;unsupported container mode {m}&quot;</span>),</span>
+<span class="ln" id="L207">            Self::WrongMode =&gt; <span class="tok-str">&quot;container is locked with a different method&quot;</span>,</span>
+<span class="ln" id="L208">            Self::Shred =&gt; <span class="tok-str">&quot;could not securely erase the file&quot;</span>,</span>
+<span class="ln" id="L209">            Self::ShredSymlink =&gt; {</span>
+<span class="ln" id="L210">                <span class="tok-str">&quot;that path is a symbolic link, so erasing it would destroy whatever it \</span></span>
+<span class="ln" id="L211"><span class="tok-str">                 points at and delete only the link; name the real file instead&quot;</span></span>
+<span class="ln" id="L212">            }</span>
+<span class="ln" id="L213">            Self::AppLockRejected =&gt; <span class="tok-str">&quot;wrong app-lock password&quot;</span>,</span>
+<span class="ln" id="L214">            Self::<span class="tok-fn">AppLockCooldown</span>(secs) =&gt; {</span>
+<span class="ln" id="L215">                <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;too many attempts, so wait {secs}s before trying again&quot;</span>)</span>
 <span class="ln" id="L216">            }</span>
-<span class="ln" id="L217">            Self::AppLockSpareStale =&gt; {</span>
-<span class="ln" id="L218">                <span class="tok-str">&quot;the password was changed here, but the administrator-owned copy of the lock \</span></span>
-<span class="ln" id="L219"><span class="tok-str">                 still holds the previous one. Run VeilVoice as an administrator once to \</span></span>
-<span class="ln" id="L220"><span class="tok-str">                 finish the change.&quot;</span></span>
+<span class="ln" id="L217">            Self::AppLockStore =&gt; <span class="tok-str">&quot;could not read or write the app-lock file&quot;</span>,</span>
+<span class="ln" id="L218">            Self::AppLockExists =&gt; {</span>
+<span class="ln" id="L219">                <span class="tok-str">&quot;an app lock is already set on this machine. Change its password \</span></span>
+<span class="ln" id="L220"><span class="tok-str">                 from the security tab, or remove it there first&quot;</span></span>
 <span class="ln" id="L221">            }</span>
-<span class="ln" id="L222">            Self::TapeLength =&gt; {</span>
-<span class="ln" id="L223">                <span class="tok-str">&quot;the buffer offered for the recording is not the length of the recording&quot;</span></span>
-<span class="ln" id="L224">            }</span>
-<span class="ln" id="L225">            Self::StudioNeedsBoth =&gt; {</span>
-<span class="ln" id="L226">                <span class="tok-str">&quot;the studio vault needs both the app lock and the at-rest passphrase, and \</span></span>
-<span class="ln" id="L227"><span class="tok-str">                 only one was given&quot;</span></span>
-<span class="ln" id="L228">            }</span>
-<span class="ln" id="L229">        };</span>
-<span class="ln" id="L230">        f.<span class="tok-fn">write_str</span>(msg)</span>
-<span class="ln" id="L231">    }</span>
+<span class="ln" id="L222">            Self::AppLockSpareStale =&gt; {</span>
+<span class="ln" id="L223">                <span class="tok-str">&quot;the password was changed here, but the administrator-owned copy of the lock \</span></span>
+<span class="ln" id="L224"><span class="tok-str">                 still holds the previous one. Run VeilVoice as an administrator once to \</span></span>
+<span class="ln" id="L225"><span class="tok-str">                 finish the change.&quot;</span></span>
+<span class="ln" id="L226">            }</span>
+<span class="ln" id="L227">            Self::TapeLength =&gt; {</span>
+<span class="ln" id="L228">                <span class="tok-str">&quot;the buffer offered for the recording is not the length of the recording&quot;</span></span>
+<span class="ln" id="L229">            }</span>
+<span class="ln" id="L230">            Self::StudioNeedsBoth =&gt; {</span>
+<span class="ln" id="L231">                <span class="tok-str">&quot;the studio vault needs both the app lock and the at-rest passphrase, and \</span></span>
+<span class="ln" id="L232"><span class="tok-str">                 only one was given&quot;</span></span>
+<span class="ln" id="L233">            }</span>
+<span class="ln" id="L234">            Self::NoSuchTake =&gt; <span class="tok-str">&quot;there is no recording with that identifier in this vault&quot;</span>,</span>
+<span class="ln" id="L235">        };</span>
+<span class="ln" id="L236">        f.<span class="tok-fn">write_str</span>(msg)</span>
+<span class="ln" id="L237">    }</span>
 </span>
-<span class="ln" id="L232">}</span>
-<span class="ln" id="L233"></span>
-<span class="ln" id="L234"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
+<span class="ln" id="L238">}</span>
+<span class="ln" id="L239"></span>
+<span class="ln" id="L240"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

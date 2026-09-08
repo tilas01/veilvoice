@@ -96,7 +96,13 @@ New-Item -ItemType Directory -Force $Out | Out-Null
 # The tabs, by the names the application answers to. These are
 # `Tab::key` in crates/veilvoice-gui/src/app.rs, and a test in that file keeps
 # them unique and stable, because each one is also a file name the README links.
-$tabs = @("file", "live", "group", "monitor", "lock", "verify", "settings", "install", "about")
+# The tab names, asked of the application rather than written down here. A
+# hand-written copy of another list goes stale the first time a tab is added,
+# and it does it silently: the run succeeds and the new tab has no picture.
+$tabs = & $exe --tabs
+if (-not $tabs) {
+  throw "the application listed no tabs, so there is nothing to photograph"
+}
 
 # Group mode is off by default, which is correct and makes for a picture of an
 # empty panel. It is turned on for these captures through the application's own
