@@ -354,6 +354,83 @@ pub fn show(
     action
 }
 
+/// One level meter: a bar on the decibel scale, and the number beside it.
+///
+/// This was a **linear** bar with a decibel number printed next to it, which is
+/// a meter arguing with itself: the number said -12 dB and the bar showed a
+/// quarter. Ordinary speech at a sensible recording level peaks near -12 dBFS,
+/// so the bar read as near-silence and the only way to fill it was to clip.
+///
+/// The scale now comes from `veilvoice_audio::meter`, which is where the peaks
+/// come from, so this bar and the terminal's are the same bar. `hold` is the
+/// highest level of the last moment or so, drawn as a mark: a transient is over
+/// before an eye finishes moving, and a bar showing only *now* cannot show one.
+///
+/// # Why it lives here
+///
+/// It was in `app.rs` and private there, so when the Studio needed to meter
+/// a take as it recorded there were two choices: reach into a private module,
+/// or draw a second bar that would slowly stop looking like the first. It
+/// belongs here, beside [`Levels`], which is the thing that smooths what it
+/// draws.
+///
+/// Below -40 dBFS the colour goes muted rather than green, so a quiet room does
+/// not read as a working microphone.
+pub fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
+    use veilvoice_audio::meter;
+
+    ui.horizontal(|ui| {
+        ui.label(RichText::new(label).color(p::muted()));
+        let (rect, _) = ui.allocate_exact_size(egui::vec2(280.0, 12.0), egui::Sense::hover());
+        let painter = ui.painter();
+        painter.rect_filled(rect, 2.0, p::bg_dark());
+
+        let db = meter::dbfs(peak);
+        let colour = if meter::clipping(peak) {
+            p::red()
+        } else if db >= -6.0 {
+            p::yellow()
+        } else if db >= -40.0 {
+            p::green()
+        } else {
+            // Below -40 the signal is room tone rather than speech. Drawn muted,
+            // so a quiet room does not read as a working microphone.
+            p::muted()
+        };
+        let mut filled = rect;
+        filled.set_width(rect.width() * meter::position(peak));
+        painter.rect_filled(filled, 2.0, colour);
+
+        // The held peak, as a hairline. Only where the bar is empty: inside the
+        // fill it would be saying what the fill already says.
+        if meter::position(hold) > meter::position(peak) {
+            let x = rect.left() + rect.width() * meter::position(hold);
+            painter.line_segment(
+                [egui::pos2(x, rect.top()), egui::pos2(x, rect.bottom())],
+                egui::Stroke::new(1.5, p::fg()),
+            );
+        }
+
+        painter.rect_stroke(
+            rect,
+            2.0,
+            egui::Stroke::new(1.0, p::border()),
+            egui::StrokeKind::Inside,
+        );
+
+        let text = if db <= meter::FLOOR_DB {
+            "  -inf dBFS".to_string()
+        } else {
+            format!("{db:>6.1} dBFS")
+        };
+        ui.label(RichText::new(text).color(if meter::clipping(peak) {
+            p::red()
+        } else {
+            p::muted()
+        }));
+    });
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

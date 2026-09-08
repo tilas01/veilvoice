@@ -120,6 +120,15 @@ pub struct Studio {
     renaming: Option<(String, String)>,
     /// The take a removal is waiting to be confirmed for.
     confirm_remove: Option<String>,
+    /// Smoothed input and output peaks, for the bars drawn while recording.
+    levels: crate::monitor::Levels,
+    /// The take being played, and which one it is.
+    ///
+    /// Held as a pair so the row that started it can show its own controls. One
+    /// at a time: two takes playing over each other is not a feature, and the
+    /// second would decrypt a second recording into memory while the first was
+    /// still there.
+    playing: Option<(String, veilvoice_audio::playback::Playing)>,
     /// The folder picker, while it is open.
     picker: crate::dialog::Pending,
     /// What the picker is open for: which take, and what to make of it.
@@ -170,6 +179,9 @@ impl Studio {
         // A picker still open belongs to a vault that is now shut. Its answer
         // must not arrive later and export from a vault nobody opened.
         self.choosing = None;
+        // And a take still playing is a decrypted recording in memory. The
+        // window is locking; it goes with the vault.
+        self.playing = None;
         self.app_entry.zeroize();
         self.rest_entry.zeroize();
     }
@@ -268,6 +280,9 @@ impl Studio {
         // The audio stops first. Sealing takes a noticeable moment, and samples
         // arriving during it would be dropped rather than kept.
         self.session = None;
+        // The bars go back to nothing rather than freezing at the last peak,
+        // which would read as a level still arriving.
+        self.levels.clear();
 
         let Some(mut recorder) = self.recorder.take() else {
             return;
@@ -333,6 +348,58 @@ impl Studio {
                     ));
                 }
                 self.message = Some((said, p::green()));
+            }
+            Err(error) => self.message = Some((error.to_string(), p::red())),
+        }
+    }
+
+    /// Play a take, straight out of the vault and out of locked memory.
+    ///
+    /// # Nothing is written
+    ///
+    /// The obvious way to hear a WAV is to put it somewhere and hand the path
+    /// to something that plays files. That would leave an unencrypted recording
+    /// on the disk, which is what the vault exists to prevent, and it would
+    /// leave it there until somebody remembered to shred it.
+    ///
+    /// So the samples go from the sealed record, through
+    /// [`Secret`](veilvoice_crypto::Secret), to the audio device. The take is
+    /// decrypted whole rather than in pieces, because the container is
+    /// authenticated as one piece and an AEAD that let you open the first
+    /// second of it would not be authenticating anything. What that buys is the
+    /// thing that matters, which is no plaintext file at any point; what it
+    /// does not buy is a footprint smaller than the recording, and that is said
+    /// here rather than implied.
+    fn play(&mut self, id: &str) {
+        // Whatever was playing stops first, and its samples go with it. Two
+        // takes decrypted at once is twice as much of somebody's voice in
+        // memory as the reason for it.
+        self.playing = None;
+
+        let Some(vault) = &self.vault else {
+            return;
+        };
+        let wav = match vault.load(id) {
+            Ok(wav) => wav,
+            Err(error) => {
+                self.message = Some((error.to_string(), p::red()));
+                return;
+            }
+        };
+        let Some((rate, _seconds)) = wav_shape(wav.expose()) else {
+            self.message = Some((
+                "That recording does not have a WAV header this can read, so \
+                 there is no way to know what rate to play it at."
+                    .into(),
+                p::red(),
+            ));
+            return;
+        };
+
+        match veilvoice_audio::playback::start(pcm16(wav.expose()), rate, None) {
+            Ok(playing) => {
+                self.playing = Some((id.to_string(), playing));
+                self.message = None;
             }
             Err(error) => self.message = Some((error.to_string(), p::red())),
         }
@@ -560,6 +627,23 @@ impl Studio {
                     ui.label(RichText::new("● recording").color(p::red()).strong());
                     ui.label(RichText::new(length(seconds as f64)).color(p::fg()));
                 });
+
+                // What is going in and what is coming out, while it happens.
+                //
+                // Two bars rather than one, and this is the reason: a single
+                // output meter answers "is something being recorded" and not
+                // "is it being veiled", which is the question somebody at this
+                // tab is actually asking. Seeing the input move and the output
+                // move differently is the only thing on screen that shows the
+                // engine is between them.
+                if let Some(session) = &self.session {
+                    let stats = session.stats();
+                    self.levels.update(stats.input_peak, stats.output_peak);
+                }
+                ui.add_space(8.0);
+                ui.label(RichText::new("Levels").color(p::blue()).small());
+                crate::monitor::meter(ui, "in ", self.levels.input, self.levels.hold_input);
+                crate::monitor::meter(ui, "out", self.levels.output, self.levels.hold_output);
                 if dropped > 0 {
                     ui.label(
                         RichText::new(format!(
@@ -588,6 +672,20 @@ impl Studio {
     /// The Recording Browser tab.
     pub fn browser(&mut self, ui: &mut Ui) {
         ui.add_space(4.0);
+
+        // A take that has reached its end releases its samples here rather
+        // than waiting for somebody to press stop. The buffer is a decrypted
+        // recording; it should not outlive the playing of it by however long
+        // the window is left open.
+        if self.playing.as_ref().is_some_and(|(_, p)| p.finished()) {
+            self.playing = None;
+        }
+        if self.playing.is_some() {
+            // Only while something is playing: the position moves, so the
+            // window has to redraw, and the rest of the time it must not.
+            ui.ctx()
+                .request_repaint_after(std::time::Duration::from_millis(200));
+        }
 
         // The folder picker's answer, if it has arrived. Polled rather than
         // waited for, so the window keeps running while it is open.
@@ -685,6 +783,42 @@ impl Studio {
                                 });
                                 return;
                             }
+                            // Playing, and where it has got to.
+                            //
+                            // The progress is read rather than counted here:
+                            // the callback knows how many samples it has
+                            // actually handed the device, which is the only
+                            // number that is true when the device is behind.
+                            let this_is_playing =
+                                self.playing.as_ref().is_some_and(|(id, _)| id == &entry.id);
+                            ui.horizontal(|ui| {
+                                if this_is_playing {
+                                    if ui.button("  stop  ").clicked() {
+                                        act = Some(Act::Stop);
+                                    }
+                                    if let Some((_, playing)) = &self.playing {
+                                        ui.label(
+                                            RichText::new(format!(
+                                                "{} / {}",
+                                                length(playing.position() as f64),
+                                                length(playing.duration() as f64)
+                                            ))
+                                            .color(p::fg()),
+                                        );
+                                    }
+                                } else if ui
+                                    .button("  play  ")
+                                    .on_hover_text(
+                                        "Plays it out of locked memory. Nothing is \
+                                         written to the disk, so there is no copy to \
+                                         remember to shred afterwards.",
+                                    )
+                                    .clicked()
+                                {
+                                    act = Some(Act::Play(entry.id.clone()));
+                                }
+                            });
+                            ui.add_space(4.0);
                             ui.horizontal(|ui| {
                                 if ui.button("rename").clicked() {
                                     act = Some(Act::StartRename(
@@ -878,6 +1012,14 @@ impl Studio {
                 self.confirm_remove = Some(id);
             }
             Act::CancelRemove => self.confirm_remove = None,
+            Act::Play(id) => self.play(&id),
+            Act::Stop => {
+                // Dropping it stops the audio and releases the samples. There
+                // is no stop that keeps the buffer: a decrypted recording
+                // outliving the reason it was decrypted is the leak the vault
+                // exists to prevent.
+                self.playing = None;
+            }
             Act::Export(id, what) => {
                 // Off the render loop. `rfd`'s blocking picker freezes the
                 // window until it is answered, which `dialog` exists to avoid
@@ -993,6 +1135,8 @@ enum Act {
     CancelRemove,
     Remove(String),
     Export(String, Render),
+    Play(String),
+    Stop,
 }
 
 /// "One recording" or "four recordings", so the interface does not say

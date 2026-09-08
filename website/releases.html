@@ -166,6 +166,17 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </tbody></table>
 <p class="muted">The generated reference for every crate and every source file is under <a href="wiki.html">the reference</a>, and the same pages are in <a href="https://github.com/tilas01/veilvoice/wiki" rel="noopener noreferrer">the wiki</a>.</p>
 </details>
+<details class="release">
+<summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>The Studio meters what it is doing, and the Browser can play</strong></p>
+<ul>
+<li>Two bars while a take records, input and output. One output meter answers &quot;is something being recorded&quot; and not &quot;is it being veiled&quot;, which is the question somebody at that tab is actually asking; seeing the two move differently is the only thing on screen that shows the engine is between them. The bar itself moved out of the window&#x27;s private module into <code>monitor</code>, so there is one of it rather than a second that would slowly stop looking like the first.</li>
+<li>A take in the Browser plays, straight out of locked memory. <strong>Nothing is written to the disk</strong>, so there is no copy to remember to shred: the obvious way to hear a WAV is to put it somewhere and hand over the path, and that would leave an unencrypted recording lying about, which is what the vault exists to prevent.</li>
+<li>Said as built rather than as first imagined: the take is decrypted <strong>whole</strong>, not in blocks. The container is sealed and authenticated as one piece, and an encryption that let you open the first second without the rest would not be authenticating anything. What that buys is no plaintext file at any point. What it does not buy is a footprint smaller than the recording, and the roadmap entry now says that instead of the other thing.</li>
+<li>One take at a time, and starting a second releases the first: two decrypted recordings in memory at once is twice as much of somebody&#x27;s voice as the reason for it. Locking the window releases whatever is playing, along with the vault.</li>
+<li>Playing at the wrong sample rate is refused rather than done. It would make a voice sound higher or lower, and in a program whose whole point is that a voice cannot be traced back, that is a wrong answer rather than a small one.</li>
+</ul>
+</details>
 <details class="release" id="v0.1.20">
 <summary><strong>v0.1.20</strong> <span class="muted">The offline claim is now proved by a machine, four ways</span></summary>
 <div class="release-files">

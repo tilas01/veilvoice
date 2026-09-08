@@ -49,6 +49,7 @@ pub mod io;
 #[cfg(feature = "live")]
 pub mod live;
 #[cfg(feature = "live")]
+pub mod playback;
 pub mod record;
 // Not behind the `live` feature. The scale is arithmetic over a number, and a
 // front end that only processes files still has a level to draw -- and on the
