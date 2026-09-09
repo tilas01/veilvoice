@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/group.svg" alt="group.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/group.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1745 lines &middot; <a href="group.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1873 lines &middot; <a href="group.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-toggle-does-not-persist-and-the-tick-that-makes-it-persist-is-separate">The toggle does not persist, and the tick that makes it persist is separate</a>
@@ -77,31 +77,31 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1745 lines defining <strong>40 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1873 lines defining <strong>40 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Person</code> <span style="color:var(--muted)">line 70</span> &middot; One person, as the panel holds them.</li>
-<li><code>struct Outputs</code> <span style="color:var(--muted)">line 93</span> &middot; What comes out of a group render.</li>
-<li><code>struct Group</code> <span style="color:var(--muted)">line 158</span> &middot; The group-mode panel&#x27;s state.</li>
-<li><code>struct Job</code> <span style="color:var(--muted)">line 1130</span> &middot; Everything one render needs, taken from the panel at the moment the button was pressed.</li>
+<li><code>struct Person</code> <span style="color:var(--muted)">line 71</span> &middot; One person, as the panel holds them.</li>
+<li><code>struct Outputs</code> <span style="color:var(--muted)">line 94</span> &middot; What comes out of a group render.</li>
+<li><code>struct Group</code> <span style="color:var(--muted)">line 159</span> &middot; The group-mode panel&#x27;s state.</li>
+<li><code>struct Job</code> <span style="color:var(--muted)">line 1200</span> &middot; Everything one render needs, taken from the panel at the moment the button was pressed.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Outputs::any</code> <span style="color:var(--muted)">line 114</span> &middot; Whether anything at all would be written.
+<li><code>Outputs::any</code> <span style="color:var(--muted)">line 115</span> &middot; Whether anything at all would be written.
 </li>
-<li><code>Outputs::names</code> <span style="color:var(--muted)">line 119</span> &middot; The ticked ones, by name, for a project file.
+<li><code>Outputs::names</code> <span style="color:var(--muted)">line 120</span> &middot; The ticked ones, by name, for a project file.
 </li>
-<li><code>Group::start_from</code> <span style="color:var(--muted)">line 257</span> &middot; The panel as it should open, given the saved preference.
+<li><code>Group::start_from</code> <span style="color:var(--muted)">line 264</span> &middot; The panel as it should open, given the saved preference.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code></span>
 </li>
-<li><code>Group::len</code> <span style="color:var(--muted)">line 265</span> &middot; How many people are in the recording.
+<li><code>Group::len</code> <span style="color:var(--muted)">line 272</span> &middot; How many people are in the recording.
 </li>
-<li><code>Group::is_empty</code> <span style="color:var(--muted)">line 270</span> &middot; Whether there is nobody in it.
+<li><code>Group::is_empty</code> <span style="color:var(--muted)">line 277</span> &middot; Whether there is nobody in it.
 </li>
-<li><code>Group::to_plan</code> <span style="color:var(--muted)">line 323</span> &middot; Build a plan from the panel: names in slot order, no turns.
+<li><code>Group::to_plan</code> <span style="color:var(--muted)">line 330</span> &middot; Build a plan from the panel: names in slot order, no turns.
 </li>
-<li><code>Group::tab</code> <span style="color:var(--muted)">line 339</span> &middot; The whole panel.
+<li><code>Group::tab</code> <span style="color:var(--muted)">line 346</span> &middot; The whole panel.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>collect_dialogs</code>, <code>files_and_theme</code>, <code>mode_controls</code>, <code>output_controls</code>, <code>people_list</code>, <code>profile_controls</code>, <code>render_controls</code>, <code>strip</code>, <code>voice_mode_controls</code>, <code>from_workspace</code>, <code>to_workspace</code></span>
 </li>
-<li><code>Group::drain</code> <span style="color:var(--muted)">line 921</span> &middot; Take the worker&#x27;s answer if it has one.
+<li><code>Group::drain</code> <span style="color:var(--muted)">line 928</span> &middot; Take the worker&#x27;s answer if it has one.
 </li>
 </ul>
 </section>
@@ -140,112 +140,112 @@
 <a href="group.src.html#fn-person-at">
 <rect x="80.4" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="134.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Person::at</text>
-<text x="134.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 79</text>
+<text x="134.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 80</text>
 </a>
 <a href="group.src.html#fn-outputs-default">
 <rect x="76.4" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="146.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outputs::default</text>
-<text x="146.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
+<text x="146.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 104</text>
 </a>
 <a href="group.src.html#fn-outputs-from_names">
 <rect x="381.8" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="472.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outputs::from_names</text>
-<text x="472.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
+<text x="472.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
 </a>
 <a href="group.src.html#fn-group-default">
 <rect x="76.4" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="146.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::default</text>
-<text x="146.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+<text x="146.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
 </a>
 <a href="group.src.html#fn-group-start_from">
 <rect x="243.2" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="325.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::start_from</text>
-<text x="325.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<text x="325.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 264</text>
 </a>
 <a href="group.src.html#fn-group-colour">
 <rect x="434.2" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="500.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::colour</text>
-<text x="500.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
+<text x="500.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
 </a>
 <a href="group.src.html#fn-group-add">
 <rect x="45.3" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="99.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::add</text>
-<text x="99.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+<text x="99.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 295</text>
 </a>
 <a href="group.src.html#fn-group-limit">
 <rect x="179.9" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="242.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::limit</text>
-<text x="242.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 301</text>
+<text x="242.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
 </a>
 <a href="group.src.html#fn-group-remove">
 <rect x="330.6" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="397.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::remove</text>
-<text x="397.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<text x="397.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
 </a>
 <a href="group.src.html#fn-group-tab">
 <rect x="489.4" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="543.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::tab</text>
-<text x="543.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 339</text>
+<text x="543.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 346</text>
 </a>
 <a href="group.src.html#fn-group-collect_dialogs">
 <rect x="135.6" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="238.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::collect_dialogs</text>
-<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 356</text>
+<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 363</text>
 </a>
 <a href="group.src.html#fn-group-body">
 <rect x="48.1" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="106.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::body</text>
-<text x="106.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 384</text>
+<text x="106.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 391</text>
 </a>
 <a href="group.src.html#fn-group-profile_controls">
 <rect x="107.4" y="620.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="214.1" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::profile_controls</text>
-<text x="214.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 459</text>
+<text x="214.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 466</text>
 </a>
 <a href="group.src.html#fn-group-apply_profile">
 <rect x="227.1" y="820.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="321.7" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::apply_profile</text>
-<text x="321.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 526</text>
+<text x="321.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 533</text>
 </a>
 <a href="group.src.html#fn-group-mode_controls">
 <rect x="346.8" y="620.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="441.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::mode_controls</text>
-<text x="441.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 547</text>
+<text x="441.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 554</text>
 </a>
 <a href="group.src.html#fn-group-voice_mode_controls">
 <rect x="28.0" y="720.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="146.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::voice_mode_controls</text>
-<text x="146.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 604</text>
+<text x="146.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 611</text>
 </a>
 <a href="group.src.html#fn-group-strip">
 <rect x="291.6" y="720.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="353.9" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::strip</text>
-<text x="353.9" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 645</text>
+<text x="353.9" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 652</text>
 </a>
 <a href="group.src.html#fn-group-people_list">
 <rect x="442.3" y="720.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="528.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::people_list</text>
-<text x="528.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 680</text>
+<text x="528.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 687</text>
 </a>
 <a href="group.src.html#fn-group-to_workspace">
 <rect x="190.8" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="281.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::to_workspace</text>
-<text x="281.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 838</text>
+<text x="281.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 845</text>
 </a>
 <a href="group.src.html#fn-group-from_workspace">
 <rect x="398.0" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="496.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::from_workspace</text>
-<text x="496.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 864</text>
+<text x="496.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 871</text>
 </a>
 <a href="group.src.html#fn-group-is_busy">
 <rect x="366.9" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="437.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::is_busy</text>
-<text x="437.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 916</text>
+<text x="437.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 923</text>
 </a>
 <a href="group.src.html#fn-assigned_colour">
 <rect x="247.2" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="321.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">assigned_colour</text>
-<text x="321.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1273</text>
+<text x="321.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1343</text>
 </a>
 <rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -265,28 +265,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_at[&quot;Person::at&lt;br/&gt;line 79&quot;]
-    n_default[&quot;Outputs::default&lt;br/&gt;line 103&quot;]
-    n_from_names[&quot;Outputs::from_names&lt;br/&gt;line 138&quot;]
-    n_default[&quot;Group::default&lt;br/&gt;line 223&quot;]
-    n_start_from([&quot;Group::start_from&lt;br/&gt;line 257&quot;])
-    n_colour[&quot;Group::colour&lt;br/&gt;line 275&quot;]
-    n_add[&quot;Group::add&lt;br/&gt;line 288&quot;]
-    n_limit[&quot;Group::limit&lt;br/&gt;line 301&quot;]
-    n_remove[&quot;Group::remove&lt;br/&gt;line 309&quot;]
-    n_tab([&quot;Group::tab&lt;br/&gt;line 339&quot;])
-    n_collect_dialogs[&quot;Group::collect_dialogs&lt;br/&gt;line 356&quot;]
-    n_body[&quot;Group::body&lt;br/&gt;line 384&quot;]
-    n_profile_controls[&quot;Group::profile_controls&lt;br/&gt;line 459&quot;]
-    n_apply_profile[&quot;Group::apply_profile&lt;br/&gt;line 526&quot;]
-    n_mode_controls[&quot;Group::mode_controls&lt;br/&gt;line 547&quot;]
-    n_voice_mode_controls[&quot;Group::voice_mode_controls&lt;br/&gt;line 604&quot;]
-    n_strip[&quot;Group::strip&lt;br/&gt;line 645&quot;]
-    n_people_list[&quot;Group::people_list&lt;br/&gt;line 680&quot;]
-    n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 838&quot;]
-    n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 864&quot;]
-    n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 916&quot;]
-    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1273&quot;]
+    n_at[&quot;Person::at&lt;br/&gt;line 80&quot;]
+    n_default[&quot;Outputs::default&lt;br/&gt;line 104&quot;]
+    n_from_names[&quot;Outputs::from_names&lt;br/&gt;line 139&quot;]
+    n_default[&quot;Group::default&lt;br/&gt;line 229&quot;]
+    n_start_from([&quot;Group::start_from&lt;br/&gt;line 264&quot;])
+    n_colour[&quot;Group::colour&lt;br/&gt;line 282&quot;]
+    n_add[&quot;Group::add&lt;br/&gt;line 295&quot;]
+    n_limit[&quot;Group::limit&lt;br/&gt;line 308&quot;]
+    n_remove[&quot;Group::remove&lt;br/&gt;line 316&quot;]
+    n_tab([&quot;Group::tab&lt;br/&gt;line 346&quot;])
+    n_collect_dialogs[&quot;Group::collect_dialogs&lt;br/&gt;line 363&quot;]
+    n_body[&quot;Group::body&lt;br/&gt;line 391&quot;]
+    n_profile_controls[&quot;Group::profile_controls&lt;br/&gt;line 466&quot;]
+    n_apply_profile[&quot;Group::apply_profile&lt;br/&gt;line 533&quot;]
+    n_mode_controls[&quot;Group::mode_controls&lt;br/&gt;line 554&quot;]
+    n_voice_mode_controls[&quot;Group::voice_mode_controls&lt;br/&gt;line 611&quot;]
+    n_strip[&quot;Group::strip&lt;br/&gt;line 652&quot;]
+    n_people_list[&quot;Group::people_list&lt;br/&gt;line 687&quot;]
+    n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 845&quot;]
+    n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 871&quot;]
+    n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 923&quot;]
+    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1343&quot;]
     n_add --&gt; n_at
     n_body --&gt; n_collect_dialogs
     n_body --&gt; n_mode_controls
@@ -306,28 +306,28 @@ flowchart TD
     n_start_from --&gt; n_default
     n_strip --&gt; n_colour
     n_tab --&gt; n_body
-    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L79&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L103&quot; &quot;open the source&quot;
-    click n_from_names href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L138&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L223&quot; &quot;open the source&quot;
-    click n_start_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L257&quot; &quot;open the source&quot;
-    click n_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L275&quot; &quot;open the source&quot;
-    click n_add href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L288&quot; &quot;open the source&quot;
-    click n_limit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L301&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L309&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L339&quot; &quot;open the source&quot;
-    click n_collect_dialogs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L356&quot; &quot;open the source&quot;
-    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L384&quot; &quot;open the source&quot;
-    click n_profile_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L459&quot; &quot;open the source&quot;
-    click n_apply_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L526&quot; &quot;open the source&quot;
-    click n_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L547&quot; &quot;open the source&quot;
-    click n_voice_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L604&quot; &quot;open the source&quot;
-    click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L645&quot; &quot;open the source&quot;
-    click n_people_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L680&quot; &quot;open the source&quot;
-    click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L838&quot; &quot;open the source&quot;
-    click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916&quot; &quot;open the source&quot;
-    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1273&quot; &quot;open the source&quot;
+    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L80&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L104&quot; &quot;open the source&quot;
+    click n_from_names href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L139&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L229&quot; &quot;open the source&quot;
+    click n_start_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L264&quot; &quot;open the source&quot;
+    click n_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L282&quot; &quot;open the source&quot;
+    click n_add href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L295&quot; &quot;open the source&quot;
+    click n_limit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L308&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L316&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L346&quot; &quot;open the source&quot;
+    click n_collect_dialogs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L363&quot; &quot;open the source&quot;
+    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L391&quot; &quot;open the source&quot;
+    click n_profile_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L466&quot; &quot;open the source&quot;
+    click n_apply_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L533&quot; &quot;open the source&quot;
+    click n_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L554&quot; &quot;open the source&quot;
+    click n_voice_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L611&quot; &quot;open the source&quot;
+    click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L652&quot; &quot;open the source&quot;
+    click n_people_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L687&quot; &quot;open the source&quot;
+    click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L845&quot; &quot;open the source&quot;
+    click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L871&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L923&quot; &quot;open the source&quot;
+    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1343&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -340,50 +340,50 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Person</code> <sub>pub struct</sub></td><td><a href="group.src.html#fn-person">70</a></td><td>One person, as the panel holds them.</td></tr>
-<tr><td><code>Person::at</code> <sub>fn</sub></td><td><a href="group.src.html#fn-person-at">79</a></td><td>A person with the default name for their slot.</td></tr>
-<tr><td><code>Outputs</code> <sub>pub struct</sub></td><td><a href="group.src.html#fn-outputs">93</a></td><td>What comes out of a group render.</td></tr>
-<tr><td><code>Outputs::default</code> <sub>fn</sub></td><td><a href="group.src.html#fn-outputs-default">103</a></td><td></td></tr>
-<tr><td><code>Outputs::any</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-outputs-any">114</a></td><td>Whether anything at all would be written.</td></tr>
-<tr><td><code>Outputs::names</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-outputs-names">119</a></td><td>The ticked ones, by name, for a project file.</td></tr>
-<tr><td><code>Outputs::from_names</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-outputs-from_names">138</a></td><td>Read back from a project file.</td></tr>
-<tr><td><code>hex_of</code> <sub>fn</sub></td><td><a href="group.src.html#fn-hex_of">148</a></td><td>An egui colour as #rrggbb.</td></tr>
-<tr><td><code>colour_of</code> <sub>fn</sub></td><td><a href="group.src.html#fn-colour_of">153</a></td><td>#rrggbb as an egui colour, or None for anything that is not one.</td></tr>
-<tr><td><code>Group</code> <sub>pub struct</sub></td><td><a href="group.src.html#fn-group">158</a></td><td>The group-mode panel&#x27;s state.</td></tr>
-<tr><td><code>Group::default</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-default">223</a></td><td></td></tr>
-<tr><td><code>Group::start_from</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-start_from">257</a></td><td>The panel as it should open, given the saved preference.</td></tr>
-<tr><td><code>Group::len</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-len">265</a></td><td>How many people are in the recording.</td></tr>
-<tr><td><code>Group::is_empty</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-is_empty">270</a></td><td>Whether there is nobody in it.</td></tr>
-<tr><td><code>Group::colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-colour">275</a></td><td>The colour a slot is drawn in: the override, or the one it is given.</td></tr>
-<tr><td><code>Group::add</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-add">288</a></td><td>Add a person, if there is room for one.</td></tr>
-<tr><td><code>Group::limit</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-limit">301</a></td><td>How many people this panel can hold in its current mode.</td></tr>
-<tr><td><code>Group::remove</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-remove">309</a></td><td>Remove one person, keeping at least two.</td></tr>
-<tr><td><code>Group::to_plan</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-to_plan">323</a></td><td>Build a plan from the panel: names in slot order, no turns.</td></tr>
-<tr><td><code>Group::tab</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-tab">339</a></td><td>The whole panel.</td></tr>
-<tr><td><code>Group::collect_dialogs</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-collect_dialogs">356</a></td><td>Collect whatever the open pickers have answered.</td></tr>
-<tr><td><code>Group::body</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-body">384</a></td><td>Everything inside the scroller.</td></tr>
-<tr><td><code>Group::profile_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-profile_controls">459</a></td><td>The named ways of working, and the project this panel came from.</td></tr>
-<tr><td><code>Group::apply_profile</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-apply_profile">526</a></td><td>Set the controls this profile names, and change nothing else.</td></tr>
-<tr><td><code>Group::mode_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-mode_controls">547</a></td><td>The two controls that decide whether group mode is on.</td></tr>
-<tr><td><code>Group::voice_mode_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-voice_mode_controls">604</a></td><td>A voice each, or one voice between everybody.</td></tr>
-<tr><td><code>Group::strip</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-strip">645</a></td><td>The picture: a circle per person, in their colour, with their name.</td></tr>
-<tr><td><code>Group::people_list</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-people_list">680</a></td><td>One row per person: colour, name, and a way to remove them.</td></tr>
-<tr><td><code>Group::palette_picker</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-palette_picker">752</a></td><td>Every colour in every palette, as swatches.</td></tr>
-<tr><td><code>Group::swatch</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-swatch">791</a></td><td>One clickable colour.</td></tr>
-<tr><td><code>Group::output_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-output_controls">814</a></td><td>What a render writes.</td></tr>
-<tr><td><code>Group::to_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-to_workspace">838</a></td><td>This panel as a saveable project.</td></tr>
-<tr><td><code>Group::from_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-from_workspace">864</a></td><td>Put a saved project back.</td></tr>
-<tr><td><code>Group::is_busy</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-is_busy">916</a></td><td>Whether a render is running, so the window keeps repainting.</td></tr>
-<tr><td><code>Group::drain</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-drain">921</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
-<tr><td><code>Group::files_and_theme</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-files_and_theme">937</a></td><td>The recording, the plan, the title and the palette.</td></tr>
-<tr><td><code>Group::render_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-render_controls">1027</a></td><td>The button, and what came of pressing it.</td></tr>
-<tr><td><code>Group::start</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-start">1083</a></td><td>Start a render on a thread of its own.</td></tr>
-<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="group.src.html#fn-file_name">1118</a></td><td>The last component of a path, for showing beside a button.</td></tr>
-<tr><td><code>Job</code> <sub>struct</sub></td><td><a href="group.src.html#fn-job">1130</a></td><td>Everything one render needs, taken from the panel at the moment the button was pressed.</td></tr>
-<tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="group.src.html#fn-render_now">1150</a></td><td>Do the render.</td></tr>
-<tr><td><code>write_private</code> <sub>fn</sub></td><td><a href="group.src.html#fn-write_private">1256</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
-<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="group.src.html#fn-with_extension">1261</a></td><td></td></tr>
-<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-assigned_colour">1273</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
+<tr><td><code>Person</code> <sub>pub struct</sub></td><td><a href="group.src.html#fn-person">71</a></td><td>One person, as the panel holds them.</td></tr>
+<tr><td><code>Person::at</code> <sub>fn</sub></td><td><a href="group.src.html#fn-person-at">80</a></td><td>A person with the default name for their slot.</td></tr>
+<tr><td><code>Outputs</code> <sub>pub struct</sub></td><td><a href="group.src.html#fn-outputs">94</a></td><td>What comes out of a group render.</td></tr>
+<tr><td><code>Outputs::default</code> <sub>fn</sub></td><td><a href="group.src.html#fn-outputs-default">104</a></td><td></td></tr>
+<tr><td><code>Outputs::any</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-outputs-any">115</a></td><td>Whether anything at all would be written.</td></tr>
+<tr><td><code>Outputs::names</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-outputs-names">120</a></td><td>The ticked ones, by name, for a project file.</td></tr>
+<tr><td><code>Outputs::from_names</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-outputs-from_names">139</a></td><td>Read back from a project file.</td></tr>
+<tr><td><code>hex_of</code> <sub>fn</sub></td><td><a href="group.src.html#fn-hex_of">149</a></td><td>An egui colour as #rrggbb.</td></tr>
+<tr><td><code>colour_of</code> <sub>fn</sub></td><td><a href="group.src.html#fn-colour_of">154</a></td><td>#rrggbb as an egui colour, or None for anything that is not one.</td></tr>
+<tr><td><code>Group</code> <sub>pub struct</sub></td><td><a href="group.src.html#fn-group">159</a></td><td>The group-mode panel&#x27;s state.</td></tr>
+<tr><td><code>Group::default</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-default">229</a></td><td></td></tr>
+<tr><td><code>Group::start_from</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-start_from">264</a></td><td>The panel as it should open, given the saved preference.</td></tr>
+<tr><td><code>Group::len</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-len">272</a></td><td>How many people are in the recording.</td></tr>
+<tr><td><code>Group::is_empty</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-is_empty">277</a></td><td>Whether there is nobody in it.</td></tr>
+<tr><td><code>Group::colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-colour">282</a></td><td>The colour a slot is drawn in: the override, or the one it is given.</td></tr>
+<tr><td><code>Group::add</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-add">295</a></td><td>Add a person, if there is room for one.</td></tr>
+<tr><td><code>Group::limit</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-limit">308</a></td><td>How many people this panel can hold in its current mode.</td></tr>
+<tr><td><code>Group::remove</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-remove">316</a></td><td>Remove one person, keeping at least two.</td></tr>
+<tr><td><code>Group::to_plan</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-to_plan">330</a></td><td>Build a plan from the panel: names in slot order, no turns.</td></tr>
+<tr><td><code>Group::tab</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-tab">346</a></td><td>The whole panel.</td></tr>
+<tr><td><code>Group::collect_dialogs</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-collect_dialogs">363</a></td><td>Collect whatever the open pickers have answered.</td></tr>
+<tr><td><code>Group::body</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-body">391</a></td><td>Everything inside the scroller.</td></tr>
+<tr><td><code>Group::profile_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-profile_controls">466</a></td><td>The named ways of working, and the project this panel came from.</td></tr>
+<tr><td><code>Group::apply_profile</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-apply_profile">533</a></td><td>Set the controls this profile names, and change nothing else.</td></tr>
+<tr><td><code>Group::mode_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-mode_controls">554</a></td><td>The two controls that decide whether group mode is on.</td></tr>
+<tr><td><code>Group::voice_mode_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-voice_mode_controls">611</a></td><td>A voice each, or one voice between everybody.</td></tr>
+<tr><td><code>Group::strip</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-strip">652</a></td><td>The picture: a circle per person, in their colour, with their name.</td></tr>
+<tr><td><code>Group::people_list</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-people_list">687</a></td><td>One row per person: colour, name, and a way to remove them.</td></tr>
+<tr><td><code>Group::palette_picker</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-palette_picker">759</a></td><td>Every colour in every palette, as swatches.</td></tr>
+<tr><td><code>Group::swatch</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-swatch">798</a></td><td>One clickable colour.</td></tr>
+<tr><td><code>Group::output_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-output_controls">821</a></td><td>What a render writes.</td></tr>
+<tr><td><code>Group::to_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-to_workspace">845</a></td><td>This panel as a saveable project.</td></tr>
+<tr><td><code>Group::from_workspace</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-from_workspace">871</a></td><td>Put a saved project back.</td></tr>
+<tr><td><code>Group::is_busy</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-is_busy">923</a></td><td>Whether a render is running, so the window keeps repainting.</td></tr>
+<tr><td><code>Group::drain</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-group-drain">928</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
+<tr><td><code>Group::files_and_theme</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-files_and_theme">950</a></td><td>The recording, the plan, the title and the palette.</td></tr>
+<tr><td><code>Group::render_controls</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-render_controls">1040</a></td><td>The button, and what came of pressing it.</td></tr>
+<tr><td><code>Group::start</code> <sub>fn</sub></td><td><a href="group.src.html#fn-group-start">1146</a></td><td>Start a render on a thread of its own.</td></tr>
+<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="group.src.html#fn-file_name">1188</a></td><td>The last component of a path, for showing beside a button.</td></tr>
+<tr><td><code>Job</code> <sub>struct</sub></td><td><a href="group.src.html#fn-job">1200</a></td><td>Everything one render needs, taken from the panel at the moment the button was pressed.</td></tr>
+<tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="group.src.html#fn-render_now">1220</a></td><td>Do the render.</td></tr>
+<tr><td><code>write_private</code> <sub>fn</sub></td><td><a href="group.src.html#fn-write_private">1326</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
+<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="group.src.html#fn-with_extension">1331</a></td><td></td></tr>
+<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-assigned_colour">1343</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
 </tbody></table>
 </section>
 </div></div>

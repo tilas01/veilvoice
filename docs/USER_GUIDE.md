@@ -262,6 +262,17 @@ VeilVoice does not guess who is speaking. Turns come from a plan file or from
 one microphone per person, and that is a deliberate limit: guessing wrongly
 would put one person's words under another person's name.
 
+**Two bars per person, while the render runs.** As the render walks the file it
+draws, for each person, what went into the turn it has just finished and what
+the engine produced from it, along with how far through their turns it is. One
+bar would answer "is something being written"; two answer "is this person being
+veiled", which is the question you are actually asking, and two that move
+differently are the only thing on screen showing the engine is between them.
+
+They cannot show that a voice cannot be recovered, and nothing on a screen can.
+What they catch is the case that matters in practice: a person whose input bar
+moves and whose output bar does not.
+
 ### studio
 
 Veiling as it happens, and keeping what was said, in one tab. It used to be

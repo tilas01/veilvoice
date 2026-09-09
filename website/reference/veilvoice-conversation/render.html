@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/render.svg" alt="render.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/render.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 851 lines &middot; <a href="render.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 1111 lines &middot; <a href="render.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#one-engine-each-and-why-that-is-not-merely-convenient">One engine each, and why that is not merely convenient</a>
@@ -98,23 +98,37 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>851 lines defining <strong>6 functions</strong> (2 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1111 lines defining <strong>16 functions</strong> (9 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Settings</code> <span style="color:var(--muted)">line 137</span> &middot; How to render.</li>
-<li><code>struct Rendered</code> <span style="color:var(--muted)">line 161</span> &middot; What came back.</li>
+<li><code>struct Settings</code> <span style="color:var(--muted)">line 138</span> &middot; How to render.</li>
+<li><code>struct Progress</code> <span style="color:var(--muted)">line 178</span> &middot; What a render has done so far, readable while it is still running.</li>
+<li><code>struct SpeakerProgress</code> <span style="color:var(--muted)">line 184</span> &middot; One speaker&#x27;s share of a running render.</li>
+<li><code>struct Rendered</code> <span style="color:var(--muted)">line 293</span> &middot; What came back.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Rendered::has_unassigned</code> <span style="color:var(--muted)">line 183</span> &middot; Whether some of the recording was silenced because no turn claimed it.
+<li><code>Progress::for_speakers</code> <span style="color:var(--muted)">line 198</span> &middot; Room for a render of speakers people.
 </li>
-<li><code>render</code> <span style="color:var(--muted)">line 194</span> &middot; Render input according to plan.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>fade_ends</code>, <code>process_span</code>, <code>seconds_to_index</code></span>
+<li><code>Progress::len</code> <span style="color:var(--muted)">line 205</span> &middot; How many speakers this was made for.
+</li>
+<li><code>Progress::is_empty</code> <span style="color:var(--muted)">line 210</span> &middot; Whether it was made for none, which is what a default one is.
+</li>
+<li><code>Progress::levels</code> <span style="color:var(--muted)">line 220</span> &middot; What the most recently finished turn for slot measured: the peak that went in and the peak that came out, both in 0, 1.
+</li>
+<li><code>Progress::done</code> <span style="color:var(--muted)">line 233</span> &middot; How far through this speaker&#x27;s turns the render is, in 0, 1.
+</li>
+<li><code>Progress::seconds</code> <span style="color:var(--muted)">line 245</span> &middot; How many seconds of this speaker&#x27;s audio have been rendered.
+</li>
+<li><code>Rendered::has_unassigned</code> <span style="color:var(--muted)">line 315</span> &middot; Whether some of the recording was silenced because no turn claimed it.
+</li>
+<li><code>render</code> <span style="color:var(--muted)">line 326</span> &middot; Render input according to plan.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>render_watched</code>, <code>fade_ends</code>, <code>peak</code>, <code>process_span</code>, <code>seconds_to_index</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 571 315" width="571" height="315" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 731" width="595" height="731" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -123,89 +137,179 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="571" height="315" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M504.7 74.0 C 504.7 94.0, 452.3 100.0, 452.3 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M504.7 74.0 C 504.7 94.0, 313.7 100.0, 313.7 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M504.7 74.0 C 504.7 94.0, 146.8 100.0, 146.8 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<rect x="0" y="0" width="595" height="731" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M480.5 374.0 C 480.5 394.0, 297.6 400.0, 297.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M297.6 474.0 C 297.6 494.0, 464.4 500.0, 464.4 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M368.0 447.0 C 390.0 447.0, 390.0 347.0, 163.8 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M297.6 474.0 C 297.6 494.0, 325.8 500.0, 325.8 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M297.6 474.0 C 297.6 494.0, 158.9 500.0, 158.9 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <a href="render.src.html#fn-settings-default">
 <rect x="20.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="102.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::default</text>
-<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
+<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
+</a>
+<a href="render.src.html#fn-progress-for_speakers">
+<rect x="211.0" y="20.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="313.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::for_speakers</text>
+<text x="313.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
+</a>
+<a href="render.src.html#fn-progress-len">
+<rect x="442.3" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="508.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::len</text>
+<text x="508.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 205</text>
+</a>
+<a href="render.src.html#fn-progress-is_empty">
+<rect x="36.1" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="122.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::is_empty</text>
+<text x="122.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
+</a>
+<a href="render.src.html#fn-progress-levels">
+<rect x="235.2" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="313.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::levels</text>
+<text x="313.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 220</text>
+</a>
+<a href="render.src.html#fn-progress-done">
+<rect x="418.2" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="488.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::done</text>
+<text x="488.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 233</text>
+</a>
+<a href="render.src.html#fn-progress-seconds">
+<rect x="24.0" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="106.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::seconds</text>
+<text x="106.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+</a>
+<a href="render.src.html#fn-progress-expect">
+<rect x="215.0" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="293.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::expect</text>
+<text x="293.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
+</a>
+<a href="render.src.html#fn-progress-finished">
+<rect x="398.0" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="484.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Progress::finished</text>
+<text x="484.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
+</a>
+<a href="render.src.html#fn-peak">
+<rect x="68.4" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="114.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">peak</text>
+<text x="114.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 284</text>
 </a>
 <a href="render.src.html#fn-rendered-has_unassigned">
-<rect x="211.0" y="20.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="321.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rendered::has_unassigned</text>
-<text x="321.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
+<rect x="186.8" y="320.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="297.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rendered::has_unassigned</text>
+<text x="297.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
 </a>
 <a href="render.src.html#fn-render">
-<rect x="458.5" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="504.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render</text>
-<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
+<rect x="434.3" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="480.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render</text>
+<text x="480.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 326</text>
+</a>
+<a href="render.src.html#fn-render_watched">
+<rect x="227.1" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="297.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render_watched</text>
+<text x="297.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 344</text>
 </a>
 <a href="render.src.html#fn-seconds_to_index">
-<rect x="68.4" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="146.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seconds_to_index</text>
-<text x="146.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 369</text>
+<rect x="80.4" y="520.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="158.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seconds_to_index</text>
+<text x="158.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 535</text>
 </a>
 <a href="render.src.html#fn-process_span">
-<rect x="251.3" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="313.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">process_span</text>
-<text x="313.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 386</text>
+<rect x="263.4" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="325.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">process_span</text>
+<text x="325.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 552</text>
 </a>
 <a href="render.src.html#fn-fade_ends">
-<rect x="402.0" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="452.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fade_ends</text>
-<text x="452.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 401</text>
+<rect x="414.1" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="464.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fade_ends</text>
+<text x="464.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 567</text>
 </a>
-<rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="220.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="229.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 240.5 L29.0 240.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="245.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="267.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="282.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
-<text x="20.0" y="297.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
+<rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="620.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="629.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="636.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="645.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 656.5 L29.0 656.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="661.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="683.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Settings::default&lt;br/&gt;line 149&quot;]
-    n_has_unassigned([&quot;Rendered::has_unassigned&lt;br/&gt;line 183&quot;])
-    n_render([&quot;render&lt;br/&gt;line 194&quot;])
-    n_seconds_to_index[&quot;seconds_to_index&lt;br/&gt;line 369&quot;]
-    n_process_span[&quot;process_span&lt;br/&gt;line 386&quot;]
-    n_fade_ends[&quot;fade_ends&lt;br/&gt;line 401&quot;]
-    n_render --&gt; n_fade_ends
-    n_render --&gt; n_process_span
-    n_render --&gt; n_seconds_to_index
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L149&quot; &quot;open the source&quot;
-    click n_has_unassigned href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L183&quot; &quot;open the source&quot;
-    click n_render href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L194&quot; &quot;open the source&quot;
-    click n_seconds_to_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L369&quot; &quot;open the source&quot;
-    click n_process_span href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L386&quot; &quot;open the source&quot;
-    click n_fade_ends href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L401&quot; &quot;open the source&quot;
+    n_default[&quot;Settings::default&lt;br/&gt;line 150&quot;]
+    n_for_speakers([&quot;Progress::for_speakers&lt;br/&gt;line 198&quot;])
+    n_len([&quot;Progress::len&lt;br/&gt;line 205&quot;])
+    n_is_empty([&quot;Progress::is_empty&lt;br/&gt;line 210&quot;])
+    n_levels([&quot;Progress::levels&lt;br/&gt;line 220&quot;])
+    n_done([&quot;Progress::done&lt;br/&gt;line 233&quot;])
+    n_seconds([&quot;Progress::seconds&lt;br/&gt;line 245&quot;])
+    n_expect[&quot;Progress::expect&lt;br/&gt;line 253&quot;]
+    n_finished[&quot;Progress::finished&lt;br/&gt;line 260&quot;]
+    n_peak[&quot;peak&lt;br/&gt;line 284&quot;]
+    n_has_unassigned([&quot;Rendered::has_unassigned&lt;br/&gt;line 315&quot;])
+    n_render([&quot;render&lt;br/&gt;line 326&quot;])
+    n_render_watched[&quot;render_watched&lt;br/&gt;line 344&quot;]
+    n_seconds_to_index[&quot;seconds_to_index&lt;br/&gt;line 535&quot;]
+    n_process_span[&quot;process_span&lt;br/&gt;line 552&quot;]
+    n_fade_ends[&quot;fade_ends&lt;br/&gt;line 567&quot;]
+    n_render --&gt; n_render_watched
+    n_render_watched --&gt; n_fade_ends
+    n_render_watched --&gt; n_peak
+    n_render_watched --&gt; n_process_span
+    n_render_watched --&gt; n_seconds_to_index
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L150&quot; &quot;open the source&quot;
+    click n_for_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L198&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L205&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L210&quot; &quot;open the source&quot;
+    click n_levels href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L220&quot; &quot;open the source&quot;
+    click n_done href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L233&quot; &quot;open the source&quot;
+    click n_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L245&quot; &quot;open the source&quot;
+    click n_expect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L253&quot; &quot;open the source&quot;
+    click n_finished href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L260&quot; &quot;open the source&quot;
+    click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L284&quot; &quot;open the source&quot;
+    click n_has_unassigned href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L315&quot; &quot;open the source&quot;
+    click n_render href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L326&quot; &quot;open the source&quot;
+    click n_render_watched href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L344&quot; &quot;open the source&quot;
+    click n_seconds_to_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L535&quot; &quot;open the source&quot;
+    click n_process_span href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L552&quot; &quot;open the source&quot;
+    click n_fade_ends href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L567&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_has_unassigned,n_render entry
+    class n_for_speakers,n_len,n_is_empty,n_levels,n_done,n_seconds,n_has_unassigned,n_render entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_render_watched api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_seconds_to_index,n_process_span,n_fade_ends helper</code></pre>
+    class n_default,n_expect,n_finished,n_peak,n_seconds_to_index,n_process_span,n_fade_ends helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>SpeakerSpans</code> <sub>type</sub></td><td><a href="render.src.html#fn-speakerspans">133</a></td><td>One speaker&#x27;s finished spans: where each starts, and the veiled samples.</td></tr>
-<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="render.src.html#fn-settings">137</a></td><td>How to render.</td></tr>
-<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="render.src.html#fn-settings-default">149</a></td><td></td></tr>
-<tr><td><code>Rendered</code> <sub>pub struct</sub></td><td><a href="render.src.html#fn-rendered">161</a></td><td>What came back.</td></tr>
-<tr><td><code>Rendered::has_unassigned</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-rendered-has_unassigned">183</a></td><td>Whether some of the recording was silenced because no turn claimed it.</td></tr>
-<tr><td><code>render</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-render">194</a></td><td>Render input according to plan.</td></tr>
-<tr><td><code>seconds_to_index</code> <sub>fn</sub></td><td><a href="render.src.html#fn-seconds_to_index">369</a></td><td>A time in seconds as a sample index, clamped into the recording.</td></tr>
-<tr><td><code>process_span</code> <sub>fn</sub></td><td><a href="render.src.html#fn-process_span">386</a></td><td>Run one span through one engine and give back audio aligned with the input.</td></tr>
-<tr><td><code>fade_ends</code> <sub>fn</sub></td><td><a href="render.src.html#fn-fade_ends">401</a></td><td>Fade the first and last fade samples, so a splice is not a click.</td></tr>
+<tr><td><code>SpeakerSpans</code> <sub>type</sub></td><td><a href="render.src.html#fn-speakerspans">134</a></td><td>One speaker&#x27;s finished spans: where each starts, and the veiled samples.</td></tr>
+<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="render.src.html#fn-settings">138</a></td><td>How to render.</td></tr>
+<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="render.src.html#fn-settings-default">150</a></td><td></td></tr>
+<tr><td><code>Progress</code> <sub>pub struct</sub></td><td><a href="render.src.html#fn-progress">178</a></td><td>What a render has done so far, readable while it is still running.</td></tr>
+<tr><td><code>SpeakerProgress</code> <sub>struct</sub></td><td><a href="render.src.html#fn-speakerprogress">184</a></td><td>One speaker&#x27;s share of a running render.</td></tr>
+<tr><td><code>Progress::for_speakers</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-progress-for_speakers">198</a></td><td>Room for a render of speakers people.</td></tr>
+<tr><td><code>Progress::len</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-progress-len">205</a></td><td>How many speakers this was made for.</td></tr>
+<tr><td><code>Progress::is_empty</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-progress-is_empty">210</a></td><td>Whether it was made for none, which is what a default one is.</td></tr>
+<tr><td><code>Progress::levels</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-progress-levels">220</a></td><td>What the most recently finished turn for slot measured: the peak that went in and the peak that came out, both in 0, 1.</td></tr>
+<tr><td><code>Progress::done</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-progress-done">233</a></td><td>How far through this speaker&#x27;s turns the render is, in 0, 1.</td></tr>
+<tr><td><code>Progress::seconds</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-progress-seconds">245</a></td><td>How many seconds of this speaker&#x27;s audio have been rendered.</td></tr>
+<tr><td><code>Progress::expect</code> <sub>fn</sub></td><td><a href="render.src.html#fn-progress-expect">253</a></td><td>Say how many turns a speaker has, before any of them is rendered.</td></tr>
+<tr><td><code>Progress::finished</code> <sub>fn</sub></td><td><a href="render.src.html#fn-progress-finished">260</a></td><td>Record a finished turn.</td></tr>
+<tr><td><code>peak</code> <sub>fn</sub></td><td><a href="render.src.html#fn-peak">284</a></td><td>The loudest sample in a span, as a peak in 0, 1.</td></tr>
+<tr><td><code>Rendered</code> <sub>pub struct</sub></td><td><a href="render.src.html#fn-rendered">293</a></td><td>What came back.</td></tr>
+<tr><td><code>Rendered::has_unassigned</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-rendered-has_unassigned">315</a></td><td>Whether some of the recording was silenced because no turn claimed it.</td></tr>
+<tr><td><code>render</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-render">326</a></td><td>Render input according to plan.</td></tr>
+<tr><td><code>render_watched</code> <sub>pub fn</sub></td><td><a href="render.src.html#fn-render_watched">344</a></td><td>render, with somewhere to report what it is doing as it does it.</td></tr>
+<tr><td><code>seconds_to_index</code> <sub>fn</sub></td><td><a href="render.src.html#fn-seconds_to_index">535</a></td><td>A time in seconds as a sample index, clamped into the recording.</td></tr>
+<tr><td><code>process_span</code> <sub>fn</sub></td><td><a href="render.src.html#fn-process_span">552</a></td><td>Run one span through one engine and give back audio aligned with the input.</td></tr>
+<tr><td><code>fade_ends</code> <sub>fn</sub></td><td><a href="render.src.html#fn-fade_ends">567</a></td><td>Fade the first and last fade samples, so a splice is not a click.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -123,6 +123,7 @@
 //! somebody's real voice.
 
 use crate::{Conversation, Error};
+use std::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
 use veilvoice_core::{DeidConfig, Deidentifier};
 
 /// One speaker's finished spans: where each starts, and the veiled samples.
@@ -154,6 +155,137 @@ impl Default for Settings {
             fade_ms: 4.0,
         }
     }
+}
+
+/// What a render has done so far, readable while it is still running.
+///
+/// **Marker 133.** The row asked for two bars per speaker, what went in and
+/// what came out, so the difference is visible rather than asserted. It asked
+/// for them *live*, in group mode, and neither word survived reading the code:
+/// group mode works on a recording that already exists and never opens a
+/// device. This is the half of it that can be built from what is here, and the
+/// moment it applies to is the render.
+///
+/// Every field is an atomic and nothing here allocates or locks, so a front end
+/// may read it every frame from another thread while the render threads write
+/// to it. Written with [`Ordering::Relaxed`] throughout: these are numbers to
+/// draw a bar with, and a bar that is one frame behind is a bar nobody can tell
+/// from a bar that is not.
+///
+/// A default one has no speakers and every write to it is dropped, which is
+/// what [`render`] passes when the caller did not ask to watch.
+#[derive(Debug, Default)]
+pub struct Progress {
+    speakers: Vec<SpeakerProgress>,
+}
+
+/// One speaker's share of a running render.
+#[derive(Debug, Default)]
+struct SpeakerProgress {
+    /// The peak of the most recently finished span, as it arrived. `f32` bits.
+    input_peak: AtomicU32,
+    /// The peak of the same span as the engine produced it. `f32` bits.
+    output_peak: AtomicU32,
+    /// Seconds of this speaker's audio rendered so far. `f64` bits.
+    seconds: AtomicU64,
+    /// Turns finished, and how many there are.
+    spans_done: AtomicUsize,
+    spans_total: AtomicUsize,
+}
+
+impl Progress {
+    /// Room for a render of `speakers` people.
+    pub fn for_speakers(speakers: usize) -> Self {
+        let mut slots = Vec::new();
+        slots.resize_with(speakers, SpeakerProgress::default);
+        Self { speakers: slots }
+    }
+
+    /// How many speakers this was made for.
+    pub fn len(&self) -> usize {
+        self.speakers.len()
+    }
+
+    /// Whether it was made for none, which is what a default one is.
+    pub fn is_empty(&self) -> bool {
+        self.speakers.is_empty()
+    }
+
+    /// What the most recently finished turn for `slot` measured: the peak that
+    /// went in and the peak that came out, both in `[0, 1]`.
+    ///
+    /// `None` for a slot this was not made for. `(0.0, 0.0)` before that
+    /// speaker's first turn has finished, which is a bar at rest rather than a
+    /// bar that is lying.
+    pub fn levels(&self, slot: usize) -> Option<(f32, f32)> {
+        let speaker = self.speakers.get(slot)?;
+        Some((
+            f32::from_bits(speaker.input_peak.load(Ordering::Relaxed)),
+            f32::from_bits(speaker.output_peak.load(Ordering::Relaxed)),
+        ))
+    }
+
+    /// How far through this speaker's turns the render is, in `[0, 1]`.
+    ///
+    /// `0.0` for a speaker with no turns, rather than a division by zero: a
+    /// speaker the plan never gives a turn to has nothing to be part of the way
+    /// through.
+    pub fn done(&self, slot: usize) -> f32 {
+        let Some(speaker) = self.speakers.get(slot) else {
+            return 0.0;
+        };
+        let total = speaker.spans_total.load(Ordering::Relaxed);
+        if total == 0 {
+            return 0.0;
+        }
+        speaker.spans_done.load(Ordering::Relaxed) as f32 / total as f32
+    }
+
+    /// How many seconds of this speaker's audio have been rendered.
+    pub fn seconds(&self, slot: usize) -> f64 {
+        self.speakers
+            .get(slot)
+            .map(|speaker| f64::from_bits(speaker.seconds.load(Ordering::Relaxed)))
+            .unwrap_or(0.0)
+    }
+
+    /// Say how many turns a speaker has, before any of them is rendered.
+    fn expect(&self, slot: usize, spans: usize) {
+        if let Some(speaker) = self.speakers.get(slot) {
+            speaker.spans_total.store(spans, Ordering::Relaxed);
+        }
+    }
+
+    /// Record a finished turn.
+    fn finished(&self, slot: usize, went_in: f32, came_out: f32, seconds: f64) {
+        let Some(speaker) = self.speakers.get(slot) else {
+            return;
+        };
+        speaker
+            .input_peak
+            .store(went_in.to_bits(), Ordering::Relaxed);
+        speaker
+            .output_peak
+            .store(came_out.to_bits(), Ordering::Relaxed);
+        let so_far = f64::from_bits(speaker.seconds.load(Ordering::Relaxed));
+        speaker
+            .seconds
+            .store((so_far + seconds).to_bits(), Ordering::Relaxed);
+        speaker.spans_done.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
+/// The loudest sample in a span, as a peak in `[0, 1]`.
+///
+/// One pass over a slice the engine has just walked twice, so it is in cache
+/// and costs nothing measurable next to an FFT. Marker 126 asks for work that
+/// can be done once to be done once; this is new work rather than repeated
+/// work, and it is the feature.
+fn peak(samples: &[f32]) -> f32 {
+    samples
+        .iter()
+        .fold(0.0f32, |loudest, sample| loudest.max(sample.abs()))
+        .min(1.0)
 }
 
 /// What came back.
@@ -196,6 +328,25 @@ pub fn render(
     input: &[f32],
     settings: &Settings,
     seeds: Option<&[[u8; 32]]>,
+) -> Result<Rendered, Error> {
+    render_watched(plan, input, settings, seeds, &Progress::default())
+}
+
+/// [`render`], with somewhere to report what it is doing as it does it.
+///
+/// **Marker 133.** `progress` is written to from every speaker's thread as
+/// each turn finishes, and may be read from another thread at the same time:
+/// see [`Progress`]. Pass one made by [`Progress::for_speakers`] with as many
+/// slots as the plan has, or a default one to be told nothing.
+///
+/// The render is otherwise identical, and deliberately: a watched render and an
+/// unwatched one that produced different audio would be two renderers.
+pub fn render_watched(
+    plan: &Conversation,
+    input: &[f32],
+    settings: &Settings,
+    seeds: Option<&[[u8; 32]]>,
+    progress: &Progress,
 ) -> Result<Rendered, Error> {
     if plan.is_empty() {
         return Err(Error::Malformed(
@@ -255,6 +406,10 @@ pub fn render(
             config.accent = plan.voice(slot).applied_to(config.accent);
             let seed = seeds.map(|seeds| seeds[slot]);
             let input = &input;
+            // Before the thread starts, so a front end drawing a bar sees how
+            // many turns this speaker has rather than a denominator of zero
+            // that becomes one the moment the thread is scheduled.
+            progress.expect(slot, spans.len());
             handles.push(scope.spawn(move || {
                 // Built inside the thread, so ten Argon2-free but still
                 // FFT-plan-allocating constructions happen in parallel too.
@@ -269,6 +424,17 @@ pub fn render(
                     // would give them a different voice at each end of the
                     // recording.
                     let veiled = process_span(&mut engine, &input[*start..*end]);
+                    // **Marker 133.** What went in and what came out, measured
+                    // before the ends are faded: the fade is this module's
+                    // splice repair rather than anything the engine did, and a
+                    // bar showing the engine's output should show the engine's
+                    // output.
+                    progress.finished(
+                        slot,
+                        peak(&input[*start..*end]),
+                        peak(&veiled),
+                        (end - start) as f64 / sample_rate as f64,
+                    );
                     done.push((*start, fade_ends(veiled, fade)));
                 }
                 Ok(done)
@@ -682,6 +848,100 @@ mod tests {
         )
         .unwrap();
         assert_ne!(a.samples, b.samples);
+    }
+
+    /// **Marker 133.** A watched render reports what it is doing per speaker.
+    ///
+    /// Checked after it has finished rather than while it runs, which is a
+    /// choice about what can be asserted: a test that read the bars mid-render
+    /// would be racing the threads it is measuring, and the flake would be in
+    /// the test rather than in the code. What is worth asserting is that every
+    /// turn is accounted for, that the time adds up to the same figure the
+    /// finished render reports, and that both bars carry a level for a speaker
+    /// whose audio was not silence.
+    #[test]
+    fn a_watched_render_reports_every_speakers_turns() {
+        let progress = Progress::for_speakers(2);
+        let rendered = render_watched(
+            &two_people(true),
+            &tone(3.0),
+            &settings(),
+            Some(&seeds(2)),
+            &progress,
+        )
+        .unwrap();
+
+        assert_eq!(progress.len(), 2);
+        for slot in 0..2 {
+            assert_eq!(
+                progress.done(slot),
+                1.0,
+                "speaker {slot} did not finish all of their turns"
+            );
+            assert!(
+                (progress.seconds(slot) - rendered.per_speaker_secs[slot]).abs() < 0.01,
+                "speaker {slot} was watched for {:.3}s and credited with {:.3}s",
+                progress.seconds(slot),
+                rendered.per_speaker_secs[slot]
+            );
+            let (went_in, came_out) = progress.levels(slot).expect("a slot that exists");
+            assert!(
+                went_in > 0.0,
+                "speaker {slot}'s input bar says the tone was silence"
+            );
+            assert!(
+                came_out > 0.0,
+                "speaker {slot}'s output bar says the engine produced silence"
+            );
+            assert!(
+                (0.0..=1.0).contains(&went_in) && (0.0..=1.0).contains(&came_out),
+                "a bar is drawn from these, so {went_in} and {came_out} have to be levels"
+            );
+        }
+    }
+
+    /// A render nobody is watching is the same render.
+    ///
+    /// The default `Progress` has no slots, so every write to it is dropped.
+    /// That path is the one `render` itself takes, and it must not be a second
+    /// renderer: the same seeds have to give the same audio either way.
+    #[test]
+    fn watching_a_render_does_not_change_it() {
+        let watched = render_watched(
+            &two_people(true),
+            &tone(2.0),
+            &settings(),
+            Some(&seeds(2)),
+            &Progress::for_speakers(2),
+        )
+        .unwrap();
+        let unwatched =
+            render(&two_people(true), &tone(2.0), &settings(), Some(&seeds(2))).unwrap();
+        assert_eq!(watched.samples, unwatched.samples);
+    }
+
+    /// A `Progress` made for fewer speakers than the plan has drops what it
+    /// cannot hold rather than panicking.
+    ///
+    /// The window builds one from the panel's speaker count and the plan comes
+    /// off disk, so the two can disagree. A render that stopped because a bar
+    /// had nowhere to go would be the worst possible trade.
+    #[test]
+    fn a_progress_too_small_for_the_plan_is_survived() {
+        let progress = Progress::for_speakers(1);
+        let rendered = render_watched(
+            &two_people(true),
+            &tone(2.0),
+            &settings(),
+            Some(&seeds(2)),
+            &progress,
+        )
+        .unwrap();
+        assert_eq!(rendered.per_speaker_secs.len(), 2);
+        assert_eq!(progress.done(0), 1.0);
+        assert_eq!(progress.levels(1), None, "there is no second slot to read");
+        assert_eq!(progress.done(1), 0.0);
+        assert_eq!(progress.seconds(1), 0.0);
     }
 
     #[test]

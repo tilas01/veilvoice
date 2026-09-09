@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-conversation/src/render.rs`
 
-[[veilvoice-conversation|Crate-veilvoice-conversation]] &middot; 851 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs)
+[[veilvoice-conversation|Crate-veilvoice-conversation]] &middot; 1111 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs)
 
 ## Contents
 
@@ -143,22 +143,30 @@ somebody's real voice.
 
 ## What this file contains
 
-851 lines defining **6 functions** (2 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1111 lines defining **16 functions** (9 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Settings` (line 137) -- How to render.
-- `struct Rendered` (line 161) -- What came back.
+- `struct Settings` (line 138) -- How to render.
+- `struct Progress` (line 178) -- What a render has done so far, readable while it is still running.
+- `struct SpeakerProgress` (line 184) -- One speaker's share of a running render.
+- `struct Rendered` (line 293) -- What came back.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Rendered::has_unassigned` (line 183) -- Whether some of the recording was silenced because no turn claimed it.
-- `render` (line 194) -- Render input according to plan.
-  - reaches: `fade_ends`, `process_span`, `seconds_to_index`
+- `Progress::for_speakers` (line 198) -- Room for a render of speakers people.
+- `Progress::len` (line 205) -- How many speakers this was made for.
+- `Progress::is_empty` (line 210) -- Whether it was made for none, which is what a default one is.
+- `Progress::levels` (line 220) -- What the most recently finished turn for slot measured: the peak that went in and the peak that came out, both in 0, 1.
+- `Progress::done` (line 233) -- How far through this speaker's turns the render is, in 0, 1.
+- `Progress::seconds` (line 245) -- How many seconds of this speaker's audio have been rendered.
+- `Rendered::has_unassigned` (line 315) -- Whether some of the recording was silenced because no turn claimed it.
+- `render` (line 326) -- Render input according to plan.
+  - reaches: `render_watched`, `fade_ends`, `peak`, `process_span`, `seconds_to_index`
 
 ## What calls what
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-conversation/render.svg" alt="what calls what in render.rs" width="640">
@@ -170,25 +178,49 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Settings::default<br/>line 149"]
-    n_has_unassigned(["Rendered::has_unassigned<br/>line 183"])
-    n_render(["render<br/>line 194"])
-    n_seconds_to_index["seconds_to_index<br/>line 369"]
-    n_process_span["process_span<br/>line 386"]
-    n_fade_ends["fade_ends<br/>line 401"]
-    n_render --> n_fade_ends
-    n_render --> n_process_span
-    n_render --> n_seconds_to_index
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L149" "open the source"
-    click n_has_unassigned href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L183" "open the source"
-    click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L194" "open the source"
-    click n_seconds_to_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L369" "open the source"
-    click n_process_span href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L386" "open the source"
-    click n_fade_ends href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L401" "open the source"
+    n_default["Settings::default<br/>line 150"]
+    n_for_speakers(["Progress::for_speakers<br/>line 198"])
+    n_len(["Progress::len<br/>line 205"])
+    n_is_empty(["Progress::is_empty<br/>line 210"])
+    n_levels(["Progress::levels<br/>line 220"])
+    n_done(["Progress::done<br/>line 233"])
+    n_seconds(["Progress::seconds<br/>line 245"])
+    n_expect["Progress::expect<br/>line 253"]
+    n_finished["Progress::finished<br/>line 260"]
+    n_peak["peak<br/>line 284"]
+    n_has_unassigned(["Rendered::has_unassigned<br/>line 315"])
+    n_render(["render<br/>line 326"])
+    n_render_watched["render_watched<br/>line 344"]
+    n_seconds_to_index["seconds_to_index<br/>line 535"]
+    n_process_span["process_span<br/>line 552"]
+    n_fade_ends["fade_ends<br/>line 567"]
+    n_render --> n_render_watched
+    n_render_watched --> n_fade_ends
+    n_render_watched --> n_peak
+    n_render_watched --> n_process_span
+    n_render_watched --> n_seconds_to_index
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L150" "open the source"
+    click n_for_speakers href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L198" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L205" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L210" "open the source"
+    click n_levels href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L220" "open the source"
+    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L233" "open the source"
+    click n_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L245" "open the source"
+    click n_expect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L253" "open the source"
+    click n_finished href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L260" "open the source"
+    click n_peak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L284" "open the source"
+    click n_has_unassigned href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L315" "open the source"
+    click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L326" "open the source"
+    click n_render_watched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L344" "open the source"
+    click n_seconds_to_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L535" "open the source"
+    click n_process_span href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L552" "open the source"
+    click n_fade_ends href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L567" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_has_unassigned,n_render entry
+    class n_for_speakers,n_len,n_is_empty,n_levels,n_done,n_seconds,n_has_unassigned,n_render entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_render_watched api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_seconds_to_index,n_process_span,n_fade_ends helper
+    class n_default,n_expect,n_finished,n_peak,n_seconds_to_index,n_process_span,n_fade_ends helper
 ```
 
 </details>
@@ -197,12 +229,24 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `SpeakerSpans` <sub>type</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L133) | One speaker's finished spans: where each starts, and the veiled samples. |
-| `Settings` <sub>pub struct</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L137) | How to render. |
-| `Settings::default` <sub>fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L149) |  |
-| `Rendered` <sub>pub struct</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L161) | What came back. |
-| `Rendered::has_unassigned` <sub>pub fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L183) | Whether some of the recording was silenced because no turn claimed it. |
-| `render` <sub>pub fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L194) | Render input according to plan. |
-| `seconds_to_index` <sub>fn</sub> | [369](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L369) | A time in seconds as a sample index, clamped into the recording. |
-| `process_span` <sub>fn</sub> | [386](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L386) | Run one span through one engine and give back audio aligned with the input. |
-| `fade_ends` <sub>fn</sub> | [401](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L401) | Fade the first and last fade samples, so a splice is not a click. |
+| `SpeakerSpans` <sub>type</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L134) | One speaker's finished spans: where each starts, and the veiled samples. |
+| `Settings` <sub>pub struct</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L138) | How to render. |
+| `Settings::default` <sub>fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L150) |  |
+| `Progress` <sub>pub struct</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L178) | What a render has done so far, readable while it is still running. |
+| `SpeakerProgress` <sub>struct</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L184) | One speaker's share of a running render. |
+| `Progress::for_speakers` <sub>pub fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L198) | Room for a render of speakers people. |
+| `Progress::len` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L205) | How many speakers this was made for. |
+| `Progress::is_empty` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L210) | Whether it was made for none, which is what a default one is. |
+| `Progress::levels` <sub>pub fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L220) | What the most recently finished turn for slot measured: the peak that went in and the peak that came out, both in 0, 1. |
+| `Progress::done` <sub>pub fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L233) | How far through this speaker's turns the render is, in 0, 1. |
+| `Progress::seconds` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L245) | How many seconds of this speaker's audio have been rendered. |
+| `Progress::expect` <sub>fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L253) | Say how many turns a speaker has, before any of them is rendered. |
+| `Progress::finished` <sub>fn</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L260) | Record a finished turn. |
+| `peak` <sub>fn</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L284) | The loudest sample in a span, as a peak in 0, 1. |
+| `Rendered` <sub>pub struct</sub> | [293](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L293) | What came back. |
+| `Rendered::has_unassigned` <sub>pub fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L315) | Whether some of the recording was silenced because no turn claimed it. |
+| `render` <sub>pub fn</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L326) | Render input according to plan. |
+| `render_watched` <sub>pub fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L344) | render, with somewhere to report what it is doing as it does it. |
+| `seconds_to_index` <sub>fn</sub> | [535](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L535) | A time in seconds as a sample index, clamped into the recording. |
+| `process_span` <sub>fn</sub> | [552](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L552) | Run one span through one engine and give back audio aligned with the input. |
+| `fade_ends` <sub>fn</sub> | [567](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L567) | Fade the first and last fade samples, so a splice is not a click. |
