@@ -493,9 +493,24 @@ recording.
 | **rename** | Rewrites the index only. The audio is sealed under an identifier rather than a name, so renaming never re-encrypts anything and cannot lose a recording if it is interrupted. |
 | **play** | Plays it straight out of locked memory. **Nothing is written to the disk**, so there is no copy to remember to shred afterwards. Stopping releases the samples, and so does locking the window. |
 | **remove** | Asks first, and cannot be undone. |
-| **preview page** | Writes the audio, a self-contained player page and its captions into a folder you pick. The page plays the recording, draws its waveform and lights the speaker, and needs nothing installed. |
+| **preview page** | Writes the audio, a self-contained player page and its captions into a folder you pick. The page plays the recording, draws its waveform, lights whoever is speaking and moves a level under their name, and needs nothing installed. |
 | **render video** | Writes an MP4 with a black picture, for somewhere that will not accept an audio file. Needs `ffmpeg`, which VeilVoice does not ship and will not install: without it you get the exact command to run, and the audio it needs, rather than a promise. |
 | **both** | The page and the video. |
+
+**The level under each name, and what it means.** A lit circle says whose turn
+it is. It says nothing about whether that person is mid-sentence or mid-pause,
+and those look identical for as long as the turn lasts, so under each name is a
+bar that moves with the sound. It is drawn from the same waveform underneath
+it, which is why the two can never disagree.
+
+It is the loudness of the **mix**, given to whoever the plan says is speaking. A
+render produces one mixed track, so there is no separate signal per person to
+measure. While one person is talking those are the same thing. Where two turns
+overlap they are not, and both people show the same bar: that is what a listener
+hears, and it is not a claim that each of them was that loud. Somebody whose
+turn it is not shows nothing rather than a small amount, because a bar moving
+for a person who is not speaking would be the one thing on the picture saying
+something untrue.
 
 Playback decrypts the take **whole**, into page-locked memory, rather than in
 pieces. That is a property of the container rather than a shortcut: it is
