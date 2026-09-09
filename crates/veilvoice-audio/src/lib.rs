@@ -61,7 +61,7 @@ pub mod meter;
 pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
 #[cfg(feature = "live")]
-pub use live::{LiveSession, LiveStats};
+pub use live::{Keeping, Kept, LiveSession, LiveStats};
 #[cfg(feature = "live")]
 pub use record::{Recorder, Sink};
 

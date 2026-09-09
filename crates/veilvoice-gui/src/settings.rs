@@ -387,7 +387,7 @@ impl Settings {
         section(
             ui,
             "The live monitor",
-            "What is going in and what is coming out, while live scramble is running.",
+            "What is going in and what is coming out, while the Studio is veiling.",
         );
 
         let current_monitor = self.live_monitor();
@@ -413,8 +413,8 @@ impl Settings {
         ui.label(
             RichText::new(
                 "  It shows levels, which tells you sound is arriving and sound is leaving. \
-                 It cannot tell you the disguise is working; listening to the preview on \
-                 the live tab is what does that.",
+                 It cannot tell you the disguise is working; listening to the preview in \
+                 the Studio is what does that.",
             )
             .small()
             .color(p::muted()),

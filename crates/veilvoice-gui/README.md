@@ -95,8 +95,8 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>106 lines"])
-    n_main(["main.rs<br/>213 lines"])
-    n_app["app.rs<br/>2918 lines"]
+    n_main(["main.rs<br/>214 lines"])
+    n_app["app.rs<br/>2971 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
@@ -120,9 +120,9 @@ flowchart TD
     n_setup["setup.rs<br/>882 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_studio["studio.rs<br/>1575 lines"]
+    n_studio["studio.rs<br/>1736 lines"]
     n_theme["theme.rs<br/>784 lines"]
-    n_tour["tour.rs<br/>303 lines"]
+    n_tour["tour.rs<br/>299 lines"]
     n_updates["updates.rs<br/>246 lines"]
     n_vault_store["vault_store.rs<br/>601 lines"]
     n_verify["verify.rs<br/>1592 lines"]
@@ -256,7 +256,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2918 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2971 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 447 | Make a failure that produces no output produce some. |
@@ -269,7 +269,7 @@ flowchart TD
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 106 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
-| [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 213 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
+| [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 214 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 496 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
@@ -282,16 +282,16 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 882 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 766 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1575 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1736 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 784 | Colour schemes for the desktop app. |
-| [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 303 | The short tour on a first run, and after an upgrade. |
+| [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 299 | The short tour on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
 | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | 601 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1592 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**16,446 functional lines of Rust** in this crate. A functional line is a line
+**16,500 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -351,7 +351,7 @@ counts blank lines and comments too. Both are produced by
 | `fn tabs` | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | The name of every tab the window shows, in the order it shows them. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | Crate version string, surfaced in the About panel. |
 | `enum Style` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | Where the monitor sits, or whether it is shown at all. |
-| `struct Levels` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | The smoothed levels the monitor and the live tab both draw. |
+| `struct Levels` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | The smoothed levels the monitor and the Studio both draw. |
 | `enum Action` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | What the reader did with the monitor this frame. |
 | `fn show` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | Draw the monitor for this frame. |
 | `fn meter` | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | One level meter: a bar on the decibel scale, and the number beside it. |

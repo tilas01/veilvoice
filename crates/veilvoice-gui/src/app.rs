@@ -8,17 +8,28 @@
 //! [`crate::security`] draws the lock tab and the unlock screen,
 //! [`crate::prefs`] draws settings.
 //!
-//! # The seven tabs, and why these seven
+//! # The tabs, and why these
+//!
+//! One row, in the order [`Tab::ALL`] lists them, which is the order they are
+//! drawn in and the order this table is in.
 //!
 //! | Tab | What it is |
 //! |---|---|
 //! | **anonymise file** | Process a recording on disk. The default path. |
-//! | **live scramble** | Scramble a microphone in real time into a virtual cable. |
+//! | **group** | One recording with several people in it, each given their own voice. |
+//! | **studio** | Scramble a microphone in real time, and keep what was said if it was asked for. |
+//! | **browser** | What is in the recording vault, without opening any of it. |
 //! | **monitor** | Which applications currently hold the microphone and camera. |
 //! | **lock** | The app lock, and a plain statement of what it is worth. |
+//! | **verify** | Check a download against the signed list of hashes. |
 //! | **settings** | Colour scheme, animation, and where those choices are kept. |
 //! | **install** | Whether this copy is portable or installed, and the optional companions. |
 //! | **about** | Versions, licence, and the honest scope. |
+//!
+//! **Marker 130** took one row out of this table rather than adding one. Live
+//! scramble was a tab, and everything it did the Studio also did, through the
+//! same session, with the devices the other tab happened to be set to. Two
+//! screens for one act, and two starters for one microphone.
 //!
 //! There is no "advanced" tab and no hidden pane. Everything the program can
 //! do is reachable in one click from the strip, because a privacy tool whose
@@ -130,11 +141,10 @@ use veilvoice_core::{AccentConfig, DeidConfig};
 pub(crate) enum Tab {
     /// Process a file on disk.
     File,
-    /// Scramble a microphone in real time.
-    Live,
     /// Several people in one recording, each with a name and a colour.
     Group,
-    /// Record straight into the vault, veiled on the way in.
+    /// Scramble a microphone in real time, and keep what was said if it was
+    /// asked for. **Marker 130**: live scramble used to be a tab of its own.
     Studio,
     /// What is in the vault, without opening any of it.
     Browser,
@@ -162,7 +172,6 @@ impl Tab {
     pub fn key(self) -> &'static str {
         match self {
             Self::File => "file",
-            Self::Live => "live",
             Self::Group => "group",
             Self::Studio => "studio",
             Self::Browser => "browser",
@@ -178,7 +187,6 @@ impl Tab {
     /// Every tab, in the order the window shows them.
     pub const ALL: &'static [Tab] = &[
         Tab::File,
-        Tab::Live,
         Tab::Group,
         Tab::Studio,
         Tab::Browser,
@@ -193,6 +201,13 @@ impl Tab {
     /// The tab with this name, if it is one.
     pub fn from_key(key: &str) -> Option<Tab> {
         let key = key.trim().to_ascii_lowercase();
+        // **Marker 130.** Live scramble is the Studio now. `--tab live` still
+        // opens something rather than failing, because it is written into
+        // shortcuts and scripts that were made before the tab moved, and the
+        // honest destination for it is the tab that does that job today.
+        if key == "live" {
+            return Some(Tab::Studio);
+        }
         Self::ALL.iter().copied().find(|tab| tab.key() == key)
     }
 }
@@ -289,21 +304,21 @@ pub struct VeilVoiceApp {
     // the mode itself is never saved -- see `crate::group`.
     group: crate::group::Group,
 
-    // Live mode.
+    // The devices the Studio veils between. The lists are the window's
+    // because the window is what enumerates them, once, at startup; the
+    // session that uses them is the Studio's, because marker 130 made the
+    // Studio the one place a session is started.
     inputs: Vec<devices::DeviceInfo>,
     outputs: Vec<devices::DeviceInfo>,
     chosen_input: Option<String>,
     chosen_output: Option<String>,
-    session: Option<veilvoice_audio::LiveSession>,
-    /// The Studio and the Browser, which share one vault.
+    /// The Studio and the Browser, which share one vault, and which own the
+    /// live session and the levels drawn from it.
     studio: crate::studio::Studio,
-    live_error: Option<String>,
-    /// The smoothed levels, updated once a frame from the session.
-    ///
-    /// One copy, because the live tab and the monitor strip both draw them and
-    /// two copies is two bars that disagree by a frame. Whichever of them
-    /// somebody happens to be looking at is then the wrong one.
-    levels: crate::monitor::Levels,
+    /// What the running session reported this frame, or `None` when none is
+    /// running. Read once, in `update`, because `stats` resets the peaks as it
+    /// reads them and two readers would each see half the level.
+    live_stats: Option<veilvoice_audio::LiveStats>,
     /// A rolling average of how long a frame takes, in milliseconds.
     ///
     /// Shown on the About tab. Somebody reporting that the window is slow can
@@ -312,11 +327,6 @@ pub struct VeilVoiceApp {
     /// an interface is not measuring it, and this is the smallest thing that
     /// turns one into the other.
     frame_ms: f32,
-    /// Whether the running session is a preview to this machine's own output
-    /// rather than the real thing going to a cable. Shown in the interface,
-    /// because a person who thinks they are live and is not, or the other way
-    /// round, is the whole problem this pair of buttons exists to prevent.
-    previewing: bool,
 
     // The app lock, and at-rest encryption of what jobs write.
     security: Security,
@@ -471,12 +481,9 @@ impl VeilVoiceApp {
             outputs: Vec::new(),
             chosen_input: None,
             chosen_output: None,
-            session: None,
             studio: crate::studio::Studio::default(),
-            live_error: None,
-            levels: crate::monitor::Levels::default(),
+            live_stats: None,
             frame_ms: 0.0,
-            previewing: false,
             security: Security::default(),
             integrity: crate::integrity::Integrity::default(),
             storage: crate::storage::Storage::default(),
@@ -942,7 +949,6 @@ impl eframe::App for VeilVoiceApp {
         // The gate comes before everything: while locked, no device list, no
         // file names and no live session are reachable or even drawn.
         if self.security.is_locked() {
-            self.session = None;
             // The vault closes with the window. Its key is derived from both
             // passphrases and held only while it is open, so leaving it open
             // behind a lock screen would undo the thing the second passphrase
@@ -1065,7 +1071,6 @@ impl eframe::App for VeilVoiceApp {
                     ui.horizontal(|ui| {
                         for (tab, label) in [
                             (Tab::File, "Anonymise file"),
-                            (Tab::Live, "Live scramble"),
                             (Tab::Group, "Group"),
                             (Tab::Studio, "Studio"),
                             (Tab::Browser, "Browser"),
@@ -1111,15 +1116,13 @@ impl eframe::App for VeilVoiceApp {
 
         // The levels, once a frame, before anything draws them.
         //
-        // Here rather than in the live tab, because the monitor strip below is
-        // drawn on every tab and the live tab is drawn on one. Reading the
+        // Here rather than in the Studio, because the monitor strip below is
+        // drawn on every tab and the Studio is drawn on one. Reading the
         // session from whichever happened to run would have made the strip
         // freeze the moment somebody navigated away, which is the exact moment
-        // this feature exists for.
-        if let Some(session) = &self.session {
-            let stats = session.stats();
-            self.levels.update(stats.input_peak, stats.output_peak);
-        }
+        // this feature exists for. `stats` resets the peaks as it reads them,
+        // so this is the only reader and everything else is shown what it got.
+        self.live_stats = self.studio.tick();
 
         // The live monitor, on every tab and above the panel. Docked by
         // default; a floating card or nothing if the reader has said so.
@@ -1129,15 +1132,15 @@ impl eframe::App for VeilVoiceApp {
         if crate::monitor::show(
             ctx,
             self.preferences.live_monitor(),
-            self.session.is_some(),
-            self.previewing,
-            &self.levels,
+            self.studio.is_veiling(),
+            self.studio.is_previewing(),
+            self.studio.levels(),
         ) == crate::monitor::Action::Dismiss
         {
             self.preferences
                 .set_live_monitor(crate::monitor::Style::Off);
             self.notice = Some(crate::notify::Notice::note(
-                "The live monitor is off. Settings brings it back, and the live tab still \
+                "The live monitor is off. Settings brings it back, and the Studio still \
                  has the full meters.",
             ));
         }
@@ -1247,15 +1250,8 @@ impl eframe::App for VeilVoiceApp {
                     .auto_shrink([false, false])
                     .show(ui, |ui| match self.tab {
                         Tab::File => self.file_tab(ui),
-                        Tab::Live => self.live_tab(ui),
                         Tab::Group => self.group.tab(ui, &mut self.preferences),
-                        Tab::Studio => {
-                            let config = self.config();
-                            let input = self.chosen_input.clone();
-                            let output = self.chosen_output.clone();
-                            self.studio
-                                .tab(ui, config, input.as_deref(), output.as_deref());
-                        }
+                        Tab::Studio => self.studio_tab(ui),
                         Tab::Browser => self.studio.browser(ui),
                         Tab::Watch => self.watch_tab(ui),
                         Tab::Security => {
@@ -1300,7 +1296,7 @@ impl eframe::App for VeilVoiceApp {
         // machine has no display and the frame time is not measurable from
         // here, which is why the About tab now shows it. A number the person
         // with the problem can read is worth more than a change made blind.
-        if self.session.is_some() {
+        if self.studio.is_veiling() {
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
         } else if self.updates.is_busy()
             // Hovering, not only busy. An idle window requests no repaint, so
@@ -1666,12 +1662,38 @@ impl VeilVoiceApp {
         });
     }
 
-    fn live_tab(&mut self, ui: &mut egui::Ui) {
-        let running = self.session.is_some();
+    /// The Recording Studio: the voice first, then the take.
+    ///
+    /// # Marker 130: live scramble is not a separate tab any more
+    ///
+    /// It was, and the split was in the wrong place. The Studio has always
+    /// recorded through the same `LiveSession` the live tab ran, with the same
+    /// engine and the same routing, so the two screens were one act performed
+    /// in two rooms: pick the devices over there, come here, press record. The
+    /// devices the Studio recorded with were the ones the other tab happened to
+    /// be set to, and nothing on this screen said so.
+    ///
+    /// Worse, each tab started a session of its own. Veiling on one and
+    /// recording on the other opened the same microphone twice, which on the
+    /// platforms that allow it at all gives the second stream a copy of the
+    /// input nobody asked for. There is now exactly one starter, in
+    /// `studio::Studio::start_session`, and this tab is the only thing that
+    /// calls it.
+    ///
+    /// So: the voice half is here, at the top, and it works with the vault shut
+    /// because veiling a call has never needed a vault and requiring one would
+    /// be a worse program. The take half is under it and needs both
+    /// passphrases, as it always has.
+    ///
+    /// The lists and the settings widgets stay the window's rather than the
+    /// Studio's, because the window is what enumerates the devices, once, at
+    /// startup, and because the file tab shows the same engine settings.
+    fn studio_tab(&mut self, ui: &mut egui::Ui) {
+        let veiling = self.studio.is_veiling();
 
         ui.add_space(4.0);
         ui.label(RichText::new("Devices").color(p::blue()).small());
-        ui.add_enabled_ui(!running, |ui| {
+        ui.add_enabled_ui(!veiling, |ui| {
             device_picker(ui, "input ", &self.inputs, &mut self.chosen_input);
             device_picker(ui, "output", &self.outputs, &mut self.chosen_output);
         });
@@ -1693,28 +1715,33 @@ impl VeilVoiceApp {
         }
 
         ui.add_space(8.0);
-        ui.add_enabled_ui(!running, |ui| self.settings(ui));
+        ui.add_enabled_ui(!veiling, |ui| self.settings(ui));
 
         ui.add_space(12.0);
         ui.horizontal(|ui| {
-            if !running {
-                if ui.button(RichText::new("  start  ").strong()).clicked() {
-                    self.start_live();
+            if !veiling {
+                if ui
+                    .button(RichText::new("  start veiling  ").strong())
+                    .on_hover_text(
+                        "The veiled voice goes to the output selected above. Nothing is \
+                         kept unless a take is started.",
+                    )
+                    .clicked()
+                {
+                    let config = self.config();
+                    let input = self.chosen_input.clone();
+                    let output = self.chosen_output.clone();
+                    self.studio
+                        .start_veiling(config, input.as_deref(), output.as_deref(), false);
                 }
-            } else if ui.button(RichText::new("  stop  ").strong()).clicked() {
-                self.session = None;
-                self.levels.clear();
-                self.previewing = false;
-            }
-            // Listening to yourself before anybody else does.
-            //
-            // Same session, one thing different: the veiled voice goes to this
-            // machine's own output rather than to a virtual cable, so it
-            // reaches your headphones and nothing else. It is the only check
-            // that answers the question the meters cannot, which is whether
-            // the voice coming out is a voice that is not yours.
-            if !running
-                && ui
+                // Listening to yourself before anybody else does.
+                //
+                // Same session, one thing different: the veiled voice goes to
+                // this machine's own output rather than to a virtual cable, so
+                // it reaches your headphones and nothing else. It is the only
+                // check that answers the question the meters cannot, which is
+                // whether the voice coming out is a voice that is not yours.
+                if ui
                     .button("  preview to my headphones  ")
                     .on_hover_text(
                         "Hear yourself veiled. The output goes to this machine's \
@@ -1723,17 +1750,27 @@ impl VeilVoiceApp {
                          is a feedback loop.",
                     )
                     .clicked()
+                {
+                    self.start_preview();
+                }
+            } else if ui
+                .button(RichText::new("  stop  ").strong())
+                .on_hover_text(
+                    "Stops the veiling. A take still running is stopped and stored \
+                     first, never discarded.",
+                )
+                .clicked()
             {
-                self.start_live_preview();
+                self.studio.stop_veiling();
             }
-            if running {
+            if veiling {
                 ui.label(
-                    RichText::new(if self.previewing {
+                    RichText::new(if self.studio.is_previewing() {
                         "● preview"
                     } else {
                         "● live"
                     })
-                    .color(if self.previewing {
+                    .color(if self.studio.is_previewing() {
                         p::yellow()
                     } else {
                         p::green()
@@ -1742,21 +1779,15 @@ impl VeilVoiceApp {
             }
         });
 
-        if let Some(message) = &self.live_error {
-            ui.add_space(8.0);
-            ui.label(RichText::new(message).color(p::red()));
-        }
-
-        if let Some(session) = &self.session {
-            let stats = session.stats();
+        if let Some(stats) = self.live_stats {
             // The smoothing happens once a frame in `update`, so the strip and
             // this panel are the same numbers rather than two readings taken a
             // frame apart.
-
+            let levels = self.studio.levels();
             ui.add_space(12.0);
             ui.label(RichText::new("Levels").color(p::blue()).small());
-            crate::monitor::meter(ui, "in ", self.levels.input, self.levels.hold_input);
-            crate::monitor::meter(ui, "out", self.levels.output, self.levels.hold_output);
+            crate::monitor::meter(ui, "in ", levels.input, levels.hold_input);
+            crate::monitor::meter(ui, "out", levels.output, levels.hold_output);
             ui.label(
                 RichText::new(
                     "  These say sound is arriving and sound is leaving. They cannot say \
@@ -1795,65 +1826,58 @@ impl VeilVoiceApp {
                 );
             }
         }
+
+        ui.add_space(14.0);
+        ui.separator();
+        // The take, and the vault it goes into. Everything below this line
+        // needs both passphrases; everything above it does not.
+        let config = self.config();
+        let input = self.chosen_input.clone();
+        let output = self.chosen_output.clone();
+        self.studio
+            .tab(ui, config, input.as_deref(), output.as_deref());
     }
 
-    fn start_live(&mut self) {
-        self.previewing = false;
-        self.live_error = None;
-        let result = (|| {
-            let input = devices::open(devices::Direction::Input, self.chosen_input.as_deref())?;
-            let output = devices::open(devices::Direction::Output, self.chosen_output.as_deref())?;
-            veilvoice_audio::LiveSession::start(&input, &output, self.config())
-        })();
-        match result {
-            Ok(session) => self.session = Some(session),
-            Err(e) => self.live_error = Some(e.to_string()),
-        }
-    }
-
-    /// The same session, pointed at this machine's own output.
+    /// Veil to this machine's own output, and say where it is going.
     ///
-    /// The chosen output is deliberately ignored: a preview that went to the
-    /// virtual cable would be heard by whatever is listening on it, which is
-    /// the one place somebody checking their setup does not want it to go.
-    /// `None` asks the audio layer for the default device.
-    fn start_live_preview(&mut self) {
-        self.live_error = None;
-        let result = (|| {
-            let input = devices::open(devices::Direction::Input, self.chosen_input.as_deref())?;
-            let output = devices::open(devices::Direction::Output, None)?;
-            veilvoice_audio::LiveSession::start(&input, &output, self.config())
-        })();
-        match result {
-            Ok(session) => {
-                self.session = Some(session);
-                self.previewing = true;
-                // **F-84.** The claim is checked rather than asserted.
-                //
-                // A preview goes to the default output, and on a machine whose
-                // default output *is* a virtual cable, whatever is listening on
-                // that cable hears it. Telling somebody the opposite in the one
-                // place they are checking their setup is worse than telling
-                // them nothing, because checking is what they came to do.
-                let cable = devices::find_virtual_cable().map(|d| d.name);
-                let default = devices::open(devices::Direction::Output, None)
-                    .ok()
-                    .map(|d| devices::name_of(&d));
-                let into_cable = cable.is_some() && cable == default;
-                self.notice = Some(if into_cable {
-                    crate::notify::Notice::warn(
-                        "Preview, but this machine's default output is a virtual cable, \
-                         so whatever is listening on it hears this too.",
-                    )
-                } else {
-                    crate::notify::Notice::note(
-                        "Preview: the veiled voice is going to this machine's own output \
-                         and nowhere else. Listen for a voice that is not yours.",
-                    )
-                });
-            }
-            Err(e) => self.live_error = Some(e.to_string()),
+    /// The chosen output is deliberately ignored by the session this starts: a
+    /// preview that went to the virtual cable would be heard by whatever is
+    /// listening on it, which is the one place somebody checking their setup
+    /// does not want it to go.
+    fn start_preview(&mut self) {
+        let config = self.config();
+        let input = self.chosen_input.clone();
+        self.studio
+            .start_veiling(config, input.as_deref(), None, true);
+        if !self.studio.is_veiling() {
+            // It did not start. The Studio says why, in its own message line,
+            // and a note claiming to describe a preview that is not running
+            // would be the second wrong thing on the screen.
+            return;
         }
+        // **F-84.** The claim is checked rather than asserted.
+        //
+        // A preview goes to the default output, and on a machine whose default
+        // output *is* a virtual cable, whatever is listening on that cable
+        // hears it. Telling somebody the opposite in the one place they are
+        // checking their setup is worse than telling them nothing, because
+        // checking is what they came to do.
+        let cable = devices::find_virtual_cable().map(|d| d.name);
+        let default = devices::open(devices::Direction::Output, None)
+            .ok()
+            .map(|d| devices::name_of(&d));
+        let into_cable = cable.is_some() && cable == default;
+        self.notice = Some(if into_cable {
+            crate::notify::Notice::warn(
+                "Preview, but this machine's default output is a virtual cable, \
+                 so whatever is listening on it hears this too.",
+            )
+        } else {
+            crate::notify::Notice::note(
+                "Preview: the veiled voice is going to this machine's own output \
+                 and nowhere else. Listen for a voice that is not yours.",
+            )
+        });
     }
 
     /// Ask the safety catch what it makes of what is holding a microphone.
@@ -1874,7 +1898,7 @@ impl VeilVoiceApp {
 
         // What VeilVoice is itself veiling, so a program on our own cable is
         // not mistaken for the accident.
-        self.failsafe.live = self.session.is_some();
+        self.failsafe.live = self.studio.is_veiling();
         self.failsafe.veiling = self.chosen_output.clone();
 
         let holders: Vec<veilvoice_failsafe::Holder> = self
@@ -2429,23 +2453,41 @@ mod tests {
     /// fact and drifts from the first. It already did: "Five tabs", nine tabs.
     #[test]
     fn the_user_guide_does_not_count_the_tabs_by_hand() {
-        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
-        for wrong in [
-            "Three tabs",
-            "Four tabs",
-            "Five tabs",
-            "Six tabs",
-            "Seven tabs",
-            "Eight tabs",
-            "Ten tabs",
+        /// The number words, in order, so a written count can be compared with
+        /// the list it is a copy of.
+        ///
+        /// This used to be a list of *wrong* counts to forbid, which is the
+        /// same mistake one level up: the list had to be edited every time the
+        /// number changed, and marker 130 took a tab away and made "ten" both
+        /// the truth and one of the forbidden words. Reading the number and
+        /// comparing it needs no maintenance at all.
+        const WORDS: &[&str] = &[
+            "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+            "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+        ];
+
+        for (file, text) in [
+            (
+                "docs/USER_GUIDE.md",
+                include_str!("../../../docs/USER_GUIDE.md"),
+            ),
+            ("README.md", include_str!("../../../README.md")),
         ] {
-            assert!(
-                !guide.contains(wrong),
-                "docs/USER_GUIDE.md says {wrong:?} and the window shows {}. A \
-                 number typed beside a list is a copy of the list's length, \
-                 and it goes stale the first time a tab is added.",
-                Tab::ALL.len()
-            );
+            let text = text.replace("\r\n", "\n").to_lowercase();
+            for (n, word) in WORDS.iter().enumerate() {
+                let counted = format!("{word} tabs");
+                if !text.contains(&counted) {
+                    continue;
+                }
+                assert_eq!(
+                    n,
+                    Tab::ALL.len(),
+                    "{file} says {counted:?} and the window shows {}. A number \
+                     typed beside a list is a copy of the list's length, and it \
+                     goes stale the first time a tab is added or taken away.",
+                    Tab::ALL.len()
+                );
+            }
         }
     }
 
@@ -2583,6 +2625,14 @@ mod tests {
         }
         assert_eq!(Tab::from_key("nothing-like-this"), None);
         assert_eq!(Tab::from_key(""), None);
+        // **Marker 130.** `live` is not a tab any more and is still a name
+        // people have in shortcuts, in scripts and in the older manual page.
+        // It opens the tab that does that job now rather than failing.
+        assert_eq!(Tab::from_key("live"), Some(Tab::Studio));
+        assert!(
+            !Tab::ALL.iter().any(|tab| tab.key() == "live"),
+            "`live` answers, but it is not a tab of its own any more"
+        );
     }
 
     /// Every tab is introduced, and the tour introduces nothing that is gone.
@@ -2656,7 +2706,10 @@ mod tests {
         assert!(app.clean_metadata, "metadata stripping should default on");
         assert_eq!(app.intensity, 1.0);
         assert_eq!(app.reseed_secs, 2.0, "the seed should roll by default");
-        assert!(app.session.is_none());
+        assert!(
+            !app.studio.is_veiling(),
+            "nothing should be veiling before anybody has asked for it"
+        );
         assert!(
             app.security.encrypt_recordings,
             "recordings should be encrypted at rest by default"
