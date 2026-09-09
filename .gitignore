@@ -85,3 +85,15 @@ NEXT-SESSION.md
 veilvoice-code-key.pem
 *.p7s
 APPMANIFEST.json.sig
+
+# The dependency watch: the Dependabot configuration, the recorded graph, the
+# journal of every version change with its date and changelog, the backups and
+# the diffs. Deliberately not committed, on request: this directory is a local
+# working record of what the dependencies are doing, not something the
+# repository publishes.
+#
+# `.dependabot/dependabot.yml` is a *draft* kept here for review. GitHub reads
+# the live configuration from `.github/dependabot.yml` on the default branch,
+# so nothing in this directory is read by GitHub, and nothing in it produces an
+# alert or a pull request.
+.dependabot/
