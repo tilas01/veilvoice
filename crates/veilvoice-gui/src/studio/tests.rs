@@ -612,3 +612,22 @@ fn the_unveiled_take_is_named_so_it_can_be_told_from_the_other() {
         "the unveiled take is no longer named differently from the veiled one"
     );
 }
+
+#[test]
+fn every_recorder_that_is_running_is_drained_every_frame() {
+    // A recorder nobody drains fills its ring and starts dropping samples, so
+    // draining only the veiled one would have made an unveiled take quietly
+    // short: the exact failure `dropped` exists to report, arrived at by not
+    // asking. And the clock has to come from whichever is running, because
+    // keeping only the microphone leaves no veiled recorder at all.
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    let at = source
+        .find("Phase::Recording => {")
+        .expect("the recording panel exists");
+    let body = &source[at..];
+    assert!(
+        body.contains("[self.recorder.as_mut(), self.plain.as_mut()]"),
+        "the recording panel no longer drains both recorders, so a second take \
+         would be short and its clock would sit at zero"
+    );
+}

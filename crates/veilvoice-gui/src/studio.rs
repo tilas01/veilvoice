@@ -766,14 +766,26 @@ impl Studio {
                 }
             }
             Phase::Recording => {
-                let (seconds, dropped) = self
-                    .recorder
-                    .as_mut()
-                    .map(|r| {
-                        r.drain();
-                        (r.seconds(), r.dropped())
-                    })
-                    .unwrap_or((0.0, 0));
+                // **Both** recorders, every frame, and the reason is the ring
+                // rather than the clock. A recorder nobody drains fills up and
+                // starts dropping samples, so draining only one of them would
+                // have made the second take quietly short: the exact failure
+                // `dropped` exists to report, arrived at by not asking.
+                //
+                // The counter is whichever is running, because keeping only the
+                // microphone leaves no veiled recorder at all, and a clock that
+                // sat at zero while a take ran would read as nothing being
+                // recorded.
+                let mut seconds = 0.0f32;
+                let mut dropped = 0u64;
+                for recorder in [self.recorder.as_mut(), self.plain.as_mut()]
+                    .into_iter()
+                    .flatten()
+                {
+                    recorder.drain();
+                    seconds = seconds.max(recorder.seconds());
+                    dropped = dropped.max(recorder.dropped());
+                }
 
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("● recording").color(p::red()).strong());
