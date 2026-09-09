@@ -168,6 +168,15 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>ffmpeg joins the companion list, and the render points at it</strong></p>
+<ul>
+<li>The Setup tab lists the software VeilVoice works with, says who makes each and under what licence, and installs one on an explicit yes. <strong><code>ffmpeg</code> was not in it</strong>, which is the whole of this: a render told you <code>ffmpeg</code> was missing and the tab that installs things had never heard of the name, so the message pointed at nothing.</li>
+<li>It is there now, first in the list, with what it is for, what still works without it, and the install command for this system: <code>winget</code> on Windows, Homebrew on macOS, and whichever package manager is actually on PATH elsewhere. Every message about a missing <code>ffmpeg</code> now names the tab, and a test fails if one stops doing so.</li>
+<li>Both front ends read the same table, so <code>veilvoice companions</code> gained the entry at the same time and cannot disagree with the window about what exists.</li>
+<li>The loop that asks each package manager in turn existed twice and would have become three copies. It is written once, which is the point at which copies start disagreeing about which managers this project recognises.</li>
+<li><strong>&quot;Look again&quot; no longer freezes the window.</strong> It ran a command per companion inside the frame it was drawing, which on a machine with several of them is the window going white. The search moved to a worker and the button says it is working while it runs.</li>
+<li>Nothing here downloads anything. An install runs the package manager the machine already has, so the claim that VeilVoice ships no network client is unchanged and still checked three ways on every commit.</li>
+</ul>
 <p><strong>The video has a picture in it</strong> (marker 139, finished)</p>
 <ul>
 <li>A render produced veiled audio over a black rectangle. It now produces the same picture the preview page shows: a circle per speaker in their colour, whoever is talking lit, the level under each name, the waveform and a playhead. One layout function draws both, so the two cannot drift into being pictures of different recordings.</li>

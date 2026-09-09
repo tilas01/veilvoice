@@ -1430,8 +1430,10 @@ impl Studio {
                     self.message = Some((
                         format!(
                             "The audio and the page are written. `ffmpeg` is not on this \
-                             machine, and VeilVoice does not ship or install it, so the \
-                             video is not. This is the command:\n\n{}",
+                             machine, so the video is not.\n\nThe Setup tab lists \
+                             `ffmpeg` under companion software, with the install command \
+                             for this system and a button to run it. Or run this yourself, \
+                             which is the same command:\n\n{}",
                             veilvoice_video::ffmpeg::command_line(&argv)
                         ),
                         p::yellow(),
@@ -1833,7 +1835,8 @@ impl Studio {
                                     .on_hover_text(
                                         "An MP4 with a black picture, for somewhere that \
                                          will not accept an audio file. Needs ffmpeg, \
-                                         which VeilVoice does not ship.",
+                                         which VeilVoice does not ship: the Setup tab \
+                                         can install it.",
                                     )
                                     .clicked()
                                 {

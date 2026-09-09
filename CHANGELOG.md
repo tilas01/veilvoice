@@ -8,6 +8,31 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**ffmpeg joins the companion list, and the render points at it**
+
+- The Setup tab lists the software VeilVoice works with, says who makes each and
+  under what licence, and installs one on an explicit yes. **`ffmpeg` was not in
+  it**, which is the whole of this: a render told you `ffmpeg` was missing and
+  the tab that installs things had never heard of the name, so the message
+  pointed at nothing.
+- It is there now, first in the list, with what it is for, what still works
+  without it, and the install command for this system: `winget` on Windows,
+  Homebrew on macOS, and whichever package manager is actually on PATH
+  elsewhere. Every message about a missing `ffmpeg` now names the tab, and a
+  test fails if one stops doing so.
+- Both front ends read the same table, so `veilvoice companions` gained the
+  entry at the same time and cannot disagree with the window about what exists.
+- The loop that asks each package manager in turn existed twice and would have
+  become three copies. It is written once, which is the point at which copies
+  start disagreeing about which managers this project recognises.
+- **"Look again" no longer freezes the window.** It ran a command per companion
+  inside the frame it was drawing, which on a machine with several of them is
+  the window going white. The search moved to a worker and the button says it is
+  working while it runs.
+- Nothing here downloads anything. An install runs the package manager the
+  machine already has, so the claim that VeilVoice ships no network client is
+  unchanged and still checked three ways on every commit.
+
 **The video has a picture in it** (marker 139, finished)
 
 - A render produced veiled audio over a black rectangle. It now produces the

@@ -76,6 +76,14 @@ pub struct Setup {
     status: install::Status,
     rows: Vec<Row>,
     job: Option<mpsc::Receiver<Done>>,
+    /// A probe of the companions, running off the paint thread.
+    ///
+    /// `detect_all` runs a command per companion: `where` or `which`, and on
+    /// Windows a PowerShell call that enumerates sound devices. On the paint
+    /// thread that is hundreds of milliseconds inside one frame, which is the
+    /// window going white and the pointer becoming a spinner. It was doing
+    /// exactly that every time somebody pressed "look again".
+    probe: Option<mpsc::Receiver<Vec<Row>>>,
     /// What is running, in words, for the progress strip.
     busy: Option<String>,
     /// The last report, and whether it was a success.
@@ -104,6 +112,7 @@ impl Setup {
             status: install::status(),
             rows: detect_all(),
             job: None,
+            probe: None,
             busy: None,
             carry: None,
             report: None,
@@ -123,7 +132,7 @@ impl Setup {
 
     /// True while a worker is running, so the app can keep repainting.
     pub fn is_busy(&self) -> bool {
-        self.job.is_some()
+        self.job.is_some() || self.probe.is_some()
     }
 
     /// Drain the worker channel. Called once per frame.
@@ -131,6 +140,25 @@ impl Setup {
     /// Handles `Disconnected` as well as a message: a worker that panicked
     /// must leave the interface saying so rather than spinning for ever.
     pub fn poll(&mut self) {
+        // The probe first, and separately: it can finish while an install is
+        // still running, and one `return` for both would leave its answer in
+        // the channel until the install ended.
+        if let Some(rx) = &self.probe {
+            match rx.try_recv() {
+                Ok(rows) => {
+                    self.rows = rows;
+                    self.probe = None;
+                }
+                Err(mpsc::TryRecvError::Empty) => {}
+                Err(mpsc::TryRecvError::Disconnected) => {
+                    // A probe that died leaves what was already on screen,
+                    // which is the last true answer, rather than an empty list
+                    // that would read as "you have none of these".
+                    self.probe = None;
+                }
+            }
+        }
+
         let Some(rx) = &self.job else { return };
         match rx.try_recv() {
             Ok(Done { lines, good }) => {
@@ -533,11 +561,29 @@ impl Setup {
             .color(p::fg()),
         );
         ui.add_space(4.0);
-        if ui
+        if self.probe.is_some() {
+            // Said rather than left blank. The button that has just been
+            // pressed going quiet for half a second is what reads as a freeze,
+            // and the fix is as much this line as it is the worker.
+            ui.horizontal(|ui| {
+                ui.spinner();
+                ui.label(
+                    RichText::new("looking for each of these on this machine")
+                        .color(p::muted())
+                        .small(),
+                );
+            });
+        } else if ui
             .button(RichText::new("look again").color(p::muted()).small())
             .clicked()
         {
-            self.rows = detect_all();
+            let (tx, rx) = mpsc::channel();
+            // Detached: nothing waits for it, and a probe that outlives the
+            // tab simply sends into a channel nobody reads.
+            std::thread::spawn(move || {
+                let _ = tx.send(detect_all());
+            });
+            self.probe = Some(rx);
         }
         ui.add_space(10.0);
 
@@ -875,6 +921,64 @@ mod tests {
                     row.offer.is_runnable(),
                     "{} disagrees with the library about whether it is runnable",
                     row.companion.key
+                );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod companion_tests {
+    /// The probe runs off the paint thread.
+    ///
+    /// `detect_all` runs a command per companion, and on Windows one of them
+    /// enumerates sound devices through PowerShell. On the paint thread that is
+    /// hundreds of milliseconds inside a single frame, which is the window
+    /// going white and the pointer becoming a spinner. Pressing "look again"
+    /// did exactly that.
+    #[test]
+    fn looking_again_does_not_probe_on_the_paint_thread() {
+        let source = std::fs::read_to_string("src/setup.rs").expect("its own source");
+        let at = source
+            .find("fn companion_rows")
+            .expect("the companion rows");
+        let end = source[at..]
+            .find("\n    fn ")
+            .map(|offset| at + offset)
+            .unwrap_or(source.len());
+        let body = &source[at..end];
+
+        assert!(
+            body.contains("std::thread::spawn"),
+            "the probe is started on the thread that is painting"
+        );
+        assert!(
+            !body.contains("self.rows = detect_all()"),
+            "the rows are still being filled in by probing inside the frame"
+        );
+        assert!(
+            body.contains("ui.spinner()"),
+            "nothing on screen says the probe is running, so the button reads as dead"
+        );
+    }
+
+    /// Every message that names a missing ffmpeg says where to get it.
+    ///
+    /// Naming a thing somebody cannot act on from where they are standing is
+    /// the failure this guards: the render said "ffmpeg is not on this machine"
+    /// and the tab that installs software had never heard of it.
+    #[test]
+    fn a_missing_ffmpeg_always_says_where_it_can_be_installed() {
+        for file in ["src/studio.rs", "src/group.rs"] {
+            let source = std::fs::read_to_string(file).expect("a source file");
+            for (at, _) in source.match_indices("`ffmpeg` is not on") {
+                // The sentence and what follows it, which is where the offer
+                // has to be. Bounded rather than to the end of the file, so a
+                // mention of Setup somewhere else entirely cannot satisfy this.
+                let window = &source[at..(at + 600).min(source.len())];
+                assert!(
+                    window.contains("Setup tab"),
+                    "{file} says ffmpeg is missing without saying where to get it"
                 );
             }
         }
