@@ -8,6 +8,43 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Every platform is green again, and the crash is understood**
+
+- `test / windows-latest` was dying with an access violation after every test
+  it printed had passed. A step that reran the desktop crate's tests on one
+  thread named the culprit on its first run: a test that played a recording and
+  then locked the window, on the stated assumption that a build machine has no
+  audio device. The Windows runner has one. A stream started and tearing it
+  down took the whole test binary with it.
+- A test whose correctness depends on the machine not having a sound card is
+  not testing the thing it names. It reads `close`'s own source now, the way
+  its sibling reads `play`'s, and no test in the crate opens a device.
+- That step was there to identify the defect and is gone, as it said it would
+  be. All thirteen jobs pass: the offline proof runs all four of its steps for
+  the first time, and macOS and Windows are green.
+
+**A fifth setup card, and every number on it read from the machine**
+
+- First run ends on "What this machine says": where recordings will go and how
+  much room is free there, how many devices there are to record from and play
+  to, and what the window will ask the graphics driver for.
+- Every figure is read at the moment the card is drawn. None of it is a default
+  written into the program: a setup screen that asserts how much room there is,
+  or that the graphics will be fine, is guessing on somebody else's hardware and
+  sounding certain about it.
+- The free space is said as an hour of veiled audio rather than as a number of
+  bytes, because that is the question somebody about to record actually has.
+- Where the machine will not answer, the card says so instead of printing a
+  figure nobody measured. A system that does not say where an application keeps
+  its files is told plainly what that costs, which is that nothing is kept
+  between runs.
+- Nothing on the card has to be answered, and like the four before it there is
+  a way past it.
+- The guard that proves no card is a gate read a fixed four thousand characters
+  after each function's name, which is a length rather than a body. A card
+  longer than that reported no way past it, and a shorter one was checked
+  against the card after it as well. It ends where the function does now.
+
 **Acceleration is a switch now, and the About tab shows both halves**
 
 - The window has always asked the platform for a hardware context and accepted
