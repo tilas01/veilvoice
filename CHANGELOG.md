@@ -39,6 +39,19 @@ than a summary written afterwards.
   exists to report; and reading the clock from the veiled recorder alone would
   have shown 0:00 for the whole of a microphone-only take.
 
+**A guard for it, rather than a third one at a time**
+
+- No test in the desktop crate may open a device, a dialog or a window. The
+  guard walks that crate's test code and fails naming any line that reaches
+  one, with a single exception by test name for the one place that enumerates
+  devices on purpose.
+- Proved both ways: it passes on the tree as it stands, and planting one line
+  that enumerates a device makes it fail naming the file, the line and the
+  test.
+- Its own first false positive is recorded too. `dialog.rs`'s guard searches
+  the source for `rfd::FileDialog`, and the string it searches for is not an
+  opened dialog, so a match inside a string literal is skipped.
+
 **Windows, a second time, and the same mistake in a new place**
 
 - A test written for the new setup card asked the machine how many audio
