@@ -49,7 +49,7 @@ use std::sync::{Arc, Mutex};
 use veilvoice_core::{DeidConfig, Deidentifier, ProcessStats};
 
 /// How much jitter the ring absorbs before it starts dropping samples.
-const RING_MILLIS: f32 = 120.0;
+pub(crate) const RING_MILLIS: f32 = 120.0;
 
 /// Which side of the engine something happened to.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -251,7 +251,7 @@ fn rate_they_agree_on(
 }
 
 /// The ranges a device reports, as plain numbers.
-fn input_ranges(device: &cpal::Device) -> Result<Vec<(u32, u32)>, Error> {
+pub(crate) fn input_ranges(device: &cpal::Device) -> Result<Vec<(u32, u32)>, Error> {
     Ok(device
         .supported_input_configs()
         .map_err(|e| Error::Device(e.to_string()))?
@@ -301,14 +301,43 @@ fn agree_on_a_rate(
     input: &cpal::Device,
     output: &cpal::Device,
 ) -> Result<(cpal::SupportedStreamConfig, cpal::SupportedStreamConfig), Error> {
-    let in_default = input
-        .default_input_config()
-        .map_err(|e| Error::Device(e.to_string()))?;
+    let (mut inputs, out) = agree_on_a_rate_for(std::slice::from_ref(&input), output)?;
+    Ok((inputs.remove(0), out))
+}
+
+/// The same, for any number of microphones. **Marker 147.**
+///
+/// One rate for the whole room. Several microphones each running at their own
+/// rate into one mix is the F-168 problem once per guest, and it is worse than
+/// the single case: the others sound right, so the fault reads as one person's
+/// microphone being bad rather than as a mismatch nobody checked.
+pub(crate) fn agree_on_a_rate_for(
+    inputs: &[&cpal::Device],
+    output: &cpal::Device,
+) -> Result<
+    (
+        Vec<cpal::SupportedStreamConfig>,
+        cpal::SupportedStreamConfig,
+    ),
+    Error,
+> {
+    let defaults: Vec<cpal::SupportedStreamConfig> = inputs
+        .iter()
+        .map(|device| {
+            device
+                .default_input_config()
+                .map_err(|e| Error::Device(e.to_string()))
+        })
+        .collect::<Result<_, _>>()?;
     let out_default = output
         .default_output_config()
         .map_err(|e| Error::Device(e.to_string()))?;
-    if in_default.sample_rate() == out_default.sample_rate() {
-        return Ok((in_default, out_default));
+
+    if defaults
+        .iter()
+        .all(|cfg| cfg.sample_rate() == out_default.sample_rate())
+    {
+        return Ok((defaults, out_default));
     }
 
     let out_ranges: Vec<(u32, u32)> = output
@@ -316,34 +345,45 @@ fn agree_on_a_rate(
         .map_err(|e| Error::Device(e.to_string()))?
         .map(|range| (range.min_sample_rate().0, range.max_sample_rate().0))
         .collect();
-    let inputs = vec![(in_default.sample_rate().0, input_ranges(input)?)];
+    let reported: Vec<(u32, Vec<(u32, u32)>)> = inputs
+        .iter()
+        .zip(&defaults)
+        .map(|(device, cfg)| Ok((cfg.sample_rate().0, input_ranges(device)?)))
+        .collect::<Result<_, Error>>()?;
 
-    let Some(rate) = rate_they_agree_on(out_default.sample_rate().0, &out_ranges, &inputs) else {
+    let Some(rate) = rate_they_agree_on(out_default.sample_rate().0, &out_ranges, &reported) else {
+        let rates: Vec<String> = defaults
+            .iter()
+            .map(|cfg| format!("{} Hz", cfg.sample_rate().0))
+            .collect();
         return Err(Error::Device(format!(
-            "this microphone runs at {} Hz and this output at {} Hz, and neither will \
-             take the other's rate. VeilVoice does not resample, so it will not run \
-             them together and quietly shift the voice: set both to the same rate in \
-             your system's sound settings, or choose devices that already agree.",
-            in_default.sample_rate().0,
+            "the microphone side runs at {} and this output at {} Hz, and there is no \
+             rate all of them will take. VeilVoice does not resample, so it will not run \
+             them together and quietly shift a voice: set them to the same rate in your \
+             system's sound settings, or choose devices that already agree.",
+            rates.join(", "),
             out_default.sample_rate().0
         )));
     };
 
-    let chosen_in = if in_default.sample_rate().0 == rate {
-        in_default
-    } else {
-        at_rate(
-            input
-                .supported_input_configs()
-                .map_err(|e| Error::Device(e.to_string()))?,
-            rate,
-        )
-        .ok_or_else(|| {
-            Error::Device(format!(
-                "this microphone would not open at {rate} Hz after all"
-            ))
-        })?
-    };
+    let mut chosen_inputs = Vec::with_capacity(inputs.len());
+    for (device, default) in inputs.iter().zip(defaults) {
+        chosen_inputs.push(if default.sample_rate().0 == rate {
+            default
+        } else {
+            at_rate(
+                device
+                    .supported_input_configs()
+                    .map_err(|e| Error::Device(e.to_string()))?,
+                rate,
+            )
+            .ok_or_else(|| {
+                Error::Device(format!(
+                    "a microphone would not open at {rate} Hz after all"
+                ))
+            })?
+        });
+    }
     let chosen_out = if out_default.sample_rate().0 == rate {
         out_default
     } else {
@@ -357,7 +397,7 @@ fn agree_on_a_rate(
             Error::Device(format!("this output would not open at {rate} Hz after all"))
         })?
     };
-    Ok((chosen_in, chosen_out))
+    Ok((chosen_inputs, chosen_out))
 }
 
 impl LiveSession {

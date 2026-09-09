@@ -8,6 +8,37 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Several microphones at once: the capture path** (marker 147, the first half)
+
+- `veilvoice_audio::room` opens one input per guest, veils each with its own
+  engine, seed and destination voice, and mixes the results into the one output
+  a call or a recorder hears. One microphone carrying four people is one signal,
+  and whatever it is turned into, everybody in it is turned into the same thing.
+- **The cost is a number rather than a promise.** The output callback runs every
+  guest's engine before it returns, so they share one deadline of a few
+  milliseconds and the cost is the sum. `RoomStats::load` is that sum measured
+  against that deadline. At 1.0 the engines have used the whole block and what
+  follows is dropouts. The guest limit is a bound on the arithmetic, not a claim
+  about any machine.
+- **The mix is summed and clipped, and never limited.** Two people talking at
+  once is two signals added, which can pass full scale; a render fixes that
+  afterwards with one factor and a live path cannot see the rest of the
+  conversation. So the peak *before* clipping is reported, the blocks that
+  clipped are counted, and there is deliberately no limiter: a limiter is a
+  dynamics processor, it changes the voice, and this program's whole claim is
+  about what changes a voice.
+- Each guest has their own ring, so a microphone whose clock runs fast drops
+  that guest's samples rather than everybody's, and a slow one starves and is
+  padded. A rate *mismatch* is not absorbed: it is refused before anything
+  opens, which is the fix in this same release.
+- A recorder per guest, veiled or unveiled, and one for the mix. Marker 131's
+  warning about the unveiled side applies once per guest.
+- **What is not here yet is the tab that drives it.** The guest list in the
+  Studio, the bars per guest and the takes stored per guest are the other half
+  of the marker, which is marked next rather than done. This is said here
+  because a capture path nothing calls is exactly the kind of thing that gets
+  shipped and forgotten.
+
 **A microphone and an output that never compared their rates**
 
 - The live path built the engine and the ring between its callbacks from the
