@@ -181,6 +181,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`avnotice.rs`|File-veilvoice-gui-avnotice]] &middot; Noticing when antivirus software has closed VeilVoice, and saying so kindly.
 - [[`crashlog.rs`|File-veilvoice-gui-crashlog]] &middot; Make a failure that produces no output produce some.
 - [[`crashreport.rs`|File-veilvoice-gui-crashreport]] &middot; Offering the report from the last crash, on the run after it.
+- [[`decoys.rs`|File-veilvoice-gui-decoys]] &middot; Decoy vaults: how many there is room for, and the panel that offers them.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &middot; Asking for a file without stopping the window.
 - [[`firstrun.rs`|File-veilvoice-gui-firstrun]] &middot; The first run: the four things worth deciding before anything else.
 - [[`graphics.rs`|File-veilvoice-gui-graphics]] &middot; What the window is drawn with, asked for explicitly and then reported.
@@ -254,6 +255,7 @@ Per-user installation and companion-software detection, shared by the command li
 - [[`companions.rs`|File-veilvoice-setup-companions]] &middot; Optional third-party software, detected rather than assumed.
 - [[`install.rs`|File-veilvoice-setup-install]] &middot; Put this program somewhere the system can find it.
 - [[`lib.rs`|File-veilvoice-setup-lib]] &middot; Everything that puts VeilVoice on a machine, and everything that reports what is already on it.
+- [[`space.rs`|File-veilvoice-setup-space]] &middot; How much room is actually free where VeilVoice keeps things.
 - [[`volumes.rs`|File-veilvoice-setup-volumes]] &middot; Encrypted volumes this machine already has: Cryptomator and VeraCrypt.
 
 ## [[veilvoice-update|Crate-veilvoice-update]]

@@ -483,9 +483,45 @@ jobs:
           echo "veilvoice imports no network function (socketpair, which is AF_UNIX and local, is not one)"
 
       # 2. No network namespace at all.
+      #
+      #    `unshare -rn` on its own is not enough here. It asks for a *user*
+      #    namespace so that an ordinary account can make a network one, and
+      #    Ubuntu 24.04 refuses unprivileged user namespaces by default
+      #    (`kernel.apparmor_restrict_unprivileged_userns`). The step failed
+      #    with "write failed /proc/self/uid_map: Operation not permitted" on
+      #    every run since it was added, and because it failed early the two
+      #    steps after it were skipped: the job proved nothing at all while
+      #    looking like it was proving three things.
+      #
+      #    So the namespace is obtained whichever way this kernel allows, and
+      #    the program is dropped back to the ordinary account inside it, so
+      #    what is measured is still VeilVoice as somebody actually runs it.
+      #    If no way works, this fails: a guard that quietly skips is worse
+      #    than no guard, because it is green.
       - name: The command line does its work with no network namespace
         run: |
           set -euo pipefail
+
+          # Best effort, and not depended on: where the restriction can be
+          # lifted, the unprivileged path below is the one that runs.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 \
+            >/dev/null 2>&1 || true
+
+          me="$(id -u):$(id -g)"
+          if unshare -rn true 2>/dev/null; then
+            empty_netns() { unshare -rn "$@"; }
+            echo "empty network namespace: unprivileged, through a user namespace"
+          elif sudo unshare -n true 2>/dev/null; then
+            empty_netns() {
+              sudo unshare -n -- setpriv --reuid="${me%%:*}" --regid="${me##*:}" \
+                --clear-groups "$@"
+            }
+            echo "empty network namespace: made as root, program dropped back to $me"
+          else
+            echo "::error::this runner will not make an empty network namespace, so nothing here is proved"
+            exit 1
+          fi
+
           python3 - <<'WAV'
           import struct, math, io
           rate, seconds = 48000, 2
@@ -498,7 +534,7 @@ jobs:
               struct.pack('<IHHIIHH', 16, 1, 1, rate, rate * 2, 2, 16) +
               b'data' + struct.pack('<I', len(raw)) + raw)
           WAV
-          unshare -rn target/release/veilvoice anonymise /tmp/offline.wav \
+          empty_netns target/release/veilvoice anonymise /tmp/offline.wav \
             -o /tmp/offline.veiled.wav --encrypt false --yes
           test -s /tmp/offline.veiled.wav
           echo "de-identified a recording inside an empty network namespace"
@@ -549,7 +585,7 @@ jobs:
           families=$(grep -oE 'socket\(AF_[A-Z0-9_]+' /tmp/gui-trace.txt \
             | grep -oE 'AF_[A-Z0-9_]+' | sort -u | tr '\n' ' ')
           echo "socket families the window asked for: ${families:-none}"
-          echo "no AF_INET or AF_INET6 anywhere: the window's sockets are local""
+          echo "no AF_INET or AF_INET6 anywhere: the window's sockets are local"
 
   # `rsa` is in the dependency graph through `pgp`, and it carries
   # RUSTSEC-2023-0071 -- the Marvin attack, key recovery through a timing side

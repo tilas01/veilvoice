@@ -37,6 +37,8 @@
 <path d="M229.0 274.0 C 229.0 294.0, 165.7 800.0, 165.7 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M454.2 247.0 C 476.2 247.0, 476.2 247.0, 290.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M383.7 274.0 C 383.7 294.0, 304.4 900.0, 304.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M208.8 174.0 C 208.8 194.0, 90.4 500.0, 90.4 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M208.8 174.0 C 208.8 194.0, 304.4 900.0, 304.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M90.4 374.0 C 90.4 394.0, 90.4 700.0, 90.4 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M90.4 374.0 C 90.4 394.0, 367.6 700.0, 367.6 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M90.4 374.0 C 90.4 394.0, 510.3 700.0, 510.3 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -64,7 +66,7 @@
 <path d="M568.6 747.0 C 590.6 747.0, 590.6 447.0, 298.4 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M568.6 747.0 C 590.6 747.0, 590.6 747.0, 286.3 747.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M510.3 774.0 C 510.3 794.0, 165.7 800.0, 165.7 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
-<path d="M568.6 747.0 C 590.6 747.0, 590.6 147.0, 389.9 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M568.6 747.0 C 590.6 747.0, 590.6 147.0, 453.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M510.3 774.0 C 510.3 794.0, 300.3 800.0, 300.3 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M510.3 774.0 C 510.3 794.0, 439.0 800.0, 439.0 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M510.3 774.0 C 510.3 794.0, 304.4 900.0, 304.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -74,6 +76,7 @@
 <path d="M300.3 874.0 C 300.3 894.0, 304.4 900.0, 304.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M493.3 847.0 C 602.7 847.0, 602.7 247.0, 583.7 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M439.0 874.0 C 439.0 894.0, 304.4 900.0, 304.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M144.7 547.0 C 281.1 547.0, 281.1 147.0, 262.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M144.7 547.0 C 602.7 547.0, 602.7 247.0, 583.7 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M144.7 547.0 C 190.8 547.0, 190.8 447.0, 171.8 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M90.4 574.0 C 90.4 594.0, 304.4 900.0, 304.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -86,7 +89,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="52.2" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="102.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">104 lines</text>
+<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">105 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="178.7" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -118,10 +121,15 @@
 <text x="383.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">crashreport.rs</text>
 <text x="383.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">289 lines</text>
 </a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" target="_blank" rel="noopener noreferrer">
+<rect x="158.6" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="208.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decoys.rs</text>
+<text x="208.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">216 lines</text>
+</a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" target="_blank" rel="noopener noreferrer">
 <rect x="480.2" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="530.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">dialog.rs</text>
-<text x="530.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">369 lines</text>
+<text x="530.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">425 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" target="_blank" rel="noopener noreferrer">
 <rect x="32.0" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -174,9 +182,9 @@
 <text x="165.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">638 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" target="_blank" rel="noopener noreferrer">
-<rect x="221.8" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
-<text x="304.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reduced_motion.rs</text>
-<text x="304.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">348 lines</text>
+<rect x="285.1" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="367.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reduced_motion.rs</text>
+<text x="367.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">348 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" target="_blank" rel="noopener noreferrer">
 <rect x="309.3" y="720.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -206,7 +214,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs" target="_blank" rel="noopener noreferrer">
 <rect x="36.1" y="520.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="90.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">studio.rs</text>
-<text x="90.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1263 lines</text>
+<text x="90.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1386 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" target="_blank" rel="noopener noreferrer">
 <rect x="254.1" y="920.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>

@@ -72,6 +72,7 @@ pub mod autolock;
 pub mod avnotice;
 pub mod crashlog;
 pub mod crashreport;
+pub mod decoys;
 pub mod dialog;
 pub mod firstrun;
 pub mod graphics;

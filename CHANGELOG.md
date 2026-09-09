@@ -8,6 +8,62 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The build was red, and the offline proof had never run**
+
+- The `offline-runtime` job proves the front page's claim four ways. Its third
+  step ran the command line inside an empty network namespace with
+  `unshare -rn`, which asks for an unprivileged user namespace, and Ubuntu 24.04
+  refuses those by default. It failed on its first run and on every run since,
+  and because a failed step ends a job, **the two steps after it never ran**:
+  the syscall trace and the window's socket families. The job existed, looked
+  like it proved four things, and proved one.
+- The namespace is now taken whichever way the kernel allows, with the program
+  dropped back to the ordinary account inside it, and the step fails saying the
+  claim is unproved rather than passing quietly if neither way works.
+- The fourth step, never reached, had one quotation mark too many on its last
+  line and would have failed the job the first time it ran.
+- The desktop tests were opening a real file panel. On macOS that panics
+  outright, and on Windows the dialog thread outlived the harness and took the
+  process down with an access violation after every test had passed. Both
+  platforms were red. A file panel is not opened where there is no window to
+  open it on, and on macOS an ask from any thread but the main one now reads as
+  a cancel rather than crashing the application.
+- Three counts said on the front page and in the README had drifted from the
+  tree: the tests, the functional lines and the defects. They are checked
+  against it, and now agree with it.
+
+**Decoy vaults, and a real vault that is not found by its name**
+
+- The Browser can now fill the vault folder with decoys: vaults whose contents
+  never existed, sealed under a key made and dropped inside the call that
+  writes them. Nobody holds that key, so there is nothing to find, to leak, or
+  to be compelled to hand over, and cracking one yields bytes that parse as
+  nothing.
+- `make_decoy` and `Shape::of` had been written, documented and tested since
+  0.1.20 and were reached by nothing. This is the half that was missing.
+- How many is worked out from the room actually free where the vaults live,
+  read from the operating system rather than guessed: one twentieth of it, up
+  to a stated ceiling of thirty-two. Where the system will not say how much is
+  free, the panel says that instead of showing an invented figure as though it
+  had been measured.
+- The real vault used to sit at a fixed name, `studio`, which would have made
+  every decoy beside it pointless: the one directory called `studio` is the one
+  worth attacking. Vaults now live in directories with opaque names and the
+  real one is found by trying each in turn until one opens, which only the pair
+  of passphrases does. A vault written the old way is moved down into a
+  directory of its own on the next unlock, index last, so an interrupted move
+  finishes on the following one rather than splitting the vault in two.
+- A wrong pair of passphrases finds nothing and **makes** nothing. Creating a
+  fresh vault there would show somebody who mistyped an empty vault, which
+  reads exactly like their recordings having been lost.
+- A decoy's index is padded to the length the real one measured. Without it,
+  every decoy in the folder would be the one with the smallest index file, and
+  the sizes were the thing this was meant to make identical.
+- The limit is stated where the button is: this raises the cost of a search. It
+  does not hide the real vault from somebody watching you open it, from
+  something already running inside the computer, or from a backup taken before
+  the decoys were made.
+
 **The pictures of the window showed nine tabs, and there are eleven**
 
 - Both the README's table and the website's "what it looks like" grid were

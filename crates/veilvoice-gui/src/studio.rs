@@ -71,9 +71,15 @@ fn into_secret(typed: &mut String) -> Secret {
     secret
 }
 
-/// Where the vault lives: beside the lock file, in this platform's config
+/// Where the vaults live: beside the lock file, in this platform's config
 /// directory. `None` when the environment does not say where that is, in which
 /// case the Studio says so rather than inventing a location.
+///
+/// A folder of vaults rather than a vault. The real one and any decoys made
+/// beside it are directories in here with opaque names, and which of them is
+/// real is a question only the pair of passphrases answers. A real vault at a
+/// fixed name would be told from a decoy by reading the name, which would make
+/// the decoys worthless.
 pub fn default_dir() -> Option<std::path::PathBuf> {
     veilvoice_crypto::lock::default_path().map(|lock| lock.with_file_name("studio"))
 }
@@ -134,6 +140,21 @@ pub struct Studio {
     /// What the picker is open for: which take, and what to make of it.
     choosing: Option<(String, Render)>,
 
+    // --- decoys ---
+    /// How many decoys the slider is on.
+    decoys_wanted: usize,
+    /// Free space where the vaults live, measured when the vault opens and
+    /// again after decoys are made.
+    ///
+    /// Cached rather than read while drawing: measuring it starts a process,
+    /// and a frame is sixteen milliseconds. `None` is "the system would not
+    /// say", which the panel reports as such.
+    free: Option<u64>,
+    /// How many vault-shaped directories are in the folder, real and decoy
+    /// together. Counted at the same moments as the free space, and for the
+    /// same reason.
+    vaults: usize,
+
     /// The last thing worth saying, and the colour to say it in.
     message: Option<(String, Color32)>,
 }
@@ -182,6 +203,10 @@ impl Studio {
         // And a take still playing is a decrypted recording in memory. The
         // window is locking; it goes with the vault.
         self.playing = None;
+        // Measurements of a folder this no longer has open. Kept, they would
+        // be shown beside the next vault as though they described it.
+        self.free = None;
+        self.vaults = 0;
         self.app_entry.zeroize();
         self.rest_entry.zeroize();
     }
@@ -211,12 +236,13 @@ impl Studio {
             }
         };
 
-        match Vault::open(&dir, key) {
+        match veilvoice_crypto::studio::find_or_make(&dir, key) {
             Ok(vault) => match vault.list() {
                 Ok(entries) => {
                     let count = entries.len();
                     self.entries = entries;
                     self.vault = Some(vault);
+                    self.measure(&dir);
                     self.message = Some((
                         match count {
                             0 => "Vault open. Nothing in it yet.".to_string(),
@@ -241,6 +267,70 @@ impl Studio {
             },
             Err(error) => self.message = Some((error.to_string(), p::red())),
         }
+    }
+
+    /// Read the folder the vaults are in: how much room is free, and how many
+    /// vaults are already there.
+    ///
+    /// Both start a little work, so this is called when something changes
+    /// rather than while drawing. Neither is an error worth reporting: a folder
+    /// that will not list and a system that will not say how much is free both
+    /// mean the panel offers a starting point instead of a measurement, and it
+    /// says which.
+    fn measure(&mut self, dir: &std::path::Path) {
+        self.free = veilvoice_setup::space::free_bytes(dir);
+        self.vaults = veilvoice_crypto::studio::vault_dirs(dir)
+            .map(|v| v.len())
+            .unwrap_or(0);
+    }
+
+    /// Make `count` decoys beside the open vault.
+    ///
+    /// Sized from the vault that is open, so they cannot be told from it by
+    /// size, and named the way it is named, so they cannot be told from it by
+    /// name. The key each is filled under is made and dropped inside
+    /// `make_decoy_in`; nothing here ever holds it.
+    fn make_decoys(&mut self, count: usize) {
+        let Some(vault) = &self.vault else { return };
+        let Some(parent) = vault.dir().parent().map(std::path::Path::to_path_buf) else {
+            return;
+        };
+
+        let shape = match veilvoice_crypto::studio::Shape::of(vault) {
+            Ok(shape) => shape,
+            Err(error) => {
+                self.message = Some((error.to_string(), p::red()));
+                return;
+            }
+        };
+
+        for made in 0..count {
+            if let Err(error) = veilvoice_crypto::studio::make_decoy_in(&parent, shape) {
+                // Said with the number that did get made. Stopping quietly
+                // after three of eight would leave somebody believing they had
+                // eight, which is worse than the failure itself.
+                self.message = Some((
+                    format!(
+                        "{made} of {count} were made, and then this stopped: {error}. \
+                         The ones already made are decoys and are staying."
+                    ),
+                    p::red(),
+                ));
+                self.measure(&parent);
+                return;
+            }
+        }
+
+        self.measure(&parent);
+        self.message = Some((
+            format!(
+                "{} made. This folder now holds {} and only the pair of passphrases says \
+                 which one is yours.",
+                counted_decoys(count),
+                self.vaults
+            ),
+            p::green(),
+        ));
     }
 
     /// Start recording into the vault's holding area.
@@ -712,6 +802,7 @@ impl Studio {
                 )
                 .color(p::muted()),
             );
+            self.decoy_panel(ui);
             self.say(ui);
             return;
         }
@@ -887,7 +978,31 @@ impl Studio {
             .small(),
         );
 
+        self.decoy_panel(ui);
         self.say(ui);
+    }
+
+    /// The decoy panel, under the listing.
+    ///
+    /// Here rather than in the Studio tab because it is about the folder the
+    /// vault is in rather than about making a recording, and this is the tab
+    /// that already shows what is on the disk.
+    fn decoy_panel(&mut self, ui: &mut Ui) {
+        let Some(vault) = &self.vault else { return };
+        let shape = match veilvoice_crypto::studio::Shape::of(vault) {
+            Ok(shape) => shape,
+            // The listing above would already have failed, so there is nothing
+            // to add and no second red line worth printing.
+            Err(_) => return,
+        };
+
+        ui.add_space(10.0);
+        let mut wanted = self.decoys_wanted;
+        let asked = crate::decoys::panel(ui, shape, self.free, self.vaults, &mut wanted);
+        self.decoys_wanted = wanted;
+        if let Some(count) = asked {
+            self.make_decoys(count);
+        }
     }
 
     /// The panel shown while the vault is shut, in both tabs.
@@ -1137,6 +1252,14 @@ enum Act {
     Export(String, Render),
     Play(String),
     Stop,
+}
+
+/// "One decoy" or "four decoys", so the interface does not say "1 decoys".
+pub fn counted_decoys(n: usize) -> String {
+    match n {
+        1 => "One decoy".to_string(),
+        n => format!("{n} decoys"),
+    }
 }
 
 /// "One recording" or "four recordings", so the interface does not say

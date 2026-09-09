@@ -105,7 +105,7 @@ flowchart TD
     n_lock["lock.rs<br/>1823 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
-    n_studio["studio.rs<br/>1037 lines"]
+    n_studio["studio.rs<br/>1494 lines"]
     n_tape["tape.rs<br/>350 lines"]
     n_vault["vault.rs<br/>615 lines"]
     n_weave["weave.rs<br/>1314 lines"]
@@ -152,7 +152,7 @@ flowchart TD
 | [[`lock.rs`|File-veilvoice-crypto-lock]] | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
-| [[`studio.rs`|File-veilvoice-crypto-studio]] | 1037 | The studio vault: a key that exists only when both locks have been opened. |
+| [[`studio.rs`|File-veilvoice-crypto-studio]] | 1494 | The studio vault: a key that exists only when both locks have been opened. |
 | [[`tape.rs`|File-veilvoice-crypto-tape]] | 350 | A recording held in locked, zeroizing memory while it is still being made. |
 | [[`vault.rs`|File-veilvoice-crypto-vault]] | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [[`weave.rs`|File-veilvoice-crypto-weave]] | 1314 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
@@ -160,7 +160,7 @@ flowchart TD
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |
 
-**5,854 functional lines of Rust** in this crate. A functional line is a line
+**6,130 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

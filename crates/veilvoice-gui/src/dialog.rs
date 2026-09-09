@@ -123,6 +123,34 @@ impl Ask {
     }
 }
 
+/// Whether a platform file panel can be opened from here at all.
+///
+/// # Two places where it cannot, and what each one did
+///
+/// **A test binary.** There is no window for a panel to belong to and, on a
+/// build machine, usually no desktop either. Opening one there was not a
+/// harmless no-operation: on macOS `rfd` panics outright rather than returning
+/// nothing, and on Windows the dialog thread outlived the test harness and took
+/// the process down with an access violation after every test had passed. Both
+/// were failing builds on those two platforms and neither said anything about
+/// VeilVoice.
+///
+/// **Anywhere but the main thread on macOS.** `NSOpenPanel` must be driven from
+/// the main thread; asking from another one is not slow or unreliable, it is
+/// impossible, and `rfd` says so by panicking. A panic here would take down an
+/// application in the middle of somebody's recording, so the ask is refused and
+/// reads as a cancel instead.
+///
+/// The main thread is recognised by its name, which is what Rust calls it and
+/// is the only way to ask without `unsafe`. A thread deliberately named `main`
+/// would fool it, and that is a thing this codebase does not do.
+fn can_show() -> bool {
+    if cfg!(test) {
+        return false;
+    }
+    !cfg!(target_os = "macos") || std::thread::current().name() == Some("main")
+}
+
 /// A file dialog that is open, or has just been answered.
 ///
 /// Held by whichever panel asked. `None` inside means nothing is being asked.
@@ -153,6 +181,13 @@ impl Pending {
         }
         let (tx, rx) = mpsc::channel();
         self.waiting = Some(rx);
+
+        // Nothing to open a panel on. The sender is dropped, so the ask reads
+        // as open now and as cancelled when it is next polled, which is the
+        // truth: nothing was shown, so nothing was chosen.
+        if !can_show() {
+            return;
+        }
 
         // macOS requires the panel on the main thread. See the module note:
         // this is the platform's rule, not a corner being cut.
@@ -239,6 +274,27 @@ mod tests {
         assert_eq!(pending.taken(), Some(PathBuf::from("/tmp/a.wav")));
         assert!(!pending.is_open());
         assert_eq!(pending.taken(), None, "and only once");
+    }
+
+    /// Nothing may reach the platform panel from a test binary. This is the
+    /// guard itself: `can_show` is what `start` asks, and a change that made it
+    /// answer yes here would put a native dialog back into every build machine
+    /// on macOS and Windows, which is how those two platforms were failing.
+    #[test]
+    fn no_platform_panel_is_opened_from_a_test_binary() {
+        assert!(!can_show(), "a test build must not open a native dialog");
+    }
+
+    /// An ask that cannot be shown still reads as open, and then as cancelled.
+    /// Reporting it as never started would leave the caller believing the
+    /// button had done nothing at all.
+    #[test]
+    fn an_ask_that_cannot_be_shown_is_open_and_then_cancelled() {
+        let mut pending = Pending::new();
+        pending.start(Ask::Folder);
+        assert!(pending.is_open());
+        assert_eq!(pending.poll(), Some(None));
+        assert!(!pending.is_open());
     }
 
     /// Two asks at once would be two answers to one question, and the second

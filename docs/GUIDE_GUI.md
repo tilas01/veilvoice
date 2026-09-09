@@ -307,6 +307,100 @@ VeilVoice does not guess who is speaking. Turns come from a plan file or from
 one microphone per person, and that is a deliberate limit: guessing wrongly
 would put one person's words under another person's name.
 
+### studio
+
+Record straight into a locked vault, veiled on the way in. What reaches the
+recorder is the voice the engine produced, never the microphone: there is no
+path here that captures the original, because a path that existed would
+eventually be taken, and the file it left behind would be somebody's real voice
+sitting in a vault they believed was safe.
+
+The recording is assembled in page-locked memory and handed to the vault to be
+sealed. It is never a plain file, not even briefly.
+
+| Control | What it is |
+|---|---|
+| **app lock / at rest** | The two passphrases that open the vault. Both, every time. Neither on its own opens anything, and an empty one is refused rather than treated as "no second factor". |
+| **call it** | What this take will be called. A name is a label and nothing veils a name; it is sealed with the recording, so it is not readable from the disk, and it is still the thing that says who this is. |
+| **start recording** | Begins, at the engine strength the rest of the window is set to. |
+| **stop and store** | Ends the take and seals it into the vault. Samples that were dropped are reported rather than passed over, because a recording that is quietly short is the failure this path exists to avoid. |
+| **the two bars** | What is going in, and what is coming out, while it happens. Two rather than one on purpose: a single output meter answers "is something being recorded" and not "is it being veiled", which is the question you are actually asking. Seeing the input move and the output move differently is the only thing on screen that shows the engine is between them. |
+
+Locking the window closes the vault. A take that is still recording when that
+happens is stopped and **stored** first, rather than discarded: the vault is
+still open at that moment, and throwing away a recording because an idle timer
+fired would be the worst thing the tab could do.
+
+### browser
+
+What is in the vault, without opening any of it. The listing comes from a
+sealed index, so reading it decrypts one small file rather than every
+recording.
+
+| Control | What it is |
+|---|---|
+| **the list** | Each recording's name, size and the date it was made. The date and not the time: a listing open on a screen in an office already says enough. |
+| **rename** | Rewrites the index only. The audio is sealed under an identifier rather than a name, so renaming never re-encrypts anything and cannot lose a recording if it is interrupted. |
+| **play** | Plays it straight out of locked memory. **Nothing is written to the disk**, so there is no copy to remember to shred afterwards. Stopping releases the samples, and so does locking the window. |
+| **remove** | Asks first, and cannot be undone. |
+| **preview page** | Writes the audio, a self-contained player page and its captions into a folder you pick. The page plays the recording, draws its waveform and lights the speaker, and needs nothing installed. |
+| **render video** | Writes an MP4 with a black picture, for somewhere that will not accept an audio file. Needs `ffmpeg`, which VeilVoice does not ship and will not install: without it you get the exact command to run, and the audio it needs, rather than a promise. |
+| **both** | The page and the video. |
+
+Playback decrypts the take **whole**, into page-locked memory, rather than in
+pieces. That is a property of the container rather than a shortcut: it is
+sealed and authenticated as one thing, and an encryption that let you open the
+first second without the rest would not be authenticating anything. What it
+buys is the part that matters, which is that no plaintext file exists at any
+point. What it does not buy is a footprint smaller than the recording, and an
+hour of audio is an hour of audio in memory while it plays.
+
+Anything taken out is written **unsealed**, and the tab says so before you
+press anything. That is not a defect: a video nobody can open is not a video.
+The voice in it is still veiled, because it was veiled before it was ever
+stored; what leaves is an ordinary file of a voice that is not anybody's.
+
+The folder is asked for every time rather than remembered. A remembered folder
+is how the second export goes somewhere the first one was deliberately kept out
+of.
+
+What a vault sitting on a disk gives away is how many recordings there are and
+roughly how large each one is. Not their names, not their dates, and not what
+any of them is.
+
+#### Decoy vaults
+
+Under the listing is a dropdown that fills the folder with decoys. A decoy is
+not a vault with weak contents, or one whose passphrase is written down
+somewhere, or one holding harmless recordings. Any of those is a vault that
+rewards cracking, and a decoy that rewards cracking teaches an attacker that
+cracking works. It is a vault whose contents **never existed**: random bytes
+sealed under a key made inside the call that writes it and dropped before that
+call returns. Nobody holds it. Cracked, it yields bytes that parse as nothing,
+which looks exactly like a wrong passphrase.
+
+| Control | What it is |
+|---|---|
+| **how many** | Starts on what the free space allows: a twentieth of what is actually free where the vaults live, up to thirty-two. Where the system will not say how much is free, the panel says so and the number is a starting point rather than a measurement. |
+| **make them** | Writes them. Each is the size the open vault is, down to the byte, including the size of its index. |
+
+Your vault and its decoys are directories with opaque names, and the real one
+is found by trying each until one opens, which only both passphrases do. That
+is why there is no directory called `studio` to look for: a real vault at a
+fixed name is told from a decoy by reading the name, and the decoys would be
+worth nothing.
+
+**What this buys, and what it does not.** It buys the cost of a search.
+Somebody who takes the disk sees several vaults, cannot tell which holds
+anything, and gets no signal from cracking one. It does **not** hide the real
+vault from somebody watching the screen while you open it, from something
+already running inside the computer, or from a backup taken before the decoys
+were made.
+
+One consequence worth knowing before you press it: decoys cannot be told from
+the real vault by looking, which means **you** cannot tell them apart either.
+Removing one afterwards is removing a directory you cannot open to check first.
+
 ### verify
 
 Check that a download is the one that was published, without leaving the

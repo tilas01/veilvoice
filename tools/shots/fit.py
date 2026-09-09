@@ -8,34 +8,39 @@
 # The two ways a screenshot goes wrong, and why one size cannot fix both
 
 A window capture is wrong if it cuts a sentence in half at the bottom edge,
-and it is wrong if two thirds of it are empty background. The nine tabs of
-this application make both happen at once, because their panels are nowhere
-near the same length. Measured, at 1400 wide:
+and it is wrong if two thirds of it are empty background. The tabs of this
+application make both happen at once, because their panels are nowhere near
+the same length: the monitor tab draws a couple of hundred pixels of content
+and the group tab draws well over a thousand.
 
-    monitor   174      lock      778      install   939
-    settings  430      about     840      group    1288
-    live      473      verify    896      file      729
-
-A window 1000 tall cuts the group panel in half. A window 1320 tall shows the
-monitor tab as a strip of content above nine hundred pixels of nothing. There
-is no single window size that is right for all nine, and picking one means
-choosing which of the two faults to publish.
+A window short enough to suit the monitor tab cuts the group panel in half. A
+window tall enough for the group panel shows the monitor tab as a strip of
+content above most of a screen of nothing. There is no single window size that
+is right for all of them, and picking one means choosing which of the two
+faults to publish.
 
 So the capture is taken generously tall, and each picture is then trimmed to
 what it actually contains. Nothing is cut off, and nothing is padding.
 
-# The floor, and why eight of the nine still come out identical
+No table of per-tab heights is kept here. It would be a measurement of one
+version of the window, written where nothing can check it, and it would be
+wrong the first time a panel gained a line. The committed pictures carry the
+answer instead: their own heights, which `--check` proves are what this tool
+would produce.
 
-Trimming to content alone would make the monitor tab 198 pixels tall: a wide
-thin strip that, in a three-column gallery, is a sliver showing nothing. So
-nothing is trimmed below `FLOOR`, which is the height the capture scripts ask
-the window to open at. That is the size the application actually is, and a
-picture of a window has no business being shorter than the window.
+# The floor, and why most tabs still come out identical
 
-The result is that eight of the nine come out at exactly the same size, and
-the ninth is taller because its panel is genuinely longer. That is as close to
-one size as the application allows, and the exception is a fact about the
-program rather than an accident of the tooling.
+Trimming to content alone would make the monitor tab a couple of hundred
+pixels tall: a wide thin strip that, in a three-column gallery, is a sliver
+showing nothing. So nothing is trimmed below `FLOOR`, which is the height the
+capture scripts ask the window to open at. That is the size the application
+actually is, and a picture of a window has no business being shorter than the
+window.
+
+The result is that most of the tabs come out at exactly the same size, and the
+few that are taller are taller because their panels are genuinely longer. That
+is as close to one size as the application allows, and each exception is a fact
+about the program rather than an accident of the tooling.
 
 # What is read, and what is ignored
 

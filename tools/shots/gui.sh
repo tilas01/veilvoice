@@ -23,7 +23,7 @@
 # without one the window is mapped at the origin at exactly the size it asks
 # for, so the X root window *is* the application window, pixel for pixel. The
 # capture needs no cropping, cannot include a strip of desktop down one edge,
-# and comes out the same size for all nine tabs by construction rather than by
+# and comes out the same size for every tab by construction rather than by
 # arithmetic afterwards. The Windows script has to ask the desktop compositor
 # for the window's real bounds to get the same result, because there a window
 # manager owns the frame.
