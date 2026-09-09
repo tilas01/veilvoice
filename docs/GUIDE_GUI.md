@@ -65,8 +65,12 @@ Three things are genuinely outside, and each is optional:
   explained under §7.
 - **A virtual audio cable**, if you want live mode to feed a call. On Linux
   this is usually PipeWire, which is already there.
-- **`ffmpeg`**, only if you ask for a video file. Without it, the command
-  prints exactly what it would have run and exits successfully, because
+- **`ffmpeg`**, only if you ask for a video file. VeilVoice draws every picture
+  in the video itself and asks `ffmpeg` for the last step only, because a video
+  encoder is a large piece of C and carrying one would end the claim that you
+  can read the whole of this program. Without it, a render still writes the
+  audio, the subtitles, the player page and every picture, then prints exactly
+  the command that turns them into the file and exits successfully, because
   nothing failed.
 
 `veilvoice companions` lists all of them, says whether this machine has each,
@@ -250,7 +254,8 @@ It works on a recording that already exists, not on a live microphone.
 | **always start in group mode** | Remembered, for people who are always working this way. |
 | **the people** | A name and a colour each. **Names are not veiled by anything**: you type them and they go into the subtitles as typed. |
 | **the recording, and the plan** | The plan says when each person speaks. Without one there is nothing to render against, and audio no turn claims is silenced rather than passed through, so a missing plan gives a silent file rather than an unveiled one. `veilvoice conversation inspect` describes a plan you already have. |
-| **what a render writes** | Audio, subtitles and a player page. All three by default. |
+| **what a render writes** | Audio, subtitles, a player page, and a video. The first three by default. |
+| **video** | An MP4 with the same picture the player page draws: a circle per speaker, whoever is talking lit, the level under each name, the waveform and a playhead. Off unless you ask, because it is the one output needing `ffmpeg`, which VeilVoice does not ship. Without it the pictures are still written and you get the command. |
 | **who was speaking** | A score out of a hundred, beside the voice choice, saying how much the finished recording gives away about which person each turn belongs to. It falls as the group grows. See below for what it does and does not mean. |
 
 #### The "who was speaking" score
@@ -644,10 +649,29 @@ account.
 
 **Companion software** is listed on the same tab, and none of it is part of
 VeilVoice or required by it. Each entry names one program, says who makes it
-and under what licence, says whether it was found, and gives the one command
-that would install it. VeilVoice never runs somebody else's installer, and
-anything needing root prints the command for you to run in a terminal where you
-can see what you are approving.
+and under what licence, says whether it was found, says what still works
+without it, and gives the one command that would install it. VeilVoice never
+runs somebody else's installer, and anything needing root prints the command for
+you to run in a terminal where you can see what you are approving.
+
+The list is `ffmpeg`, a virtual audio cable for your system, GnuPG and Audacity.
+Where a render tells you `ffmpeg` is missing, it names this tab, because a
+message about something you cannot act on from where you are standing is only
+half a message.
+
+**Nothing here is downloaded by VeilVoice.** An install runs the package manager
+your machine already has, which is the same arrangement as everywhere else in
+this program: no HTTP client is shipped, and three checks in the build say so
+on every commit. Stopping one part-way and starting again continues rather than
+beginning from nothing, because your package manager keeps what it had already
+fetched. That is its behaviour rather than VeilVoice's, and it is said that way
+round because VeilVoice does not manage those files and will not promise for
+every installer on every system.
+
+**"Look again"** re-runs the search. It looks for each program in turn, which
+takes a moment on a machine with several of them, so it says it is working while
+it does. It used to do that inside the frame it was drawing, which made the
+window look as though it had hung.
 
 ### monitor
 

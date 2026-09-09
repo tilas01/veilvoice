@@ -1443,8 +1443,9 @@ fn render_video(
     let Some(program) = ffmpeg::found() else {
         return Err(format!(
             "The {} pictures and their list are written, in {}. `ffmpeg` is not on \
-             this machine, so the last step is yours:\n\n    {}\n\nThe About tab \
-             can install `ffmpeg` for you.",
+             this machine, so the last step is yours:\n\n    {}\n\nThe Setup tab \
+             lists `ffmpeg` under companion software, with the install command for \
+             this system and a button to run it.",
             written_frames.files,
             directory.display(),
             ffmpeg::command_line(&argv)
