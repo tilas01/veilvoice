@@ -189,6 +189,8 @@ Everything the window does, and some things it does not.
 
 ![veilvoice conversation preview --help](assets/screenshots/cli-preview.svg)
 
+![veilvoice conversation fix --help](assets/screenshots/cli-fix.svg)
+
 ![veilvoice companions --help](assets/screenshots/cli-companions.svg)
 
 ![veilvoice capture --help](assets/screenshots/cli-capture.svg)
