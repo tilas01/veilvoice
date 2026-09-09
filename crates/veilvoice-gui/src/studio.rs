@@ -330,8 +330,78 @@ impl Studio {
             }
             self.troubles_seen = stats.interfered;
             self.trouble = self.session.as_ref().and_then(|s| s.interference());
+            self.catch_a_fault();
         }
         Some(stats)
+    }
+
+    /// **Marker 145.** The Studio's own failsafe, and what it is for.
+    ///
+    /// Separate from [`veilvoice_failsafe`], which is the application's and is
+    /// about *other programs* taking the microphone. This one is about this
+    /// tab: a fault in the Studio stops the Studio rather than the recording.
+    ///
+    /// # The fault it catches
+    ///
+    /// The device a take is being recorded from stops existing: unplugged,
+    /// switched away by the operating system, taken by something with more
+    /// authority. Marker 132 made that visible, and visible was as far as it
+    /// went: the take carried on, recording silence, until somebody looked at
+    /// the screen. A recording that continues after there is nothing to record
+    /// is worse than one that stops, because it looks like it worked.
+    ///
+    /// # What it does, and what it deliberately does not
+    ///
+    /// It **stores** what was captured and stops. It does not discard, retry,
+    /// or switch to another device.
+    ///
+    /// Not discard, for the reason locking the window does not: everything up
+    /// to the fault is a real recording of something somebody said, and
+    /// throwing it away because the end of it is missing would be the worst
+    /// thing this tab could do.
+    ///
+    /// Not retry, and not switch: the person chose that microphone. Moving a
+    /// recording onto a different one because the first went away is a program
+    /// deciding, on its own, to record somebody through a device they did not
+    /// pick. On a machine where the default input is a laptop's built-in
+    /// microphone, that is exactly the wrong answer.
+    ///
+    /// Only a device that has gone. Anything else the platform reports is
+    /// shown and left alone, because "the mixer said something" is not a
+    /// reason to end a recording somebody is making.
+    fn catch_a_fault(&mut self) {
+        let gone = self.trouble.as_ref().is_some_and(|t| t.device_gone);
+        if !gone {
+            return;
+        }
+        let recording = self.is_recording();
+        // The session is over either way: a device that has gone does not come
+        // back, and the streams on it are not going to produce another sample.
+        self.stop_veiling();
+        if !recording {
+            self.message = Some((
+                "The device this was using is gone, so the veiling has stopped.".to_string(),
+                p::red(),
+            ));
+            return;
+        }
+        // `stop_veiling` sealed the take on the way through and left its own
+        // message about what was stored. This says why it stopped, in front of
+        // it, because the reason is the part somebody has to know.
+        let stored = self
+            .message
+            .take()
+            .map(|(said, _)| said)
+            .unwrap_or_default();
+        self.message = Some((
+            format!(
+                "The device this was recording from is gone, so the take was stopped and \
+                 stored rather than left running on nothing. {stored}"
+            )
+            .trim_end()
+            .to_string(),
+            p::red(),
+        ));
     }
 
     /// What phase the take half of the tab is in.
@@ -1069,6 +1139,22 @@ impl Studio {
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("● recording").color(p::red()).strong());
                     ui.label(RichText::new(length(seconds as f64)).color(p::fg()));
+                    // **Marker 145**: whether what is being recorded is veiled,
+                    // said *while* it is being recorded and not only before it
+                    // started. The choice is made on the form above and then
+                    // the form is gone, so a take that keeps somebody's real
+                    // voice looked exactly like one that does not for the whole
+                    // of the recording. It is drawn in the colour the choice
+                    // carries: the safe one is not a warning.
+                    ui.label(
+                        RichText::new(format!("keeping {}", self.keep.label()))
+                            .color(if self.keep.wants_plain() {
+                                p::yellow()
+                            } else {
+                                p::muted()
+                            })
+                            .small(),
+                    );
                 });
 
                 // The two bars used to be drawn here as well. They are not any

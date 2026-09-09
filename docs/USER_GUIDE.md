@@ -358,6 +358,25 @@ worth knowing before renaming either.
 The recording is assembled in page-locked memory and handed to the vault to be
 sealed. It is never a plain file, not even briefly.
 
+**While it runs, it says which voice it is keeping.** The choice is made on a
+form that disappears the moment recording starts, and a take of somebody's real
+voice would otherwise look exactly like one that is not for the whole of the
+recording. The line beside the clock says which, and says it in yellow when the
+microphone is being kept.
+
+**If the device goes, the take is stopped and stored.** A microphone unplugged,
+switched away by the operating system, or taken by something with more
+authority, is a device that will not produce another sample, and a take left
+running on one records silence while looking exactly like it is working. So the
+Studio stops and seals what it has.
+
+It does not discard what was captured: everything up to that point is a real
+recording of something somebody said. It does not retry, and it does not move
+the recording onto a different microphone, because you chose that one and a
+program that quietly records you through another is a program deciding
+something that is not its to decide. Anything else the platform reports is
+shown and left alone: an underrun is not a reason to end a recording.
+
 **Starting a take does not interrupt the call, and ending one does not end it.**
 A recorder cannot be attached to a stream that has already started, so beginning
 a take and ending one each restart the audio, which costs a short gap in what is
