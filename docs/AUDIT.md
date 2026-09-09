@@ -177,6 +177,31 @@ something and a decoy's were called nothing. The sizes were the one thing this
 was meant to make identical. The names are now padded to the length the real
 index measured, and the test builds decoys and adds up the real files.
 
+### F-165: a second enumerator, and Windows red again
+
+The same shape as F-163, a day later, in a test written to check that the new
+setup card could not fail.
+
+Marker 135's card counts the recording and playback devices this machine has.
+The test asked for that count twice and asserted the two agreed, on the ground
+that a build machine with no sound card, a sandbox that refuses to enumerate
+and an ordinary desktop all have to reach the card without an error.
+
+The desktop crate's test binary **already** enumerates real devices, once, on
+purpose, in `app::tests::building_the_app_with_real_device_enumeration_does_not_panic`.
+A second enumerator running beside it on another thread killed the process on
+Windows with an access violation, exactly as F-163 did, and the two runs either
+side of the change say so: green without the test, red with it, crashing at the
+point in the listing where it sits.
+
+The test is gone rather than made conditional. It was checking that a call the
+machine answers does not fail, which is a fact about the machine; what is worth
+checking is that the card asks the machine rather than carrying a number, and a
+test reads the card's own source for that.
+
+**One enumeration, in one place**, is now written where the counting function
+is, so the next person to reach for a second one reads why there is not one.
+
 ### F-164: a second recorder nobody drained
 
 Found by re-reading the change that introduced it, before it was pushed, which
@@ -236,7 +261,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1528 tests, 56150 functional lines. Both are measured and
+* **The counts**: 1527 tests, 56145 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4348,7 +4373,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1528 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1527 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -5995,7 +6020,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-four defects found and fixed (F-1 to F-164), across
+**One hundred and sixty-five defects found and fixed (F-1 to F-165), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

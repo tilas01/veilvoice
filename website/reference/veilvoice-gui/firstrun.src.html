@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/firstrun.rs</code></h1>
-<p style="color:var(--muted)"><a href="firstrun.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 689 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="firstrun.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 686 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -595,183 +595,180 @@
 <span class="ln" id="L515"><span class="tok-com">/// reads the same way as a machine with no sound card. That is the right</span></span>
 <span class="ln" id="L516"><span class="tok-com">/// reading here: from the person&#x27;s side, &quot;we cannot see a microphone&quot; and</span></span>
 <span class="ln" id="L517"><span class="tok-com">/// &quot;there is no microphone&quot; have the same consequence.</span></span>
-<span class="ln" id="L518"><span class="tok-kw">fn</span> <span class="tok-fn">device_counts</span>() -&gt; (usize, usize) {</span>
-<span class="ln" id="L519">    <span class="tok-kw">use</span> veilvoice_audio::devices::Direction;</span>
-<span class="ln" id="L520">    (</span>
-<span class="ln" id="L521">        veilvoice_audio::devices::<span class="tok-fn">list</span>(Direction::Input)</span>
-<span class="ln" id="L522">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">len</span>())</span>
-<span class="ln" id="L523">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
-<span class="ln" id="L524">        veilvoice_audio::devices::<span class="tok-fn">list</span>(Direction::Output)</span>
-<span class="ln" id="L525">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">len</span>())</span>
-<span class="ln" id="L526">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
-<span class="ln" id="L527">    )</span>
-<span class="ln" id="L528">}</span>
+<span class="ln" id="L518"><span class="tok-com">///</span></span>
+<span class="ln" id="L519"><span class="tok-com">/// # Not called by any test, and that is deliberate</span></span>
+<span class="ln" id="L520"><span class="tok-com">///</span></span>
+<span class="ln" id="L521"><span class="tok-com">/// This asks the platform for its real devices, and a test that did so was</span></span>
+<span class="ln" id="L522"><span class="tok-com">/// **F-165**: the desktop crate&#x27;s test binary already enumerates once, on</span></span>
+<span class="ln" id="L523"><span class="tok-com">/// purpose, in `app`, and a second enumerator running beside it killed the</span></span>
+<span class="ln" id="L524"><span class="tok-com">/// process on Windows. One enumeration, in one place, is what this crate does.</span></span>
+<span class="ln" id="L525"><span class="tok-com">/// What can be checked without a device is that the card calls this rather than</span></span>
+<span class="ln" id="L526"><span class="tok-com">/// carrying a number, and a test reads the card&#x27;s source for exactly that.</span></span>
+<span class="ln" id="L527"><span class="tok-kw">fn</span> <span class="tok-fn">device_counts</span>() -&gt; (usize, usize) {</span>
+<span class="ln" id="L528">    <span class="tok-kw">use</span> veilvoice_audio::devices::Direction;</span>
+<span class="ln" id="L529">    (</span>
+<span class="ln" id="L530">        veilvoice_audio::devices::<span class="tok-fn">list</span>(Direction::Input)</span>
+<span class="ln" id="L531">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">len</span>())</span>
+<span class="ln" id="L532">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
+<span class="ln" id="L533">        veilvoice_audio::devices::<span class="tok-fn">list</span>(Direction::Output)</span>
+<span class="ln" id="L534">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">len</span>())</span>
+<span class="ln" id="L535">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
+<span class="ln" id="L536">    )</span>
+<span class="ln" id="L537">}</span>
 </span>
-<span class="ln" id="L529"></span>
+<span class="ln" id="L538"></span>
 <span class="src-item" id="fn-field">
-<span class="ln" id="L530"><span class="tok-com">/// A password field with its label, laid out like the rest of the application.</span></span>
-<span class="ln" id="L531"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, label: &amp;str, value: &amp;<span class="tok-kw">mut</span> String) {</span>
-<span class="ln" id="L532">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L533">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L534">        ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L535">            egui::TextEdit::<span class="tok-fn">singleline</span>(value)</span>
-<span class="ln" id="L536">                .<span class="tok-fn">password</span>(true)</span>
-<span class="ln" id="L537">                .<span class="tok-fn">desired_width</span>(<span class="tok-num">240.0</span>),</span>
-<span class="ln" id="L538">        );</span>
-<span class="ln" id="L539">    });</span>
-<span class="ln" id="L540">}</span>
-</span>
-<span class="ln" id="L541"></span>
-<span class="src-item" id="fn-buttons">
-<span class="ln" id="L542"><span class="tok-com">/// The row that moves on. Returns whether it was pressed.</span></span>
-<span class="ln" id="L543"><span class="tok-kw">fn</span> <span class="tok-fn">buttons</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, forward: &amp;str, _unused: Option&lt;&amp;str&gt;) -&gt; (bool, bool) {</span>
-<span class="ln" id="L544">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
-<span class="ln" id="L545">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pressed = false;</span>
-<span class="ln" id="L546">    <span class="tok-kw">crate</span>::layout::<span class="tok-fn">centred_row</span>(ui, |ui| {</span>
-<span class="ln" id="L547">        pressed = ui.<span class="tok-fn">button</span>(forward).<span class="tok-fn">clicked</span>();</span>
+<span class="ln" id="L539"><span class="tok-com">/// A password field with its label, laid out like the rest of the application.</span></span>
+<span class="ln" id="L540"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, label: &amp;str, value: &amp;<span class="tok-kw">mut</span> String) {</span>
+<span class="ln" id="L541">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L542">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L543">        ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L544">            egui::TextEdit::<span class="tok-fn">singleline</span>(value)</span>
+<span class="ln" id="L545">                .<span class="tok-fn">password</span>(true)</span>
+<span class="ln" id="L546">                .<span class="tok-fn">desired_width</span>(<span class="tok-num">240.0</span>),</span>
+<span class="ln" id="L547">        );</span>
 <span class="ln" id="L548">    });</span>
-<span class="ln" id="L549">    (pressed, false)</span>
-<span class="ln" id="L550">}</span>
+<span class="ln" id="L549">}</span>
 </span>
-<span class="ln" id="L551"></span>
-<span class="ln" id="L552"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L553"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L554">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L555"></span>
-<span class="ln" id="L556">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L557">    <span class="tok-kw">fn</span> <span class="tok-fn">the_steps_run_in_order_and_then_stop</span>() {</span>
-<span class="ln" id="L558">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L559">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = vec![step];</span>
-<span class="ln" id="L560">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(next) = step.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L561">            step = next;</span>
-<span class="ln" id="L562">            seen.<span class="tok-fn">push</span>(step);</span>
-<span class="ln" id="L563">        }</span>
-<span class="ln" id="L564">        assert_eq!(</span>
-<span class="ln" id="L565">            seen,</span>
-<span class="ln" id="L566">            vec![</span>
-<span class="ln" id="L567">                Step::Appearance,</span>
-<span class="ln" id="L568">                Step::AppLock,</span>
-<span class="ln" id="L569">                Step::Recording,</span>
-<span class="ln" id="L570">                Step::Autolock,</span>
-<span class="ln" id="L571">                Step::Machine</span>
-<span class="ln" id="L572">            ]</span>
-<span class="ln" id="L573">        );</span>
-<span class="ln" id="L574">        assert_eq!(seen.<span class="tok-fn">len</span>(), Step::COUNT);</span>
-<span class="ln" id="L575">    }</span>
-<span class="ln" id="L576"></span>
-<span class="ln" id="L577">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L578">    <span class="tok-kw">fn</span> <span class="tok-fn">every_step_knows_where_it_is</span>() {</span>
-<span class="ln" id="L579">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L580">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> expected = <span class="tok-num">1</span>;</span>
-<span class="ln" id="L581">        loop {</span>
-<span class="ln" id="L582">            assert_eq!(step.<span class="tok-fn">position</span>(), expected);</span>
-<span class="ln" id="L583">            <span class="tok-kw">match</span> step.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L584">                <span class="tok-fn">Some</span>(next) =&gt; {</span>
-<span class="ln" id="L585">                    step = next;</span>
-<span class="ln" id="L586">                    expected += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L587">                }</span>
-<span class="ln" id="L588">                None =&gt; break,</span>
-<span class="ln" id="L589">            }</span>
-<span class="ln" id="L590">        }</span>
-<span class="ln" id="L591">        assert_eq!(expected, Step::COUNT, <span class="tok-str">&quot;the count and the walk must agree&quot;</span>);</span>
-<span class="ln" id="L592">    }</span>
-<span class="ln" id="L593"></span>
-<span class="ln" id="L594">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L595">    <span class="tok-kw">fn</span> <span class="tok-fn">a_question_already_answered_is_not_asked_again</span>() {</span>
-<span class="ln" id="L596">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L597">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L598">        assert!(</span>
-<span class="ln" id="L599">            !run.<span class="tok-fn">should_skip</span>(Step::AppLock, &amp;security),</span>
-<span class="ln" id="L600">            <span class="tok-str">&quot;with no lock set, the card has something to ask&quot;</span></span>
-<span class="ln" id="L601">        );</span>
-<span class="ln" id="L602">        security.<span class="tok-fn">set_recording_passphrase</span>(<span class="tok-str">&quot;already chosen&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L603">        assert!(</span>
-<span class="ln" id="L604">            run.<span class="tok-fn">should_skip</span>(Step::Recording, &amp;security),</span>
-<span class="ln" id="L605">            <span class="tok-str">&quot;a passphrase set from the command line must not be asked for again&quot;</span></span>
-<span class="ln" id="L606">        );</span>
-<span class="ln" id="L607">    }</span>
-<span class="ln" id="L608"></span>
-<span class="ln" id="L609">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L610">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance_and_autolock_are_always_shown</span>() {</span>
-<span class="ln" id="L611">        <span class="tok-com">// Neither can be &quot;already answered&quot;: both have a default that is a</span></span>
-<span class="ln" id="L612">        <span class="tok-com">// real choice, and both are worth stating once.</span></span>
-<span class="ln" id="L613">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L614">        <span class="tok-kw">let</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L615">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Appearance, &amp;security));</span>
-<span class="ln" id="L616">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Autolock, &amp;security));</span>
-<span class="ln" id="L617">    }</span>
-<span class="ln" id="L618"></span>
-<span class="ln" id="L619">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L620">    <span class="tok-kw">fn</span> <span class="tok-fn">counting_devices_never_fails_however_the_platform_answers</span>() {</span>
-<span class="ln" id="L621">        <span class="tok-com">// A build machine with no sound card, a sandbox that refuses to</span></span>
-<span class="ln" id="L622">        <span class="tok-com">// enumerate, and an ordinary desktop all have to reach this card. The</span></span>
-<span class="ln" id="L623">        <span class="tok-com">// first two report nothing, which the card reads the same way as &quot;there</span></span>
-<span class="ln" id="L624">        <span class="tok-com">// is no microphone&quot;, and neither is an error worth stopping a setup</span></span>
-<span class="ln" id="L625">        <span class="tok-com">// screen for.</span></span>
-<span class="ln" id="L626">        <span class="tok-kw">let</span> (inputs, outputs) = <span class="tok-fn">device_counts</span>();</span>
-<span class="ln" id="L627">        <span class="tok-com">// Asking twice must give the same answer: this is drawn every frame.</span></span>
-<span class="ln" id="L628">        assert_eq!(<span class="tok-fn">device_counts</span>(), (inputs, outputs));</span>
-<span class="ln" id="L629">    }</span>
-<span class="ln" id="L630"></span>
-<span class="ln" id="L631">    <span class="tok-com">/// **Marker 135&#x27;s whole point.** The card has to read the machine rather</span></span>
-<span class="ln" id="L632">    <span class="tok-com">/// than carry numbers written here. A constant would be a claim about</span></span>
-<span class="ln" id="L633">    <span class="tok-com">/// somebody else&#x27;s hardware, stated with the confidence of a measurement.</span></span>
-<span class="ln" id="L634">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L635">    <span class="tok-kw">fn</span> <span class="tok-fn">the_machine_card_measures_rather_than_asserts</span>() {</span>
-<span class="ln" id="L636">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
-<span class="ln" id="L637">        <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn machine&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the card exists&quot;</span>);</span>
-<span class="ln" id="L638">        <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
-<span class="ln" id="L639">        <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
-<span class="ln" id="L640"></span>
-<span class="ln" id="L641">        <span class="tok-kw">for</span> reads <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L642">            <span class="tok-str">&quot;veilvoice_setup::space::free_bytes&quot;</span>,</span>
-<span class="ln" id="L643">            <span class="tok-str">&quot;veilvoice_crypto::lock::default_dir&quot;</span>,</span>
-<span class="ln" id="L644">            <span class="tok-str">&quot;device_counts()&quot;</span>,</span>
-<span class="ln" id="L645">            <span class="tok-str">&quot;prefs.acceleration()&quot;</span>,</span>
-<span class="ln" id="L646">        ] {</span>
-<span class="ln" id="L647">            assert!(</span>
-<span class="ln" id="L648">                body.<span class="tok-fn">contains</span>(reads),</span>
-<span class="ln" id="L649">                <span class="tok-str">&quot;the card no longer reads {reads}, so it is asserting something \</span></span>
-<span class="ln" id="L650"><span class="tok-str">                 about this machine instead of measuring it&quot;</span></span>
-<span class="ln" id="L651">            );</span>
-<span class="ln" id="L652">        }</span>
-<span class="ln" id="L653">        <span class="tok-com">// And it says so when the machine will not answer, rather than</span></span>
-<span class="ln" id="L654">        <span class="tok-com">// printing a number it did not get.</span></span>
-<span class="ln" id="L655">        assert!(</span>
-<span class="ln" id="L656">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;would not say&quot;</span>),</span>
-<span class="ln" id="L657">            <span class="tok-str">&quot;the card has no answer for a system that will not say how much \</span></span>
-<span class="ln" id="L658"><span class="tok-str">             room is free, so it would show one that was never measured&quot;</span></span>
-<span class="ln" id="L659">        );</span>
-<span class="ln" id="L660">    }</span>
-<span class="ln" id="L661"></span>
-<span class="ln" id="L662">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L663">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_is_a_gate</span>() {</span>
-<span class="ln" id="L664">        <span class="tok-com">// Every card&#x27;s source has a way past it. Read from the source rather</span></span>
-<span class="ln" id="L665">        <span class="tok-com">// than by driving egui, which needs a context these tests do not build.</span></span>
-<span class="ln" id="L666">        <span class="tok-com">//</span></span>
-<span class="ln" id="L667">        <span class="tok-com">// The window used to be a fixed four thousand characters after the</span></span>
-<span class="ln" id="L668">        <span class="tok-com">// function&#x27;s name, which is a length rather than a body: a card longer</span></span>
-<span class="ln" id="L669">        <span class="tok-com">// than that reported no way past it, and a card shorter than that was</span></span>
-<span class="ln" id="L670">        <span class="tok-com">// checked against the one after it as well. It now ends where the</span></span>
-<span class="ln" id="L671">        <span class="tok-com">// function does.</span></span>
-<span class="ln" id="L672">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
-<span class="ln" id="L673">        <span class="tok-kw">for</span> card <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L674">            <span class="tok-str">&quot;fn appearance&quot;</span>,</span>
-<span class="ln" id="L675">            <span class="tok-str">&quot;fn app_lock&quot;</span>,</span>
-<span class="ln" id="L676">            <span class="tok-str">&quot;fn recording&quot;</span>,</span>
-<span class="ln" id="L677">            <span class="tok-str">&quot;fn autolock&quot;</span>,</span>
-<span class="ln" id="L678">            <span class="tok-str">&quot;fn machine&quot;</span>,</span>
-<span class="ln" id="L679">        ] {</span>
-<span class="ln" id="L680">            <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(card).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every card exists&quot;</span>);</span>
-<span class="ln" id="L681">            <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
-<span class="ln" id="L682">            <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
-<span class="ln" id="L683">            assert!(</span>
-<span class="ln" id="L684">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;buttons(ui,&quot;</span>),</span>
-<span class="ln" id="L685">                <span class="tok-str">&quot;{card} has no way past it, which makes the setup a gate&quot;</span></span>
-<span class="ln" id="L686">            );</span>
-<span class="ln" id="L687">        }</span>
-<span class="ln" id="L688">    }</span>
-<span class="ln" id="L689">}</span>
+<span class="ln" id="L550"></span>
+<span class="src-item" id="fn-buttons">
+<span class="ln" id="L551"><span class="tok-com">/// The row that moves on. Returns whether it was pressed.</span></span>
+<span class="ln" id="L552"><span class="tok-kw">fn</span> <span class="tok-fn">buttons</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, forward: &amp;str, _unused: Option&lt;&amp;str&gt;) -&gt; (bool, bool) {</span>
+<span class="ln" id="L553">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
+<span class="ln" id="L554">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pressed = false;</span>
+<span class="ln" id="L555">    <span class="tok-kw">crate</span>::layout::<span class="tok-fn">centred_row</span>(ui, |ui| {</span>
+<span class="ln" id="L556">        pressed = ui.<span class="tok-fn">button</span>(forward).<span class="tok-fn">clicked</span>();</span>
+<span class="ln" id="L557">    });</span>
+<span class="ln" id="L558">    (pressed, false)</span>
+<span class="ln" id="L559">}</span>
+</span>
+<span class="ln" id="L560"></span>
+<span class="ln" id="L561"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L562"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L563">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L564"></span>
+<span class="ln" id="L565">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L566">    <span class="tok-kw">fn</span> <span class="tok-fn">the_steps_run_in_order_and_then_stop</span>() {</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = vec![step];</span>
+<span class="ln" id="L569">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(next) = step.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L570">            step = next;</span>
+<span class="ln" id="L571">            seen.<span class="tok-fn">push</span>(step);</span>
+<span class="ln" id="L572">        }</span>
+<span class="ln" id="L573">        assert_eq!(</span>
+<span class="ln" id="L574">            seen,</span>
+<span class="ln" id="L575">            vec![</span>
+<span class="ln" id="L576">                Step::Appearance,</span>
+<span class="ln" id="L577">                Step::AppLock,</span>
+<span class="ln" id="L578">                Step::Recording,</span>
+<span class="ln" id="L579">                Step::Autolock,</span>
+<span class="ln" id="L580">                Step::Machine</span>
+<span class="ln" id="L581">            ]</span>
+<span class="ln" id="L582">        );</span>
+<span class="ln" id="L583">        assert_eq!(seen.<span class="tok-fn">len</span>(), Step::COUNT);</span>
+<span class="ln" id="L584">    }</span>
+<span class="ln" id="L585"></span>
+<span class="ln" id="L586">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L587">    <span class="tok-kw">fn</span> <span class="tok-fn">every_step_knows_where_it_is</span>() {</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L589">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> expected = <span class="tok-num">1</span>;</span>
+<span class="ln" id="L590">        loop {</span>
+<span class="ln" id="L591">            assert_eq!(step.<span class="tok-fn">position</span>(), expected);</span>
+<span class="ln" id="L592">            <span class="tok-kw">match</span> step.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L593">                <span class="tok-fn">Some</span>(next) =&gt; {</span>
+<span class="ln" id="L594">                    step = next;</span>
+<span class="ln" id="L595">                    expected += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L596">                }</span>
+<span class="ln" id="L597">                None =&gt; break,</span>
+<span class="ln" id="L598">            }</span>
+<span class="ln" id="L599">        }</span>
+<span class="ln" id="L600">        assert_eq!(expected, Step::COUNT, <span class="tok-str">&quot;the count and the walk must agree&quot;</span>);</span>
+<span class="ln" id="L601">    }</span>
+<span class="ln" id="L602"></span>
+<span class="ln" id="L603">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L604">    <span class="tok-kw">fn</span> <span class="tok-fn">a_question_already_answered_is_not_asked_again</span>() {</span>
+<span class="ln" id="L605">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L606">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L607">        assert!(</span>
+<span class="ln" id="L608">            !run.<span class="tok-fn">should_skip</span>(Step::AppLock, &amp;security),</span>
+<span class="ln" id="L609">            <span class="tok-str">&quot;with no lock set, the card has something to ask&quot;</span></span>
+<span class="ln" id="L610">        );</span>
+<span class="ln" id="L611">        security.<span class="tok-fn">set_recording_passphrase</span>(<span class="tok-str">&quot;already chosen&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L612">        assert!(</span>
+<span class="ln" id="L613">            run.<span class="tok-fn">should_skip</span>(Step::Recording, &amp;security),</span>
+<span class="ln" id="L614">            <span class="tok-str">&quot;a passphrase set from the command line must not be asked for again&quot;</span></span>
+<span class="ln" id="L615">        );</span>
+<span class="ln" id="L616">    }</span>
+<span class="ln" id="L617"></span>
+<span class="ln" id="L618">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L619">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance_and_autolock_are_always_shown</span>() {</span>
+<span class="ln" id="L620">        <span class="tok-com">// Neither can be &quot;already answered&quot;: both have a default that is a</span></span>
+<span class="ln" id="L621">        <span class="tok-com">// real choice, and both are worth stating once.</span></span>
+<span class="ln" id="L622">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L623">        <span class="tok-kw">let</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L624">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Appearance, &amp;security));</span>
+<span class="ln" id="L625">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Autolock, &amp;security));</span>
+<span class="ln" id="L626">    }</span>
+<span class="ln" id="L627"></span>
+<span class="ln" id="L628">    <span class="tok-com">/// **Marker 135&#x27;s whole point.** The card has to read the machine rather</span></span>
+<span class="ln" id="L629">    <span class="tok-com">/// than carry numbers written here. A constant would be a claim about</span></span>
+<span class="ln" id="L630">    <span class="tok-com">/// somebody else&#x27;s hardware, stated with the confidence of a measurement.</span></span>
+<span class="ln" id="L631">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L632">    <span class="tok-kw">fn</span> <span class="tok-fn">the_machine_card_measures_rather_than_asserts</span>() {</span>
+<span class="ln" id="L633">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
+<span class="ln" id="L634">        <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn machine&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the card exists&quot;</span>);</span>
+<span class="ln" id="L635">        <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
+<span class="ln" id="L636">        <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
+<span class="ln" id="L637"></span>
+<span class="ln" id="L638">        <span class="tok-kw">for</span> reads <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L639">            <span class="tok-str">&quot;veilvoice_setup::space::free_bytes&quot;</span>,</span>
+<span class="ln" id="L640">            <span class="tok-str">&quot;veilvoice_crypto::lock::default_dir&quot;</span>,</span>
+<span class="ln" id="L641">            <span class="tok-str">&quot;device_counts()&quot;</span>,</span>
+<span class="ln" id="L642">            <span class="tok-str">&quot;prefs.acceleration()&quot;</span>,</span>
+<span class="ln" id="L643">        ] {</span>
+<span class="ln" id="L644">            assert!(</span>
+<span class="ln" id="L645">                body.<span class="tok-fn">contains</span>(reads),</span>
+<span class="ln" id="L646">                <span class="tok-str">&quot;the card no longer reads {reads}, so it is asserting something \</span></span>
+<span class="ln" id="L647"><span class="tok-str">                 about this machine instead of measuring it&quot;</span></span>
+<span class="ln" id="L648">            );</span>
+<span class="ln" id="L649">        }</span>
+<span class="ln" id="L650">        <span class="tok-com">// And it says so when the machine will not answer, rather than</span></span>
+<span class="ln" id="L651">        <span class="tok-com">// printing a number it did not get.</span></span>
+<span class="ln" id="L652">        assert!(</span>
+<span class="ln" id="L653">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;would not say&quot;</span>),</span>
+<span class="ln" id="L654">            <span class="tok-str">&quot;the card has no answer for a system that will not say how much \</span></span>
+<span class="ln" id="L655"><span class="tok-str">             room is free, so it would show one that was never measured&quot;</span></span>
+<span class="ln" id="L656">        );</span>
+<span class="ln" id="L657">    }</span>
+<span class="ln" id="L658"></span>
+<span class="ln" id="L659">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L660">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_is_a_gate</span>() {</span>
+<span class="ln" id="L661">        <span class="tok-com">// Every card&#x27;s source has a way past it. Read from the source rather</span></span>
+<span class="ln" id="L662">        <span class="tok-com">// than by driving egui, which needs a context these tests do not build.</span></span>
+<span class="ln" id="L663">        <span class="tok-com">//</span></span>
+<span class="ln" id="L664">        <span class="tok-com">// The window used to be a fixed four thousand characters after the</span></span>
+<span class="ln" id="L665">        <span class="tok-com">// function&#x27;s name, which is a length rather than a body: a card longer</span></span>
+<span class="ln" id="L666">        <span class="tok-com">// than that reported no way past it, and a card shorter than that was</span></span>
+<span class="ln" id="L667">        <span class="tok-com">// checked against the one after it as well. It now ends where the</span></span>
+<span class="ln" id="L668">        <span class="tok-com">// function does.</span></span>
+<span class="ln" id="L669">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
+<span class="ln" id="L670">        <span class="tok-kw">for</span> card <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L671">            <span class="tok-str">&quot;fn appearance&quot;</span>,</span>
+<span class="ln" id="L672">            <span class="tok-str">&quot;fn app_lock&quot;</span>,</span>
+<span class="ln" id="L673">            <span class="tok-str">&quot;fn recording&quot;</span>,</span>
+<span class="ln" id="L674">            <span class="tok-str">&quot;fn autolock&quot;</span>,</span>
+<span class="ln" id="L675">            <span class="tok-str">&quot;fn machine&quot;</span>,</span>
+<span class="ln" id="L676">        ] {</span>
+<span class="ln" id="L677">            <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(card).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every card exists&quot;</span>);</span>
+<span class="ln" id="L678">            <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
+<span class="ln" id="L679">            <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
+<span class="ln" id="L680">            assert!(</span>
+<span class="ln" id="L681">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;buttons(ui,&quot;</span>),</span>
+<span class="ln" id="L682">                <span class="tok-str">&quot;{card} has no way past it, which makes the setup a gate&quot;</span></span>
+<span class="ln" id="L683">            );</span>
+<span class="ln" id="L684">        }</span>
+<span class="ln" id="L685">    }</span>
+<span class="ln" id="L686">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
