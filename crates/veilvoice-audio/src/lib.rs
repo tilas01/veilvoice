@@ -51,6 +51,9 @@ pub mod live;
 #[cfg(feature = "live")]
 pub mod playback;
 pub mod record;
+/// Several microphones at once, a guest each. **Marker 147.**
+#[cfg(feature = "live")]
+pub mod room;
 // Not behind the `live` feature. The scale is arithmetic over a number, and a
 // front end that only processes files still has a level to draw -- and on the
 // BSDs, where `cpal` has no backend and `live` is off, the alternative would be
@@ -64,6 +67,8 @@ pub use io::Audio;
 pub use live::{Interference, Keeping, Kept, LiveSession, LiveStats, Side};
 #[cfg(feature = "live")]
 pub use record::{Recorder, Sink};
+#[cfg(feature = "live")]
+pub use room::{Guest, GuestStats, KeptRoom, RoomSession, RoomStats, MAX_GUESTS};
 
 /// Crate version string, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

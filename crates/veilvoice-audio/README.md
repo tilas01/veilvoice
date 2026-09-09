@@ -80,15 +80,18 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>244 lines"])
+    n_lib(["lib.rs<br/>249 lines"])
     n_devices["devices.rs<br/>243 lines"]
     n_io["io.rs<br/>569 lines"]
-    n_live["live.rs<br/>819 lines"]
+    n_live["live.rs<br/>859 lines"]
     n_meter["meter.rs<br/>166 lines"]
     n_playback["playback.rs<br/>212 lines"]
     n_record["record.rs<br/>543 lines"]
+    n_room["room.rs<br/>614 lines"]
     n_live --> n_record
     n_playback --> n_devices
+    n_room --> n_live
+    n_room --> n_record
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
     click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
     click n_io href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" "open the source"
@@ -96,6 +99,7 @@ flowchart TD
     click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs" "open the source"
     click n_playback href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs" "open the source"
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" "open the source"
+    click n_room href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs" "open the source"
 ```
 
 </details>
@@ -106,13 +110,14 @@ flowchart TD
 |---|---:|---|
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 243 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 569 | Reading and writing audio files. |
-| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 244 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
-| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 819 | Live microphone scrambling. |
+| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 249 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 859 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 212 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
+| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 614 | Marker 147. |
 
-**1,632 functional lines of Rust** in this crate. A functional line is a line
+**2,049 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -155,6 +160,12 @@ counts blank lines and comments too. Both are produced by
 | `struct Sink` | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | The writing half, handed to the audio callback. |
 | `struct Recorder` | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | The reading half: moves samples out of the ring and into locked memory. |
 | `fn start` | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | Start a recorder and the sink that feeds it. |
+| `const MAX_GUESTS` | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | The most microphones one room will open at once. |
+| `struct Guest` | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | One guest: the microphone they speak into and the voice they become. |
+| `struct GuestStats` | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | What one guest's half of a running room is doing. |
+| `struct RoomStats` | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | What a running room is doing, safe to read from the interface. |
+| `struct KeptRoom` | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | The recorders a room was asked for. |
+| `struct RoomSession` | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | A running room. |
 
 ## Reading it elsewhere
 

@@ -168,6 +168,15 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Several microphones at once: the capture path</strong> (marker 147, the first half)</p>
+<ul>
+<li><code>veilvoice_audio::room</code> opens one input per guest, veils each with its own engine, seed and destination voice, and mixes the results into the one output a call or a recorder hears. One microphone carrying four people is one signal, and whatever it is turned into, everybody in it is turned into the same thing.</li>
+<li><strong>The cost is a number rather than a promise.</strong> The output callback runs every guest&#x27;s engine before it returns, so they share one deadline of a few milliseconds and the cost is the sum. <code>RoomStats::load</code> is that sum measured against that deadline. At 1.0 the engines have used the whole block and what follows is dropouts. The guest limit is a bound on the arithmetic, not a claim about any machine.</li>
+<li><strong>The mix is summed and clipped, and never limited.</strong> Two people talking at once is two signals added, which can pass full scale; a render fixes that afterwards with one factor and a live path cannot see the rest of the conversation. So the peak <em>before</em> clipping is reported, the blocks that clipped are counted, and there is deliberately no limiter: a limiter is a dynamics processor, it changes the voice, and this program&#x27;s whole claim is about what changes a voice.</li>
+<li>Each guest has their own ring, so a microphone whose clock runs fast drops that guest&#x27;s samples rather than everybody&#x27;s, and a slow one starves and is padded. A rate <em>mismatch</em> is not absorbed: it is refused before anything opens, which is the fix in this same release.</li>
+<li>A recorder per guest, veiled or unveiled, and one for the mix. Marker 131&#x27;s warning about the unveiled side applies once per guest.</li>
+<li><strong>What is not here yet is the tab that drives it.</strong> The guest list in the Studio, the bars per guest and the takes stored per guest are the other half of the marker, which is marked next rather than done. This is said here because a capture path nothing calls is exactly the kind of thing that gets shipped and forgotten.</li>
+</ul>
 <p><strong>A microphone and an output that never compared their rates</strong></p>
 <ul>
 <li>The live path built the engine and the ring between its callbacks from the output device&#x27;s sample rate, and the input stream from the microphone&#x27;s, and never checked that the two were the same number.</li>
