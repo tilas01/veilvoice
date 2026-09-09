@@ -92,7 +92,7 @@ flowchart TD
     n_dialog["dialog.rs<br/>425 lines"]
     n_firstrun["firstrun.rs<br/>686 lines"]
     n_graphics["graphics.rs<br/>206 lines"]
-    n_group["group.rs<br/>2107 lines"]
+    n_group["group.rs<br/>2108 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
     n_layout["layout.rs<br/>280 lines"]
     n_monitor["monitor.rs<br/>496 lines"]
@@ -104,10 +104,10 @@ flowchart TD
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
     n_security["security.rs<br/>2269 lines"]
     n_settings["settings.rs<br/>1333 lines"]
-    n_setup["setup.rs<br/>882 lines"]
+    n_setup["setup.rs<br/>986 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_studio["studio.rs<br/>2408 lines"]
+    n_studio["studio.rs<br/>2411 lines"]
     n_theme["theme.rs<br/>784 lines"]
     n_tour["tour.rs<br/>299 lines"]
     n_updates["updates.rs<br/>246 lines"]
@@ -253,7 +253,7 @@ flowchart TD
 | [[`dialog.rs`|File-veilvoice-gui-dialog]] | 425 | Asking for a file without stopping the window. |
 | [[`firstrun.rs`|File-veilvoice-gui-firstrun]] | 686 | The first run: the four things worth deciding before anything else. |
 | [[`graphics.rs`|File-veilvoice-gui-graphics]] | 206 | What the window is drawn with, asked for explicitly and then reported. |
-| [[`group.rs`|File-veilvoice-gui-group]] | 2107 | Group mode: several people in one recording, each with a name and a colour. |
+| [[`group.rs`|File-veilvoice-gui-group]] | 2108 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`integrity.rs`|File-veilvoice-gui-integrity]] | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [[`layout.rs`|File-veilvoice-gui-layout]] | 280 | Centring a row of widgets, which egui does not do by nesting. |
 | [[`lib.rs`|File-veilvoice-gui-lib]] | 106 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
@@ -267,10 +267,10 @@ flowchart TD
 | [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] | 348 | Whether the operating system has been asked to reduce motion. |
 | [[`security.rs`|File-veilvoice-gui-security]] | 2269 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [[`settings.rs`|File-veilvoice-gui-settings]] | 1333 | The settings panel: a menu of pages, each a titled group of choices. |
-| [[`setup.rs`|File-veilvoice-gui-setup]] | 882 | The setup tab: install this copy, undo that, and the optional companions. |
+| [[`setup.rs`|File-veilvoice-gui-setup]] | 986 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 766 | The animated mark: a row of bars that rise and fall. |
 | [[`storage.rs`|File-veilvoice-gui-storage]] | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [[`studio.rs`|File-veilvoice-gui-studio]] | 2408 | The Recording Studio and the Recording Browser. |
+| [[`studio.rs`|File-veilvoice-gui-studio]] | 2411 | The Recording Studio and the Recording Browser. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 784 | Colour schemes for the desktop app. |
 | [[`tour.rs`|File-veilvoice-gui-tour]] | 299 | The short tour on a first run, and after an upgrade. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
@@ -279,7 +279,7 @@ flowchart TD
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 417 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 244 | How big the window opens, and why it is not a constant. |
 
-**17,627 functional lines of Rust** in this crate. A functional line is a line
+**17,702 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

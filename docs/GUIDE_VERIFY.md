@@ -43,8 +43,12 @@ Three things are genuinely outside, and each is optional:
   explained under §7.
 - **A virtual audio cable**, if you want live mode to feed a call. On Linux
   this is usually PipeWire, which is already there.
-- **`ffmpeg`**, only if you ask for a video file. Without it, the command
-  prints exactly what it would have run and exits successfully, because
+- **`ffmpeg`**, only if you ask for a video file. VeilVoice draws every picture
+  in the video itself and asks `ffmpeg` for the last step only, because a video
+  encoder is a large piece of C and carrying one would end the claim that you
+  can read the whole of this program. Without it, a render still writes the
+  audio, the subtitles, the player page and every picture, then prints exactly
+  the command that turns them into the file and exits successfully, because
   nothing failed.
 
 `veilvoice companions` lists all of them, says whether this machine has each,

@@ -394,9 +394,18 @@ fn without_ffmpeg_the_command_is_printed_rather_than_the_video_promised() {
     if veilvoice_video::ffmpeg::found().is_some() {
         assert!(into.join("a-take.mp4").is_file(), "{said}");
     } else {
+        // Named, and pointed somewhere. "VeilVoice does not ship it" was what
+        // this used to check, and it is true but it is only half a message:
+        // somebody reading it still has nowhere to go. The Setup tab now lists
+        // `ffmpeg` and installs it, so the message says so, and this checks the
+        // half that is useful rather than the half that is merely accurate.
         assert!(
-            said.contains("ffmpeg") && said.contains("does not ship"),
+            said.contains("ffmpeg"),
             "the missing tool has to be named, and this said: {said}"
+        );
+        assert!(
+            said.contains("Setup tab"),
+            "the message names a tool without saying where to get it: {said}"
         );
         assert!(
             said.contains("-i") || said.contains("ffmpeg "),

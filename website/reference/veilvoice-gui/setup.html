@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/setup.svg" alt="setup.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/setup.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 882 lines &middot; <a href="setup.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 986 lines &middot; <a href="setup.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#portable-is-the-default-and-this-tab-says-so-first">Portable is the default, and this tab says so first</a>
@@ -77,18 +77,18 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>882 lines defining <strong>17 functions</strong> (5 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>986 lines defining <strong>17 functions</strong> (5 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Done</code> <span style="color:var(--muted)">line 62</span> &middot; What a worker finished doing: lines to show, and whether it went well.</li>
 <li><code>struct Row</code> <span style="color:var(--muted)">line 68</span> &middot; One companion as this tab needs it: the facts, plus what was found.</li>
 <li><code>struct Setup</code> <span style="color:var(--muted)">line 75</span> &middot; The setup tab&#x27;s state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Setup::running_installed</code> <span style="color:var(--muted)">line 120</span> &middot; Whether this copy is the installed one.
+<li><code>Setup::running_installed</code> <span style="color:var(--muted)">line 129</span> &middot; Whether this copy is the installed one.
 </li>
-<li><code>Setup::is_busy</code> <span style="color:var(--muted)">line 125</span> &middot; True while a worker is running, so the app can keep repainting.
+<li><code>Setup::is_busy</code> <span style="color:var(--muted)">line 134</span> &middot; True while a worker is running, so the app can keep repainting.
 </li>
-<li><code>Setup::tab</code> <span style="color:var(--muted)">line 163</span> &middot; Draw the tab.
+<li><code>Setup::tab</code> <span style="color:var(--muted)">line 191</span> &middot; Draw the tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>companion_rows</code>, <code>install_controls</code>, <code>poll</code>, <code>where_this_copy_lives</code>, <code>detect_all</code>, <code>start</code>, <code>can_install</code>, <code>carry_question</code>, <code>install_changes</code>, <code>progress</code>, <code>field</code>, <code>visibility_note</code></span>
 </li>
 </ul>
@@ -125,87 +125,87 @@
 <a href="setup.src.html#fn-setup-default">
 <rect x="20.0" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="90.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::default</text>
-<text x="90.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
+<text x="90.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
 </a>
 <a href="setup.src.html#fn-setup-new">
 <rect x="103.4" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="157.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::new</text>
-<text x="157.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
+<text x="157.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
 </a>
 <a href="setup.src.html#fn-setup-running_installed">
 <rect x="186.8" y="20.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="297.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::running_installed</text>
-<text x="297.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
+<text x="297.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 129</text>
 </a>
 <a href="setup.src.html#fn-setup-is_busy">
 <rect x="434.3" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="504.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::is_busy</text>
-<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
+<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
 <a href="setup.src.html#fn-setup-poll">
 <rect x="56.3" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="114.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::poll</text>
-<text x="114.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="114.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 142</text>
 </a>
 <a href="setup.src.html#fn-setup-tab">
 <rect x="198.9" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="253.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::tab</text>
-<text x="253.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 163</text>
+<text x="253.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
 </a>
 <a href="setup.src.html#fn-setup-visibility_note">
 <rect x="333.5" y="120.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="436.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::visibility_note</text>
-<text x="436.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
+<text x="436.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
 </a>
 <a href="setup.src.html#fn-setup-where_this_copy_lives">
 <rect x="238.0" y="220.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="364.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::where_this_copy_lives</text>
-<text x="364.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 208</text>
+<text x="364.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 236</text>
 </a>
 <a href="setup.src.html#fn-setup-install_controls">
 <rect x="79.2" y="320.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="185.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::install_controls</text>
-<text x="185.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
+<text x="185.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
 </a>
 <a href="setup.src.html#fn-setup-carry_question">
 <rect x="36.1" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="134.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::carry_question</text>
-<text x="134.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 409</text>
+<text x="134.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 437</text>
 </a>
 <a href="setup.src.html#fn-setup-start">
 <rect x="259.4" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="321.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::start</text>
-<text x="321.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 455</text>
+<text x="321.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 483</text>
 </a>
 <a href="setup.src.html#fn-setup-progress">
 <rect x="410.1" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="484.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::progress</text>
-<text x="484.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
+<text x="484.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 507</text>
 </a>
 <a href="setup.src.html#fn-setup-companion_rows">
 <rect x="318.6" y="320.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="417.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::companion_rows</text>
-<text x="417.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 524</text>
+<text x="417.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 552</text>
 </a>
 <a href="setup.src.html#fn-detect_all">
 <rect x="25.2" y="520.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="79.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_all</text>
-<text x="79.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 681</text>
+<text x="79.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 727</text>
 </a>
 <a href="setup.src.html#fn-can_install">
 <rect x="159.8" y="520.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="218.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">can_install</text>
-<text x="218.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 705</text>
+<text x="218.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 751</text>
 </a>
 <a href="setup.src.html#fn-install_changes">
 <rect x="302.5" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="376.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_changes</text>
-<text x="376.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 714</text>
+<text x="376.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 760</text>
 </a>
 <a href="setup.src.html#fn-field">
 <rect x="477.4" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="523.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="523.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 726</text>
+<text x="523.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 772</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -224,23 +224,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Setup::default&lt;br/&gt;line 95&quot;]
-    n_new[&quot;Setup::new&lt;br/&gt;line 102&quot;]
-    n_running_installed([&quot;Setup::running_installed&lt;br/&gt;line 120&quot;])
-    n_is_busy([&quot;Setup::is_busy&lt;br/&gt;line 125&quot;])
-    n_poll[&quot;Setup::poll&lt;br/&gt;line 133&quot;]
-    n_tab([&quot;Setup::tab&lt;br/&gt;line 163&quot;])
-    n_visibility_note[&quot;Setup::visibility_note&lt;br/&gt;line 191&quot;]
-    n_where_this_copy_lives[&quot;Setup::where_this_copy_lives&lt;br/&gt;line 208&quot;]
-    n_install_controls[&quot;Setup::install_controls&lt;br/&gt;line 275&quot;]
-    n_carry_question[&quot;Setup::carry_question&lt;br/&gt;line 409&quot;]
-    n_start[&quot;Setup::start&lt;br/&gt;line 455&quot;]
-    n_progress[&quot;Setup::progress&lt;br/&gt;line 479&quot;]
-    n_companion_rows[&quot;Setup::companion_rows&lt;br/&gt;line 524&quot;]
-    n_detect_all[&quot;detect_all&lt;br/&gt;line 681&quot;]
-    n_can_install[&quot;can_install&lt;br/&gt;line 705&quot;]
-    n_install_changes[&quot;install_changes&lt;br/&gt;line 714&quot;]
-    n_field[&quot;field&lt;br/&gt;line 726&quot;]
+    n_default[&quot;Setup::default&lt;br/&gt;line 103&quot;]
+    n_new[&quot;Setup::new&lt;br/&gt;line 110&quot;]
+    n_running_installed([&quot;Setup::running_installed&lt;br/&gt;line 129&quot;])
+    n_is_busy([&quot;Setup::is_busy&lt;br/&gt;line 134&quot;])
+    n_poll[&quot;Setup::poll&lt;br/&gt;line 142&quot;]
+    n_tab([&quot;Setup::tab&lt;br/&gt;line 191&quot;])
+    n_visibility_note[&quot;Setup::visibility_note&lt;br/&gt;line 219&quot;]
+    n_where_this_copy_lives[&quot;Setup::where_this_copy_lives&lt;br/&gt;line 236&quot;]
+    n_install_controls[&quot;Setup::install_controls&lt;br/&gt;line 303&quot;]
+    n_carry_question[&quot;Setup::carry_question&lt;br/&gt;line 437&quot;]
+    n_start[&quot;Setup::start&lt;br/&gt;line 483&quot;]
+    n_progress[&quot;Setup::progress&lt;br/&gt;line 507&quot;]
+    n_companion_rows[&quot;Setup::companion_rows&lt;br/&gt;line 552&quot;]
+    n_detect_all[&quot;detect_all&lt;br/&gt;line 727&quot;]
+    n_can_install[&quot;can_install&lt;br/&gt;line 751&quot;]
+    n_install_changes[&quot;install_changes&lt;br/&gt;line 760&quot;]
+    n_field[&quot;field&lt;br/&gt;line 772&quot;]
     n_companion_rows --&gt; n_detect_all
     n_companion_rows --&gt; n_start
     n_default --&gt; n_new
@@ -257,23 +257,23 @@ flowchart TD
     n_tab --&gt; n_where_this_copy_lives
     n_where_this_copy_lives --&gt; n_field
     n_where_this_copy_lives --&gt; n_visibility_note
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L95&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L102&quot; &quot;open the source&quot;
-    click n_running_installed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L120&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L125&quot; &quot;open the source&quot;
-    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L133&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L163&quot; &quot;open the source&quot;
-    click n_visibility_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L191&quot; &quot;open the source&quot;
-    click n_where_this_copy_lives href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L208&quot; &quot;open the source&quot;
-    click n_install_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L275&quot; &quot;open the source&quot;
-    click n_carry_question href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L409&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L455&quot; &quot;open the source&quot;
-    click n_progress href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L479&quot; &quot;open the source&quot;
-    click n_companion_rows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L524&quot; &quot;open the source&quot;
-    click n_detect_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L681&quot; &quot;open the source&quot;
-    click n_can_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L705&quot; &quot;open the source&quot;
-    click n_install_changes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L714&quot; &quot;open the source&quot;
-    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L726&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L103&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L110&quot; &quot;open the source&quot;
+    click n_running_installed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L129&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L134&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L142&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L191&quot; &quot;open the source&quot;
+    click n_visibility_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L219&quot; &quot;open the source&quot;
+    click n_where_this_copy_lives href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L236&quot; &quot;open the source&quot;
+    click n_install_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L303&quot; &quot;open the source&quot;
+    click n_carry_question href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L437&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L483&quot; &quot;open the source&quot;
+    click n_progress href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L507&quot; &quot;open the source&quot;
+    click n_companion_rows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L552&quot; &quot;open the source&quot;
+    click n_detect_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L727&quot; &quot;open the source&quot;
+    click n_can_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L751&quot; &quot;open the source&quot;
+    click n_install_changes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L760&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L772&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_running_installed,n_is_busy,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -289,23 +289,24 @@ flowchart TD
 <tr><td><code>Done</code> <sub>struct</sub></td><td><a href="setup.src.html#fn-done">62</a></td><td>What a worker finished doing: lines to show, and whether it went well.</td></tr>
 <tr><td><code>Row</code> <sub>struct</sub></td><td><a href="setup.src.html#fn-row">68</a></td><td>One companion as this tab needs it: the facts, plus what was found.</td></tr>
 <tr><td><code>Setup</code> <sub>pub struct</sub></td><td><a href="setup.src.html#fn-setup">75</a></td><td>The setup tab&#x27;s state.</td></tr>
-<tr><td><code>Setup::default</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-default">95</a></td><td></td></tr>
-<tr><td><code>Setup::new</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-new">102</a></td><td>Read the machine&#x27;s current state.</td></tr>
-<tr><td><code>Setup::running_installed</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-running_installed">120</a></td><td>Whether this copy is the installed one.</td></tr>
-<tr><td><code>Setup::is_busy</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-is_busy">125</a></td><td>True while a worker is running, so the app can keep repainting.</td></tr>
-<tr><td><code>Setup::poll</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-poll">133</a></td><td>Drain the worker channel.</td></tr>
-<tr><td><code>Setup::tab</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-tab">163</a></td><td>Draw the tab.</td></tr>
-<tr><td><code>Setup::visibility_note</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-visibility_note">191</a></td><td>Why this tab is here, and how to make it not be.</td></tr>
-<tr><td><code>Setup::where_this_copy_lives</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-where_this_copy_lives">208</a></td><td></td></tr>
-<tr><td><code>Setup::install_controls</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-install_controls">275</a></td><td></td></tr>
-<tr><td><code>Setup::carry_question</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-carry_question">409</a></td><td>Ask whether an install should take the settings with it.</td></tr>
-<tr><td><code>Setup::start</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-start">455</a></td><td>Start a worker, and remember what it is doing so the strip can say.</td></tr>
-<tr><td><code>Setup::progress</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-progress">479</a></td><td>The progress strip: a travelling highlight, or a plain bar when motion is off.</td></tr>
-<tr><td><code>Setup::companion_rows</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-companion_rows">524</a></td><td></td></tr>
-<tr><td><code>detect_all</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-detect_all">681</a></td><td>Probe for every companion that applies to this platform.</td></tr>
-<tr><td><code>can_install</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-can_install">705</a></td><td>Exactly what an install changes, in the order it changes it.</td></tr>
-<tr><td><code>install_changes</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-install_changes">714</a></td><td></td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-field">726</a></td><td></td></tr>
+<tr><td><code>Setup::default</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-default">103</a></td><td></td></tr>
+<tr><td><code>Setup::new</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-new">110</a></td><td>Read the machine&#x27;s current state.</td></tr>
+<tr><td><code>Setup::running_installed</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-running_installed">129</a></td><td>Whether this copy is the installed one.</td></tr>
+<tr><td><code>Setup::is_busy</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-is_busy">134</a></td><td>True while a worker is running, so the app can keep repainting.</td></tr>
+<tr><td><code>Setup::poll</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-poll">142</a></td><td>Drain the worker channel.</td></tr>
+<tr><td><code>Setup::tab</code> <sub>pub fn</sub></td><td><a href="setup.src.html#fn-setup-tab">191</a></td><td>Draw the tab.</td></tr>
+<tr><td><code>Setup::visibility_note</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-visibility_note">219</a></td><td>Why this tab is here, and how to make it not be.</td></tr>
+<tr><td><code>Setup::where_this_copy_lives</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-where_this_copy_lives">236</a></td><td></td></tr>
+<tr><td><code>Setup::install_controls</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-install_controls">303</a></td><td></td></tr>
+<tr><td><code>Setup::carry_question</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-carry_question">437</a></td><td>Ask whether an install should take the settings with it.</td></tr>
+<tr><td><code>Setup::start</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-start">483</a></td><td>Start a worker, and remember what it is doing so the strip can say.</td></tr>
+<tr><td><code>Setup::progress</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-progress">507</a></td><td>The progress strip: a travelling highlight, or a plain bar when motion is off.</td></tr>
+<tr><td><code>Setup::companion_rows</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-setup-companion_rows">552</a></td><td></td></tr>
+<tr><td><code>detect_all</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-detect_all">727</a></td><td>Probe for every companion that applies to this platform.</td></tr>
+<tr><td><code>can_install</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-can_install">751</a></td><td>Exactly what an install changes, in the order it changes it.</td></tr>
+<tr><td><code>install_changes</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-install_changes">760</a></td><td></td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="setup.src.html#fn-field">772</a></td><td></td></tr>
+<tr><td><code>companion_tests</code> <sub>mod</sub></td><td><a href="setup.src.html#fn-companion_tests">931</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

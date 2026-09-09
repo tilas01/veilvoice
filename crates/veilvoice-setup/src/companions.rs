@@ -168,6 +168,7 @@ impl Companion {
     /// Look for it, without changing anything.
     pub fn detect(&self) -> Presence {
         match self.key {
+            "ffmpeg" => detect_ffmpeg(),
             "vb-cable" => detect_vb_cable(),
             "blackhole" => detect_blackhole(),
             "pipewire" => detect_pipewire(),
@@ -208,6 +209,7 @@ impl Companion {
                     Offer::NotOnThisPlatform
                 }
             }
+            "ffmpeg" => ffmpeg_offer(),
             "audacity" => audacity_offer(),
             "gnupg" => gnupg_offer(),
             other => Offer::NoKnownRoute(format!("no route is written for {other}")),
@@ -224,6 +226,21 @@ impl Companion {
 /// filters, and a reader looking at the source should be able to see the whole
 /// set without switching machines.
 pub const ALL: &[Companion] = &[
+    Companion {
+        key: "ffmpeg",
+        name: "ffmpeg",
+        vendor: "the FFmpeg project",
+        licence: "LGPL-2.1-or-later or GPL-2.0-or-later, depending on the build",
+        what: "The tool almost everything uses to read, write and convert audio and \
+               video.",
+        why: "Rendering a conversation to a video file. VeilVoice draws the pictures \
+              itself, frame by frame, and hands ffmpeg the last step, because a video \
+              encoder is a large piece of C and carrying one would end this project's \
+              claim that you can read the whole of it. Without ffmpeg a render still \
+              writes the audio, the subtitles, the player page and every picture, and \
+              gives you the one command that turns them into the file.",
+        page: "https://ffmpeg.org/download.html",
+    },
     Companion {
         key: "vb-cable",
         name: "VB-CABLE",
@@ -498,6 +515,82 @@ fn detect_audacity() -> Presence {
 
 // --- the offers -------------------------------------------------------------
 
+/// The install command for `package` from whichever Unix package manager is here.
+///
+/// **Written once.** This loop existed twice, in `gnupg_offer` and
+/// `audacity_offer`, and adding `ffmpeg` would have made three copies of a
+/// decision about which package managers this project recognises and in what
+/// order. A third copy is the point at which they start disagreeing.
+///
+/// `sudo` is in the command and the command is marked as needing privilege, so
+/// a front end shows it rather than running it. This program does not ask for a
+/// root password.
+fn unix_package(package: &str, absent: &str) -> Offer {
+    for (manager, install) in UNIX_PACKAGE_MANAGERS {
+        if on_path(manager).is_none() {
+            continue;
+        }
+        let mut argv = vec!["sudo".to_string(), (*manager).to_string()];
+        argv.extend(install.iter().map(|part| (*part).to_string()));
+        argv.push(package.to_string());
+        return Offer::Command {
+            argv,
+            via: manager,
+            needs_privilege: true,
+        };
+    }
+    Offer::NoKnownRoute(format!(
+        "no package manager this program recognises is on PATH. Install {absent} the \
+         way you install anything else on this system."
+    ))
+}
+
+/// ffmpeg, which is on `PATH` or is not.
+///
+/// `PATH` only, and for the same reason GnuPG is: the command a render hands
+/// over is `ffmpeg ...`, so an ffmpeg the shell cannot find is one the reader
+/// cannot use, and calling it present would be reporting something untrue about
+/// the thing they are about to try.
+fn detect_ffmpeg() -> Presence {
+    match on_path("ffmpeg") {
+        Some(found) => Presence::Present(found.display().to_string()),
+        None => Presence::NotDetected,
+    }
+}
+
+/// How ffmpeg would be installed here.
+fn ffmpeg_offer() -> Offer {
+    if cfg!(windows) {
+        return if on_path("winget").is_some() {
+            Offer::Command {
+                argv: vec![
+                    "winget".to_string(),
+                    "install".to_string(),
+                    "--id".to_string(),
+                    // The Gyan build is the one ffmpeg.org's own download page
+                    // sends Windows readers to.
+                    "Gyan.FFmpeg".to_string(),
+                    "-e".to_string(),
+                    "--accept-package-agreements".to_string(),
+                    "--accept-source-agreements".to_string(),
+                ],
+                via: "winget",
+                needs_privilege: false,
+            }
+        } else {
+            Offer::NoKnownRoute(
+                "winget is not on this system. ffmpeg's own download page lists builds \
+                 for Windows."
+                    .to_string(),
+            )
+        };
+    }
+    if cfg!(target_os = "macos") {
+        return brew(&["install", "ffmpeg"]);
+    }
+    unix_package("ffmpeg", "ffmpeg")
+}
+
 fn brew(arguments: &[&str]) -> Offer {
     if on_path("brew").is_none() {
         return Offer::NoKnownRoute(
@@ -571,25 +664,8 @@ fn gnupg_offer() -> Offer {
     if cfg!(target_os = "macos") {
         return brew(&["install", "gnupg"]);
     }
-    for (manager, install) in UNIX_PACKAGE_MANAGERS {
-        if on_path(manager).is_none() {
-            continue;
-        }
-        let mut argv = vec!["sudo".to_string(), (*manager).to_string()];
-        argv.extend(install.iter().map(|part| (*part).to_string()));
-        // Debian and Ubuntu call it `gnupg`; so do Fedora and Arch.
-        argv.push("gnupg".to_string());
-        return Offer::Command {
-            argv,
-            via: manager,
-            needs_privilege: true,
-        };
-    }
-    Offer::NoKnownRoute(
-        "no package manager this program recognises is on PATH. Install GnuPG the \
-         way you install anything else on this system."
-            .to_string(),
-    )
+    // Debian and Ubuntu call it `gnupg`; so do Fedora and Arch.
+    unix_package("gnupg", "GnuPG")
 }
 
 fn audacity_offer() -> Offer {
@@ -620,24 +696,7 @@ fn audacity_offer() -> Offer {
         return brew(&["install", "--cask", "audacity"]);
     }
     // Linux and the BSDs: whichever package manager is actually here.
-    for (manager, install) in UNIX_PACKAGE_MANAGERS {
-        if on_path(manager).is_none() {
-            continue;
-        }
-        let mut argv = vec!["sudo".to_string(), (*manager).to_string()];
-        argv.extend(install.iter().map(|part| (*part).to_string()));
-        argv.push("audacity".to_string());
-        return Offer::Command {
-            argv,
-            via: manager,
-            needs_privilege: true,
-        };
-    }
-    Offer::NoKnownRoute(
-        "no package manager this program recognises is on PATH. Install Audacity the \
-         way you install anything else on this system."
-            .to_string(),
-    )
+    unix_package("audacity", "Audacity")
 }
 
 /// Package managers, and the arguments that install one named package
@@ -851,5 +910,115 @@ mod tests {
     #[test]
     fn nothing_on_path_is_found_for_a_nonsense_name() {
         assert!(on_path("this-program-does-not-exist-42").is_none());
+    }
+}
+
+#[cfg(test)]
+mod ffmpeg_tests {
+    use super::*;
+
+    /// ffmpeg is in the list, because the video render is what asks for it.
+    ///
+    /// It was not, which is the whole of this addition: a render without ffmpeg
+    /// said what was missing and the tab that installs things had never heard
+    /// of it, so the message named something the reader could not act on.
+    #[test]
+    fn ffmpeg_is_a_companion_and_says_what_still_works_without_it() {
+        let ffmpeg = by_key("ffmpeg").expect("ffmpeg is in the list");
+        assert_eq!(ffmpeg.name, "ffmpeg");
+        assert!(
+            ffmpeg.why.to_lowercase().contains("video"),
+            "ffmpeg's row does not say what VeilVoice wants it for"
+        );
+        assert!(
+            ffmpeg.why.to_lowercase().contains("without"),
+            "ffmpeg's row does not say what happens without it, which is the half \
+             somebody deciding actually needs"
+        );
+    }
+
+    /// It is offered on every platform this program runs on.
+    ///
+    /// The virtual-cable entries are each on exactly one platform, deliberately.
+    /// ffmpeg is not: the video render exists everywhere, so a reader who cannot
+    /// see the row would be told to install something the tab denies exists.
+    #[test]
+    fn ffmpeg_is_offered_on_this_platform() {
+        assert!(
+            for_this_platform().iter().any(|c| c.key == "ffmpeg"),
+            "ffmpeg is filtered out on this platform, so the render's message \
+             points at a row that is not there"
+        );
+    }
+
+    /// Its route is either a command that can be shown, or a reason there is none.
+    ///
+    /// Never a silent nothing: the two failures this guards are an empty button
+    /// and a command that appears without the reader being able to read it first.
+    #[test]
+    fn the_ffmpeg_route_is_either_a_readable_command_or_a_stated_reason() {
+        let offer = by_key("ffmpeg").unwrap().offer();
+        match &offer {
+            Offer::Command { argv, via, .. } => {
+                assert!(argv.len() >= 2, "a command of {} parts", argv.len());
+                assert!(!via.is_empty(), "a command from nowhere");
+                let line = offer.command_line().expect("a command shows itself");
+                assert!(
+                    line.contains("ffmpeg"),
+                    "the command does not mention ffmpeg: {line}"
+                );
+            }
+            Offer::NoKnownRoute(why) => {
+                assert!(
+                    why.split_whitespace().count() >= 6,
+                    "no route, and no reason worth reading: {why:?}"
+                );
+            }
+            other => panic!("ffmpeg offered {other:?}, which is neither"),
+        }
+    }
+
+    /// Every companion whose route is a command names a package manager.
+    ///
+    /// The loop that builds these is now written once rather than three times,
+    /// and this is what says the three callers still get the same shape out of
+    /// it.
+    #[test]
+    fn every_command_route_names_where_it_came_from() {
+        for companion in ALL {
+            if let Offer::Command { argv, via, .. } = companion.offer() {
+                assert!(
+                    !via.is_empty(),
+                    "{} installs from an unnamed source",
+                    companion.key
+                );
+                assert!(!argv.is_empty(), "{} has an empty command", companion.key);
+            }
+        }
+    }
+
+    /// A `sudo` command is always marked as needing privilege.
+    ///
+    /// A front end may run anything not so marked. One that says `sudo` and
+    /// claims otherwise would be a prompt for a root password appearing from a
+    /// button somebody pressed for a different reason.
+    #[test]
+    fn anything_that_says_sudo_admits_it_needs_privilege() {
+        for companion in ALL {
+            if let Offer::Command {
+                argv,
+                needs_privilege,
+                ..
+            } = companion.offer()
+            {
+                if argv.first().map(String::as_str) == Some("sudo") {
+                    assert!(
+                        needs_privilege,
+                        "{} runs sudo and is marked as runnable without privilege",
+                        companion.key
+                    );
+                }
+            }
+        }
     }
 }
