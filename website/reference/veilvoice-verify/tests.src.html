@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 894 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1038 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1000,6 +1000,152 @@
 <span class="ln" id="L892">        wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
 <span class="ln" id="L893">    );</span>
 <span class="ln" id="L894">}</span>
+</span>
+<span class="ln" id="L895"></span>
+<span class="src-item" id="fn-no_desktop_test_opens_a_device_a_dialog_or_a_window">
+<span class="ln" id="L896"><span class="tok-com">/// **No test in the desktop crate may open a device, a dialog or a window.**</span></span>
+<span class="ln" id="L897"><span class="tok-com">///</span></span>
+<span class="ln" id="L898"><span class="tok-com">/// # Two access violations, a day apart, from the same mistake</span></span>
+<span class="ln" id="L899"><span class="tok-com">///</span></span>
+<span class="ln" id="L900"><span class="tok-com">/// **F-163.** A Studio test played a recording and then locked the window, to</span></span>
+<span class="ln" id="L901"><span class="tok-com">/// assert that locking releases what is playing. Its comment said in as many</span></span>
+<span class="ln" id="L902"><span class="tok-com">/// words: no audio device in a test runner, so `play` will not start a stream.</span></span>
+<span class="ln" id="L903"><span class="tok-com">/// The Windows runner has one. A stream started, tearing it down took the whole</span></span>
+<span class="ln" id="L904"><span class="tok-com">/// test binary with it, and every test in the crate had already passed.</span></span>
+<span class="ln" id="L905"><span class="tok-com">///</span></span>
+<span class="ln" id="L906"><span class="tok-com">/// **F-165.** A setup-card test asked the machine how many audio devices it</span></span>
+<span class="ln" id="L907"><span class="tok-com">/// has, twice, to check the answer was stable. The crate&#x27;s test binary already</span></span>
+<span class="ln" id="L908"><span class="tok-com">/// enumerates once, deliberately, and a second enumerator beside it killed the</span></span>
+<span class="ln" id="L909"><span class="tok-com">/// process the same way.</span></span>
+<span class="ln" id="L910"><span class="tok-com">///</span></span>
+<span class="ln" id="L911"><span class="tok-com">/// Both were fixed one at a time. This is the guard, so the third is caught</span></span>
+<span class="ln" id="L912"><span class="tok-com">/// here rather than on a build machine somebody has to go and read.</span></span>
+<span class="ln" id="L913"><span class="tok-com">///</span></span>
+<span class="ln" id="L914"><span class="tok-com">/// # Why this crate and not every crate</span></span>
+<span class="ln" id="L915"><span class="tok-com">///</span></span>
+<span class="ln" id="L916"><span class="tok-com">/// The desktop crate&#x27;s test binary is the one that links cpal, `rfd`, egui and</span></span>
+<span class="ln" id="L917"><span class="tok-com">/// winit together, and it is where both crashes happened. A narrower guard that</span></span>
+<span class="ln" id="L918"><span class="tok-com">/// is exactly right is worth more than a wide one that has to be argued with;</span></span>
+<span class="ln" id="L919"><span class="tok-com">/// widen it the day another binary does the same thing.</span></span>
+<span class="ln" id="L920"><span class="tok-com">///</span></span>
+<span class="ln" id="L921"><span class="tok-com">/// # What a test may do instead</span></span>
+<span class="ln" id="L922"><span class="tok-com">///</span></span>
+<span class="ln" id="L923"><span class="tok-com">/// Read the source of the function it is about, which is how</span></span>
+<span class="ln" id="L924"><span class="tok-com">/// `locking_the_window_stops_a_take_that_is_playing` asserts the one line in</span></span>
+<span class="ln" id="L925"><span class="tok-com">/// `close` that matters, and how the setup card is checked to be measuring the</span></span>
+<span class="ln" id="L926"><span class="tok-com">/// machine rather than carrying a number. A test whose correctness depends on</span></span>
+<span class="ln" id="L927"><span class="tok-com">/// the machine it runs on is not testing the thing it names.</span></span>
+<span class="ln" id="L928"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L929"><span class="tok-kw">fn</span> <span class="tok-fn">no_desktop_test_opens_a_device_a_dialog_or_a_window</span>() {</span>
+<span class="ln" id="L930">    <span class="tok-kw">let</span> gui = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L931">        .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L932">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
+<span class="ln" id="L933">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)</span>
+<span class="ln" id="L934">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
+<span class="ln" id="L935"></span>
+<span class="ln" id="L936">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L937">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![gui.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L938">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L939">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the desktop crate&#x27;s source&quot;</span>) {</span>
+<span class="ln" id="L940">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L941">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L942">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L943">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L944">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L945">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L946">            }</span>
+<span class="ln" id="L947">        }</span>
+<span class="ln" id="L948">    }</span>
+<span class="ln" id="L949">    assert!(</span>
+<span class="ln" id="L950">        sources.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L951">        <span class="tok-str">&quot;the walk found {} files, so it is not looking at the desktop crate&quot;</span>,</span>
+<span class="ln" id="L952">        sources.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L953">    );</span>
+<span class="ln" id="L954"></span>
+<span class="ln" id="L955">    <span class="tok-com">/// What reaches the platform. Each of these opens something the machine</span></span>
+<span class="ln" id="L956">    <span class="tok-com">/// owns: a sound card, a file panel, or a stream on either.</span></span>
+<span class="ln" id="L957">    <span class="tok-kw">const</span> REACHES_THE_PLATFORM: &amp;[&amp;str] = &amp;[</span>
+<span class="ln" id="L958">        <span class="tok-str">&quot;devices::list(&quot;</span>,</span>
+<span class="ln" id="L959">        <span class="tok-str">&quot;devices::open(&quot;</span>,</span>
+<span class="ln" id="L960">        <span class="tok-str">&quot;playback::start(&quot;</span>,</span>
+<span class="ln" id="L961">        <span class="tok-str">&quot;LiveSession::start(&quot;</span>,</span>
+<span class="ln" id="L962">        <span class="tok-str">&quot;LiveSession::start_recording(&quot;</span>,</span>
+<span class="ln" id="L963">        <span class="tok-str">&quot;rfd::FileDialog&quot;</span>,</span>
+<span class="ln" id="L964">    ];</span>
+<span class="ln" id="L965"></span>
+<span class="ln" id="L966">    <span class="tok-com">/// The one deliberate exception, and it is one call in one test.</span></span>
+<span class="ln" id="L967">    <span class="tok-com">///</span></span>
+<span class="ln" id="L968">    <span class="tok-com">/// Enumerating once, on purpose, is how the window&#x27;s device pickers are</span></span>
+<span class="ln" id="L969">    <span class="tok-com">/// known to survive a machine with no sound card. A second enumerator is</span></span>
+<span class="ln" id="L970">    <span class="tok-com">/// what F-165 was, so the exception is the test&#x27;s name rather than the</span></span>
+<span class="ln" id="L971">    <span class="tok-com">/// call: another test may not borrow it.</span></span>
+<span class="ln" id="L972">    <span class="tok-kw">const</span> ALLOWED: &amp;str = <span class="tok-str">&quot;building_the_app_with_real_device_enumeration_does_not_panic&quot;</span>;</span>
+<span class="ln" id="L973"></span>
+<span class="ln" id="L974">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L975">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L976">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L977">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L978">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
+<span class="ln" id="L979">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L980">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L981">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
+<span class="ln" id="L982">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
+<span class="ln" id="L983">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L984"></span>
+<span class="ln" id="L985">        <span class="tok-com">// A file under `src/&lt;module&gt;/tests.rs` is test code whole; anything</span></span>
+<span class="ln" id="L986">        <span class="tok-com">// else is test code only after its `#[cfg(test)]`.</span></span>
+<span class="ln" id="L987">        <span class="tok-kw">let</span> is_test_file = name == <span class="tok-str">&quot;tests.rs&quot;</span>;</span>
+<span class="ln" id="L988">        <span class="tok-kw">let</span> body = <span class="tok-kw">if</span> is_test_file {</span>
+<span class="ln" id="L989">            text.<span class="tok-fn">as_str</span>()</span>
+<span class="ln" id="L990">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L991">            <span class="tok-kw">match</span> text.<span class="tok-fn">split_once</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>) {</span>
+<span class="ln" id="L992">                <span class="tok-fn">Some</span>((_, tests)) =&gt; tests,</span>
+<span class="ln" id="L993">                None =&gt; continue,</span>
+<span class="ln" id="L994">            }</span>
+<span class="ln" id="L995">        };</span>
+<span class="ln" id="L996"></span>
+<span class="ln" id="L997">        <span class="tok-com">// Which test each line belongs to, so the exception can be by name.</span></span>
+<span class="ln" id="L998">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L999">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1000">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1001">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rest) = trimmed.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;fn &quot;</span>) {</span>
+<span class="ln" id="L1002">                current = rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1003">            }</span>
+<span class="ln" id="L1004">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L1005">                continue;</span>
+<span class="ln" id="L1006">            }</span>
+<span class="ln" id="L1007">            <span class="tok-kw">if</span> current == ALLOWED {</span>
+<span class="ln" id="L1008">                continue;</span>
+<span class="ln" id="L1009">            }</span>
+<span class="ln" id="L1010">            <span class="tok-kw">for</span> reaching <span class="tok-kw">in</span> REACHES_THE_PLATFORM {</span>
+<span class="ln" id="L1011">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(reaching) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1012">                    continue;</span>
+<span class="ln" id="L1013">                };</span>
+<span class="ln" id="L1014">                <span class="tok-com">// A needle is not a call. `dialog.rs`&#x27;s own guard searches the</span></span>
+<span class="ln" id="L1015">                <span class="tok-com">// source for `rfd::FileDialog`, and the string it searches for</span></span>
+<span class="ln" id="L1016">                <span class="tok-com">// is not an opened dialog. An odd number of quotes before the</span></span>
+<span class="ln" id="L1017">                <span class="tok-com">// match means it is inside one.</span></span>
+<span class="ln" id="L1018">                <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1019">                    continue;</span>
+<span class="ln" id="L1020">                }</span>
+<span class="ln" id="L1021">                offenders.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1022">                    <span class="tok-str">&quot;{name}:{}: {} (in {current})&quot;</span>,</span>
+<span class="ln" id="L1023">                    number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1024">                    line.<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L1025">                ));</span>
+<span class="ln" id="L1026">            }</span>
+<span class="ln" id="L1027">        }</span>
+<span class="ln" id="L1028">    }</span>
+<span class="ln" id="L1029"></span>
+<span class="ln" id="L1030">    assert!(</span>
+<span class="ln" id="L1031">        offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1032">        <span class="tok-str">&quot;these tests open something the machine owns, which is how F-163 and \</span></span>
+<span class="ln" id="L1033"><span class="tok-str">         F-165 killed the desktop test binary on Windows after every test had \</span></span>
+<span class="ln" id="L1034"><span class="tok-str">         passed. Assert the thing the test names instead, by reading the source \</span></span>
+<span class="ln" id="L1035"><span class="tok-str">         of the function it is about:\n{}&quot;</span>,</span>
+<span class="ln" id="L1036">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1037">    );</span>
+<span class="ln" id="L1038">}</span>
 </span>
 </code></pre>
 </main>

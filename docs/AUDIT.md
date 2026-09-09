@@ -177,6 +177,36 @@ something and a decoy's were called nothing. The sizes were the one thing this
 was meant to make identical. The names are now padded to the length the real
 index measured, and the test builds decoys and adds up the real files.
 
+### The guard for F-163 and F-165, rather than a third one at a time
+
+Both were fixed individually and neither fix stops the next one. So there is
+now a guard: **no test in the desktop crate may open a device, a dialog or a
+window.** It walks that crate's source, takes the test code, and fails naming
+any line that reaches `devices::list`, `devices::open`, `playback::start`,
+`LiveSession::start`, `LiveSession::start_recording` or `rfd::FileDialog`.
+
+One deliberate exception, by test name rather than by call site:
+`app::tests::building_the_app_with_real_device_enumeration_does_not_panic`
+enumerates once, on purpose, because that is how the window's device pickers
+are known to survive a machine with no sound card. F-165 was a second test
+borrowing that, so the exception cannot be borrowed.
+
+A needle is not a call. `dialog.rs`'s own guard searches its crate's source for
+`rfd::FileDialog`, and the string it searches for is not an opened dialog, so a
+match inside a string literal is skipped. That was the guard's own first false
+positive and it is worth recording, because the check that caught it was
+running the guard rather than reading it.
+
+Proved both ways, as this repository requires of a guard: it passes on the tree
+as it stands, and planting one line that enumerates a device in a Studio test
+makes it fail naming the file, the line and the test.
+
+It is scoped to the desktop crate rather than the workspace. That binary is the
+one linking cpal, `rfd`, egui and winit together and it is where both crashes
+happened; a narrower guard that is exactly right is worth more than a wide one
+that has to be argued with. Widen it the day another binary does the same
+thing.
+
 ### F-165: a second enumerator, and Windows red again
 
 The same shape as F-163, a day later, in a test written to check that the new
@@ -261,7 +291,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1527 tests, 56145 functional lines. Both are measured and
+* **The counts**: 1528 tests, 56234 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4373,7 +4403,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1527 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1528 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |

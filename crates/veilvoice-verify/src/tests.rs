@@ -892,3 +892,147 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
         wrong.join("\n")
     );
 }
+
+/// **No test in the desktop crate may open a device, a dialog or a window.**
+///
+/// # Two access violations, a day apart, from the same mistake
+///
+/// **F-163.** A Studio test played a recording and then locked the window, to
+/// assert that locking releases what is playing. Its comment said in as many
+/// words: no audio device in a test runner, so `play` will not start a stream.
+/// The Windows runner has one. A stream started, tearing it down took the whole
+/// test binary with it, and every test in the crate had already passed.
+///
+/// **F-165.** A setup-card test asked the machine how many audio devices it
+/// has, twice, to check the answer was stable. The crate's test binary already
+/// enumerates once, deliberately, and a second enumerator beside it killed the
+/// process the same way.
+///
+/// Both were fixed one at a time. This is the guard, so the third is caught
+/// here rather than on a build machine somebody has to go and read.
+///
+/// # Why this crate and not every crate
+///
+/// The desktop crate's test binary is the one that links cpal, `rfd`, egui and
+/// winit together, and it is where both crashes happened. A narrower guard that
+/// is exactly right is worth more than a wide one that has to be argued with;
+/// widen it the day another binary does the same thing.
+///
+/// # What a test may do instead
+///
+/// Read the source of the function it is about, which is how
+/// `locking_the_window_stops_a_take_that_is_playing` asserts the one line in
+/// `close` that matters, and how the setup card is checked to be measuring the
+/// machine rather than carrying a number. A test whose correctness depends on
+/// the machine it runs on is not testing the thing it names.
+#[test]
+fn no_desktop_test_opens_a_device_a_dialog_or_a_window() {
+    let gui = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("the crates directory")
+        .join("veilvoice-gui")
+        .join("src");
+
+    let mut sources = Vec::new();
+    let mut pending = vec![gui.clone()];
+    while let Some(directory) = pending.pop() {
+        for entry in std::fs::read_dir(&directory).expect("the desktop crate's source") {
+            let entry = entry.expect("a readable directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                pending.push(path);
+            } else if path.extension().is_some_and(|e| e == "rs") {
+                sources.push(path);
+            }
+        }
+    }
+    assert!(
+        sources.len() > 20,
+        "the walk found {} files, so it is not looking at the desktop crate",
+        sources.len()
+    );
+
+    /// What reaches the platform. Each of these opens something the machine
+    /// owns: a sound card, a file panel, or a stream on either.
+    const REACHES_THE_PLATFORM: &[&str] = &[
+        "devices::list(",
+        "devices::open(",
+        "playback::start(",
+        "LiveSession::start(",
+        "LiveSession::start_recording(",
+        "rfd::FileDialog",
+    ];
+
+    /// The one deliberate exception, and it is one call in one test.
+    ///
+    /// Enumerating once, on purpose, is how the window's device pickers are
+    /// known to survive a machine with no sound card. A second enumerator is
+    /// what F-165 was, so the exception is the test's name rather than the
+    /// call: another test may not borrow it.
+    const ALLOWED: &str = "building_the_app_with_real_device_enumeration_does_not_panic";
+
+    let mut offenders = Vec::new();
+    for path in &sources {
+        let name = path
+            .file_name()
+            .expect("a file")
+            .to_string_lossy()
+            .into_owned();
+        let text = std::fs::read_to_string(path)
+            .expect("a readable source file")
+            .replace("\r\n", "\n");
+
+        // A file under `src/<module>/tests.rs` is test code whole; anything
+        // else is test code only after its `#[cfg(test)]`.
+        let is_test_file = name == "tests.rs";
+        let body = if is_test_file {
+            text.as_str()
+        } else {
+            match text.split_once("\n#[cfg(test)]") {
+                Some((_, tests)) => tests,
+                None => continue,
+            }
+        };
+
+        // Which test each line belongs to, so the exception can be by name.
+        let mut current = String::new();
+        for (number, line) in body.lines().enumerate() {
+            let trimmed = line.trim_start();
+            if let Some(rest) = trimmed.strip_prefix("fn ") {
+                current = rest.split('(').next().unwrap_or("").to_string();
+            }
+            if trimmed.starts_with("//") {
+                continue;
+            }
+            if current == ALLOWED {
+                continue;
+            }
+            for reaching in REACHES_THE_PLATFORM {
+                let Some(at) = line.find(reaching) else {
+                    continue;
+                };
+                // A needle is not a call. `dialog.rs`'s own guard searches the
+                // source for `rfd::FileDialog`, and the string it searches for
+                // is not an opened dialog. An odd number of quotes before the
+                // match means it is inside one.
+                if line[..at].matches('"').count() % 2 == 1 {
+                    continue;
+                }
+                offenders.push(format!(
+                    "{name}:{}: {} (in {current})",
+                    number + 1,
+                    line.trim()
+                ));
+            }
+        }
+    }
+
+    assert!(
+        offenders.is_empty(),
+        "these tests open something the machine owns, which is how F-163 and \
+         F-165 killed the desktop test binary on Windows after every test had \
+         passed. Assert the thing the test names instead, by reading the source \
+         of the function it is about:\n{}",
+        offenders.join("\n")
+    );
+}

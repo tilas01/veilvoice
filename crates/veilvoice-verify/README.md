@@ -100,7 +100,7 @@ flowchart TD
     n_extracted["extracted.rs<br/>316 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
-    n_tests["tests.rs<br/>894 lines"]
+    n_tests["tests.rs<br/>1038 lines"]
     n_builder --> n_deps
     n_builder --> n_extracted
     n_builder --> n_report
@@ -128,10 +128,10 @@ flowchart TD
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
 | [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 1889 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
-| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 894 | The verifier's own tests. |
+| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 1038 | The verifier's own tests. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Marker 97. |
 
-**4,077 functional lines of Rust** in this crate. A functional line is a line
+**4,166 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
