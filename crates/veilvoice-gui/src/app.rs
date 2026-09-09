@@ -318,7 +318,11 @@ pub struct VeilVoiceApp {
     /// What the running session reported this frame, or `None` when none is
     /// running. Read once, in `update`, because `stats` resets the peaks as it
     /// reads them and two readers would each see half the level.
-    live_stats: Option<veilvoice_audio::LiveStats>,
+    ///
+    /// **Marker 147.** One microphone and a room report different shapes, and
+    /// this holds whichever it was rather than a flattened pair of numbers:
+    /// flattening is what would lose the per-guest bars.
+    reading: Option<crate::studio::Reading>,
     /// A rolling average of how long a frame takes, in milliseconds.
     ///
     /// Shown on the About tab. Somebody reporting that the window is slow can
@@ -482,7 +486,7 @@ impl VeilVoiceApp {
             chosen_input: None,
             chosen_output: None,
             studio: crate::studio::Studio::default(),
-            live_stats: None,
+            reading: None,
             frame_ms: 0.0,
             security: Security::default(),
             integrity: crate::integrity::Integrity::default(),
@@ -1122,7 +1126,7 @@ impl eframe::App for VeilVoiceApp {
         // freeze the moment somebody navigated away, which is the exact moment
         // this feature exists for. `stats` resets the peaks as it reads them,
         // so this is the only reader and everything else is shown what it got.
-        self.live_stats = self.studio.tick();
+        self.reading = self.studio.tick();
 
         // **Marker 132.** Who else is holding the microphone, while a take is
         // being made and only then. Outside one this is the Monitor tab's
@@ -1707,13 +1711,121 @@ impl VeilVoiceApp {
     /// The lists and the settings widgets stay the window's rather than the
     /// Studio's, because the window is what enumerates the devices, once, at
     /// startup, and because the file tab shows the same engine settings.
+    /// The room: a name and a microphone each, and what that costs.
+    ///
+    /// **Marker 147.** Drawn by the window rather than by the Studio for the
+    /// reason the device pickers are: the device list belongs to the window.
+    /// What the Studio owns is the list of guests, because the session it
+    /// starts is built from it.
+    fn guest_list(&mut self, ui: &mut egui::Ui) {
+        let count = self.studio.room_guests().len();
+        let mut remove = None;
+        for index in 0..count {
+            ui.horizontal(|ui| {
+                let Some(guest) = self.studio.room_guest_mut(index) else {
+                    return;
+                };
+                ui.label(RichText::new(format!("{:>2}.", index + 1)).color(p::muted()));
+                let hint = format!("guest {}", index + 1);
+                ui.add(
+                    egui::TextEdit::singleline(&mut guest.name)
+                        .desired_width(140.0)
+                        .hint_text(&hint),
+                );
+                // Its own salt per row: two combo boxes sharing an identifier
+                // are one combo box drawn twice, and opening either would open
+                // the other.
+                let current = guest
+                    .device
+                    .clone()
+                    .unwrap_or_else(|| "system default".into());
+                let chosen = &mut guest.device;
+                egui::ComboBox::from_id_salt(("room guest", index))
+                    .width(300.0)
+                    .selected_text(RichText::new(current).color(p::cyan()))
+                    .show_ui(ui, |ui| {
+                        ui.selectable_value(chosen, None, "system default");
+                        for device in &self.inputs {
+                            ui.selectable_value(
+                                chosen,
+                                Some(device.name.clone()),
+                                device.name.clone(),
+                            );
+                        }
+                    });
+                if ui.button("remove").clicked() {
+                    remove = Some(index);
+                }
+            });
+        }
+        if let Some(index) = remove {
+            self.studio.remove_guest(index);
+        }
+
+        ui.horizontal(|ui| {
+            let room = veilvoice_audio::MAX_GUESTS;
+            ui.add_enabled_ui(count < room, |ui| {
+                if ui.button("  add a guest  ").clicked() {
+                    self.studio.add_guest();
+                }
+            });
+            ui.label(
+                RichText::new(format!("{count} of at most {room}"))
+                    .small()
+                    .color(p::muted()),
+            );
+        });
+
+        // Said before the session refuses rather than after, because the
+        // refusal is easier to act on when the row it is about is on screen.
+        if let Some(shared) = crate::studio::sharing_a_microphone(self.studio.room_guests()) {
+            ui.label(RichText::new(shared).color(p::yellow()).small());
+        }
+        ui.label(
+            RichText::new(
+                "  Each guest is veiled into a voice of their own, from the same set a \
+                 group render hands out, and the results are mixed into the output. \
+                 Four voices is four times the work on one deadline: the load below \
+                 says how much of it is being used.",
+            )
+            .small()
+            .color(p::muted()),
+        );
+    }
+
     fn studio_tab(&mut self, ui: &mut egui::Ui) {
         let veiling = self.studio.is_veiling();
 
         ui.add_space(4.0);
         ui.label(RichText::new("Devices").color(p::blue()).small());
         ui.add_enabled_ui(!veiling, |ui| {
-            device_picker(ui, "input ", &self.inputs, &mut self.chosen_input);
+            // **Marker 147.** One microphone, or one per person in the room.
+            //
+            // A room is not a bigger version of one microphone. One microphone
+            // carrying four people is one signal, so whatever it is turned into
+            // turns all four of them into the same thing and a listener can no
+            // longer follow who is speaking. A microphone each is the only way
+            // to give them a voice each.
+            let mut room = self.studio.wants_a_room();
+            if ui
+                .checkbox(&mut room, "several microphones, a guest each")
+                .on_hover_text(
+                    "Everybody in the room on their own microphone. Each voice is \
+                     veiled separately, into a voice of its own, and the results are \
+                     mixed into the output below. One microphone for four people \
+                     cannot do this: it is one signal, and everybody in it comes out \
+                     as the same person.",
+                )
+                .changed()
+            {
+                self.studio.want_a_room(room);
+            }
+
+            if room {
+                self.guest_list(ui);
+            } else {
+                device_picker(ui, "input ", &self.inputs, &mut self.chosen_input);
+            }
             device_picker(ui, "output", &self.outputs, &mut self.chosen_output);
         });
 
@@ -1750,8 +1862,16 @@ impl VeilVoiceApp {
                     let config = self.config();
                     let input = self.chosen_input.clone();
                     let output = self.chosen_output.clone();
-                    self.studio
-                        .start_veiling(config, input.as_deref(), output.as_deref(), false);
+                    if self.studio.wants_a_room() {
+                        self.studio.start_room(config, output.as_deref(), false);
+                    } else {
+                        self.studio.start_veiling(
+                            config,
+                            input.as_deref(),
+                            output.as_deref(),
+                            false,
+                        );
+                    }
                 }
                 // Listening to yourself before anybody else does.
                 //
@@ -1859,52 +1979,143 @@ impl VeilVoiceApp {
             );
         }
 
-        if let Some(stats) = self.live_stats {
-            // The smoothing happens once a frame in `update`, so the strip and
-            // this panel are the same numbers rather than two readings taken a
-            // frame apart.
-            let levels = self.studio.levels();
-            ui.add_space(12.0);
-            ui.label(RichText::new("Levels").color(p::blue()).small());
-            crate::monitor::meter(ui, "in ", levels.input, levels.hold_input);
-            crate::monitor::meter(ui, "out", levels.output, levels.hold_output);
-            ui.label(
-                RichText::new(
-                    "  These say sound is arriving and sound is leaving. They cannot say \
-                     the voice has been changed: a working meter and a bypassed engine draw \
-                     the same bar. Listen to the output to hear that.",
-                )
-                .small()
-                .color(p::muted()),
-            );
+        // What the bars cannot say, in the same words wherever they are drawn.
+        const WHAT_A_METER_IS_WORTH: &str =
+            "  These say sound is arriving and sound is leaving. They cannot say the \
+             voice has been changed: a working meter and a bypassed engine draw the \
+             same bar. Listen to the output to hear that.";
 
-            ui.add_space(12.0);
-            ui.label(RichText::new("Performance").color(p::blue()).small());
-            field(
-                ui,
-                "processing",
-                &format!("{:.2} ms/block", stats.process.ema_block_ms()),
-            );
-            field(
-                ui,
-                "engine latency",
-                &format!("{:.1} ms", stats.process.algorithmic_latency_ms),
-            );
-            field(
-                ui,
-                "realtime factor",
-                &format!("{:.3}", stats.process.last_realtime_factor()),
-            );
-            if stats.dropped > 0 || stats.starved > 0 {
+        match &self.reading {
+            Some(crate::studio::Reading::One(stats)) => {
+                // The smoothing happens once a frame in `update`, so the strip
+                // and this panel are the same numbers rather than two readings
+                // taken a frame apart.
+                let levels = self.studio.levels();
+                ui.add_space(12.0);
+                ui.label(RichText::new("Levels").color(p::blue()).small());
+                crate::monitor::meter(ui, "in ", levels.input, levels.hold_input);
+                crate::monitor::meter(ui, "out", levels.output, levels.hold_output);
                 ui.label(
-                    RichText::new(format!(
-                        "glitches: {} dropped, {} starved",
-                        stats.dropped, stats.starved
-                    ))
-                    .color(p::yellow())
-                    .small(),
+                    RichText::new(WHAT_A_METER_IS_WORTH)
+                        .small()
+                        .color(p::muted()),
                 );
+
+                ui.add_space(12.0);
+                ui.label(RichText::new("Performance").color(p::blue()).small());
+                field(
+                    ui,
+                    "processing",
+                    &format!("{:.2} ms/block", stats.process.ema_block_ms()),
+                );
+                field(
+                    ui,
+                    "engine latency",
+                    &format!("{:.1} ms", stats.process.algorithmic_latency_ms),
+                );
+                field(
+                    ui,
+                    "realtime factor",
+                    &format!("{:.3}", stats.process.last_realtime_factor()),
+                );
+                if stats.dropped > 0 || stats.starved > 0 {
+                    ui.label(
+                        RichText::new(format!(
+                            "glitches: {} dropped, {} starved",
+                            stats.dropped, stats.starved
+                        ))
+                        .color(p::yellow())
+                        .small(),
+                    );
+                }
             }
+            // **Marker 147.** Two bars per guest, and the cost of running all
+            // of them, which is the honest account the row asked for.
+            Some(crate::studio::Reading::Room(stats)) => {
+                let levels = self.studio.guest_levels();
+                ui.add_space(12.0);
+                ui.label(RichText::new("Levels").color(p::blue()).small());
+                for (index, pair) in levels.iter().enumerate() {
+                    let name = self
+                        .studio
+                        .room_guests()
+                        .get(index)
+                        .map(|guest| guest.called(index))
+                        .unwrap_or_else(|| format!("guest {}", index + 1));
+                    ui.label(RichText::new(name).color(p::cyan()).small());
+                    crate::monitor::meter(ui, "  in ", pair.input, pair.hold_input);
+                    crate::monitor::meter(ui, "  out", pair.output, pair.hold_output);
+                    if let Some(guest) = stats.guests.get(index) {
+                        if guest.dropped > 0 {
+                            ui.label(
+                                RichText::new(format!(
+                                    "  {} samples dropped: this microphone is running \
+                                     faster than the output.",
+                                    guest.dropped
+                                ))
+                                .color(p::yellow())
+                                .small(),
+                            );
+                        }
+                    }
+                }
+                let mix = self.studio.levels();
+                ui.label(RichText::new("everybody, mixed").color(p::cyan()).small());
+                crate::monitor::meter(ui, "  out", mix.output, mix.hold_output);
+                ui.label(
+                    RichText::new(WHAT_A_METER_IS_WORTH)
+                        .small()
+                        .color(p::muted()),
+                );
+
+                ui.add_space(12.0);
+                ui.label(RichText::new("Performance").color(p::blue()).small());
+                // The one number that says whether this machine can carry this
+                // room. Every guest's engine runs inside one output callback,
+                // so they share one deadline and the cost is the sum of them.
+                field(
+                    ui,
+                    "load",
+                    &format!("{:.0}% of the block", stats.load * 100.0),
+                );
+                field(ui, "guests", &format!("{}", stats.guests.len()));
+                if stats.load >= 0.8 {
+                    ui.label(
+                        RichText::new(
+                            "The engines are using most of the time each block has. Past \
+                             the whole of it the sound breaks up: take a guest out, or \
+                             use a larger frame size.",
+                        )
+                        .color(p::yellow())
+                        .small(),
+                    );
+                }
+                if stats.clipped > 0 {
+                    // Never hidden and never limited. A limiter is a dynamics
+                    // processor: it would change the voice, which is the one
+                    // thing this program is careful about.
+                    ui.label(
+                        RichText::new(format!(
+                            "{} blocks went past full scale and were clipped. Several \
+                             people talking at once is several signals added together. \
+                             Nothing here compresses them, because that would be a \
+                             second thing changing the voice: turn the microphones \
+                             down instead.",
+                            stats.clipped
+                        ))
+                        .color(p::yellow())
+                        .small(),
+                    );
+                }
+                if stats.starved > 0 {
+                    ui.label(
+                        RichText::new(format!("{} starved blocks", stats.starved))
+                            .color(p::yellow())
+                            .small(),
+                    );
+                }
+            }
+            None => {}
         }
 
         ui.add_space(14.0);
@@ -1927,8 +2138,15 @@ impl VeilVoiceApp {
     fn start_preview(&mut self) {
         let config = self.config();
         let input = self.chosen_input.clone();
-        self.studio
-            .start_veiling(config, input.as_deref(), None, true);
+        // A room previews as a room: the mix goes to the headphones instead of
+        // to the cable, and everything else about it is the same session.
+        // Previewing a room as one microphone would hear one of the guests.
+        if self.studio.wants_a_room() {
+            self.studio.start_room(config, None, true);
+        } else {
+            self.studio
+                .start_veiling(config, input.as_deref(), None, true);
+        }
         if !self.studio.is_veiling() {
             // It did not start. The Studio says why, in its own message line,
             // and a note claiming to describe a preview that is not running

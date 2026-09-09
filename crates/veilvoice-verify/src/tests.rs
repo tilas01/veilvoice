@@ -1165,7 +1165,13 @@ fn the_desktop_starts_a_live_session_in_exactly_one_place() {
             if trimmed.starts_with("//") {
                 continue;
             }
-            for needle in ["LiveSession::start(", "LiveSession::start_recording("] {
+            // **Marker 147.** A room is a session too, and is under the same
+            // rule: the microphone it opens is opened once or not at all.
+            for needle in [
+                "LiveSession::start(",
+                "LiveSession::start_recording(",
+                "RoomSession::start(",
+            ] {
                 let Some(at) = line.find(needle) else {
                     continue;
                 };
@@ -1177,20 +1183,31 @@ fn the_desktop_starts_a_live_session_in_exactly_one_place() {
         }
     }
 
+    // Two: one microphone and a room, both in `Studio::start_session`, which
+    // is the function that chooses between them. They are counted rather than
+    // capped at one because a room is a different call with different
+    // arguments; what the guard is about is that neither is reachable from a
+    // second place, and both being in one function is how "never both" holds.
     assert_eq!(
         starters.len(),
-        1,
-        "a live session is started in {} places in the desktop crate. Two \
-         starters is two opens of the same microphone, which is what having a \
-         live tab beside the Studio was:\n{}",
+        2,
+        "a session is started in {} places in the desktop crate. Two starters \
+         for the same kind is two opens of the same microphone, which is what \
+         having a live tab beside the Studio was:\n{}",
         starters.len(),
         starters.join("\n")
     );
-    assert!(
-        starters[0].starts_with("studio.rs:"),
-        "the one starter should be the Studio's, and it is {}",
-        starters[0]
-    );
+    for starter in &starters {
+        assert!(
+            starter.starts_with("studio.rs:"),
+            "the starters should all be the Studio's, and one is {starter}"
+        );
+        assert!(
+            starter.ends_with("in start_session"),
+            "a session is started outside `Studio::start_session`, so the \
+             Studio can hold a room and a single session at once: {starter}"
+        );
+    }
 }
 
 /// **Marker 126.** Nothing in an audio callback allocates, locks or prints.

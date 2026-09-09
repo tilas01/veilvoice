@@ -96,7 +96,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>106 lines"])
     n_main(["main.rs<br/>214 lines"])
-    n_app["app.rs<br/>3051 lines"]
+    n_app["app.rs<br/>3269 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
@@ -120,7 +120,7 @@ flowchart TD
     n_setup["setup.rs<br/>882 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_studio["studio.rs<br/>1946 lines"]
+    n_studio["studio.rs<br/>2408 lines"]
     n_theme["theme.rs<br/>784 lines"]
     n_tour["tour.rs<br/>299 lines"]
     n_updates["updates.rs<br/>246 lines"]
@@ -257,7 +257,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3051 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3269 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 447 | Make a failure that produces no output produce some. |
@@ -283,7 +283,7 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 882 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 766 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1946 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2408 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 784 | Colour schemes for the desktop app. |
 | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 299 | The short tour on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
@@ -292,7 +292,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**16,853 functional lines of Rust** in this crate. A functional line is a line
+**17,466 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -397,6 +397,11 @@ counts blank lines and comments too. Both are produced by
 | `struct Storage` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | Everything the window shows about encrypted storage. |
 | `fn panel` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | The encrypted-storage panel, drawn on the security tab. |
 | `fn default_dir` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Where the vaults live: beside the lock file, in this platform's config directory. |
+| `struct RoomGuest` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | One guest in a room: the name their take is filed under, and the microphone they speak into. |
+| `fn sharing_a_microphone` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Which guests are sharing a microphone, and the sentence to say about it. |
+| `enum Whose` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Whose voice one recording of a take is. |
+| `fn take_name` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | What one recording of a take is called in the vault. |
+| `enum Reading` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | What a running session last reported about itself. |
 | `struct Studio` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | The Studio and the Browser. |
 | `enum Keep` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Which side of the engine a take keeps. |
 | `enum Render` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | What a take is to be turned into. |

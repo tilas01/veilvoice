@@ -132,6 +132,24 @@ enum Phase {
     Recording,
 }
 
+/// Who is speaking into a session.
+///
+/// **Marker 147.** One microphone or several, and the choice is this enum
+/// rather than a pair of fields, so "never both" is a thing that cannot be
+/// written rather than a thing to remember.
+#[derive(Clone)]
+enum Who {
+    /// One person, on the named microphone or on this machine's default.
+    One(Option<String>),
+    /// A room: one microphone per guest, as [`Studio::room_guests`] lists them.
+    ///
+    /// The list is deliberately **not** copied in here. It is the Studio's, the
+    /// controls that edit it are disabled while a room is running, and a copy
+    /// would be a second answer to "who is in this room" that could disagree
+    /// with the one on screen.
+    Room,
+}
+
 /// What a live session was started with.
 ///
 /// Held for as long as one is running, because sinks cannot be attached to a
@@ -143,13 +161,166 @@ enum Phase {
 struct Setup {
     /// The engine settings this session is running.
     config: DeidConfig,
-    /// The chosen input device, or `None` for the default.
-    input: Option<String>,
+    /// Whether one microphone is open or a room of them.
+    who: Who,
     /// The chosen output device, or `None` for the default.
     output: Option<String>,
     /// Whether this is a preview: the veiled voice goes to this machine's own
     /// output and the chosen one is ignored. See [`Studio::start_session`].
     preview: bool,
+}
+
+/// The session the Studio has open, and there is at most one.
+///
+/// **Marker 147.** Two fields would be two things to clear, and a room left
+/// running beside a single session is two streams on one output with every
+/// guest's voice arriving twice. This is one field, so the invariant holds by
+/// construction rather than by every path remembering to clear the other.
+enum Running {
+    /// One person, through [`veilvoice_audio::LiveSession`].
+    One(veilvoice_audio::LiveSession),
+    /// A room, through [`veilvoice_audio::RoomSession`].
+    Room(veilvoice_audio::RoomSession),
+}
+
+/// One guest in a room: the name their take is filed under, and the microphone
+/// they speak into.
+///
+/// **Marker 147.** A room is a list of these. It is edited while nothing is
+/// running and read when a session starts.
+#[derive(Clone, Default)]
+pub struct RoomGuest {
+    /// What their take is called, and what their bars are labelled with. Blank
+    /// is allowed while it is being typed and becomes "guest 3" when it is
+    /// used: see [`RoomGuest::called`].
+    pub name: String,
+    /// The microphone they speak into, or `None` for this machine's default.
+    pub device: Option<String>,
+}
+
+impl RoomGuest {
+    /// What to call this guest in slot `slot`, filling in a blank name.
+    ///
+    /// A name is what tells four recordings apart afterwards, so an empty one
+    /// becomes the slot rather than an empty file name.
+    pub fn called(&self, slot: usize) -> String {
+        let typed = self.name.trim();
+        if typed.is_empty() {
+            format!("guest {}", slot + 1)
+        } else {
+            typed.to_string()
+        }
+    }
+}
+
+/// Which guests are sharing a microphone, and the sentence to say about it.
+///
+/// `None` means everybody has their own. Two guests on one device is refused,
+/// because one microphone carrying two people is one signal and nothing in this
+/// program can separate it again: veiling it would give both of them the same
+/// voice, which is the exact thing a room exists to avoid.
+///
+/// Two guests on the default device are the same case. `None` is a device, not
+/// an absence, and it took saying so to notice that a list of guests nobody had
+/// picked a microphone for was a room of one microphone opened several times.
+///
+/// Pure, and separate from starting, so it can be tested on a machine with no
+/// sound card: F-163 and F-165 are why nothing here opens a device to answer a
+/// question that does not need one.
+pub fn sharing_a_microphone(guests: &[RoomGuest]) -> Option<String> {
+    for (first, guest) in guests.iter().enumerate() {
+        for (second, other) in guests.iter().enumerate().skip(first + 1) {
+            if guest.device != other.device {
+                continue;
+            }
+            let where_it_is = match &guest.device {
+                Some(name) => format!("{name:?}"),
+                None => "this machine's default microphone".to_string(),
+            };
+            return Some(format!(
+                "{} and {} are both on {}. One microphone carrying two people is one \
+                 signal, and nothing here can separate it again: give them a device \
+                 each, or record them as one person.",
+                guest.called(first),
+                other.called(second),
+                where_it_is,
+            ));
+        }
+    }
+    None
+}
+
+/// Whose voice one recording of a take is.
+///
+/// **Marker 147.** A take used to be one recording, or two when the real voice
+/// was kept as well. A room take is the mix plus one or two per guest, which is
+/// up to seventeen recordings landing in one vault under one take name, and the
+/// only thing telling them apart is what they are called.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Whose<'a> {
+    /// The one person a single-microphone take recorded.
+    Only,
+    /// One guest of a room.
+    Guest(&'a str),
+    /// The mix: the one recording with the whole room in it.
+    Everybody,
+}
+
+/// What one recording of a take is called in the vault.
+///
+/// Pure, and the **one** place a take name is built. A take can now produce
+/// seventeen recordings, stored from three loops, and a suffix added in two of
+/// them would leave an entry that is somebody's real voice looking exactly like
+/// the veiled one beside it. Written once here, and a test reads this module to
+/// check the suffix appears nowhere else.
+pub fn take_name(take: &str, whose: Whose<'_>, veiled: bool) -> String {
+    let mut name = take.to_string();
+    match whose {
+        Whose::Only => {}
+        Whose::Guest(guest) => {
+            name.push_str(" - ");
+            name.push_str(guest);
+        }
+        // Named for what it holds rather than numbered, because in a Browser
+        // full of one take's recordings this is the one somebody wants first.
+        Whose::Everybody => name.push_str(" (everybody)"),
+    }
+    if !veiled {
+        // The one thing telling an unveiled recording from a veiled one in the
+        // Browser. Everything else about the two entries is identical.
+        name.push_str(" (unveiled)");
+    }
+    name
+}
+
+/// What is being kept for one guest while a room take runs.
+struct GuestTake {
+    /// The guest's name at the moment the take started.
+    ///
+    /// Copied rather than looked up when the take is stored, because the list
+    /// can be edited between takes and a recording is filed under the name it
+    /// was made with.
+    name: String,
+    /// Their veiled voice, when it is being kept.
+    veiled: Option<veilvoice_audio::record::Recorder>,
+    /// Their real voice, when it is being kept. Marker 131's warning applies
+    /// once per guest.
+    plain: Option<veilvoice_audio::record::Recorder>,
+}
+
+/// What a running session last reported about itself.
+///
+/// **Marker 147.** One microphone reports [`veilvoice_audio::LiveStats`] and a
+/// room reports [`veilvoice_audio::RoomStats`], which is a different shape
+/// because it has one entry per guest. The window matches on this rather than
+/// being handed a single-microphone reading a room would have to be flattened
+/// into, because flattening it is exactly what loses the per-guest bars the
+/// marker asked for.
+pub enum Reading {
+    /// One person.
+    One(veilvoice_audio::LiveStats),
+    /// A room.
+    Room(veilvoice_audio::RoomStats),
 }
 
 /// The Studio and the Browser.
@@ -172,8 +343,8 @@ pub struct Studio {
 
     // --- veiling, and recording ---
     /// The running session: the veiled voice going out, whether or not a take
-    /// is being kept from it.
-    session: Option<veilvoice_audio::LiveSession>,
+    /// is being kept from it. One microphone or a room, never both.
+    running: Option<Running>,
     /// What that session was started with, and `None` when none is running.
     setup: Option<Setup>,
     /// The last thing the platform said about either stream, and how many it
@@ -198,6 +369,29 @@ pub struct Studio {
     keep: Keep,
     /// The second recorder, when the real voice is being kept as well.
     plain: Option<veilvoice_audio::record::Recorder>,
+
+    // --- the room ---
+    /// **Marker 147.** Whether the form is set to a room rather than to one
+    /// microphone. Beside the guest list rather than in the window, because the
+    /// two are one answer and splitting them would let the window ask for a
+    /// room of nobody.
+    room_wanted: bool,
+    /// Who is in the room. Empty until the form is switched to a room, which
+    /// seeds it: a room of one person is one microphone, which is the other
+    /// half of this tab.
+    guests: Vec<RoomGuest>,
+    /// What is being kept per guest while a room take runs, in the order the
+    /// guests were given.
+    room_takes: Vec<GuestTake>,
+    /// The mix everybody in a room hears, when a take is keeping the veiled
+    /// side. The one recording that has the whole conversation in it.
+    mixed: Option<veilvoice_audio::record::Recorder>,
+    /// Smoothed bars, one pair per guest, sized when a room starts.
+    ///
+    /// Separate from [`Studio::levels`], which is the one pair the monitor
+    /// strip draws on every tab. Sharing them would mean a room drawn as one
+    /// bar, which is the reading that cannot say which microphone is dead.
+    guest_levels: Vec<crate::monitor::Levels>,
 
     // --- the browser ---
     /// Which take is selected, by identifier.
@@ -254,12 +448,73 @@ impl Studio {
     /// those as the same thing would refuse to close a window over a call
     /// nobody was recording.
     pub fn is_recording(&self) -> bool {
-        self.recorder.is_some() || self.plain.is_some()
+        self.recorder.is_some()
+            || self.plain.is_some()
+            || self.mixed.is_some()
+            || !self.room_takes.is_empty()
     }
 
     /// Whether the veiled voice is going out.
     pub fn is_veiling(&self) -> bool {
-        self.session.is_some()
+        self.running.is_some()
+    }
+
+    /// Whether what is running is a room rather than one microphone.
+    pub fn is_a_room(&self) -> bool {
+        matches!(self.running, Some(Running::Room(_)))
+    }
+
+    /// Whether the form is set to a room. **Marker 147.**
+    pub fn wants_a_room(&self) -> bool {
+        self.room_wanted
+    }
+
+    /// Switch the form between one microphone and a room.
+    ///
+    /// Switching to a room with nobody in it seeds two guests, because a room
+    /// of one is one microphone and this tab already has that. Switching away
+    /// keeps the list: somebody who ticked the box to look at it and untucked
+    /// it again has not asked for the names they typed to be thrown away.
+    pub fn want_a_room(&mut self, yes: bool) {
+        self.room_wanted = yes;
+        if yes && self.guests.is_empty() {
+            self.guests = vec![RoomGuest::default(), RoomGuest::default()];
+        }
+    }
+
+    /// Who is in the room, in the order they were added.
+    pub fn room_guests(&self) -> &[RoomGuest] {
+        &self.guests
+    }
+
+    /// One guest, to be edited by the controls that draw them.
+    pub fn room_guest_mut(&mut self, index: usize) -> Option<&mut RoomGuest> {
+        self.guests.get_mut(index)
+    }
+
+    /// Add a guest, up to [`veilvoice_audio::MAX_GUESTS`].
+    ///
+    /// The bound is the audio layer's and is checked here as well, so the
+    /// button stops adding rather than the session refusing afterwards.
+    pub fn add_guest(&mut self) {
+        if self.guests.len() < veilvoice_audio::MAX_GUESTS {
+            self.guests.push(RoomGuest::default());
+        }
+    }
+
+    /// Take a guest out of the room.
+    pub fn remove_guest(&mut self, index: usize) {
+        if index < self.guests.len() {
+            self.guests.remove(index);
+        }
+    }
+
+    /// The smoothed bars for the room, one pair per guest.
+    ///
+    /// Empty when what is running is one microphone, which is what
+    /// [`Studio::levels`] is for.
+    pub fn guest_levels(&self) -> &[crate::monitor::Levels] {
+        &self.guest_levels
     }
 
     /// Whether what is going out is a preview to this machine's own output
@@ -318,21 +573,62 @@ impl Studio {
     /// strip is drawn on every tab and this tab is drawn on one. Reading the
     /// session only while the Studio was on screen would freeze the strip the
     /// moment somebody navigated away, which is the exact moment it exists for.
-    pub fn tick(&mut self) -> Option<veilvoice_audio::LiveStats> {
-        let stats = self.session.as_ref()?.stats();
-        self.levels.update(stats.input_peak, stats.output_peak);
-        // **Marker 132.** The count is `Copy` and is read every frame; the
+    pub fn tick(&mut self) -> Option<Reading> {
+        let reading = match self.running.as_ref()? {
+            Running::One(session) => Reading::One(session.stats()),
+            Running::Room(room) => Reading::Room(room.stats()),
+        };
+
+        // The strip on every tab is one pair of bars, and a room has one pair
+        // per guest, so the strip gets the loudest microphone in the room and
+        // the mix. That answers "is anything arriving and is anything leaving",
+        // which is what the strip is for; which guest is silent is a question
+        // the per-guest bars answer and this one deliberately does not.
+        //
+        // Which numbers is decided here and the bars are moved on **once**,
+        // below. Two calls, one per arm, would be two readers of a counter that
+        // resets as it is read, and only one of them would run per frame, which
+        // is the kind of thing that is true until somebody adds a third arm.
+        let (input, output, interfered) = match &reading {
+            Reading::One(stats) => (stats.input_peak, stats.output_peak, stats.interfered),
+            Reading::Room(stats) => {
+                // Sized here rather than assumed: a room whose guest count
+                // changed would otherwise draw a guest's bar against somebody
+                // else's numbers for a frame.
+                if self.guest_levels.len() != stats.guests.len() {
+                    self.guest_levels = vec![crate::monitor::Levels::default(); stats.guests.len()];
+                }
+                for (levels, guest) in self.guest_levels.iter_mut().zip(&stats.guests) {
+                    levels.update(guest.input_peak, guest.output_peak);
+                }
+                let loudest = stats
+                    .guests
+                    .iter()
+                    .fold(0.0f32, |most, guest| most.max(guest.input_peak));
+                // The mix peak **before** clipping, which is what every other
+                // bar in this program shows and is the one that can say the
+                // room went past full scale.
+                (loudest, stats.mix_peak, stats.interfered)
+            }
+        };
+        self.levels.update(input, output);
+
+        // **Marker 132.** The count is a number and is read every frame; the
         // report itself holds a string and is asked for only when the count
         // has moved.
-        if stats.interfered > self.troubles_seen {
+        if interfered > self.troubles_seen {
             if self.is_recording() {
-                self.take_troubles += stats.interfered - self.troubles_seen;
+                self.take_troubles += interfered - self.troubles_seen;
             }
-            self.troubles_seen = stats.interfered;
-            self.trouble = self.session.as_ref().and_then(|s| s.interference());
+            self.troubles_seen = interfered;
+            self.trouble = match self.running.as_ref() {
+                Some(Running::One(session)) => session.interference(),
+                Some(Running::Room(room)) => room.interference(),
+                None => None,
+            };
             self.catch_a_fault();
         }
-        Some(stats)
+        Some(reading)
     }
 
     /// **Marker 145.** The Studio's own failsafe, and what it is for.
@@ -427,7 +723,22 @@ impl Studio {
     ) {
         let setup = Setup {
             config,
-            input: input.map(str::to_owned),
+            who: Who::One(input.map(str::to_owned)),
+            output: output.map(str::to_owned),
+            preview,
+        };
+        self.start_session(setup, veilvoice_audio::Keeping::default());
+    }
+
+    /// **Marker 147.** Start veiling a room, keeping nothing.
+    ///
+    /// One microphone per guest, each veiled into a voice of their own and the
+    /// results mixed into `output`. The guests are [`Studio::room_guests`]
+    /// rather than an argument, for the reason [`Who::Room`] gives.
+    pub fn start_room(&mut self, config: DeidConfig, output: Option<&str>, preview: bool) {
+        let setup = Setup {
+            config,
+            who: Who::Room,
             output: output.map(str::to_owned),
             preview,
         };
@@ -439,11 +750,12 @@ impl Studio {
         if self.is_recording() {
             self.finish_take();
         }
-        self.session = None;
+        self.running = None;
         self.setup = None;
         // The bars go back to nothing rather than freezing at the last peak,
         // which would read as a level still arriving.
         self.levels.clear();
+        self.guest_levels.clear();
     }
 
     /// Shut the vault and forget the key.
@@ -459,6 +771,8 @@ impl Studio {
         // choice somebody made before lunch deciding what is recorded after it.
         self.keep = Keep::default();
         self.plain = None;
+        self.mixed = None;
+        self.room_takes.clear();
         self.vault = None;
         self.entries.clear();
         self.selected = None;
@@ -633,16 +947,9 @@ impl Studio {
         // The running one goes first, and before the devices are opened rather
         // than after: a second stream on the same microphone would exist for as
         // long as the open took.
-        self.session = None;
+        self.running = None;
+        self.guest_levels.clear();
 
-        let input = match veilvoice_audio::devices::open(Direction::Input, setup.input.as_deref()) {
-            Ok(device) => device,
-            Err(error) => {
-                self.setup = None;
-                self.message = Some((error.to_string(), p::red()));
-                return;
-            }
-        };
         // A preview goes to this machine's own output and the chosen output is
         // deliberately ignored: a preview sent to the virtual cable would be
         // heard by whatever is listening on it, which is the one place somebody
@@ -662,12 +969,116 @@ impl Studio {
             }
         };
 
-        match veilvoice_audio::LiveSession::start_recording(&input, &output, setup.config, keeping)
-        {
-            Ok((session, kept)) => {
-                self.session = Some(session);
-                self.recorder = kept.veiled;
-                self.plain = kept.plain;
+        // Whichever kind this is, it ends as one session, one set of recorders
+        // and one `Kept`-shaped answer. The two arms differ in how many
+        // microphones they open and in nothing else, which is why the state
+        // they leave behind is set once, below both of them.
+        let started = match &setup.who {
+            Who::One(name) => {
+                let input = match veilvoice_audio::devices::open(Direction::Input, name.as_deref())
+                {
+                    Ok(device) => device,
+                    Err(error) => {
+                        self.setup = None;
+                        self.message = Some((error.to_string(), p::red()));
+                        return;
+                    }
+                };
+                veilvoice_audio::LiveSession::start_recording(
+                    &input,
+                    &output,
+                    setup.config,
+                    keeping,
+                )
+                .map(|(session, kept)| {
+                    (
+                        Running::One(session),
+                        kept.veiled,
+                        kept.plain,
+                        None,
+                        Vec::new(),
+                    )
+                })
+            }
+            Who::Room => {
+                // Refused here rather than by the audio layer, because the
+                // audio layer would open one device twice and succeed: it
+                // cannot tell that two of its `Guest`s are the same machine.
+                let list = self.guests.clone();
+                if let Some(said) = sharing_a_microphone(&list) {
+                    self.setup = None;
+                    self.message = Some((said, p::red()));
+                    return;
+                }
+
+                // Every microphone is opened before any `Guest` is built,
+                // because a `Guest` borrows its device and both have to outlive
+                // the call that starts the room.
+                let mut devices = Vec::with_capacity(list.len());
+                for (slot, guest) in list.iter().enumerate() {
+                    match veilvoice_audio::devices::open(Direction::Input, guest.device.as_deref())
+                    {
+                        Ok(device) => devices.push(device),
+                        Err(error) => {
+                            self.setup = None;
+                            // Named, because a room has several microphones and
+                            // "a device would not open" does not say which
+                            // person to go and look at.
+                            self.message =
+                                Some((format!("{}: {error}", guest.called(slot)), p::red()));
+                            return;
+                        }
+                    }
+                }
+
+                // A voice each, from the same table a group *render* hands out,
+                // in the same order. Two guests on one voice would be two
+                // people who cannot be told apart by ear, which is what opening
+                // a microphone each was for.
+                let guests: Vec<veilvoice_audio::Guest<'_>> = devices
+                    .iter()
+                    .enumerate()
+                    .map(|(slot, device)| {
+                        let mut config = setup.config;
+                        config.accent =
+                            veilvoice_core::voices::voice(slot).applied_to(config.accent);
+                        veilvoice_audio::Guest {
+                            device,
+                            config,
+                            keeping,
+                        }
+                    })
+                    .collect();
+
+                // The mix is kept when the veiled side is: it is the veiled
+                // recording of the whole conversation. Keeping only the
+                // microphones asks for everybody's real voice and for no mix,
+                // which is what it says.
+                veilvoice_audio::RoomSession::start(&guests, &output, keeping.veiled).map(
+                    |(session, kept)| {
+                        let takes = kept
+                            .guests
+                            .into_iter()
+                            .enumerate()
+                            .map(|(slot, one)| GuestTake {
+                                name: list[slot].called(slot),
+                                veiled: one.veiled,
+                                plain: one.plain,
+                            })
+                            .collect();
+                        (Running::Room(session), None, None, kept.mixed, takes)
+                    },
+                )
+            }
+        };
+
+        match started {
+            Ok((session, veiled, plain, mixed, takes)) => {
+                self.running = Some(session);
+                self.recorder = veiled;
+                self.plain = plain;
+                self.mixed = mixed;
+                self.room_takes = takes;
                 self.setup = Some(setup);
                 self.message = None;
                 // A new session reports on itself. The counter belongs to the
@@ -709,10 +1120,11 @@ impl Studio {
     fn finish_take(&mut self) {
         // The audio stops first. Sealing takes a noticeable moment, and samples
         // arriving during it would be dropped rather than kept.
-        self.session = None;
+        self.running = None;
         // The bars go back to nothing rather than freezing at the last peak,
         // which would read as a level still arriving.
         self.levels.clear();
+        self.guest_levels.clear();
 
         let name = if self.take_name.trim().is_empty() {
             "untitled".to_string()
@@ -724,14 +1136,25 @@ impl Studio {
         // sealing the first does not leave the second holding audio.
         let veiled = self.recorder.take();
         let plain = self.plain.take();
+        // **Marker 147.** A room's mix and its guests, taken before any of them
+        // is stored, for the reason the pair above is: a failure sealing the
+        // first must not leave the rest holding audio.
+        let mixed = self.mixed.take();
+        let room = std::mem::take(&mut self.room_takes);
 
         let mut said = Vec::new();
         let mut trouble = false;
         // The veiled take first, so that when both were kept the one in the
-        // message and the one selected in the Browser is the safe one.
-        for (recorder, suffix) in [(veiled, ""), (plain, " (unveiled)")] {
+        // message and the one selected in the Browser is the safe one. In a
+        // room the mix takes that place, and is named for what it holds: it is
+        // the only recording with the whole conversation in it.
+        for (recorder, whose, is_veiled) in [
+            (veiled, Whose::Only, true),
+            (plain, Whose::Only, false),
+            (mixed, Whose::Everybody, true),
+        ] {
             let Some(recorder) = recorder else { continue };
-            match self.store_take(recorder, &format!("{name}{suffix}")) {
+            match self.store_take(recorder, &take_name(&name, whose, is_veiled)) {
                 Ok(line) => said.push(line),
                 Err(line) => {
                     said.push(line);
@@ -739,10 +1162,26 @@ impl Studio {
                 }
             }
         }
+        // Then every guest, under their own name. Four people is four files
+        // somebody can tell apart afterwards, which is the whole reason each of
+        // them was given a microphone.
+        for guest in room {
+            for (recorder, is_veiled) in [(guest.veiled, true), (guest.plain, false)] {
+                let Some(recorder) = recorder else { continue };
+                let called = take_name(&name, Whose::Guest(&guest.name), is_veiled);
+                match self.store_take(recorder, &called) {
+                    Ok(line) => said.push(line),
+                    Err(line) => {
+                        said.push(line);
+                        trouble = true;
+                    }
+                }
+            }
+        }
 
         if said.is_empty() {
-            // Neither side was being kept, which `start_take` does not allow
-            // and which would otherwise end in silence.
+            // Nothing was being kept, which `start_take` does not allow and
+            // which would otherwise end in silence.
             return;
         }
 
@@ -1106,9 +1545,18 @@ impl Studio {
                     // The routing the person is already hearing is kept: a take
                     // started while previewing stays on the headphones rather
                     // than being moved onto the cable by the act of recording.
+                    // The same kind of session, and the same devices, that
+                    // are already running. A take that started a room because
+                    // the box above happened to be ticked would be this tab
+                    // opening three more microphones on its own.
+                    let who = match self.setup.as_ref() {
+                        Some(running) => running.who.clone(),
+                        None if self.room_wanted => Who::Room,
+                        None => Who::One(input.map(str::to_owned)),
+                    };
                     self.start_take(Setup {
                         config,
-                        input: input.map(str::to_owned),
+                        who,
                         output: output.map(str::to_owned),
                         preview: self.is_previewing(),
                     });
@@ -1127,9 +1575,23 @@ impl Studio {
                 // recorded.
                 let mut seconds = 0.0f32;
                 let mut dropped = 0u64;
-                for recorder in [self.recorder.as_mut(), self.plain.as_mut()]
-                    .into_iter()
-                    .flatten()
+                // **Marker 147.** A room take is the mix plus one or two
+                // recorders per guest, and every one of them is on the same
+                // rule: drained here or quietly short. Chained rather than
+                // repeated, because the loop is what makes that true and a
+                // second loop somewhere else is how one of them gets missed.
+                let room = self
+                    .room_takes
+                    .iter_mut()
+                    .flat_map(|take| [take.veiled.as_mut(), take.plain.as_mut()]);
+                for recorder in [
+                    self.recorder.as_mut(),
+                    self.plain.as_mut(),
+                    self.mixed.as_mut(),
+                ]
+                .into_iter()
+                .chain(room)
+                .flatten()
                 {
                     recorder.drain();
                     seconds = seconds.max(recorder.seconds());
