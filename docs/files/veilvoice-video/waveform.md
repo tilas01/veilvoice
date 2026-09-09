@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-video/src/waveform.rs`
 
-[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 259 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs)
+[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 298 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ worth looking at.
 
 ## What this file contains
 
-259 lines defining **4 functions** (4 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+298 lines defining **5 functions** (5 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -79,7 +79,8 @@ worth looking at.
 - `Envelope::len` (line 56) -- How many columns this envelope has.
 - `Envelope::is_empty` (line 61) -- Whether there are no columns at all.
 - `envelope` (line 72) -- Reduce samples to columns peak pairs.
-- `svg_path` (line 115) -- The envelope as an SVG path, filled, inside a box.
+- `level_at` (line 127) -- How loud the recording is at progress, from 0.0 to 1.0.
+- `svg_path` (line 154) -- The envelope as an SVG path, filled, inside a box.
 
 ## What calls what
 
@@ -104,13 +105,15 @@ flowchart TD
     n_len(["Envelope::len<br/>line 56"])
     n_is_empty(["Envelope::is_empty<br/>line 61"])
     n_envelope(["envelope<br/>line 72"])
-    n_svg_path(["svg_path<br/>line 115"])
+    n_level_at(["level_at<br/>line 127"])
+    n_svg_path(["svg_path<br/>line 154"])
     click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L56" "open the source"
     click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L61" "open the source"
     click n_envelope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L72" "open the source"
-    click n_svg_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L115" "open the source"
+    click n_level_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L127" "open the source"
+    click n_svg_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L154" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_len,n_is_empty,n_envelope,n_svg_path entry
+    class n_len,n_is_empty,n_envelope,n_level_at,n_svg_path entry
 ```
 
 </details>
@@ -123,7 +126,8 @@ flowchart TD
 | `Envelope::len` <sub>pub fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L56) | How many columns this envelope has. |
 | `Envelope::is_empty` <sub>pub fn</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L61) | Whether there are no columns at all. |
 | `envelope` <sub>pub fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L72) | Reduce samples to columns peak pairs. |
-| `svg_path` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L115) | The envelope as an SVG path, filled, inside a box. |
+| `level_at` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L127) | How loud the recording is at progress, from 0.0 to 1.0. |
+| `svg_path` <sub>pub fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L154) | The envelope as an SVG path, filled, inside a box. |
 
 ---
 

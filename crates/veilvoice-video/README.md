@@ -92,10 +92,10 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>149 lines"])
     n_ffmpeg["ffmpeg.rs<br/>562 lines"]
-    n_page["page.rs<br/>1440 lines"]
+    n_page["page.rs<br/>1610 lines"]
     n_palette["palette.rs<br/>747 lines"]
     n_size["size.rs<br/>732 lines"]
-    n_waveform["waveform.rs<br/>259 lines"]
+    n_waveform["waveform.rs<br/>298 lines"]
     n_ffmpeg --> n_size
     n_page --> n_palette
     n_page --> n_waveform
@@ -115,12 +115,12 @@ flowchart TD
 |---|---:|---|
 | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 562 | The video file, which needs a codec this project does not ship. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 149 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1440 | The picture: one still for a preview, and one page that plays. |
+| [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1610 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
-| [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 259 | The shape of the audio, reduced to something a page can draw. |
+| [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**2,673 functional lines of Rust** in this crate. A functional line is a line
+**2,798 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -185,6 +185,7 @@ counts blank lines and comments too. Both are produced by
 | `fn human_bytes` | [`size.rs`](../../docs/files/veilvoice-video/size.md) | A byte count, in the units a person reads. |
 | `struct Envelope` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | The peak envelope of a signal: one minimum and one maximum per column. |
 | `fn envelope` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | Reduce samples to columns peak pairs. |
+| `fn level_at` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | How loud the recording is at progress, from 0.0 to 1.0. |
 | `fn svg_path` | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | The envelope as an SVG path, filled, inside a box. |
 
 ## Reading it elsewhere
