@@ -293,6 +293,15 @@ is what lets other applications hear the veiled voice; if none is found you are
 warned rather than silently sent to the speakers. Levels, processing time per
 block, engine latency and a glitch counter are shown live.
 
+**The two devices have to be at the same sample rate.** VeilVoice does not
+resample a live stream, so it puts both on one rate: the rate they already
+share, the output's if the microphone will take it, or the microphone's if the
+output will. If neither will move it says so, naming both rates, rather than
+running them together: a microphone at 44.1 kHz feeding an output at 48 kHz
+gives a voice about a semitone and a half sharp, stuttering, and no way to tell
+that from the veiling working. Set both to the same rate in your system's sound
+settings, or choose devices that already agree.
+
 **Hear yourself first.** Beside **start veiling** there is **preview to my
 headphones**. It runs the same engine and sends the result to this machine's own
 output rather than to the cable, so you hear the veiled voice and nobody else

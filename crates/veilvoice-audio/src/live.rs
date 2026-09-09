@@ -204,6 +204,162 @@ impl Shared {
     }
 }
 
+/// Which sample rate a set of devices can all run at, if any.
+///
+/// **F-168.** Pure arithmetic over what the platform reported, so it is decided
+/// and tested without opening anything: F-163 and F-165 are why nothing here
+/// touches a device to answer a question that does not need one.
+///
+/// `inputs` is each microphone's default rate and the ranges it supports; the
+/// output's are given separately because its rate is preferred. It is what the
+/// person hears through and what anything listening on a virtual cable expects,
+/// so moving *it* to suit a microphone is the change more likely to surprise
+/// somebody.
+///
+/// The order is: the rate everything is already on, then the output's, then
+/// each microphone's in turn. `None` means no rate every device will accept,
+/// which is a thing to refuse rather than to work around, because nothing in
+/// this crate resamples.
+fn rate_they_agree_on(
+    output_default: u32,
+    output_ranges: &[(u32, u32)],
+    inputs: &[(u32, Vec<(u32, u32)>)],
+) -> Option<u32> {
+    fn covers(ranges: &[(u32, u32)], rate: u32) -> bool {
+        ranges
+            .iter()
+            .any(|(low, high)| *low <= rate && rate <= *high)
+    }
+    let everyone_takes = |rate: u32| {
+        covers(output_ranges, rate) && inputs.iter().all(|(_, ranges)| covers(ranges, rate))
+    };
+
+    // Already agreed. Asked first so that the ordinary case does not depend on
+    // a device reporting its ranges honestly, which not all of them do.
+    if inputs.iter().all(|(default, _)| *default == output_default) {
+        return Some(output_default);
+    }
+    if everyone_takes(output_default) {
+        return Some(output_default);
+    }
+    for (default, _) in inputs {
+        if everyone_takes(*default) {
+            return Some(*default);
+        }
+    }
+    None
+}
+
+/// The ranges a device reports, as plain numbers.
+fn input_ranges(device: &cpal::Device) -> Result<Vec<(u32, u32)>, Error> {
+    Ok(device
+        .supported_input_configs()
+        .map_err(|e| Error::Device(e.to_string()))?
+        .map(|range| (range.min_sample_rate().0, range.max_sample_rate().0))
+        .collect())
+}
+
+/// One of a device's configurations at `rate`, preferring `f32`.
+///
+/// The streams in this crate are built as `f32` whatever the reported format
+/// says, so a configuration in that format is the one to take. Anything else at
+/// the right rate is returned rather than nothing, so that cpal refuses with
+/// its own words about the format instead of this refusing with a sentence
+/// about the rate, which would be the wrong reason.
+fn at_rate(
+    ranges: impl Iterator<Item = cpal::SupportedStreamConfigRange>,
+    rate: u32,
+) -> Option<cpal::SupportedStreamConfig> {
+    let mut anything = None;
+    for range in ranges {
+        let Some(config) = range.try_with_sample_rate(cpal::SampleRate(rate)) else {
+            continue;
+        };
+        if config.sample_format() == cpal::SampleFormat::F32 {
+            return Some(config);
+        }
+        anything.get_or_insert(config);
+    }
+    anything
+}
+
+/// A microphone and an output, configured to one rate.
+///
+/// # F-168: nothing here resamples, and nothing used to check
+///
+/// The engine runs at one rate and the ring between the callbacks holds samples
+/// at one rate. A microphone delivering 44 100 samples a second into a ring
+/// emptied 48 000 times a second is a ring that starves for ever and a voice
+/// shifted up by nine per cent, stuttering.
+///
+/// That is what this did. The input stream was built from
+/// `default_input_config`, the engine and the ring from `default_output_config`,
+/// and the two rates were never compared. A laptop whose microphone defaults to
+/// 44.1 kHz and whose speakers default to 48 kHz is an ordinary machine, not a
+/// contrived one.
+fn agree_on_a_rate(
+    input: &cpal::Device,
+    output: &cpal::Device,
+) -> Result<(cpal::SupportedStreamConfig, cpal::SupportedStreamConfig), Error> {
+    let in_default = input
+        .default_input_config()
+        .map_err(|e| Error::Device(e.to_string()))?;
+    let out_default = output
+        .default_output_config()
+        .map_err(|e| Error::Device(e.to_string()))?;
+    if in_default.sample_rate() == out_default.sample_rate() {
+        return Ok((in_default, out_default));
+    }
+
+    let out_ranges: Vec<(u32, u32)> = output
+        .supported_output_configs()
+        .map_err(|e| Error::Device(e.to_string()))?
+        .map(|range| (range.min_sample_rate().0, range.max_sample_rate().0))
+        .collect();
+    let inputs = vec![(in_default.sample_rate().0, input_ranges(input)?)];
+
+    let Some(rate) = rate_they_agree_on(out_default.sample_rate().0, &out_ranges, &inputs) else {
+        return Err(Error::Device(format!(
+            "this microphone runs at {} Hz and this output at {} Hz, and neither will \
+             take the other's rate. VeilVoice does not resample, so it will not run \
+             them together and quietly shift the voice: set both to the same rate in \
+             your system's sound settings, or choose devices that already agree.",
+            in_default.sample_rate().0,
+            out_default.sample_rate().0
+        )));
+    };
+
+    let chosen_in = if in_default.sample_rate().0 == rate {
+        in_default
+    } else {
+        at_rate(
+            input
+                .supported_input_configs()
+                .map_err(|e| Error::Device(e.to_string()))?,
+            rate,
+        )
+        .ok_or_else(|| {
+            Error::Device(format!(
+                "this microphone would not open at {rate} Hz after all"
+            ))
+        })?
+    };
+    let chosen_out = if out_default.sample_rate().0 == rate {
+        out_default
+    } else {
+        at_rate(
+            output
+                .supported_output_configs()
+                .map_err(|e| Error::Device(e.to_string()))?,
+            rate,
+        )
+        .ok_or_else(|| {
+            Error::Device(format!("this output would not open at {rate} Hz after all"))
+        })?
+    };
+    Ok((chosen_in, chosen_out))
+}
+
 impl LiveSession {
     /// Start scrambling from `input` into `output`.
     ///
@@ -258,12 +414,10 @@ impl LiveSession {
         mut config: DeidConfig,
         keeping: Keeping,
     ) -> Result<(Self, Kept), Error> {
-        let in_cfg = input
-            .default_input_config()
-            .map_err(|e| Error::Device(e.to_string()))?;
-        let out_cfg = output
-            .default_output_config()
-            .map_err(|e| Error::Device(e.to_string()))?;
+        // **F-168.** One rate for both, or a refusal that says why. These used
+        // to be two independent `default_*_config` calls whose rates were never
+        // compared.
+        let (in_cfg, out_cfg) = agree_on_a_rate(input, output)?;
 
         let sample_rate = out_cfg.sample_rate().0;
         config.sample_rate = sample_rate as f32;
@@ -532,6 +686,85 @@ mod tests {
             2,
             "there are exactly two sinks and two places they are written. A \
              third write is a third copy of somebody's voice"
+        );
+    }
+
+    /// **F-168.** Two devices, one rate, or a refusal that says why.
+    ///
+    /// The decision, without a sound card: this is arithmetic over what the
+    /// platform reported, and the whole reason it is a separate function is
+    /// that a test can reach it. F-163 and F-165 are why nothing here opens a
+    /// device to answer a question that does not need one.
+    #[test]
+    fn devices_agree_on_a_rate_or_there_is_none_to_agree_on() {
+        // Already the same. Answered without consulting the ranges at all,
+        // because a device that under-reports what it supports is common and
+        // this case does not need the report.
+        assert_eq!(
+            rate_they_agree_on(48_000, &[], &[(48_000, vec![])]),
+            Some(48_000)
+        );
+
+        // The microphone defaults to 44.1 and will take 48. The output's rate
+        // wins, because that is what the person hears through and what anything
+        // on a virtual cable expects.
+        assert_eq!(
+            rate_they_agree_on(
+                48_000,
+                &[(48_000, 48_000)],
+                &[(44_100, vec![(44_100, 48_000)])]
+            ),
+            Some(48_000)
+        );
+
+        // The microphone will not move and the output will. Then the
+        // microphone's rate is the one, rather than a refusal.
+        assert_eq!(
+            rate_they_agree_on(
+                48_000,
+                &[(44_100, 48_000)],
+                &[(44_100, vec![(44_100, 44_100)])]
+            ),
+            Some(44_100)
+        );
+
+        // Neither will move. This is the case that has to be refused rather
+        // than worked around: running them together is a ring that starves for
+        // ever and a voice shifted up by nine per cent.
+        assert_eq!(
+            rate_they_agree_on(
+                48_000,
+                &[(48_000, 48_000)],
+                &[(44_100, vec![(44_100, 44_100)])]
+            ),
+            None
+        );
+
+        // Several microphones, which is what marker 147 opens. One rate has to
+        // suit every one of them and the output.
+        assert_eq!(
+            rate_they_agree_on(
+                48_000,
+                &[(44_100, 48_000)],
+                &[
+                    (44_100, vec![(44_100, 48_000)]),
+                    (48_000, vec![(48_000, 48_000)]),
+                ]
+            ),
+            Some(48_000)
+        );
+        assert_eq!(
+            rate_they_agree_on(
+                48_000,
+                &[(44_100, 48_000)],
+                &[
+                    (44_100, vec![(44_100, 44_100)]),
+                    (48_000, vec![(48_000, 48_000)]),
+                ],
+            ),
+            None,
+            "one microphone that will only do 44.1 and one that will only do 48 \
+             cannot be run together, and saying so is the answer"
         );
     }
 
