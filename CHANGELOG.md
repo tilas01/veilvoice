@@ -8,6 +8,38 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**A BSD reader was told to run a command their system does not have**
+
+- `veilvoice verify --script` writes a shell script that checks the signature
+  and the hashes with the reader's own GnuPG. It knew two systems, Linux and
+  macOS, and every mapping onto it ended in a catch-all meaning Linux, so a
+  reader on FreeBSD, OpenBSD or NetBSD was handed `sha256sum -c`.
+- The same release's *other* script, the one that reproduces the build, has
+  always given the BSDs `sha256 -c` and has a test forbidding `sha256sum`
+  there. Two scripts in one release, disagreeing about the reader's machine.
+- The cause was a copy: both modules answered the same question and one of them
+  was not kept current. The copy is gone. There is one public
+  `System::hash_check_command`, the verification script asks it, and the two
+  catch-all matches are now one exhaustive function that will not compile if a
+  system is added to one enumeration and not the other.
+- The guard is that no system's script may contain another system's hash
+  command, which fails on exactly the fall-through this was.
+
+**Checking a download, written up per system**
+
+- `veilvoice verify` on its own is the same command everywhere: it hashes and
+  checks the signature itself, and needs no GnuPG, no network and none of the
+  system's own tools. A BSD reader has nothing to translate, which is why the
+  guide now says so first.
+- The second opinion is where systems differ, and the guide carries a table of
+  which script each system gets and what it runs. The table is checked against
+  the program in the test suite, so a command in the documentation that the
+  program no longer prints fails a build.
+- Installing GnuPG on OpenBSD and NetBSD is the one thing left unsaid. This
+  project has not run those package managers and does not print commands it has
+  not run; FreeBSD's spelling is named because `install/install.sh` already
+  uses it.
+
 **Two bars per speaker, while a group render runs**
 
 - As the render walks the file, each person gets what went into the turn just

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gnupg/src/script.rs`
 
-[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 283 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs)
+[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 446 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs)
 
 ## Contents
 
@@ -44,16 +44,16 @@ fetched things would be a verification script with a network path in it.
 
 ## What this file contains
 
-283 lines defining **4 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+446 lines defining **5 functions** (2 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Flavour` (line 37) -- Which system the script is being written for.
+- `enum Flavour` (line 44) -- Which system the script is being written for.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Flavour::file_name` (line 64) -- The name a reader would give the file.
-- `shell` (line 73) -- The script, with the fingerprint compiled in from the one source of it.
+- `Flavour::file_name` (line 98) -- The name a reader would give the file.
+- `shell` (line 108) -- The script, with the fingerprint compiled in from the one source of it.
 
 ## What calls what
 
@@ -69,18 +69,21 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_hash_check["Flavour::hash_check<br/>line 46"]
-    n_install_hint["Flavour::install_hint<br/>line 54"]
-    n_file_name(["Flavour::file_name<br/>line 64"])
-    n_shell(["shell<br/>line 73"])
-    click n_hash_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L46" "open the source"
-    click n_install_hint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L54" "open the source"
-    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64" "open the source"
-    click n_shell href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L73" "open the source"
+    n_system["Flavour::system<br/>line 64"]
+    n_hash_check["Flavour::hash_check<br/>line 77"]
+    n_install_hint["Flavour::install_hint<br/>line 82"]
+    n_file_name(["Flavour::file_name<br/>line 98"])
+    n_shell(["shell<br/>line 108"])
+    n_hash_check --> n_system
+    click n_system href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64" "open the source"
+    click n_hash_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L77" "open the source"
+    click n_install_hint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L82" "open the source"
+    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L98" "open the source"
+    click n_shell href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L108" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_file_name,n_shell entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_hash_check,n_install_hint helper
+    class n_system,n_hash_check,n_install_hint helper
 ```
 
 </details>
@@ -89,8 +92,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Flavour` <sub>pub enum</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L37) | Which system the script is being written for. |
-| `Flavour::hash_check` <sub>fn</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L46) | The command that checks a file against SHA256SUMS. |
-| `Flavour::install_hint` <sub>fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L54) | What to type if GnuPG is not installed. |
-| `Flavour::file_name` <sub>pub fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64) | The name a reader would give the file. |
-| `shell` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L73) | The script, with the fingerprint compiled in from the one source of it. |
+| `Flavour` <sub>pub enum</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L44) | Which system the script is being written for. |
+| `Flavour::ALL` <sub>pub const</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L56) | Every one of them, so a caller writing all the scripts writes all of them rather than the ones it remembered. |
+| `Flavour::system` <sub>fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L64) | The same system, as the reproduce scripts name it. |
+| `Flavour::hash_check` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L77) | The command that checks a file against SHA256SUMS. |
+| `Flavour::install_hint` <sub>fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L82) | What to type if GnuPG is not installed. |
+| `Flavour::file_name` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L98) | The name a reader would give the file. |
+| `shell` <sub>pub fn</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs#L108) | The script, with the fingerprint compiled in from the one source of it. |
