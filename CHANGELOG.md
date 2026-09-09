@@ -8,7 +8,7 @@ than a summary written afterwards.
 
 ## Unreleased
 
-**Several microphones at once: the capture path** (marker 147, the first half)
+**Several microphones at once, veiled and metered each** (marker 147)
 
 - `veilvoice_audio::room` opens one input per guest, veils each with its own
   engine, seed and destination voice, and mixes the results into the one output
@@ -33,11 +33,33 @@ than a summary written afterwards.
   opens, which is the fix in this same release.
 - A recorder per guest, veiled or unveiled, and one for the mix. Marker 131's
   warning about the unveiled side applies once per guest.
-- **What is not here yet is the tab that drives it.** The guest list in the
-  Studio, the bars per guest and the takes stored per guest are the other half
-  of the marker, which is marked next rather than done. This is said here
-  because a capture path nothing calls is exactly the kind of thing that gets
-  shipped and forgotten.
+- **The Studio drives it.** Ticking "several microphones, a guest each" in the
+  Studio turns the input picker into a guest list: a name and a microphone per
+  person, up to eight. Starting it opens all of them, and each guest is veiled
+  into a voice of their own, from the same table a group render hands out and in
+  the same order.
+- **Two bars per guest**, what went into their microphone and what their engine
+  produced from it, with the mix under them and the load beside them. A room
+  drawn as one pair of bars cannot say which microphone is dead, which is the
+  reading somebody actually needs. The load is said as a percentage of the block
+  every engine shares, and past 80 per cent it says what to do about it.
+- **A take stores every guest separately, beside the mix.** One name, and the
+  recordings under it are the mix, called "(everybody)", and one or two per guest
+  called after them. The choice of which side to keep is the one the single
+  microphone already has and applies to every guest at once, so an unveiled room
+  is eight recordings of eight real voices and says so before it starts.
+- **The Studio holds one session or the other and never both**, as one field
+  rather than two: two of them would be two streams on one output with every
+  guest's voice arriving twice, and a field that has to be remembered is a field
+  that gets forgotten.
+- **Two guests on one microphone is refused by name before anything opens.** One
+  microphone carrying two people is one signal, so veiling it would give both of
+  them the same voice, which is what a microphone each was for. Two guests on
+  the *default* device are the same refusal: `None` is a device, not an absence.
+- Every recording of a take is named in one function, checked by a test that
+  reads this module. A take now produces up to seventeen recordings from three
+  loops, and a suffix added in two of them would leave an entry that is
+  somebody's real voice looking exactly like the veiled one beside it.
 
 **A microphone and an output that never compared their rates**
 

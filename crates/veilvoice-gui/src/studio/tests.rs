@@ -625,13 +625,76 @@ fn every_choice_is_labelled_and_they_are_all_different() {
 
 #[test]
 fn the_unveiled_take_is_named_so_it_can_be_told_from_the_other() {
-    // Both sides land in one vault under one name, and the only thing telling
-    // them apart in the Browser is the name. A suffix that stopped being added
-    // would leave two identical entries, one of which is somebody's real voice.
+    // Every recording of one take lands in one vault under one take name, and
+    // the only thing telling them apart in the Browser is what they are called.
+    // A suffix that stopped being added would leave two identical entries, one
+    // of which is somebody's real voice.
+    assert_eq!(take_name("chat", Whose::Only, true), "chat");
+    assert_eq!(take_name("chat", Whose::Only, false), "chat (unveiled)");
+
+    // **Marker 147.** A room take is the mix and one or two per guest, so the
+    // names have to separate the guests from each other as well as the two
+    // sides of each of them.
+    assert_eq!(
+        take_name("chat", Whose::Everybody, true),
+        "chat (everybody)"
+    );
+    assert_eq!(take_name("chat", Whose::Guest("ana"), true), "chat - ana");
+    assert_eq!(
+        take_name("chat", Whose::Guest("ana"), false),
+        "chat - ana (unveiled)"
+    );
+
+    // Nothing collides. A room of eight, both sides kept, is seventeen entries
+    // in one vault, and two of them sharing a name would be two recordings a
+    // person could not tell apart, one of which is a real voice.
+    let mut names = vec![
+        take_name("chat", Whose::Everybody, true),
+        take_name("chat", Whose::Everybody, false),
+    ];
+    for slot in 0..veilvoice_audio::MAX_GUESTS {
+        let guest = RoomGuest::default().called(slot);
+        names.push(take_name("chat", Whose::Guest(&guest), true));
+        names.push(take_name("chat", Whose::Guest(&guest), false));
+    }
+    let mut sorted = names.clone();
+    sorted.sort();
+    sorted.dedup();
+    assert_eq!(
+        sorted.len(),
+        names.len(),
+        "two recordings of one take share a name: {names:?}"
+    );
+}
+
+/// The suffix is written in one place, so it cannot be dropped from one loop.
+///
+/// A take is stored from three loops now: the single microphone's two sides,
+/// the mix, and every guest's two sides. Building the name in each of them
+/// worked until the third was added, which is exactly when it would have
+/// stopped working quietly.
+#[test]
+fn only_one_function_in_this_module_names_a_take() {
     let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
-    assert!(
-        source.contains(r#"(veiled, ""), (plain, " (unveiled)")"#),
-        "the unveiled take is no longer named differently from the veiled one"
+    // The prose above `take_name` uses the word, so the search is over code.
+    let code: String = source
+        .lines()
+        .filter(|line| !line.trim_start().starts_with("//"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let at = code
+        .find("pub fn take_name(")
+        .expect("the one place a take is named");
+    let end = code[at..]
+        .find("\n}\n")
+        .map(|offset| at + offset)
+        .expect("its end");
+    let elsewhere = code[..at].matches(r#"" (unveiled)""#).count()
+        + code[end..].matches(r#"" (unveiled)""#).count();
+    assert_eq!(
+        elsewhere, 0,
+        "a take name is built somewhere other than `take_name`, so the suffix \
+         that tells a real voice from a veiled one can be dropped from one of them"
     );
 }
 
@@ -646,12 +709,42 @@ fn every_recorder_that_is_running_is_drained_every_frame() {
     let at = source
         .find("Phase::Recording => {")
         .expect("the recording panel exists");
-    let body = &source[at..];
-    assert!(
-        body.contains("[self.recorder.as_mut(), self.plain.as_mut()]"),
-        "the recording panel no longer drains both recorders, so a second take \
-         would be short and its clock would sit at zero"
-    );
+    // Whitespace removed before the search, because `rustfmt` decides where a
+    // chained expression breaks and a guard that fails when it chooses
+    // differently is a guard about layout rather than about draining. This one
+    // cost a green run to learn.
+    let body: String = source[at..]
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .collect();
+    // The **field**, not the call on it. What has to be true is that every
+    // recorder a take can be holding is reached from this panel; how the
+    // iterator over them is spelled is not this test's business, and a guard
+    // that named the call would fail on a rename that changed nothing.
+    for (needle, cost) in [
+        (
+            "self.recorder",
+            "the veiled take would be short and its clock would sit at zero",
+        ),
+        ("self.plain", "an unveiled take would be quietly short"),
+        // **Marker 147.** A room take is the mix and one or two per guest, on
+        // the same rule, drained by the same loop: a second loop somewhere
+        // else is how one of them gets missed.
+        (
+            "self.mixed",
+            "the mix, the one recording with the whole room in it, would be short",
+        ),
+        (
+            "self.room_takes",
+            "every guest's own take would be quietly short",
+        ),
+    ] {
+        let wanted: String = needle.chars().filter(|c| !c.is_whitespace()).collect();
+        assert!(
+            body.contains(&wanted),
+            "the recording panel no longer drains `{needle}`, so {cost}"
+        );
+    }
 }
 
 /// **Marker 145.** The Studio's own failsafe stops the Studio, not the take.
@@ -666,7 +759,7 @@ fn a_device_that_goes_stops_the_studio_and_says_why() {
     let mut studio = Studio {
         setup: Some(Setup {
             config: DeidConfig::default(),
-            input: Some("a microphone".to_string()),
+            who: Who::One(Some("a microphone".to_string())),
             output: None,
             preview: false,
         }),
@@ -703,7 +796,7 @@ fn a_report_that_is_not_a_missing_device_does_not_stop_anything() {
     let mut studio = Studio {
         setup: Some(Setup {
             config: DeidConfig::default(),
-            input: None,
+            who: Who::One(None),
             output: None,
             preview: false,
         }),
@@ -789,5 +882,166 @@ fn a_running_take_says_which_voice_it_is_keeping() {
         panel.contains("self.keep.wants_plain()"),
         "the panel says what is being kept without distinguishing the one that \
          keeps a real voice, which is the only one worth a colour"
+    );
+}
+
+/// **Marker 147.** Two guests on one microphone is refused, and says why.
+///
+/// One microphone carrying two people is one signal. Veiling it gives both of
+/// them the same voice, which is the exact thing a microphone each was for, and
+/// nothing downstream can separate it again.
+#[test]
+fn two_guests_on_one_microphone_are_refused_by_name() {
+    let both = vec![
+        RoomGuest {
+            name: "ana".into(),
+            device: Some("USB mic".into()),
+        },
+        RoomGuest {
+            name: "bo".into(),
+            device: Some("USB mic".into()),
+        },
+    ];
+    let said = sharing_a_microphone(&both).expect("two guests on one device is refused");
+    assert!(said.contains("ana") && said.contains("bo"), "{said:?}");
+    assert!(said.contains("USB mic"), "{said:?}");
+
+    // A device each is the ordinary case and is not refused.
+    let apart = vec![
+        RoomGuest {
+            name: "ana".into(),
+            device: Some("USB mic".into()),
+        },
+        RoomGuest {
+            name: "bo".into(),
+            device: Some("headset".into()),
+        },
+    ];
+    assert!(sharing_a_microphone(&apart).is_none());
+}
+
+/// The default microphone is a device, not an absence.
+///
+/// A list of guests nobody had chosen a microphone for is one microphone opened
+/// several times, which is the case above wearing a different name. It took
+/// saying so to notice it.
+#[test]
+fn two_guests_on_the_default_microphone_are_the_same_refusal() {
+    let neither = vec![RoomGuest::default(), RoomGuest::default()];
+    let said = sharing_a_microphone(&neither).expect("two defaults are one device");
+    assert!(
+        said.contains("default"),
+        "the refusal does not say which device: {said:?}"
+    );
+    // Named by slot, because nobody has typed a name yet and "and are both on"
+    // would be the sentence otherwise.
+    assert!(
+        said.contains("guest 1") && said.contains("guest 2"),
+        "{said:?}"
+    );
+}
+
+/// A blank name becomes the slot rather than an empty file name.
+#[test]
+fn a_guest_with_no_name_is_called_by_their_slot() {
+    assert_eq!(RoomGuest::default().called(2), "guest 3");
+    assert_eq!(
+        RoomGuest {
+            name: "  ana  ".into(),
+            device: None,
+        }
+        .called(0),
+        "ana"
+    );
+}
+
+/// The room form seeds two guests, and never more than the audio layer opens.
+///
+/// A room of one is one microphone, which is the other half of this tab, so
+/// ticking the box for a room and being given a room of one would be a control
+/// that did nothing. The upper bound is the audio layer's and is checked here
+/// as well, so the button stops adding rather than the session refusing after
+/// somebody has set eleven of them up.
+#[test]
+fn a_room_starts_with_two_and_stops_at_the_audio_layers_limit() {
+    let mut studio = Studio::default();
+    assert!(!studio.wants_a_room());
+    assert!(studio.room_guests().is_empty());
+
+    studio.want_a_room(true);
+    assert!(studio.wants_a_room());
+    assert_eq!(studio.room_guests().len(), 2);
+
+    for _ in 0..veilvoice_audio::MAX_GUESTS + 4 {
+        studio.add_guest();
+    }
+    assert_eq!(
+        studio.room_guests().len(),
+        veilvoice_audio::MAX_GUESTS,
+        "the room grew past what the audio layer will open"
+    );
+
+    // Unticking keeps the list: somebody who looked at the form and changed
+    // their mind has not asked for the names they typed to be thrown away.
+    studio.want_a_room(false);
+    assert_eq!(studio.room_guests().len(), veilvoice_audio::MAX_GUESTS);
+}
+
+/// **Marker 147.** One session or the other, and never both.
+///
+/// Two fields would be two things to clear, and a room left running beside a
+/// single session is two streams on one output with every guest arriving twice.
+/// This reads the source, because observing it otherwise needs several sound
+/// cards: what it checks is that the state is one field rather than two.
+#[test]
+fn the_studio_cannot_hold_a_room_and_a_single_session_at_once() {
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    let code = &source[..source.find("\n#[cfg(test)]").unwrap_or(source.len())];
+    assert!(
+        code.contains("running: Option<Running>"),
+        "the session is no longer held as one field"
+    );
+    for gone in [
+        "session: Option<veilvoice_audio::LiveSession>",
+        "room: Option<veilvoice_audio::RoomSession>",
+    ] {
+        assert!(
+            !code.contains(gone),
+            "the Studio holds `{gone}` beside the other, so both can run at once"
+        );
+    }
+}
+
+/// Every guest gets a different voice, from the table a group render uses.
+///
+/// Two guests given the same configuration get the same voice, which defeats
+/// the point of opening a microphone each: a listener could no longer follow
+/// who is speaking, which is the whole reason a room is not one microphone.
+#[test]
+fn a_room_gives_every_guest_a_voice_of_their_own() {
+    let config = DeidConfig::default();
+    let mut targets = Vec::new();
+    for slot in 0..veilvoice_audio::MAX_GUESTS {
+        let accent = veilvoice_core::voices::voice(slot).applied_to(config.accent);
+        targets.push(format!(
+            "{:.3}/{:.3}/{:.3}",
+            accent.target_f0_hz, accent.target_centroid_hz, accent.target_tilt_db_oct
+        ));
+    }
+    let mut sorted = targets.clone();
+    sorted.sort();
+    sorted.dedup();
+    assert_eq!(
+        sorted.len(),
+        targets.len(),
+        "two guests in a full room are veiled onto the same voice: {targets:?}"
+    );
+
+    // And the Studio is what hands them out, rather than the audio crate,
+    // which is why the audio crate says it does not choose voices.
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    assert!(
+        source.contains("veilvoice_core::voices::voice(slot).applied_to(config.accent)"),
+        "the room no longer gives its guests a voice each"
     );
 }

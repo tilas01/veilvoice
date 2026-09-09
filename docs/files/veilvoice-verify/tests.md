@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 1356 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 1373 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -47,7 +47,7 @@ whether it says no.
 
 ## What this file contains
 
-1356 lines defining **33 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1373 lines defining **33 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -159,7 +159,7 @@ flowchart TD
 | `no_desktop_test_opens_a_device_a_dialog_or_a_window` <sub>fn</sub> | [929](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L929) | No test in the desktop crate may open a device, a dialog or a window. |
 | `only_the_session_builds_a_recorder` <sub>fn</sub> | [1053](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1053) | F-166. |
 | `the_desktop_starts_a_live_session_in_exactly_one_place` <sub>fn</sub> | [1127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1127) | Marker 130. |
-| `no_audio_callback_allocates_or_blocks` <sub>fn</sub> | [1218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1218) | Marker 126. |
+| `no_audio_callback_allocates_or_blocks` <sub>fn</sub> | [1235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1235) | Marker 126. |
 
 ---
 
