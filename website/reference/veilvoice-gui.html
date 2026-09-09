@@ -120,6 +120,7 @@
 <path d="M90.4 374.0 C 90.4 394.0, 98.4 700.0, 98.4 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M90.4 374.0 C 90.4 394.0, 502.2 700.0, 502.2 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M90.4 374.0 C 90.4 394.0, 237.1 800.0, 237.1 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M90.4 374.0 C 90.4 394.0, 375.7 800.0, 375.7 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M90.4 374.0 C 90.4 394.0, 304.4 1000.0, 304.4 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M426.0 347.0 C 602.7 347.0, 602.7 247.0, 583.7 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M371.7 374.0 C 371.7 394.0, 237.1 800.0, 237.1 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -218,7 +219,7 @@
 <a href="veilvoice-gui/firstrun.src.html">
 <rect x="32.0" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="90.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">firstrun.rs</text>
-<text x="90.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">490 lines</text>
+<text x="90.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">689 lines</text>
 </a>
 <a href="veilvoice-gui/graphics.src.html">
 <rect x="174.7" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -357,7 +358,7 @@ flowchart TD
     n_crashreport[&quot;crashreport.rs&lt;br/&gt;289 lines&quot;]
     n_decoys[&quot;decoys.rs&lt;br/&gt;216 lines&quot;]
     n_dialog[&quot;dialog.rs&lt;br/&gt;425 lines&quot;]
-    n_firstrun[&quot;firstrun.rs&lt;br/&gt;490 lines&quot;]
+    n_firstrun[&quot;firstrun.rs&lt;br/&gt;689 lines&quot;]
     n_graphics[&quot;graphics.rs&lt;br/&gt;206 lines&quot;]
     n_group[&quot;group.rs&lt;br/&gt;1745 lines&quot;]
     n_integrity[&quot;integrity.rs&lt;br/&gt;386 lines&quot;]
@@ -417,6 +418,7 @@ flowchart TD
     n_firstrun --&gt; n_layout
     n_firstrun --&gt; n_security
     n_firstrun --&gt; n_settings
+    n_firstrun --&gt; n_studio
     n_firstrun --&gt; n_theme
     n_group --&gt; n_dialog
     n_group --&gt; n_settings
@@ -514,7 +516,7 @@ flowchart TD
 <tr><td><a href="veilvoice-gui/crashreport.html"><code>crashreport.rs</code></a></td><td>289</td><td>Offering the report from the last crash, on the run after it.</td></tr>
 <tr><td><a href="veilvoice-gui/decoys.html"><code>decoys.rs</code></a></td><td>216</td><td>Decoy vaults: how many there is room for, and the panel that offers them.</td></tr>
 <tr><td><a href="veilvoice-gui/dialog.html"><code>dialog.rs</code></a></td><td>425</td><td>Asking for a file without stopping the window.</td></tr>
-<tr><td><a href="veilvoice-gui/firstrun.html"><code>firstrun.rs</code></a></td><td>490</td><td>The first run: the four things worth deciding before anything else.</td></tr>
+<tr><td><a href="veilvoice-gui/firstrun.html"><code>firstrun.rs</code></a></td><td>689</td><td>The first run: the four things worth deciding before anything else.</td></tr>
 <tr><td><a href="veilvoice-gui/graphics.html"><code>graphics.rs</code></a></td><td>206</td><td>What the window is drawn with, asked for explicitly and then reported.</td></tr>
 <tr><td><a href="veilvoice-gui/group.html"><code>group.rs</code></a></td><td>1745</td><td>Group mode: several people in one recording, each with a name and a colour.</td></tr>
 <tr><td><a href="veilvoice-gui/integrity.html"><code>integrity.rs</code></a></td><td>386</td><td>The integrity record, taken and checked by the window rather than by hand.</td></tr>

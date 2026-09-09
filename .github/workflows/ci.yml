@@ -65,23 +65,6 @@ jobs:
       - name: Tests
         run: cargo test --workspace --locked
 
-      # The desktop crate's test binary has been dying on Windows with
-      # STATUS_ACCESS_VIOLATION *after* every test it printed had passed, which
-      # names nothing: the harness runs them in parallel, so the last line in
-      # the log is whatever finished last rather than whatever crashed.
-      #
-      # Run again on one thread, on Windows only, and only when the parallel
-      # run has already failed. The serial run stops at the test that kills the
-      # process, so the log names it; and if the serial run passes, that is
-      # itself the answer, because it means the fault is a race between two
-      # tests rather than anything one of them does.
-      #
-      # This step is here to identify a live defect and comes out when it is
-      # understood. It costs nothing on a green build, because it does not run.
-      - name: Name the test that killed the process, if one did
-        if: failure() && runner.os == 'Windows'
-        run: cargo test -p veilvoice-gui --locked -- --test-threads=1
-
       - name: Release build
         run: cargo build --workspace --release --locked
 
