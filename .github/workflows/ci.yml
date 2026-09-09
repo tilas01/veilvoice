@@ -293,6 +293,13 @@ jobs:
       - name: Every dependency must say what it is for
         run: python tools/audit/dependencies.py
 
+      # And the other half of the question. Saying what a dependency is for
+      # does not make anything watch it: a crate outside the workspace, or a
+      # second workflow directory, falls outside every Dependabot entry and
+      # stops being monitored without anything saying so.
+      - name: Every manifest must be covered by a Dependabot entry
+        run: python tools/audit/dependabot.py
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a

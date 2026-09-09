@@ -318,6 +318,19 @@ It cannot tell whether a dependency is *used*, which is `cargo udeps` and needs
 nightly. What it can do is force somebody to answer the question that made
 these three obvious.
 
+A second question was not being asked at all, and is now. Saying what a
+dependency is for does not make anything *watch* it, and until this pass
+nothing did: there was no `.github/dependabot.yml`, so no version update and no
+alert had ever been raised against this tree. There is one now, covering the
+workspace, `fuzz/` (which is outside the workspace and would otherwise have
+been missed by an entry on the root) and the actions the workflows run.
+
+The configuration is checked rather than remembered.
+`tools/audit/dependabot.py` reads it against the tree and fails on either
+direction: a manifest no entry covers, or an entry naming a directory that has
+gone. The first is the one that matters, because a manifest nothing watches is
+worse than a dependency with a known problem: there is no one looking at it.
+
 ### The comments said no callback allocates, and nothing checked
 
 The three audio callbacks in this tree each carry a comment saying its buffers
