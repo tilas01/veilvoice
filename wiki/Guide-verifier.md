@@ -251,6 +251,46 @@ veilvoice verify --script       # a shell script that uses gpg and nothing of ou
 The script is about sixty lines. Read it before running it: the entire reason
 to use it rather than `veilvoice verify` is that it is not this project's code.
 
+#### The same check on every system
+
+`veilvoice verify` on its own is the same command everywhere. It hashes the
+files itself, checks the signature itself, needs **no GnuPG, no network and no
+hash tool from your system**, and that is why it is the first thing this section
+offers rather than the last. A reader on FreeBSD, OpenBSD or NetBSD has nothing
+to translate.
+
+The second opinion is where systems differ, because it runs *your* tools rather
+than ours, and the hash tool is spelled differently on each. Ask for the one
+your system has:
+
+```bash
+veilvoice verify --script                  # the one for the machine you are on
+veilvoice verify --script --system bsd     # or name it: linux, macos, bsd
+```
+
+| Your system | The script it writes | What that script runs to check the hashes |
+|---|---|---|
+| Linux, and WSL | `verify-veilvoice.sh` | `sha256sum -c SHA256SUMS --ignore-missing` |
+| macOS | `verify-veilvoice-macos.sh` | `shasum -a 256 -c SHA256SUMS --ignore-missing` |
+| FreeBSD, OpenBSD, NetBSD | `verify-veilvoice-bsd.sh` | `sha256 -c SHA256SUMS` |
+
+Those three rows are checked against the program in this project's own test
+suite, so a command here that the program no longer prints fails a build rather
+than being read by somebody.
+
+**Installing GnuPG on a BSD**: `sudo pkg install -y gnupg` is FreeBSD's
+spelling, and OpenBSD and NetBSD use tools of their own. This project has not
+run those, so it does not print them: use your system's package manager. If you
+would rather not install anything, `veilvoice verify` with no arguments is the
+route that needs nothing, and the website's checker is the other one.
+
+**The website's checker** hashes the file in your browser, with JavaScript, and
+uploads nothing. It is the same arithmetic on every system, so a BSD reader with
+a browser has a third route that needs no terminal at all.
+
+The reproduce script is per system in the same way, and `veilvoice verify
+--build-script --system bsd` writes `reproduce-veilvoice-bsd.sh`.
+
 ### The strongest check, which no program here can do for you
 
 Rebuild the release from source and compare:

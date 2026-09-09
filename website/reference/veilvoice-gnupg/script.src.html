@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gnupg/src/script.rs</code></h1>
-<p style="color:var(--muted)"><a href="script.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 283 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="script.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 446 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -83,265 +83,432 @@
 <span class="ln" id="L31"><span class="tok-com">/// Which system the script is being written for.</span></span>
 <span class="ln" id="L32"><span class="tok-com">///</span></span>
 <span class="ln" id="L33"><span class="tok-com">/// The only real difference is how the hashes are checked: coreutils calls it</span></span>
-<span class="ln" id="L34"><span class="tok-com">/// `sha256sum`, macOS ships `shasum`. WSL is Linux, and is listed separately</span></span>
-<span class="ln" id="L35"><span class="tok-com">/// only because saying so is what a Windows reader needs to hear.</span></span>
-<span class="ln" id="L36"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
-<span class="ln" id="L37"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Flavour {</span>
-<span class="ln" id="L38">    <span class="tok-com">/// Linux, and WSL, which is Linux.</span></span>
-<span class="ln" id="L39">    Linux,</span>
-<span class="ln" id="L40">    <span class="tok-com">/// macOS, where the hash tool has a different name.</span></span>
-<span class="ln" id="L41">    MacOs,</span>
-<span class="ln" id="L42">}</span>
-</span>
-<span class="ln" id="L43"></span>
-<span class="ln" id="L44"><span class="tok-kw">impl</span> Flavour {</span>
-<span class="src-item" id="fn-flavour-hash_check">
-<span class="ln" id="L45">    <span class="tok-com">/// The command that checks a file against `SHA256SUMS`.</span></span>
-<span class="ln" id="L46">    <span class="tok-kw">fn</span> <span class="tok-fn">hash_check</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
-<span class="ln" id="L47">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L48">            Flavour::Linux =&gt; <span class="tok-str">&quot;sha256sum -c SHA256SUMS --ignore-missing&quot;</span>,</span>
-<span class="ln" id="L49">            Flavour::MacOs =&gt; <span class="tok-str">&quot;shasum -a 256 -c SHA256SUMS --ignore-missing&quot;</span>,</span>
-<span class="ln" id="L50">        }</span>
-<span class="ln" id="L51">    }</span>
+<span class="ln" id="L34"><span class="tok-com">/// `sha256sum`, macOS ships `shasum`, and the BSDs ship `sha256`. WSL is Linux,</span></span>
+<span class="ln" id="L35"><span class="tok-com">/// and is listed separately only because saying so is what a Windows reader</span></span>
+<span class="ln" id="L36"><span class="tok-com">/// needs to hear.</span></span>
+<span class="ln" id="L37"><span class="tok-com">///</span></span>
+<span class="ln" id="L38"><span class="tok-com">/// **The BSDs were missing and fell through to Linux**, which is F-167: this</span></span>
+<span class="ln" id="L39"><span class="tok-com">/// script told a reader on FreeBSD, OpenBSD or NetBSD to run a command that</span></span>
+<span class="ln" id="L40"><span class="tok-com">/// `veilvoice-check`&#x27;s reproduce script, in the same release, says they do not</span></span>
+<span class="ln" id="L41"><span class="tok-com">/// have. The command now comes from that module rather than from a second copy</span></span>
+<span class="ln" id="L42"><span class="tok-com">/// here, so the two cannot disagree again.</span></span>
+<span class="ln" id="L43"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
+<span class="ln" id="L44"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Flavour {</span>
+<span class="ln" id="L45">    <span class="tok-com">/// Linux, and WSL, which is Linux.</span></span>
+<span class="ln" id="L46">    Linux,</span>
+<span class="ln" id="L47">    <span class="tok-com">/// macOS, where the hash tool has a different name.</span></span>
+<span class="ln" id="L48">    MacOs,</span>
+<span class="ln" id="L49">    <span class="tok-com">/// FreeBSD, OpenBSD and NetBSD, which have a different one again.</span></span>
+<span class="ln" id="L50">    Bsd,</span>
+<span class="ln" id="L51">}</span>
 </span>
 <span class="ln" id="L52"></span>
-<span class="src-item" id="fn-flavour-install_hint">
-<span class="ln" id="L53">    <span class="tok-com">/// What to type if GnuPG is not installed.</span></span>
-<span class="ln" id="L54">    <span class="tok-kw">fn</span> <span class="tok-fn">install_hint</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
-<span class="ln" id="L55">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L56">            Flavour::Linux =&gt; {</span>
-<span class="ln" id="L57">                <span class="tok-str">&quot;sudo apt-get install -y gnupg   (or your package manager&#x27;s equivalent)&quot;</span></span>
-<span class="ln" id="L58">            }</span>
-<span class="ln" id="L59">            Flavour::MacOs =&gt; <span class="tok-str">&quot;brew install gnupg&quot;</span>,</span>
-<span class="ln" id="L60">        }</span>
-<span class="ln" id="L61">    }</span>
+<span class="ln" id="L53"><span class="tok-kw">impl</span> Flavour {</span>
+<span class="src-item" id="fn-flavour-all">
+<span class="ln" id="L54">    <span class="tok-com">/// Every one of them, so a caller writing all the scripts writes all of</span></span>
+<span class="ln" id="L55">    <span class="tok-com">/// them rather than the ones it remembered.</span></span>
+<span class="ln" id="L56">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;&#x27;<span class="tok-kw">static</span> [Flavour] = &amp;[Flavour::Linux, Flavour::MacOs, Flavour::Bsd];</span>
 </span>
-<span class="ln" id="L62"></span>
-<span class="src-item" id="fn-flavour-file_name">
-<span class="ln" id="L63">    <span class="tok-com">/// The name a reader would give the file.</span></span>
-<span class="ln" id="L64">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">file_name</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L57"></span>
+<span class="src-item" id="fn-flavour-system">
+<span class="ln" id="L58">    <span class="tok-com">/// The same system, as the reproduce scripts name it.</span></span>
+<span class="ln" id="L59">    <span class="tok-com">///</span></span>
+<span class="ln" id="L60">    <span class="tok-com">/// The two halves of &quot;check what you downloaded&quot; are this script and</span></span>
+<span class="ln" id="L61">    <span class="tok-com">/// `veilvoice-check`&#x27;s, and a reader on one machine may follow either. They</span></span>
+<span class="ln" id="L62">    <span class="tok-com">/// answer to one enumeration so that they cannot describe different</span></span>
+<span class="ln" id="L63">    <span class="tok-com">/// machines.</span></span>
+<span class="ln" id="L64">    <span class="tok-kw">fn</span> <span class="tok-fn">system</span>(<span class="tok-kw">self</span>) -&gt; veilvoice_check::reproduce::System {</span>
 <span class="ln" id="L65">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L66">            Flavour::Linux =&gt; <span class="tok-str">&quot;verify-veilvoice.sh&quot;</span>,</span>
-<span class="ln" id="L67">            Flavour::MacOs =&gt; <span class="tok-str">&quot;verify-veilvoice-macos.sh&quot;</span>,</span>
-<span class="ln" id="L68">        }</span>
-<span class="ln" id="L69">    }</span>
+<span class="ln" id="L66">            Flavour::Linux =&gt; veilvoice_check::reproduce::System::Linux,</span>
+<span class="ln" id="L67">            Flavour::MacOs =&gt; veilvoice_check::reproduce::System::MacOs,</span>
+<span class="ln" id="L68">            Flavour::Bsd =&gt; veilvoice_check::reproduce::System::Bsd,</span>
+<span class="ln" id="L69">        }</span>
+<span class="ln" id="L70">    }</span>
 </span>
-<span class="ln" id="L70">}</span>
 <span class="ln" id="L71"></span>
-<span class="src-item" id="fn-shell">
-<span class="ln" id="L72"><span class="tok-com">/// The script, with the fingerprint compiled in from the one source of it.</span></span>
-<span class="ln" id="L73"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">shell</span>(flavour: Flavour) -&gt; String {</span>
-<span class="ln" id="L74">    <span class="tok-kw">let</span> fingerprint = veilvoice_check::FINGERPRINT;</span>
-<span class="ln" id="L75">    <span class="tok-kw">let</span> hash_check = flavour.<span class="tok-fn">hash_check</span>();</span>
-<span class="ln" id="L76">    <span class="tok-kw">let</span> install = flavour.<span class="tok-fn">install_hint</span>();</span>
-<span class="ln" id="L77">    format!(</span>
-<span class="ln" id="L78">        <span class="tok-str">r##&quot;#!/bin/sh</span></span>
-<span class="ln" id="L79"><span class="tok-str"># Check a VeilVoice release, using GnuPG and nothing from VeilVoice.</span></span>
-<span class="ln" id="L80"><span class="tok-str">#</span></span>
-<span class="ln" id="L81"><span class="tok-str"># Run it in the folder holding the archive, SHA256SUMS and SHA256SUMS.asc.</span></span>
-<span class="ln" id="L82"><span class="tok-str"># All three are published together on the releases page:</span></span>
-<span class="ln" id="L83"><span class="tok-str">#</span></span>
-<span class="ln" id="L84"><span class="tok-str">#   https://github.com/tilas01/veilvoice/releases/latest</span></span>
-<span class="ln" id="L85"><span class="tok-str">#</span></span>
-<span class="ln" id="L86"><span class="tok-str"># This script is short on purpose. Read it before you run it: the whole reason</span></span>
-<span class="ln" id="L87"><span class="tok-str"># to use it rather than `veilvoice verify` is that it is not VeilVoice&#x27;s code</span></span>
-<span class="ln" id="L88"><span class="tok-str"># checking VeilVoice&#x27;s download.</span></span>
-<span class="ln" id="L89"><span class="tok-str">#</span></span>
-<span class="ln" id="L90"><span class="tok-str"># Generated by `veilvoice verify --script`. The fingerprint below comes from</span></span>
-<span class="ln" id="L91"><span class="tok-str"># the same constant the programs compile in, so the two cannot disagree.</span></span>
-<span class="ln" id="L92"></span>
-<span class="ln" id="L93"><span class="tok-str">set -eu</span></span>
-<span class="ln" id="L94"></span>
-<span class="ln" id="L95"><span class="tok-str">FINGERPRINT={fingerprint}</span></span>
-<span class="ln" id="L96"></span>
-<span class="ln" id="L97"><span class="tok-str">say() {{ printf &#x27;%s\n&#x27; &quot;$*&quot;; }}</span></span>
-<span class="ln" id="L98"><span class="tok-str">die() {{ say &quot;FAILED: $*&quot;; exit 1; }}</span></span>
-<span class="ln" id="L99"></span>
-<span class="ln" id="L100"><span class="tok-str">command -v gpg &gt;/dev/null 2&gt;&amp;1 || die &quot;GnuPG is not installed. To install it:</span></span>
-<span class="ln" id="L101"><span class="tok-str">    {install}&quot;</span></span>
-<span class="ln" id="L102"></span>
-<span class="ln" id="L103"><span class="tok-str">[ -f SHA256SUMS ] || die &quot;no SHA256SUMS here. Download it from the release.&quot;</span></span>
-<span class="ln" id="L104"><span class="tok-str">[ -f SHA256SUMS.asc ] || die &quot;no SHA256SUMS.asc here. Download it from the release.&quot;</span></span>
-<span class="ln" id="L105"></span>
-<span class="ln" id="L106"><span class="tok-str"># 1. The key. Import it from the release if it is here, and check that what</span></span>
-<span class="ln" id="L107"><span class="tok-str">#    was imported is the fingerprint this script expects. This is the step</span></span>
-<span class="ln" id="L108"><span class="tok-str">#    that anchors every other one, and it is the step nothing can do for you:</span></span>
-<span class="ln" id="L109"><span class="tok-str">#    compare the fingerprint against the one on the website and in README.md,</span></span>
-<span class="ln" id="L110"><span class="tok-str">#    from a source other than the download you are checking.</span></span>
-<span class="ln" id="L111"><span class="tok-str">if [ -f veilvoice-signing-key.asc ]; then</span></span>
-<span class="ln" id="L112"><span class="tok-str">    gpg --quiet --import veilvoice-signing-key.asc</span></span>
-<span class="ln" id="L113"><span class="tok-str">fi</span></span>
-<span class="ln" id="L114"></span>
-<span class="ln" id="L115"><span class="tok-str">gpg --with-colons --fingerprint &quot;$FINGERPRINT&quot; &gt;/dev/null 2&gt;&amp;1 \</span></span>
-<span class="ln" id="L116"><span class="tok-str">    || die &quot;the signing key is not in your keyring.</span></span>
-<span class="ln" id="L117"><span class="tok-str">    Import it:  gpg --import veilvoice-signing-key.asc</span></span>
-<span class="ln" id="L118"><span class="tok-str">    It is published beside every release, and is also in the repository at</span></span>
-<span class="ln" id="L119"><span class="tok-str">    website/assets/veilvoice-signing-key.asc&quot;</span></span>
-<span class="ln" id="L120"></span>
-<span class="ln" id="L121"><span class="tok-str">say &quot;key         $FINGERPRINT is in your keyring&quot;</span></span>
-<span class="ln" id="L122"></span>
-<span class="ln" id="L123"><span class="tok-str"># 2. The signature over the hash list. Before the hashes, always: whoever</span></span>
-<span class="ln" id="L124"><span class="tok-str">#    could replace the download could replace SHA256SUMS beside it, and the</span></span>
-<span class="ln" id="L125"><span class="tok-str">#    two would agree perfectly. The signature is what makes the list worth</span></span>
-<span class="ln" id="L126"><span class="tok-str">#    comparing against.</span></span>
-<span class="ln" id="L127"><span class="tok-str">#</span></span>
-<span class="ln" id="L128"><span class="tok-str">#    The output is captured rather than piped. A pipeline&#x27;s status is the</span></span>
-<span class="ln" id="L129"><span class="tok-str">#    status of its LAST command, so `gpg ... | sed` reports whether `sed`</span></span>
-<span class="ln" id="L130"><span class="tok-str">#    worked, and a script that did that would print a pass over a signature</span></span>
-<span class="ln" id="L131"><span class="tok-str">#    GnuPG had just refused. It did, before this comment existed.</span></span>
-<span class="ln" id="L132"><span class="tok-str">if signature=$(gpg --status-fd 1 --verify SHA256SUMS.asc SHA256SUMS 2&gt;&amp;1); then</span></span>
-<span class="ln" id="L133"><span class="tok-str">    :</span></span>
-<span class="ln" id="L134"><span class="tok-str">else</span></span>
-<span class="ln" id="L135"><span class="tok-str">    printf &#x27;%s\n&#x27; &quot;$signature&quot; | sed &#x27;s/^/    /&#x27;</span></span>
-<span class="ln" id="L136"><span class="tok-str">    die &quot;GnuPG did not accept the signature over SHA256SUMS.&quot;</span></span>
-<span class="ln" id="L137"><span class="tok-str">fi</span></span>
-<span class="ln" id="L138"></span>
-<span class="ln" id="L139"><span class="tok-str">#    And a good signature is not enough on its own: gpg reports a good</span></span>
-<span class="ln" id="L140"><span class="tok-str">#    signature by ANY key in your keyring, including one an attacker talked</span></span>
-<span class="ln" id="L141"><span class="tok-str">#    you into importing. VALIDSIG carries the fingerprint that actually</span></span>
-<span class="ln" id="L142"><span class="tok-str">#    signed, first the signing key and last its primary key, so either may be</span></span>
-<span class="ln" id="L143"><span class="tok-str">#    the one we expect.</span></span>
-<span class="ln" id="L144"><span class="tok-str">printf &#x27;%s\n&#x27; &quot;$signature&quot; \</span></span>
-<span class="ln" id="L145"><span class="tok-str">    | awk -v want=&quot;$FINGERPRINT&quot; &#x27;</span></span>
-<span class="ln" id="L146"><span class="tok-str">        /^\[GNUPG:\] VALIDSIG /  {{ if ($3 == want || $NF == want) hit = 1 }}</span></span>
-<span class="ln" id="L147"><span class="tok-str">        END                     {{ exit !hit }}&#x27; \</span></span>
-<span class="ln" id="L148"><span class="tok-str">    || die &quot;the signature is not by $FINGERPRINT.</span></span>
-<span class="ln" id="L149"><span class="tok-str">    GnuPG may still call it good: it is good by some other key. That is not</span></span>
-<span class="ln" id="L150"><span class="tok-str">    the same thing, and it is exactly what a substituted release looks like.&quot;</span></span>
-<span class="ln" id="L151"></span>
-<span class="ln" id="L152"><span class="tok-str">say &quot;signature   SHA256SUMS is signed by $FINGERPRINT&quot;</span></span>
-<span class="ln" id="L153"></span>
-<span class="ln" id="L154"><span class="tok-str"># 3. The download against the now-trusted list.</span></span>
-<span class="ln" id="L155"><span class="tok-str">#</span></span>
-<span class="ln" id="L156"><span class="tok-str">#    `--ignore-missing` checks the files that are here, which is what somebody</span></span>
-<span class="ln" id="L157"><span class="tok-str">#    who downloaded one archive out of twelve wants. It also means that with</span></span>
-<span class="ln" id="L158"><span class="tok-str">#    NO release file here at all, the hash tool checks nothing and reports a</span></span>
-<span class="ln" id="L159"><span class="tok-str">#    failure, and &quot;a file does not match&quot; would be a frightening and untrue</span></span>
-<span class="ln" id="L160"><span class="tok-str">#    way to say &quot;there was nothing to look at&quot;. So that case is separated out</span></span>
-<span class="ln" id="L161"><span class="tok-str">#    and named.</span></span>
-<span class="ln" id="L162"><span class="tok-str">present=0</span></span>
-<span class="ln" id="L163"><span class="tok-str">while read -r _ name; do</span></span>
-<span class="ln" id="L164"><span class="tok-str">    [ -f &quot;$name&quot; ] &amp;&amp; present=$((present + 1))</span></span>
-<span class="ln" id="L165"><span class="tok-str">done &lt; SHA256SUMS</span></span>
-<span class="ln" id="L166"><span class="tok-str">if [ &quot;$present&quot; -eq 0 ]; then</span></span>
-<span class="ln" id="L167"><span class="tok-str">    die &quot;none of the files listed in SHA256SUMS is in this folder, so there</span></span>
-<span class="ln" id="L168"><span class="tok-str">    was nothing to check. Download the archive you want into this folder and</span></span>
-<span class="ln" id="L169"><span class="tok-str">    run this again.&quot;</span></span>
-<span class="ln" id="L170"><span class="tok-str">fi</span></span>
-<span class="ln" id="L171"></span>
-<span class="ln" id="L172"><span class="tok-str">{hash_check} || die &quot;a file here does not match the signed list.&quot;</span></span>
-<span class="ln" id="L173"><span class="tok-str">say &quot;hashes      $present of the release&#x27;s files are here, and all of them match&quot;</span></span>
-<span class="ln" id="L174"><span class="tok-str">say &quot;&quot;</span></span>
-<span class="ln" id="L175"><span class="tok-str">say &quot;What this proves: these files are the ones the holder of that key&quot;</span></span>
-<span class="ln" id="L176"><span class="tok-str">say &quot;published. It does not prove they are safe, that the source compiles to&quot;</span></span>
-<span class="ln" id="L177"><span class="tok-str">say &quot;them, or that the key belongs to anybody in particular.&quot;</span></span>
-<span class="ln" id="L178"><span class="tok-str">&quot;##</span></span>
-<span class="ln" id="L179">    )</span>
-<span class="ln" id="L180">}</span>
+<span class="src-item" id="fn-flavour-hash_check">
+<span class="ln" id="L72">    <span class="tok-com">/// The command that checks a file against `SHA256SUMS`.</span></span>
+<span class="ln" id="L73">    <span class="tok-com">///</span></span>
+<span class="ln" id="L74">    <span class="tok-com">/// Asked of [`veilvoice_check::reproduce::System`] rather than answered</span></span>
+<span class="ln" id="L75">    <span class="tok-com">/// here. This function used to answer it, knew two systems, and was wrong</span></span>
+<span class="ln" id="L76">    <span class="tok-com">/// about the third.</span></span>
+<span class="ln" id="L77">    <span class="tok-kw">fn</span> <span class="tok-fn">hash_check</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L78">        <span class="tok-kw">self</span>.<span class="tok-fn">system</span>().<span class="tok-fn">hash_check_command</span>()</span>
+<span class="ln" id="L79">    }</span>
 </span>
-<span class="ln" id="L181"></span>
-<span class="ln" id="L182"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L183"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L184">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L185"></span>
-<span class="ln" id="L186">    <span class="tok-com">/// The one thing that must never drift.</span></span>
-<span class="ln" id="L187">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L188">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_carries_the_fingerprint_the_programs_use</span>() {</span>
-<span class="ln" id="L189">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> [Flavour::Linux, Flavour::MacOs] {</span>
-<span class="ln" id="L190">            assert!(</span>
-<span class="ln" id="L191">                <span class="tok-fn">shell</span>(flavour).<span class="tok-fn">contains</span>(veilvoice_check::FINGERPRINT),</span>
-<span class="ln" id="L192">                <span class="tok-str">&quot;the script does not carry the project&#x27;s fingerprint&quot;</span></span>
-<span class="ln" id="L193">            );</span>
-<span class="ln" id="L194">        }</span>
-<span class="ln" id="L195">    }</span>
-<span class="ln" id="L196"></span>
-<span class="ln" id="L197">    <span class="tok-com">/// Signature before hashes. Getting this order wrong makes the whole</span></span>
-<span class="ln" id="L198">    <span class="tok-com">/// script worthless while still printing a pass, so it is checked rather</span></span>
-<span class="ln" id="L199">    <span class="tok-com">/// than trusted to stay written correctly.</span></span>
-<span class="ln" id="L200">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L201">    <span class="tok-kw">fn</span> <span class="tok-fn">the_signature_is_checked_before_the_hashes</span>() {</span>
-<span class="ln" id="L202">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> [Flavour::Linux, Flavour::MacOs] {</span>
-<span class="ln" id="L203">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
-<span class="ln" id="L204">            <span class="tok-kw">let</span> signature = script</span>
-<span class="ln" id="L205">                .<span class="tok-fn">find</span>(<span class="tok-str">&quot;gpg --status-fd 1 --verify&quot;</span>)</span>
-<span class="ln" id="L206">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;verifies the signature&quot;</span>);</span>
-<span class="ln" id="L207">            <span class="tok-kw">let</span> hashes = script</span>
-<span class="ln" id="L208">                .<span class="tok-fn">find</span>(flavour.<span class="tok-fn">hash_check</span>())</span>
-<span class="ln" id="L209">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;checks the hashes&quot;</span>);</span>
-<span class="ln" id="L210">            assert!(</span>
-<span class="ln" id="L211">                signature &lt; hashes,</span>
-<span class="ln" id="L212">                <span class="tok-str">&quot;the hashes are checked before the signature, which proves the \</span></span>
-<span class="ln" id="L213"><span class="tok-str">                 download matches a list and nothing about the list&quot;</span></span>
-<span class="ln" id="L214">            );</span>
-<span class="ln" id="L215">        }</span>
-<span class="ln" id="L216">    }</span>
-<span class="ln" id="L217"></span>
-<span class="ln" id="L218">    <span class="tok-com">/// It checks what is here; it does not fetch anything. A verification</span></span>
-<span class="ln" id="L219">    <span class="tok-com">/// script with a network path in it is a different and worse thing.</span></span>
-<span class="ln" id="L220">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L221">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_downloads_nothing</span>() {</span>
-<span class="ln" id="L222">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> [Flavour::Linux, Flavour::MacOs] {</span>
-<span class="ln" id="L223">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
-<span class="ln" id="L224">            <span class="tok-kw">for</span> fetcher <span class="tok-kw">in</span> [<span class="tok-str">&quot;curl &quot;</span>, <span class="tok-str">&quot;wget &quot;</span>, <span class="tok-str">&quot;nc &quot;</span>] {</span>
-<span class="ln" id="L225">                assert!(</span>
-<span class="ln" id="L226">                    !script.<span class="tok-fn">contains</span>(fetcher),</span>
-<span class="ln" id="L227">                    <span class="tok-str">&quot;the script runs {fetcher:?}; it is meant to check files \</span></span>
-<span class="ln" id="L228"><span class="tok-str">                     that are already here&quot;</span></span>
-<span class="ln" id="L229">                );</span>
-<span class="ln" id="L230">            }</span>
-<span class="ln" id="L231">        }</span>
-<span class="ln" id="L232">    }</span>
-<span class="ln" id="L233"></span>
-<span class="ln" id="L234">    <span class="tok-com">/// It does not install anything either. It says what to type.</span></span>
-<span class="ln" id="L235">    <span class="tok-com">///</span></span>
-<span class="ln" id="L236">    <span class="tok-com">/// The distinction is between running `sudo` and *mentioning* it, and the</span></span>
-<span class="ln" id="L237">    <span class="tok-com">/// script does mention it: the message shown when GnuPG is missing is the</span></span>
-<span class="ln" id="L238">    <span class="tok-com">/// command to install it. So this tracks quoting rather than searching for</span></span>
-<span class="ln" id="L239">    <span class="tok-com">/// the word. A first attempt did search for the word and failed on the</span></span>
-<span class="ln" id="L240">    <span class="tok-com">/// help text, which would have meant either deleting a useful message or</span></span>
-<span class="ln" id="L241">    <span class="tok-com">/// keeping a test that could not tell a command from a sentence.</span></span>
-<span class="ln" id="L242">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L243">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_installs_nothing</span>() {</span>
-<span class="ln" id="L244">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> [Flavour::Linux, Flavour::MacOs] {</span>
-<span class="ln" id="L245">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
-<span class="ln" id="L246">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> inside_string = false;</span>
-<span class="ln" id="L247">            <span class="tok-kw">for</span> line <span class="tok-kw">in</span> script.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L248">                <span class="tok-kw">let</span> code = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L249">                <span class="tok-kw">if</span> !inside_string {</span>
-<span class="ln" id="L250">                    assert!(</span>
-<span class="ln" id="L251">                        !code.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;sudo &quot;</span>) &amp;&amp; !code.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;apt-get &quot;</span>),</span>
-<span class="ln" id="L252">                        <span class="tok-str">&quot;the script runs {code:?}; it is meant to print such a \</span></span>
-<span class="ln" id="L253"><span class="tok-str">                         command and let the reader run it in a terminal where \</span></span>
-<span class="ln" id="L254"><span class="tok-str">                         they can see what they are approving&quot;</span></span>
-<span class="ln" id="L255">                    );</span>
-<span class="ln" id="L256">                }</span>
-<span class="ln" id="L257">                <span class="tok-com">// An odd number of unescaped quotes on a line flips whether</span></span>
-<span class="ln" id="L258">                <span class="tok-com">// what follows is inside one.</span></span>
-<span class="ln" id="L259">                <span class="tok-kw">if</span> line.<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L260">                    inside_string = !inside_string;</span>
-<span class="ln" id="L261">                }</span>
-<span class="ln" id="L262">            }</span>
-<span class="ln" id="L263">        }</span>
-<span class="ln" id="L264">    }</span>
-<span class="ln" id="L265"></span>
-<span class="ln" id="L266">    <span class="tok-com">/// macOS has no `sha256sum`, and a script that calls one there fails at</span></span>
-<span class="ln" id="L267">    <span class="tok-com">/// the last step after appearing to work.</span></span>
+<span class="ln" id="L80"></span>
+<span class="src-item" id="fn-flavour-install_hint">
+<span class="ln" id="L81">    <span class="tok-com">/// What to type if GnuPG is not installed.</span></span>
+<span class="ln" id="L82">    <span class="tok-kw">fn</span> <span class="tok-fn">install_hint</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L83">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L84">            Flavour::Linux =&gt; {</span>
+<span class="ln" id="L85">                <span class="tok-str">&quot;sudo apt-get install -y gnupg   (or your package manager&#x27;s equivalent)&quot;</span></span>
+<span class="ln" id="L86">            }</span>
+<span class="ln" id="L87">            Flavour::MacOs =&gt; <span class="tok-str">&quot;brew install gnupg&quot;</span>,</span>
+<span class="ln" id="L88">            <span class="tok-com">// FreeBSD&#x27;s spelling, which this repository already uses in</span></span>
+<span class="ln" id="L89">            <span class="tok-com">// `install/install.sh`. OpenBSD&#x27;s `pkg_add` and NetBSD&#x27;s `pkgin`</span></span>
+<span class="ln" id="L90">            <span class="tok-com">// are not named here, because this project has not run them and</span></span>
+<span class="ln" id="L91">            <span class="tok-com">// does not print commands it has not run. The hedge is the same one</span></span>
+<span class="ln" id="L92">            <span class="tok-com">// the Linux line carries, for the same reason.</span></span>
+<span class="ln" id="L93">            Flavour::Bsd =&gt; <span class="tok-str">&quot;sudo pkg install -y gnupg   (or your system&#x27;s equivalent)&quot;</span>,</span>
+<span class="ln" id="L94">        }</span>
+<span class="ln" id="L95">    }</span>
+</span>
+<span class="ln" id="L96"></span>
+<span class="src-item" id="fn-flavour-file_name">
+<span class="ln" id="L97">    <span class="tok-com">/// The name a reader would give the file.</span></span>
+<span class="ln" id="L98">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">file_name</span>(<span class="tok-kw">self</span>) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L99">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L100">            Flavour::Linux =&gt; <span class="tok-str">&quot;verify-veilvoice.sh&quot;</span>,</span>
+<span class="ln" id="L101">            Flavour::MacOs =&gt; <span class="tok-str">&quot;verify-veilvoice-macos.sh&quot;</span>,</span>
+<span class="ln" id="L102">            Flavour::Bsd =&gt; <span class="tok-str">&quot;verify-veilvoice-bsd.sh&quot;</span>,</span>
+<span class="ln" id="L103">        }</span>
+<span class="ln" id="L104">    }</span>
+</span>
+<span class="ln" id="L105">}</span>
+<span class="ln" id="L106"></span>
+<span class="src-item" id="fn-shell">
+<span class="ln" id="L107"><span class="tok-com">/// The script, with the fingerprint compiled in from the one source of it.</span></span>
+<span class="ln" id="L108"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">shell</span>(flavour: Flavour) -&gt; String {</span>
+<span class="ln" id="L109">    <span class="tok-kw">let</span> fingerprint = veilvoice_check::FINGERPRINT;</span>
+<span class="ln" id="L110">    <span class="tok-kw">let</span> hash_check = flavour.<span class="tok-fn">hash_check</span>();</span>
+<span class="ln" id="L111">    <span class="tok-kw">let</span> install = flavour.<span class="tok-fn">install_hint</span>();</span>
+<span class="ln" id="L112">    format!(</span>
+<span class="ln" id="L113">        <span class="tok-str">r##&quot;#!/bin/sh</span></span>
+<span class="ln" id="L114"><span class="tok-str"># Check a VeilVoice release, using GnuPG and nothing from VeilVoice.</span></span>
+<span class="ln" id="L115"><span class="tok-str">#</span></span>
+<span class="ln" id="L116"><span class="tok-str"># Run it in the folder holding the archive, SHA256SUMS and SHA256SUMS.asc.</span></span>
+<span class="ln" id="L117"><span class="tok-str"># All three are published together on the releases page:</span></span>
+<span class="ln" id="L118"><span class="tok-str">#</span></span>
+<span class="ln" id="L119"><span class="tok-str">#   https://github.com/tilas01/veilvoice/releases/latest</span></span>
+<span class="ln" id="L120"><span class="tok-str">#</span></span>
+<span class="ln" id="L121"><span class="tok-str"># This script is short on purpose. Read it before you run it: the whole reason</span></span>
+<span class="ln" id="L122"><span class="tok-str"># to use it rather than `veilvoice verify` is that it is not VeilVoice&#x27;s code</span></span>
+<span class="ln" id="L123"><span class="tok-str"># checking VeilVoice&#x27;s download.</span></span>
+<span class="ln" id="L124"><span class="tok-str">#</span></span>
+<span class="ln" id="L125"><span class="tok-str"># Generated by `veilvoice verify --script`. The fingerprint below comes from</span></span>
+<span class="ln" id="L126"><span class="tok-str"># the same constant the programs compile in, so the two cannot disagree.</span></span>
+<span class="ln" id="L127"></span>
+<span class="ln" id="L128"><span class="tok-str">set -eu</span></span>
+<span class="ln" id="L129"></span>
+<span class="ln" id="L130"><span class="tok-str">FINGERPRINT={fingerprint}</span></span>
+<span class="ln" id="L131"></span>
+<span class="ln" id="L132"><span class="tok-str">say() {{ printf &#x27;%s\n&#x27; &quot;$*&quot;; }}</span></span>
+<span class="ln" id="L133"><span class="tok-str">die() {{ say &quot;FAILED: $*&quot;; exit 1; }}</span></span>
+<span class="ln" id="L134"></span>
+<span class="ln" id="L135"><span class="tok-str">command -v gpg &gt;/dev/null 2&gt;&amp;1 || die &quot;GnuPG is not installed. To install it:</span></span>
+<span class="ln" id="L136"><span class="tok-str">    {install}&quot;</span></span>
+<span class="ln" id="L137"></span>
+<span class="ln" id="L138"><span class="tok-str">[ -f SHA256SUMS ] || die &quot;no SHA256SUMS here. Download it from the release.&quot;</span></span>
+<span class="ln" id="L139"><span class="tok-str">[ -f SHA256SUMS.asc ] || die &quot;no SHA256SUMS.asc here. Download it from the release.&quot;</span></span>
+<span class="ln" id="L140"></span>
+<span class="ln" id="L141"><span class="tok-str"># 1. The key. Import it from the release if it is here, and check that what</span></span>
+<span class="ln" id="L142"><span class="tok-str">#    was imported is the fingerprint this script expects. This is the step</span></span>
+<span class="ln" id="L143"><span class="tok-str">#    that anchors every other one, and it is the step nothing can do for you:</span></span>
+<span class="ln" id="L144"><span class="tok-str">#    compare the fingerprint against the one on the website and in README.md,</span></span>
+<span class="ln" id="L145"><span class="tok-str">#    from a source other than the download you are checking.</span></span>
+<span class="ln" id="L146"><span class="tok-str">if [ -f veilvoice-signing-key.asc ]; then</span></span>
+<span class="ln" id="L147"><span class="tok-str">    gpg --quiet --import veilvoice-signing-key.asc</span></span>
+<span class="ln" id="L148"><span class="tok-str">fi</span></span>
+<span class="ln" id="L149"></span>
+<span class="ln" id="L150"><span class="tok-str">gpg --with-colons --fingerprint &quot;$FINGERPRINT&quot; &gt;/dev/null 2&gt;&amp;1 \</span></span>
+<span class="ln" id="L151"><span class="tok-str">    || die &quot;the signing key is not in your keyring.</span></span>
+<span class="ln" id="L152"><span class="tok-str">    Import it:  gpg --import veilvoice-signing-key.asc</span></span>
+<span class="ln" id="L153"><span class="tok-str">    It is published beside every release, and is also in the repository at</span></span>
+<span class="ln" id="L154"><span class="tok-str">    website/assets/veilvoice-signing-key.asc&quot;</span></span>
+<span class="ln" id="L155"></span>
+<span class="ln" id="L156"><span class="tok-str">say &quot;key         $FINGERPRINT is in your keyring&quot;</span></span>
+<span class="ln" id="L157"></span>
+<span class="ln" id="L158"><span class="tok-str"># 2. The signature over the hash list. Before the hashes, always: whoever</span></span>
+<span class="ln" id="L159"><span class="tok-str">#    could replace the download could replace SHA256SUMS beside it, and the</span></span>
+<span class="ln" id="L160"><span class="tok-str">#    two would agree perfectly. The signature is what makes the list worth</span></span>
+<span class="ln" id="L161"><span class="tok-str">#    comparing against.</span></span>
+<span class="ln" id="L162"><span class="tok-str">#</span></span>
+<span class="ln" id="L163"><span class="tok-str">#    The output is captured rather than piped. A pipeline&#x27;s status is the</span></span>
+<span class="ln" id="L164"><span class="tok-str">#    status of its LAST command, so `gpg ... | sed` reports whether `sed`</span></span>
+<span class="ln" id="L165"><span class="tok-str">#    worked, and a script that did that would print a pass over a signature</span></span>
+<span class="ln" id="L166"><span class="tok-str">#    GnuPG had just refused. It did, before this comment existed.</span></span>
+<span class="ln" id="L167"><span class="tok-str">if signature=$(gpg --status-fd 1 --verify SHA256SUMS.asc SHA256SUMS 2&gt;&amp;1); then</span></span>
+<span class="ln" id="L168"><span class="tok-str">    :</span></span>
+<span class="ln" id="L169"><span class="tok-str">else</span></span>
+<span class="ln" id="L170"><span class="tok-str">    printf &#x27;%s\n&#x27; &quot;$signature&quot; | sed &#x27;s/^/    /&#x27;</span></span>
+<span class="ln" id="L171"><span class="tok-str">    die &quot;GnuPG did not accept the signature over SHA256SUMS.&quot;</span></span>
+<span class="ln" id="L172"><span class="tok-str">fi</span></span>
+<span class="ln" id="L173"></span>
+<span class="ln" id="L174"><span class="tok-str">#    And a good signature is not enough on its own: gpg reports a good</span></span>
+<span class="ln" id="L175"><span class="tok-str">#    signature by ANY key in your keyring, including one an attacker talked</span></span>
+<span class="ln" id="L176"><span class="tok-str">#    you into importing. VALIDSIG carries the fingerprint that actually</span></span>
+<span class="ln" id="L177"><span class="tok-str">#    signed, first the signing key and last its primary key, so either may be</span></span>
+<span class="ln" id="L178"><span class="tok-str">#    the one we expect.</span></span>
+<span class="ln" id="L179"><span class="tok-str">printf &#x27;%s\n&#x27; &quot;$signature&quot; \</span></span>
+<span class="ln" id="L180"><span class="tok-str">    | awk -v want=&quot;$FINGERPRINT&quot; &#x27;</span></span>
+<span class="ln" id="L181"><span class="tok-str">        /^\[GNUPG:\] VALIDSIG /  {{ if ($3 == want || $NF == want) hit = 1 }}</span></span>
+<span class="ln" id="L182"><span class="tok-str">        END                     {{ exit !hit }}&#x27; \</span></span>
+<span class="ln" id="L183"><span class="tok-str">    || die &quot;the signature is not by $FINGERPRINT.</span></span>
+<span class="ln" id="L184"><span class="tok-str">    GnuPG may still call it good: it is good by some other key. That is not</span></span>
+<span class="ln" id="L185"><span class="tok-str">    the same thing, and it is exactly what a substituted release looks like.&quot;</span></span>
+<span class="ln" id="L186"></span>
+<span class="ln" id="L187"><span class="tok-str">say &quot;signature   SHA256SUMS is signed by $FINGERPRINT&quot;</span></span>
+<span class="ln" id="L188"></span>
+<span class="ln" id="L189"><span class="tok-str"># 3. The download against the now-trusted list.</span></span>
+<span class="ln" id="L190"><span class="tok-str">#</span></span>
+<span class="ln" id="L191"><span class="tok-str">#    `--ignore-missing` checks the files that are here, which is what somebody</span></span>
+<span class="ln" id="L192"><span class="tok-str">#    who downloaded one archive out of twelve wants. It also means that with</span></span>
+<span class="ln" id="L193"><span class="tok-str">#    NO release file here at all, the hash tool checks nothing and reports a</span></span>
+<span class="ln" id="L194"><span class="tok-str">#    failure, and &quot;a file does not match&quot; would be a frightening and untrue</span></span>
+<span class="ln" id="L195"><span class="tok-str">#    way to say &quot;there was nothing to look at&quot;. So that case is separated out</span></span>
+<span class="ln" id="L196"><span class="tok-str">#    and named.</span></span>
+<span class="ln" id="L197"><span class="tok-str">present=0</span></span>
+<span class="ln" id="L198"><span class="tok-str">while read -r _ name; do</span></span>
+<span class="ln" id="L199"><span class="tok-str">    [ -f &quot;$name&quot; ] &amp;&amp; present=$((present + 1))</span></span>
+<span class="ln" id="L200"><span class="tok-str">done &lt; SHA256SUMS</span></span>
+<span class="ln" id="L201"><span class="tok-str">if [ &quot;$present&quot; -eq 0 ]; then</span></span>
+<span class="ln" id="L202"><span class="tok-str">    die &quot;none of the files listed in SHA256SUMS is in this folder, so there</span></span>
+<span class="ln" id="L203"><span class="tok-str">    was nothing to check. Download the archive you want into this folder and</span></span>
+<span class="ln" id="L204"><span class="tok-str">    run this again.&quot;</span></span>
+<span class="ln" id="L205"><span class="tok-str">fi</span></span>
+<span class="ln" id="L206"></span>
+<span class="ln" id="L207"><span class="tok-str">{hash_check} || die &quot;a file here does not match the signed list.&quot;</span></span>
+<span class="ln" id="L208"><span class="tok-str">say &quot;hashes      $present of the release&#x27;s files are here, and all of them match&quot;</span></span>
+<span class="ln" id="L209"><span class="tok-str">say &quot;&quot;</span></span>
+<span class="ln" id="L210"><span class="tok-str">say &quot;What this proves: these files are the ones the holder of that key&quot;</span></span>
+<span class="ln" id="L211"><span class="tok-str">say &quot;published. It does not prove they are safe, that the source compiles to&quot;</span></span>
+<span class="ln" id="L212"><span class="tok-str">say &quot;them, or that the key belongs to anybody in particular.&quot;</span></span>
+<span class="ln" id="L213"><span class="tok-str">&quot;##</span></span>
+<span class="ln" id="L214">    )</span>
+<span class="ln" id="L215">}</span>
+</span>
+<span class="ln" id="L216"></span>
+<span class="ln" id="L217"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L218"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L219">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L220"></span>
+<span class="ln" id="L221">    <span class="tok-com">/// The one thing that must never drift.</span></span>
+<span class="ln" id="L222">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L223">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_carries_the_fingerprint_the_programs_use</span>() {</span>
+<span class="ln" id="L224">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L225">            assert!(</span>
+<span class="ln" id="L226">                <span class="tok-fn">shell</span>(flavour).<span class="tok-fn">contains</span>(veilvoice_check::FINGERPRINT),</span>
+<span class="ln" id="L227">                <span class="tok-str">&quot;the script does not carry the project&#x27;s fingerprint&quot;</span></span>
+<span class="ln" id="L228">            );</span>
+<span class="ln" id="L229">        }</span>
+<span class="ln" id="L230">    }</span>
+<span class="ln" id="L231"></span>
+<span class="ln" id="L232">    <span class="tok-com">/// Signature before hashes. Getting this order wrong makes the whole</span></span>
+<span class="ln" id="L233">    <span class="tok-com">/// script worthless while still printing a pass, so it is checked rather</span></span>
+<span class="ln" id="L234">    <span class="tok-com">/// than trusted to stay written correctly.</span></span>
+<span class="ln" id="L235">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L236">    <span class="tok-kw">fn</span> <span class="tok-fn">the_signature_is_checked_before_the_hashes</span>() {</span>
+<span class="ln" id="L237">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L238">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
+<span class="ln" id="L239">            <span class="tok-kw">let</span> signature = script</span>
+<span class="ln" id="L240">                .<span class="tok-fn">find</span>(<span class="tok-str">&quot;gpg --status-fd 1 --verify&quot;</span>)</span>
+<span class="ln" id="L241">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;verifies the signature&quot;</span>);</span>
+<span class="ln" id="L242">            <span class="tok-kw">let</span> hashes = script</span>
+<span class="ln" id="L243">                .<span class="tok-fn">find</span>(flavour.<span class="tok-fn">hash_check</span>())</span>
+<span class="ln" id="L244">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;checks the hashes&quot;</span>);</span>
+<span class="ln" id="L245">            assert!(</span>
+<span class="ln" id="L246">                signature &lt; hashes,</span>
+<span class="ln" id="L247">                <span class="tok-str">&quot;the hashes are checked before the signature, which proves the \</span></span>
+<span class="ln" id="L248"><span class="tok-str">                 download matches a list and nothing about the list&quot;</span></span>
+<span class="ln" id="L249">            );</span>
+<span class="ln" id="L250">        }</span>
+<span class="ln" id="L251">    }</span>
+<span class="ln" id="L252"></span>
+<span class="ln" id="L253">    <span class="tok-com">/// It checks what is here; it does not fetch anything. A verification</span></span>
+<span class="ln" id="L254">    <span class="tok-com">/// script with a network path in it is a different and worse thing.</span></span>
+<span class="ln" id="L255">    <span class="tok-com">/// **F-167.** The two scripts a reader might follow agree about their</span></span>
+<span class="ln" id="L256">    <span class="tok-com">/// machine.</span></span>
+<span class="ln" id="L257">    <span class="tok-com">///</span></span>
+<span class="ln" id="L258">    <span class="tok-com">/// This repository ships two shell scripts that check a download: this one,</span></span>
+<span class="ln" id="L259">    <span class="tok-com">/// which verifies a signature and a hash list, and `veilvoice-check`&#x27;s,</span></span>
+<span class="ln" id="L260">    <span class="tok-com">/// which reproduces the build. A reader on one machine may run either, and</span></span>
+<span class="ln" id="L261">    <span class="tok-com">/// for a while they named different hash tools on the BSDs, because this</span></span>
+<span class="ln" id="L262">    <span class="tok-com">/// module carried its own copy of the answer and that copy knew two</span></span>
+<span class="ln" id="L263">    <span class="tok-com">/// systems.</span></span>
+<span class="ln" id="L264">    <span class="tok-com">///</span></span>
+<span class="ln" id="L265">    <span class="tok-com">/// The copy is gone and this is what keeps it gone: every flavour asks the</span></span>
+<span class="ln" id="L266">    <span class="tok-com">/// other module, and a flavour added here without a system there would not</span></span>
+<span class="ln" id="L267">    <span class="tok-com">/// compile.</span></span>
 <span class="ln" id="L268">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L269">    <span class="tok-kw">fn</span> <span class="tok-fn">each_flavour_uses_the_hash_tool_that_system_has</span>() {</span>
-<span class="ln" id="L270">        assert!(<span class="tok-fn">shell</span>(Flavour::Linux).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum -c&quot;</span>));</span>
-<span class="ln" id="L271">        assert!(<span class="tok-fn">shell</span>(Flavour::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;shasum -a 256 -c&quot;</span>));</span>
-<span class="ln" id="L272">        assert!(!<span class="tok-fn">shell</span>(Flavour::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum -c&quot;</span>));</span>
-<span class="ln" id="L273">    }</span>
-<span class="ln" id="L274"></span>
-<span class="ln" id="L275">    <span class="tok-com">/// The script says where the files come from. Somebody running it in the</span></span>
-<span class="ln" id="L276">    <span class="tok-com">/// wrong folder needs to know what to fetch and from where.</span></span>
-<span class="ln" id="L277">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L278">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_says_where_the_files_come_from</span>() {</span>
-<span class="ln" id="L279">        <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(Flavour::Linux);</span>
-<span class="ln" id="L280">        assert!(script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;releases/latest&quot;</span>));</span>
-<span class="ln" id="L281">        assert!(script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice-signing-key.asc&quot;</span>));</span>
-<span class="ln" id="L282">    }</span>
-<span class="ln" id="L283">}</span>
+<span class="ln" id="L269">    <span class="tok-kw">fn</span> <span class="tok-fn">no_script_names_another_machines_hash_tool</span>() {</span>
+<span class="ln" id="L270">        <span class="tok-com">// `hash_check` *is* `system().hash_check_command()` now, so comparing</span></span>
+<span class="ln" id="L271">        <span class="tok-com">// the two would be comparing a function with itself. What can still go</span></span>
+<span class="ln" id="L272">        <span class="tok-com">// wrong, and did, is a reader being handed the wrong script: the tool</span></span>
+<span class="ln" id="L273">        <span class="tok-com">// has to reach the text, and no other machine&#x27;s tool may.</span></span>
+<span class="ln" id="L274">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L275">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
+<span class="ln" id="L276">            <span class="tok-kw">let</span> mine = flavour.<span class="tok-fn">system</span>().<span class="tok-fn">hash_check_command</span>();</span>
+<span class="ln" id="L277">            assert!(</span>
+<span class="ln" id="L278">                script.<span class="tok-fn">contains</span>(mine),</span>
+<span class="ln" id="L279">                <span class="tok-str">&quot;the {flavour:?} script does not run {mine:?}, which is what \</span></span>
+<span class="ln" id="L280"><span class="tok-str">                 that machine checks hashes with&quot;</span></span>
+<span class="ln" id="L281">            );</span>
+<span class="ln" id="L282">            <span class="tok-kw">for</span> other <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L283">                <span class="tok-kw">if</span> other == flavour {</span>
+<span class="ln" id="L284">                    continue;</span>
+<span class="ln" id="L285">                }</span>
+<span class="ln" id="L286">                <span class="tok-kw">let</span> theirs = other.<span class="tok-fn">system</span>().<span class="tok-fn">hash_check_command</span>();</span>
+<span class="ln" id="L287">                <span class="tok-com">// The BSDs&#x27; `sha256 -c` is a substring of nothing here, and</span></span>
+<span class="ln" id="L288">                <span class="tok-com">// `sha256sum -c` contains no other tool&#x27;s name, so a plain</span></span>
+<span class="ln" id="L289">                <span class="tok-com">// containment check is exact for these three. It is asserted</span></span>
+<span class="ln" id="L290">                <span class="tok-com">// rather than assumed, because a fourth tool whose name</span></span>
+<span class="ln" id="L291">                <span class="tok-com">// contains another&#x27;s would make this test quietly weaker.</span></span>
+<span class="ln" id="L292">                assert!(</span>
+<span class="ln" id="L293">                    !mine.<span class="tok-fn">contains</span>(theirs) &amp;&amp; !theirs.<span class="tok-fn">contains</span>(mine),</span>
+<span class="ln" id="L294">                    <span class="tok-str">&quot;{mine:?} and {theirs:?} contain one another, so this test \</span></span>
+<span class="ln" id="L295"><span class="tok-str">                     cannot tell them apart any more&quot;</span></span>
+<span class="ln" id="L296">                );</span>
+<span class="ln" id="L297">                assert!(</span>
+<span class="ln" id="L298">                    !script.<span class="tok-fn">contains</span>(theirs),</span>
+<span class="ln" id="L299">                    <span class="tok-str">&quot;the {flavour:?} script tells the reader to run {theirs:?}, \</span></span>
+<span class="ln" id="L300"><span class="tok-str">                     which belongs to {other:?}. That is F-167: a reader on one \</span></span>
+<span class="ln" id="L301"><span class="tok-str">                     machine given another machine&#x27;s command&quot;</span></span>
+<span class="ln" id="L302">                );</span>
+<span class="ln" id="L303">            }</span>
+<span class="ln" id="L304">        }</span>
+<span class="ln" id="L305">    }</span>
+<span class="ln" id="L306"></span>
+<span class="ln" id="L307">    <span class="tok-com">/// **Marker 129.** The guide&#x27;s per-system table is the program&#x27;s answer.</span></span>
+<span class="ln" id="L308">    <span class="tok-com">///</span></span>
+<span class="ln" id="L309">    <span class="tok-com">/// The row this comes from asks for the verification to be written up per</span></span>
+<span class="ln" id="L310">    <span class="tok-com">/// platform &quot;rather than left as a Linux instruction somebody has to</span></span>
+<span class="ln" id="L311">    <span class="tok-com">/// translate&quot;. A table of commands in a document is a copy of what the</span></span>
+<span class="ln" id="L312">    <span class="tok-com">/// program prints, and a copy goes stale: F-167 was two copies of exactly</span></span>
+<span class="ln" id="L313">    <span class="tok-com">/// this answer disagreeing. So the table is checked here against the code</span></span>
+<span class="ln" id="L314">    <span class="tok-com">/// it describes, which is what `CLAUDE.md` asks for when a fact cannot be</span></span>
+<span class="ln" id="L315">    <span class="tok-com">/// derived.</span></span>
+<span class="ln" id="L316">    <span class="tok-com">///</span></span>
+<span class="ln" id="L317">    <span class="tok-com">/// Read out of the guide&#x27;s source. If the table moves, this fails saying</span></span>
+<span class="ln" id="L318">    <span class="tok-com">/// it cannot find it, rather than passing because there was nothing left</span></span>
+<span class="ln" id="L319">    <span class="tok-com">/// to check.</span></span>
+<span class="ln" id="L320">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L321">    <span class="tok-kw">fn</span> <span class="tok-fn">the_guides_table_of_systems_is_what_the_program_prints</span>() {</span>
+<span class="ln" id="L322">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L323">        <span class="tok-kw">let</span> table = guide</span>
+<span class="ln" id="L324">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;| Your system | The script it writes |&quot;</span>)</span>
+<span class="ln" id="L325">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L326">            .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n\n&quot;</span>).<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L327">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the per-system table has to be findable in the user guide&quot;</span>);</span>
+<span class="ln" id="L328"></span>
+<span class="ln" id="L329">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L330">            <span class="tok-kw">let</span> name = flavour.<span class="tok-fn">file_name</span>();</span>
+<span class="ln" id="L331">            <span class="tok-kw">let</span> command = flavour.<span class="tok-fn">system</span>().<span class="tok-fn">hash_check_command</span>();</span>
+<span class="ln" id="L332">            assert!(</span>
+<span class="ln" id="L333">                table.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;`{name}`&quot;</span>)),</span>
+<span class="ln" id="L334">                <span class="tok-str">&quot;the guide&#x27;s table does not name {name:?}, which is the file \</span></span>
+<span class="ln" id="L335"><span class="tok-str">                 `--script --system {}` writes&quot;</span>,</span>
+<span class="ln" id="L336">                flavour.<span class="tok-fn">system</span>().<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L337">            );</span>
+<span class="ln" id="L338">            assert!(</span>
+<span class="ln" id="L339">                table.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;`{command}`&quot;</span>)),</span>
+<span class="ln" id="L340">                <span class="tok-str">&quot;the guide&#x27;s table does not carry {command:?}, which is what \</span></span>
+<span class="ln" id="L341"><span class="tok-str">                 the {flavour:?} script runs&quot;</span></span>
+<span class="ln" id="L342">            );</span>
+<span class="ln" id="L343">        }</span>
+<span class="ln" id="L344">        <span class="tok-com">// And nothing else: a fourth row would describe a system the program</span></span>
+<span class="ln" id="L345">        <span class="tok-com">// has no script for, which is the failure this is guarding against</span></span>
+<span class="ln" id="L346">        <span class="tok-com">// pointed the other way.</span></span>
+<span class="ln" id="L347">        <span class="tok-kw">let</span> rows = table.<span class="tok-fn">lines</span>().<span class="tok-fn">filter</span>(|line| line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;|&#x27;</span>)).<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L348">        assert_eq!(</span>
+<span class="ln" id="L349">            rows,</span>
+<span class="ln" id="L350">            Flavour::ALL.<span class="tok-fn">len</span>() + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L351">            <span class="tok-str">&quot;the guide&#x27;s table has {rows} lines including its rule, and the \</span></span>
+<span class="ln" id="L352"><span class="tok-str">             program has {} systems&quot;</span>,</span>
+<span class="ln" id="L353">            Flavour::ALL.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L354">        );</span>
+<span class="ln" id="L355">    }</span>
+<span class="ln" id="L356"></span>
+<span class="ln" id="L357">    <span class="tok-com">/// Every flavour has a file name of its own.</span></span>
+<span class="ln" id="L358">    <span class="tok-com">///</span></span>
+<span class="ln" id="L359">    <span class="tok-com">/// Two flavours sharing one would mean a reader saving the second over the</span></span>
+<span class="ln" id="L360">    <span class="tok-com">/// first, which is how somebody on a BSD ends up running the macOS script.</span></span>
+<span class="ln" id="L361">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L362">    <span class="tok-kw">fn</span> <span class="tok-fn">every_flavour_is_saved_under_its_own_name</span>() {</span>
+<span class="ln" id="L363">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = std::collections::BTreeSet::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L364">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L365">            assert!(</span>
+<span class="ln" id="L366">                seen.<span class="tok-fn">insert</span>(flavour.<span class="tok-fn">file_name</span>()),</span>
+<span class="ln" id="L367">                <span class="tok-str">&quot;{flavour:?} shares a file name with another flavour&quot;</span></span>
+<span class="ln" id="L368">            );</span>
+<span class="ln" id="L369">        }</span>
+<span class="ln" id="L370">        assert_eq!(seen.<span class="tok-fn">len</span>(), Flavour::ALL.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L371">    }</span>
+<span class="ln" id="L372"></span>
+<span class="ln" id="L373">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L374">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_downloads_nothing</span>() {</span>
+<span class="ln" id="L375">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L376">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
+<span class="ln" id="L377">            <span class="tok-kw">for</span> fetcher <span class="tok-kw">in</span> [<span class="tok-str">&quot;curl &quot;</span>, <span class="tok-str">&quot;wget &quot;</span>, <span class="tok-str">&quot;nc &quot;</span>] {</span>
+<span class="ln" id="L378">                assert!(</span>
+<span class="ln" id="L379">                    !script.<span class="tok-fn">contains</span>(fetcher),</span>
+<span class="ln" id="L380">                    <span class="tok-str">&quot;the script runs {fetcher:?}; it is meant to check files \</span></span>
+<span class="ln" id="L381"><span class="tok-str">                     that are already here&quot;</span></span>
+<span class="ln" id="L382">                );</span>
+<span class="ln" id="L383">            }</span>
+<span class="ln" id="L384">        }</span>
+<span class="ln" id="L385">    }</span>
+<span class="ln" id="L386"></span>
+<span class="ln" id="L387">    <span class="tok-com">/// It does not install anything either. It says what to type.</span></span>
+<span class="ln" id="L388">    <span class="tok-com">///</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// The distinction is between running `sudo` and *mentioning* it, and the</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// script does mention it: the message shown when GnuPG is missing is the</span></span>
+<span class="ln" id="L391">    <span class="tok-com">/// command to install it. So this tracks quoting rather than searching for</span></span>
+<span class="ln" id="L392">    <span class="tok-com">/// the word. A first attempt did search for the word and failed on the</span></span>
+<span class="ln" id="L393">    <span class="tok-com">/// help text, which would have meant either deleting a useful message or</span></span>
+<span class="ln" id="L394">    <span class="tok-com">/// keeping a test that could not tell a command from a sentence.</span></span>
+<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_installs_nothing</span>() {</span>
+<span class="ln" id="L397">        <span class="tok-kw">for</span> flavour <span class="tok-kw">in</span> Flavour::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L398">            <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(flavour);</span>
+<span class="ln" id="L399">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> inside_string = false;</span>
+<span class="ln" id="L400">            <span class="tok-kw">for</span> line <span class="tok-kw">in</span> script.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L401">                <span class="tok-kw">let</span> code = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L402">                <span class="tok-kw">if</span> !inside_string {</span>
+<span class="ln" id="L403">                    assert!(</span>
+<span class="ln" id="L404">                        !code.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;sudo &quot;</span>) &amp;&amp; !code.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;apt-get &quot;</span>),</span>
+<span class="ln" id="L405">                        <span class="tok-str">&quot;the script runs {code:?}; it is meant to print such a \</span></span>
+<span class="ln" id="L406"><span class="tok-str">                         command and let the reader run it in a terminal where \</span></span>
+<span class="ln" id="L407"><span class="tok-str">                         they can see what they are approving&quot;</span></span>
+<span class="ln" id="L408">                    );</span>
+<span class="ln" id="L409">                }</span>
+<span class="ln" id="L410">                <span class="tok-com">// An odd number of unescaped quotes on a line flips whether</span></span>
+<span class="ln" id="L411">                <span class="tok-com">// what follows is inside one.</span></span>
+<span class="ln" id="L412">                <span class="tok-kw">if</span> line.<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L413">                    inside_string = !inside_string;</span>
+<span class="ln" id="L414">                }</span>
+<span class="ln" id="L415">            }</span>
+<span class="ln" id="L416">        }</span>
+<span class="ln" id="L417">    }</span>
+<span class="ln" id="L418"></span>
+<span class="ln" id="L419">    <span class="tok-com">/// macOS has no `sha256sum`, and a script that calls one there fails at</span></span>
+<span class="ln" id="L420">    <span class="tok-com">/// the last step after appearing to work.</span></span>
+<span class="ln" id="L421">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L422">    <span class="tok-kw">fn</span> <span class="tok-fn">each_flavour_uses_the_hash_tool_that_system_has</span>() {</span>
+<span class="ln" id="L423">        assert!(<span class="tok-fn">shell</span>(Flavour::Linux).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum -c&quot;</span>));</span>
+<span class="ln" id="L424">        assert!(<span class="tok-fn">shell</span>(Flavour::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;shasum -a 256 -c&quot;</span>));</span>
+<span class="ln" id="L425">        assert!(!<span class="tok-fn">shell</span>(Flavour::MacOs).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum -c&quot;</span>));</span>
+<span class="ln" id="L426">        <span class="tok-com">// **F-167.** The BSDs ship `sha256`, and this script used not to have</span></span>
+<span class="ln" id="L427">        <span class="tok-com">// a spelling for them at all: they fell through to Linux and were told</span></span>
+<span class="ln" id="L428">        <span class="tok-com">// to run `sha256sum -c`, which the reproduce script in the same</span></span>
+<span class="ln" id="L429">        <span class="tok-com">// release says they do not have.</span></span>
+<span class="ln" id="L430">        assert!(<span class="tok-fn">shell</span>(Flavour::Bsd).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256 -c&quot;</span>));</span>
+<span class="ln" id="L431">        assert!(</span>
+<span class="ln" id="L432">            !<span class="tok-fn">shell</span>(Flavour::Bsd).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sha256sum&quot;</span>),</span>
+<span class="ln" id="L433">            <span class="tok-str">&quot;the BSD script names a tool this project&#x27;s other script says the \</span></span>
+<span class="ln" id="L434"><span class="tok-str">             BSDs do not have&quot;</span></span>
+<span class="ln" id="L435">        );</span>
+<span class="ln" id="L436">    }</span>
+<span class="ln" id="L437"></span>
+<span class="ln" id="L438">    <span class="tok-com">/// The script says where the files come from. Somebody running it in the</span></span>
+<span class="ln" id="L439">    <span class="tok-com">/// wrong folder needs to know what to fetch and from where.</span></span>
+<span class="ln" id="L440">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">the_script_says_where_the_files_come_from</span>() {</span>
+<span class="ln" id="L442">        <span class="tok-kw">let</span> script = <span class="tok-fn">shell</span>(Flavour::Linux);</span>
+<span class="ln" id="L443">        assert!(script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;releases/latest&quot;</span>));</span>
+<span class="ln" id="L444">        assert!(script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice-signing-key.asc&quot;</span>));</span>
+<span class="ln" id="L445">    }</span>
+<span class="ln" id="L446">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

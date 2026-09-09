@@ -109,7 +109,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>863 lines"])
     n_backend["backend.rs<br/>469 lines"]
-    n_script["script.rs<br/>283 lines"]
+    n_script["script.rs<br/>446 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" "open the source"
     click n_backend href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/backend.rs" "open the source"
     click n_script href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/script.rs" "open the source"
@@ -123,9 +123,9 @@ flowchart TD
 |---|---:|---|
 | [`backend.rs`](../../docs/files/veilvoice-gnupg/backend.md) | 469 | Which program checks the signature, and who decides. |
 | [`lib.rs`](../../docs/files/veilvoice-gnupg/lib.md) | 863 | Run the GnuPG that is already on this machine. |
-| [`script.rs`](../../docs/files/veilvoice-gnupg/script.md) | 283 | A shell script that checks a release, for people who would rather read one. |
+| [`script.rs`](../../docs/files/veilvoice-gnupg/script.md) | 446 | A shell script that checks a release, for people who would rather read one. |
 
-**1,023 functional lines of Rust** in this crate. A functional line is a line
+**1,109 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

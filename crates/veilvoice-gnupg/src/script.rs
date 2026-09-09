@@ -31,23 +31,51 @@
 /// Which system the script is being written for.
 ///
 /// The only real difference is how the hashes are checked: coreutils calls it
-/// `sha256sum`, macOS ships `shasum`. WSL is Linux, and is listed separately
-/// only because saying so is what a Windows reader needs to hear.
+/// `sha256sum`, macOS ships `shasum`, and the BSDs ship `sha256`. WSL is Linux,
+/// and is listed separately only because saying so is what a Windows reader
+/// needs to hear.
+///
+/// **The BSDs were missing and fell through to Linux**, which is F-167: this
+/// script told a reader on FreeBSD, OpenBSD or NetBSD to run a command that
+/// `veilvoice-check`'s reproduce script, in the same release, says they do not
+/// have. The command now comes from that module rather than from a second copy
+/// here, so the two cannot disagree again.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Flavour {
     /// Linux, and WSL, which is Linux.
     Linux,
     /// macOS, where the hash tool has a different name.
     MacOs,
+    /// FreeBSD, OpenBSD and NetBSD, which have a different one again.
+    Bsd,
 }
 
 impl Flavour {
-    /// The command that checks a file against `SHA256SUMS`.
-    fn hash_check(self) -> &'static str {
+    /// Every one of them, so a caller writing all the scripts writes all of
+    /// them rather than the ones it remembered.
+    pub const ALL: &'static [Flavour] = &[Flavour::Linux, Flavour::MacOs, Flavour::Bsd];
+
+    /// The same system, as the reproduce scripts name it.
+    ///
+    /// The two halves of "check what you downloaded" are this script and
+    /// `veilvoice-check`'s, and a reader on one machine may follow either. They
+    /// answer to one enumeration so that they cannot describe different
+    /// machines.
+    fn system(self) -> veilvoice_check::reproduce::System {
         match self {
-            Flavour::Linux => "sha256sum -c SHA256SUMS --ignore-missing",
-            Flavour::MacOs => "shasum -a 256 -c SHA256SUMS --ignore-missing",
+            Flavour::Linux => veilvoice_check::reproduce::System::Linux,
+            Flavour::MacOs => veilvoice_check::reproduce::System::MacOs,
+            Flavour::Bsd => veilvoice_check::reproduce::System::Bsd,
         }
+    }
+
+    /// The command that checks a file against `SHA256SUMS`.
+    ///
+    /// Asked of [`veilvoice_check::reproduce::System`] rather than answered
+    /// here. This function used to answer it, knew two systems, and was wrong
+    /// about the third.
+    fn hash_check(self) -> &'static str {
+        self.system().hash_check_command()
     }
 
     /// What to type if GnuPG is not installed.
@@ -57,6 +85,12 @@ impl Flavour {
                 "sudo apt-get install -y gnupg   (or your package manager's equivalent)"
             }
             Flavour::MacOs => "brew install gnupg",
+            // FreeBSD's spelling, which this repository already uses in
+            // `install/install.sh`. OpenBSD's `pkg_add` and NetBSD's `pkgin`
+            // are not named here, because this project has not run them and
+            // does not print commands it has not run. The hedge is the same one
+            // the Linux line carries, for the same reason.
+            Flavour::Bsd => "sudo pkg install -y gnupg   (or your system's equivalent)",
         }
     }
 
@@ -65,6 +99,7 @@ impl Flavour {
         match self {
             Flavour::Linux => "verify-veilvoice.sh",
             Flavour::MacOs => "verify-veilvoice-macos.sh",
+            Flavour::Bsd => "verify-veilvoice-bsd.sh",
         }
     }
 }
@@ -186,7 +221,7 @@ mod tests {
     /// The one thing that must never drift.
     #[test]
     fn the_script_carries_the_fingerprint_the_programs_use() {
-        for flavour in [Flavour::Linux, Flavour::MacOs] {
+        for flavour in Flavour::ALL.iter().copied() {
             assert!(
                 shell(flavour).contains(veilvoice_check::FINGERPRINT),
                 "the script does not carry the project's fingerprint"
@@ -199,7 +234,7 @@ mod tests {
     /// than trusted to stay written correctly.
     #[test]
     fn the_signature_is_checked_before_the_hashes() {
-        for flavour in [Flavour::Linux, Flavour::MacOs] {
+        for flavour in Flavour::ALL.iter().copied() {
             let script = shell(flavour);
             let signature = script
                 .find("gpg --status-fd 1 --verify")
@@ -217,9 +252,127 @@ mod tests {
 
     /// It checks what is here; it does not fetch anything. A verification
     /// script with a network path in it is a different and worse thing.
+    /// **F-167.** The two scripts a reader might follow agree about their
+    /// machine.
+    ///
+    /// This repository ships two shell scripts that check a download: this one,
+    /// which verifies a signature and a hash list, and `veilvoice-check`'s,
+    /// which reproduces the build. A reader on one machine may run either, and
+    /// for a while they named different hash tools on the BSDs, because this
+    /// module carried its own copy of the answer and that copy knew two
+    /// systems.
+    ///
+    /// The copy is gone and this is what keeps it gone: every flavour asks the
+    /// other module, and a flavour added here without a system there would not
+    /// compile.
+    #[test]
+    fn no_script_names_another_machines_hash_tool() {
+        // `hash_check` *is* `system().hash_check_command()` now, so comparing
+        // the two would be comparing a function with itself. What can still go
+        // wrong, and did, is a reader being handed the wrong script: the tool
+        // has to reach the text, and no other machine's tool may.
+        for flavour in Flavour::ALL.iter().copied() {
+            let script = shell(flavour);
+            let mine = flavour.system().hash_check_command();
+            assert!(
+                script.contains(mine),
+                "the {flavour:?} script does not run {mine:?}, which is what \
+                 that machine checks hashes with"
+            );
+            for other in Flavour::ALL.iter().copied() {
+                if other == flavour {
+                    continue;
+                }
+                let theirs = other.system().hash_check_command();
+                // The BSDs' `sha256 -c` is a substring of nothing here, and
+                // `sha256sum -c` contains no other tool's name, so a plain
+                // containment check is exact for these three. It is asserted
+                // rather than assumed, because a fourth tool whose name
+                // contains another's would make this test quietly weaker.
+                assert!(
+                    !mine.contains(theirs) && !theirs.contains(mine),
+                    "{mine:?} and {theirs:?} contain one another, so this test \
+                     cannot tell them apart any more"
+                );
+                assert!(
+                    !script.contains(theirs),
+                    "the {flavour:?} script tells the reader to run {theirs:?}, \
+                     which belongs to {other:?}. That is F-167: a reader on one \
+                     machine given another machine's command"
+                );
+            }
+        }
+    }
+
+    /// **Marker 129.** The guide's per-system table is the program's answer.
+    ///
+    /// The row this comes from asks for the verification to be written up per
+    /// platform "rather than left as a Linux instruction somebody has to
+    /// translate". A table of commands in a document is a copy of what the
+    /// program prints, and a copy goes stale: F-167 was two copies of exactly
+    /// this answer disagreeing. So the table is checked here against the code
+    /// it describes, which is what `CLAUDE.md` asks for when a fact cannot be
+    /// derived.
+    ///
+    /// Read out of the guide's source. If the table moves, this fails saying
+    /// it cannot find it, rather than passing because there was nothing left
+    /// to check.
+    #[test]
+    fn the_guides_table_of_systems_is_what_the_program_prints() {
+        let guide = include_str!("../../../docs/USER_GUIDE.md").replace("\r\n", "\n");
+        let table = guide
+            .split("| Your system | The script it writes |")
+            .nth(1)
+            .and_then(|rest| rest.split("\n\n").next())
+            .expect("the per-system table has to be findable in the user guide");
+
+        for flavour in Flavour::ALL.iter().copied() {
+            let name = flavour.file_name();
+            let command = flavour.system().hash_check_command();
+            assert!(
+                table.contains(&format!("`{name}`")),
+                "the guide's table does not name {name:?}, which is the file \
+                 `--script --system {}` writes",
+                flavour.system().key()
+            );
+            assert!(
+                table.contains(&format!("`{command}`")),
+                "the guide's table does not carry {command:?}, which is what \
+                 the {flavour:?} script runs"
+            );
+        }
+        // And nothing else: a fourth row would describe a system the program
+        // has no script for, which is the failure this is guarding against
+        // pointed the other way.
+        let rows = table.lines().filter(|line| line.starts_with('|')).count();
+        assert_eq!(
+            rows,
+            Flavour::ALL.len() + 1,
+            "the guide's table has {rows} lines including its rule, and the \
+             program has {} systems",
+            Flavour::ALL.len()
+        );
+    }
+
+    /// Every flavour has a file name of its own.
+    ///
+    /// Two flavours sharing one would mean a reader saving the second over the
+    /// first, which is how somebody on a BSD ends up running the macOS script.
+    #[test]
+    fn every_flavour_is_saved_under_its_own_name() {
+        let mut seen = std::collections::BTreeSet::new();
+        for flavour in Flavour::ALL.iter().copied() {
+            assert!(
+                seen.insert(flavour.file_name()),
+                "{flavour:?} shares a file name with another flavour"
+            );
+        }
+        assert_eq!(seen.len(), Flavour::ALL.len());
+    }
+
     #[test]
     fn the_script_downloads_nothing() {
-        for flavour in [Flavour::Linux, Flavour::MacOs] {
+        for flavour in Flavour::ALL.iter().copied() {
             let script = shell(flavour);
             for fetcher in ["curl ", "wget ", "nc "] {
                 assert!(
@@ -241,7 +394,7 @@ mod tests {
     /// keeping a test that could not tell a command from a sentence.
     #[test]
     fn the_script_installs_nothing() {
-        for flavour in [Flavour::Linux, Flavour::MacOs] {
+        for flavour in Flavour::ALL.iter().copied() {
             let script = shell(flavour);
             let mut inside_string = false;
             for line in script.lines() {
@@ -270,6 +423,16 @@ mod tests {
         assert!(shell(Flavour::Linux).contains("sha256sum -c"));
         assert!(shell(Flavour::MacOs).contains("shasum -a 256 -c"));
         assert!(!shell(Flavour::MacOs).contains("sha256sum -c"));
+        // **F-167.** The BSDs ship `sha256`, and this script used not to have
+        // a spelling for them at all: they fell through to Linux and were told
+        // to run `sha256sum -c`, which the reproduce script in the same
+        // release says they do not have.
+        assert!(shell(Flavour::Bsd).contains("sha256 -c"));
+        assert!(
+            !shell(Flavour::Bsd).contains("sha256sum"),
+            "the BSD script names a tool this project's other script says the \
+             BSDs do not have"
+        );
     }
 
     /// The script says where the files come from. Somebody running it in the

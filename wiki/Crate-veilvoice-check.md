@@ -82,7 +82,7 @@ built the same thing and got the same answer.
 flowchart TD
     n_lib(["lib.rs<br/>472 lines"])
     n_contents["contents.rs<br/>623 lines"]
-    n_reproduce["reproduce.rs<br/>536 lines"]
+    n_reproduce["reproduce.rs<br/>542 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" "open the source"
     click n_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" "open the source"
     click n_reproduce href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/reproduce.rs" "open the source"
@@ -96,7 +96,7 @@ flowchart TD
 |---|---:|---|
 | [[`contents.rs`|File-veilvoice-check-contents]] | 623 | The signed list of what is inside each release archive. |
 | [[`lib.rs`|File-veilvoice-check-lib]] | 472 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
-| [[`reproduce.rs`|File-veilvoice-check-reproduce]] | 536 | A script that rebuilds a release and compares it with what was published. |
+| [[`reproduce.rs`|File-veilvoice-check-reproduce]] | 542 | A script that rebuilds a release and compares it with what was published. |
 
 **1,063 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
