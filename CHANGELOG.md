@@ -8,6 +8,25 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**A microphone and an output that never compared their rates**
+
+- The live path built the engine and the ring between its callbacks from the
+  output device's sample rate, and the input stream from the microphone's, and
+  never checked that the two were the same number.
+- Where they are not, and a laptop with a 44.1 kHz microphone and 48 kHz
+  speakers is an ordinary machine, the ring starves continuously and the veiled
+  voice comes out about a semitone and a half sharp and stuttering.
+- Invisible twice over: the starvation reads as "this machine is too slow",
+  and the pitch is *meant* to change, because this is a voice de-identifier.
+- Both devices are now put on one rate: the one they already share, the
+  output's if the microphone will take it, or the microphone's if the output
+  will. If neither will move, it refuses and names both rates and what to do,
+  rather than running them together and quietly shifting the voice.
+- The output's rate is preferred, because it is what the person hears through
+  and what anything on a virtual cable expects.
+- Nothing here resamples, and adding a resampler to paper over a mismatch would
+  be a quality and latency decision taken to avoid saying something.
+
 **The Studio has a failsafe of its own, and a running take says what it keeps**
 
 - Both are clauses of marker 145 that nothing had built, found by reading that
