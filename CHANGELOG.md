@@ -8,6 +8,34 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Every screenshot the same size, and in the face they were meant to be in**
+
+- The captures were trimmed to each tab's own content, with a floor. That gave
+  eight pictures 1000 tall, one 1095 and one 1315, which is right for one
+  picture and wrong for the grid the README and the website show them in: the
+  row holding the group tab sat lower than the rows either side of it.
+- **One height now, and it is the tallest one's content**, measured across the
+  set on every run rather than written down. It is the only shared height that
+  crops nothing: trimming to the shortest would cut the group panel off, and
+  scaling would make the text in one picture a different size from the next.
+  The cost is real and is paid on purpose: the short tabs carry background below
+  their content. Empty space in a picture reads as the window having room; a
+  stepped grid reads as a mistake.
+- **The captures are in JetBrains Mono, and that is now proved rather than
+  hoped.** The window prefers it and falls back to the built-in monospace when
+  it is absent, which is right for somebody running the program and wrong for a
+  capture: half a set in the wrong face looks subtly off and nothing about the
+  run says so. `veilvoice-gui --typeface` answers which face the window would
+  draw with, without opening one, and the capture script asks first and refuses
+  to photograph anything if the answer is the fallback, naming the package for
+  each platform.
+- All ten retaken, so they show what this release actually contains.
+- More room between them on the website: 40px across and 48px down, more
+  vertically because each picture has a caption under it and a matching row gap
+  put the next picture as close to a caption as the caption is to its own
+  picture. The README's grid is a table GitHub renders and strips styles from,
+  so there the equal heights are the whole of the fix.
+
 **ffmpeg joins the companion list, and the render points at it**
 
 - The Setup tab lists the software VeilVoice works with, says who makes each and

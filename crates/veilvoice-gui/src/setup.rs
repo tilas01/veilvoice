@@ -984,3 +984,48 @@ mod companion_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod typeface_tests {
+    /// The capture script refuses to photograph in the wrong face.
+    ///
+    /// The window prefers JetBrains Mono and falls back to the built-in
+    /// monospace. That fallback is right for somebody running the program and
+    /// wrong for a screenshot: a capture in the wrong face looks subtly unlike
+    /// every other picture in the set and nothing about the run says so, so
+    /// half a set could be published before anybody noticed.
+    #[test]
+    fn the_capture_script_will_not_photograph_in_the_fallback_face() {
+        let script =
+            std::fs::read_to_string("../../tools/shots/gui.sh").expect("the Linux capture script");
+        assert!(
+            script.contains("--typeface"),
+            "the script does not ask which face the window would use"
+        );
+        assert!(
+            script.contains("JetBrains Mono"),
+            "the script does not check for the face it wants"
+        );
+        assert!(
+            script.contains("exit 1"),
+            "the script does not refuse, so it would capture in the fallback"
+        );
+    }
+
+    /// The flag exists and is documented in the usage text.
+    ///
+    /// A flag the capture script depends on and the help does not mention is
+    /// one somebody removes as unused.
+    #[test]
+    fn the_typeface_flag_is_documented_where_it_is_answered() {
+        let main = std::fs::read_to_string("src/main.rs").expect("the binary's source");
+        assert!(
+            main.contains("--typeface"),
+            "the flag is not answered in main.rs"
+        );
+        assert!(
+            main.contains("--typeface    Say which face"),
+            "the flag is answered and not documented in the usage text"
+        );
+    }
+}

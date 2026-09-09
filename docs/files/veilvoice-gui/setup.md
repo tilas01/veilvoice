@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/setup.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 986 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1031 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ exact command is shown before the question.
 
 ## What this file contains
 
-986 lines defining **17 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1031 lines defining **17 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -198,6 +198,7 @@ flowchart TD
 | `install_changes` <sub>fn</sub> | [760](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L760) |  |
 | `field` <sub>fn</sub> | [772](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L772) |  |
 | `companion_tests` <sub>mod</sub> | [931](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L931) |  |
+| `typeface_tests` <sub>mod</sub> | [989](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L989) |  |
 
 ---
 

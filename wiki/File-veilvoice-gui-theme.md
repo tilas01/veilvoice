@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/theme.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 784 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 796 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
 
 ## Contents
 
@@ -52,7 +52,7 @@ next time.
 
 ## What this file contains
 
-784 lines defining **8 functions** (7 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+796 lines defining **9 functions** (8 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -63,7 +63,9 @@ next time.
 - `load_custom` (line 294) -- Read the user's palettes and add them to the table.
 - `set_by_id` (line 315) -- Switch to id, and apply it to ctx.
   - reaches: `by_id`, `install`, `themes`, `active`
-- `install_fonts` (line 435) -- Load JetBrains Mono if the system has it.
+- `jetbrains_mono_path` (line 442) -- Where JetBrains Mono is on this machine, if it is anywhere.
+  - reaches: `user_font_paths`
+- `install_fonts` (line 447) -- Load JetBrains Mono if the system has it.
   - reaches: `user_font_paths`
 
 ## What calls what
@@ -86,12 +88,14 @@ flowchart TD
     n_by_id["by_id<br/>line 308"]
     n_set_by_id(["set_by_id<br/>line 315"])
     n_user_font_paths["user_font_paths<br/>line 420"]
-    n_install_fonts(["install_fonts<br/>line 435"])
-    n_install["install<br/>line 459"]
+    n_jetbrains_mono_path(["jetbrains_mono_path<br/>line 442"])
+    n_install_fonts(["install_fonts<br/>line 447"])
+    n_install["install<br/>line 471"]
     n_active --> n_themes
     n_by_id --> n_themes
     n_install --> n_active
     n_install_fonts --> n_user_font_paths
+    n_jetbrains_mono_path --> n_user_font_paths
     n_set_by_id --> n_by_id
     n_set_by_id --> n_install
     click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L264" "open the source"
@@ -100,10 +104,11 @@ flowchart TD
     click n_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L308" "open the source"
     click n_set_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L315" "open the source"
     click n_user_font_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420" "open the source"
-    click n_install_fonts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L459" "open the source"
+    click n_jetbrains_mono_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L442" "open the source"
+    click n_install_fonts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L447" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L471" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_load_custom,n_set_by_id,n_install_fonts entry
+    class n_load_custom,n_set_by_id,n_jetbrains_mono_path,n_install_fonts entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_active,n_themes,n_by_id,n_install api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -129,5 +134,6 @@ flowchart TD
 | `palette` <sub>pub mod</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L332) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
 | `JETBRAINS_MONO_PATHS` <sub>const</sub> | [408](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L408) | Places JetBrains Mono is normally installed. |
 | `user_font_paths` <sub>fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420) |  |
-| `install_fonts` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435) | Load JetBrains Mono if the system has it. |
-| `install` <sub>pub fn</sub> | [459](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L459) | Apply the active theme's visuals and a monospace-everywhere type scale. |
+| `jetbrains_mono_path` <sub>pub fn</sub> | [442](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L442) | Where JetBrains Mono is on this machine, if it is anywhere. |
+| `install_fonts` <sub>pub fn</sub> | [447](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L447) | Load JetBrains Mono if the system has it. |
+| `install` <sub>pub fn</sub> | [471](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L471) | Apply the active theme's visuals and a monospace-everywhere type scale. |

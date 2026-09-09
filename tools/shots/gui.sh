@@ -69,6 +69,65 @@ out="${1:-$here/assets/screenshots}"
 width="${SHOT_WIDTH:-1400}"
 height="${SHOT_HEIGHT:-1600}"
 
+# The size every finished picture is, after `fit.py`.
+#
+# It used to be each tab's own content height, with a floor of 1000. That is
+# right for one picture and wrong for ten: the README and the website show them
+# in a grid, and a grid of 1000s with a 1315 and a 1095 in it steps, so the row
+# containing `group` sits lower than the rows either side of it.
+#
+# So they are all the tallest, which is the only shared height that crops
+# nothing. Trimming every picture to the shortest would cut the bottom off
+# `group`, and scaling them to match would make the text in one picture a
+# different size from the text in the next.
+#
+# 1315 is `group`, measured. It is passed to `fit.py` rather than written into
+# it, and the check in `images.test.js` reads the pictures rather than this
+# number, so a tab that grows past it fails the build instead of being cropped.
+shared_height="${SHOT_SHARED_HEIGHT:-1315}"
+
+# JetBrains Mono, or nothing.
+#
+# The window prefers it and falls back to egui's own monospace when it is
+# absent. That fallback is right for somebody running the program and wrong
+# here: a capture taken with the built-in face looks subtly unlike every other
+# picture in the set, and **nothing about the run says so**. Half a set of
+# screenshots in the wrong face is the kind of thing noticed on the website
+# weeks later.
+#
+# So it is asked first, and refused rather than fallen back on. The answer comes
+# from the program itself, through `--typeface`, rather than from `fc-list`:
+# what matters is which face *this binary* would load, and the two can disagree
+# (a font installed somewhere the program does not look is on `fc-list` and is
+# not on its list of paths).
+if [ -x "$exe" ]; then
+  face="$("$exe" --typeface 2>/dev/null || true)"
+  case "$face" in
+    "JetBrains Mono"*)
+      echo "typeface: ${face}"
+      ;;
+    *)
+      cat >&2 <<'WHY'
+JetBrains Mono is not installed where the application looks for it, so these
+captures would be taken in the built-in monospace face and would not match the
+ones already committed.
+
+Install it and run this again:
+
+  Debian, Ubuntu    sudo apt-get install fonts-jetbrains-mono
+  Fedora            sudo dnf install jetbrains-mono-fonts
+  Arch              sudo pacman -S ttf-jetbrains-mono
+  macOS             brew install --cask font-jetbrains-mono
+  Windows           winget install --id JetBrains.JetBrainsMono
+
+`veilvoice-gui --typeface` says which face the window would draw with, and is
+what this script just asked.
+WHY
+      exit 1
+      ;;
+  esac
+fi
+
 for tool in Xvfb xwd; do
   command -v "$tool" >/dev/null 2>&1 || {
     echo "missing $tool -- install xvfb and x11-apps" >&2
