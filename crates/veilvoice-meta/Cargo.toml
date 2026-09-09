@@ -15,5 +15,9 @@ lofty = "0.25"
 img-parts = "0.4"
 
 [dev-dependencies]
+# Tests that write a real WAV, so the cleaner is run over a file rather than
+# over bytes this crate made up.
 hound = "3"
+# Tests that write a file and clean it, in a directory that goes away with
+# them.
 tempfile = "3"

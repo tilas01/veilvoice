@@ -9,11 +9,15 @@ repository.workspace = true
 description = "Named profiles and saved projects: the settings a recording was made with, written down so the next one can be made the same way."
 
 [dependencies]
+# The engine configuration a saved profile is.
 veilvoice-core = { path = "../veilvoice-core" }
+# Which voice mode a saved group recording was made with.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 # For `privatefile`, which is what writes a project file the rest of this
 # program's rules would recognise. A project holds the names somebody typed.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 
 [dev-dependencies]
+# Tests that write a workspace and load it again, in a directory that goes
+# away with them.
 tempfile = "3"

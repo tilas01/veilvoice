@@ -23,36 +23,78 @@ live = ["veilvoice-audio/live"]
 # beside rather than by a second binary somebody has to find. It was a binary
 # of its own until 0.1.18; `src/lib.rs` there says what that cost.
 veilvoice-verify = { path = "../veilvoice-verify" }
+# `veilvoice verify` offering to run the reader's own GnuPG, and the
+# per-platform script that installs one.
 veilvoice-gnupg = { path = "../veilvoice-gnupg" }
+# The verifier: the signed hash lists, the contents manifest, and which
+# platforms reproduce.
 veilvoice-check = { path = "../veilvoice-check" }
+# The engine's version, its configuration, and the seed-roll range parser the
+# flags share with the window.
 veilvoice-core = { path = "../veilvoice-core" }
+# Everything sealed: the container, the app lock, owner-only writes and
+# `shred`.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
+# `veilvoice guard`: the manifest of this installation, and what it can and
+# cannot blame.
 veilvoice-guard = { path = "../veilvoice-guard" }
+# Capture, playback, decoding and the live session `veilvoice live` and
+# `record` run.
 veilvoice-audio = { path = "../veilvoice-audio", default-features = false }
+# What a virtual cable is, and how the ones this machine has are described.
 veilvoice-capture = { path = "../veilvoice-capture" }
+# `veilvoice accel`: what hardware acceleration changes, and how many threads
+# are usable here.
 veilvoice-accel = { path = "../veilvoice-accel" }
+# `veilvoice decoy`: making vaults that are indistinguishable by size, and
+# saying what that does not do.
 veilvoice-decoy = { path = "../veilvoice-decoy" }
+# `veilvoice appctl`: what closing another program is allowed to mean.
 veilvoice-appctl = { path = "../veilvoice-appctl" }
+# The safety catch's own words about what it cannot prevent and what it never
+# closes.
 veilvoice-failsafe = { path = "../veilvoice-failsafe" }
+# `veilvoice input`: what can reach the keyboard and mouse, and why nothing
+# here hooks them.
 veilvoice-input = { path = "../veilvoice-input" }
+# `veilvoice priv`: the privilege this process is running at, and the three
+# things it never does.
 veilvoice-priv = { path = "../veilvoice-priv" }
+# Whether a named process is running, for `appctl`.
 veilvoice-proc = { path = "../veilvoice-proc" }
+# Group mode: the plan, the render and the subtitles.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
+# Stripping tags, EXIF and GPS out of what is written.
 veilvoice-meta = { path = "../veilvoice-meta" }
+# Settings somebody else decided, and the mandate that seals them.
 veilvoice-policy = { path = "../veilvoice-policy" }
+# `veilvoice sentry`: the canary files and the rate limit behind the app lock.
 veilvoice-sentry = { path = "../veilvoice-sentry" }
+# Installing this copy, and finding the encrypted volumes it can write into.
 veilvoice-setup = { path = "../veilvoice-setup" }
+# The preview page, the palette every speaker is coloured from, and the render
+# size.
 veilvoice-video = { path = "../veilvoice-video" }
+# Who is holding the microphone and the camera, which the safety catch reads.
 veilvoice-watch = { path = "../veilvoice-watch" }
+# The argument parser and the derived subcommands. The help it prints is the
+# reference the documentation is generated from.
 clap = { version = "4", features = ["derive"] }
+# Reading a passphrase without echoing it. A terminal that shows the password
+# while it is typed is the one thing this must not do.
 rpassword = "7"
+# Wiping the passphrase buffer once the key is derived from it.
 zeroize.workspace = true
 
 [dev-dependencies]
+# Tests that write a vault, a lock or a plan and read it back, in a directory
+# that goes away with them.
 tempfile = "3"
 
 # Embeds the application icon and version block into the Windows executable.
 # A *build* dependency only: it is not in the shipped dependency graph, and the
 # `offline` CI job that forbids network crates is unaffected.
 [target.'cfg(windows)'.build-dependencies]
+# The Windows resource block: the icon, the version and the manifest, compiled
+# into the executable by `build.rs`.
 winresource = "0.1"

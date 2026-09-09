@@ -69,9 +69,15 @@ homepage = "https://github.com/tilas01/veilvoice"
 [workspace.dependencies]
 # --- DSP / math ---
 realfft = "3"            # real-input FFT built on rustfft; re-exports num-complex
+# The complex FFT `realfft` is built on. Named here so both are pinned
+# together: a version skew between them is a type mismatch in the engine's hot
+# path.
 rustfft = "6"
 # --- cryptographic randomness ---
 getrandom = "0.2"        # OS CSPRNG seed
+# The `Rng` traits the modulation stream is driven through. The randomness
+# itself is `rand_chacha`, seeded from `getrandom`; this is the interface, not
+# the source.
 rand = "0.8"
 rand_chacha = "0.3"      # ChaCha20 CSPRNG for parameter modulation
 # --- secret hygiene ---

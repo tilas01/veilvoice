@@ -9,7 +9,11 @@ repository.workspace = true
 description = "A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg."
 
 [dependencies]
+# The plan the preview page is drawn from: who speaks, when, and in which
+# colour.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 
 [dev-dependencies]
+# Tests that write a page and read it back, in a directory that goes away with
+# them.
 tempfile = "3"

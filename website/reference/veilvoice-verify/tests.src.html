@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1194 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1356 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1306,6 +1306,170 @@
 <span class="ln" id="L1192">        starters[<span class="tok-num">0</span>]</span>
 <span class="ln" id="L1193">    );</span>
 <span class="ln" id="L1194">}</span>
+</span>
+<span class="ln" id="L1195"></span>
+<span class="src-item" id="fn-no_audio_callback_allocates_or_blocks">
+<span class="ln" id="L1196"><span class="tok-com">/// **Marker 126.** Nothing in an audio callback allocates, locks or prints.</span></span>
+<span class="ln" id="L1197"><span class="tok-com">///</span></span>
+<span class="ln" id="L1198"><span class="tok-com">/// A callback runs on the operating system&#x27;s audio thread with a deadline</span></span>
+<span class="ln" id="L1199"><span class="tok-com">/// measured in milliseconds. Allocating in one takes a global lock in the</span></span>
+<span class="ln" id="L1200"><span class="tok-com">/// allocator, blocking on a mutex hands the thread to whoever holds it, and</span></span>
+<span class="ln" id="L1201"><span class="tok-com">/// printing takes the lock on standard output. Each of those is somebody</span></span>
+<span class="ln" id="L1202"><span class="tok-com">/// else&#x27;s schedule deciding when this thread runs again, and missing the</span></span>
+<span class="ln" id="L1203"><span class="tok-com">/// deadline is an audible click in the veiled voice, or a dropped block in a</span></span>
+<span class="ln" id="L1204"><span class="tok-com">/// recording.</span></span>
+<span class="ln" id="L1205"><span class="tok-com">///</span></span>
+<span class="ln" id="L1206"><span class="tok-com">/// Every buffer these callbacks use is sized once, before the stream starts.</span></span>
+<span class="ln" id="L1207"><span class="tok-com">/// That is a fact about how they are written, and until now it was a fact</span></span>
+<span class="ln" id="L1208"><span class="tok-com">/// nothing checked: the comments say &quot;sized once, here, so the callback never</span></span>
+<span class="ln" id="L1209"><span class="tok-com">/// allocates&quot;, and a comment is not a guard. This reads the callbacks</span></span>
+<span class="ln" id="L1210"><span class="tok-com">/// themselves.</span></span>
+<span class="ln" id="L1211"><span class="tok-com">///</span></span>
+<span class="ln" id="L1212"><span class="tok-com">/// Written rather than measured, deliberately. A test that counted</span></span>
+<span class="ln" id="L1213"><span class="tok-com">/// allocations would need a global allocator hook and a running stream, which</span></span>
+<span class="ln" id="L1214"><span class="tok-com">/// means a machine with a sound card, which is what F-163 and F-165 were about.</span></span>
+<span class="ln" id="L1215"><span class="tok-com">/// Reading the source finds the same mistake on a build machine with no audio</span></span>
+<span class="ln" id="L1216"><span class="tok-com">/// at all.</span></span>
+<span class="ln" id="L1217"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1218"><span class="tok-kw">fn</span> <span class="tok-fn">no_audio_callback_allocates_or_blocks</span>() {</span>
+<span class="ln" id="L1219">    <span class="tok-kw">let</span> crates = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L1220">        .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L1221">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
+<span class="ln" id="L1222">        .<span class="tok-fn">to_path_buf</span>();</span>
+<span class="ln" id="L1223"></span>
+<span class="ln" id="L1224">    <span class="tok-com">/// Where a realtime callback is handed to the platform. The closure that</span></span>
+<span class="ln" id="L1225">    <span class="tok-com">/// follows one of these is the body with the deadline on it.</span></span>
+<span class="ln" id="L1226">    <span class="tok-kw">const</span> OPENS_A_STREAM: &amp;[&amp;str] = &amp;[<span class="tok-str">&quot;build_input_stream(&quot;</span>, <span class="tok-str">&quot;build_output_stream(&quot;</span>];</span>
+<span class="ln" id="L1227"></span>
+<span class="ln" id="L1228">    <span class="tok-com">/// What may not appear inside one, and what each would cost.</span></span>
+<span class="ln" id="L1229">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1230">    <span class="tok-com">/// `try_lock` and `try_push` are the non-blocking forms and are what this</span></span>
+<span class="ln" id="L1231">    <span class="tok-com">/// code already uses, so a needle that is a prefix of one is matched on the</span></span>
+<span class="ln" id="L1232">    <span class="tok-com">/// call rather than on the name: see `reaches` below.</span></span>
+<span class="ln" id="L1233">    <span class="tok-kw">const</span> FORBIDDEN: &amp;[(&amp;str, &amp;str)] = &amp;[</span>
+<span class="ln" id="L1234">        (<span class="tok-str">&quot;vec![&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1235">        (<span class="tok-str">&quot;Vec::&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1236">        (<span class="tok-str">&quot;.to_vec()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1237">        (<span class="tok-str">&quot;.to_owned()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1238">        (<span class="tok-str">&quot;.to_string()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1239">        (<span class="tok-str">&quot;String::&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1240">        (<span class="tok-str">&quot;format!&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1241">        (<span class="tok-str">&quot;.collect()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1242">        (<span class="tok-str">&quot;Box::new&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1243">        (<span class="tok-str">&quot;.clone()&quot;</span>, <span class="tok-str">&quot;may allocate&quot;</span>),</span>
+<span class="ln" id="L1244">        (<span class="tok-str">&quot;.push(&quot;</span>, <span class="tok-str">&quot;may reallocate; the ring&#x27;s `try_push` does not&quot;</span>),</span>
+<span class="ln" id="L1245">        (<span class="tok-str">&quot;.insert(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
+<span class="ln" id="L1246">        (<span class="tok-str">&quot;.extend(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
+<span class="ln" id="L1247">        (<span class="tok-str">&quot;.resize(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
+<span class="ln" id="L1248">        (<span class="tok-str">&quot;.reserve(&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1249">        (<span class="tok-str">&quot;.lock()&quot;</span>, <span class="tok-str">&quot;blocks; `try_lock` is what this code uses&quot;</span>),</span>
+<span class="ln" id="L1250">        (<span class="tok-str">&quot;println!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard output&quot;</span>),</span>
+<span class="ln" id="L1251">        (<span class="tok-str">&quot;eprintln!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard error&quot;</span>),</span>
+<span class="ln" id="L1252">        (<span class="tok-str">&quot;print!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard output&quot;</span>),</span>
+<span class="ln" id="L1253">    ];</span>
+<span class="ln" id="L1254"></span>
+<span class="ln" id="L1255">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1256">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![crates.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L1257">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L1258">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a crate directory&quot;</span>) {</span>
+<span class="ln" id="L1259">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L1260">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L1261">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L1262">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1263">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L1264">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1265">            }</span>
+<span class="ln" id="L1266">        }</span>
+<span class="ln" id="L1267">    }</span>
+<span class="ln" id="L1268"></span>
+<span class="ln" id="L1269">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> callbacks = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1270">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1271">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L1272">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L1273">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L1274">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
+<span class="ln" id="L1275">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L1276">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L1277">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
+<span class="ln" id="L1278">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
+<span class="ln" id="L1279">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1280"></span>
+<span class="ln" id="L1281">        <span class="tok-kw">for</span> opener <span class="tok-kw">in</span> OPENS_A_STREAM {</span>
+<span class="ln" id="L1282">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> from = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1283">            while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = text[from..].<span class="tok-fn">find</span>(opener) {</span>
+<span class="ln" id="L1284">                <span class="tok-kw">let</span> at = from + at;</span>
+<span class="ln" id="L1285">                from = at + opener.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L1286">                <span class="tok-com">// A needle is not a call: this guard names what it looks for.</span></span>
+<span class="ln" id="L1287">                <span class="tok-kw">let</span> line_start = text[..at].<span class="tok-fn">rfind</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">map_or</span>(<span class="tok-num">0</span>, |n| n + <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1288">                <span class="tok-kw">if</span> text[line_start..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1289">                    continue;</span>
+<span class="ln" id="L1290">                }</span>
+<span class="ln" id="L1291"></span>
+<span class="ln" id="L1292">                <span class="tok-com">// The data callback is the first closure after the opener, and</span></span>
+<span class="ln" id="L1293">                <span class="tok-com">// its body is from its `{` to the matching `}`.</span></span>
+<span class="ln" id="L1294">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(brace) = text[at..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;| {&quot;</span>).<span class="tok-fn">map</span>(|n| at + n + <span class="tok-num">2</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1295">                    continue;</span>
+<span class="ln" id="L1296">                };</span>
+<span class="ln" id="L1297">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> depth = 0usize;</span>
+<span class="ln" id="L1298">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> end = brace;</span>
+<span class="ln" id="L1299">                <span class="tok-kw">for</span> (offset, byte) <span class="tok-kw">in</span> text[brace..].<span class="tok-fn">char_indices</span>() {</span>
+<span class="ln" id="L1300">                    <span class="tok-kw">match</span> byte {</span>
+<span class="ln" id="L1301">                        <span class="tok-str">&#x27;{&#x27;</span> =&gt; depth += <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1302">                        <span class="tok-str">&#x27;}&#x27;</span> =&gt; {</span>
+<span class="ln" id="L1303">                            depth -= <span class="tok-num">1</span>;</span>
+<span class="ln" id="L1304">                            <span class="tok-kw">if</span> depth == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L1305">                                end = brace + offset;</span>
+<span class="ln" id="L1306">                                break;</span>
+<span class="ln" id="L1307">                            }</span>
+<span class="ln" id="L1308">                        }</span>
+<span class="ln" id="L1309">                        _ =&gt; {}</span>
+<span class="ln" id="L1310">                    }</span>
+<span class="ln" id="L1311">                }</span>
+<span class="ln" id="L1312">                callbacks += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L1313"></span>
+<span class="ln" id="L1314">                <span class="tok-kw">let</span> before = text[..brace].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L1315">                <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text[brace..end].<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1316">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1317">                    <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L1318">                        continue;</span>
+<span class="ln" id="L1319">                    }</span>
+<span class="ln" id="L1320">                    <span class="tok-kw">for</span> (needle, cost) <span class="tok-kw">in</span> FORBIDDEN {</span>
+<span class="ln" id="L1321">                        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hit) = line.<span class="tok-fn">find</span>(needle) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1322">                            continue;</span>
+<span class="ln" id="L1323">                        };</span>
+<span class="ln" id="L1324">                        <span class="tok-com">// `try_lock()` and `try_push(` end in the needle and are</span></span>
+<span class="ln" id="L1325">                        <span class="tok-com">// the non-blocking forms. Only the bare call counts.</span></span>
+<span class="ln" id="L1326">                        <span class="tok-kw">if</span> line[..hit].<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;try_&quot;</span>) {</span>
+<span class="ln" id="L1327">                            continue;</span>
+<span class="ln" id="L1328">                        }</span>
+<span class="ln" id="L1329">                        <span class="tok-kw">if</span> line[..hit].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1330">                            continue;</span>
+<span class="ln" id="L1331">                        }</span>
+<span class="ln" id="L1332">                        offenders.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1333">                            <span class="tok-str">&quot;{name}:{}: {} ({needle} {cost})&quot;</span>,</span>
+<span class="ln" id="L1334">                            before + number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1335">                            line.<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L1336">                        ));</span>
+<span class="ln" id="L1337">                    }</span>
+<span class="ln" id="L1338">                }</span>
+<span class="ln" id="L1339">            }</span>
+<span class="ln" id="L1340">        }</span>
+<span class="ln" id="L1341">    }</span>
+<span class="ln" id="L1342"></span>
+<span class="ln" id="L1343">    assert!(</span>
+<span class="ln" id="L1344">        callbacks &gt;= <span class="tok-num">3</span>,</span>
+<span class="ln" id="L1345">        <span class="tok-str">&quot;the walk found {callbacks} audio callbacks, and there are at least \</span></span>
+<span class="ln" id="L1346"><span class="tok-str">         three: the live path&#x27;s input and output, and playback&#x27;s. A guard that \</span></span>
+<span class="ln" id="L1347"><span class="tok-str">         finds none passes for the wrong reason&quot;</span></span>
+<span class="ln" id="L1348">    );</span>
+<span class="ln" id="L1349">    assert!(</span>
+<span class="ln" id="L1350">        offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1351">        <span class="tok-str">&quot;these lines run on an audio thread with a deadline in milliseconds, \</span></span>
+<span class="ln" id="L1352"><span class="tok-str">         and each of them can miss it. Do the work before the stream starts, \</span></span>
+<span class="ln" id="L1353"><span class="tok-str">         into a buffer sized once:\n{}&quot;</span>,</span>
+<span class="ln" id="L1354">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1355">    );</span>
+<span class="ln" id="L1356">}</span>
 </span>
 </code></pre>
 </main>

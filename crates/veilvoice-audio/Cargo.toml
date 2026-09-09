@@ -17,6 +17,8 @@ default = ["live"]
 live = ["dep:cpal", "dep:ringbuf"]
 
 [dependencies]
+# The engine itself: `Deidentifier::process` is what the live path runs per
+# block, and `DeidConfig` is what it is configured with.
 veilvoice-core = { path = "../veilvoice-core" }
 # Locked, zeroizing memory for a recording that must never reach the page
 # file or a plaintext temporary. See `record`.
@@ -31,4 +33,6 @@ hound = "3"
 symphonia = { version = "0.5", features = ["mp3", "isomp4", "aac", "flac", "vorbis", "ogg", "wav", "pcm"] }
 
 [dev-dependencies]
+# Tests that write a file and read it back, in a directory that goes away with
+# them.
 tempfile = "3"

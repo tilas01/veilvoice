@@ -9,7 +9,11 @@ repository.workspace = true
 description = "Settings that can only be tightened, sealed with the project's own post-quantum cryptography."
 
 [dependencies]
+# Sealing a policy so it cannot be quietly rewritten, and the owner-only write
+# that puts it on disk.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 
 [dev-dependencies]
+# Tests that write a policy and read it back, in a directory that goes away
+# with them.
 tempfile = "3"

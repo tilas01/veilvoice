@@ -141,6 +141,11 @@ CHECKS = [
      [sys.executable, "tools/release/packaging.py"]),
     ("no state file is written one place and read another",
      [sys.executable, "tools/audit/state_paths.py"]),
+    # Marker 126. A dependency is a decision, and a decision with no sentence
+    # beside it is one nobody can revisit. The day this was added it found
+    # three that no line of code referred to.
+    ("every dependency says what it is for",
+     [sys.executable, "tools/audit/dependencies.py"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),

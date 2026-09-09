@@ -9,8 +9,14 @@ repository.workspace = true
 description = "Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them."
 
 [dependencies]
+# Sealing the manifest with a passphrase, so a list of what this installation
+# is cannot be quietly rewritten.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
+# The SHA-256 of every file the manifest lists, written in the same form
+# `sha256sum` prints so it can be checked without this program.
 sha2 = "0.10"
 
 [dev-dependencies]
+# Tests that write a manifest and check it, in a directory that goes away with
+# them.
 tempfile = "3"

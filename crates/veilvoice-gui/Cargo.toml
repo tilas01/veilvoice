@@ -13,33 +13,66 @@ name = "veilvoice-gui"
 path = "src/main.rs"
 
 [dependencies]
+# The engine's version and the configuration every tab that runs it is set
+# from.
 veilvoice-core = { path = "../veilvoice-core" }
+# Device enumeration, decoding, playback, and the live session the Studio
+# starts.
 veilvoice-audio = { path = "../veilvoice-audio" }
+# The app lock, the containers, the recording vault and the page-locked memory
+# a decrypted take lives in.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
+# Stripping tags out of a result before it is written.
 veilvoice-meta = { path = "../veilvoice-meta" }
+# Settings somebody else decided, and which controls that leaves the person.
 veilvoice-policy = { path = "../veilvoice-policy" }
+# The Verify tab, which runs the same check as `veilvoice verify` with the
+# same code underneath.
 veilvoice-check = { path = "../veilvoice-check" }
+# The second opinion on the Verify tab: the reader's own GnuPG, and the
+# commands it is asked to run.
 veilvoice-gnupg = { path = "../veilvoice-gnupg" }
+# Group mode and the Studio's plan, the render, and the subtitles.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
+# The Install tab, the encrypted volumes it can write into, and the free space
+# the first-run card measures.
 veilvoice-setup = { path = "../veilvoice-setup" }
+# The update check the person presses, and what it does and does not send.
 veilvoice-update = { path = "../veilvoice-update" }
+# The palettes speakers are coloured from, the preview page and the render
+# size.
 veilvoice-video = { path = "../veilvoice-video" }
+# The saved members of a group recording, and the profiles they are rendered
+# with.
 veilvoice-workspace = { path = "../veilvoice-workspace" }
+# The safety catch: what it found, what it may close, and what it never will.
 veilvoice-failsafe = { path = "../veilvoice-failsafe" }
+# The Monitor tab's feed of what is holding the microphone and the camera.
 veilvoice-watch = { path = "../veilvoice-watch" }
+# The integrity panel: the manifest of this installation and what changed in
+# it.
 veilvoice-guard = { path = "../veilvoice-guard" }
+# The window itself: the event loop, the graphics context and the `App` this
+# crate implements.
 eframe = { version = "0.32", default-features = false, features = ["glow", "default_fonts", "wayland", "x11"] }
+# The widgets. Every panel in this crate is drawn with it.
 egui = "0.32"
+# The platform's own file and folder panel, so choosing a file looks like
+# choosing a file on that machine rather than in this program.
 rfd = { version = "0.15", default-features = false, features = ["xdg-portal", "tokio"] }
 # Wipes typed passphrases out of the text fields that necessarily hold them in
 # the clear; see the `security` module for what that does and does not buy.
 zeroize.workspace = true
 
 [dev-dependencies]
+# Tests that write settings, a vault or a plan and read it back, in a
+# directory that goes away with them.
 tempfile = "3"
 
 # Embeds the application icon and version block into the Windows executable.
 # A *build* dependency only: it is not in the shipped dependency graph, and the
 # `offline` CI job that forbids network crates is unaffected.
 [target.'cfg(windows)'.build-dependencies]
+# The Windows resource block: the icon, the version and the manifest, compiled
+# into the executable by `build.rs`.
 winresource = "0.1"
