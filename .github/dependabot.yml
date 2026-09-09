@@ -1,0 +1,114 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# VeilVoice dependency monitoring.
+#
+# # What this repository actually depends on
+#
+# Two ecosystems, and only two. Every third-party line of code that ships in a
+# VeilVoice binary comes in through Cargo; everything that runs in CI comes in
+# through an action. There is no npm, bundler or pip ecosystem here: the
+# website's JavaScript and the site tests use Node's own built-in modules
+# (`fs`, `path`, `vm`, `child_process`) and nothing else, and every script under
+# `tools/` and `assets/` is pure standard-library Python. A `package.json` or a
+# `Gemfile` added here would declare no dependencies, and a manifest that says
+# nothing is one more file that has to be kept true.
+#
+# `Cargo.toml` is this project's package.json. There are 28 of them: the
+# workspace root, 27 crates, and `fuzz/`.
+#
+# # This file is checked rather than remembered
+#
+# `tools/audit/dependabot.py` reads this file and the tree beside it, and fails
+# the build if a manifest directory exists that no entry below covers. A crate
+# added outside the workspace, or a second workflow directory, would otherwise
+# stop being monitored silently, which is the kind of gap that is noticed a
+# year later. It runs in CI beside `tools/audit/dependencies.py`.
+
+version: 2
+
+updates:
+  # ---- Cargo, the workspace ----
+  #
+  # One entry covers the root manifest and every member crate: Cargo is a
+  # workspace-aware ecosystem, so Dependabot resolves `Cargo.lock` from the
+  # root and sees all 27 members through it. A separate entry per crate would
+  # open 27 pull requests for one bumped version.
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    # Ten is high enough that a quiet week clears the queue and low enough that
+    # a noisy one does not bury the repository. Every one of these is code that
+    # ships in a signed binary and is read before it is merged.
+    open-pull-requests-limit: 10
+    commit-message:
+      # Matches this repository's own subject style: a lowercase area, a colon,
+      # then what changed. `deps` rather than `chore`, because a dependency
+      # bump is a change to what this program ships, not housekeeping.
+      prefix: "deps"
+      prefix-development: "deps(dev)"
+      include: scope
+    groups:
+      # Patch and minor bumps arrive as one pull request per week rather than
+      # as twenty. A group that fails CI is bisected by hand, which is the
+      # trade: fewer reviews, and a slower answer on the rare week one breaks.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    # A major bump is its own pull request, ungrouped, because it is a decision
+    # rather than an update: it can change behaviour, drop a platform, or raise
+    # the minimum Rust version, and this project builds on the BSDs and on
+    # 32-bit targets where that matters more than it usually does.
+    labels:
+      - dependencies
+      - rust
+
+  # ---- Cargo, the fuzzing package ----
+  #
+  # `fuzz/` is deliberately excluded from the workspace (it needs nightly and
+  # its own profile), so the entry above does not reach it. Without this entry
+  # the fuzz targets would silently stop being monitored, which is the kind of
+  # gap that is only noticed when something in it has been unmaintained for a
+  # year. `tools/audit/dependencies.py` includes it for the same reason.
+  - package-ecosystem: cargo
+    directory: "/fuzz"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "deps(fuzz)"
+      include: scope
+    labels:
+      - dependencies
+      - rust
+      - fuzzing
+
+  # ---- GitHub Actions ----
+  #
+  # The actions in `.github/workflows/` run with a token that can write to this
+  # repository and, on the release workflow, publish signed artefacts. An
+  # action pinned to a tag that has been moved is a supply-chain problem with
+  # this project's signing in its blast radius, so these are monitored on the
+  # same terms as the code.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: scope
+    groups:
+      actions:
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - ci

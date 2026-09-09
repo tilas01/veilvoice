@@ -8,6 +8,26 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Dependabot, configured, and a check that keeps it true**
+
+- There was no `.github/dependabot.yml`. Nothing had ever raised a version
+  update or an alert against this tree. There is one now: the Cargo workspace,
+  `fuzz/` separately (it is outside the workspace, so an entry on the root does
+  not reach it), and the actions the workflows run, which hold a token that can
+  publish signed artefacts and are monitored on the same terms as the code.
+- **The configuration is checked rather than remembered.**
+  `tools/audit/dependabot.py` reads it against the tree and fails on a manifest
+  no entry covers, or an entry naming a directory that has gone. It runs in CI
+  beside the check that every dependency says what it is for, which is the
+  other half of the same question: saying what a dependency is for does not
+  make anything watch it.
+- Two ecosystems, and the file says why there are only two. The website's
+  JavaScript and the site tests use Node's own built-in modules and nothing
+  else, and every script under `tools/` and `assets/` is standard-library
+  Python, so a `package.json` or a `Gemfile` here would declare no dependencies
+  and would be one more file to keep true. `Cargo.toml` is this project's
+  package manifest, and there are 28 of them.
+
 **Several microphones at once, veiled and metered each** (marker 147)
 
 - `veilvoice_audio::room` opens one input per guest, veils each with its own
