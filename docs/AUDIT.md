@@ -466,6 +466,47 @@ this environment has none. What was verified is that two parts of one release
 now say the same thing, which is a claim about the tree and is exactly what
 could be checked from here.
 
+### F-168: a microphone and an output that never compared their rates
+
+Found while reading the live path to build marker 147, and it is the same shape
+as F-166 one layer out: two numbers that have to agree, in two places, never
+compared.
+
+`LiveSession::start_recording` took `input.default_input_config()` and
+`output.default_output_config()`. It built the engine and the ring between the
+callbacks from the **output's** rate, and the input stream from the
+**microphone's**. Nothing checked that they were the same number.
+
+On a machine where they are not, and a laptop whose microphone defaults to
+44.1 kHz with speakers at 48 kHz is an ordinary machine, the input callback
+pushes 44 100 samples a second into a ring the output callback empties 48 000
+times a second. The ring starves continuously, which the session counts and
+reports; and the samples that do arrive are played 8.8 per cent fast, so the
+veiled voice is shifted up about a semitone and a half and stutters.
+
+Two things made it invisible. The starvation counter reads as "this machine is
+too slow", which is what a person would conclude. And the pitch is *supposed*
+to change: this is a voice de-identifier, and a voice that comes out at the
+wrong pitch is what it is for.
+
+**The fix is to agree or to refuse.** Nothing in this crate resamples, and
+adding a resampler to paper over a mismatch would be a quality and latency
+decision taken to avoid saying something. So the two devices are put on one
+rate: the one they are already on, or the output's if the microphone will take
+it, or the microphone's if the output will take it. If neither will move, the
+session refuses and says both rates and what to do about them, which is the
+honest end of that road.
+
+The output's rate is preferred rather than the microphone's, deliberately. It
+is what the person hears through and what anything listening on a virtual cable
+expects, so moving it is the change more likely to surprise somebody.
+
+The choosing is arithmetic over what the platform reported, in a function of
+its own, so it is tested without a sound card: five cases, including two
+microphones that cannot be run together, which is what marker 147 will open. F-163
+and F-165 are why nothing here opens a device to answer a question that does
+not need one.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -501,7 +542,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1544 tests, 57323 functional lines. Both are measured and
+* **The counts**: 1545 tests, 57481 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4613,7 +4654,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1544 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1545 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6260,7 +6301,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-seven defects found and fixed (F-1 to F-167), across
+**One hundred and sixty-eight defects found and fixed (F-1 to F-168), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
