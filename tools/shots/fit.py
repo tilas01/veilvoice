@@ -1,46 +1,48 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Trim the empty background below a window capture's content.
+"""Make every window capture the same height: the tallest one's content.
 
-    python tools/shots/fit.py           # trim, in place
-    python tools/shots/fit.py --check   # verify there is nothing left to trim
+    python tools/shots/fit.py           # fit, in place
+    python tools/shots/fit.py --check   # verify every picture is that height
 
-# The two ways a screenshot goes wrong, and why one size cannot fix both
+# One height for all of them, and which fault that chooses
 
-A window capture is wrong if it cuts a sentence in half at the bottom edge,
-and it is wrong if two thirds of it are empty background. The tabs of this
-application make both happen at once, because their panels are nowhere near
-the same length: the monitor tab draws a couple of hundred pixels of content
-and the group tab draws well over a thousand.
+A window capture is wrong if it cuts a sentence in half at the bottom edge, and
+it is wrong if two thirds of it are empty background. The tabs make both happen
+at once: the monitor tab draws a couple of hundred pixels of content and the
+group tab draws well over a thousand.
 
-A window short enough to suit the monitor tab cuts the group panel in half. A
-window tall enough for the group panel shows the monitor tab as a strip of
-content above most of a screen of nothing. There is no single window size that
-is right for all of them, and picking one means choosing which of the two
-faults to publish.
+This used to trim each picture to its own content, with a floor. Nothing was
+cut off and nothing was padding, and it produced eight pictures 1000 tall, one
+1095 and one 1315.
 
-So the capture is taken generously tall, and each picture is then trimmed to
-what it actually contains. Nothing is cut off, and nothing is padding.
+**That is wrong for where they are actually shown.** The README and the website
+put them in a grid, and a grid with three heights in it steps: the row holding
+the group tab sits lower than the rows either side, and the eye reads the
+inconsistency as the pictures being wrong rather than the panels being
+different lengths.
 
-No table of per-tab heights is kept here. It would be a measurement of one
-version of the window, written where nothing can check it, and it would be
-wrong the first time a panel gained a line. The committed pictures carry the
-answer instead: their own heights, which `--check` proves are what this tool
-would produce.
+So one height, and it is **the tallest content among them**. That is the only
+shared height that crops nothing:
 
-# The floor, and why most tabs still come out identical
+* trimming everything to the shortest would cut the bottom off the group panel,
+  which is publishing the first fault on purpose;
+* scaling them to match would make the text in one picture a different size
+  from the text in the next, which is worse than either fault;
+* padding the short ones with their own background is the remaining option, and
+  the cost is real and is exactly this: the monitor tab has empty space below
+  its content now.
 
-Trimming to content alone would make the monitor tab a couple of hundred
-pixels tall: a wide thin strip that, in a three-column gallery, is a sliver
-showing nothing. So nothing is trimmed below `FLOOR`, which is the height the
-capture scripts ask the window to open at. That is the size the application
-actually is, and a picture of a window has no business being shorter than the
-window.
+That cost is paid in the one place it is cheap. Empty background at the bottom
+of a picture in a grid reads as the window having room; a stepped grid reads as
+a mistake.
 
-The result is that most of the tabs come out at exactly the same size, and the
-few that are taller are taller because their panels are genuinely longer. That
-is as close to one size as the application allows, and each exception is a fact
-about the program rather than an accident of the tooling.
+# Measured, not written down
+
+No table of per-tab heights, and no constant naming the answer. The tallest
+content is measured across the whole set on every run, so a panel that grows a
+paragraph moves every picture together rather than becoming the one exception
+again. `--check` proves the committed pictures are what this would produce.
 
 # What is read, and what is ignored
 
@@ -69,8 +71,13 @@ from crop import read_png, write_png, shots as all_shots  # noqa: E402
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 
-# No picture is trimmed below this. It is the height the capture scripts ask
-# the window to open at, so it is the size of the thing being photographed.
+# No picture is shorter than this, even if every tab's content fits in less. It
+# is the height the capture scripts ask the window to open at, so it is the size
+# of the thing being photographed, and a picture of a window has no business
+# being shorter than the window.
+#
+# It is a floor rather than the answer: the answer is the tallest content in the
+# set, and that is nearly always well above this.
 FLOOR = 1000
 
 # Kept below the content so the picture does not end flush against the last
@@ -109,14 +116,46 @@ def content_bottom(width, height, channels, rows):
     return last
 
 
-def fitted(path):
-    """`(channels, rows, was, now)` if this picture has empty space to lose."""
+def wanted_height(path):
+    """How tall this picture needs to be to hold its own content."""
     width, height, channels, rows = read_png(path)
     bottom = content_bottom(width, height, channels, rows)
-    wanted = max(FLOOR, bottom + 1 + PADDING)
-    if wanted >= height:
+    return max(FLOOR, bottom + 1 + PADDING)
+
+
+def shared_height(paths):
+    """The one height every picture is given: the tallest content among them.
+
+    Measured across the set rather than written down, so a panel that grows
+    moves all of them together instead of becoming the one that sticks out.
+    """
+    return max((wanted_height(path) for path in paths), default=FLOOR)
+
+
+def fitted(path, target):
+    """`(channels, rows, was, now)` if this picture is not `target` tall.
+
+    Taller is trimmed. Shorter is **padded with its own background**, which is
+    the cost this tool now pays on purpose: see the note at the top for why a
+    stepped grid is the worse of the two faults.
+    """
+    width, height, channels, rows = read_png(path)
+    if height == target:
         return None
-    return channels, rows[:wanted], (width, height), (width, wanted)
+    if height > target:
+        return channels, rows[:target], (width, height), (width, target)
+
+    # Padded with the row the background was read from, so the added space is
+    # the same colour as the space above it, including on a light palette.
+    # Copied rather than synthesised: a row of the picture's own pixels cannot
+    # be the wrong colour, and `round.py` runs afterwards and only touches
+    # alpha in the corners.
+    # `bytearray`, matching what `read_png` hands back and what `write_png`
+    # will accept: a plain list of ints looks equivalent and fails on the way
+    # out, in a function two files away.
+    filler = bytes(rows[height - 2])
+    grown = list(rows) + [bytearray(filler) for _ in range(target - height)]
+    return channels, grown, (width, height), (width, target)
 
 
 def captures():
@@ -137,9 +176,15 @@ def main():
                              "its content")
     args = parser.parse_args()
 
+    paths = captures()
+    if not paths:
+        print("  no window captures to fit")
+        return 0
+    target = shared_height(paths)
+
     pending = []
-    for path in captures():
-        result = fitted(path)
+    for path in paths:
+        result = fitted(path, target)
         if result is None:
             continue
         channels, rows, was, now = result
@@ -149,20 +194,21 @@ def main():
     if args.check:
         if pending:
             for _, _, _, was, now, rel in pending:
-                print("  %s has empty background below its content: "
-                      "%dx%d would become %dx%d" % (rel, was[0], was[1], *now))
+                print("  %s is %dx%d and every capture should be %dx%d"
+                      % (rel, was[0], was[1], *now))
             print("\n  Run: python tools/shots/fit.py")
             return 1
-        print("  no capture has empty space left below its content")
+        print("  all %d captures are %d tall, which is the tallest one's content"
+              % (len(paths), target))
         return 0
 
     if not pending:
-        print("  nothing to fit")
+        print("  all %d captures are already %d tall" % (len(paths), target))
         return 0
     for path, channels, rows, was, now, rel in pending:
         write_png(path, channels, rows)
         print("  %-46s %dx%d -> %dx%d" % (rel, was[0], was[1], *now))
-    print("  fitted %d capture(s)" % len(pending))
+    print("  fitted %d capture(s) to %d tall" % (len(pending), target))
     return 0
 
 

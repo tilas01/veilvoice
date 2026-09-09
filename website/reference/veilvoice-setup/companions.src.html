@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-setup/src/companions.rs</code></h1>
-<p style="color:var(--muted)"><a href="companions.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 1024 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="companions.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 1029 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1073,65 +1073,70 @@
 <span class="ln" id="L963">                assert!(argv.<span class="tok-fn">len</span>() &gt;= <span class="tok-num">2</span>, <span class="tok-str">&quot;a command of {} parts&quot;</span>, argv.<span class="tok-fn">len</span>());</span>
 <span class="ln" id="L964">                assert!(!via.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;a command from nowhere&quot;</span>);</span>
 <span class="ln" id="L965">                <span class="tok-kw">let</span> line = offer.<span class="tok-fn">command_line</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a command shows itself&quot;</span>);</span>
-<span class="ln" id="L966">                assert!(</span>
-<span class="ln" id="L967">                    line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ffmpeg&quot;</span>),</span>
-<span class="ln" id="L968">                    <span class="tok-str">&quot;the command does not mention ffmpeg: {line}&quot;</span></span>
-<span class="ln" id="L969">                );</span>
-<span class="ln" id="L970">            }</span>
-<span class="ln" id="L971">            Offer::<span class="tok-fn">NoKnownRoute</span>(why) =&gt; {</span>
-<span class="ln" id="L972">                assert!(</span>
-<span class="ln" id="L973">                    why.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">6</span>,</span>
-<span class="ln" id="L974">                    <span class="tok-str">&quot;no route, and no reason worth reading: {why:?}&quot;</span></span>
-<span class="ln" id="L975">                );</span>
-<span class="ln" id="L976">            }</span>
-<span class="ln" id="L977">            other =&gt; panic!(<span class="tok-str">&quot;ffmpeg offered {other:?}, which is neither&quot;</span>),</span>
-<span class="ln" id="L978">        }</span>
-<span class="ln" id="L979">    }</span>
-<span class="ln" id="L980"></span>
-<span class="ln" id="L981">    <span class="tok-com">/// Every companion whose route is a command names a package manager.</span></span>
-<span class="ln" id="L982">    <span class="tok-com">///</span></span>
-<span class="ln" id="L983">    <span class="tok-com">/// The loop that builds these is now written once rather than three times,</span></span>
-<span class="ln" id="L984">    <span class="tok-com">/// and this is what says the three callers still get the same shape out of</span></span>
-<span class="ln" id="L985">    <span class="tok-com">/// it.</span></span>
-<span class="ln" id="L986">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L987">    <span class="tok-kw">fn</span> <span class="tok-fn">every_command_route_names_where_it_came_from</span>() {</span>
-<span class="ln" id="L988">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L989">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command { argv, via, .. } = companion.<span class="tok-fn">offer</span>() {</span>
-<span class="ln" id="L990">                assert!(</span>
-<span class="ln" id="L991">                    !via.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L992">                    <span class="tok-str">&quot;{} installs from an unnamed source&quot;</span>,</span>
-<span class="ln" id="L993">                    companion.key</span>
-<span class="ln" id="L994">                );</span>
-<span class="ln" id="L995">                assert!(!argv.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{} has an empty command&quot;</span>, companion.key);</span>
-<span class="ln" id="L996">            }</span>
-<span class="ln" id="L997">        }</span>
-<span class="ln" id="L998">    }</span>
-<span class="ln" id="L999"></span>
-<span class="ln" id="L1000">    <span class="tok-com">/// A `sudo` command is always marked as needing privilege.</span></span>
-<span class="ln" id="L1001">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1002">    <span class="tok-com">/// A front end may run anything not so marked. One that says `sudo` and</span></span>
-<span class="ln" id="L1003">    <span class="tok-com">/// claims otherwise would be a prompt for a root password appearing from a</span></span>
-<span class="ln" id="L1004">    <span class="tok-com">/// button somebody pressed for a different reason.</span></span>
-<span class="ln" id="L1005">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1006">    <span class="tok-kw">fn</span> <span class="tok-fn">anything_that_says_sudo_admits_it_needs_privilege</span>() {</span>
-<span class="ln" id="L1007">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L1008">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command {</span>
-<span class="ln" id="L1009">                argv,</span>
-<span class="ln" id="L1010">                needs_privilege,</span>
-<span class="ln" id="L1011">                ..</span>
-<span class="ln" id="L1012">            } = companion.<span class="tok-fn">offer</span>()</span>
-<span class="ln" id="L1013">            {</span>
-<span class="ln" id="L1014">                <span class="tok-kw">if</span> argv.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(String::as_str) == <span class="tok-fn">Some</span>(<span class="tok-str">&quot;sudo&quot;</span>) {</span>
-<span class="ln" id="L1015">                    assert!(</span>
-<span class="ln" id="L1016">                        needs_privilege,</span>
-<span class="ln" id="L1017">                        <span class="tok-str">&quot;{} runs sudo and is marked as runnable without privilege&quot;</span>,</span>
-<span class="ln" id="L1018">                        companion.key</span>
-<span class="ln" id="L1019">                    );</span>
-<span class="ln" id="L1020">                }</span>
-<span class="ln" id="L1021">            }</span>
-<span class="ln" id="L1022">        }</span>
-<span class="ln" id="L1023">    }</span>
-<span class="ln" id="L1024">}</span>
+<span class="ln" id="L966">                <span class="tok-com">// Case-insensitively, because a package manager names it how it</span></span>
+<span class="ln" id="L967">                <span class="tok-com">// likes: winget&#x27;s identifier is `Gyan.FFmpeg`. Asserting the</span></span>
+<span class="ln" id="L968">                <span class="tok-com">// lowercase spelling passed on Linux and macOS and failed on</span></span>
+<span class="ln" id="L969">                <span class="tok-com">// Windows, which is a test that was wrong about names rather</span></span>
+<span class="ln" id="L970">                <span class="tok-com">// than a route that was wrong about ffmpeg.</span></span>
+<span class="ln" id="L971">                assert!(</span>
+<span class="ln" id="L972">                    line.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ffmpeg&quot;</span>),</span>
+<span class="ln" id="L973">                    <span class="tok-str">&quot;the command does not mention ffmpeg: {line}&quot;</span></span>
+<span class="ln" id="L974">                );</span>
+<span class="ln" id="L975">            }</span>
+<span class="ln" id="L976">            Offer::<span class="tok-fn">NoKnownRoute</span>(why) =&gt; {</span>
+<span class="ln" id="L977">                assert!(</span>
+<span class="ln" id="L978">                    why.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">6</span>,</span>
+<span class="ln" id="L979">                    <span class="tok-str">&quot;no route, and no reason worth reading: {why:?}&quot;</span></span>
+<span class="ln" id="L980">                );</span>
+<span class="ln" id="L981">            }</span>
+<span class="ln" id="L982">            other =&gt; panic!(<span class="tok-str">&quot;ffmpeg offered {other:?}, which is neither&quot;</span>),</span>
+<span class="ln" id="L983">        }</span>
+<span class="ln" id="L984">    }</span>
+<span class="ln" id="L985"></span>
+<span class="ln" id="L986">    <span class="tok-com">/// Every companion whose route is a command names a package manager.</span></span>
+<span class="ln" id="L987">    <span class="tok-com">///</span></span>
+<span class="ln" id="L988">    <span class="tok-com">/// The loop that builds these is now written once rather than three times,</span></span>
+<span class="ln" id="L989">    <span class="tok-com">/// and this is what says the three callers still get the same shape out of</span></span>
+<span class="ln" id="L990">    <span class="tok-com">/// it.</span></span>
+<span class="ln" id="L991">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L992">    <span class="tok-kw">fn</span> <span class="tok-fn">every_command_route_names_where_it_came_from</span>() {</span>
+<span class="ln" id="L993">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L994">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command { argv, via, .. } = companion.<span class="tok-fn">offer</span>() {</span>
+<span class="ln" id="L995">                assert!(</span>
+<span class="ln" id="L996">                    !via.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L997">                    <span class="tok-str">&quot;{} installs from an unnamed source&quot;</span>,</span>
+<span class="ln" id="L998">                    companion.key</span>
+<span class="ln" id="L999">                );</span>
+<span class="ln" id="L1000">                assert!(!argv.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{} has an empty command&quot;</span>, companion.key);</span>
+<span class="ln" id="L1001">            }</span>
+<span class="ln" id="L1002">        }</span>
+<span class="ln" id="L1003">    }</span>
+<span class="ln" id="L1004"></span>
+<span class="ln" id="L1005">    <span class="tok-com">/// A `sudo` command is always marked as needing privilege.</span></span>
+<span class="ln" id="L1006">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1007">    <span class="tok-com">/// A front end may run anything not so marked. One that says `sudo` and</span></span>
+<span class="ln" id="L1008">    <span class="tok-com">/// claims otherwise would be a prompt for a root password appearing from a</span></span>
+<span class="ln" id="L1009">    <span class="tok-com">/// button somebody pressed for a different reason.</span></span>
+<span class="ln" id="L1010">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1011">    <span class="tok-kw">fn</span> <span class="tok-fn">anything_that_says_sudo_admits_it_needs_privilege</span>() {</span>
+<span class="ln" id="L1012">        <span class="tok-kw">for</span> companion <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L1013">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command {</span>
+<span class="ln" id="L1014">                argv,</span>
+<span class="ln" id="L1015">                needs_privilege,</span>
+<span class="ln" id="L1016">                ..</span>
+<span class="ln" id="L1017">            } = companion.<span class="tok-fn">offer</span>()</span>
+<span class="ln" id="L1018">            {</span>
+<span class="ln" id="L1019">                <span class="tok-kw">if</span> argv.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(String::as_str) == <span class="tok-fn">Some</span>(<span class="tok-str">&quot;sudo&quot;</span>) {</span>
+<span class="ln" id="L1020">                    assert!(</span>
+<span class="ln" id="L1021">                        needs_privilege,</span>
+<span class="ln" id="L1022">                        <span class="tok-str">&quot;{} runs sudo and is marked as runnable without privilege&quot;</span>,</span>
+<span class="ln" id="L1023">                        companion.key</span>
+<span class="ln" id="L1024">                    );</span>
+<span class="ln" id="L1025">                }</span>
+<span class="ln" id="L1026">            }</span>
+<span class="ln" id="L1027">        }</span>
+<span class="ln" id="L1028">    }</span>
+<span class="ln" id="L1029">}</span>
 </span>
 </code></pre>
 </main>

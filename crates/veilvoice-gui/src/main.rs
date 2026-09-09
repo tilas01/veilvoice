@@ -88,6 +88,9 @@ Options:
                 minimum of 720x520.
   --tabs        List the tab names, one per line, and exit. What the
                 screenshot scripts read so they need no copy of the list.
+  --typeface    Say which face the window would draw with, and exit.
+                `JetBrains Mono` and its path, or `built-in monospace`.
+                The screenshot scripts check this before capturing.
   -h, --help    Print this message.
   -V, --version Print the version.
 
@@ -129,6 +132,20 @@ fn answered_without_a_window() -> bool {
         if arg == "--tabs" {
             for tab in veilvoice_gui::tabs() {
                 println!("{tab}");
+            }
+            return true;
+        }
+        // Which face the window would draw with, answered without opening one.
+        //
+        // The About tab shows this, but a screenshot script cannot read a tab
+        // it has not photographed yet, and a capture taken with the built-in
+        // face looks subtly unlike every other one while nothing in the run
+        // says so. `tools/shots/gui.sh` asks this first and refuses to
+        // photograph anything if the answer is the fallback.
+        if arg == "--typeface" {
+            match veilvoice_gui::jetbrains_mono_path() {
+                Some(path) => println!("JetBrains Mono\t{}", path.display()),
+                None => println!("built-in monospace"),
             }
             return true;
         }

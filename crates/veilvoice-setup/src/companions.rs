@@ -963,8 +963,13 @@ mod ffmpeg_tests {
                 assert!(argv.len() >= 2, "a command of {} parts", argv.len());
                 assert!(!via.is_empty(), "a command from nowhere");
                 let line = offer.command_line().expect("a command shows itself");
+                // Case-insensitively, because a package manager names it how it
+                // likes: winget's identifier is `Gyan.FFmpeg`. Asserting the
+                // lowercase spelling passed on Linux and macOS and failed on
+                // Windows, which is a test that was wrong about names rather
+                // than a route that was wrong about ffmpeg.
                 assert!(
-                    line.contains("ffmpeg"),
+                    line.to_lowercase().contains("ffmpeg"),
                     "the command does not mention ffmpeg: {line}"
                 );
             }

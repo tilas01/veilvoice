@@ -68,6 +68,14 @@ mod app;
 pub fn tabs() -> impl Iterator<Item = &'static str> {
     app::Tab::ALL.iter().map(|tab| tab.key())
 }
+
+/// Where JetBrains Mono is on this machine, if it is anywhere.
+///
+/// Re-exported so `--typeface` can answer without a window and without the
+/// binary reaching into a module the rest of it does not use.
+pub fn jetbrains_mono_path() -> Option<std::path::PathBuf> {
+    theme::jetbrains_mono_path()
+}
 pub mod autolock;
 pub mod avnotice;
 pub mod crashlog;
