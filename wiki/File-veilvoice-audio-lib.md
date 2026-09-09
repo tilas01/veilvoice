@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/lib.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 244 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 249 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
 
 ## Contents
 
@@ -55,15 +55,15 @@ program are drawing.
 
 ## What this file contains
 
-244 lines defining **5 functions** (1 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+249 lines defining **5 functions** (1 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 74) -- Everything that can go wrong in this crate.
+- `enum Error` (line 79) -- Everything that can go wrong in this crate.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `deidentify` (line 150) -- De-identify a whole buffer of audio in one call.
+- `deidentify` (line 155) -- De-identify a whole buffer of audio in one call.
 
 ## What calls what
 
@@ -79,16 +79,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 99"]
-    n_from["Error::from<br/>line 105"]
-    n_fmt["Error::fmt<br/>line 111"]
-    n_source["Error::source<br/>line 136"]
-    n_deidentify(["deidentify<br/>line 150"])
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L99" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L105" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L111" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L136" "open the source"
-    click n_deidentify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L150" "open the source"
+    n_from["Error::from<br/>line 104"]
+    n_from["Error::from<br/>line 110"]
+    n_fmt["Error::fmt<br/>line 116"]
+    n_source["Error::source<br/>line 141"]
+    n_deidentify(["deidentify<br/>line 155"])
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L104" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L110" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L116" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L141" "open the source"
+    click n_deidentify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L155" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_deidentify entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -101,10 +101,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L69) | Crate version string, surfaced in the About panel. |
-| `Error` <sub>pub enum</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L74) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L99) |  |
-| `Error::from` <sub>fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L105) |  |
-| `Error::fmt` <sub>fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L111) |  |
-| `Error::source` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L136) |  |
-| `deidentify` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L150) | De-identify a whole buffer of audio in one call. |
+| `VERSION` <sub>pub const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L74) | Crate version string, surfaced in the About panel. |
+| `Error` <sub>pub enum</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L79) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L104) |  |
+| `Error::from` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L110) |  |
+| `Error::fmt` <sub>fn</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L116) |  |
+| `Error::source` <sub>fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L141) |  |
+| `deidentify` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L155) | De-identify a whole buffer of audio in one call. |

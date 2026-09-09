@@ -36,6 +36,7 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 - [[`meter.rs`|File-veilvoice-audio-meter]] &middot; The scale a level meter is drawn on.
 - [[`playback.rs`|File-veilvoice-audio-playback]] &middot; Playing a recording that is only in memory, and never on disk.
 - [[`record.rs`|File-veilvoice-audio-record]] &middot; Recording the veiled voice without it ever reaching unprotected memory.
+- [[`room.rs`|File-veilvoice-audio-room]] &middot; Marker 147.
 
 ## [[veilvoice-capture|Crate-veilvoice-capture]]
 
