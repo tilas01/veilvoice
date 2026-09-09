@@ -8,6 +8,59 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The audio path says when something interfered with it**
+
+- A device unplugged or swapped mid-session, and anything else the platform
+  reports about either stream, is now shown where the person is looking. Both
+  error callbacks used to be `eprintln!` and nothing else: on Windows the
+  desktop application is built with no console at all, so a microphone taken
+  away in the middle of a call was completely silent and a recording carried on
+  being made of nothing.
+- The report is the platform's own words, with the device-is-gone case named
+  separately because it does not come back on its own.
+- Detected by the platform telling us rather than by polling a device list. A
+  list read once a second is a guess between reads, and enumerating devices
+  from another thread on Windows is what F-163 and F-165 were.
+- While a take is running, a program other than VeilVoice taking the microphone
+  is named on the tab and again with the stored take. That program heard the
+  real voice whatever was going to the cable. Independent of the safety catch's
+  posture: that setting is about closing other programs, and somebody who
+  turned it off did not ask to be told less about their own recording.
+- The command line shows the same thing as `INTERRUPTED` on the meter line, and
+  `veilvoice record` repeats it when the take is sealed, because the meter line
+  is gone by the time somebody decides whether to keep what was recorded.
+- The limit is stated beside the warning rather than after it: this is what
+  VeilVoice's own path noticed, and it cannot vouch for a microphone that was
+  already being intercepted before this opened it.
+- The marker asked for the samples reaching the recorder to be *checked*
+  against the engine's output. They cannot differ, because the recorder is fed
+  from inside the output callback from the same slice the engine has just
+  written into, so the check would be a buffer compared with itself. That is a
+  property worth keeping rather than measuring, and a test now reads the source
+  for it: two sinks, two writes, each from the one place its samples exist.
+
+**A check that failed once now says what it disagreed about**
+
+- The recorded-session check failed once on a loaded machine and passed on the
+  twenty-two runs after it. It has not been reproduced and is not claimed to be
+  fixed.
+- What it said was that the transcript "is not what the program prints now",
+  and nothing else. It now prints the differing lines, diffed on the same
+  normalised text it compares, so the next occurrence explains itself instead
+  of being re-run until it passes.
+
+**Two roadmap rows corrected rather than built around**
+
+- Marker 132's opening sentence described a check that would compare a buffer
+  with itself, and the row now says what was actually missing.
+- Marker 133 asked for two **live** bars per speaker **in group mode**, and
+  neither word survives reading the code: group mode is a panel for a recording
+  that already exists and never opens a device, and the live path opens one
+  input, so there is no per-guest live signal in this tree to draw. The row now
+  says that this is two things: bars drawn during a render, which the plan
+  already has the information for, and a multi-input capture path, which is the
+  actual work. It stays planned.
+
 **Optimisation stops being a pass and becomes how this is written**
 
 - The practices marker 125's reading established are now in `CLAUDE.md` as the

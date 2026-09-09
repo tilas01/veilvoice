@@ -97,7 +97,7 @@ thousand times.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>3411 lines"])
+    n_main(["main.rs<br/>3422 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>286 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
@@ -113,7 +113,7 @@ flowchart TD
     n_meter["meter.rs<br/>259 lines"]
     n_policy["policy.rs<br/>243 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
-    n_record["record.rs<br/>371 lines"]
+    n_record["record.rs<br/>406 lines"]
     n_sentry["sentry.rs<br/>384 lines"]
     n_theme["theme.rs<br/>144 lines"]
     n_accel --> n_sentry
@@ -190,16 +190,16 @@ flowchart TD
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
 | [[`input.rs`|File-veilvoice-cli-input]] | 117 | veilvoice input shows which running programs can see your keyboard and mouse. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 329 | veilvoice lock manages the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 3411 | veilvoice, the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 3422 | veilvoice, the command-line interface. |
 | [[`mandate.rs`|File-veilvoice-cli-mandate]] | 330 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 243 | veilvoice policy -- settings that can only be tightened. |
 | [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
-| [[`record.rs`|File-veilvoice-cli-record]] | 371 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
+| [[`record.rs`|File-veilvoice-cli-record]] | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
 | [[`sentry.rs`|File-veilvoice-cli-sentry]] | 384 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 144 | Tokyo Night colouring for the terminal. |
 
-**6,038 functional lines of Rust** in this crate. A functional line is a line
+**6,067 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

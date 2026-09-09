@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-audio/src/live.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 380 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 586 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
 
 ## Contents
 
@@ -66,22 +66,26 @@ cannot.
 
 ## What this file contains
 
-380 lines defining **4 functions** (4 public), **5 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+586 lines defining **7 functions** (6 public), **7 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct LiveStats` (line 56) -- A snapshot of what the live path is doing, safe to read from the UI.
-- `struct Keeping` (line 79) -- Which sides of the engine a session keeps.
-- `struct Kept` (line 102) -- The recorders a session was asked for, one per side of Keeping.
-- `struct LiveSession` (line 110) -- A running live-scramble session.
-- `struct Shared` (line 118)
+- `enum Side` (line 56) -- Which side of the engine something happened to.
+- `struct Interference` (line 86) -- Something that happened to the audio path while it was running.
+- `struct LiveStats` (line 104) -- A snapshot of what the live path is doing, safe to read from the UI.
+- `struct Keeping` (line 133) -- Which sides of the engine a session keeps.
+- `struct Kept` (line 156) -- The recorders a session was asked for, one per side of Keeping.
+- `struct LiveSession` (line 164) -- A running live-scramble session.
+- `struct Shared` (line 172)
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Keeping::is_anything` (line 90) -- Whether anything at all is being kept.
-- `LiveSession::start` (line 130) -- Start scrambling from input into output.
+- `Side::word` (line 65) -- The word for this side, as a person reading a warning would meet it.
+- `Keeping::is_anything` (line 144) -- Whether anything at all is being kept.
+- `LiveSession::start` (line 213) -- Start scrambling from input into output.
   - reaches: `start_recording`
-- `LiveSession::stats` (line 340) -- Read the current statistics, resetting the peak meters.
+- `LiveSession::stats` (line 429) -- Read the current statistics, resetting the peak meters.
+- `LiveSession::interference` (line 448) -- What the platform last reported about either stream.
 
 ## What calls what
 
@@ -91,7 +95,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 <p align="center">
   <img src="../../../assets/diagrams/veilvoice-audio/live.svg" alt="what calls what in live.rs" width="640">
@@ -103,19 +107,27 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_anything(["Keeping::is_anything<br/>line 90"])
-    n_start(["LiveSession::start<br/>line 130"])
-    n_start_recording["LiveSession::start_recording<br/>line 172"]
-    n_stats(["LiveSession::stats<br/>line 340"])
+    n_word(["Side::word<br/>line 65"])
+    n_is_anything(["Keeping::is_anything<br/>line 144"])
+    n_report["Shared::report<br/>line 190"]
+    n_start(["LiveSession::start<br/>line 213"])
+    n_start_recording["LiveSession::start_recording<br/>line 255"]
+    n_stats(["LiveSession::stats<br/>line 429"])
+    n_interference(["LiveSession::interference<br/>line 448"])
     n_start --> n_start_recording
-    click n_is_anything href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L90" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L130" "open the source"
-    click n_start_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L172" "open the source"
-    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L340" "open the source"
+    click n_word href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L65" "open the source"
+    click n_is_anything href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L144" "open the source"
+    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L190" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L213" "open the source"
+    click n_start_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L255" "open the source"
+    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L429" "open the source"
+    click n_interference href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L448" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_is_anything,n_start,n_stats entry
+    class n_word,n_is_anything,n_start,n_stats,n_interference entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_start_recording api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_report helper
 ```
 
 </details>
@@ -125,15 +137,20 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `RING_MILLIS` <sub>const</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L52) | How much jitter the ring absorbs before it starts dropping samples. |
-| `LiveStats` <sub>pub struct</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L56) | A snapshot of what the live path is doing, safe to read from the UI. |
-| `Keeping` <sub>pub struct</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L79) | Which sides of the engine a session keeps. |
-| `Keeping::is_anything` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L90) | Whether anything at all is being kept. |
-| `Kept` <sub>pub struct</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L102) | The recorders a session was asked for, one per side of Keeping. |
-| `LiveSession` <sub>pub struct</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L110) | A running live-scramble session. |
-| `Shared` <sub>struct</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L118) |  |
-| `LiveSession::start` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L130) | Start scrambling from input into output. |
-| `LiveSession::start_recording` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L172) | Start scrambling, keeping the sides of it Keeping asks for. |
-| `LiveSession::stats` <sub>pub fn</sub> | [340](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L340) | Read the current statistics, resetting the peak meters. |
+| `Side` <sub>pub enum</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L56) | Which side of the engine something happened to. |
+| `Side::word` <sub>pub fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L65) | The word for this side, as a person reading a warning would meet it. |
+| `Interference` <sub>pub struct</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L86) | Something that happened to the audio path while it was running. |
+| `LiveStats` <sub>pub struct</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L104) | A snapshot of what the live path is doing, safe to read from the UI. |
+| `Keeping` <sub>pub struct</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L133) | Which sides of the engine a session keeps. |
+| `Keeping::is_anything` <sub>pub fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L144) | Whether anything at all is being kept. |
+| `Kept` <sub>pub struct</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L156) | The recorders a session was asked for, one per side of Keeping. |
+| `LiveSession` <sub>pub struct</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L164) | A running live-scramble session. |
+| `Shared` <sub>struct</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L172) |  |
+| `Shared::report` <sub>fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L190) | Record what the platform said about a stream. |
+| `LiveSession::start` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L213) | Start scrambling from input into output. |
+| `LiveSession::start_recording` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L255) | Start scrambling, keeping the sides of it Keeping asks for. |
+| `LiveSession::stats` <sub>pub fn</sub> | [429](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L429) | Read the current statistics, resetting the peak meters. |
+| `LiveSession::interference` <sub>pub fn</sub> | [448](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L448) | What the platform last reported about either stream. |
 
 ---
 
