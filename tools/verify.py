@@ -146,6 +146,13 @@ CHECKS = [
     # three that no line of code referred to.
     ("every dependency says what it is for",
      [sys.executable, "tools/audit/dependencies.py"]),
+    # Beside it, and answering the other question. `dependencies.py` asks
+    # whether somebody said why each dependency is here; this asks whether
+    # anything is watching it. A manifest outside every Dependabot entry is
+    # unmonitored quietly, which is worse than a dependency with a known
+    # problem, because nobody is looking at it.
+    ("every manifest is covered by a Dependabot entry",
+     [sys.executable, "tools/audit/dependabot.py"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
