@@ -186,9 +186,17 @@ fn main() -> eframe::Result<()> {
         }));
     }
 
+    // Read before the window is made, because it decides how the window is
+    // made. The settings file is the one place this is turned off, and a
+    // machine whose driver accepts the request and then draws badly is the case
+    // it exists for: from inside the process that looks like success.
+    let acceleration = veilvoice_gui::prefs::default_path()
+        .map(|path| veilvoice_gui::prefs::Prefs::load(&path).acceleration)
+        .unwrap_or(true);
+
     let result = eframe::run_native(
         "VeilVoice",
-        veilvoice_gui::graphics::options(viewport),
+        veilvoice_gui::graphics::options(viewport, acceleration),
         Box::new(|cc| Ok(Box::new(veilvoice_gui::VeilVoiceApp::new(cc)))),
     );
 

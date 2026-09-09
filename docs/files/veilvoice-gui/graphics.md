@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/graphics.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 158 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 206 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs)
 
 ## Contents
 
@@ -62,12 +62,13 @@ discrete card are different conversations.
 
 ## What this file contains
 
-158 lines defining **2 functions** (2 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+206 lines defining **3 functions** (3 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `describe` (line 68) -- One line for the About tab, and for a bug report.
-- `options` (line 94) -- The options the window is created with.
+- `asked_for` (line 96) -- What was asked of the platform, in the words the About tab uses.
+- `options` (line 112) -- The options the window is created with.
 
 ## What calls what
 
@@ -90,11 +91,13 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_describe(["describe<br/>line 68"])
-    n_options(["options<br/>line 94"])
+    n_asked_for(["asked_for<br/>line 96"])
+    n_options(["options<br/>line 112"])
     click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L68" "open the source"
-    click n_options href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L94" "open the source"
+    click n_asked_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L96" "open the source"
+    click n_options href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L112" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_describe,n_options entry
+    class n_describe,n_asked_for,n_options entry
 ```
 
 </details>
@@ -107,7 +110,8 @@ flowchart TD
 | `VSYNC` <sub>pub const</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L54) | Whether frames wait for the display. |
 | `MULTISAMPLING` <sub>pub const</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L61) | Multisampling, off. |
 | `describe` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L68) | One line for the About tab, and for a bug report. |
-| `options` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L94) | The options the window is created with. |
+| `asked_for` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L96) | What was asked of the platform, in the words the About tab uses. |
+| `options` <sub>pub fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L112) | The options the window is created with. |
 
 ---
 

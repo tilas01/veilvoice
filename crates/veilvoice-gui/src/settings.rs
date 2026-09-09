@@ -205,6 +205,24 @@ impl Settings {
         self.persist();
     }
 
+    /// Whether the window asks the platform for a hardware-drawn context.
+    ///
+    /// **Marker 137.** Read once, before the window is made, because it decides
+    /// how the window is made. Changing it therefore takes effect at the next
+    /// launch, and the panel says so rather than appearing to do nothing.
+    pub fn acceleration(&self) -> bool {
+        self.prefs.acceleration
+    }
+
+    /// Record whether to ask for acceleration.
+    pub fn set_acceleration(&mut self, on: bool) {
+        if self.prefs.acceleration == on {
+            return;
+        }
+        self.prefs.acceleration = on;
+        self.persist();
+    }
+
     /// Whether the app should open in group mode.
     pub fn always_group(&self) -> bool {
         self.prefs.always_group
@@ -458,6 +476,48 @@ impl Settings {
             RichText::new(format!("  {}", crate::notify::SCOPE))
                 .small()
                 .color(p::muted()),
+        );
+        ui.add_space(12.0);
+
+        section(
+            ui,
+            "Drawing",
+            "How the window reaches the screen. The About tab shows what was \
+             asked for beside what the driver actually gave.",
+        );
+
+        let mut accelerated = self.prefs.acceleration;
+        if ui
+            .checkbox(
+                &mut accelerated,
+                "Ask the graphics driver to draw the window",
+            )
+            .on_hover_text("Takes effect the next time VeilVoice starts")
+            .changed()
+        {
+            self.set_acceleration(accelerated);
+        }
+        ui.label(
+            RichText::new(
+                "  On, and asking is already the safe direction: a machine that \
+                 cannot give a hardware context is given a software one and the \
+                 window still opens. This is for the other case, where the driver \
+                 accepts and then draws badly. A hybrid-graphics laptop handing \
+                 over the wrong adapter, or a black window on a driver whose \
+                 OpenGL path is broken, looks like success from in here and \
+                 nothing can detect it, so it is a switch rather than a \
+                 measurement. Turning it off is slower and it works.",
+            )
+            .small()
+            .color(p::muted()),
+        );
+        ui.label(
+            RichText::new(
+                "  It takes effect at the next launch, because the choice is \
+                           made before the window exists.",
+            )
+            .small()
+            .color(p::yellow()),
         );
         ui.add_space(12.0);
 
@@ -1221,6 +1281,7 @@ mod tests {
                 notify_style: "overlay".into(),
                 failsafe: "close".into(),
                 live_monitor: "toolbar".into(),
+                acceleration: true,
                 hide_install_tab: false,
                 always_group: false,
                 seal_with_app_lock: false,

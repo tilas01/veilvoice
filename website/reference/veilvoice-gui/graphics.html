@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/graphics.svg" alt="graphics.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/graphics.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 158 lines &middot; <a href="graphics.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 206 lines &middot; <a href="graphics.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-not-left-to-a-default">Why this is not left to a default</a>
@@ -71,11 +71,13 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>158 lines defining <strong>2 functions</strong> (2 public), <strong>0 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>206 lines defining <strong>3 functions</strong> (3 public), <strong>0 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>describe</code> <span style="color:var(--muted)">line 68</span> &middot; One line for the About tab, and for a bug report.
 </li>
-<li><code>options</code> <span style="color:var(--muted)">line 94</span> &middot; The options the window is created with.
+<li><code>asked_for</code> <span style="color:var(--muted)">line 96</span> &middot; What was asked of the platform, in the words the About tab uses.
+</li>
+<li><code>options</code> <span style="color:var(--muted)">line 112</span> &middot; The options the window is created with.
 </li>
 </ul>
 </section>
@@ -93,14 +95,19 @@
 </defs>
 <rect x="0" y="0" width="451" height="214" fill="var(--bg-inset, #16161e)" rx="8"/>
 <a href="graphics.src.html#fn-describe">
-<rect x="123.8" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="170.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe</text>
-<text x="170.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 68</text>
+<rect x="56.5" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="102.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe</text>
+<text x="102.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 68</text>
+</a>
+<a href="graphics.src.html#fn-asked_for">
+<rect x="175.0" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">asked_for</text>
+<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 96</text>
 </a>
 <a href="graphics.src.html#fn-options">
-<rect x="242.3" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="284.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">options</text>
-<text x="284.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+<rect x="301.6" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="347.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">options</text>
+<text x="347.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -117,11 +124,13 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_describe([&quot;describe&lt;br/&gt;line 68&quot;])
-    n_options([&quot;options&lt;br/&gt;line 94&quot;])
+    n_asked_for([&quot;asked_for&lt;br/&gt;line 96&quot;])
+    n_options([&quot;options&lt;br/&gt;line 112&quot;])
     click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L68&quot; &quot;open the source&quot;
-    click n_options href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L94&quot; &quot;open the source&quot;
+    click n_asked_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L96&quot; &quot;open the source&quot;
+    click n_options href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs#L112&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_describe,n_options entry</code></pre>
+    class n_describe,n_asked_for,n_options entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -132,7 +141,8 @@ flowchart TD
 <tr><td><code>VSYNC</code> <sub>pub const</sub></td><td><a href="graphics.src.html#fn-vsync">54</a></td><td>Whether frames wait for the display.</td></tr>
 <tr><td><code>MULTISAMPLING</code> <sub>pub const</sub></td><td><a href="graphics.src.html#fn-multisampling">61</a></td><td>Multisampling, off.</td></tr>
 <tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="graphics.src.html#fn-describe">68</a></td><td>One line for the About tab, and for a bug report.</td></tr>
-<tr><td><code>options</code> <sub>pub fn</sub></td><td><a href="graphics.src.html#fn-options">94</a></td><td>The options the window is created with.</td></tr>
+<tr><td><code>asked_for</code> <sub>pub fn</sub></td><td><a href="graphics.src.html#fn-asked_for">96</a></td><td>What was asked of the platform, in the words the About tab uses.</td></tr>
+<tr><td><code>options</code> <sub>pub fn</sub></td><td><a href="graphics.src.html#fn-options">112</a></td><td>The options the window is created with.</td></tr>
 </tbody></table>
 </section>
 </div></div>

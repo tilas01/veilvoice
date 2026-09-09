@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/graphics.rs</code></h1>
-<p style="color:var(--muted)"><a href="graphics.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 158 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="graphics.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 206 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -146,77 +146,127 @@
 <span class="ln" id="L88">}</span>
 </span>
 <span class="ln" id="L89"></span>
-<span class="src-item" id="fn-options">
-<span class="ln" id="L90"><span class="tok-com">/// The options the window is created with.</span></span>
+<span class="src-item" id="fn-asked_for">
+<span class="ln" id="L90"><span class="tok-com">/// What was asked of the platform, in the words the About tab uses.</span></span>
 <span class="ln" id="L91"><span class="tok-com">///</span></span>
-<span class="ln" id="L92"><span class="tok-com">/// Takes the viewport rather than building it, because where the window opens</span></span>
-<span class="ln" id="L93"><span class="tok-com">/// is `window`&#x27;s business and this is only about how it is painted.</span></span>
-<span class="ln" id="L94"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">options</span>(viewport: egui::ViewportBuilder) -&gt; eframe::NativeOptions {</span>
-<span class="ln" id="L95">    eframe::NativeOptions {</span>
-<span class="ln" id="L96">        viewport,</span>
-<span class="ln" id="L97">        vsync: VSYNC,</span>
-<span class="ln" id="L98">        multisampling: MULTISAMPLING,</span>
-<span class="ln" id="L99">        hardware_acceleration: eframe::HardwareAcceleration::Preferred,</span>
-<span class="ln" id="L100">        renderer: eframe::Renderer::Glow,</span>
-<span class="ln" id="L101">        ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L102">    }</span>
-<span class="ln" id="L103">}</span>
+<span class="ln" id="L92"><span class="tok-com">/// **Marker 137.** Two settings and no third: asking, and not asking. The</span></span>
+<span class="ln" id="L93"><span class="tok-com">/// middle option, `Required`, is the one that sounds strongest and is wrong</span></span>
+<span class="ln" id="L94"><span class="tok-com">/// here for the reason in the module note, so it is not offered anywhere and</span></span>
+<span class="ln" id="L95"><span class="tok-com">/// this cannot express it.</span></span>
+<span class="ln" id="L96"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">asked_for</span>(acceleration: bool) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L97">    <span class="tok-kw">if</span> acceleration {</span>
+<span class="ln" id="L98">        <span class="tok-str">&quot;hardware asked for, software accepted if the platform will not give it&quot;</span></span>
+<span class="ln" id="L99">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L100">        <span class="tok-str">&quot;software, because acceleration is switched off in Settings&quot;</span></span>
+<span class="ln" id="L101">    }</span>
+<span class="ln" id="L102">}</span>
 </span>
-<span class="ln" id="L104"></span>
-<span class="ln" id="L105"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L106"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L107">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L108"></span>
-<span class="ln" id="L109">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L110">    <span class="tok-kw">fn</span> <span class="tok-fn">the_gpu_is_asked_for_and_not_demanded</span>() {</span>
-<span class="ln" id="L111">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L112">        assert!(</span>
-<span class="ln" id="L113">            matches!(</span>
-<span class="ln" id="L114">                options.hardware_acceleration,</span>
-<span class="ln" id="L115">                eframe::HardwareAcceleration::Preferred</span>
-<span class="ln" id="L116">            ),</span>
-<span class="ln" id="L117">            <span class="tok-str">&quot;Required would refuse to open in a VM or over a remote desktop, \</span></span>
-<span class="ln" id="L118"><span class="tok-str">             and Off would never use the GPU at all&quot;</span></span>
-<span class="ln" id="L119">        );</span>
-<span class="ln" id="L120">    }</span>
-<span class="ln" id="L121"></span>
-<span class="ln" id="L122">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L123">    <span class="tok-kw">fn</span> <span class="tok-fn">frames_wait_for_the_display</span>() {</span>
-<span class="ln" id="L124">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L125">        assert!(options.vsync, <span class="tok-str">&quot;tearing while dragging is what VSYNC is for&quot;</span>);</span>
-<span class="ln" id="L126">        assert_eq!(options.multisampling, MULTISAMPLING);</span>
-<span class="ln" id="L127">    }</span>
-<span class="ln" id="L128"></span>
-<span class="ln" id="L129">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L130">    <span class="tok-kw">fn</span> <span class="tok-fn">the_backend_is_named_rather_than_inherited</span>() {</span>
-<span class="ln" id="L131">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L132">        assert!(matches!(options.renderer, eframe::Renderer::Glow));</span>
-<span class="ln" id="L133">    }</span>
-<span class="ln" id="L134"></span>
-<span class="ln" id="L135">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L136">    <span class="tok-kw">fn</span> <span class="tok-fn">the_viewport_passes_through_untouched</span>() {</span>
-<span class="ln" id="L137">        <span class="tok-kw">let</span> viewport = egui::ViewportBuilder::<span class="tok-fn">default</span>().<span class="tok-fn">with_title</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>);</span>
-<span class="ln" id="L138">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(viewport);</span>
-<span class="ln" id="L139">        assert_eq!(options.viewport.title.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>));</span>
-<span class="ln" id="L140">    }</span>
-<span class="ln" id="L141"></span>
-<span class="ln" id="L142">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L143">    <span class="tok-kw">fn</span> <span class="tok-fn">no_context_is_reported_as_no_context</span>() {</span>
-<span class="ln" id="L144">        <span class="tok-com">// A window that never got a context and a window that got a slow one</span></span>
-<span class="ln" id="L145">        <span class="tok-com">// are different bug reports, so they must not read the same.</span></span>
-<span class="ln" id="L146">        assert_eq!(<span class="tok-fn">describe</span>(None), <span class="tok-str">&quot;no OpenGL context&quot;</span>);</span>
-<span class="ln" id="L147">        assert!(</span>
-<span class="ln" id="L148">            !<span class="tok-fn">describe</span>(None).<span class="tok-fn">chars</span>().<span class="tok-fn">any</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>()),</span>
-<span class="ln" id="L149">            <span class="tok-str">&quot;a version number here would read as a context that exists&quot;</span></span>
-<span class="ln" id="L150">        );</span>
-<span class="ln" id="L151">    }</span>
-<span class="ln" id="L152"></span>
-<span class="ln" id="L153">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L154">    <span class="tok-kw">fn</span> <span class="tok-fn">the_backend_line_names_what_a_reader_can_check</span>() {</span>
-<span class="ln" id="L155">        assert!(BACKEND.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;OpenGL&quot;</span>));</span>
-<span class="ln" id="L156">        assert!(BACKEND.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;glow&quot;</span>));</span>
-<span class="ln" id="L157">    }</span>
-<span class="ln" id="L158">}</span>
+<span class="ln" id="L103"></span>
+<span class="src-item" id="fn-options">
+<span class="ln" id="L104"><span class="tok-com">/// The options the window is created with.</span></span>
+<span class="ln" id="L105"><span class="tok-com">///</span></span>
+<span class="ln" id="L106"><span class="tok-com">/// Takes the viewport rather than building it, because where the window opens</span></span>
+<span class="ln" id="L107"><span class="tok-com">/// is `window`&#x27;s business and this is only about how it is painted.</span></span>
+<span class="ln" id="L108"><span class="tok-com">///</span></span>
+<span class="ln" id="L109"><span class="tok-com">/// `acceleration` is the person&#x27;s setting, and it can only turn the request</span></span>
+<span class="ln" id="L110"><span class="tok-com">/// off. It is never `Required`: see the module note, where the whole point is</span></span>
+<span class="ln" id="L111"><span class="tok-com">/// that a machine which cannot give a GPU context must still open.</span></span>
+<span class="ln" id="L112"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">options</span>(viewport: egui::ViewportBuilder, acceleration: bool) -&gt; eframe::NativeOptions {</span>
+<span class="ln" id="L113">    eframe::NativeOptions {</span>
+<span class="ln" id="L114">        viewport,</span>
+<span class="ln" id="L115">        vsync: VSYNC,</span>
+<span class="ln" id="L116">        multisampling: MULTISAMPLING,</span>
+<span class="ln" id="L117">        hardware_acceleration: <span class="tok-kw">if</span> acceleration {</span>
+<span class="ln" id="L118">            eframe::HardwareAcceleration::Preferred</span>
+<span class="ln" id="L119">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L120">            eframe::HardwareAcceleration::Off</span>
+<span class="ln" id="L121">        },</span>
+<span class="ln" id="L122">        renderer: eframe::Renderer::Glow,</span>
+<span class="ln" id="L123">        ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L124">    }</span>
+<span class="ln" id="L125">}</span>
+</span>
+<span class="ln" id="L126"></span>
+<span class="ln" id="L127"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L128"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L129">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L130"></span>
+<span class="ln" id="L131">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L132">    <span class="tok-kw">fn</span> <span class="tok-fn">the_gpu_is_asked_for_and_not_demanded</span>() {</span>
+<span class="ln" id="L133">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>(), true);</span>
+<span class="ln" id="L134">        assert!(</span>
+<span class="ln" id="L135">            matches!(</span>
+<span class="ln" id="L136">                options.hardware_acceleration,</span>
+<span class="ln" id="L137">                eframe::HardwareAcceleration::Preferred</span>
+<span class="ln" id="L138">            ),</span>
+<span class="ln" id="L139">            <span class="tok-str">&quot;Required would refuse to open in a VM or over a remote desktop, \</span></span>
+<span class="ln" id="L140"><span class="tok-str">             and Off would never use the GPU at all&quot;</span></span>
+<span class="ln" id="L141">        );</span>
+<span class="ln" id="L142">    }</span>
+<span class="ln" id="L143"></span>
+<span class="ln" id="L144">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L145">    <span class="tok-kw">fn</span> <span class="tok-fn">switching_it_off_asks_for_software_rather_than_demanding_hardware</span>() {</span>
+<span class="ln" id="L146">        <span class="tok-com">// The setting turns the request off. It never turns it into a demand:</span></span>
+<span class="ln" id="L147">        <span class="tok-com">// `Required` refuses to open on a machine with no GPU context, and a</span></span>
+<span class="ln" id="L148">        <span class="tok-com">// privacy tool that will not run is not more private.</span></span>
+<span class="ln" id="L149">        <span class="tok-kw">let</span> off = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>(), false);</span>
+<span class="ln" id="L150">        assert!(matches!(</span>
+<span class="ln" id="L151">            off.hardware_acceleration,</span>
+<span class="ln" id="L152">            eframe::HardwareAcceleration::Off</span>
+<span class="ln" id="L153">        ));</span>
+<span class="ln" id="L154">        <span class="tok-kw">let</span> on = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>(), true);</span>
+<span class="ln" id="L155">        assert!(matches!(</span>
+<span class="ln" id="L156">            on.hardware_acceleration,</span>
+<span class="ln" id="L157">            eframe::HardwareAcceleration::Preferred</span>
+<span class="ln" id="L158">        ));</span>
+<span class="ln" id="L159">    }</span>
+<span class="ln" id="L160"></span>
+<span class="ln" id="L161">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L162">    <span class="tok-kw">fn</span> <span class="tok-fn">what_was_asked_for_is_said_differently_each_way</span>() {</span>
+<span class="ln" id="L163">        <span class="tok-com">// The About tab prints this beside what the driver actually gave, so</span></span>
+<span class="ln" id="L164">        <span class="tok-com">// the two settings have to read as two different requests.</span></span>
+<span class="ln" id="L165">        assert_ne!(<span class="tok-fn">asked_for</span>(true), <span class="tok-fn">asked_for</span>(false));</span>
+<span class="ln" id="L166">        assert!(<span class="tok-fn">asked_for</span>(true).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;hardware&quot;</span>));</span>
+<span class="ln" id="L167">        assert!(<span class="tok-fn">asked_for</span>(false).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;software&quot;</span>));</span>
+<span class="ln" id="L168">    }</span>
+<span class="ln" id="L169"></span>
+<span class="ln" id="L170">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L171">    <span class="tok-kw">fn</span> <span class="tok-fn">frames_wait_for_the_display</span>() {</span>
+<span class="ln" id="L172">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>(), true);</span>
+<span class="ln" id="L173">        assert!(options.vsync, <span class="tok-str">&quot;tearing while dragging is what VSYNC is for&quot;</span>);</span>
+<span class="ln" id="L174">        assert_eq!(options.multisampling, MULTISAMPLING);</span>
+<span class="ln" id="L175">    }</span>
+<span class="ln" id="L176"></span>
+<span class="ln" id="L177">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L178">    <span class="tok-kw">fn</span> <span class="tok-fn">the_backend_is_named_rather_than_inherited</span>() {</span>
+<span class="ln" id="L179">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(egui::ViewportBuilder::<span class="tok-fn">default</span>(), true);</span>
+<span class="ln" id="L180">        assert!(matches!(options.renderer, eframe::Renderer::Glow));</span>
+<span class="ln" id="L181">    }</span>
+<span class="ln" id="L182"></span>
+<span class="ln" id="L183">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L184">    <span class="tok-kw">fn</span> <span class="tok-fn">the_viewport_passes_through_untouched</span>() {</span>
+<span class="ln" id="L185">        <span class="tok-kw">let</span> viewport = egui::ViewportBuilder::<span class="tok-fn">default</span>().<span class="tok-fn">with_title</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>);</span>
+<span class="ln" id="L186">        <span class="tok-kw">let</span> options = <span class="tok-fn">options</span>(viewport, true);</span>
+<span class="ln" id="L187">        assert_eq!(options.viewport.title.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>));</span>
+<span class="ln" id="L188">    }</span>
+<span class="ln" id="L189"></span>
+<span class="ln" id="L190">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L191">    <span class="tok-kw">fn</span> <span class="tok-fn">no_context_is_reported_as_no_context</span>() {</span>
+<span class="ln" id="L192">        <span class="tok-com">// A window that never got a context and a window that got a slow one</span></span>
+<span class="ln" id="L193">        <span class="tok-com">// are different bug reports, so they must not read the same.</span></span>
+<span class="ln" id="L194">        assert_eq!(<span class="tok-fn">describe</span>(None), <span class="tok-str">&quot;no OpenGL context&quot;</span>);</span>
+<span class="ln" id="L195">        assert!(</span>
+<span class="ln" id="L196">            !<span class="tok-fn">describe</span>(None).<span class="tok-fn">chars</span>().<span class="tok-fn">any</span>(|c| c.<span class="tok-fn">is_ascii_digit</span>()),</span>
+<span class="ln" id="L197">            <span class="tok-str">&quot;a version number here would read as a context that exists&quot;</span></span>
+<span class="ln" id="L198">        );</span>
+<span class="ln" id="L199">    }</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L202">    <span class="tok-kw">fn</span> <span class="tok-fn">the_backend_line_names_what_a_reader_can_check</span>() {</span>
+<span class="ln" id="L203">        assert!(BACKEND.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;OpenGL&quot;</span>));</span>
+<span class="ln" id="L204">        assert!(BACKEND.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;glow&quot;</span>));</span>
+<span class="ln" id="L205">    }</span>
+<span class="ln" id="L206">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

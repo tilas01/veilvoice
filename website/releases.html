@@ -168,6 +168,13 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Acceleration is a switch now, and the About tab shows both halves</strong></p>
+<ul>
+<li>The window has always asked the platform for a hardware context and accepted a software one, which is why it opens in a virtual machine, over a remote desktop and on a server with no card. That was not settable.</li>
+<li>One tick in Settings turns the asking off. It is for the case the request cannot cover: a driver that accepts and then draws badly, which is a hybrid-graphics laptop handing over the wrong adapter or a black window on a broken OpenGL path. Nothing can detect that, because from inside the process it looks like success, so it is a switch rather than a measurement and the panel says so.</li>
+<li>It never becomes a demand. <code>Required</code> refuses to open where no hardware context exists, and a privacy tool that will not run is not more private.</li>
+<li>The About tab shows what was asked for beside what the driver actually gave. Either line alone answers half of &quot;why is this slow&quot;.</li>
+</ul>
 <p><strong>Portable first, and the About tab says exactly where things are</strong></p>
 <ul>
 <li>A folder called <code>veilvoice-data</code> beside the program makes the settings, the vaults, the policies, the palettes and the app lock live in it. A copy on a memory stick now stays a copy on a stick. Remove the folder and it goes back to the platform&#x27;s own configuration directory; neither switch moves anything that is already there.</li>
