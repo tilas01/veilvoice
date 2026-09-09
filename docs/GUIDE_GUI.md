@@ -310,10 +310,20 @@ would put one person's words under another person's name.
 ### studio
 
 Record straight into a locked vault, veiled on the way in. What reaches the
-recorder is the voice the engine produced, never the microphone: there is no
-path here that captures the original, because a path that existed would
-eventually be taken, and the file it left behind would be somebody's real voice
-sitting in a vault they believed was safe.
+recorder is the voice the engine produced, and that is what the Studio does
+unless you say otherwise before you start.
+
+**Saying otherwise is possible and is asked for.** "What to keep" offers the
+veiled voice, both, or the microphone unveiled, and it says what each costs
+where it is chosen. Anything that keeps the microphone makes a recording of
+somebody's real voice: it is sealed in the vault like everything else, and it
+is still a recording that anybody who opens the vault can hear who was speaking
+in. The veiled voice is what is selected, the choice is never remembered
+between runs, and locking the window puts it back.
+
+Two takes land in the vault when both are kept, and the unveiled one's name
+ends in `(unveiled)`. That name is the only thing telling them apart, which is
+worth knowing before renaming either.
 
 The recording is assembled in page-locked memory and handed to the vault to be
 sealed. It is never a plain file, not even briefly.
@@ -322,6 +332,7 @@ sealed. It is never a plain file, not even briefly.
 |---|---|
 | **app lock / at rest** | The two passphrases that open the vault. Both, every time. Neither on its own opens anything, and an empty one is refused rather than treated as "no second factor". |
 | **call it** | What this take will be called. A name is a label and nothing veils a name; it is sealed with the recording, so it is not readable from the disk, and it is still the thing that says who this is. |
+| **what to keep** | The veiled voice, both, or the microphone unveiled. Before the button rather than after it, because a recording of somebody's real voice is not a thing to discover having made. Not remembered between runs, for the same reason group mode is not: a mode somebody forgets is on eventually records what they did not mean to record. |
 | **start recording** | Begins, at the engine strength the rest of the window is set to. |
 | **stop and store** | Ends the take and seals it into the vault. Samples that were dropped are reported rather than passed over, because a recording that is quietly short is the failure this path exists to avoid. |
 | **the two bars** | What is going in, and what is coming out, while it happens. Two rather than one on purpose: a single output meter answers "is something being recorded" and not "is it being veiled", which is the question you are actually asking. Seeing the input move and the output move differently is the only thing on screen that shows the engine is between them. |

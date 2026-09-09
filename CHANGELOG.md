@@ -8,6 +8,32 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The Studio can keep the real voice, and asks before it does**
+
+- "What to keep": the veiled voice, both, or the microphone unveiled. Before
+  the start button rather than after it, because a recording of somebody's real
+  voice is not a thing to discover having made.
+- The veiled voice is what is selected. The choice is not remembered between
+  runs and locking the window puts it back, for the reason group mode is not
+  remembered: a mode somebody forgets is on eventually records what they did not
+  mean to record.
+- Anything that keeps the microphone says what that costs in the same words the
+  plaintext path uses. It is sealed in the vault exactly as strongly as a veiled
+  take, and it is still a recording anybody who opens the vault can hear who was
+  speaking in.
+- Keeping both gives two takes, and the unveiled one's name ends in
+  "(unveiled)". The name is the only thing telling them apart, which the panel
+  says where the choice is made.
+- The microphone is copied into its recorder from inside the input callback,
+  after the downmix and before anything else sees it, through a buffer sized
+  once at startup so nothing allocates in a realtime path. It is a separate
+  argument to `start_recording` rather than a flag on the existing one, so no
+  caller can reach it without naming it, and every path that was not asked for
+  it passes nothing.
+- `veilvoice record` on the command line keeps the veiled voice only and is
+  unchanged. This is a Studio decision, made where the vault that receives it
+  is.
+
 **Every platform is green again, and the crash is understood**
 
 - `test / windows-latest` was dying with an access violation after every test
