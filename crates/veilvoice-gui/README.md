@@ -103,7 +103,7 @@ flowchart TD
     n_crashreport["crashreport.rs<br/>289 lines"]
     n_decoys["decoys.rs<br/>216 lines"]
     n_dialog["dialog.rs<br/>425 lines"]
-    n_firstrun["firstrun.rs<br/>689 lines"]
+    n_firstrun["firstrun.rs<br/>686 lines"]
     n_graphics["graphics.rs<br/>206 lines"]
     n_group["group.rs<br/>1745 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
@@ -263,7 +263,7 @@ flowchart TD
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 289 | Offering the report from the last crash, on the run after it. |
 | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | 216 | Decoy vaults: how many there is room for, and the panel that offers them. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 425 | Asking for a file without stopping the window. |
-| [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 689 | The first run: the four things worth deciding before anything else. |
+| [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 686 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 206 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1745 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
@@ -291,7 +291,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**16,451 functional lines of Rust** in this crate. A functional line is a line
+**16,446 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

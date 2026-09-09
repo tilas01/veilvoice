@@ -39,6 +39,19 @@ than a summary written afterwards.
   exists to report; and reading the clock from the veiled recorder alone would
   have shown 0:00 for the whole of a microphone-only take.
 
+**Windows, a second time, and the same mistake in a new place**
+
+- A test written for the new setup card asked the machine how many audio
+  devices it has, twice, to check the answer was stable. The desktop crate's
+  test binary already enumerates real devices once, deliberately, in one place;
+  a second enumerator beside it killed the process on Windows with an access
+  violation, exactly as the last one did.
+- Gone rather than made conditional. It was checking that a call the machine
+  answers does not fail, which is a fact about the machine. What is worth
+  checking is that the card asks the machine rather than carrying a number, and
+  a test reads the card's source for that. "One enumeration, in one place" is
+  now written where the counting function is.
+
 **Every platform is green again, and the crash is understood**
 
 - `test / windows-latest` was dying with an access violation after every test
