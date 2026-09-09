@@ -8,6 +8,31 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**A score for what a recording gives away about who was speaking**
+
+- Beside the voice controls in the Group tab there is now a percentage. A
+  hundred means the finished recording says nothing about which of the people in
+  it was talking. It falls as the group grows in "a voice each" mode: two people
+  is 70 per cent, four is 40, eight is 10. One voice for everybody is a hundred
+  at any size.
+- **It is not a measure of how well a voice is disguised.** That is the engine's
+  and it does not get weaker because somebody else joined the call: eight people
+  are each hidden exactly as well as one. It is not cryptography either, and the
+  module, the guide and the interface all say so rather than letting an
+  information count be read as a claim about strength.
+- What it counts is the other leak, the one that does grow with the group: how
+  much of the conversation's shape a listener gets free. Eight tellable-apart
+  voices let anybody count the participants, follow who said what, and align two
+  recordings of the same group by voice. `log2(classes)` bits per turn, measured
+  against the widest the engine goes.
+- **Two speakers whose voices are too close to separate count as one.** So
+  crowding the table makes a recording give *less* away while making it harder
+  to follow. That runs backwards from the obvious reading, so it is shown on its
+  own line rather than folded into the score, and a test pins it down.
+- Fixed while building it: a solo recording was reported as "crowded", because
+  the closest-pair measure answers 1.0 when there is nothing to compare and that
+  is below the separation floor. One voice has nothing to be confused with.
+
 **A level under every speaker's name** (marker 139, the first of its two halves)
 
 - The preview page lit whoever had the turn and said nothing more. A lit circle

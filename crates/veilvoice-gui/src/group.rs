@@ -643,6 +643,66 @@ impl Group {
             .color(p::muted())
             .small(),
         );
+
+        // What the finished recording gives away about **who** was speaking,
+        // beside the control that decides it.
+        //
+        // Not a measure of how well any voice is disguised: that is the
+        // engine's, it is the same for one person and for eight, and a number
+        // here that moved with the group size would be read as saying otherwise.
+        // This counts one specific thing, which is how much of the shape of the
+        // conversation a listener gets for free.
+        let seen = voice_mode::Exposure::of(self.voices, self.people.len(), &self.config);
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            ui.label(RichText::new("who was speaking").color(p::muted()).small());
+            // Green at the top, yellow in the middle, red where most of the
+            // conversation's structure is on the surface. The thresholds are
+            // the two the note's wording already turns on.
+            let colour = if seen.score >= 70 {
+                p::green()
+            } else if seen.score >= 35 {
+                p::yellow()
+            } else {
+                p::red()
+            };
+            ui.label(
+                RichText::new(format!("{}%", seen.score))
+                    .color(colour)
+                    .strong(),
+            );
+            ui.label(
+                RichText::new(format!(
+                    "{:.1} bits per turn, {} voice{} a listener can separate",
+                    seen.bits,
+                    seen.classes,
+                    if seen.classes == 1 { "" } else { "s" }
+                ))
+                .color(p::muted())
+                .small(),
+            );
+        });
+        ui.label(
+            RichText::new(format!("  {}", seen.note()))
+                .color(p::muted())
+                .small(),
+        );
+        if seen.crowded() {
+            // The other half of the trade, and it moves the opposite way: a
+            // crowded table gives less away and is harder to follow. Said as
+            // its own line so it is not read as making the score worse.
+            ui.label(
+                RichText::new(format!(
+                    "  The closest pair of these voices is {:.2}, under the {:.2} a \
+                     listener needs. That makes the recording give *less* away and \
+                     harder to follow: two of these people will sound like one.",
+                    seen.crowding,
+                    veilvoice_core::voices::CLEAR_SEPARATION,
+                ))
+                .color(p::yellow())
+                .small(),
+            );
+        }
     }
 
     /// The picture: a circle per person, in their colour, with their name.
@@ -1382,6 +1442,33 @@ mod tests {
         assert_eq!(group.colour(0), Color32::from_rgb(1, 2, 3));
         // The override is one speaker's, not everybody's.
         assert_eq!(group.colour(1), assigned_colour(1));
+    }
+
+    /// The score sits beside the control that decides it.
+    ///
+    /// It answers "what does this recording give away about who was speaking",
+    /// and the two things that decide the answer are the voice mode and the
+    /// number of people. Somewhere else in the window it would be a number
+    /// without the two controls that move it.
+    #[test]
+    fn what_the_recording_gives_away_is_shown_beside_the_choice_that_sets_it() {
+        let source = std::fs::read_to_string("src/group.rs").expect("its own source");
+        let at = source
+            .find("fn voice_mode_controls")
+            .expect("the voice mode controls");
+        let end = source[at..]
+            .find("\n    fn ")
+            .map(|o| at + o)
+            .unwrap_or(source.len());
+        let body = &source[at..end];
+        assert!(
+            body.contains("Exposure::of"),
+            "the score is no longer drawn beside the mode and the speaker count"
+        );
+        assert!(
+            body.contains("seen.crowded()"),
+            "the crowding is not shown, so the trade looks like it only goes one way"
+        );
     }
 
     /// Two speakers is the common case, and slots 0 and 1 are the furthest
