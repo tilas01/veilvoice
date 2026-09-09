@@ -124,16 +124,23 @@ pub fn run(
     );
 
     let config = crate::config(tuning);
-    let rate = config.sample_rate as u32;
-    let (mut recorder, sink) = record::start(rate);
-    let session = veilvoice_audio::LiveSession::start_recording(
+    // The session builds the recorder, at the rate the device agreed to. This
+    // used to build one here from `config.sample_rate`, which is the rate that
+    // was *asked* for, and the two disagree on any device not running at
+    // 48 kHz. See F-166 and `LiveSession::start_recording`.
+    let (session, kept) = veilvoice_audio::LiveSession::start_recording(
         &in_device,
         &out_device,
         config,
-        Some(sink),
-        None,
+        veilvoice_audio::Keeping {
+            veiled: true,
+            plain: false,
+        },
     )
     .map_err(|e| e.to_string())?;
+    let mut recorder = kept
+        .veiled
+        .ok_or("the veiled recorder the session was asked for")?;
 
     println!();
     match seconds {

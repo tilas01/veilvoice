@@ -180,7 +180,7 @@ impl Default for Prefs {
             autolock_floor: crate::autolock::FLOOR_SECS,
             autolock_ceiling: crate::autolock::CEILING_SECS,
             notify_style: crate::notify::Style::default().key().to_string(),
-            // On, and docked. Live scramble is the mode where what is being
+            // On, and docked. Veiling as it runs is the mode where what is being
             // protected is happening now, and the two questions a person has
             // are "is it hearing me" and "is anything coming out". Both are
             // answered by a strip that is already on screen.

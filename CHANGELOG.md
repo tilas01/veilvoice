@@ -8,6 +8,55 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Live scramble is the Studio now, not a tab beside it**
+
+- Veiling as it runs has stopped being a separate tab. The Studio is where it
+  happens, and the tab is the voice above and the take below: devices, engine
+  settings, meters, performance figures and the preview button on top, the
+  vault and the take under them.
+- The voice half works with the vault shut. Veiling a call has never needed a
+  recording vault, and requiring one would be a worse program.
+- Both screens always ran the same engine through the same session, which is
+  what made two of them wrong rather than merely redundant. The Studio recorded
+  with whichever devices the other tab happened to be set to, and nothing on
+  its screen said so. Worse, each tab started a session of its own: veiling on
+  one and recording on the other opened the same microphone twice.
+- There is one starter now, and a test that reads the desktop crate's source
+  and fails if a second one appears.
+- Ending a take leaves the veiling running. Somebody who has just stopped
+  recording has not asked to be heard in their own voice again. **stop**, in
+  the voice half, ends the veiling, and it stores a take still running rather
+  than discarding it.
+- Starting and ending a take each restart the audio, because a recorder cannot
+  be attached to a stream that has already started. That costs a short gap in
+  the outgoing voice, and it is said on screen and in the guide rather than
+  hidden.
+- `veilvoice-gui --tab live` still opens a window. It opens the Studio, because
+  the name is in shortcuts and scripts written before the tab moved and the
+  honest destination is the tab that does the job today.
+- The monitor strip works during a take, which it did not before: it read the
+  live tab's session, and a Studio recording was a different one, so the strip
+  went blank over a recording that was running.
+
+**A recording was written with the rate it asked for, not the rate it got**
+
+- `record::start` takes the sample rate for the WAV header, and its own
+  documentation says that has to be the rate the device agreed to. Both callers
+  passed `config.sample_rate`, which is the rate the engine was configured for
+  and is 48 kHz by default, and the session then overwrites that field with
+  what the hardware actually gave. On a machine whose output runs at 44.1 kHz
+  the take was written 48 kHz over 44.1 kHz samples: about nine per cent fast
+  and a semitone and a half sharp, on top of the veiling.
+- Fixed by construction rather than by care. `LiveSession::start_recording`
+  builds the recorders itself, after the device has answered, and hands them
+  back: it takes a `Keeping` saying which sides to keep and returns a `Kept`
+  holding them. The caller has no rate to get wrong.
+- The property marker 131 asked for survives: `Keeping`'s fields are named at
+  the call site, so no caller reaches a recording of somebody's real voice
+  without writing the word `plain` next to it.
+- A test reads the workspace and fails if a recorder is built anywhere outside
+  the crate that knows the rate.
+
 **The Studio can keep the real voice, and asks before it does**
 
 - "What to keep": the veiled voice, both, or the microphone unveiled. Before

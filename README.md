@@ -126,18 +126,16 @@ are different kinds of thing.
 
 | | |
 |---|---|
-| **Anonymise a file.** One recording, veiled, encrypted at rest by default. | **Live scramble.** A microphone in, a voice that is not yours out. |
-| ![anonymise a file](assets/screenshots/gui-file.png) | ![live scramble](assets/screenshots/gui-live.png) |
-| **Group mode.** Several people, a name and a colour each. | **Recording Studio.** Record into a locked vault, veiled on the way in. |
-| ![group mode](assets/screenshots/gui-group.png) | ![recording studio](assets/screenshots/gui-studio.png) |
-| **Recording Browser.** What is in the vault, played out of locked memory, and the decoys that hide which vault is yours. | **Monitor.** Who is using the microphone and camera. |
-| ![recording browser](assets/screenshots/gui-browser.png) | ![monitor](assets/screenshots/gui-monitor.png) |
-| **Lock.** The app lock, and what it is and is not worth. | **Verify.** Drop a download on the window and be told what it is. |
-| ![the app lock](assets/screenshots/gui-lock.png) | ![verify a download](assets/screenshots/gui-verify.png) |
-| **Settings.** Nine palettes, motion, Failsafe, and which tabs are shown. | **Install.** Offered only to a portable copy. |
-| ![settings](assets/screenshots/gui-settings.png) | ![install](assets/screenshots/gui-install.png) |
-| **About.** Versions, scope, and the update check you press. | |
-| ![about](assets/screenshots/gui-about.png) | |
+| **Anonymise a file.** One recording, veiled, encrypted at rest by default. | **Group mode.** Several people, a name and a colour each. |
+| ![anonymise a file](assets/screenshots/gui-file.png) | ![group mode](assets/screenshots/gui-group.png) |
+| **Recording Studio.** A microphone in, a voice that is not yours out, and a locked vault to keep it in. | **Recording Browser.** What is in the vault, played out of locked memory, and the decoys that hide which vault is yours. |
+| ![recording studio](assets/screenshots/gui-studio.png) | ![recording browser](assets/screenshots/gui-browser.png) |
+| **Monitor.** Who is using the microphone and camera. | **Lock.** The app lock, and what it is and is not worth. |
+| ![monitor](assets/screenshots/gui-monitor.png) | ![the app lock](assets/screenshots/gui-lock.png) |
+| **Verify.** Drop a download on the window and be told what it is. | **Settings.** Nine palettes, motion, Failsafe, and which tabs are shown. |
+| ![verify a download](assets/screenshots/gui-verify.png) | ![settings](assets/screenshots/gui-settings.png) |
+| **Install.** Offered only to a portable copy. | **About.** Versions, scope, and the update check you press. |
+| ![install](assets/screenshots/gui-install.png) | ![about](assets/screenshots/gui-about.png) |
 
 Both scripts start the application once per tab with `--tab <name>` and
 photograph it. There is no clicking and there are no coordinates, so a picture
@@ -385,10 +383,10 @@ Also: [installing in detail](docs/INSTALL.md),
 veilvoice-gui
 ```
 
-Eleven tabs: anonymise a file, scramble live, group conversations, record into
-the vault, browse what is in it, who is using the microphone and camera, the
-app lock, verify a download, settings, portable or installed, and an about
-panel that states the scope. Nine palettes, or your own, and every screen is
+Ten tabs: anonymise a file, group conversations, the Studio, which scrambles a
+microphone live and records into the vault, browse what is in that vault, who is
+using the microphone and camera, the app lock, verify a download, settings,
+portable or installed, and an about panel that states the scope. Nine palettes, or your own, and every screen is
 captured under
 [What it looks like](#what-it-looks-like).
 
@@ -690,7 +688,7 @@ writes with no extra work.
 - **Offline by construction.** Zero servers, enforced in CI.
 - **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
   including the page-locking path.
-- **56234 functional lines of Rust**, across 28 crates. A *functional line* is
+- **56449 functional lines of Rust**, across 28 crates. A *functional line* is
   a line holding code: blank lines and lines holding only a comment are not
   counted, and a line with code and a trailing comment counts once. Each
   crate's own README states its share of that total under **The files**.
@@ -752,7 +750,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.20: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1528 tests across 27
+destinations, CLI and GUI are implemented and tested (1530 tests across 27
 crates plus doctests, and 18 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
@@ -767,7 +765,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Thirty-two audit rounds have found and fixed **165 defects**.
+Thirty-two audit rounds have found and fixed **166 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a

@@ -256,6 +256,44 @@ and everything done to one has to be done to both. The panel drains every
 recorder that exists and takes the clock from whichever is running, and a test
 reads the panel's source for that.
 
+### F-166: the WAV header said 48 kHz because that is what was asked for
+
+Found while reading the recording path for marker 130, in code that has been in
+both front ends since the recorder existed.
+
+`veilvoice_audio::record::start` takes the rate to write into the WAV header,
+and its own documentation says what that rate has to be:
+
+> `sample_rate` is the rate the device actually agreed to, not the one that was
+> asked for: it is written into the WAV header, and a header that disagrees
+> with the samples plays back at the wrong speed and the wrong pitch, which on
+> a de-identified recording would be a second voice change nobody chose.
+
+Both callers passed the other one. The command line's `record` and the Studio
+each built their recorder from `config.sample_rate`, which is the rate the
+engine was **configured** for and is 48 000 by default, and then handed the
+sinks to `LiveSession::start_recording`, whose first act is to overwrite that
+field with the rate the output device agreed to. On any machine whose output
+runs at 44 100, which is a great many of them, the take was written with a
+48 000 header over 44 100 samples: about nine per cent fast and a semitone and
+a half sharp, on top of the veiling.
+
+Nothing could have caught it by reading a call site, because each call site was
+self-consistent. The rate came from a field that was true when it was read and
+false a function call later.
+
+**So the caller no longer has a rate to get wrong.** `start_recording` takes a
+`Keeping`, which is two named booleans saying which sides of the engine to
+keep, and returns a `Kept`, which is the recorders for them, built after the
+device has answered. Marker 131's property survives the change and is the
+reason `Keeping` has named fields rather than being a pair of positional flags:
+no caller reaches a recording of somebody's real voice without writing the word
+`plain` next to it.
+
+This is the shape marker 126 asks for. A guard reading the two call sites would
+have worked and would have had to keep working; a signature with no rate in it
+cannot be got wrong by a third caller written next year.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -291,7 +329,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1528 tests, 56234 functional lines. Both are measured and
+* **The counts**: 1530 tests, 56449 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4403,7 +4441,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1528 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1530 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6050,7 +6088,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-five defects found and fixed (F-1 to F-165), across
+**One hundred and sixty-six defects found and fixed (F-1 to F-166), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

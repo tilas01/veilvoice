@@ -93,13 +93,12 @@ COMMANDS = [
 TAB_NOTES = {
     "file": "Point it at a recording, choose how hard to push the voice, and "
             "write the result. Encryption at rest is already on.",
-    "live": "The microphone, veiled as it runs, into a virtual cable other "
-            "programs can hear. The meters say sound is arriving and leaving.",
     "group": "One recording with several people in it. Each speaker is given "
              "their own destination voice, and every voiceprint is destroyed.",
-    "studio": "Record straight into a locked vault, veiled on the way in. The "
-              "vault opens with both passphrases at once, and with neither on "
-              "its own.",
+    "studio": "The microphone, veiled as it runs, into a virtual cable other "
+              "programs can hear, and a take of it recorded straight into a "
+              "locked vault if you ask for one. The vault opens with both "
+              "passphrases at once, and with neither on its own.",
     "browser": "What is in the vault, listed without opening any of it. Rename "
                "and remove; the names and dates are sealed with the "
                "recordings.",

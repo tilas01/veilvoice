@@ -52,12 +52,6 @@ pub const CARDS: &[(&str, &str, &str)] = &[
          anybody can read is a transcript anybody can read.",
     ),
     (
-        "live",
-        "Live scramble",
-        "The same thing on a microphone as you speak, into a virtual cable \
-         that other programs can listen to. For a call rather than a file.",
-    ),
-    (
         "group",
         "Group",
         "One recording with several people in it. Each gets a different voice, \
@@ -67,9 +61,11 @@ pub const CARDS: &[(&str, &str, &str)] = &[
     (
         "studio",
         "Studio",
-        "Record straight into a locked vault, veiled on the way in. The vault \
-         opens with both of your passphrases at once, the one on this \
-         application and the one on your recordings, and neither on its own.",
+        "The same thing on a microphone as you speak, into a virtual cable \
+         that other programs can listen to, and a locked vault to keep what \
+         was said in if you want one. The vault opens with both of your \
+         passphrases at once, the one on this application and the one on your \
+         recordings, and neither on its own.",
     ),
     (
         "browser",

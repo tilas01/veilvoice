@@ -239,57 +239,6 @@ Unticking the box opens a dialogue that must be answered first. The result is
 still a recording of every word that was said, and on flash storage deleting it
 afterwards is not a reliable fix, so the question is asked once, plainly.
 
-### live scramble
-
-Pick an input and an output device and press **start**. A virtual audio cable is
-preselected as the output when one is installed, because routing there is what
-lets other applications hear the veiled voice; if none is found you are warned
-rather than silently sent to the speakers. Levels, processing time per block,
-engine latency and a glitch counter are shown live.
-
-**Hear yourself first.** Beside **start** there is **preview to my headphones**.
-It runs the same engine and sends the result to this machine's own output rather
-than to the cable, so you hear the veiled voice and nobody else does. Use it
-before an interview begins rather than during one. Use headphones while you do:
-speakers plus a microphone is a feedback loop.
-
-While a preview is running the interface says **preview** in yellow rather than
-**live** in green, everywhere it says anything, because somebody who has those
-two the wrong way round is either speaking to a call in their own voice or
-speaking to nobody.
-
-**The monitor follows you.** While a session is running, a strip along the
-bottom of the window shows the level going in and the level coming out, on every
-tab. It is on by default, because the moment you want it is the moment you are
-setting up an interview on another tab and are not sure the microphone is still
-working. Settings, under *the live monitor*, moves it to a floating card in the
-corner or switches it off; the live tab keeps its full meters either way.
-
-**What the meters can and cannot tell you.** They say sound is arriving and
-sound is leaving, which is the thing that usually goes wrong: a muted
-microphone, the wrong device, a cable nothing is listening to. They cannot tell
-you the voice has been changed. A working meter and a bypassed engine draw the
-same bar. The check for that is listening to the preview and hearing a voice
-that is not yours.
-
-### recording an interview
-
-Group mode is about a recording that already exists, so the steps for an
-interview are:
-
-1. **Set up and check first.** Choose the microphone, press **preview to my
-   headphones**, and listen. This is where you find out that the wrong device
-   was selected, or that you are too close to the microphone and clipping.
-2. **Start live scramble** into the virtual cable, and point whatever is
-   recording or calling at that cable rather than at the microphone.
-3. **Watch the strip.** It stays on screen while you work on other tabs. `in`
-   moving and `out` flat means the engine has stopped or the cable has gone;
-   `CLIPPED` means the input is too loud and is being cut off, which cannot be
-   undone afterwards.
-4. **Afterwards**, if the recording has several people in it and you want each
-   one given a different voice, that is the **Group** tab and it works on the
-   file.
-
 ### group
 
 Several people in one recording, each given a **different** destination voice,
@@ -315,6 +264,51 @@ would put one person's words under another person's name.
 
 ### studio
 
+Veiling as it happens, and keeping what was said, in one tab. It used to be
+two: live scramble picked the devices and started the engine, and the Studio
+recorded through that same engine on another screen, with whichever devices the
+other tab happened to be set to. They are one act and they are now in one place.
+
+The tab is in two halves. The top half is **the voice**, and it works with the
+vault shut, because veiling a call has never needed a vault and requiring one
+would be a worse program. The bottom half is **the take**, and it needs both
+passphrases, as it always has.
+
+#### The voice
+
+Pick an input and an output device and press **start veiling**. A virtual audio
+cable is preselected as the output when one is installed, because routing there
+is what lets other applications hear the veiled voice; if none is found you are
+warned rather than silently sent to the speakers. Levels, processing time per
+block, engine latency and a glitch counter are shown live.
+
+**Hear yourself first.** Beside **start veiling** there is **preview to my
+headphones**. It runs the same engine and sends the result to this machine's own
+output rather than to the cable, so you hear the veiled voice and nobody else
+does. Use it before an interview begins rather than during one. Use headphones
+while you do: speakers plus a microphone is a feedback loop.
+
+While a preview is running the interface says **preview** in yellow rather than
+**live** in green, everywhere it says anything, because somebody who has those
+two the wrong way round is either speaking to a call in their own voice or
+speaking to nobody.
+
+**The monitor follows you.** While a session is running, a strip along the
+bottom of the window shows the level going in and the level coming out, on every
+tab. It is on by default, because the moment you want it is the moment you are
+setting up an interview on another tab and are not sure the microphone is still
+working. Settings, under *the live monitor*, moves it to a floating card in the
+corner or switches it off; the Studio keeps its full meters either way.
+
+**What the meters can and cannot tell you.** They say sound is arriving and
+sound is leaving, which is the thing that usually goes wrong: a muted
+microphone, the wrong device, a cable nothing is listening to. They cannot tell
+you the voice has been changed. A working meter and a bypassed engine draw the
+same bar. The check for that is listening to the preview and hearing a voice
+that is not yours.
+
+#### The take
+
 Record straight into a locked vault, veiled on the way in. What reaches the
 recorder is the voice the engine produced, and that is what the Studio does
 unless you say otherwise before you start.
@@ -334,19 +328,51 @@ worth knowing before renaming either.
 The recording is assembled in page-locked memory and handed to the vault to be
 sealed. It is never a plain file, not even briefly.
 
+**Starting a take does not interrupt the call, and ending one does not end it.**
+A recorder cannot be attached to a stream that has already started, so beginning
+a take and ending one each restart the audio, which costs a short gap in what is
+going out. Ending a take leaves the veiling running: somebody who has just
+stopped recording has not asked to be heard in their own voice again. **stop**,
+in the voice half, is what ends the veiling, and it stores a take that is still
+running rather than discarding it.
+
 | Control | What it is |
 |---|---|
+| **input / output** | Which microphone the voice comes from and where the veiled voice goes. Locked while a session is running, because changing the device under a running stream is not a change, it is a restart. |
+| **start veiling** | Begins, at the engine strength shown below the devices. Nothing is kept unless a take is started. |
+| **preview to my headphones** | The same engine to this machine's own output and nowhere else. The chosen output is deliberately ignored, so nothing listening on the cable hears it. If this machine's default output *is* a cable, you are told so rather than reassured. |
+| **stop** | Ends the veiling. A take still running is stopped and stored first, never discarded. |
 | **app lock / at rest** | The two passphrases that open the vault. Both, every time. Neither on its own opens anything, and an empty one is refused rather than treated as "no second factor". |
 | **call it** | What this take will be called. A name is a label and nothing veils a name; it is sealed with the recording, so it is not readable from the disk, and it is still the thing that says who this is. |
 | **what to keep** | The veiled voice, both, or the microphone unveiled. Before the button rather than after it, because a recording of somebody's real voice is not a thing to discover having made. Not remembered between runs, for the same reason group mode is not: a mode somebody forgets is on eventually records what they did not mean to record. |
-| **start recording** | Begins, at the engine strength the rest of the window is set to. |
-| **stop and store** | Ends the take and seals it into the vault. Samples that were dropped are reported rather than passed over, because a recording that is quietly short is the failure this path exists to avoid. |
+| **start recording** | Begins a take, at the engine strength the rest of the window is set to, keeping the routing you are already hearing. |
+| **stop and store** | Ends the take and seals it into the vault, and the veiling carries on. Samples that were dropped are reported rather than passed over, because a recording that is quietly short is the failure this path exists to avoid. |
 | **the two bars** | What is going in, and what is coming out, while it happens. Two rather than one on purpose: a single output meter answers "is something being recorded" and not "is it being veiled", which is the question you are actually asking. Seeing the input move and the output move differently is the only thing on screen that shows the engine is between them. |
 
-Locking the window closes the vault. A take that is still recording when that
-happens is stopped and **stored** first, rather than discarded: the vault is
-still open at that moment, and throwing away a recording because an idle timer
-fired would be the worst thing the tab could do.
+Locking the window closes the vault and stops the audio. A take that is still
+recording when that happens is stopped and **stored** first, rather than
+discarded: the vault is still open at that moment, and throwing away a recording
+because an idle timer fired would be the worst thing the tab could do.
+
+### recording an interview
+
+Group mode is about a recording that already exists, so the steps for an
+interview are:
+
+1. **Set up and check first.** On the Studio tab, choose the microphone,
+   press **preview to my headphones**, and listen. This is where you find out that the wrong device
+   was selected, or that you are too close to the microphone and clipping.
+2. **Start veiling** into the virtual cable, and point whatever is
+   recording or calling at that cable rather than at the microphone. If you
+   want a copy of the conversation as well, start a take: the vault is on
+   the same tab and the take rides the session that is already running.
+3. **Watch the strip.** It stays on screen while you work on other tabs. `in`
+   moving and `out` flat means the engine has stopped or the cable has gone;
+   `CLIPPED` means the input is too loud and is being cut off, which cannot be
+   undone afterwards.
+4. **Afterwards**, if the recording has several people in it and you want each
+   one given a different voice, that is the **Group** tab and it works on the
+   file.
 
 ### browser
 
