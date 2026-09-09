@@ -475,6 +475,23 @@ Set, change or remove the app lock, and lock immediately. See §5.
 Crate versions, licence, the typeface in use, and a plain statement of what
 VeilVoice protects and what it does not.
 
+#### How the window is drawn
+
+Two lines: what was asked of the platform, and what the driver actually gave.
+
+VeilVoice asks for a hardware context and accepts a software one. That is why
+it opens in a virtual machine, over a remote desktop and on a machine with no
+graphics card at all; demanding hardware would turn every one of those into a
+program that does not start.
+
+The Settings tab has one tick that turns the asking off. It is there for the
+case asking cannot cover: a driver that accepts the request and then draws
+badly, which happens on hybrid-graphics laptops that hand over the wrong
+adapter and on drivers whose OpenGL path is broken in a way that shows as a
+black window. Nothing in the program can detect that, because from inside it
+looks like success, so it is a switch rather than something measured. It takes
+effect at the next launch, because the choice is made before the window exists.
+
 #### Where this copy keeps things
 
 The tab lists the exact folders in use on this computer: the program itself,

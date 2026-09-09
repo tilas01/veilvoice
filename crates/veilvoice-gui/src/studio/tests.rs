@@ -465,15 +465,27 @@ fn playing_a_take_that_is_not_there_says_so_and_starts_nothing() {
 fn locking_the_window_stops_a_take_that_is_playing() {
     // The buffer is a decrypted recording. It goes with the vault, rather than
     // sitting in memory behind a lock screen.
-    let (_dir, mut studio, id) = studio_with_a_take("a take");
-    // No audio device in a test runner, so `play` will not start a stream.
-    // What is asserted is the shape: whatever `playing` holds, `close` empties
-    // it, and that is the line that would be forgotten in a later change.
-    studio.play(&id);
-    studio.close();
+    //
+    // Read from `close`'s own source rather than exercised, and the reason is
+    // worth keeping. This used to call `play` and then `close`, on the
+    // assumption that a build machine has no audio device and no stream would
+    // start. On the Windows runner that assumption was wrong: a stream did
+    // start, and tearing it down took the whole test binary with it. Every
+    // test in the crate passed and the process died anyway.
+    //
+    // A test whose correctness depends on a machine not having a sound card is
+    // not testing the thing it names. What matters here is one line in `close`,
+    // and that is what this asserts.
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    let body = source
+        .split("pub fn close(&mut self) {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n    }").next())
+        .expect("the close method has to be findable");
     assert!(
-        studio.playing.is_none(),
-        "a decrypted take outlived the vault"
+        body.contains("self.playing = None;"),
+        "`close` no longer releases what is playing, so a decrypted take \
+         outlives the vault it came out of"
     );
 }
 
