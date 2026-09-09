@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/firstrun.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 689 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 686 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs)
 
 ## Contents
 
@@ -57,7 +57,7 @@ walk away. You can skip any of them and set them later.
 
 ## What this file contains
 
-689 lines defining **13 functions** (1 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+686 lines defining **13 functions** (1 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -94,9 +94,9 @@ flowchart TD
     n_machine["FirstRun::machine<br/>line 367"]
     n_autolock["FirstRun::autolock<br/>line 470"]
     n_card["card<br/>line 494"]
-    n_device_counts["device_counts<br/>line 518"]
-    n_field["field<br/>line 531"]
-    n_buttons["buttons<br/>line 543"]
+    n_device_counts["device_counts<br/>line 527"]
+    n_field["field<br/>line 540"]
+    n_buttons["buttons<br/>line 552"]
     n_app_lock --> n_buttons
     n_app_lock --> n_card
     n_app_lock --> n_field
@@ -126,9 +126,9 @@ flowchart TD
     click n_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L367" "open the source"
     click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L470" "open the source"
     click n_card href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L494" "open the source"
-    click n_device_counts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L518" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L531" "open the source"
-    click n_buttons href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L543" "open the source"
+    click n_device_counts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L527" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L540" "open the source"
+    click n_buttons href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L552" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -155,6 +155,6 @@ flowchart TD
 | `FirstRun::machine` <sub>fn</sub> | [367](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L367) | What this machine says about itself, and the one choice that follows. |
 | `FirstRun::autolock` <sub>fn</sub> | [470](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L470) |  |
 | `card` <sub>fn</sub> | [494](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L494) | A bordered card, so each step reads as one thing rather than a page of text. |
-| `device_counts` <sub>fn</sub> | [518](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L518) | How many recording and playback devices this machine has. |
-| `field` <sub>fn</sub> | [531](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L531) | A password field with its label, laid out like the rest of the application. |
-| `buttons` <sub>fn</sub> | [543](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L543) | The row that moves on. |
+| `device_counts` <sub>fn</sub> | [527](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L527) | How many recording and playback devices this machine has. |
+| `field` <sub>fn</sub> | [540](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L540) | A password field with its label, laid out like the rest of the application. |
+| `buttons` <sub>fn</sub> | [552](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L552) | The row that moves on. |

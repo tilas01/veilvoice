@@ -515,6 +515,15 @@ fn card(ui: &mut Ui, title: &str, contents: impl FnOnce(&mut Ui)) {
 /// reads the same way as a machine with no sound card. That is the right
 /// reading here: from the person's side, "we cannot see a microphone" and
 /// "there is no microphone" have the same consequence.
+///
+/// # Not called by any test, and that is deliberate
+///
+/// This asks the platform for its real devices, and a test that did so was
+/// **F-165**: the desktop crate's test binary already enumerates once, on
+/// purpose, in `app`, and a second enumerator running beside it killed the
+/// process on Windows. One enumeration, in one place, is what this crate does.
+/// What can be checked without a device is that the card calls this rather than
+/// carrying a number, and a test reads the card's source for exactly that.
 fn device_counts() -> (usize, usize) {
     use veilvoice_audio::devices::Direction;
     (
@@ -614,18 +623,6 @@ mod tests {
         let security = crate::security::Security::default();
         assert!(!run.should_skip(Step::Appearance, &security));
         assert!(!run.should_skip(Step::Autolock, &security));
-    }
-
-    #[test]
-    fn counting_devices_never_fails_however_the_platform_answers() {
-        // A build machine with no sound card, a sandbox that refuses to
-        // enumerate, and an ordinary desktop all have to reach this card. The
-        // first two report nothing, which the card reads the same way as "there
-        // is no microphone", and neither is an error worth stopping a setup
-        // screen for.
-        let (inputs, outputs) = device_counts();
-        // Asking twice must give the same answer: this is drawn every frame.
-        assert_eq!(device_counts(), (inputs, outputs));
     }
 
     /// **Marker 135's whole point.** The card has to read the machine rather

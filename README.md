@@ -690,7 +690,7 @@ writes with no extra work.
 - **Offline by construction.** Zero servers, enforced in CI.
 - **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
   including the page-locking path.
-- **56150 functional lines of Rust**, across 28 crates. A *functional line* is
+- **56145 functional lines of Rust**, across 28 crates. A *functional line* is
   a line holding code: blank lines and lines holding only a comment are not
   counted, and a line with code and a trailing comment counts once. Each
   crate's own README states its share of that total under **The files**.
@@ -752,7 +752,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.20: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1528 tests across 27
+destinations, CLI and GUI are implemented and tested (1527 tests across 27
 crates plus doctests, and 18 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
@@ -767,7 +767,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Thirty-two audit rounds have found and fixed **164 defects**.
+Thirty-two audit rounds have found and fixed **165 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a
