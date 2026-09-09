@@ -33,6 +33,11 @@ than a summary written afterwards.
 - `veilvoice record` on the command line keeps the veiled voice only and is
   unchanged. This is a Studio decision, made where the vault that receives it
   is.
+- The panel that runs during a take drains **both** recorders every frame and
+  takes the clock from whichever is running. Draining one of two would have made
+  the second take quietly short, which is the failure the dropped-sample count
+  exists to report; and reading the clock from the veiled recorder alone would
+  have shown 0:00 for the whole of a microphone-only take.
 
 **Every platform is green again, and the crash is understood**
 

@@ -107,7 +107,7 @@ flowchart TD
     n_setup["setup.rs<br/>882 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_studio["studio.rs<br/>1563 lines"]
+    n_studio["studio.rs<br/>1575 lines"]
     n_theme["theme.rs<br/>784 lines"]
     n_tour["tour.rs<br/>303 lines"]
     n_updates["updates.rs<br/>246 lines"]
@@ -269,7 +269,7 @@ flowchart TD
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 882 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 766 | The animated mark: a row of bars that rise and fall. |
 | [[`storage.rs`|File-veilvoice-gui-storage]] | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [[`studio.rs`|File-veilvoice-gui-studio]] | 1563 | The Recording Studio and the Recording Browser. |
+| [[`studio.rs`|File-veilvoice-gui-studio]] | 1575 | The Recording Studio and the Recording Browser. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 784 | Colour schemes for the desktop app. |
 | [[`tour.rs`|File-veilvoice-gui-tour]] | 303 | The short tour on a first run, and after an upgrade. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
@@ -278,7 +278,7 @@ flowchart TD
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 417 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 244 | How big the window opens, and why it is not a constant. |
 
-**16,436 functional lines of Rust** in this crate. A functional line is a line
+**16,451 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

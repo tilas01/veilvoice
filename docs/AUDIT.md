@@ -177,6 +177,30 @@ something and a decoy's were called nothing. The sizes were the one thing this
 was meant to make identical. The names are now padded to the length the real
 index measured, and the test builds decoys and adds up the real files.
 
+### F-164: a second recorder nobody drained
+
+Found by re-reading the change that introduced it, before it was pushed, which
+is the only reason it is a paragraph rather than a bug report.
+
+Marker 131 gives the Studio two recorders: one for the veiled voice and one for
+the microphone. The panel that runs while a take is recording drained the
+first, every frame, because a recorder nobody drains fills its ring and starts
+dropping samples. It did not drain the second.
+
+So keeping the microphone would have produced a take that was quietly short,
+which is the exact failure `dropped` exists to report, arrived at by not asking
+the question anywhere.
+
+The same code read the clock from the veiled recorder alone. Keeping *only* the
+microphone leaves no veiled recorder at all, so the counter would have sat at
+0:00 for the whole of a recording that was running, which reads as nothing
+being recorded.
+
+Both come from the same missing idea, which is that there are now two of these
+and everything done to one has to be done to both. The panel drains every
+recorder that exists and takes the clock from whichever is running, and a test
+reads the panel's source for that.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -212,7 +236,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1527 tests, 56135 functional lines. Both are measured and
+* **The counts**: 1528 tests, 56150 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4324,7 +4348,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1527 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1528 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -5971,7 +5995,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-three defects found and fixed (F-1 to F-163), across
+**One hundred and sixty-four defects found and fixed (F-1 to F-164), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
