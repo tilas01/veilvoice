@@ -185,6 +185,75 @@ pub fn command(
     ]
 }
 
+/// The command that turns a **concat list** of held pictures and a WAV into a
+/// video file.
+///
+/// This is what [`crate::frames::write`] produces a list for, and it is the one
+/// a render actually uses.
+///
+/// # Why not the numbered sequence [`command`] builds
+///
+/// `image2`, which reads `frame-%05d.png`, gives every picture the same
+/// duration. That is right when there is one picture per frame of video, and
+/// wrong here: the frames module writes a picture only when the drawing
+/// changes, so a picture may stand for one frame or for fifty, and each carries
+/// its own `duration` line.
+///
+/// Feeding held frames to `image2` would play an hour of conversation in the
+/// few seconds its handful of distinct pictures cover, which is a video that
+/// is wrong rather than one that fails to encode.
+///
+/// `-safe 0` is needed because the list names files rather than a pattern, and
+/// ffmpeg refuses relative paths in a concat list without it. The names are
+/// ones this program wrote into a directory this program made, which is the
+/// case the switch exists for.
+pub fn concat_command(list: &Path, audio: &Path, output: &Path, encoding: Encoding) -> Vec<String> {
+    vec![
+        "ffmpeg".to_string(),
+        // Never overwrite without being asked, the same as `command`.
+        "-n".to_string(),
+        "-f".to_string(),
+        "concat".to_string(),
+        "-safe".to_string(),
+        "0".to_string(),
+        "-i".to_string(),
+        list.display().to_string(),
+        "-i".to_string(),
+        audio.display().to_string(),
+        "-c:v".to_string(),
+        encoding
+            .encoder
+            .clone()
+            .unwrap_or_else(|| "libx264".to_string()),
+        if encoding.encoder.is_some() {
+            "-cq".to_string()
+        } else {
+            "-crf".to_string()
+        },
+        encoding.crf.to_string(),
+        // The output frame rate. The concat demuxer's durations say when each
+        // picture changes; this says how often the encoder samples that, and
+        // without it a held picture becomes one very long frame that seeking
+        // in a player lands badly on.
+        "-r".to_string(),
+        encoding.plan.fps.get().to_string(),
+        "-vf".to_string(),
+        format!(
+            "scale={}:{}:flags=lanczos",
+            encoding.plan.size.width(),
+            encoding.plan.size.height()
+        ),
+        "-pix_fmt".to_string(),
+        "yuv420p".to_string(),
+        "-c:a".to_string(),
+        "aac".to_string(),
+        "-b:a".to_string(),
+        "192k".to_string(),
+        "-shortest".to_string(),
+        output.display().to_string(),
+    ]
+}
+
 /// The command that turns a veiled recording into a video with a black frame.
 ///
 /// **Marker 87.** Somewhere that accepts only video is a common place to need

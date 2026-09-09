@@ -53,8 +53,14 @@
 #![warn(missing_docs)]
 
 pub mod ffmpeg;
+/// The monospace face the video frames are lettered with.
+pub mod font;
+/// The video pictures, drawn as pixels and written as PNG.
+pub mod frames;
 pub mod page;
 pub mod palette;
+/// Pixels, and the PNG they are written into.
+pub mod raster;
 pub mod size;
 pub mod waveform;
 
@@ -82,6 +88,17 @@ pub enum Error {
     Io(std::io::Error),
     /// Something about the request does not make sense.
     Malformed(String),
+    /// A file could not be written, and which one.
+    ///
+    /// Separate from [`Error::Io`] because a render writes hundreds of files
+    /// into a directory somebody chose, and "input/output error: permission
+    /// denied" without the path is not something a person can act on.
+    Write {
+        /// The file or directory that could not be written.
+        path: std::path::PathBuf,
+        /// What the operating system said.
+        why: String,
+    },
     /// A frame size or frame rate a video cannot be rendered at.
     ///
     /// Separate from [`Error::Malformed`] because it is the one error here a
@@ -102,6 +119,7 @@ impl std::fmt::Display for Error {
         match self {
             Self::Io(error) => write!(f, "input/output error: {error}"),
             Self::Malformed(what) => write!(f, "{what}"),
+            Self::Write { path, why } => write!(f, "could not write {}: {why}", path.display()),
             Self::Size(what) => write!(f, "{what}"),
         }
     }
