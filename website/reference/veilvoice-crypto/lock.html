@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/lock.svg" alt="lock.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/lock.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1823 lines &middot; <a href="lock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1958 lines &middot; <a href="lock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-worth-stated-before-anything-else">What this is worth, stated before anything else</a>
@@ -89,7 +89,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1823 lines defining <strong>46 functions</strong> (33 public), <strong>3 types</strong> and <strong>15 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1958 lines defining <strong>50 functions</strong> (35 public), <strong>3 types</strong> and <strong>16 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct AppLock</code> <span style="color:var(--muted)">line 191</span> &middot; A password verifier plus its attempt history.</li>
 <li><code>struct LockStore</code> <span style="color:var(--muted)">line 651</span> &middot; An AppLock bound to a file, which is persisted after every attempt.</li>
@@ -156,10 +156,16 @@
 <li><code>LockStore::every_copy_current</code> <span style="color:var(--muted)">line 862</span> &middot; Whether the last write reached every copy.
 </li>
 <li><code>open_default</code> <span style="color:var(--muted)">line 879</span> &middot; Open the lock at the default location, wherever this platform keeps it.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>default_dir</code>, <code>open_in</code>, <code>default_path</code>, <code>read_legacy</code>, <code>config_path</code>, <code>parse</code></span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>default_dir</code>, <code>open_in</code>, <code>default_path</code>, <code>read_legacy</code>, <code>choose_base</code>, <code>config_path</code>, <code>portable_dir</code>, <code>parse</code></span>
 </li>
 <li><code>create_default</code> <span style="color:var(--muted)">line 948</span> &middot; Create a lock at the default location, refusing to replace one already there.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>create_in</code>, <code>default_dir</code>, <code>read_legacy</code>, <code>default_path</code>, <code>parse</code>, <code>config_path</code></span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>create_in</code>, <code>default_dir</code>, <code>read_legacy</code>, <code>default_path</code>, <code>parse</code>, <code>choose_base</code>, <code>config_path</code>, <code>portable_dir</code></span>
+</li>
+<li><code>platform_dir</code> <span style="color:var(--muted)">line 1099</span> &middot; The platform&#x27;s own configuration directory, whether or not it is the one in use.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>config_path</code></span>
+</li>
+<li><code>is_portable</code> <span style="color:var(--muted)">line 1118</span> &middot; Whether this copy is keeping its state beside itself.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>portable_dir</code></span>
 </li>
 </ul>
 </section>
@@ -292,7 +298,7 @@
 <a href="lock.src.html#fn-default_dir">
 <rect x="377.9" y="720.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="436.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_dir</text>
-<text x="436.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1043</text>
+<text x="436.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1088</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -302,11 +308,11 @@
 <text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="867.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
 <text x="20.0" y="882.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
-<text x="20.0" y="897.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one. 22 of 40 functions are drawn; the diagram is bounded at 22 so</text>
+<text x="20.0" y="897.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one. 22 of 44 functions are drawn; the diagram is bounded at 22 so</text>
 <text x="20.0" y="912.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 40 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 44 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
@@ -331,7 +337,7 @@ flowchart TD
     n_open_in[&quot;open_in&lt;br/&gt;line 892&quot;]
     n_create_default([&quot;create_default&lt;br/&gt;line 948&quot;])
     n_create_in[&quot;create_in&lt;br/&gt;line 958&quot;]
-    n_default_dir[&quot;default_dir&lt;br/&gt;line 1043&quot;]
+    n_default_dir[&quot;default_dir&lt;br/&gt;line 1088&quot;]
     n_acknowledge --&gt; n_verify
     n_change_password --&gt; n_unlock
     n_create_default --&gt; n_create_in
@@ -361,7 +367,7 @@ flowchart TD
     click n_open_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L892&quot; &quot;open the source&quot;
     click n_create_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L948&quot; &quot;open the source&quot;
     click n_create_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L958&quot; &quot;open the source&quot;
-    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1043&quot; &quot;open the source&quot;
+    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1088&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_create,n_store_key,n_acknowledge,n_cooldown,n_retag,n_to_bytes,n_open,n_create,n_acknowledge,n_change_password,n_remove,n_cooldown,n_store_key,n_open_default,n_create_default entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -434,8 +440,13 @@ flowchart TD
 <tr><td><code>create_in</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-create_in">958</a></td><td>Create a vault-backed lock under base.</td></tr>
 <tr><td><code>write_private</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-write_private">984</a></td><td>Write the lock file so it is owner-only from the moment it exists.</td></tr>
 <tr><td><code>config_path</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-config_path">1014</a></td><td>Where the lock file lives, given a platform and an environment.</td></tr>
-<tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_dir">1043</a></td><td>The configuration directory the vault keeps its files in, if the environment says where one is.</td></tr>
-<tr><td><code>default_path</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_path">1060</a></td><td>Where the lock file lives on this platform, if the environment says.</td></tr>
+<tr><td><code>PORTABLE_DIR</code> <sub>pub const</sub></td><td><a href="lock.src.html#fn-portable_dir">1047</a></td><td>The name of the folder that makes a copy of VeilVoice keep its state beside itself.</td></tr>
+<tr><td><code>portable_dir</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-portable_dir-2">1063</a></td><td>Where a portable copy keeps its state, when it is one.</td></tr>
+<tr><td><code>choose_base</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-choose_base">1082</a></td><td>Which of the two locations a copy is using, given what is beside it and what the platform says.</td></tr>
+<tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_dir">1088</a></td><td>The configuration directory the vault keeps its files in, if the environment says where one is.</td></tr>
+<tr><td><code>platform_dir</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-platform_dir">1099</a></td><td>The platform&#x27;s own configuration directory, whether or not it is the one in use.</td></tr>
+<tr><td><code>is_portable</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-is_portable">1118</a></td><td>Whether this copy is keeping its state beside itself.</td></tr>
+<tr><td><code>default_path</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_path">1141</a></td><td>Where the lock file lives, if there is anywhere for it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

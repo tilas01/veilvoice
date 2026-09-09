@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 2849 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 2913 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -135,7 +135,7 @@ started on another thread and the answer is collected later.
 
 ## What this file contains
 
-2849 lines defining **30 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+2913 lines defining **31 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -151,7 +151,7 @@ started on another thread and the answer is collected later.
 
 ## What calls what
 
-_22 of 30 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 31 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
@@ -280,5 +280,6 @@ flowchart TD
 | `VeilVoiceApp::watch_tab` <sub>fn</sub> | [1974](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1974) |  |
 | `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [2064](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2064) | Say so if the last run ended badly, and offer the file. |
 | `VeilVoiceApp::about_tab` <sub>fn</sub> | [2080](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2080) |  |
-| `device_picker` <sub>fn</sub> | [2169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2169) |  |
-| `field` <sub>fn</sub> | [2194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2194) |  |
+| `paths_section` <sub>fn</sub> | [2178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2178) | Where this copy is keeping things, on this machine. |
+| `device_picker` <sub>fn</sub> | [2233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2233) |  |
+| `field` <sub>fn</sub> | [2258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2258) |  |

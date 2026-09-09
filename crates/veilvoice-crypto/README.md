@@ -115,7 +115,7 @@ flowchart TD
     n_hoard["hoard.rs<br/>1037 lines"]
     n_hybrid["hybrid.rs<br/>460 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1823 lines"]
+    n_lock["lock.rs<br/>1958 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_studio["studio.rs<br/>1494 lines"]
@@ -162,7 +162,7 @@ flowchart TD
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 460 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1958 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 308 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure, the self-destruct. |
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1494 | The studio vault: a key that exists only when both locks have been opened. |
@@ -173,7 +173,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**6,130 functional lines of Rust** in this crate. A functional line is a line
+**6,193 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -235,8 +235,11 @@ counts blank lines and comments too. Both are produced by
 | `fn open_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Open a vault-backed lock under base, adopting a pre-vault file if one is there. |
 | `fn create_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a lock at the default location, refusing to replace one already there. |
 | `fn create_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a vault-backed lock under base. |
+| `const PORTABLE_DIR` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | The name of the folder that makes a copy of VeilVoice keep its state beside itself. |
 | `fn default_dir` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | The configuration directory the vault keeps its files in, if the environment says where one is. |
-| `fn default_path` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Where the lock file lives on this platform, if the environment says. |
+| `fn platform_dir` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | The platform's own configuration directory, whether or not it is the one in use. |
+| `fn is_portable` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Whether this copy is keeping its state beside itself. |
+| `fn default_path` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Where the lock file lives, if there is anywhere for it. |
 | `fn write_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Create path containing bytes, readable only by the current user. |
 | `fn write_owner_only_new` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As write_owner_only, but fail if anything is already at path. |
 | `fn replace_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Replace path with bytes in one step, or leave what was there. |

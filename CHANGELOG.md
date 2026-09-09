@@ -8,6 +8,31 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Portable first, and the About tab says exactly where things are**
+
+- A folder called `veilvoice-data` beside the program makes the settings, the
+  vaults, the policies, the palettes and the app lock live in it. A copy on a
+  memory stick now stays a copy on a stick. Remove the folder and it goes back
+  to the platform's own configuration directory; neither switch moves anything
+  that is already there.
+- Opted into rather than detected. "Beside the program if that is writable"
+  would have moved an ordinary installation's state the day somebody unpacked
+  it somewhere writable, and the symptom would have been an empty vault.
+- The About tab lists the exact folders in use, worked out on the machine
+  rather than written down, with a line saying which of the two arrangements is
+  in force. The app lock's file names are not among them: they are derived
+  rather than fixed, on purpose, and printing them in a window would hand that
+  back to anybody standing behind the reader.
+- A test reads the crate's own source for every place it keeps something and
+  fails naming any the tab does not show, so a location added tomorrow cannot
+  quietly stop being reported.
+- Installing a portable copy now asks what should happen to that folder, and
+  the button waits for the answer. There is no default because the two right
+  answers point in opposite directions: carrying over is right when moving onto
+  your own machine, and leaving is right when installing on somebody else's.
+  Carried means copied, never moved, and nothing already at the destination is
+  replaced.
+
 **The build was red, and the offline proof had never run**
 
 - The `offline-runtime` job proves the front page's claim four ways. Its third

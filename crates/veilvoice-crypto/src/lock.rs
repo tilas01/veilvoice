@@ -1038,19 +1038,100 @@ fn config_path(
     Some(base.join("veilvoice").join("applock.bin"))
 }
 
+/// The name of the folder that makes a copy of VeilVoice keep its state beside
+/// itself.
+///
+/// Fixed, and not configurable, because the thing it turns on has to be
+/// visible: somebody looking at a folder on a memory stick can see whether the
+/// settings are in it.
+pub const PORTABLE_DIR: &str = "veilvoice-data";
+
+/// Where a portable copy keeps its state, when it is one.
+///
+/// # Why this is opted into rather than detected
+///
+/// "Beside the program if that is writable" would move an ordinary
+/// installation's settings the day somebody unpacked it somewhere writable, and
+/// the symptom would be an empty vault: everything still on the disk, and the
+/// program looking in the other place. So it is not guessed. A directory named
+/// [`PORTABLE_DIR`] beside the executable turns it on, and removing that
+/// directory turns it off. Both are things a person does deliberately and can
+/// see they have done.
+///
+/// The directory has to exist already. Creating it here would make every copy
+/// portable on its first run, which is the guess this avoids.
+fn portable_dir() -> Option<PathBuf> {
+    let beside = std::env::current_exe().ok()?.parent()?.join(PORTABLE_DIR);
+    // A file of that name is not a folder of that name, and following it would
+    // put the lock somewhere that cannot hold it.
+    beside.is_dir().then_some(beside)
+}
+
+/// Which of the two locations a copy is using, given what is beside it and what
+/// the platform says.
+///
+/// Split out so both branches are testable from any machine, which is the same
+/// reason [`config_path`] is split out, and for the same reason: the branch
+/// that mattered in **F-143** could not be checked from the machine that wrote
+/// it.
+///
+/// The portable folder wins where it exists. That is the whole point of it, and
+/// it is the answer even when the platform also offers a configuration
+/// directory: somebody who put that folder beside the program asked for the
+/// state to be there.
+fn choose_base(portable: Option<PathBuf>, config: Option<PathBuf>) -> Option<PathBuf> {
+    portable.map(|p| p.join("applock.bin")).or(config)
+}
+
 /// The configuration directory the vault keeps its files in, if the
 /// environment says where one is.
 pub fn default_dir() -> Option<PathBuf> {
     default_path().and_then(|p| p.parent().map(Path::to_path_buf))
 }
 
-/// Where the lock file lives on this platform, if the environment says.
+/// The platform's own configuration directory, whether or not it is the one in
+/// use.
 ///
-/// Resolved from environment variables rather than a directories crate: it is
-/// twenty lines, it adds no dependency to a security crate, and it returns
-/// `None` instead of guessing when the environment does not say. A caller that
-/// gets `None` should tell the user it cannot find a config directory rather
-/// than scattering a lock file into the working directory.
+/// [`default_dir`] answers "where is the state", which is the portable folder
+/// when there is one. This answers "where would it be if there were not", which
+/// is the other half of the question somebody installing a portable copy is
+/// being asked: what to carry the settings *to*.
+pub fn platform_dir() -> Option<PathBuf> {
+    let path = config_path(
+        cfg!(windows),
+        cfg!(target_os = "macos"),
+        std::env::var_os("APPDATA"),
+        std::env::var_os("HOME"),
+        std::env::var_os("XDG_CONFIG_HOME"),
+    )?;
+    path.is_absolute()
+        .then_some(path)?
+        .parent()
+        .map(Path::to_path_buf)
+}
+
+/// Whether this copy is keeping its state beside itself.
+///
+/// Reported rather than inferred by a caller comparing paths: the About tab
+/// says which of the two arrangements is in use, and working that out by
+/// looking at a path would be a second copy of the rule.
+pub fn is_portable() -> bool {
+    portable_dir().is_some()
+}
+
+/// Where the lock file lives, if there is anywhere for it.
+///
+/// Two answers, in this order. A folder named [`PORTABLE_DIR`] beside the
+/// program, when one is there: a copy on a memory stick then keeps its
+/// settings, its vaults and its lock on the stick, and stays a copy on a stick.
+/// Otherwise this platform's configuration directory.
+///
+/// The configuration directory is resolved from environment variables rather
+/// than a directories crate: it is twenty lines, it adds no dependency to a
+/// security crate, and it returns `None` instead of guessing when the
+/// environment does not say. A caller that gets `None` should tell the user it
+/// cannot find a config directory rather than scattering a lock file into the
+/// working directory.
 ///
 /// This is the path a caller naming one gets, and the anchor a dozen other
 /// settings files are derived from -- policy, capture, sentry. It is no longer
@@ -1058,12 +1139,15 @@ pub fn default_dir() -> Option<PathBuf> {
 /// [`crate::vault`], whose files sit in the same directory under names derived
 /// from its index.
 pub fn default_path() -> Option<PathBuf> {
-    let path = config_path(
-        cfg!(windows),
-        cfg!(target_os = "macos"),
-        std::env::var_os("APPDATA"),
-        std::env::var_os("HOME"),
-        std::env::var_os("XDG_CONFIG_HOME"),
+    let path = choose_base(
+        portable_dir(),
+        config_path(
+            cfg!(windows),
+            cfg!(target_os = "macos"),
+            std::env::var_os("APPDATA"),
+            std::env::var_os("HOME"),
+            std::env::var_os("XDG_CONFIG_HOME"),
+        ),
     )?;
     // The invariant the whole function exists for, checked rather than
     // reasoned about: a relative answer is no answer, because it means a lock
@@ -1083,6 +1167,57 @@ mod tests {
 
     fn weak() -> kdf::KdfParams {
         kdf::KdfParams::weak_for_tests()
+    }
+
+    #[test]
+    fn a_folder_beside_the_program_wins_over_the_platform_directory() {
+        // The whole of the portable arrangement: a copy on a stick keeps its
+        // state on the stick. Tested through `choose_base` because
+        // `current_exe` is the machine's answer rather than something a test
+        // can set.
+        let beside = PathBuf::from("/media/stick/veilvoice-data");
+        let config = PathBuf::from("/home/someone/.config/veilvoice/applock.bin");
+        assert_eq!(
+            choose_base(Some(beside.clone()), Some(config.clone())),
+            Some(beside.join("applock.bin"))
+        );
+        assert_eq!(choose_base(None, Some(config.clone())), Some(config));
+    }
+
+    #[test]
+    fn a_portable_folder_is_an_answer_even_where_the_platform_has_none() {
+        // A stripped environment that says nothing about a configuration
+        // directory is exactly the case a stick is carried into.
+        let beside = PathBuf::from("/media/stick/veilvoice-data");
+        assert_eq!(
+            choose_base(Some(beside.clone()), None),
+            Some(beside.join("applock.bin"))
+        );
+        assert_eq!(choose_base(None, None), None);
+    }
+
+    #[test]
+    fn nothing_beside_the_program_is_created_by_asking() {
+        // The opt-in has to be a thing a person did. If asking made the folder,
+        // every copy would become portable on its first run and an ordinary
+        // installation's settings would move without anybody choosing it.
+        let before = portable_dir();
+        let again = portable_dir();
+        assert_eq!(before, again, "asking twice gave two answers");
+        if let Some(dir) = before {
+            assert!(dir.is_dir(), "a folder that is not there was reported");
+        }
+    }
+
+    #[test]
+    fn the_name_that_turns_it_on_is_the_one_that_is_looked_for() {
+        // Said in the documentation, in the About tab and in the user guide.
+        // One constant, so those cannot drift apart from what is read.
+        assert_eq!(PORTABLE_DIR, "veilvoice-data");
+        assert!(
+            !PORTABLE_DIR.contains(std::path::MAIN_SEPARATOR),
+            "the marker has to be one folder beside the program"
+        );
     }
 
     #[test]
