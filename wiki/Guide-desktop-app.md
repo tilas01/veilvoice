@@ -294,7 +294,55 @@ output will. If neither will move it says so, naming both rates, rather than
 running them together: a microphone at 44.1 kHz feeding an output at 48 kHz
 gives a voice about a semitone and a half sharp, stuttering, and no way to tell
 that from the veiling working. Set both to the same rate in your system's sound
-settings, or choose devices that already agree.
+settings, or choose devices that already agree. A room of several microphones is
+the same rule over all of them at once, and it matters more there: the others
+sound right, so one microphone at the wrong rate reads as that one person's
+microphone being bad.
+
+#### Several microphones, a guest each
+
+An interview with everybody in the room needs a microphone each, and ticking
+**several microphones, a guest each** turns the input picker into a list of
+them: a name and a device per person, up to eight. Press **add a guest** for
+another row and **remove** to take one out. Everything else works as it does
+with one microphone, including **preview to my headphones**, which previews the
+mix.
+
+**Why not one microphone in the middle of the table.** One microphone carrying
+four people is one signal. Whatever it is turned into, all four of them are
+turned into the same thing, and a listener cannot follow who is speaking. A
+microphone each is what lets each person be veiled into a voice of their own,
+from the same set a group render hands out.
+
+**Two guests cannot share a device.** It is refused before anything opens, by
+name, because nothing here can separate one signal back into two people. Two
+guests both left on *system default* is the same refusal: the default is a
+device, not an absence.
+
+**Two bars per guest, and the load.** Each person gets what went into their
+microphone and what came out of their engine, with the mix under them. The
+**load** is the one number that says whether this machine can carry this room:
+every guest's engine runs inside one output callback, so they share one deadline
+of a few milliseconds and the cost is the sum of them. Below 100 per cent the
+machine keeps up; past 80 the tab says so and what to do about it, which is one
+guest fewer or a larger frame size. It is a measurement rather than a limit,
+because how many voices a machine can carry is a fact about the machine.
+
+**The mix can clip, and nothing quietly fixes it.** Several people talking at
+once is several signals added together, which can go past full scale, and a live
+path cannot scale the whole conversation afterwards the way a render can. So the
+blocks that clipped are counted and shown, and nothing compresses or limits
+them: a limiter is a dynamics processor, it changes the voice, and a second
+thing changing the voice is exactly what this program is careful about. Turn the
+microphones down.
+
+**A take stores everybody separately.** One take name, and under it the mix,
+called *(everybody)*, and one recording per guest called after them. The choice
+of which side to keep is the same one a single microphone has and applies to
+every guest at once, so choosing the unveiled side in a room of four keeps four
+recordings of four real voices.
+
+#### Hearing yourself, and what the meters say
 
 **Hear yourself first.** Beside **start veiling** there is **preview to my
 headphones**. It runs the same engine and sends the result to this machine's own
@@ -391,6 +439,7 @@ running rather than discarding it.
 | Control | What it is |
 |---|---|
 | **input / output** | Which microphone the voice comes from and where the veiled voice goes. Locked while a session is running, because changing the device under a running stream is not a change, it is a restart. |
+| **several microphones, a guest each** | Turns the input picker into a guest list: a name and a microphone per person, up to eight, each veiled into a voice of their own and mixed into the output. |
 | **start veiling** | Begins, at the engine strength shown below the devices. Nothing is kept unless a take is started. |
 | **preview to my headphones** | The same engine to this machine's own output and nowhere else. The chosen output is deliberately ignored, so nothing listening on the cable hears it. If this machine's default output *is* a cable, you are told so rather than reassured. |
 | **stop** | Ends the veiling. A take still running is stopped and stored first, never discarded. |
