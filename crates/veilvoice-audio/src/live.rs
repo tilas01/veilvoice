@@ -93,27 +93,36 @@ impl LiveSession {
         output: &cpal::Device,
         config: DeidConfig,
     ) -> Result<Self, Error> {
-        Self::start_recording(input, output, config, None)
+        Self::start_recording(input, output, config, None, None)
     }
 
-    /// Start scrambling, and copy the veiled voice into `sink` as it is
-    /// produced.
+    /// Start scrambling, copying the veiled voice into `veiled` and the
+    /// microphone into `plain`, as each is produced.
     ///
-    /// The sink is fed from inside the output callback, which is where the
-    /// veiled samples exist and the only place they exist before they reach the
-    /// device. Taking them anywhere else would mean a second copy of the audio
-    /// living somewhere unprotected, which is the thing
-    /// [`record`](crate::record) is for avoiding.
+    /// Each sink is fed from the callback where its samples exist and from
+    /// nowhere else. The veiled voice comes from inside the output callback,
+    /// which is the only place it exists before it reaches the device; the
+    /// microphone comes from inside the input callback, after the downmix to
+    /// mono and before anything else sees it. Taking either anywhere else would
+    /// mean a second copy of the audio living somewhere unprotected, which is
+    /// the thing [`record`](crate::record) is for avoiding.
     ///
-    /// [`Sink::write`](crate::record::Sink::write) is realtime-safe, so this
-    /// costs the callback a memcpy into an already-allocated ring and nothing
+    /// **Marker 131.** `plain` is the one thing in this crate that records the
+    /// real voice, and it is a separate argument rather than a flag on the
+    /// first for that reason: a caller cannot reach it without naming it. It is
+    /// `None` in every path that has not been asked for it, and the interface
+    /// that offers it says what it is before it is started.
+    ///
+    /// [`Sink::write`](crate::record::Sink::write) is realtime-safe, so each
+    /// costs its callback a memcpy into an already-allocated ring and nothing
     /// else. A sink that cannot keep up drops samples and counts them rather
     /// than stalling the audio somebody is speaking into.
     pub fn start_recording(
         input: &cpal::Device,
         output: &cpal::Device,
         mut config: DeidConfig,
-        mut sink: Option<crate::record::Sink>,
+        mut veiled: Option<crate::record::Sink>,
+        mut plain: Option<crate::record::Sink>,
     ) -> Result<Self, Error> {
         let in_cfg = input
             .default_input_config()
@@ -136,20 +145,36 @@ impl LiveSession {
         let cap_shared = Arc::clone(&shared);
         let play_shared = Arc::clone(&shared);
 
+        // Sized once, here, so the input callback never allocates. Only used
+        // when the microphone is being kept: the mono samples have to exist as
+        // a slice before `Sink::write` can take them, and building that slice
+        // per callback would be an allocation in a realtime path.
+        let mut mono_scratch = vec![0.0f32; capacity];
+
         let input_stream = input
             .build_input_stream(
                 &in_cfg.config(),
                 move |data: &[f32], _| {
                     let mut peak = 0.0f32;
                     let mut dropped = 0u64;
+                    let mut kept = 0usize;
                     // Downmix to mono: the engine is single channel, and a
                     // stereo image is itself a recording-setup fingerprint.
                     for frame in data.chunks(in_channels) {
                         let mono = frame.iter().sum::<f32>() / in_channels as f32;
                         peak = peak.max(mono.abs());
+                        // The real voice, at the one moment it exists in this
+                        // process, and only where it was asked for.
+                        if plain.is_some() && kept < mono_scratch.len() {
+                            mono_scratch[kept] = mono;
+                            kept += 1;
+                        }
                         if producer.try_push(mono).is_err() {
                             dropped += 1;
                         }
+                    }
+                    if let Some(sink) = plain.as_mut() {
+                        sink.write(&mono_scratch[..kept]);
                     }
                     if dropped > 0 {
                         cap_shared.dropped.fetch_add(dropped, Ordering::Relaxed);
@@ -189,7 +214,7 @@ impl LiveSession {
                     // The veiled voice, at the one moment it exists. Copied
                     // into the recorder's ring here rather than read back from
                     // the device, which would be a second unprotected copy.
-                    if let Some(sink) = sink.as_mut() {
+                    if let Some(sink) = veiled.as_mut() {
                         sink.write(&scratch_out[..frames]);
                     }
 

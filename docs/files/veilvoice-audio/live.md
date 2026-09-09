@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-audio/src/live.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 281 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 306 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
 
 ## Contents
 
@@ -66,7 +66,7 @@ cannot.
 
 ## What this file contains
 
-281 lines defining **3 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+306 lines defining **3 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -78,7 +78,7 @@ cannot.
 
 - `LiveSession::start` (line 91) -- Start scrambling from input into output.
   - reaches: `start_recording`
-- `LiveSession::stats` (line 241) -- Read the current statistics, resetting the peak meters.
+- `LiveSession::stats` (line 266) -- Read the current statistics, resetting the peak meters.
 
 ## What calls what
 
@@ -101,12 +101,12 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_start(["LiveSession::start<br/>line 91"])
-    n_start_recording["LiveSession::start_recording<br/>line 112"]
-    n_stats(["LiveSession::stats<br/>line 241"])
+    n_start_recording["LiveSession::start_recording<br/>line 120"]
+    n_stats(["LiveSession::stats<br/>line 266"])
     n_start --> n_start_recording
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L91" "open the source"
-    click n_start_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L112" "open the source"
-    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L241" "open the source"
+    click n_start_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L120" "open the source"
+    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L266" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_stats entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -124,8 +124,8 @@ flowchart TD
 | `LiveSession` <sub>pub struct</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L71) | A running live-scramble session. |
 | `Shared` <sub>struct</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L79) |  |
 | `LiveSession::start` <sub>pub fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L91) | Start scrambling from input into output. |
-| `LiveSession::start_recording` <sub>pub fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L112) | Start scrambling, and copy the veiled voice into sink as it is produced. |
-| `LiveSession::stats` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L241) | Read the current statistics, resetting the peak meters. |
+| `LiveSession::start_recording` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L120) | Start scrambling, copying the veiled voice into veiled and the microphone into plain, as each is produced. |
+| `LiveSession::stats` <sub>pub fn</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L266) | Read the current statistics, resetting the peak meters. |
 
 ---
 

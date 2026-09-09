@@ -30,26 +30,39 @@
 //! key is derived, and the derived key lives in page-locked memory for as long
 //! as the vault is open. Locking the window closes the vault.
 //!
-//! # What is recorded is what comes out, never what went in
+//! # What is recorded is what comes out, unless it was asked to be otherwise
 //!
 //! The Studio records through
 //! `veilvoice_audio::LiveSession::start_recording`,
 //! which is the same path the command line uses, so the samples that reach the
-//! recorder are the **veiled** ones. There is no code path here that captures
-//! the microphone before the engine has been through it, because a path that
-//! existed would eventually be taken, and the file it produced would be a
-//! recording of somebody's real voice sitting in a vault they believed was
-//! safe.
+//! recorder are the **veiled** ones. That is the default and it is what
+//! [`Keep::Veiled`] means.
 //!
-//! The recording is assembled inside a `veilvoice_crypto::Secret` and
-//! handed straight to the vault to be sealed. It is never a plain file, not
-//! even briefly.
+//! **Marker 131** adds the other two. The microphone can be kept as well, or
+//! instead, and the reasoning for allowing it at all is on [`Keep`]: refusing
+//! would not stop somebody who needs the real recording, it would move them to
+//! a phone on the table, which is a plaintext file on a device with none of
+//! this. What matters is that it is asked for rather than arrived at.
+//!
+//! So it is a choice made **before** the button, never remembered between runs,
+//! reset when the window locks, and stated in the same words the plaintext path
+//! uses. The default is the safe one, and every path that has not been asked
+//! for the microphone passes `None` where it would go.
+//!
+//! Each recording is assembled inside a `veilvoice_crypto::Secret` and handed
+//! straight to the vault to be sealed. Neither is ever a plain file, not even
+//! briefly: an unveiled take is a recording of a real voice, and it is sealed
+//! exactly as strongly as a veiled one.
 //!
 //! # In plain words
 //!
 //! Record here, and what you record is kept locked up. Opening the cupboard
 //! needs both of your passwords at once, every time, which is what makes it
 //! worth having.
+//!
+//! What gets recorded is the disguised voice. You can ask for your real one as
+//! well, or instead, and the screen tells you what that means before you start:
+//! anybody who can open the cupboard can then hear who was talking.
 
 use egui::{Color32, RichText, Ui};
 use veilvoice_core::DeidConfig;
@@ -118,6 +131,13 @@ pub struct Studio {
     recorder: Option<veilvoice_audio::record::Recorder>,
     /// What the next take will be called.
     take_name: String,
+    /// Which side of the engine the next take keeps.
+    ///
+    /// Defaults to the veiled voice, and the default is the point: nothing here
+    /// reaches a recording of somebody's real voice without being asked for.
+    keep: Keep,
+    /// The second recorder, when the real voice is being kept as well.
+    plain: Option<veilvoice_audio::record::Recorder>,
 
     // --- the browser ---
     /// Which take is selected, by identifier.
@@ -192,6 +212,10 @@ impl Studio {
         if self.session.is_some() {
             self.finish_take();
         }
+        // Back to the safe side. A choice that survived a lock would be a
+        // choice somebody made before lunch deciding what is recorded after it.
+        self.keep = Keep::default();
+        self.plain = None;
         self.vault = None;
         self.entries.clear();
         self.selected = None;
@@ -338,7 +362,21 @@ impl Studio {
         use veilvoice_audio::devices::Direction;
 
         let rate = config.sample_rate as u32;
-        let (recorder, sink) = veilvoice_audio::record::start(rate);
+        // One recorder per side that is being kept, and neither exists unless
+        // it was asked for. A recorder made and then not used would still have
+        // a ring holding audio, which for the plain side is the real voice.
+        let (veiled_recorder, veiled_sink) = if self.keep.wants_veiled() {
+            let (r, s) = veilvoice_audio::record::start(rate);
+            (Some(r), Some(s))
+        } else {
+            (None, None)
+        };
+        let (plain_recorder, plain_sink) = if self.keep.wants_plain() {
+            let (r, s) = veilvoice_audio::record::start(rate);
+            (Some(r), Some(s))
+        } else {
+            (None, None)
+        };
 
         let input = match veilvoice_audio::devices::open(Direction::Input, input) {
             Ok(device) => device,
@@ -355,10 +393,17 @@ impl Studio {
             }
         };
 
-        match veilvoice_audio::LiveSession::start_recording(&input, &output, config, Some(sink)) {
+        match veilvoice_audio::LiveSession::start_recording(
+            &input,
+            &output,
+            config,
+            veiled_sink,
+            plain_sink,
+        ) {
             Ok(session) => {
                 self.session = Some(session);
-                self.recorder = Some(recorder);
+                self.recorder = veiled_recorder;
+                self.plain = plain_recorder;
                 self.message = None;
             }
             Err(error) => self.message = Some((error.to_string(), p::red())),
@@ -374,61 +419,85 @@ impl Studio {
         // which would read as a level still arriving.
         self.levels.clear();
 
-        let Some(mut recorder) = self.recorder.take() else {
-            return;
+        let name = if self.take_name.trim().is_empty() {
+            "untitled".to_string()
+        } else {
+            self.take_name.trim().to_string()
         };
-        recorder.drain();
 
-        if recorder.samples() == 0 {
-            self.message = Some((
-                "Nothing was captured, so nothing was stored. Check the input \
-                 device is the one you are speaking into."
-                    .into(),
-                p::yellow(),
-            ));
+        // Both recorders are taken before either is stored, so a failure
+        // sealing the first does not leave the second holding audio.
+        let veiled = self.recorder.take();
+        let plain = self.plain.take();
+
+        let mut said = Vec::new();
+        let mut trouble = false;
+        // The veiled take first, so that when both were kept the one in the
+        // message and the one selected in the Browser is the safe one.
+        for (recorder, suffix) in [(veiled, ""), (plain, " (unveiled)")] {
+            let Some(recorder) = recorder else { continue };
+            match self.store_take(recorder, &format!("{name}{suffix}")) {
+                Ok(line) => said.push(line),
+                Err(line) => {
+                    said.push(line);
+                    trouble = true;
+                }
+            }
+        }
+
+        if said.is_empty() {
+            // Neither side was being kept, which `start_take` does not allow
+            // and which would otherwise end in silence.
             return;
+        }
+        self.take_name.clear();
+        self.message = Some((said.join(" "), if trouble { p::red() } else { p::green() }));
+    }
+
+    /// Seal one recorder's audio into the vault under `name`.
+    ///
+    /// Returns the line to say either way. Split out of [`Self::finish_take`]
+    /// because a take can now produce two recordings and the sealing is
+    /// identical for both: what differs is only the name and, for the person
+    /// reading the message, which side it came from.
+    fn store_take(
+        &mut self,
+        mut recorder: veilvoice_audio::record::Recorder,
+        name: &str,
+    ) -> Result<String, String> {
+        recorder.drain();
+        if recorder.samples() == 0 {
+            return Err(format!(
+                "Nothing was captured for {name:?}, so nothing was stored. \
+                 Check the input device is the one you are speaking into."
+            ));
         }
 
         let seconds = recorder.seconds();
         let dropped = recorder.dropped();
-
-        let wav = match recorder.wav() {
-            Ok(wav) => wav,
-            Err(error) => {
-                self.message = Some((error.to_string(), p::red()));
-                return;
-            }
-        };
+        let wav = recorder.wav().map_err(|e| e.to_string())?;
 
         let Some(vault) = &self.vault else {
             // The vault shut while a recording was running. The recording is
             // still in locked memory here and there is nowhere safe to put it,
             // so say so plainly rather than writing it somewhere it does not
             // belong.
-            self.message = Some((
+            return Err(
                 "The vault closed while this was recording, so there is nowhere \
                  to put it. Open the vault and record again."
-                    .into(),
-                p::red(),
-            ));
-            return;
+                    .to_string(),
+            );
         };
 
-        let name = if self.take_name.trim().is_empty() {
-            "untitled".to_string()
-        } else {
-            self.take_name.trim().to_string()
-        };
         let made = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_secs() as i64)
             .unwrap_or(0);
 
-        match vault.store(&name, made, wav.expose()) {
+        match vault.store(name, made, wav.expose()) {
             Ok(entry) => {
                 self.selected = Some(entry.id.clone());
                 self.entries.push(entry);
-                self.take_name.clear();
                 let mut said = format!("Stored {name:?}, {}.", length(seconds as f64));
                 if dropped > 0 {
                     // Never hidden. A recording that is quietly short is the
@@ -437,9 +506,9 @@ impl Studio {
                         " {dropped} samples were dropped, so it is slightly short."
                     ));
                 }
-                self.message = Some((said, p::green()));
+                Ok(said)
             }
-            Err(error) => self.message = Some((error.to_string(), p::red())),
+            Err(error) => Err(error.to_string()),
         }
     }
 
@@ -686,6 +755,8 @@ impl Studio {
             Phase::Shut => self.shut_panel(ui),
             Phase::Idle => {
                 self.take_form(ui);
+                ui.add_space(10.0);
+                self.keep_form(ui);
                 ui.add_space(12.0);
                 if ui
                     .button(RichText::new("  start recording  ").strong())
@@ -693,15 +764,6 @@ impl Studio {
                 {
                     self.start_take(config, input, output);
                 }
-                ui.add_space(4.0);
-                ui.label(
-                    RichText::new(
-                        "What is recorded is the veiled voice, not the microphone. The engine \
-                         runs first and the recorder only ever sees what comes out of it.",
-                    )
-                    .color(p::muted())
-                    .small(),
-                );
             }
             Phase::Recording => {
                 let (seconds, dropped) = self
@@ -1086,6 +1148,46 @@ impl Studio {
         );
     }
 
+    /// Which side of the engine to keep, asked before anything starts.
+    ///
+    /// **Marker 131.** Before the button rather than after it, because the
+    /// answer cannot be changed once a take has been made: a recording of
+    /// somebody's real voice is not something to discover having made.
+    ///
+    /// The safe choice is selected, and choosing either of the others puts what
+    /// it costs on the screen in the same words the plaintext path uses. There
+    /// is no tick that quietly remembers this between runs, for the reason
+    /// group mode is not remembered either: a mode somebody forgets is on is a
+    /// mode that eventually records what they did not mean to record.
+    fn keep_form(&mut self, ui: &mut Ui) {
+        ui.label(RichText::new("what to keep").color(p::blue()).small());
+        ui.horizontal(|ui| {
+            for choice in [Keep::Veiled, Keep::Both, Keep::Plain] {
+                ui.selectable_value(&mut self.keep, choice, choice.label());
+            }
+        });
+        ui.label(
+            RichText::new(self.keep.cost())
+                .color(if self.keep.wants_plain() {
+                    p::yellow()
+                } else {
+                    p::muted()
+                })
+                .small(),
+        );
+        if self.keep == Keep::Both {
+            ui.label(
+                RichText::new(
+                    "Two entries in the Browser, one of them ending in \
+                     \"(unveiled)\". The name is the only thing telling them \
+                     apart, so rename rather than deleting if you are not sure.",
+                )
+                .color(p::muted())
+                .small(),
+            );
+        }
+    }
+
     /// Show the last message, if there is one.
     fn say(&self, ui: &mut Ui) {
         if let Some((text, colour)) = &self.message {
@@ -1161,6 +1263,81 @@ impl Studio {
                         Err(error) => self.message = Some((error.to_string(), p::red())),
                     }
                 }
+            }
+        }
+    }
+}
+
+/// Which side of the engine a take keeps.
+///
+/// **Marker 131.** Three, and the order they are written in is the order they
+/// are offered: the safe one first, and the one that records the real voice
+/// last.
+///
+/// # Why the plain voice is offered at all
+///
+/// Because somebody comparing the two needs both, and because an interview
+/// whose consent covers the real recording is a real thing people do. Refusing
+/// it would not stop that; it would move it to a phone on the table, which is a
+/// plaintext recording on a device with none of this. What matters is that it
+/// is asked for rather than arrived at.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum Keep {
+    /// The veiled voice only. The default, and what the Studio has always done.
+    #[default]
+    Veiled,
+    /// Both, as two takes in the vault.
+    Both,
+    /// The microphone only, unveiled.
+    Plain,
+}
+
+impl Keep {
+    /// Whether the veiled voice is kept.
+    pub fn wants_veiled(self) -> bool {
+        matches!(self, Keep::Veiled | Keep::Both)
+    }
+
+    /// Whether the real voice is kept.
+    ///
+    /// The one question the warning hangs off, so it is asked once here rather
+    /// than matched on in three places.
+    pub fn wants_plain(self) -> bool {
+        matches!(self, Keep::Plain | Keep::Both)
+    }
+
+    /// What this is called where it is chosen.
+    pub fn label(self) -> &'static str {
+        match self {
+            Keep::Veiled => "the veiled voice",
+            Keep::Both => "both",
+            Keep::Plain => "the microphone, unveiled",
+        }
+    }
+
+    /// What it costs, in the words the plaintext path uses.
+    ///
+    /// The wording matters and is deliberately the same shape as the warning on
+    /// writing an unencrypted file: this is the one thing the Studio does that
+    /// produces a recording of somebody's real voice, and it says so before it
+    /// starts rather than after.
+    pub fn cost(self) -> &'static str {
+        match self {
+            Keep::Veiled => {
+                "The engine runs first and the recorder only ever sees what \
+                 comes out of it. No recording of the real voice is made."
+            }
+            Keep::Both => {
+                "Two takes, and one of them is the real voice. It is sealed in \
+                 the vault like everything else, and it is still a recording of \
+                 somebody that a veiled one is not: anybody who opens the vault \
+                 can hear who was speaking."
+            }
+            Keep::Plain => {
+                "The real voice, and nothing veiled. It is sealed in the vault \
+                 like everything else, and it is still a recording of somebody \
+                 that a veiled one is not: anybody who opens the vault can hear \
+                 who was speaking. Nothing here removes that afterwards."
             }
         }
     }

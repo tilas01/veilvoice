@@ -532,3 +532,83 @@ fn the_studio_meters_what_goes_in_as_well_as_what_comes_out() {
         "the Studio draws its own meter instead of the shared one"
     );
 }
+
+#[test]
+fn a_new_studio_keeps_the_veiled_voice_and_nothing_else() {
+    // The default is the whole safety property of marker 131: nothing reaches a
+    // recording of somebody's real voice without being asked for.
+    let studio = Studio::default();
+    assert_eq!(studio.keep, Keep::Veiled);
+    assert!(!studio.keep.wants_plain());
+    assert!(studio.keep.wants_veiled());
+}
+
+#[test]
+fn locking_the_window_puts_the_choice_back_to_the_safe_one() {
+    // A choice that survived a lock would be a choice somebody made before
+    // lunch deciding what is recorded after it.
+    let mut studio = Studio {
+        keep: Keep::Plain,
+        ..Studio::default()
+    };
+    studio.close();
+    assert_eq!(studio.keep, Keep::Veiled);
+    assert!(studio.plain.is_none());
+}
+
+#[test]
+fn each_side_says_which_of_the_two_it_keeps() {
+    assert!(Keep::Veiled.wants_veiled() && !Keep::Veiled.wants_plain());
+    assert!(Keep::Plain.wants_plain() && !Keep::Plain.wants_veiled());
+    assert!(Keep::Both.wants_veiled() && Keep::Both.wants_plain());
+}
+
+#[test]
+fn anything_that_keeps_the_real_voice_says_so_before_it_starts() {
+    // The wording is the point, not the wiring: this is the one thing the
+    // Studio does that makes a recording of somebody, and the sentence has to
+    // say that rather than describing a file format.
+    for keep in [Keep::Both, Keep::Plain] {
+        let cost = keep.cost();
+        assert!(
+            cost.contains("real voice"),
+            "{keep:?} does not say it records the real voice: {cost}"
+        );
+        assert!(
+            cost.contains("hear who was speaking"),
+            "{keep:?} does not say what that means for somebody who opens the \
+             vault: {cost}"
+        );
+    }
+    // And the safe one says the opposite rather than saying nothing.
+    assert!(Keep::Veiled
+        .cost()
+        .contains("No recording of the real voice"));
+}
+
+#[test]
+fn every_choice_is_labelled_and_they_are_all_different() {
+    let labels: Vec<&str> = [Keep::Veiled, Keep::Both, Keep::Plain]
+        .iter()
+        .map(|k| k.label())
+        .collect();
+    for label in &labels {
+        assert!(!label.is_empty());
+    }
+    let mut sorted = labels.clone();
+    sorted.sort_unstable();
+    sorted.dedup();
+    assert_eq!(sorted.len(), labels.len(), "two choices read the same");
+}
+
+#[test]
+fn the_unveiled_take_is_named_so_it_can_be_told_from_the_other() {
+    // Both sides land in one vault under one name, and the only thing telling
+    // them apart in the Browser is the name. A suffix that stopped being added
+    // would leave two identical entries, one of which is somebody's real voice.
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    assert!(
+        source.contains(r#"(veiled, ""), (plain, " (unveiled)")"#),
+        "the unveiled take is no longer named differently from the veiled one"
+    );
+}

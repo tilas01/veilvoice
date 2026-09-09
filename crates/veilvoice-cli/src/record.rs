@@ -126,9 +126,14 @@ pub fn run(
     let config = crate::config(tuning);
     let rate = config.sample_rate as u32;
     let (mut recorder, sink) = record::start(rate);
-    let session =
-        veilvoice_audio::LiveSession::start_recording(&in_device, &out_device, config, Some(sink))
-            .map_err(|e| e.to_string())?;
+    let session = veilvoice_audio::LiveSession::start_recording(
+        &in_device,
+        &out_device,
+        config,
+        Some(sink),
+        None,
+    )
+    .map_err(|e| e.to_string())?;
 
     println!();
     match seconds {
