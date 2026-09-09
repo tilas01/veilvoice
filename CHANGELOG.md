@@ -8,6 +8,32 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The Studio has a failsafe of its own, and a running take says what it keeps**
+
+- Both are clauses of marker 145 that nothing had built, found by reading that
+  row rather than treating it as a sum of the markers under it.
+- **A device that goes stops the Studio, not the recording.** Since the last
+  change the Studio knows when the device a take is being recorded from has
+  stopped existing; knowing was as far as it went, and the take carried on
+  recording silence until somebody looked at the screen. It now stores what was
+  captured and stops.
+- It does not discard, retry or switch device. Not discard, because everything
+  up to the fault is a real recording of something somebody said. Not retry or
+  switch, because the person chose that microphone and moving a recording onto
+  another one is this program deciding that for them, which on most machines
+  means a laptop's built-in microphone.
+- Only a device that has gone. Anything else the platform reports is shown and
+  left alone: an underrun is not a reason to end somebody's recording.
+- Separate from the application's safety catch, which is about *other programs*
+  taking the microphone. This one is about this tab.
+- **A running take now says which voice it is keeping.** The choice is made on a
+  form that disappears when recording starts, so a take of somebody's real
+  voice looked exactly like one that is not for the whole of the recording. It
+  is beside the clock, in yellow when the microphone is being kept.
+- Marker 145 is still planned, and its row now says what it is waiting for
+  rather than reading as a sum of the markers under it: group mode recording
+  every guest with the same guarantees, which is marker 147.
+
 **A BSD reader was told to run a command their system does not have**
 
 - `veilvoice verify --script` writes a shell script that checks the signature

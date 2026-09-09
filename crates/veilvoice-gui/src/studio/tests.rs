@@ -653,3 +653,141 @@ fn every_recorder_that_is_running_is_drained_every_frame() {
          would be short and its clock would sit at zero"
     );
 }
+
+/// **Marker 145.** The Studio's own failsafe stops the Studio, not the take.
+///
+/// A device that has gone does not come back and will not produce another
+/// sample, so a take left running on it records silence and looks like it
+/// worked. What was captured up to that point is a real recording of something
+/// somebody said, and it is stored rather than discarded, for the same reason
+/// locking the window stores one.
+#[test]
+fn a_device_that_goes_stops_the_studio_and_says_why() {
+    let mut studio = Studio {
+        setup: Some(Setup {
+            config: DeidConfig::default(),
+            input: Some("a microphone".to_string()),
+            output: None,
+            preview: false,
+        }),
+        trouble: Some(veilvoice_audio::Interference {
+            side: veilvoice_audio::Side::Input,
+            device_gone: true,
+            said: "the device is no longer available".to_string(),
+            count: 1,
+        }),
+        ..Studio::default()
+    };
+
+    studio.catch_a_fault();
+
+    assert!(
+        studio.setup.is_none(),
+        "the session was left running on a device that has gone"
+    );
+    assert!(!studio.is_veiling());
+    let (said, _) = studio.message.clone().expect("it has to say something");
+    assert!(
+        said.contains("gone"),
+        "the message does not say the device went: {said:?}"
+    );
+}
+
+/// Anything else the platform says is shown and left alone.
+///
+/// "The mixer said something" is not a reason to end a recording somebody is
+/// making. Only a device that has stopped existing is, because that is the one
+/// report that means no further sample is coming.
+#[test]
+fn a_report_that_is_not_a_missing_device_does_not_stop_anything() {
+    let mut studio = Studio {
+        setup: Some(Setup {
+            config: DeidConfig::default(),
+            input: None,
+            output: None,
+            preview: false,
+        }),
+        trouble: Some(veilvoice_audio::Interference {
+            side: veilvoice_audio::Side::Output,
+            device_gone: false,
+            said: "an underrun".to_string(),
+            count: 1,
+        }),
+        ..Studio::default()
+    };
+
+    studio.catch_a_fault();
+
+    assert!(
+        studio.setup.is_some(),
+        "an underrun ended a session, and it is not a reason to"
+    );
+    assert!(
+        studio.message.is_none(),
+        "the failsafe spoke about something it did not act on"
+    );
+}
+
+/// The failsafe stores. It does not discard, retry, or change device.
+///
+/// Read out of its own source, because the difference between storing and
+/// discarding is one line and the test for it would otherwise need a vault, a
+/// passphrase and an Argon2 derivation to observe. What is worth keeping is the
+/// decision: `stop_veiling` seals a take on its way through, and dropping the
+/// recorders instead would throw one away.
+#[test]
+fn the_failsafe_stores_rather_than_discarding_or_retrying() {
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    let body = source
+        .split("fn catch_a_fault(&mut self) {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n    }").next())
+        .expect("the failsafe has to be findable");
+
+    assert!(
+        body.contains("self.stop_veiling();"),
+        "the failsafe does not go through `stop_veiling`, which is what seals \
+         a take that is still running"
+    );
+    for discarding in ["self.recorder = None", "self.plain = None", ".take();"] {
+        assert!(
+            !body.contains(discarding),
+            "the failsafe drops a recorder ({discarding}) instead of storing \
+             what it holds"
+        );
+    }
+    for retrying in ["start_session", "start_veiling", "start_take"] {
+        assert!(
+            !body.contains(retrying),
+            "the failsafe restarts the audio ({retrying}). The person chose \
+             that microphone, and recording them through another one because \
+             the first went away is this program deciding that for them"
+        );
+    }
+}
+
+/// **Marker 145.** A take says what it is keeping while it is being made.
+///
+/// The choice is made on a form that is gone the moment recording starts, so a
+/// take keeping somebody's real voice looked exactly like one that does not for
+/// the whole of the recording. The marker asks for this to be shown "at all
+/// times", and before the button is not all times.
+#[test]
+fn a_running_take_says_which_voice_it_is_keeping() {
+    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    let panel = source
+        .split("Phase::Recording => {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n        }").next())
+        .expect("the recording panel has to be findable");
+
+    assert!(
+        panel.contains("self.keep.label()"),
+        "the recording panel does not say which voice the take is keeping"
+    );
+    assert!(
+        panel.contains("self.keep.wants_plain()"),
+        "the panel says what is being kept without distinguishing the one that \
+         keeps a real voice, which is the only one worth a colour"
+    );
+}
