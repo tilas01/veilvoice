@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 105 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 106 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ another thread, so the window keeps answering while it is busy.
 
 ## What this file contains
 
-105 lines defining **1 function** (1 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+106 lines defining **1 function** (1 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -117,7 +117,7 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `tabs` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68) | The name of every tab the window shows, in the order it shows them. |
-| `VERSION` <sub>pub const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L105) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L106) | Crate version string, surfaced in the About panel. |
 
 ---
 

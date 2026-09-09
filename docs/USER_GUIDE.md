@@ -481,6 +481,53 @@ Set, change or remove the app lock, and lock immediately. See §5.
 Crate versions, licence, the typeface in use, and a plain statement of what
 VeilVoice protects and what it does not.
 
+#### Where this copy keeps things
+
+The tab lists the exact folders in use on this computer: the program itself,
+the settings folder everything else sits in, the settings file, the app lock,
+the vaults, the policies, the palettes and the crash report. Each one is worked
+out on the machine rather than written down, and each is different on Windows,
+macOS and Linux, so a guess in a document would be worse than nothing: somebody
+told the wrong directory deletes the wrong directory.
+
+The app lock's own file **names** are not shown, only the folder. They are
+derived from an index rather than fixed, which is deliberate and is described
+as obscurity in the source: what it buys is that a search of a disk for a known
+filename misses, and printing the names in a window would hand that back to
+anybody standing behind you.
+
+#### Portable, and how to make it so
+
+A line above the list says which of two arrangements is in force.
+
+By default the state goes in this platform's own configuration directory.
+**Put a folder called `veilvoice-data` next to the program and it goes in there
+instead**, so a copy on a memory stick keeps its settings, its vaults and its
+lock on the stick. Remove that folder and it goes back to the platform
+directory.
+
+It is opted into rather than detected. "Beside the program if that is writable"
+would move an ordinary installation's state the day somebody unpacked it
+somewhere writable, and the symptom would be an empty vault: everything still
+on the disk and the program looking in the other place.
+
+Neither switch moves anything. What is already in the other place stays there,
+and the About tab is how you see which one is being read.
+
+#### Installing a portable copy
+
+The Install tab asks what should happen to the folder beside the program, and
+the install button waits for the answer. There is no sensible default: somebody
+moving off a stick onto their own machine wants the settings carried over, and
+somebody installing on a shared or borrowed machine wants them left where they
+are, because the wrong guess copies their vault onto a computer that is not
+theirs.
+
+Carried means **copied**, never moved. Anything already in the configuration
+directory is left alone and named in the report, and the folder beside the
+program is untouched, so both copies work afterwards and you decide what to do
+with the stick.
+
 ---
 
 ## 4. The command line
