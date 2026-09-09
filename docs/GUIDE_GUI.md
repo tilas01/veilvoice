@@ -251,6 +251,38 @@ It works on a recording that already exists, not on a live microphone.
 | **the people** | A name and a colour each. **Names are not veiled by anything**: you type them and they go into the subtitles as typed. |
 | **the recording, and the plan** | The plan says when each person speaks. Without one there is nothing to render against, and audio no turn claims is silenced rather than passed through, so a missing plan gives a silent file rather than an unveiled one. `veilvoice conversation inspect` describes a plan you already have. |
 | **what a render writes** | Audio, subtitles and a player page. All three by default. |
+| **who was speaking** | A score out of a hundred, beside the voice choice, saying how much the finished recording gives away about which person each turn belongs to. It falls as the group grows. See below for what it does and does not mean. |
+
+#### The "who was speaking" score
+
+Beside the voice controls is a percentage. **One hundred means the recording
+says nothing about which of the people in it was talking.** It falls as you add
+people in "a voice each" mode: two people is 70%, four is 40%, eight is 10%. One
+voice for everybody is 100% at any group size.
+
+**What it is not.** It is not a measure of how well anybody's voice is
+disguised. That is what the engine does, every speaker is mapped onto a
+canonical destination voice, and it does not get weaker because somebody else
+joined the call: a recording of eight people hides each of their voiceprints
+exactly as well as a recording of one. It is also not cryptography. There is no
+key, no work factor and no attacker racing a clock, and nothing here gets better
+with a longer password.
+
+**What it is.** A count of one specific thing: how much of the shape of the
+conversation a listener gets for free. Give eight people eight tellable-apart
+voices and anybody who hears the result can count the participants, follow who
+said what, and line two recordings of the same group up against each other by
+voice. Give them all one voice and none of that is there to find. A listener who
+could not tell the voices apart would have to guess which of them spoke each
+turn, and that guess is worth `log2(voices)` bits; the score is those bits
+measured against the widest the engine goes.
+
+**The part that runs backwards.** Crowding the table makes the recording give
+*less* away, not more, because two people whose voices are too close to separate
+count as one to a listener. It also makes the recording harder to follow, which
+is the real cost, and it is shown as its own line rather than folded into the
+score. That is the whole trade the two voice modes exist to let you choose
+between: followable and more revealing, or private and harder to follow.
 
 VeilVoice does not guess who is speaking. Turns come from a plan file or from
 one microphone per person, and that is a deliberate limit: guessing wrongly

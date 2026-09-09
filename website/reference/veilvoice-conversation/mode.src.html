@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-conversation/src/mode.rs</code></h1>
-<p style="color:var(--muted)"><a href="mode.html">what this file is for</a> &middot; <a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 286 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="mode.html">what this file is for</a> &middot; <a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 592 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -184,173 +184,491 @@
 </span>
 <span class="ln" id="L124">}</span>
 <span class="ln" id="L125"></span>
+<span class="src-item" id="fn-exposure">
+<span class="ln" id="L126"><span class="tok-com">/// What the finished recording says about **who** was speaking.</span></span>
+<span class="ln" id="L127"><span class="tok-com">///</span></span>
+<span class="ln" id="L128"><span class="tok-com">/// # The question this answers, and the one it does not</span></span>
+<span class="ln" id="L129"><span class="tok-com">///</span></span>
+<span class="ln" id="L130"><span class="tok-com">/// It does **not** measure how well any one person&#x27;s voice is disguised. That</span></span>
+<span class="ln" id="L131"><span class="tok-com">/// is what the engine does, every speaker is mapped onto a canonical</span></span>
+<span class="ln" id="L132"><span class="tok-com">/// destination, and it does not get weaker because somebody else joined the</span></span>
+<span class="ln" id="L133"><span class="tok-com">/// call. A recording of eight people hides each of their voiceprints exactly as</span></span>
+<span class="ln" id="L134"><span class="tok-com">/// well as a recording of one.</span></span>
+<span class="ln" id="L135"><span class="tok-com">///</span></span>
+<span class="ln" id="L136"><span class="tok-com">/// What it measures is the *other* leak, the one that does grow with the group:</span></span>
+<span class="ln" id="L137"><span class="tok-com">/// **how much of the conversation&#x27;s structure a listener gets for free.** Give</span></span>
+<span class="ln" id="L138"><span class="tok-com">/// eight people eight tellable-apart voices and anybody who hears the output can</span></span>
+<span class="ln" id="L139"><span class="tok-com">/// count the participants, follow who said what, and line two recordings of the</span></span>
+<span class="ln" id="L140"><span class="tok-com">/// same group up against each other by voice. Give them all one voice and none</span></span>
+<span class="ln" id="L141"><span class="tok-com">/// of that is there to find.</span></span>
+<span class="ln" id="L142"><span class="tok-com">///</span></span>
+<span class="ln" id="L143"><span class="tok-com">/// # It is not cryptography, and this does not pretend it is</span></span>
+<span class="ln" id="L144"><span class="tok-com">///</span></span>
+<span class="ln" id="L145"><span class="tok-com">/// There is no key here, no work factor and no adversary bounded by</span></span>
+<span class="ln" id="L146"><span class="tok-com">/// computation. Nothing about this number gets better with a longer key or</span></span>
+<span class="ln" id="L147"><span class="tok-com">/// worse with a faster machine. It is an information count about one specific</span></span>
+<span class="ln" id="L148"><span class="tok-com">/// thing: which of the speakers a given turn belongs to. Calling that</span></span>
+<span class="ln" id="L149"><span class="tok-com">/// &quot;cryptographic strength&quot; would be the kind of sentence this project spends</span></span>
+<span class="ln" id="L150"><span class="tok-com">/// most of its documentation refusing to write.</span></span>
+<span class="ln" id="L151"><span class="tok-com">///</span></span>
+<span class="ln" id="L152"><span class="tok-com">/// # Where the bits come from</span></span>
+<span class="ln" id="L153"><span class="tok-com">///</span></span>
+<span class="ln" id="L154"><span class="tok-com">/// A listener who cannot tell the voices apart has to guess which of `classes`</span></span>
+<span class="ln" id="L155"><span class="tok-com">/// speakers produced a turn, and that guess costs `log2(classes)` bits. When</span></span>
+<span class="ln" id="L156"><span class="tok-com">/// the voices *are* tellable apart the output hands those bits over. So the</span></span>
+<span class="ln" id="L157"><span class="tok-com">/// leak is `log2(classes)` bits per turn: zero when everybody shares one voice,</span></span>
+<span class="ln" id="L158"><span class="tok-com">/// one bit for two, three bits for eight.</span></span>
+<span class="ln" id="L159"><span class="tok-com">///</span></span>
+<span class="ln" id="L160"><span class="tok-com">/// `classes` is not simply the number of speakers. Two speakers whose voices</span></span>
+<span class="ln" id="L161"><span class="tok-com">/// fall within [`voices::CLEAR_SEPARATION`] of each other cannot reliably be</span></span>
+<span class="ln" id="L162"><span class="tok-com">/// separated by ear, so they count as one class. That is the part of this that</span></span>
+<span class="ln" id="L163"><span class="tok-com">/// runs the other way from intuition: crowding the table makes the recording</span></span>
+<span class="ln" id="L164"><span class="tok-com">/// *leak less* and *follow worse* at the same time, which is the trade the two</span></span>
+<span class="ln" id="L165"><span class="tok-com">/// modes exist to let somebody choose between.</span></span>
+<span class="ln" id="L166"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq)]</span>
+<span class="ln" id="L167"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Exposure {</span>
+<span class="ln" id="L168">    <span class="tok-com">/// How many voice classes a listener can separate in the output.</span></span>
+<span class="ln" id="L169">    <span class="tok-com">///</span></span>
+<span class="ln" id="L170">    <span class="tok-com">/// One in [`VoiceMode::Uniform`], whatever the group size. In</span></span>
+<span class="ln" id="L171">    <span class="tok-com">/// [`VoiceMode::Distinct`] it is the number of speakers, less any that were</span></span>
+<span class="ln" id="L172">    <span class="tok-com">/// given voices too close together to tell apart.</span></span>
+<span class="ln" id="L173">    <span class="tok-kw">pub</span> classes: usize,</span>
+<span class="ln" id="L174">    <span class="tok-com">/// Bits about the speaker of a turn that the output gives away, per turn.</span></span>
+<span class="ln" id="L175">    <span class="tok-com">///</span></span>
+<span class="ln" id="L176">    <span class="tok-com">/// `log2(classes)`. Zero means the output says nothing about which of them</span></span>
+<span class="ln" id="L177">    <span class="tok-com">/// was talking.</span></span>
+<span class="ln" id="L178">    <span class="tok-kw">pub</span> bits: f32,</span>
+<span class="ln" id="L179">    <span class="tok-com">/// The same thing as a score out of a hundred, where a hundred is a</span></span>
+<span class="ln" id="L180">    <span class="tok-com">/// recording that says nothing about who is who.</span></span>
+<span class="ln" id="L181">    <span class="tok-com">///</span></span>
+<span class="ln" id="L182">    <span class="tok-com">/// Measured against the widest the engine can go, which is</span></span>
+<span class="ln" id="L183">    <span class="tok-com">/// [`voices::MAX_VOICES`] classes, so the number means the same thing</span></span>
+<span class="ln" id="L184">    <span class="tok-com">/// whatever configuration it was asked about.</span></span>
+<span class="ln" id="L185">    <span class="tok-kw">pub</span> score: u8,</span>
+<span class="ln" id="L186">    <span class="tok-com">/// The closest pair among the voices actually handed out, as a ratio.</span></span>
+<span class="ln" id="L187">    <span class="tok-com">///</span></span>
+<span class="ln" id="L188">    <span class="tok-com">/// The *usability* side, and it moves opposite to the score: below</span></span>
+<span class="ln" id="L189">    <span class="tok-com">/// [`voices::CLEAR_SEPARATION`] two people start sounding like one. Carried</span></span>
+<span class="ln" id="L190">    <span class="tok-com">/// here so a front end can show both halves of the trade rather than a</span></span>
+<span class="ln" id="L191">    <span class="tok-com">/// number that looks like it only goes one way.</span></span>
+<span class="ln" id="L192">    <span class="tok-kw">pub</span> crowding: f32,</span>
+<span class="ln" id="L193">}</span>
+</span>
+<span class="ln" id="L194"></span>
+<span class="ln" id="L195"><span class="tok-kw">impl</span> Exposure {</span>
+<span class="src-item" id="fn-exposure-of">
+<span class="ln" id="L196">    <span class="tok-com">/// What this recording gives away, for `speakers` people under `config`.</span></span>
+<span class="ln" id="L197">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">of</span>(mode: VoiceMode, speakers: usize, config: &amp;DeidConfig) -&gt; Self {</span>
+<span class="ln" id="L198">        <span class="tok-kw">let</span> classes = <span class="tok-kw">match</span> mode {</span>
+<span class="ln" id="L199">            <span class="tok-com">// One voice for everybody is one class however many people there</span></span>
+<span class="ln" id="L200">            <span class="tok-com">// are. There is no structure in the output to count.</span></span>
+<span class="ln" id="L201">            VoiceMode::Uniform =&gt; <span class="tok-num">1</span>,</span>
+<span class="ln" id="L202">            VoiceMode::Distinct =&gt; <span class="tok-fn">separable</span>(speakers, config),</span>
+<span class="ln" id="L203">        };</span>
+<span class="ln" id="L204">        <span class="tok-kw">let</span> bits = <span class="tok-kw">if</span> classes &lt;= <span class="tok-num">1</span> {</span>
+<span class="ln" id="L205">            <span class="tok-num">0.0</span></span>
+<span class="ln" id="L206">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L207">            (classes <span class="tok-kw">as</span> f32).<span class="tok-fn">log2</span>()</span>
+<span class="ln" id="L208">        };</span>
+<span class="ln" id="L209">        <span class="tok-kw">let</span> widest = (voices::MAX_VOICES <span class="tok-kw">as</span> f32).<span class="tok-fn">log2</span>();</span>
+<span class="ln" id="L210">        <span class="tok-kw">let</span> score = <span class="tok-kw">if</span> widest &lt;= <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L211">            <span class="tok-num">100.0</span></span>
+<span class="ln" id="L212">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L213">            <span class="tok-num">100.0</span> * (<span class="tok-num">1.0</span> - bits / widest)</span>
+<span class="ln" id="L214">        };</span>
+<span class="ln" id="L215">        Self {</span>
+<span class="ln" id="L216">            classes,</span>
+<span class="ln" id="L217">            bits,</span>
+<span class="ln" id="L218">            score: score.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>).<span class="tok-fn">round</span>() <span class="tok-kw">as</span> u8,</span>
+<span class="ln" id="L219">            crowding: voices::<span class="tok-fn">closest_pair</span>(</span>
+<span class="ln" id="L220">                <span class="tok-kw">match</span> mode {</span>
+<span class="ln" id="L221">                    VoiceMode::Uniform =&gt; <span class="tok-num">1</span>,</span>
+<span class="ln" id="L222">                    VoiceMode::Distinct =&gt; speakers,</span>
+<span class="ln" id="L223">                },</span>
+<span class="ln" id="L224">                config,</span>
+<span class="ln" id="L225">            ),</span>
+<span class="ln" id="L226">        }</span>
+<span class="ln" id="L227">    }</span>
+</span>
+<span class="ln" id="L228"></span>
+<span class="src-item" id="fn-exposure-crowded">
+<span class="ln" id="L229">    <span class="tok-com">/// Whether the voices handed out are too close to be told apart.</span></span>
+<span class="ln" id="L230">    <span class="tok-com">///</span></span>
+<span class="ln" id="L231">    <span class="tok-com">/// The usability failure, not the privacy one. A recording in this state</span></span>
+<span class="ln" id="L232">    <span class="tok-com">/// leaks *less* and is harder to follow, which is why it is reported rather</span></span>
+<span class="ln" id="L233">    <span class="tok-com">/// than folded into the score.</span></span>
+<span class="ln" id="L234">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">crowded</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L235">        <span class="tok-com">// One voice has nothing to be confused with. `closest_pair` answers</span></span>
+<span class="ln" id="L236">        <span class="tok-com">// 1.0 for a single voice, which is below the floor and is not a warning</span></span>
+<span class="ln" id="L237">        <span class="tok-com">// about anything: without this guard every solo recording carried a</span></span>
+<span class="ln" id="L238">        <span class="tok-com">// &quot;two of these sound alike&quot; notice about the one voice in it.</span></span>
+<span class="ln" id="L239">        <span class="tok-kw">self</span>.classes &gt; <span class="tok-num">1</span> &amp;&amp; <span class="tok-kw">self</span>.crowding &lt; voices::CLEAR_SEPARATION</span>
+<span class="ln" id="L240">    }</span>
+</span>
+<span class="ln" id="L241"></span>
+<span class="src-item" id="fn-exposure-note">
+<span class="ln" id="L242">    <span class="tok-com">/// One sentence for the interface, saying what the number means here.</span></span>
+<span class="ln" id="L243">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">note</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L244">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.classes &lt;= <span class="tok-num">1</span> {</span>
+<span class="ln" id="L245">            <span class="tok-kw">return</span> <span class="tok-str">&quot;Everybody is the same voice, so the recording does not say which \</span></span>
+<span class="ln" id="L246"><span class="tok-str">                    of them was speaking. A listener cannot pick anyone out, not even \</span></span>
+<span class="ln" id="L247"><span class="tok-str">                    as \&quot;the third speaker\&quot;, and two recordings of this group cannot \</span></span>
+<span class="ln" id="L248"><span class="tok-str">                    be lined up against each other by voice.&quot;</span></span>
+<span class="ln" id="L249">                .<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L250">        }</span>
+<span class="ln" id="L251">        format!(</span>
+<span class="ln" id="L252">            <span class="tok-str">&quot;A listener can separate {} voices, which tells them which of the speakers \</span></span>
+<span class="ln" id="L253"><span class="tok-str">             each turn belongs to: {:.1} bits per turn. They can count the people in \</span></span>
+<span class="ln" id="L254"><span class="tok-str">             the room and follow who said what. This is about the shape of the \</span></span>
+<span class="ln" id="L255"><span class="tok-str">             conversation and not about the voices themselves, which are disguised the \</span></span>
+<span class="ln" id="L256"><span class="tok-str">             same either way.&quot;</span>,</span>
+<span class="ln" id="L257">            <span class="tok-kw">self</span>.classes, <span class="tok-kw">self</span>.bits</span>
+<span class="ln" id="L258">        )</span>
+<span class="ln" id="L259">    }</span>
+</span>
+<span class="ln" id="L260">}</span>
+<span class="ln" id="L261"></span>
+<span class="src-item" id="fn-separable">
+<span class="ln" id="L262"><span class="tok-com">/// How many of the first `count` voices a listener can actually separate.</span></span>
+<span class="ln" id="L263"><span class="tok-com">///</span></span>
+<span class="ln" id="L264"><span class="tok-com">/// Voices are handed out in table order, so this walks them and puts each into</span></span>
+<span class="ln" id="L265"><span class="tok-com">/// an existing class when it is within [`voices::CLEAR_SEPARATION`] of one</span></span>
+<span class="ln" id="L266"><span class="tok-com">/// already there. Greedy and in table order deliberately: that is the order</span></span>
+<span class="ln" id="L267"><span class="tok-com">/// slots are given out in, so this counts the classes that will actually exist</span></span>
+<span class="ln" id="L268"><span class="tok-com">/// rather than the best packing of the same voices.</span></span>
+<span class="ln" id="L269"><span class="tok-kw">fn</span> <span class="tok-fn">separable</span>(count: usize, config: &amp;DeidConfig) -&gt; usize {</span>
+<span class="ln" id="L270">    <span class="tok-kw">if</span> count == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L271">        <span class="tok-kw">return</span> <span class="tok-num">0</span>;</span>
+<span class="ln" id="L272">    }</span>
+<span class="ln" id="L273">    <span class="tok-kw">let</span> table = voices::<span class="tok-fn">all</span>();</span>
+<span class="ln" id="L274">    <span class="tok-kw">let</span> taken = &amp;table[..count.<span class="tok-fn">min</span>(table.<span class="tok-fn">len</span>())];</span>
+<span class="ln" id="L275">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> classes: Vec&lt;Voice&gt; = Vec::<span class="tok-fn">with_capacity</span>(taken.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L276">    <span class="tok-kw">for</span> voice <span class="tok-kw">in</span> taken {</span>
+<span class="ln" id="L277">        <span class="tok-kw">let</span> merged = classes</span>
+<span class="ln" id="L278">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L279">            .<span class="tok-fn">any</span>(|held| voices::<span class="tok-fn">separation</span>(held, voice, config) &lt; voices::CLEAR_SEPARATION);</span>
+<span class="ln" id="L280">        <span class="tok-kw">if</span> !merged {</span>
+<span class="ln" id="L281">            classes.<span class="tok-fn">push</span>(*voice);</span>
+<span class="ln" id="L282">        }</span>
+<span class="ln" id="L283">    }</span>
+<span class="ln" id="L284">    classes.<span class="tok-fn">len</span>().<span class="tok-fn">max</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L285">}</span>
+</span>
+<span class="ln" id="L286"></span>
 <span class="src-item" id="fn-toomany">
-<span class="ln" id="L126"><span class="tok-com">/// Why a group cannot be rendered as asked.</span></span>
-<span class="ln" id="L127"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> TooMany {</span>
-<span class="ln" id="L129">    <span class="tok-com">/// More speakers than there are clearly separable voices.</span></span>
-<span class="ln" id="L130">    ForDistinct {</span>
-<span class="ln" id="L131">        <span class="tok-com">/// How many were asked for.</span></span>
-<span class="ln" id="L132">        asked: usize,</span>
-<span class="ln" id="L133">        <span class="tok-com">/// How many voices are clearly separable here.</span></span>
-<span class="ln" id="L134">        limit: usize,</span>
-<span class="ln" id="L135">    },</span>
-<span class="ln" id="L136">    <span class="tok-com">/// More speakers than a plan can hold at all.</span></span>
-<span class="ln" id="L137">    ForAnyMode {</span>
-<span class="ln" id="L138">        <span class="tok-com">/// How many were asked for.</span></span>
-<span class="ln" id="L139">        asked: usize,</span>
-<span class="ln" id="L140">        <span class="tok-com">/// The plan&#x27;s own limit.</span></span>
-<span class="ln" id="L141">        limit: usize,</span>
-<span class="ln" id="L142">    },</span>
-<span class="ln" id="L143">}</span>
+<span class="ln" id="L287"><span class="tok-com">/// Why a group cannot be rendered as asked.</span></span>
+<span class="ln" id="L288"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L289"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> TooMany {</span>
+<span class="ln" id="L290">    <span class="tok-com">/// More speakers than there are clearly separable voices.</span></span>
+<span class="ln" id="L291">    ForDistinct {</span>
+<span class="ln" id="L292">        <span class="tok-com">/// How many were asked for.</span></span>
+<span class="ln" id="L293">        asked: usize,</span>
+<span class="ln" id="L294">        <span class="tok-com">/// How many voices are clearly separable here.</span></span>
+<span class="ln" id="L295">        limit: usize,</span>
+<span class="ln" id="L296">    },</span>
+<span class="ln" id="L297">    <span class="tok-com">/// More speakers than a plan can hold at all.</span></span>
+<span class="ln" id="L298">    ForAnyMode {</span>
+<span class="ln" id="L299">        <span class="tok-com">/// How many were asked for.</span></span>
+<span class="ln" id="L300">        asked: usize,</span>
+<span class="ln" id="L301">        <span class="tok-com">/// The plan&#x27;s own limit.</span></span>
+<span class="ln" id="L302">        limit: usize,</span>
+<span class="ln" id="L303">    },</span>
+<span class="ln" id="L304">}</span>
 </span>
-<span class="ln" id="L144"></span>
-<span class="ln" id="L145"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> TooMany {</span>
+<span class="ln" id="L305"></span>
+<span class="ln" id="L306"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> TooMany {</span>
 <span class="src-item" id="fn-toomany-fmt">
-<span class="ln" id="L146">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L147">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L148">            Self::ForDistinct { asked, limit } =&gt; write!(</span>
-<span class="ln" id="L149">                f,</span>
-<span class="ln" id="L150">                <span class="tok-str">&quot;{asked} speakers, and only {limit} destination voices are far enough \</span></span>
-<span class="ln" id="L151"><span class="tok-str">                 apart to be told apart by ear. Two of them would sound like the same \</span></span>
-<span class="ln" id="L152"><span class="tok-str">                 person. Either use {limit} or fewer, or switch to one voice for \</span></span>
-<span class="ln" id="L153"><span class="tok-str">                 everybody -- which has no such limit, is more private, and leaves the \</span></span>
-<span class="ln" id="L154"><span class="tok-str">                 names and the picture to say who is speaking.&quot;</span></span>
-<span class="ln" id="L155">            ),</span>
-<span class="ln" id="L156">            Self::ForAnyMode { asked, limit } =&gt; write!(</span>
-<span class="ln" id="L157">                f,</span>
-<span class="ln" id="L158">                <span class="tok-str">&quot;{asked} speakers is past the {limit} a plan can hold. Ten names is \</span></span>
-<span class="ln" id="L159"><span class="tok-str">                 already a great deal for a listener to follow.&quot;</span></span>
-<span class="ln" id="L160">            ),</span>
-<span class="ln" id="L161">        }</span>
-<span class="ln" id="L162">    }</span>
+<span class="ln" id="L307">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L308">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L309">            Self::ForDistinct { asked, limit } =&gt; write!(</span>
+<span class="ln" id="L310">                f,</span>
+<span class="ln" id="L311">                <span class="tok-str">&quot;{asked} speakers, and only {limit} destination voices are far enough \</span></span>
+<span class="ln" id="L312"><span class="tok-str">                 apart to be told apart by ear. Two of them would sound like the same \</span></span>
+<span class="ln" id="L313"><span class="tok-str">                 person. Either use {limit} or fewer, or switch to one voice for \</span></span>
+<span class="ln" id="L314"><span class="tok-str">                 everybody -- which has no such limit, is more private, and leaves the \</span></span>
+<span class="ln" id="L315"><span class="tok-str">                 names and the picture to say who is speaking.&quot;</span></span>
+<span class="ln" id="L316">            ),</span>
+<span class="ln" id="L317">            Self::ForAnyMode { asked, limit } =&gt; write!(</span>
+<span class="ln" id="L318">                f,</span>
+<span class="ln" id="L319">                <span class="tok-str">&quot;{asked} speakers is past the {limit} a plan can hold. Ten names is \</span></span>
+<span class="ln" id="L320"><span class="tok-str">                 already a great deal for a listener to follow.&quot;</span></span>
+<span class="ln" id="L321">            ),</span>
+<span class="ln" id="L322">        }</span>
+<span class="ln" id="L323">    }</span>
 </span>
-<span class="ln" id="L163">}</span>
-<span class="ln" id="L164"></span>
-<span class="ln" id="L165"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> TooMany {}</span>
-<span class="ln" id="L166"></span>
+<span class="ln" id="L324">}</span>
+<span class="ln" id="L325"></span>
+<span class="ln" id="L326"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> TooMany {}</span>
+<span class="ln" id="L327"></span>
 <span class="src-item" id="fn-check">
-<span class="ln" id="L167"><span class="tok-com">/// Whether this many speakers can be rendered in this mode.</span></span>
-<span class="ln" id="L168"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check</span>(count: usize, mode: VoiceMode, config: &amp;DeidConfig) -&gt; Result&lt;(), TooMany&gt; {</span>
-<span class="ln" id="L169">    <span class="tok-kw">if</span> count &gt; voices::MAX_VOICES {</span>
-<span class="ln" id="L170">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(TooMany::ForAnyMode {</span>
-<span class="ln" id="L171">            asked: count,</span>
-<span class="ln" id="L172">            limit: voices::MAX_VOICES,</span>
-<span class="ln" id="L173">        });</span>
-<span class="ln" id="L174">    }</span>
-<span class="ln" id="L175">    <span class="tok-kw">let</span> limit = mode.<span class="tok-fn">speaker_limit</span>(config);</span>
-<span class="ln" id="L176">    <span class="tok-kw">if</span> count &gt; limit {</span>
-<span class="ln" id="L177">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(TooMany::ForDistinct {</span>
-<span class="ln" id="L178">            asked: count,</span>
-<span class="ln" id="L179">            limit,</span>
-<span class="ln" id="L180">        });</span>
-<span class="ln" id="L181">    }</span>
-<span class="ln" id="L182">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L183">}</span>
+<span class="ln" id="L328"><span class="tok-com">/// Whether this many speakers can be rendered in this mode.</span></span>
+<span class="ln" id="L329"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check</span>(count: usize, mode: VoiceMode, config: &amp;DeidConfig) -&gt; Result&lt;(), TooMany&gt; {</span>
+<span class="ln" id="L330">    <span class="tok-kw">if</span> count &gt; voices::MAX_VOICES {</span>
+<span class="ln" id="L331">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(TooMany::ForAnyMode {</span>
+<span class="ln" id="L332">            asked: count,</span>
+<span class="ln" id="L333">            limit: voices::MAX_VOICES,</span>
+<span class="ln" id="L334">        });</span>
+<span class="ln" id="L335">    }</span>
+<span class="ln" id="L336">    <span class="tok-kw">let</span> limit = mode.<span class="tok-fn">speaker_limit</span>(config);</span>
+<span class="ln" id="L337">    <span class="tok-kw">if</span> count &gt; limit {</span>
+<span class="ln" id="L338">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(TooMany::ForDistinct {</span>
+<span class="ln" id="L339">            asked: count,</span>
+<span class="ln" id="L340">            limit,</span>
+<span class="ln" id="L341">        });</span>
+<span class="ln" id="L342">    }</span>
+<span class="ln" id="L343">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L344">}</span>
 </span>
-<span class="ln" id="L184"></span>
-<span class="ln" id="L185"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L186"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L187">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L188"></span>
-<span class="ln" id="L189">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L190">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_is_the_default_because_most_recordings_want_it</span>() {</span>
-<span class="ln" id="L191">        assert_eq!(VoiceMode::<span class="tok-fn">default</span>(), VoiceMode::Distinct);</span>
-<span class="ln" id="L192">    }</span>
-<span class="ln" id="L193"></span>
-<span class="ln" id="L194">    <span class="tok-com">/// The measured number, and the reason this module exists.</span></span>
-<span class="ln" id="L195">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L196">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_mode_stops_at_the_measured_clear_limit</span>() {</span>
-<span class="ln" id="L197">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L198">        assert_eq!(VoiceMode::Distinct.<span class="tok-fn">speaker_limit</span>(&amp;config), <span class="tok-num">8</span>);</span>
-<span class="ln" id="L199">        assert!(<span class="tok-fn">check</span>(<span class="tok-num">8</span>, VoiceMode::Distinct, &amp;config).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L200">        <span class="tok-kw">let</span> error = <span class="tok-fn">check</span>(<span class="tok-num">9</span>, VoiceMode::Distinct, &amp;config).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;nine is too many&quot;</span>);</span>
-<span class="ln" id="L201">        assert!(matches!(error, TooMany::ForDistinct { asked: <span class="tok-num">9</span>, limit: <span class="tok-num">8</span> }));</span>
-<span class="ln" id="L202">    }</span>
-<span class="ln" id="L203"></span>
-<span class="ln" id="L204">    <span class="tok-com">/// The refusal has to point at the way out, or it is a dead end.</span></span>
-<span class="ln" id="L205">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L206">    <span class="tok-kw">fn</span> <span class="tok-fn">the_refusal_names_the_alternative</span>() {</span>
-<span class="ln" id="L207">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L208">        <span class="tok-kw">let</span> error = <span class="tok-fn">check</span>(<span class="tok-num">9</span>, VoiceMode::Distinct, &amp;config).<span class="tok-fn">unwrap_err</span>();</span>
-<span class="ln" id="L209">        <span class="tok-kw">let</span> words = error.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L210">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L211">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;more private&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L212">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;8&#x27;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L213">    }</span>
-<span class="ln" id="L214"></span>
-<span class="ln" id="L215">    <span class="tok-com">/// Uniform mode has no voice-based limit, because there is no second voice.</span></span>
-<span class="ln" id="L216">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L217">    <span class="tok-kw">fn</span> <span class="tok-fn">uniform_mode_carries_everybody_a_plan_can_hold</span>() {</span>
-<span class="ln" id="L218">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L219">        assert_eq!(</span>
-<span class="ln" id="L220">            VoiceMode::Uniform.<span class="tok-fn">speaker_limit</span>(&amp;config),</span>
-<span class="ln" id="L221">            voices::MAX_VOICES</span>
-<span class="ln" id="L222">        );</span>
-<span class="ln" id="L223">        <span class="tok-kw">for</span> count <span class="tok-kw">in</span> <span class="tok-num">1</span>..=voices::MAX_VOICES {</span>
-<span class="ln" id="L224">            assert!(<span class="tok-fn">check</span>(count, VoiceMode::Uniform, &amp;config).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{count}&quot;</span>);</span>
-<span class="ln" id="L225">        }</span>
-<span class="ln" id="L226">    }</span>
-<span class="ln" id="L227"></span>
-<span class="ln" id="L228">    <span class="tok-com">/// And the plan&#x27;s own limit still applies to both.</span></span>
-<span class="ln" id="L229">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L230">    <span class="tok-kw">fn</span> <span class="tok-fn">neither_mode_goes_past_what_a_plan_can_hold</span>() {</span>
-<span class="ln" id="L231">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L232">        <span class="tok-kw">for</span> mode <span class="tok-kw">in</span> [VoiceMode::Distinct, VoiceMode::Uniform] {</span>
-<span class="ln" id="L233">            <span class="tok-kw">let</span> error = <span class="tok-fn">check</span>(<span class="tok-num">11</span>, mode, &amp;config).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;eleven is past the plan&quot;</span>);</span>
-<span class="ln" id="L234">            assert!(matches!(error, TooMany::ForAnyMode { asked: <span class="tok-num">11</span>, .. }));</span>
-<span class="ln" id="L235">        }</span>
-<span class="ln" id="L236">    }</span>
-<span class="ln" id="L237"></span>
-<span class="ln" id="L238">    <span class="tok-com">/// Uniform means uniform: every slot is the same voice, and it is one the</span></span>
-<span class="ln" id="L239">    <span class="tok-com">/// table already contains rather than an eleventh nobody measured.</span></span>
-<span class="ln" id="L240">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L241">    <span class="tok-kw">fn</span> <span class="tok-fn">uniform_gives_every_slot_the_same_measured_voice</span>() {</span>
-<span class="ln" id="L242">        <span class="tok-kw">let</span> first = VoiceMode::Uniform.<span class="tok-fn">voice_for</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L243">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..voices::MAX_VOICES {</span>
-<span class="ln" id="L244">            assert_eq!(VoiceMode::Uniform.<span class="tok-fn">voice_for</span>(slot), first, <span class="tok-str">&quot;slot {slot}&quot;</span>);</span>
-<span class="ln" id="L245">        }</span>
-<span class="ln" id="L246">        assert_eq!(first, voices::<span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L247">    }</span>
-<span class="ln" id="L248"></span>
-<span class="ln" id="L249">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L250">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_gives_every_slot_its_own</span>() {</span>
-<span class="ln" id="L251">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..voices::MAX_VOICES {</span>
-<span class="ln" id="L252">            assert_eq!(VoiceMode::Distinct.<span class="tok-fn">voice_for</span>(slot), voices::<span class="tok-fn">voice</span>(slot));</span>
-<span class="ln" id="L253">        }</span>
-<span class="ln" id="L254">    }</span>
-<span class="ln" id="L255"></span>
-<span class="ln" id="L256">    <span class="tok-com">/// A coarser frame grid collapses registers, so the distinct limit has to</span></span>
-<span class="ln" id="L257">    <span class="tok-com">/// fall with it rather than keep promising eight.</span></span>
-<span class="ln" id="L258">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L259">    <span class="tok-kw">fn</span> <span class="tok-fn">a_coarser_grid_lowers_the_distinct_limit_and_not_the_uniform_one</span>() {</span>
-<span class="ln" id="L260">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
-<span class="ln" id="L261">            frame_size: <span class="tok-num">128</span>,</span>
-<span class="ln" id="L262">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L263">        };</span>
-<span class="ln" id="L264">        assert!(</span>
-<span class="ln" id="L265">            VoiceMode::Distinct.<span class="tok-fn">speaker_limit</span>(&amp;coarse)</span>
-<span class="ln" id="L266">                &lt;= VoiceMode::Distinct.<span class="tok-fn">speaker_limit</span>(&amp;DeidConfig::<span class="tok-fn">default</span>())</span>
-<span class="ln" id="L267">        );</span>
-<span class="ln" id="L268">        assert_eq!(</span>
-<span class="ln" id="L269">            VoiceMode::Uniform.<span class="tok-fn">speaker_limit</span>(&amp;coarse),</span>
-<span class="ln" id="L270">            voices::MAX_VOICES,</span>
-<span class="ln" id="L271">            <span class="tok-str">&quot;one voice cannot collide with itself&quot;</span></span>
-<span class="ln" id="L272">        );</span>
-<span class="ln" id="L273">    }</span>
-<span class="ln" id="L274"></span>
-<span class="ln" id="L275">    <span class="tok-com">/// Both notes have to say what the mode costs, not only what it gives.</span></span>
-<span class="ln" id="L276">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L277">    <span class="tok-kw">fn</span> <span class="tok-fn">every_note_states_the_price_as_well_as_the_benefit</span>() {</span>
-<span class="ln" id="L278">        <span class="tok-kw">let</span> distinct = VoiceMode::Distinct.<span class="tok-fn">note</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L279">        assert!(distinct.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;capped&quot;</span>), <span class="tok-str">&quot;{distinct}&quot;</span>);</span>
-<span class="ln" id="L280">        assert!(distinct.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;measured&quot;</span>), <span class="tok-str">&quot;{distinct}&quot;</span>);</span>
-<span class="ln" id="L281"></span>
-<span class="ln" id="L282">        <span class="tok-kw">let</span> uniform = VoiceMode::Uniform.<span class="tok-fn">note</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L283">        assert!(uniform.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the price is&quot;</span>), <span class="tok-str">&quot;{uniform}&quot;</span>);</span>
-<span class="ln" id="L284">        assert!(uniform.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;by ear alone, you cannot&quot;</span>), <span class="tok-str">&quot;{uniform}&quot;</span>);</span>
-<span class="ln" id="L285">    }</span>
-<span class="ln" id="L286">}</span>
+<span class="ln" id="L345"></span>
+<span class="ln" id="L346"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L347"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L348">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L349"></span>
+<span class="ln" id="L350">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_is_the_default_because_most_recordings_want_it</span>() {</span>
+<span class="ln" id="L352">        assert_eq!(VoiceMode::<span class="tok-fn">default</span>(), VoiceMode::Distinct);</span>
+<span class="ln" id="L353">    }</span>
+<span class="ln" id="L354"></span>
+<span class="ln" id="L355">    <span class="tok-com">/// The measured number, and the reason this module exists.</span></span>
+<span class="ln" id="L356">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L357">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_mode_stops_at_the_measured_clear_limit</span>() {</span>
+<span class="ln" id="L358">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L359">        assert_eq!(VoiceMode::Distinct.<span class="tok-fn">speaker_limit</span>(&amp;config), <span class="tok-num">8</span>);</span>
+<span class="ln" id="L360">        assert!(<span class="tok-fn">check</span>(<span class="tok-num">8</span>, VoiceMode::Distinct, &amp;config).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L361">        <span class="tok-kw">let</span> error = <span class="tok-fn">check</span>(<span class="tok-num">9</span>, VoiceMode::Distinct, &amp;config).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;nine is too many&quot;</span>);</span>
+<span class="ln" id="L362">        assert!(matches!(error, TooMany::ForDistinct { asked: <span class="tok-num">9</span>, limit: <span class="tok-num">8</span> }));</span>
+<span class="ln" id="L363">    }</span>
+<span class="ln" id="L364"></span>
+<span class="ln" id="L365">    <span class="tok-com">/// The refusal has to point at the way out, or it is a dead end.</span></span>
+<span class="ln" id="L366">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L367">    <span class="tok-kw">fn</span> <span class="tok-fn">the_refusal_names_the_alternative</span>() {</span>
+<span class="ln" id="L368">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L369">        <span class="tok-kw">let</span> error = <span class="tok-fn">check</span>(<span class="tok-num">9</span>, VoiceMode::Distinct, &amp;config).<span class="tok-fn">unwrap_err</span>();</span>
+<span class="ln" id="L370">        <span class="tok-kw">let</span> words = error.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L371">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L372">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;more private&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L373">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;8&#x27;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L374">    }</span>
+<span class="ln" id="L375"></span>
+<span class="ln" id="L376">    <span class="tok-com">/// Uniform mode has no voice-based limit, because there is no second voice.</span></span>
+<span class="ln" id="L377">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L378">    <span class="tok-kw">fn</span> <span class="tok-fn">uniform_mode_carries_everybody_a_plan_can_hold</span>() {</span>
+<span class="ln" id="L379">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L380">        assert_eq!(</span>
+<span class="ln" id="L381">            VoiceMode::Uniform.<span class="tok-fn">speaker_limit</span>(&amp;config),</span>
+<span class="ln" id="L382">            voices::MAX_VOICES</span>
+<span class="ln" id="L383">        );</span>
+<span class="ln" id="L384">        <span class="tok-kw">for</span> count <span class="tok-kw">in</span> <span class="tok-num">1</span>..=voices::MAX_VOICES {</span>
+<span class="ln" id="L385">            assert!(<span class="tok-fn">check</span>(count, VoiceMode::Uniform, &amp;config).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{count}&quot;</span>);</span>
+<span class="ln" id="L386">        }</span>
+<span class="ln" id="L387">    }</span>
+<span class="ln" id="L388"></span>
+<span class="ln" id="L389">    <span class="tok-com">/// And the plan&#x27;s own limit still applies to both.</span></span>
+<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">neither_mode_goes_past_what_a_plan_can_hold</span>() {</span>
+<span class="ln" id="L392">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L393">        <span class="tok-kw">for</span> mode <span class="tok-kw">in</span> [VoiceMode::Distinct, VoiceMode::Uniform] {</span>
+<span class="ln" id="L394">            <span class="tok-kw">let</span> error = <span class="tok-fn">check</span>(<span class="tok-num">11</span>, mode, &amp;config).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;eleven is past the plan&quot;</span>);</span>
+<span class="ln" id="L395">            assert!(matches!(error, TooMany::ForAnyMode { asked: <span class="tok-num">11</span>, .. }));</span>
+<span class="ln" id="L396">        }</span>
+<span class="ln" id="L397">    }</span>
+<span class="ln" id="L398"></span>
+<span class="ln" id="L399">    <span class="tok-com">/// Uniform means uniform: every slot is the same voice, and it is one the</span></span>
+<span class="ln" id="L400">    <span class="tok-com">/// table already contains rather than an eleventh nobody measured.</span></span>
+<span class="ln" id="L401">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L402">    <span class="tok-kw">fn</span> <span class="tok-fn">uniform_gives_every_slot_the_same_measured_voice</span>() {</span>
+<span class="ln" id="L403">        <span class="tok-kw">let</span> first = VoiceMode::Uniform.<span class="tok-fn">voice_for</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L404">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..voices::MAX_VOICES {</span>
+<span class="ln" id="L405">            assert_eq!(VoiceMode::Uniform.<span class="tok-fn">voice_for</span>(slot), first, <span class="tok-str">&quot;slot {slot}&quot;</span>);</span>
+<span class="ln" id="L406">        }</span>
+<span class="ln" id="L407">        assert_eq!(first, voices::<span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L408">    }</span>
+<span class="ln" id="L409"></span>
+<span class="ln" id="L410">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L411">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_gives_every_slot_its_own</span>() {</span>
+<span class="ln" id="L412">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..voices::MAX_VOICES {</span>
+<span class="ln" id="L413">            assert_eq!(VoiceMode::Distinct.<span class="tok-fn">voice_for</span>(slot), voices::<span class="tok-fn">voice</span>(slot));</span>
+<span class="ln" id="L414">        }</span>
+<span class="ln" id="L415">    }</span>
+<span class="ln" id="L416"></span>
+<span class="ln" id="L417">    <span class="tok-com">/// A coarser frame grid collapses registers, so the distinct limit has to</span></span>
+<span class="ln" id="L418">    <span class="tok-com">/// fall with it rather than keep promising eight.</span></span>
+<span class="ln" id="L419">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">a_coarser_grid_lowers_the_distinct_limit_and_not_the_uniform_one</span>() {</span>
+<span class="ln" id="L421">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
+<span class="ln" id="L422">            frame_size: <span class="tok-num">128</span>,</span>
+<span class="ln" id="L423">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L424">        };</span>
+<span class="ln" id="L425">        assert!(</span>
+<span class="ln" id="L426">            VoiceMode::Distinct.<span class="tok-fn">speaker_limit</span>(&amp;coarse)</span>
+<span class="ln" id="L427">                &lt;= VoiceMode::Distinct.<span class="tok-fn">speaker_limit</span>(&amp;DeidConfig::<span class="tok-fn">default</span>())</span>
+<span class="ln" id="L428">        );</span>
+<span class="ln" id="L429">        assert_eq!(</span>
+<span class="ln" id="L430">            VoiceMode::Uniform.<span class="tok-fn">speaker_limit</span>(&amp;coarse),</span>
+<span class="ln" id="L431">            voices::MAX_VOICES,</span>
+<span class="ln" id="L432">            <span class="tok-str">&quot;one voice cannot collide with itself&quot;</span></span>
+<span class="ln" id="L433">        );</span>
+<span class="ln" id="L434">    }</span>
+<span class="ln" id="L435"></span>
+<span class="ln" id="L436">    <span class="tok-com">/// Both notes have to say what the mode costs, not only what it gives.</span></span>
+<span class="ln" id="L437">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L438">    <span class="tok-kw">fn</span> <span class="tok-fn">every_note_states_the_price_as_well_as_the_benefit</span>() {</span>
+<span class="ln" id="L439">        <span class="tok-kw">let</span> distinct = VoiceMode::Distinct.<span class="tok-fn">note</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L440">        assert!(distinct.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;capped&quot;</span>), <span class="tok-str">&quot;{distinct}&quot;</span>);</span>
+<span class="ln" id="L441">        assert!(distinct.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;measured&quot;</span>), <span class="tok-str">&quot;{distinct}&quot;</span>);</span>
+<span class="ln" id="L442"></span>
+<span class="ln" id="L443">        <span class="tok-kw">let</span> uniform = VoiceMode::Uniform.<span class="tok-fn">note</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L444">        assert!(uniform.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the price is&quot;</span>), <span class="tok-str">&quot;{uniform}&quot;</span>);</span>
+<span class="ln" id="L445">        assert!(uniform.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;by ear alone, you cannot&quot;</span>), <span class="tok-str">&quot;{uniform}&quot;</span>);</span>
+<span class="ln" id="L446">    }</span>
+<span class="ln" id="L447">}</span>
+<span class="ln" id="L448"></span>
+<span class="src-item" id="fn-exposure_tests">
+<span class="ln" id="L449"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L450"><span class="tok-kw">mod</span> exposure_tests {</span>
+<span class="ln" id="L451">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L452">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L453">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bigger_group_gives_more_away</span>() {</span>
+<span class="ln" id="L454">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L455">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> last = 101u8;</span>
+<span class="ln" id="L456">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> <span class="tok-num">1</span>..=voices::MAX_VOICES {</span>
+<span class="ln" id="L457">            <span class="tok-kw">let</span> seen = Exposure::<span class="tok-fn">of</span>(VoiceMode::Distinct, speakers, &amp;config);</span>
+<span class="ln" id="L458">            assert!(</span>
+<span class="ln" id="L459">                seen.score &lt;= last,</span>
+<span class="ln" id="L460">                <span class="tok-str">&quot;{speakers} speakers scored {} after {last}, so the score went up as \</span></span>
+<span class="ln" id="L461"><span class="tok-str">                 the group grew&quot;</span>,</span>
+<span class="ln" id="L462">                seen.score</span>
+<span class="ln" id="L463">            );</span>
+<span class="ln" id="L464">            last = seen.score;</span>
+<span class="ln" id="L465">        }</span>
+<span class="ln" id="L466">    }</span>
+<span class="ln" id="L467"></span>
+<span class="ln" id="L468">    <span class="tok-com">/// One voice for everybody says nothing about who is who, at any size.</span></span>
+<span class="ln" id="L469">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L470">    <span class="tok-kw">fn</span> <span class="tok-fn">one_voice_for_everybody_gives_nothing_away</span>() {</span>
+<span class="ln" id="L471">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L472">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> [<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">8</span>, voices::MAX_VOICES, <span class="tok-num">40</span>] {</span>
+<span class="ln" id="L473">            <span class="tok-kw">let</span> seen = Exposure::<span class="tok-fn">of</span>(VoiceMode::Uniform, speakers, &amp;config);</span>
+<span class="ln" id="L474">            assert_eq!(seen.classes, <span class="tok-num">1</span>, <span class="tok-str">&quot;{speakers} in uniform mode&quot;</span>);</span>
+<span class="ln" id="L475">            assert_eq!(seen.bits, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L476">            assert_eq!(seen.score, <span class="tok-num">100</span>, <span class="tok-str">&quot;{speakers} in uniform mode&quot;</span>);</span>
+<span class="ln" id="L477">        }</span>
+<span class="ln" id="L478">    }</span>
+<span class="ln" id="L479"></span>
+<span class="ln" id="L480">    <span class="tok-com">/// The bits are the count they claim to be.</span></span>
+<span class="ln" id="L481">    <span class="tok-com">///</span></span>
+<span class="ln" id="L482">    <span class="tok-com">/// A listener who cannot separate the voices guesses which of `classes`</span></span>
+<span class="ln" id="L483">    <span class="tok-com">/// spoke, and that guess costs `log2(classes)`. Checked against the</span></span>
+<span class="ln" id="L484">    <span class="tok-com">/// arithmetic rather than against a table somebody typed.</span></span>
+<span class="ln" id="L485">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L486">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bits_are_the_logarithm_of_the_classes</span>() {</span>
+<span class="ln" id="L487">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L488">        <span class="tok-kw">for</span> speakers <span class="tok-kw">in</span> <span class="tok-num">1</span>..=voices::MAX_VOICES {</span>
+<span class="ln" id="L489">            <span class="tok-kw">let</span> seen = Exposure::<span class="tok-fn">of</span>(VoiceMode::Distinct, speakers, &amp;config);</span>
+<span class="ln" id="L490">            <span class="tok-kw">let</span> expected = <span class="tok-kw">if</span> seen.classes &lt;= <span class="tok-num">1</span> {</span>
+<span class="ln" id="L491">                <span class="tok-num">0.0</span></span>
+<span class="ln" id="L492">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L493">                (seen.classes <span class="tok-kw">as</span> f32).<span class="tok-fn">log2</span>()</span>
+<span class="ln" id="L494">            };</span>
+<span class="ln" id="L495">            assert!(</span>
+<span class="ln" id="L496">                (seen.bits - expected).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">5</span>,</span>
+<span class="ln" id="L497">                <span class="tok-str">&quot;{speakers} speakers: {} bits for {} classes&quot;</span>,</span>
+<span class="ln" id="L498">                seen.bits,</span>
+<span class="ln" id="L499">                seen.classes</span>
+<span class="ln" id="L500">            );</span>
+<span class="ln" id="L501">        }</span>
+<span class="ln" id="L502">    }</span>
+<span class="ln" id="L503"></span>
+<span class="ln" id="L504">    <span class="tok-com">/// Two people given voices too close to separate count as one class.</span></span>
+<span class="ln" id="L505">    <span class="tok-com">///</span></span>
+<span class="ln" id="L506">    <span class="tok-com">/// This is the part that runs the other way from intuition, so it is</span></span>
+<span class="ln" id="L507">    <span class="tok-com">/// checked rather than asserted in a comment: crowding the table makes the</span></span>
+<span class="ln" id="L508">    <span class="tok-com">/// recording leak *less* while making it harder to follow, which is the</span></span>
+<span class="ln" id="L509">    <span class="tok-com">/// trade the two modes exist to let somebody choose between.</span></span>
+<span class="ln" id="L510">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L511">    <span class="tok-kw">fn</span> <span class="tok-fn">voices_nobody_can_separate_are_one_class_and_leak_as_one</span>() {</span>
+<span class="ln" id="L512">        <span class="tok-com">// A frame size coarse enough to collapse registers onto each other.</span></span>
+<span class="ln" id="L513">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
+<span class="ln" id="L514">            frame_size: <span class="tok-num">256</span>,</span>
+<span class="ln" id="L515">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L516">        };</span>
+<span class="ln" id="L517"></span>
+<span class="ln" id="L518">        <span class="tok-kw">let</span> asked = voices::MAX_VOICES;</span>
+<span class="ln" id="L519">        <span class="tok-kw">let</span> seen = Exposure::<span class="tok-fn">of</span>(VoiceMode::Distinct, asked, &amp;coarse);</span>
+<span class="ln" id="L520">        <span class="tok-kw">let</span> clear = voices::<span class="tok-fn">clear_voices</span>(&amp;coarse);</span>
+<span class="ln" id="L521"></span>
+<span class="ln" id="L522">        <span class="tok-kw">if</span> clear &lt; asked {</span>
+<span class="ln" id="L523">            assert!(</span>
+<span class="ln" id="L524">                seen.classes &lt; asked,</span>
+<span class="ln" id="L525">                <span class="tok-str">&quot;{asked} voices collapsed to {clear} clear ones, and this still counted \</span></span>
+<span class="ln" id="L526"><span class="tok-str">                 {} classes&quot;</span>,</span>
+<span class="ln" id="L527">                seen.classes</span>
+<span class="ln" id="L528">            );</span>
+<span class="ln" id="L529">            <span class="tok-kw">let</span> fine = Exposure::<span class="tok-fn">of</span>(VoiceMode::Distinct, asked, &amp;DeidConfig::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L530">            assert!(</span>
+<span class="ln" id="L531">                seen.score &gt;= fine.score,</span>
+<span class="ln" id="L532">                <span class="tok-str">&quot;the crowded configuration leaks more than the clear one, which is \</span></span>
+<span class="ln" id="L533"><span class="tok-str">                 backwards: {} against {}&quot;</span>,</span>
+<span class="ln" id="L534">                seen.score,</span>
+<span class="ln" id="L535">                fine.score</span>
+<span class="ln" id="L536">            );</span>
+<span class="ln" id="L537">            assert!(seen.<span class="tok-fn">crowded</span>(), <span class="tok-str">&quot;the crowding was not reported&quot;</span>);</span>
+<span class="ln" id="L538">        }</span>
+<span class="ln" id="L539">    }</span>
+<span class="ln" id="L540"></span>
+<span class="ln" id="L541">    <span class="tok-com">/// One voice has nothing to be confused with.</span></span>
+<span class="ln" id="L542">    <span class="tok-com">///</span></span>
+<span class="ln" id="L543">    <span class="tok-com">/// `closest_pair` answers 1.0 when given fewer than two voices, which is</span></span>
+<span class="ln" id="L544">    <span class="tok-com">/// below the separation floor and means &quot;nothing to compare&quot; rather than</span></span>
+<span class="ln" id="L545">    <span class="tok-com">/// &quot;too close&quot;. Read without that in mind, every solo recording carried a</span></span>
+<span class="ln" id="L546">    <span class="tok-com">/// warning that two of its voices sounded alike.</span></span>
+<span class="ln" id="L547">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L548">    <span class="tok-kw">fn</span> <span class="tok-fn">one_speaker_is_never_reported_as_crowded</span>() {</span>
+<span class="ln" id="L549">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L550">        <span class="tok-kw">for</span> mode <span class="tok-kw">in</span> [VoiceMode::Distinct, VoiceMode::Uniform] {</span>
+<span class="ln" id="L551">            <span class="tok-kw">let</span> alone = Exposure::<span class="tok-fn">of</span>(mode, <span class="tok-num">1</span>, &amp;config);</span>
+<span class="ln" id="L552">            assert!(</span>
+<span class="ln" id="L553">                !alone.<span class="tok-fn">crowded</span>(),</span>
+<span class="ln" id="L554">                <span class="tok-str">&quot;{mode:?} with one speaker was called crowded, at {}&quot;</span>,</span>
+<span class="ln" id="L555">                alone.crowding</span>
+<span class="ln" id="L556">            );</span>
+<span class="ln" id="L557">            assert_eq!(alone.score, <span class="tok-num">100</span>, <span class="tok-str">&quot;one speaker gives nothing away&quot;</span>);</span>
+<span class="ln" id="L558">        }</span>
+<span class="ln" id="L559">        <span class="tok-com">// And a group whose voices really are too close still says so.</span></span>
+<span class="ln" id="L560">        <span class="tok-kw">let</span> coarse = DeidConfig {</span>
+<span class="ln" id="L561">            frame_size: <span class="tok-num">256</span>,</span>
+<span class="ln" id="L562">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L563">        };</span>
+<span class="ln" id="L564">        <span class="tok-kw">if</span> voices::<span class="tok-fn">clear_voices</span>(&amp;coarse) &lt; voices::MAX_VOICES {</span>
+<span class="ln" id="L565">            <span class="tok-kw">let</span> many = Exposure::<span class="tok-fn">of</span>(VoiceMode::Distinct, voices::MAX_VOICES, &amp;coarse);</span>
+<span class="ln" id="L566">            assert!(</span>
+<span class="ln" id="L567">                many.<span class="tok-fn">crowded</span>(),</span>
+<span class="ln" id="L568">                <span class="tok-str">&quot;a genuinely crowded group stopped saying so&quot;</span></span>
+<span class="ln" id="L569">            );</span>
+<span class="ln" id="L570">        }</span>
+<span class="ln" id="L571">    }</span>
+<span class="ln" id="L572"></span>
+<span class="ln" id="L573">    <span class="tok-com">/// The note says which question the number answers.</span></span>
+<span class="ln" id="L574">    <span class="tok-com">///</span></span>
+<span class="ln" id="L575">    <span class="tok-com">/// The one thing this must never be read as is a claim about how well a</span></span>
+<span class="ln" id="L576">    <span class="tok-com">/// voice is disguised, so the words that would invite that reading are</span></span>
+<span class="ln" id="L577">    <span class="tok-com">/// checked for absence.</span></span>
+<span class="ln" id="L578">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L579">    <span class="tok-kw">fn</span> <span class="tok-fn">the_note_does_not_claim_to_be_about_the_voices_themselves</span>() {</span>
+<span class="ln" id="L580">        <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L581">        <span class="tok-kw">for</span> mode <span class="tok-kw">in</span> [VoiceMode::Distinct, VoiceMode::Uniform] {</span>
+<span class="ln" id="L582">            <span class="tok-kw">let</span> note = Exposure::<span class="tok-fn">of</span>(mode, <span class="tok-num">4</span>, &amp;config).<span class="tok-fn">note</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L583">            <span class="tok-kw">for</span> wrong <span class="tok-kw">in</span> [<span class="tok-str">&quot;encrypt&quot;</span>, <span class="tok-str">&quot;cryptograph&quot;</span>, <span class="tok-str">&quot;key&quot;</span>, <span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;secure&quot;</span>] {</span>
+<span class="ln" id="L584">                assert!(</span>
+<span class="ln" id="L585">                    !note.<span class="tok-fn">contains</span>(wrong),</span>
+<span class="ln" id="L586">                    <span class="tok-str">&quot;{mode:?} note says {wrong:?}, which invites reading an information \</span></span>
+<span class="ln" id="L587"><span class="tok-str">                     count as a claim about strength&quot;</span></span>
+<span class="ln" id="L588">                );</span>
+<span class="ln" id="L589">            }</span>
+<span class="ln" id="L590">        }</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592">}</span>
+</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
