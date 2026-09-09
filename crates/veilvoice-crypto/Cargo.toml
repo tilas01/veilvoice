@@ -11,23 +11,32 @@ description = "Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at
 [dependencies]
 # --- secret hygiene ---
 zeroize.workspace = true
+# Constant-time comparison. An `==` on a verifier or a tag is a timing oracle,
+# and this is the type that refuses to be one.
 subtle = "2"
 # Page-locking wrapper. The one place this crate steps outside `forbid(unsafe)`;
 # see the `amnesia` module for why and how it is contained.
 region = "3"
 # --- key derivation ---
 argon2 = "0.5"
+# Deriving the separate keys each container, lock and vault uses from one
+# secret, with a distinct info string for each.
 hkdf = "0.12"
+# The hash HKDF runs over.
 sha2 = "0.10"
 # --- authenticated encryption ---
 chacha20poly1305 = "0.10"
 # --- hybrid key agreement ---
 x25519-dalek = { version = "2", features = ["static_secrets"] }
+# ML-KEM-768, the post-quantum half of the hybrid key exchange. X25519 is the
+# other half and neither alone is trusted.
 ml-kem = "0.2"
 # --- randomness ---
 getrandom.workspace = true
+# The RNG traits the key exchange takes its randomness through.
 rand_core = "0.6"
 
 [dev-dependencies]
-hex-literal = "0.4"
+# Tests that seal a file and open it again, in a directory that goes away with
+# them.
 tempfile = "3"

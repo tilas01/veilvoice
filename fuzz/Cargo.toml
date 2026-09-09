@@ -23,10 +23,17 @@ license = "GPL-3.0-or-later"
 cargo-fuzz = true
 
 [dependencies]
+# The harness `cargo fuzz` builds each target against.
 libfuzzer-sys = "0.4"
+# The container header and the lock file, both of which parse bytes somebody
+# else produced.
 veilvoice-crypto = { path = "../crates/veilvoice-crypto" }
+# The WAV chunk walker, which reads a file this program did not write.
 veilvoice-meta = { path = "../crates/veilvoice-meta" }
+# The manifest parser, which reads a list a machine other than this one may
+# have written.
 veilvoice-guard = { path = "../crates/veilvoice-guard" }
+# The contents manifest parser, which reads a published list.
 veilvoice-check = { path = "../crates/veilvoice-check" }
 # `default-features = false` drops cpal: the fuzzers touch decoding and header
 # checking only, and there is no reason to link an audio backend into them.

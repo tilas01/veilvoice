@@ -11,4 +11,6 @@ description = "Notice when a kernel driver or module appears, with a cross-view 
 [dependencies]
 
 [dev-dependencies]
+# Tests that write a driver listing and read it back, in a directory that goes
+# away with them.
 tempfile = "3"

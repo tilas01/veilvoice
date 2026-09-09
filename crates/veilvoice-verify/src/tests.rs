@@ -1192,3 +1192,165 @@ fn the_desktop_starts_a_live_session_in_exactly_one_place() {
         starters[0]
     );
 }
+
+/// **Marker 126.** Nothing in an audio callback allocates, locks or prints.
+///
+/// A callback runs on the operating system's audio thread with a deadline
+/// measured in milliseconds. Allocating in one takes a global lock in the
+/// allocator, blocking on a mutex hands the thread to whoever holds it, and
+/// printing takes the lock on standard output. Each of those is somebody
+/// else's schedule deciding when this thread runs again, and missing the
+/// deadline is an audible click in the veiled voice, or a dropped block in a
+/// recording.
+///
+/// Every buffer these callbacks use is sized once, before the stream starts.
+/// That is a fact about how they are written, and until now it was a fact
+/// nothing checked: the comments say "sized once, here, so the callback never
+/// allocates", and a comment is not a guard. This reads the callbacks
+/// themselves.
+///
+/// Written rather than measured, deliberately. A test that counted
+/// allocations would need a global allocator hook and a running stream, which
+/// means a machine with a sound card, which is what F-163 and F-165 were about.
+/// Reading the source finds the same mistake on a build machine with no audio
+/// at all.
+#[test]
+fn no_audio_callback_allocates_or_blocks() {
+    let crates = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("the crates directory")
+        .to_path_buf();
+
+    /// Where a realtime callback is handed to the platform. The closure that
+    /// follows one of these is the body with the deadline on it.
+    const OPENS_A_STREAM: &[&str] = &["build_input_stream(", "build_output_stream("];
+
+    /// What may not appear inside one, and what each would cost.
+    ///
+    /// `try_lock` and `try_push` are the non-blocking forms and are what this
+    /// code already uses, so a needle that is a prefix of one is matched on the
+    /// call rather than on the name: see `reaches` below.
+    const FORBIDDEN: &[(&str, &str)] = &[
+        ("vec![", "allocates"),
+        ("Vec::", "allocates"),
+        (".to_vec()", "allocates"),
+        (".to_owned()", "allocates"),
+        (".to_string()", "allocates"),
+        ("String::", "allocates"),
+        ("format!", "allocates"),
+        (".collect()", "allocates"),
+        ("Box::new", "allocates"),
+        (".clone()", "may allocate"),
+        (".push(", "may reallocate; the ring's `try_push` does not"),
+        (".insert(", "may reallocate"),
+        (".extend(", "may reallocate"),
+        (".resize(", "may reallocate"),
+        (".reserve(", "allocates"),
+        (".lock()", "blocks; `try_lock` is what this code uses"),
+        ("println!", "takes the lock on standard output"),
+        ("eprintln!", "takes the lock on standard error"),
+        ("print!", "takes the lock on standard output"),
+    ];
+
+    let mut sources = Vec::new();
+    let mut pending = vec![crates.clone()];
+    while let Some(directory) = pending.pop() {
+        for entry in std::fs::read_dir(&directory).expect("a crate directory") {
+            let entry = entry.expect("a readable directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                pending.push(path);
+            } else if path.extension().is_some_and(|e| e == "rs") {
+                sources.push(path);
+            }
+        }
+    }
+
+    let mut callbacks = 0;
+    let mut offenders = Vec::new();
+    for path in &sources {
+        let name = path
+            .file_name()
+            .expect("a file")
+            .to_string_lossy()
+            .into_owned();
+        let text = std::fs::read_to_string(path)
+            .expect("a readable source file")
+            .replace("\r\n", "\n");
+
+        for opener in OPENS_A_STREAM {
+            let mut from = 0;
+            while let Some(at) = text[from..].find(opener) {
+                let at = from + at;
+                from = at + opener.len();
+                // A needle is not a call: this guard names what it looks for.
+                let line_start = text[..at].rfind('\n').map_or(0, |n| n + 1);
+                if text[line_start..at].matches('"').count() % 2 == 1 {
+                    continue;
+                }
+
+                // The data callback is the first closure after the opener, and
+                // its body is from its `{` to the matching `}`.
+                let Some(brace) = text[at..].find("| {").map(|n| at + n + 2) else {
+                    continue;
+                };
+                let mut depth = 0usize;
+                let mut end = brace;
+                for (offset, byte) in text[brace..].char_indices() {
+                    match byte {
+                        '{' => depth += 1,
+                        '}' => {
+                            depth -= 1;
+                            if depth == 0 {
+                                end = brace + offset;
+                                break;
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+                callbacks += 1;
+
+                let before = text[..brace].matches('\n').count();
+                for (number, line) in text[brace..end].lines().enumerate() {
+                    let trimmed = line.trim_start();
+                    if trimmed.starts_with("//") {
+                        continue;
+                    }
+                    for (needle, cost) in FORBIDDEN {
+                        let Some(hit) = line.find(needle) else {
+                            continue;
+                        };
+                        // `try_lock()` and `try_push(` end in the needle and are
+                        // the non-blocking forms. Only the bare call counts.
+                        if line[..hit].ends_with("try_") {
+                            continue;
+                        }
+                        if line[..hit].matches('"').count() % 2 == 1 {
+                            continue;
+                        }
+                        offenders.push(format!(
+                            "{name}:{}: {} ({needle} {cost})",
+                            before + number + 1,
+                            line.trim()
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    assert!(
+        callbacks >= 3,
+        "the walk found {callbacks} audio callbacks, and there are at least \
+         three: the live path's input and output, and playback's. A guard that \
+         finds none passes for the wrong reason"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these lines run on an audio thread with a deadline in milliseconds, \
+         and each of them can miss it. Do the work before the stream starts, \
+         into a buffer sized once:\n{}",
+        offenders.join("\n")
+    );
+}

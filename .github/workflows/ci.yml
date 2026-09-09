@@ -285,6 +285,14 @@ jobs:
       - name: Packaging definitions must match what a release publishes
         run: python tools/release/packaging.py --check
 
+      # Marker 126. A dependency is code this project ships and does not
+      # review, build time on every machine that compiles this, and one more
+      # thing that has to work on the BSDs and the 32-bit targets. One sentence
+      # where it is declared, or it does not go in. The day this was written it
+      # found three that no line of code referred to.
+      - name: Every dependency must say what it is for
+        run: python tools/audit/dependencies.py
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a

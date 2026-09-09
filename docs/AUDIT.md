@@ -294,6 +294,54 @@ This is the shape marker 126 asks for. A guard reading the two call sites would
 have worked and would have had to keep working; a signature with no rate in it
 cannot be got wrong by a third caller written next year.
 
+### Three dependencies nothing referred to
+
+Marker 126 asks for a dependency to be justified where it is declared. Writing
+that sentence for each of the 122 entries in this tree's manifests is what
+found the three that had no sentence to write.
+
+`veilvoice-verify` declares `sha2` and never mentions it: it hashes through
+`veilvoice_check::sha256_file`, which is the right way round, and the direct
+dependency is left over from when it did not. Its tests declare `hex` and
+never call it. The crypto crate's tests declare `hex-literal` and never call
+it.
+
+Not a defect in what any of them does, which is why this has no finding
+number. What it is, is three crates compiled by every build on every platform,
+in a project whose whole argument about dependencies is that each one is code
+it ships and does not review. Nothing noticed, because a manifest full of bare
+names reads as a list rather than as a set of decisions.
+
+They are gone, and the check that made them visible is now in CI:
+`tools/audit/dependencies.py` fails on a dependency with no reason beside it.
+It cannot tell whether a dependency is *used*, which is `cargo udeps` and needs
+nightly. What it can do is force somebody to answer the question that made
+these three obvious.
+
+### The comments said no callback allocates, and nothing checked
+
+The three audio callbacks in this tree each carry a comment saying its buffers
+are sized once so that the callback never allocates. They are true. They were
+also the only thing standing between this project and a per-frame allocation on
+the operating system's audio thread, and a comment is not a guard: F-159 and
+the two before it were all comments that had stopped being true.
+
+`no_audio_callback_allocates_or_blocks` finds every closure handed to
+`build_input_stream` or `build_output_stream`, takes its body by matching
+braces, and fails naming any line that allocates, blocks or prints, with what
+that costs. `try_lock` and `try_push`, the non-blocking forms this code already
+uses, are matched on the call rather than on the name, so the guard does not
+object to the thing it is asking for.
+
+Proved both ways, as a guard here has to be: it passes on the tree as it
+stands, and one planted `data.to_vec()` in the live input callback makes it
+fail naming the file, the line and the reason.
+
+Read rather than measured, deliberately. A test that counted real allocations
+would need a global allocator hook and a running stream, which means a machine
+with a sound card, which is what F-163 and F-165 were about. This one finds the
+same mistake on a build machine with no audio at all.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -329,7 +377,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1530 tests, 56449 functional lines. Both are measured and
+* **The counts**: 1531 tests, 56569 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4441,7 +4489,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1530 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1531 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |

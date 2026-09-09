@@ -8,6 +8,28 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Optimisation stops being a pass and becomes how this is written**
+
+- The practices marker 125's reading established are now in `CLAUDE.md` as the
+  standing way this project is written, and three of the four are enforced by a
+  build rather than by somebody remembering.
+- **No audio callback allocates, blocks or prints.** A callback runs on the
+  operating system's audio thread with a deadline of a few milliseconds;
+  allocating takes a lock in the allocator, blocking on a mutex hands the
+  thread away, and printing takes the lock on standard output. Each of the
+  three callbacks already carried a comment saying its buffers are sized once.
+  A test now reads the callbacks themselves and fails naming the line and what
+  it would cost.
+- **Every dependency says what it is for, on the line that declares it**,
+  checked in CI. A dependency is code this project ships and does not review,
+  build time on every machine that compiles this, and one more thing that has
+  to work on the BSDs and the 32-bit targets. If there is no sentence to write,
+  that is the answer.
+- Writing those sentences found three dependencies no line of code referred to:
+  `sha2` in `veilvoice-verify`, `hex` in its tests and `hex-literal` in the
+  crypto crate's. All three had been compiled by every build on every platform
+  for as long as they had been there. They are gone.
+
 **Live scramble is the Studio now, not a tab beside it**
 
 - Veiling as it runs has stopped being a separate tab. The Studio is where it

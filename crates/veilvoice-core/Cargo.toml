@@ -9,11 +9,19 @@ repository.workspace = true
 description = "Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility."
 
 [dependencies]
+# The real-input FFT the spectral stage and the accent stage both run on, and
+# the `num_complex` types they share.
 realfft.workspace = true
+# The operating system's own randomness, which is what the modulation stream
+# is seeded from.
 getrandom.workspace = true
+# The `Rng` traits the modulation stream is drawn through.
 rand.workspace = true
+# ChaCha20 as the modulation stream itself: a CSPRNG, so the parameter path
+# cannot be predicted from any part of it that was observed.
 rand_chacha.workspace = true
+# Wiping the modulation seed when the stream that holds it is dropped.
 zeroize.workspace = true
 
 [dev-dependencies]
-# std only for tests; no extra deps needed.
+# Std only for tests; no extra deps needed.
