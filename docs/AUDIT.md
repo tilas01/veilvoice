@@ -38,6 +38,130 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-second round: the guard that failed and the two behind it
+
+The round after 0.1.20, covering the decoy vaults and everything they touched,
+and beginning where it should have begun the round before: with the build.
+
+**The build was red, and had been for five commits.** The thirty-first round's
+largest finding was that eleven drift checks did not fail a build, and ten were
+wired into CI to fix it. What that round did not do was look at whether the
+build those checks were joining was passing. It was not, and one of the checks
+it was not passing is the one that runs before them.
+
+### F-160: the offline proof that never ran once
+
+The `offline-runtime` job added in the thirty-first round proves the claim on
+the front page four ways: the dependency graph, the source, the built binary's
+imports, and the running program with no network at all.
+
+The third of those runs the command line inside an empty network namespace:
+
+```
+unshare -rn target/release/veilvoice anonymise ...
+```
+
+`unshare -r` asks for a **user** namespace, so that an ordinary account may
+then make a network one. Ubuntu 24.04, which is what `ubuntu-latest` is,
+refuses unprivileged user namespaces by default through
+`kernel.apparmor_restrict_unprivileged_userns`. The step failed on its first
+run and on every run since:
+
+```
+unshare: write failed /proc/self/uid_map: Operation not permitted
+```
+
+**The two steps after it were skipped**, because a failed step ends the job. So
+the syscall trace never ran and the window's socket families were never read.
+For the whole of 0.1.20 the job existed, looked like it proved four things, and
+proved one: the import check, which is the step before the failure.
+
+That is worse than the state it replaced. A missing guard is a known gap. A
+guard that fails for a reason unrelated to what it guards, in a job whose name
+says the program opens no network socket, is a gap that reads as coverage.
+
+The namespace is now obtained whichever way the kernel allows: unprivileged
+through a user namespace where that is permitted, and otherwise made as root
+with the program dropped straight back to the ordinary account inside it, so
+what is measured is still VeilVoice as somebody runs it. If neither works the
+step fails and says the claim is unproved, rather than passing quietly.
+
+### F-161: a shell quote that would have failed the step behind it
+
+The last line of the fourth step is
+
+```
+echo "... the window's sockets are local""
+```
+
+with one quotation mark too many, which is a syntax error `bash` reports before
+running any of it. It has never been executed, because F-160 skipped the step,
+and it would have failed the job the first time it was.
+
+Two defects in one job, the second hidden by the first, in the job that carries
+the repository's strongest claim.
+
+### F-162: the desktop tests opened a real file dialog
+
+`test / macos-latest` and `test / windows-latest` were both red, and for one
+cause. Two tests in the Studio drive the export path, which asks `dialog` for a
+folder, and `dialog::Pending::start` opened a **platform panel**.
+
+On macOS `rfd` does not decline politely: it panics.
+
+> You are running RFD in NonWindowed environment, it is impossible to spawn
+> dialog from thread different than main in this env.
+
+On Windows every test passed and then the process died at exit with
+`STATUS_ACCESS_VIOLATION`, which is the dialog thread outliving the harness.
+
+Both are the same mistake: opening a window's file panel where there is no
+window. `start` now asks whether a panel can be shown at all, and where it
+cannot the ask reads as open and then as cancelled, which is the truth about
+what happened. That covers a real case as well as the test one: on macOS the
+panel must come from the main thread, and asking from any other thread used to
+panic, which would take down the application in the middle of somebody's
+recording rather than declining to open a dialog.
+
+### The decoys that a folder listing would have identified
+
+Not a defect in shipped behaviour, and recorded because the design decision is
+easy to get wrong and this nearly did.
+
+`veilvoice-crypto::studio` shipped `make_decoy` and `Shape::of` in 0.1.20:
+documented, tested, and reached by nothing. Wiring them to a button is what
+marker 134 asks for. Wiring only that would have produced decoys worth nothing.
+
+The vault lived at a fixed name, `studio`, in the folder the decoys would have
+been made in. A decoy is indistinguishable from the real vault by size, by file
+count and by contents; it is told from it instantly by reading the name of the
+directory it is in. Every vault is now a directory with an opaque name and the
+real one is found by trying each until one opens, which only both passphrases
+do. A vault written the old way moves down into a directory of its own on the
+next unlock, index last, so an interrupted move finishes on the following one
+rather than splitting the vault in two.
+
+One measurable tell survived the first implementation and is worth recording
+because a test caught it rather than a reading: a decoy's index was eighteen
+bytes smaller than the real one, because a real vault's recordings are called
+something and a decoy's were called nothing. The sizes were the one thing this
+was meant to make identical. The names are now padded to the length the real
+index measured, and the test builds decoys and adds up the real files.
+
+### What the mechanical passes found
+
+* **`cargo clippy --workspace --all-targets`**: clean, after two findings in
+  the new code. A `.min(u64::MAX)` that does nothing, where the intent was to
+  saturate a conversion into `usize` and the correct spelling is `try_from`
+  with a fallback: on a 32-bit build the `as` cast it was written beside would
+  have given the low bits of the count rather than the largest one that fits.
+  And a `match` on one pattern, which is an `if let`.
+* **The interface-string guard** caught three strings whose line continuations
+  had been eaten in the editing, which would have rendered source indentation
+  into the middle of a sentence in the window.
+* **The counts**: 1502 tests, 55246 functional lines. Both are measured and
+  both are checked against the front page and the README by the site suite.
+
 ## The thirty-first round: the guards that did not guard
 
 The round before 0.1.20, covering everything the thirtieth round covered and
@@ -4147,7 +4271,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1393 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1502 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -5794,8 +5918,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and fifty-eight defects found and fixed (F-1 to F-158), across
-thirty rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and sixty-two defects found and fixed (F-1 to F-162), across
+thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

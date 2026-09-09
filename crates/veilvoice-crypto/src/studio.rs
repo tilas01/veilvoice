@@ -168,10 +168,15 @@ impl std::fmt::Debug for Entry {
 /// One file per recording, named by an identifier that says nothing, plus one
 /// index file. The index holds every name and date and is itself sealed under
 /// the same key, so a vault sitting on a disk shows how many recordings there
-/// are and roughly how large each is, and nothing else. Those two facts are not
-/// hidden and the documentation says so rather than implying otherwise: hiding
-/// them means padding and decoys, which is what [`crate::hoard`] is for and is
-/// a different trade.
+/// are and roughly how large each is, and nothing else.
+///
+/// Those two facts are not hidden inside a vault, and the documentation says so
+/// rather than implying otherwise. What hides them is the folder the vault is
+/// in: [`make_decoy_in`] fills it with vaults of exactly this size holding
+/// nothing, and [`find_or_make`] finds the real one by opening it rather than
+/// by its name, so the count and the sizes stop identifying anything. The
+/// program folder's own storage takes the other route, padding, which
+/// [`crate::hoard`] is for and is a different trade.
 pub struct Studio {
     dir: std::path::PathBuf,
     key: StudioKey,
@@ -354,16 +359,24 @@ impl Studio {
     }
 }
 
-/// A random, opaque identifier: 20 lower-case letters and digits that say
-/// nothing about what they name.
+/// How long an identifier is, in characters.
 ///
-/// Twenty bytes are drawn and five bits of each are used, so the identifier
-/// carries 100 bits of entropy in 20 characters. That is far more than a vault
-/// will ever hold and it is not a compromise for space: the alphabet has 32
-/// letters in it, so five bits per character is exactly what one character
-/// holds, and taking more would need a base conversion for no benefit.
+/// Named because two things read it: the generator below, and the arithmetic
+/// that works out how large a decoy will be. A second literal in either place
+/// would be a fact written twice.
+const ID_LEN: usize = 20;
+
+/// A random, opaque identifier: [`ID_LEN`] lower-case letters and digits that
+/// say nothing about what they name.
+///
+/// One byte is drawn per character and five bits of each are used, so the
+/// identifier carries five bits per character: a hundred of them at the length
+/// set above. That is far more than a vault will ever hold and it is not a
+/// compromise for space: the alphabet has 32 letters in it, so five bits per
+/// character is exactly what one character holds, and taking more would need a
+/// base conversion for no benefit.
 fn new_id() -> Result<String, Error> {
-    let mut raw = [0u8; 20];
+    let mut raw = [0u8; ID_LEN];
     getrandom::getrandom(&mut raw).map_err(|_| Error::Random)?;
     const ALPHABET: &[u8; 32] = b"abcdefghijklmnopqrstuvwxyz234567";
     Ok(raw
@@ -431,6 +444,14 @@ pub struct Shape {
     pub recordings: usize,
     /// Bytes in each, before sealing.
     pub each: usize,
+    /// Bytes in the index before it is sealed.
+    ///
+    /// Carried because the index file's size is visible on the disk and the
+    /// rest of the shape does not determine it: names are stored in there, and
+    /// a vault whose recordings are called something has a larger index than
+    /// one whose recordings are called nothing. A decoy that skipped this would
+    /// be the vault in the folder with the smallest index file.
+    pub index: usize,
 }
 
 impl Shape {
@@ -448,8 +469,209 @@ impl Shape {
             } else {
                 total / entries.len()
             },
+            index: render_index(&entries).len(),
         })
     }
+
+    /// What one vault of this shape occupies, in bytes, as files on a disk.
+    ///
+    /// # Why this is here and not where it is asked for
+    ///
+    /// The number depends on the sealed file layout: a nonce and a tag on
+    /// every file, and the index beside them. That layout is this module's, so
+    /// the arithmetic is this module's too. An interface that worked it out for
+    /// itself would be a second copy of the format, and the two would part
+    /// company the first time a field was added here.
+    ///
+    /// It is exact rather than approximate, and a test builds decoys and adds
+    /// up the real files to prove it stays exact.
+    pub fn bytes_on_disk(&self) -> u64 {
+        // Every sealed file carries a nonce in front and a tag behind.
+        let overhead = (crate::aead::NONCE_LEN + crate::aead::TAG_LEN) as u64;
+
+        let recordings = (self.each as u64)
+            .saturating_add(overhead)
+            .saturating_mul(self.recordings as u64);
+        let index = overhead.saturating_add(self.index_len() as u64);
+
+        recordings.saturating_add(index)
+    }
+
+    /// The shortest index a decoy of this shape can be written with: every
+    /// entry present and every name empty.
+    fn bare_index(&self) -> usize {
+        // The identifier, three tabs, a `made` of zero which is one digit, the
+        // byte count as text, an empty name, and a newline.
+        self.recordings
+            .saturating_mul(ID_LEN + 3 + 1 + digits(self.each) + 1)
+    }
+
+    /// The index length a decoy of this shape will actually be written with.
+    ///
+    /// The measured length, unless that is shorter than a decoy of this many
+    /// recordings can be, in which case the shortest one is what gets written.
+    /// Both this and [`make_decoy`] read it, so the size a panel promises and
+    /// the size the disk receives cannot part company.
+    fn index_len(&self) -> usize {
+        self.index.max(self.bare_index())
+    }
+}
+
+/// How many decimal digits `n` is written with.
+///
+/// The index stores the byte count as text, so its width is part of the size on
+/// disk. Written out rather than reached for through a formatted `String`,
+/// because this is asked once per decoy per redraw of a panel.
+fn digits(n: usize) -> usize {
+    let mut d = 1;
+    let mut n = n;
+    while n >= 10 {
+        n /= 10;
+        d += 1;
+    }
+    d
+}
+
+/// Every directory under `parent` that is shaped like a vault.
+///
+/// Shaped like one means it holds an index. That is the only thing that can be
+/// seen from outside, and it is deliberately the only thing looked at: a real
+/// vault and a decoy are the same shape here, and which of them opens is a
+/// question only a key can answer.
+///
+/// Sorted by name so the order does not depend on how the filesystem happens to
+/// hand directories back, which would otherwise make a test flaky and, worse,
+/// make the order a decoy is tried in vary between machines.
+pub fn vault_dirs(parent: &std::path::Path) -> Result<Vec<std::path::PathBuf>, Error> {
+    let mut out = Vec::new();
+    let listing = match std::fs::read_dir(parent) {
+        Ok(listing) => listing,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(out),
+        Err(_) => return Err(Error::AppLockStore),
+    };
+    for entry in listing.flatten() {
+        let path = entry.path();
+        if path.is_dir() && path.join(INDEX).is_file() {
+            out.push(path);
+        }
+    }
+    out.sort();
+    Ok(out)
+}
+
+/// Open the one vault under `parent` that `key` unlocks, making it on a first
+/// run.
+///
+/// # Why the vault is found rather than named
+///
+/// A decoy is only worth making if it cannot be told from the real thing, and a
+/// real vault at a fixed, known name is told from a decoy by reading the name.
+/// So every vault under `parent`, real and decoy alike, is a directory with an
+/// opaque identifier for a name, and the only thing that distinguishes them is
+/// that exactly one of them opens.
+///
+/// This tries each in turn. Trying is cheap: the expensive part of unlocking is
+/// deriving the key, which happens once before this is called, and each attempt
+/// after that is opening one small sealed index.
+///
+/// # What happens when nothing opens
+///
+/// The error from the last attempt is returned, and **no vault is made**.
+/// Making a fresh one there would be the worst answer available: somebody who
+/// mistyped a passphrase would be shown an empty vault and would reasonably
+/// conclude their recordings were gone.
+///
+/// A vault is made only when `parent` holds none at all, which is a first run.
+/// It is made with an index written immediately, so that a vault holding
+/// nothing is the same shape on the disk as a decoy holding nothing, from the
+/// moment it exists.
+pub fn find_or_make(parent: &std::path::Path, key: StudioKey) -> Result<Studio, Error> {
+    std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
+    migrate_flat(parent)?;
+
+    let mut studio = Studio {
+        dir: parent.to_path_buf(),
+        key,
+    };
+
+    let mut last = None;
+    for dir in vault_dirs(parent)? {
+        studio.dir = dir;
+        match studio.list() {
+            Ok(_) => return Ok(studio),
+            Err(error) => last = Some(error),
+        }
+    }
+    if let Some(error) = last {
+        return Err(error);
+    }
+
+    studio.dir = parent.join(new_id()?);
+    std::fs::create_dir_all(&studio.dir).map_err(|_| Error::AppLockStore)?;
+    studio.write_index(&[])?;
+    Ok(studio)
+}
+
+/// Move a vault written straight into `parent` down into a directory of its
+/// own.
+///
+/// # The layout this converts from
+///
+/// Before decoys existed there was one vault and it sat directly in `parent`,
+/// because there was nothing for it to be confused with. There is now, and a
+/// vault sitting where decoys are siblings would be the one directory that is
+/// not a directory, which gives it away completely.
+///
+/// # Interrupted half way
+///
+/// The index moves **last**, so `parent` still holding an index means the move
+/// did not finish, and this runs again on the next open. It moves into the
+/// directory already made rather than a new one when there is exactly one, so
+/// running again finishes the job instead of splitting the vault in two.
+fn migrate_flat(parent: &std::path::Path) -> Result<(), Error> {
+    if !parent.join(INDEX).is_file() {
+        return Ok(());
+    }
+
+    // A directory already there is a previous run of this that did not finish.
+    // Anything else means a vault and a half, which is not a state this can
+    // reach and not one to guess at.
+    let existing: Vec<std::path::PathBuf> = std::fs::read_dir(parent)
+        .map_err(|_| Error::AppLockStore)?
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.is_dir())
+        .collect();
+    let into = match existing.len() {
+        0 => parent.join(new_id()?),
+        1 => existing[0].clone(),
+        _ => return Err(Error::AppLockStore),
+    };
+    std::fs::create_dir_all(&into).map_err(|_| Error::AppLockStore)?;
+
+    for entry in std::fs::read_dir(parent)
+        .map_err(|_| Error::AppLockStore)?
+        .flatten()
+    {
+        let path = entry.path();
+        if path.is_dir() || path.file_name() == Some(std::ffi::OsStr::new(INDEX)) {
+            continue;
+        }
+        std::fs::rename(&path, into.join(entry.file_name())).map_err(|_| Error::AppLockStore)?;
+    }
+    std::fs::rename(parent.join(INDEX), into.join(INDEX)).map_err(|_| Error::AppLockStore)?;
+    Ok(())
+}
+
+/// Make one decoy under `parent`, named the way a real vault is named.
+///
+/// Returns where it went. The name is drawn from the same generator that names
+/// recordings and vaults, so a decoy is not distinguishable from the real vault
+/// by its name any more than by its size.
+pub fn make_decoy_in(parent: &std::path::Path, shape: Shape) -> Result<std::path::PathBuf, Error> {
+    let dir = parent.join(new_id()?);
+    make_decoy(&dir, shape)?;
+    Ok(dir)
 }
 
 /// Fill `dir` with a vault that never held anything.
@@ -503,15 +725,59 @@ pub fn make_decoy(dir: impl AsRef<std::path::Path>, shape: Shape) -> Result<(), 
             .map_err(|_| Error::AppLockStore)?;
         entries.push(Entry {
             id,
-            // A name nobody will ever read, because nobody can open the index.
-            // Still generated rather than left blank so the index is the same
-            // shape as a real one.
+            // Filled in below, once it is known how much room is left to fill.
             name: String::new(),
             made: 0,
             bytes: shape.each,
         });
     }
+    pad_index(&mut entries, shape.index_len())?;
     decoy.write_index(&entries)
+}
+
+/// Grow the names until the index is exactly the length a real one was.
+///
+/// # Why the names are padded rather than left empty
+///
+/// The index is sealed, so nobody can read a name out of it or see how the
+/// length is divided between them. What anybody can see is the size of the
+/// file, and that size is the length of the text plus a fixed overhead. A real
+/// vault's recordings are called something and a decoy's are called nothing, so
+/// without this every decoy in a folder is the one with the smallest index.
+///
+/// The share is even because the division is invisible: only the total is on
+/// the disk. The characters are random rather than repeated for the same reason
+/// the audio is, which is that a file whose size does not match its entropy is
+/// itself a tell if the sealing is ever broken.
+///
+/// `want` shorter than the bare minimum is left alone rather than forced. It
+/// means the real index was smaller than a decoy of the same count can be, and
+/// the honest answer to that is a decoy a few bytes larger, not a corrupt one.
+fn pad_index(entries: &mut [Entry], want: usize) -> Result<(), Error> {
+    if entries.is_empty() {
+        return Ok(());
+    }
+    let bare = render_index(entries).len();
+    let Some(spare) = want.checked_sub(bare) else {
+        return Ok(());
+    };
+
+    let n = entries.len();
+    for (i, entry) in entries.iter_mut().enumerate() {
+        // The last one takes the remainder, so the total is exact rather than
+        // short by up to one byte per entry.
+        let take = if i + 1 == n {
+            spare - (spare / n) * (n - 1)
+        } else {
+            spare / n
+        };
+        let mut raw = vec![0u8; take];
+        getrandom::getrandom(&mut raw).map_err(|_| Error::Random)?;
+        // Lower-case letters: one byte each, and neither a tab nor a newline,
+        // so the rendered length is the number of characters asked for.
+        entry.name = raw.iter().map(|b| (b'a' + b % 26) as char).collect();
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -915,6 +1181,7 @@ mod tests {
             Shape {
                 recordings: 3,
                 each: 512,
+                index: 0,
             },
         )
         .unwrap();
@@ -924,6 +1191,194 @@ mod tests {
             let key = StudioKey::derive(&secret(app), &secret(rest)).unwrap();
             let attempt = Studio::open(dir.path(), key).unwrap();
             assert!(attempt.list().is_err(), "a decoy index opened");
+        }
+    }
+
+    #[test]
+    fn a_first_run_makes_one_vault_and_the_next_run_finds_it() {
+        let home = tempfile::tempdir().unwrap();
+        let key = || StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+
+        let first = find_or_make(home.path(), key()).unwrap();
+        let made = first.dir().to_path_buf();
+        first.store("a take", 7, b"audio").unwrap();
+
+        // The vault is a directory of its own with an opaque name, not the
+        // parent, so a decoy beside it is not told apart by reading the name.
+        assert_eq!(made.parent().unwrap(), home.path());
+        assert!(safe_id(made.file_name().unwrap().to_str().unwrap()));
+
+        let again = find_or_make(home.path(), key()).unwrap();
+        assert_eq!(again.dir(), made, "the second run made a second vault");
+        assert_eq!(again.list().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn a_new_vault_has_an_index_from_the_moment_it_exists() {
+        // Otherwise a vault holding nothing is an empty directory and a decoy
+        // holding nothing is a directory with a file in it, which is a tell
+        // that lasts until the first recording.
+        let home = tempfile::tempdir().unwrap();
+        let key = StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+        let vault = find_or_make(home.path(), key).unwrap();
+        assert!(vault.dir().join(INDEX).is_file());
+        assert_eq!(
+            vault_dirs(home.path()).unwrap(),
+            vec![vault.dir().to_path_buf()]
+        );
+    }
+
+    #[test]
+    fn the_wrong_pair_finds_nothing_and_makes_nothing() {
+        // The dangerous failure this forbids: a mistyped passphrase creating a
+        // second, empty vault, which would look exactly like the recordings
+        // having been lost.
+        let home = tempfile::tempdir().unwrap();
+        let right = StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+        find_or_make(home.path(), right)
+            .unwrap()
+            .store("a take", 1, b"audio")
+            .unwrap();
+
+        let wrong = StudioKey::derive(&secret(b"app"), &secret(b"typo")).unwrap();
+        assert!(find_or_make(home.path(), wrong).is_err());
+        assert_eq!(vault_dirs(home.path()).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn the_real_vault_is_found_among_its_decoys() {
+        let home = tempfile::tempdir().unwrap();
+        let key = || StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+        let vault = find_or_make(home.path(), key()).unwrap();
+        vault.store("a take", 1, &vec![7u8; 4096]).unwrap();
+        let real = vault.dir().to_path_buf();
+        let shape = Shape::of(&vault).unwrap();
+        drop(vault);
+
+        for _ in 0..5 {
+            make_decoy_in(home.path(), shape).unwrap();
+        }
+        assert_eq!(vault_dirs(home.path()).unwrap().len(), 6);
+
+        let found = find_or_make(home.path(), key()).unwrap();
+        assert_eq!(found.dir(), real, "a decoy was taken for the vault");
+        assert_eq!(found.list().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn a_decoy_is_the_same_shape_on_the_disk_as_the_vault_it_copies() {
+        // Same number of files, same total size, same style of name. What a
+        // search of the disk can see is the same for both.
+        let home = tempfile::tempdir().unwrap();
+        let key = StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+        let vault = find_or_make(home.path(), key).unwrap();
+        for i in 0..3 {
+            vault
+                .store(&format!("take {i}"), i, &vec![3u8; 8192])
+                .unwrap();
+        }
+        let shape = Shape::of(&vault).unwrap();
+        let decoy = make_decoy_in(home.path(), shape).unwrap();
+
+        let weigh = |d: &std::path::Path| -> (usize, u64) {
+            let files: Vec<_> = std::fs::read_dir(d).unwrap().flatten().collect();
+            (
+                files.len(),
+                files.iter().map(|f| f.metadata().unwrap().len()).sum(),
+            )
+        };
+        assert_eq!(weigh(vault.dir()), weigh(&decoy));
+        assert!(safe_id(decoy.file_name().unwrap().to_str().unwrap()));
+    }
+
+    #[test]
+    fn a_vault_written_the_old_way_moves_down_into_a_directory_of_its_own() {
+        let home = tempfile::tempdir().unwrap();
+        let key = || StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+
+        // The layout before decoys existed: the vault straight in the parent.
+        let old = Studio::open(home.path(), key()).unwrap();
+        old.store("kept", 42, b"the recording").unwrap();
+        drop(old);
+        assert!(home.path().join(INDEX).is_file());
+
+        let moved = find_or_make(home.path(), key()).unwrap();
+        assert_ne!(moved.dir(), home.path(), "it did not move");
+        assert!(
+            !home.path().join(INDEX).exists(),
+            "the old index is still there"
+        );
+        let entries = moved.list().unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0].name, "kept");
+        assert_eq!(
+            moved.load(&entries[0].id).unwrap().expose(),
+            b"the recording",
+            "the audio did not come with it"
+        );
+    }
+
+    #[test]
+    fn a_move_interrupted_half_way_finishes_rather_than_splitting_the_vault() {
+        let home = tempfile::tempdir().unwrap();
+        let key = || StudioKey::derive(&secret(b"app"), &secret(b"rest")).unwrap();
+        let old = Studio::open(home.path(), key()).unwrap();
+        let kept = old.store("kept", 42, b"the recording").unwrap();
+        drop(old);
+
+        // What an interruption leaves: the directory made and the recording
+        // moved into it, and the index still in the parent because it goes
+        // last. The move must resume into that directory, not a second one.
+        let half = home.path().join(new_id().unwrap());
+        std::fs::create_dir(&half).unwrap();
+        std::fs::rename(home.path().join(&kept.id), half.join(&kept.id)).unwrap();
+
+        let moved = find_or_make(home.path(), key()).unwrap();
+        assert_eq!(moved.dir(), half, "it started a second vault");
+        assert_eq!(vault_dirs(home.path()).unwrap().len(), 1);
+        assert_eq!(moved.load(&kept.id).unwrap().expose(), b"the recording");
+    }
+
+    #[test]
+    fn a_decoy_takes_exactly_the_room_its_shape_says_it_will() {
+        // The interface offering decoys shows how much room they will take and
+        // how many will fit, and both come from `bytes_on_disk`. If that
+        // arithmetic drifts from the file format the panel is lying about the
+        // disk, so this builds real decoys and adds up the real files.
+        for shape in [
+            Shape {
+                recordings: 3,
+                each: 2048,
+                index: 0,
+            },
+            Shape {
+                recordings: 1,
+                each: 999_999,
+                index: 0,
+            },
+            Shape {
+                recordings: 0,
+                each: 0,
+                index: 0,
+            },
+            Shape {
+                recordings: 7,
+                each: 1,
+                index: 0,
+            },
+        ] {
+            let dir = tempfile::tempdir().unwrap();
+            make_decoy(dir.path(), shape).unwrap();
+            let actual: u64 = std::fs::read_dir(dir.path())
+                .unwrap()
+                .map(|e| e.unwrap().metadata().unwrap().len())
+                .sum();
+            assert_eq!(
+                actual,
+                shape.bytes_on_disk(),
+                "{shape:?} was predicted at {} bytes and took {actual}",
+                shape.bytes_on_disk()
+            );
         }
     }
 
@@ -938,6 +1393,7 @@ mod tests {
             Shape {
                 recordings: 1,
                 each: 4096,
+                index: 0,
             },
         )
         .unwrap();
@@ -960,6 +1416,7 @@ mod tests {
         let shape = Shape {
             recordings: 2,
             each: 1024,
+            index: 0,
         };
         make_decoy(a.path(), shape).unwrap();
         make_decoy(b.path(), shape).unwrap();

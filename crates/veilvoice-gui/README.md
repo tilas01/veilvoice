@@ -94,14 +94,15 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>104 lines"])
+    n_lib(["lib.rs<br/>105 lines"])
     n_main(["main.rs<br/>205 lines"])
     n_app["app.rs<br/>2849 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
     n_crashreport["crashreport.rs<br/>289 lines"]
-    n_dialog["dialog.rs<br/>369 lines"]
+    n_decoys["decoys.rs<br/>216 lines"]
+    n_dialog["dialog.rs<br/>425 lines"]
     n_firstrun["firstrun.rs<br/>490 lines"]
     n_graphics["graphics.rs<br/>158 lines"]
     n_group["group.rs<br/>1745 lines"]
@@ -118,7 +119,7 @@ flowchart TD
     n_setup["setup.rs<br/>758 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
-    n_studio["studio.rs<br/>1263 lines"]
+    n_studio["studio.rs<br/>1386 lines"]
     n_theme["theme.rs<br/>784 lines"]
     n_tour["tour.rs<br/>303 lines"]
     n_updates["updates.rs<br/>246 lines"]
@@ -155,6 +156,8 @@ flowchart TD
     n_crashlog --> n_prefs
     n_crashreport --> n_crashlog
     n_crashreport --> n_theme
+    n_decoys --> n_studio
+    n_decoys --> n_theme
     n_firstrun --> n_layout
     n_firstrun --> n_security
     n_firstrun --> n_settings
@@ -192,6 +195,7 @@ flowchart TD
     n_soundbar --> n_theme
     n_storage --> n_dialog
     n_storage --> n_theme
+    n_studio --> n_decoys
     n_studio --> n_dialog
     n_studio --> n_monitor
     n_studio --> n_theme
@@ -208,6 +212,7 @@ flowchart TD
     click n_avnotice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs" "open the source"
     click n_crashlog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" "open the source"
     click n_crashreport href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" "open the source"
+    click n_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" "open the source"
     click n_dialog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" "open the source"
     click n_firstrun href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" "open the source"
     click n_graphics href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" "open the source"
@@ -246,13 +251,14 @@ flowchart TD
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 447 | Make a failure that produces no output produce some. |
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 289 | Offering the report from the last crash, on the run after it. |
-| [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
+| [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | 216 | Decoy vaults: how many there is room for, and the panel that offers them. |
+| [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 425 | Asking for a file without stopping the window. |
 | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 490 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 158 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1745 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 104 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 105 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 205 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 496 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
@@ -265,7 +271,7 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 758 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 766 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1263 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1386 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 784 | Colour schemes for the desktop app. |
 | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 303 | The short tour on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
@@ -274,7 +280,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**15,340 functional lines of Rust** in this crate. A functional line is a line
+**15,625 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -308,6 +314,9 @@ counts blank lines and comments too. Both are produced by
 | `const NEW_ISSUE` | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | Where a report goes, if the person wants to file one. |
 | `const ISSUES` | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | The issue tracker itself, linked from About whether or not anything crashed. |
 | `struct Offer` | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | What the panel is showing, kept across frames. |
+| `struct Advice` | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | What to offer, and on what evidence. |
+| `fn advise` | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | Work out what to offer from the vault's shape and whatever the disk says. |
+| `fn panel` | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | The panel, under the listing in the Browser. |
 | `enum Ask` | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | What is being asked for. |
 | `struct Pending` | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | A file dialog that is open, or has just been answered. |
 | `enum Step` | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | Which card is showing. |
@@ -370,9 +379,10 @@ counts blank lines and comments too. Both are produced by
 | `struct Destination` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | The chosen place for veiled output, if there is one. |
 | `struct Storage` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | Everything the window shows about encrypted storage. |
 | `fn panel` | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | The encrypted-storage panel, drawn on the security tab. |
-| `fn default_dir` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Where the vault lives: beside the lock file, in this platform's config directory. |
+| `fn default_dir` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Where the vaults live: beside the lock file, in this platform's config directory. |
 | `struct Studio` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | The Studio and the Browser. |
 | `enum Render` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | What a take is to be turned into. |
+| `fn counted_decoys` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | "One decoy" or "four decoys", so the interface does not say "1 decoys". |
 | `fn counted` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | "One recording" or "four recordings", so the interface does not say "1 recordings". |
 | `fn made_on` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A Unix time as a date somebody reads. |
 | `fn length` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A length in seconds, as m:ss, for somewhere a person reads. |

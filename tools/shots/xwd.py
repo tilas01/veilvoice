@@ -17,7 +17,7 @@ Pure standard library, like `tools/shots/round.py` and `assets/generate.py`.
 
 # The fingerprint
 
-`gui.sh` photographs nine tabs by starting the application nine times, and the
+`gui.sh` photographs every tab by starting the application once per tab, and the
 failure it has to catch is two of them coming out identical, which means a tab
 did not open and the previous picture was taken again under a new name. That
 is invisible in a directory listing and obvious in a hash. It samples on a
