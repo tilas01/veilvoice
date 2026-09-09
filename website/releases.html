@@ -168,6 +168,19 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>A BSD reader was told to run a command their system does not have</strong></p>
+<ul>
+<li><code>veilvoice verify --script</code> writes a shell script that checks the signature and the hashes with the reader&#x27;s own GnuPG. It knew two systems, Linux and macOS, and every mapping onto it ended in a catch-all meaning Linux, so a reader on FreeBSD, OpenBSD or NetBSD was handed <code>sha256sum -c</code>.</li>
+<li>The same release&#x27;s <em>other</em> script, the one that reproduces the build, has always given the BSDs <code>sha256 -c</code> and has a test forbidding <code>sha256sum</code> there. Two scripts in one release, disagreeing about the reader&#x27;s machine.</li>
+<li>The cause was a copy: both modules answered the same question and one of them was not kept current. The copy is gone. There is one public <code>System::hash_check_command</code>, the verification script asks it, and the two catch-all matches are now one exhaustive function that will not compile if a system is added to one enumeration and not the other.</li>
+<li>The guard is that no system&#x27;s script may contain another system&#x27;s hash command, which fails on exactly the fall-through this was.</li>
+</ul>
+<p><strong>Checking a download, written up per system</strong></p>
+<ul>
+<li><code>veilvoice verify</code> on its own is the same command everywhere: it hashes and checks the signature itself, and needs no GnuPG, no network and none of the system&#x27;s own tools. A BSD reader has nothing to translate, which is why the guide now says so first.</li>
+<li>The second opinion is where systems differ, and the guide carries a table of which script each system gets and what it runs. The table is checked against the program in the test suite, so a command in the documentation that the program no longer prints fails a build.</li>
+<li>Installing GnuPG on OpenBSD and NetBSD is the one thing left unsaid. This project has not run those package managers and does not print commands it has not run; FreeBSD&#x27;s spelling is named because <code>install/install.sh</code> already uses it.</li>
+</ul>
 <p><strong>Two bars per speaker, while a group render runs</strong></p>
 <ul>
 <li>As the render walks the file, each person gets what went into the turn just finished and what the engine produced from it, with how far through their turns the render is. One bar answers &quot;is something being written&quot; and not &quot;is this person being veiled&quot;, which is the question somebody rendering an interview is asking.</li>

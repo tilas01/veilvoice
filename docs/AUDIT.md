@@ -422,6 +422,50 @@ frame still prints as a range and still normalises; the throughput line
 normalises whatever it says. So this is recorded as an open question with a
 better instrument attached to it, rather than as a defect that was found.
 
+### F-167: two scripts in one release, disagreeing about the reader's machine
+
+This repository publishes two shell scripts for checking a download.
+`veilvoice-check`'s reproduces the build; `veilvoice-gnupg`'s verifies the
+signature and the hashes with the reader's own GnuPG. A reader on one machine
+may run either.
+
+The reproduce script knows four systems and gives each the hash tool it has:
+`sha256sum` on Linux, `shasum -a 256` on macOS, `sha256` on the BSDs, and
+`certutil` on Windows. It has a test asserting the BSD script never says
+`sha256sum`.
+
+The verification script knew two, Linux and macOS, and every mapping onto it
+ended in a catch-all that meant Linux. So `veilvoice verify --script` on
+FreeBSD, OpenBSD or NetBSD wrote a script telling the reader to run
+
+```
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+which the same release's other script says is not the tool they have. Two
+mappings, in two places, both with a catch-all, and the enumeration they were
+mapping from had a `Bsd` variant the whole time.
+
+The cause is a copy. Both modules answered "how does this system check a
+`SHA256SUMS`" and only one of them was kept current. The copy is gone:
+`System::hash_check_command` is public and the verification script asks it, so
+the two cannot disagree again, and the two catch-all matches are one
+exhaustive function that will not compile if a system is added to one
+enumeration and not the other.
+
+The guard that would have caught it is not the one comparing the two functions,
+which is now a tautology. It is that no flavour's script may contain another
+system's hash command, which fails on the fall-through and fails loudly when
+two flavours are pointed at one system. Proved by pointing the BSD flavour at
+Linux and reading what came out.
+
+**What this does not claim.** The BSD hash tool is `sha256` because this
+repository already said so, in the reproduce script and its test, and that is a
+decision made by somebody who could run it. Nothing here was verified on a BSD:
+this environment has none. What was verified is that two parts of one release
+now say the same thing, which is a claim about the tree and is exactly what
+could be checked from here.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -457,7 +501,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1537 tests, 57090 functional lines. Both are measured and
+* **The counts**: 1540 tests, 57181 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4569,7 +4613,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1537 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1540 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6216,7 +6260,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-six defects found and fixed (F-1 to F-166), across
+**One hundred and sixty-seven defects found and fixed (F-1 to F-167), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

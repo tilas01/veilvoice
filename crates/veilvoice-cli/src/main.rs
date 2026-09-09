@@ -1216,6 +1216,25 @@ impl From<CleanPolicy> for Policy {
     }
 }
 
+/// The verification script's spelling for a system, in one place.
+///
+/// **F-167.** This mapping existed twice, both times as a `match` with a
+/// catch-all, and both catch-alls sent the BSDs to the Linux script. Written
+/// once, exhaustively, so a system added to one enumeration and not the other
+/// is a compile error rather than a wrong instruction.
+fn flavour_for(system: veilvoice_check::reproduce::System) -> veilvoice_gnupg::script::Flavour {
+    use veilvoice_check::reproduce::System;
+    use veilvoice_gnupg::script::Flavour;
+    match system {
+        System::MacOs => Flavour::MacOs,
+        System::Bsd => Flavour::Bsd,
+        // Windows readers are given the `.cmd` reproduce script and the
+        // desktop application's Verify tab; the shell script they would be
+        // running here is the WSL one, which is Linux.
+        System::Linux | System::Windows => Flavour::Linux,
+    }
+}
+
 /// What checking a release actually involves, and who does which part.
 ///
 /// Written out here rather than left to the website, because somebody on a
@@ -1797,10 +1816,14 @@ fn run(command: Command) -> Result<(), String> {
                 ));
             }
             if how {
+                // Named, then the shorthand, then this machine. F-167 was
+                // this falling through to Linux for a BSD reader, who was then
+                // told to run a command their system does not have.
                 let flavour = match system.as_deref() {
                     Some("macos") => veilvoice_gnupg::script::Flavour::MacOs,
+                    Some("bsd") => veilvoice_gnupg::script::Flavour::Bsd,
                     _ if macos => veilvoice_gnupg::script::Flavour::MacOs,
-                    _ => veilvoice_gnupg::script::Flavour::Linux,
+                    _ => flavour_for(veilvoice_check::reproduce::System::here()),
                 };
                 explain_verification(flavour, veilvoice_check::reproduce::System::here());
                 return Ok(());
@@ -1827,15 +1850,7 @@ fn run(command: Command) -> Result<(), String> {
                 print!("{}", veilvoice_check::reproduce::script(system));
                 return Ok(());
             }
-            // The verification script knows only two spellings, because the
-            // only thing that differs is the hash tool, and the BSDs use the
-            // same one Linux does for this purpose.
-            let flavour = match system {
-                veilvoice_check::reproduce::System::MacOs => {
-                    veilvoice_gnupg::script::Flavour::MacOs
-                }
-                _ => veilvoice_gnupg::script::Flavour::Linux,
-            };
+            let flavour = flavour_for(system);
             if script {
                 print!("{}", veilvoice_gnupg::script::shell(flavour));
                 return Ok(());

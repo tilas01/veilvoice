@@ -110,7 +110,13 @@ impl System {
     }
 
     /// How this system checks a folder against a `SHA256SUMS`.
-    fn hash_check_command(self) -> &'static str {
+    ///
+    /// **Public because it is the one answer.** `veilvoice-gnupg`'s
+    /// verification script asks this rather than carrying a second copy: it
+    /// used to carry its own, that copy knew only Linux and macOS, and a BSD
+    /// reader was therefore told to run `sha256sum -c` by one script in this
+    /// repository and `sha256 -c` by another. See F-167.
+    pub fn hash_check_command(self) -> &'static str {
         match self {
             System::Linux => "sha256sum -c SHA256SUMS --ignore-missing",
             System::MacOs => "shasum -a 256 -c SHA256SUMS --ignore-missing",
