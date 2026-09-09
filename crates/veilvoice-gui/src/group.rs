@@ -98,6 +98,14 @@ pub struct Outputs {
     pub subtitles: bool,
     /// The self-contained page that plays all of it together.
     pub page: bool,
+    /// **Marker 139.** The video file, with the picture drawn rather than black.
+    ///
+    /// Off by default, and the only one of the four that is. The other three
+    /// are files this program writes on its own; this one needs `ffmpeg`, which
+    /// VeilVoice does not ship and will not install without being asked, and a
+    /// default that silently depends on a tool the machine may not have is a
+    /// default that fails on somebody else's computer.
+    pub video: bool,
 }
 
 impl Default for Outputs {
@@ -106,6 +114,7 @@ impl Default for Outputs {
             audio: true,
             subtitles: true,
             page: true,
+            video: false,
         }
     }
 }
@@ -113,7 +122,7 @@ impl Default for Outputs {
 impl Outputs {
     /// Whether anything at all would be written.
     pub fn any(&self) -> bool {
-        self.audio || self.subtitles || self.page
+        self.audio || self.subtitles || self.page || self.video
     }
 
     /// The ticked ones, by name, for a project file.
@@ -128,6 +137,9 @@ impl Outputs {
         if self.page {
             out.push("page".to_string());
         }
+        if self.video {
+            out.push("video".to_string());
+        }
         out
     }
 
@@ -141,6 +153,7 @@ impl Outputs {
             audio: names.iter().any(|n| n == "audio"),
             subtitles: names.iter().any(|n| n == "subtitles"),
             page: names.iter().any(|n| n == "page"),
+            video: names.iter().any(|n| n == "video"),
         }
     }
 }
@@ -885,6 +898,9 @@ impl Group {
             ui.checkbox(&mut self.outputs.audio, "audio");
             ui.checkbox(&mut self.outputs.subtitles, "subtitles");
             ui.checkbox(&mut self.outputs.page, "page");
+            // **Marker 139.** Off unless asked, because this is the one output
+            // that needs a tool VeilVoice does not ship.
+            ui.checkbox(&mut self.outputs.video, "video");
         });
         if !self.outputs.any() {
             ui.label(
@@ -1357,21 +1373,98 @@ fn render_now(job: &Job, watching: &render::Progress) -> Result<Vec<PathBuf>, St
         written.push(srt);
     }
 
-    if outputs.page {
+    if outputs.page || outputs.video {
         use veilvoice_video::{page, waveform};
         let look = page::Look::default().themed(theme);
         // The veiled audio's waveform, not the input's: a picture of the
         // original signal beside a file whose point is that the original is
         // gone would be the wrong picture.
+        //
+        // Read once and given to both, because the page and the video are two
+        // drawings of one recording and an envelope computed twice is two
+        // chances for them to be drawings of different ones.
         let envelope = waveform::envelope(&veiled.samples, 640);
-        let drawn = page::player(&plan, &envelope, &look, &file_name(&base), &file_name(&vtt))
-            .map_err(|error| error.to_string())?;
-        let html = with_extension(&base, "html");
-        write_private(&html, drawn.markup.as_bytes())?;
-        written.push(html);
+
+        if outputs.page {
+            let drawn = page::player(&plan, &envelope, &look, &file_name(&base), &file_name(&vtt))
+                .map_err(|error| error.to_string())?;
+            let html = with_extension(&base, "html");
+            write_private(&html, drawn.markup.as_bytes())?;
+            written.push(html);
+        }
+
+        if outputs.video {
+            written.extend(render_video(&plan, &envelope, &look, &base)?);
+        }
     }
 
     Ok(written)
+}
+
+/// **Marker 139.** Draw the frames, then have `ffmpeg` make the video of them.
+///
+/// The pictures go into a directory beside the output and are **left there**
+/// rather than cleaned up. Two reasons, and the second is the one that decided
+/// it: a render that failed at the encode should not throw away the hours of
+/// drawing that preceded it, and somebody who wants a different encoding of the
+/// same conversation should not have to draw it again.
+///
+/// Without `ffmpeg` the frames and the list are still written and the command
+/// is returned in the error, which is the same bargain the rest of this program
+/// makes with tools it does not ship: prepare everything, name the one step
+/// that is not ours, and let the person run it.
+fn render_video(
+    plan: &veilvoice_conversation::Conversation,
+    envelope: &veilvoice_video::waveform::Envelope,
+    look: &veilvoice_video::page::Look,
+    base: &std::path::Path,
+) -> Result<Vec<PathBuf>, String> {
+    use veilvoice_video::{ffmpeg, frames, size};
+
+    let encoding = ffmpeg::Encoding::default();
+    let directory = with_extension(base, "frames");
+    let written_frames = frames::write(
+        plan,
+        envelope,
+        look,
+        &size::Plan::default(),
+        &directory,
+        // No progress reporting from here: this runs on the render thread and
+        // the caller already has a bar for the render as a whole. A second bar
+        // that only moved during the drawing would read as the render stalling
+        // whenever it was not.
+        |_, _| {},
+    )
+    .map_err(|error| error.to_string())?;
+
+    let video = with_extension(base, "mp4");
+    let argv = ffmpeg::concat_command(&written_frames.list, base, &video, encoding);
+
+    let Some(program) = ffmpeg::found() else {
+        return Err(format!(
+            "The {} pictures and their list are written, in {}. `ffmpeg` is not on \
+             this machine, so the last step is yours:\n\n    {}\n\nThe About tab \
+             can install `ffmpeg` for you.",
+            written_frames.files,
+            directory.display(),
+            ffmpeg::command_line(&argv)
+        ));
+    };
+
+    let output = std::process::Command::new(program)
+        .args(argv.iter().skip(1))
+        .output()
+        .map_err(|error| error.to_string())?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let last = stderr.lines().rev().find(|line| !line.trim().is_empty());
+        return Err(format!(
+            "`ffmpeg` refused: {}",
+            last.unwrap_or("it gave no reason").trim()
+        ));
+    }
+
+    Ok(vec![video])
 }
 
 /// Replace the last extension, keeping any `.veiled` before it.
@@ -1660,6 +1753,7 @@ mod tests {
                 audio: true,
                 subtitles: true,
                 page: true,
+                video: false,
             },
             theme: veilvoice_video::palette::default_palette(),
             voices: VoiceMode::Distinct,
@@ -1818,6 +1912,7 @@ mod tests {
                 audio: true,
                 subtitles: false,
                 page: true,
+                video: false,
             },
             ..Group::default()
         };
@@ -1934,27 +2029,79 @@ mod tests {
                 audio: true,
                 subtitles: false,
                 page: false,
+                video: false,
             },
             Outputs {
                 audio: false,
                 subtitles: false,
                 page: false,
+                video: false,
             },
         ] {
             assert_eq!(Outputs::from_names(&outputs.names()), outputs);
         }
     }
 
+    /// Everything this program can write on its own is on by default.
+    ///
+    /// **The video is not**, and it is the only one. The other three are files
+    /// VeilVoice writes itself; the video needs `ffmpeg`, which it does not
+    /// ship and will not install without being asked, and a default that
+    /// silently depends on a tool the machine may not have is one that fails on
+    /// somebody else's computer rather than on the machine it was chosen on.
     #[test]
-    fn every_output_is_on_by_default() {
+    fn everything_we_can_write_ourselves_is_on_by_default_and_the_video_is_not() {
         let outputs = Outputs::default();
         assert!(outputs.audio && outputs.subtitles && outputs.page);
+        assert!(
+            !outputs.video,
+            "the video is on by default, so a render fails wherever ffmpeg is absent"
+        );
         assert!(outputs.any());
         assert!(!Outputs {
             audio: false,
             subtitles: false,
-            page: false
+            page: false,
+            video: false
         }
         .any());
+        // And asking for only the video is still asking for something.
+        assert!(Outputs {
+            audio: false,
+            subtitles: false,
+            page: false,
+            video: true
+        }
+        .any());
+    }
+
+    /// A project file remembers the video choice like the other three.
+    ///
+    /// `names` and `from_names` are two halves of one format, and a field added
+    /// to one and not the other is a setting that silently resets every time a
+    /// project is opened.
+    #[test]
+    fn every_output_survives_a_project_file() {
+        for outputs in [
+            Outputs::default(),
+            Outputs {
+                audio: true,
+                subtitles: true,
+                page: true,
+                video: true,
+            },
+            Outputs {
+                audio: false,
+                subtitles: false,
+                page: false,
+                video: true,
+            },
+        ] {
+            let back = Outputs::from_names(&outputs.names());
+            assert_eq!(back.audio, outputs.audio, "audio");
+            assert_eq!(back.subtitles, outputs.subtitles, "subtitles");
+            assert_eq!(back.page, outputs.page, "page");
+            assert_eq!(back.video, outputs.video, "video");
+        }
     }
 }

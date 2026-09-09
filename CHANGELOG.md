@@ -8,6 +8,38 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**The video has a picture in it** (marker 139, finished)
+
+- A render produced veiled audio over a black rectangle. It now produces the
+  same picture the preview page shows: a circle per speaker in their colour,
+  whoever is talking lit, the level under each name, the waveform and a
+  playhead. One layout function draws both, so the two cannot drift into being
+  pictures of different recordings.
+- **The frames are drawn here, as pixels.** A canvas with rectangles,
+  antialiased circles and a PNG writer, and a five-by-seven monospace face of
+  ninety-five glyphs written out in the file. The drawing is SVG and no build of
+  `ffmpeg` can be assumed to read SVG; converting it would have meant an SVG
+  rasteriser, which is exactly the large library this project spends a page
+  explaining why it will not carry. One dependency, `miniz_oxide`, for the
+  deflate that PNG is made of, and it was already in this tree under `flate2`.
+- **A picture is written when the picture changes**, not once per frame of
+  video. The playhead moves a pixel at a time rather than a frame at a time, so
+  ten minutes at thirty frames writes hundreds of files instead of eighteen
+  thousand. The saving is measured and reported rather than asserted, and a
+  short recording holds nothing, which is correct: the playhead crosses the
+  whole waveform however long the recording is.
+- That is why the ffmpeg command is a **concat list with a duration per
+  picture**. Held frames handed to the numbered-sequence reader would play an
+  hour of conversation in the few seconds its distinct pictures cover, which is
+  a video that is wrong rather than one that refuses to encode.
+- **Names the face cannot draw are named.** Printable ASCII only, so a name in
+  another alphabet comes out as open boxes, and the render says which names
+  before somebody watches an hour of video to find out. The preview page does
+  not have this limit, because it is markup and uses the reader's own fonts.
+- Video is the one output **off by default**, because it is the one that needs a
+  tool VeilVoice does not ship. Without `ffmpeg` the pictures and the list are
+  still written and the exact command is handed over.
+
 **A score for what a recording gives away about who was speaking**
 
 - Beside the voice controls in the Group tab there is now a percentage. A

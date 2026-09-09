@@ -9,6 +9,13 @@ repository.workspace = true
 description = "A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg."
 
 [dependencies]
+# Deflate, for the PNG frames the video is drawn as. PNG is a deflate stream,
+# and a PNG written with stored blocks is about six megabytes a frame, so a
+# render would write gigabytes of intermediate files. Pure Rust, no C, and
+# already in this tree underneath `flate2` (which `lofty` and `pgp` both pull
+# in), so naming it here adds nothing to the graph that was not compiled
+# already.
+miniz_oxide = "0.8"
 # The plan the preview page is drawn from: who speaks, when, and in which
 # colour.
 veilvoice-conversation = { path = "../veilvoice-conversation" }

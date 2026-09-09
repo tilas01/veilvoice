@@ -286,9 +286,12 @@ Verify a VeilVoice release without GnuPG installed
 A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg.
 
 - [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] &middot; The video file, which needs a codec this project does not ship.
+- [[`font.rs`|File-veilvoice-video-font]] &middot; A monospace face, five pixels by seven, drawn here.
+- [[`frames.rs`|File-veilvoice-video-frames]] &middot; The video's pictures, and how many of them there really are.
 - [[`lib.rs`|File-veilvoice-video-lib]] &middot; A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background.
 - [[`page.rs`|File-veilvoice-video-page]] &middot; The picture: one still for a preview, and one page that plays.
 - [[`palette.rs`|File-veilvoice-video-palette]] &middot; Colours: the site's own tokens, and one per speaker.
+- [[`raster.rs`|File-veilvoice-video-raster]] &middot; Pixels, and a PNG to put them in.
 - [[`size.rs`|File-veilvoice-video-size]] &middot; The size and frame rate a video is rendered at.
 - [[`waveform.rs`|File-veilvoice-video-waveform]] &middot; The shape of the audio, reduced to something a page can draw.
 
