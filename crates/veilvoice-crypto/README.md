@@ -118,7 +118,7 @@ flowchart TD
     n_lock["lock.rs<br/>1823 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
-    n_studio["studio.rs<br/>1037 lines"]
+    n_studio["studio.rs<br/>1494 lines"]
     n_tape["tape.rs<br/>350 lines"]
     n_vault["vault.rs<br/>615 lines"]
     n_weave["weave.rs<br/>1314 lines"]
@@ -165,7 +165,7 @@ flowchart TD
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 308 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure, the self-destruct. |
-| [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1037 | The studio vault: a key that exists only when both locks have been opened. |
+| [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1494 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 350 | A recording held in locked, zeroizing memory while it is still being made. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1314 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
@@ -173,7 +173,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**5,854 functional lines of Rust** in this crate. A functional line is a line
+**6,130 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -249,6 +249,9 @@ counts blank lines and comments too. Both are produced by
 | `struct Entry` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | One recording in the vault. |
 | `struct Studio` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | A directory of recordings, sealed under a StudioKey. |
 | `struct Shape` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | What a decoy vault looks like from outside, so it looks like the real one. |
+| `fn vault_dirs` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | Every directory under parent that is shaped like a vault. |
+| `fn find_or_make` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | Open the one vault under parent that key unlocks, making it on a first run. |
+| `fn make_decoy_in` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | Make one decoy under parent, named the way a real vault is named. |
 | `fn make_decoy` | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | Fill dir with a vault that never held anything. |
 | `const CHUNK` | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | Bytes per chunk. |
 | `struct Tape` | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | An append-only buffer of locked, zeroizing chunks. |

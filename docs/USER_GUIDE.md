@@ -372,9 +372,40 @@ of.
 
 What a vault sitting on a disk gives away is how many recordings there are and
 roughly how large each one is. Not their names, not their dates, and not what
-any of them is. That is stated rather than implied: hiding the count and the
-sizes means padding and decoys, which is a different trade and is what the
-program folder's own storage does.
+any of them is.
+
+#### Decoy vaults
+
+Under the listing is a dropdown that fills the folder with decoys. A decoy is
+not a vault with weak contents, or one whose passphrase is written down
+somewhere, or one holding harmless recordings. Any of those is a vault that
+rewards cracking, and a decoy that rewards cracking teaches an attacker that
+cracking works. It is a vault whose contents **never existed**: random bytes
+sealed under a key made inside the call that writes it and dropped before that
+call returns. Nobody holds it. Cracked, it yields bytes that parse as nothing,
+which looks exactly like a wrong passphrase.
+
+| Control | What it is |
+|---|---|
+| **how many** | Starts on what the free space allows: a twentieth of what is actually free where the vaults live, up to thirty-two. Where the system will not say how much is free, the panel says so and the number is a starting point rather than a measurement. |
+| **make them** | Writes them. Each is the size the open vault is, down to the byte, including the size of its index. |
+
+Your vault and its decoys are directories with opaque names, and the real one
+is found by trying each until one opens, which only both passphrases do. That
+is why there is no directory called `studio` to look for: a real vault at a
+fixed name is told from a decoy by reading the name, and the decoys would be
+worth nothing.
+
+**What this buys, and what it does not.** It buys the cost of a search.
+Somebody who takes the disk sees several vaults, cannot tell which holds
+anything, and gets no signal from cracking one. It does **not** hide the real
+vault from somebody watching the screen while you open it, from something
+already running inside the computer, or from a backup taken before the decoys
+were made.
+
+One consequence worth knowing before you press it: decoys cannot be told from
+the real vault by looking, which means **you** cannot tell them apart either.
+Removing one afterwards is removing a directory you cannot open to check first.
 
 ### verify
 

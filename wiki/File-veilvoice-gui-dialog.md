@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/dialog.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 369 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 425 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs)
 
 ## Contents
 
@@ -61,12 +61,12 @@ which actually works.
 
 ## What this file contains
 
-369 lines defining **10 functions** (9 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+425 lines defining **11 functions** (9 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Ask` (line 53) -- What is being asked for.
-- `struct Pending` (line 130) -- A file dialog that is open, or has just been answered.
+- `struct Pending` (line 158) -- A file dialog that is open, or has just been answered.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -74,10 +74,11 @@ which actually works.
 - `Ask::open_filtered` (line 77) -- An open dialog restricted to these extensions.
 - `Ask::save` (line 87) -- A save dialog offering this name.
 - `Ask::save_filtered` (line 95) -- A save dialog offering this name, restricted to these extensions.
-- `Pending::new` (line 136) -- Nothing is being asked.
-- `Pending::is_open` (line 145) -- Whether a dialog is open right now.
-- `Pending::start` (line 150) -- Start asking.
-- `Pending::taken` (line 194) -- The answer, if one arrived and was a path.
+- `Pending::new` (line 164) -- Nothing is being asked.
+- `Pending::is_open` (line 173) -- Whether a dialog is open right now.
+- `Pending::start` (line 178) -- Start asking.
+  - reaches: `can_show`
+- `Pending::taken` (line 229) -- The answer, if one arrived and was a path.
   - reaches: `poll`
 
 ## What calls what
@@ -99,28 +100,31 @@ flowchart TD
     n_save(["Ask::save<br/>line 87"])
     n_save_filtered(["Ask::save_filtered<br/>line 95"])
     n_show["Ask::show<br/>line 106"]
-    n_new(["Pending::new<br/>line 136"])
-    n_is_open(["Pending::is_open<br/>line 145"])
-    n_start(["Pending::start<br/>line 150"])
-    n_poll["Pending::poll<br/>line 175"]
-    n_taken(["Pending::taken<br/>line 194"])
+    n_can_show["can_show<br/>line 147"]
+    n_new(["Pending::new<br/>line 164"])
+    n_is_open(["Pending::is_open<br/>line 173"])
+    n_start(["Pending::start<br/>line 178"])
+    n_poll["Pending::poll<br/>line 210"]
+    n_taken(["Pending::taken<br/>line 229"])
+    n_start --> n_can_show
     n_taken --> n_poll
     click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L72" "open the source"
     click n_open_filtered href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L77" "open the source"
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L87" "open the source"
     click n_save_filtered href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L95" "open the source"
     click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L106" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L136" "open the source"
-    click n_is_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L145" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L150" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L175" "open the source"
-    click n_taken href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L194" "open the source"
+    click n_can_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L147" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L164" "open the source"
+    click n_is_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L173" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L178" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L210" "open the source"
+    click n_taken href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L229" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_open,n_open_filtered,n_save,n_save_filtered,n_new,n_is_open,n_start,n_taken entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_poll api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_show helper
+    class n_show,n_can_show helper
 ```
 
 </details>
@@ -135,10 +139,11 @@ flowchart TD
 | `Ask::save` <sub>pub fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L87) | A save dialog offering this name. |
 | `Ask::save_filtered` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L95) | A save dialog offering this name, restricted to these extensions. |
 | `Ask::show` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L106) | Show it, here, now. |
-| `Pending` <sub>pub struct</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L130) | A file dialog that is open, or has just been answered. |
-| `Pending::new` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L136) | Nothing is being asked. |
-| `Pending::is_open` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L145) | Whether a dialog is open right now. |
-| `Pending::start` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L150) | Start asking. |
-| `Pending::poll` <sub>pub fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L175) | The answer, if one has arrived. |
-| `Pending::taken` <sub>pub fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L194) | The answer, if one arrived and was a path. |
-| `house_style` <sub>mod</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L318) |  |
+| `can_show` <sub>fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L147) | Whether a platform file panel can be opened from here at all. |
+| `Pending` <sub>pub struct</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L158) | A file dialog that is open, or has just been answered. |
+| `Pending::new` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L164) | Nothing is being asked. |
+| `Pending::is_open` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L173) | Whether a dialog is open right now. |
+| `Pending::start` <sub>pub fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L178) | Start asking. |
+| `Pending::poll` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L210) | The answer, if one has arrived. |
+| `Pending::taken` <sub>pub fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L229) | The answer, if one arrived and was a path. |
+| `house_style` <sub>mod</sub> | [374](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L374) |  |
