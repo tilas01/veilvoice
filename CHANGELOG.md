@@ -8,6 +8,27 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Two bars per speaker, while a group render runs**
+
+- As the render walks the file, each person gets what went into the turn just
+  finished and what the engine produced from it, with how far through their
+  turns the render is. One bar answers "is something being written" and not "is
+  this person being veiled", which is the question somebody rendering an
+  interview is asking.
+- Drawn with the shared meter the live path uses, so it is the same bar rather
+  than a second one that would drift from it, and the limit is printed under
+  them in the same words.
+- The render reports through a small structure of atomics: nothing allocates,
+  nothing locks, and the render threads write to it while the window reads it
+  every frame. A watched render and an unwatched one produce byte-identical
+  audio, which is a test rather than a claim.
+- A progress made for fewer speakers than the plan holds drops what it cannot
+  keep rather than failing the render. A bar with nowhere to go is not worth a
+  refused render.
+- This is the half of marker 133 that could be built from what was here. The
+  other half, several guests on several microphones at once, is now marker 147:
+  the live path opens one input and everything downstream assumes one.
+
 **The audio path says when something interfered with it**
 
 - A device unplugged or swapped mid-session, and anything else the platform

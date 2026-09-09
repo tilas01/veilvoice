@@ -59,6 +59,7 @@ use eframe::egui::{self, Color32, RichText, Ui};
 use std::path::PathBuf;
 use std::sync::mpsc;
 use veilvoice_conversation::mode::{self as voice_mode, VoiceMode};
+use veilvoice_conversation::render;
 use veilvoice_conversation::{Conversation, Speaker};
 use veilvoice_core::voices::{self, MAX_VOICES};
 use veilvoice_core::DeidConfig;
@@ -215,6 +216,11 @@ pub struct Group {
 
     /// The worker, while a render is running.
     job: Option<mpsc::Receiver<Result<Vec<PathBuf>, String>>>,
+    /// What that worker is doing, while it does it. **Marker 133.**
+    ///
+    /// Shared with the render threads, which write to it, and read here every
+    /// frame while the render is running. `None` when nothing is rendering.
+    watching: Option<std::sync::Arc<render::Progress>>,
     /// The last render's result, kept until another is started.
     report: Option<Result<Vec<PathBuf>, String>>,
 }
@@ -227,6 +233,7 @@ impl Default for Group {
             enabled: false,
             people: vec![Person::at(0), Person::at(1)],
             picking: None,
+            watching: None,
             outputs: Outputs::default(),
             notice: None,
             input: None,
@@ -924,11 +931,17 @@ impl Group {
             Ok(done) => {
                 self.report = Some(done);
                 self.job = None;
+                // The bars go with the render they were about. Left up, they
+                // would describe a render that has finished as though it were
+                // still running, which is the one thing a progress bar must
+                // not do.
+                self.watching = None;
             }
             Err(mpsc::TryRecvError::Empty) => {}
             Err(mpsc::TryRecvError::Disconnected) => {
                 self.report = Some(Err("the render stopped without finishing".into()));
                 self.job = None;
+                self.watching = None;
             }
         }
     }
@@ -1052,6 +1065,56 @@ impl Group {
             }
         });
 
+        // **Marker 133.** Two bars per speaker while the render walks the file:
+        // what went in, and what the engine produced from it. One bar answers
+        // "is something being written" and not "is this person being veiled",
+        // which is the question somebody rendering an interview is asking.
+        //
+        // Drawn from the most recently finished turn rather than smoothed the
+        // way the live meters are. There is nothing to smooth: a render is not
+        // a stream, and a bar that eased toward a value the render had already
+        // moved past would be an animation rather than a reading.
+        //
+        // The limit is under them, in the same words the live meters use. Two
+        // bars that differ show the engine is between them; they cannot show
+        // that the voice is unrecoverable, and nothing on a screen can.
+        if let Some(watching) = self.watching.clone() {
+            ui.add_space(8.0);
+            for (slot, person) in self.people.iter().enumerate() {
+                let Some((went_in, came_out)) = watching.levels(slot) else {
+                    continue;
+                };
+                ui.horizontal(|ui| {
+                    // The colour is the one this speaker is drawn in
+                    // everywhere else, and the name is beside it, because a
+                    // panel that told people apart by colour alone would be one
+                    // about eight per cent of men could not use.
+                    ui.label(RichText::new("●").color(self.colour(slot)));
+                    ui.label(RichText::new(&person.name).color(p::fg()).small());
+                    ui.label(
+                        RichText::new(format!(
+                            "{:.0}% of their turns, {:.1}s",
+                            watching.done(slot) * 100.0,
+                            watching.seconds(slot)
+                        ))
+                        .color(p::muted())
+                        .small(),
+                    );
+                });
+                crate::monitor::meter(ui, "in ", went_in, went_in);
+                crate::monitor::meter(ui, "out", came_out, came_out);
+            }
+            ui.label(
+                RichText::new(
+                    "  What went into each turn and what came out of it. Two that move \
+                     differently show the engine is between them; neither can show that \
+                     the voice cannot be recovered.",
+                )
+                .small()
+                .color(p::muted()),
+            );
+        }
+
         match &self.report {
             None => {}
             Some(Ok(written)) => {
@@ -1105,11 +1168,18 @@ impl Group {
             config,
         };
 
+        // **Marker 133.** One slot per person the panel is showing. The plan
+        // comes off disk and may name more; `render_watched` drops what this
+        // cannot hold rather than refusing to render, because a bar with
+        // nowhere to go is not worth a failed render.
+        let watching = std::sync::Arc::new(render::Progress::for_speakers(job.names.len()));
+        self.watching = Some(std::sync::Arc::clone(&watching));
+
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
         self.report = None;
         std::thread::spawn(move || {
-            let _ = tx.send(render_now(&job));
+            let _ = tx.send(render_now(&job, &watching));
         });
     }
 }
@@ -1147,7 +1217,7 @@ struct Job {
 /// rendered against a panel holding two would put one person's audio in
 /// somebody else's voice, which is the one mistake here that cannot be heard in
 /// the result -- so it is refused rather than reconciled.
-fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
+fn render_now(job: &Job, watching: &render::Progress) -> Result<Vec<PathBuf>, String> {
     let Job {
         input,
         plan_path,
@@ -1159,7 +1229,7 @@ fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
         config,
     } = job;
     let (outputs, theme, voices) = (*outputs, *theme, *voices);
-    use veilvoice_conversation::render::{self, Settings};
+    use veilvoice_conversation::render::Settings;
     use veilvoice_conversation::subtitles::{self, Format};
 
     let mut plan = Conversation::load(plan_path)
@@ -1196,7 +1266,7 @@ fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
         },
         ..Settings::default()
     };
-    let rendered = render::render(&plan, &audio.samples, &settings, None)
+    let rendered = render::render_watched(&plan, &audio.samples, &settings, None, watching)
         .map_err(|error| error.to_string())?;
 
     let mut base = input.to_path_buf();
@@ -1417,6 +1487,51 @@ mod tests {
         assert!(error.contains("line break"), "{error}");
     }
 
+    /// **Marker 133.** Two bars per speaker, drawn while the render runs.
+    ///
+    /// Read out of the source rather than driven, for the reason every guard in
+    /// this crate is: drawing a panel needs a window, and a test that opened one
+    /// is what F-162, F-163 and F-165 all were. What is worth keeping is that
+    /// there are two of them, that they are the shared meter rather than a
+    /// second bar that would drift from it, and that the limit is printed with
+    /// them.
+    #[test]
+    fn the_panel_draws_both_bars_for_every_speaker_while_rendering() {
+        let source = include_str!("group.rs").replace("\r\n", "\n");
+        let body = source
+            .split("fn render_controls(&mut self, ui: &mut Ui) {")
+            .nth(1)
+            .and_then(|rest| rest.split("\n    fn ").next())
+            .expect("the render controls have to be findable");
+
+        assert!(
+            body.contains(r#"meter(ui, "in ""#),
+            "the render draws no input bar, so it cannot show what went in"
+        );
+        assert!(
+            body.contains(r#"meter(ui, "out""#),
+            "the render draws no output bar, so one bar is answering the wrong \
+             question"
+        );
+        assert!(
+            body.contains("crate::monitor::meter"),
+            "the render draws its own meter instead of the shared one, and two \
+             bars for one measurement drift apart"
+        );
+        assert!(
+            body.contains("neither can show that"),
+            "the bars are drawn without the limit that is printed beside every \
+             other meter in this application"
+        );
+        // Every speaker, not the first: the question is whether *each* guest is
+        // being veiled, and a panel that metered one of them would answer it
+        // for one of them.
+        assert!(
+            body.contains("for (slot, person) in self.people.iter().enumerate()"),
+            "the bars are not drawn per speaker"
+        );
+    }
+
     /// Nothing a group render writes is readable by another account.
     ///
     /// The same check as the command line's, on the other half of the program,
@@ -1463,7 +1578,17 @@ mod tests {
             voices: VoiceMode::Distinct,
             config: DeidConfig::default(),
         };
-        let written = render_now(&job).expect("the render should succeed");
+        // Watched, and the bars checked below: a render the window ran without
+        // the panel's progress is not the render the window runs.
+        let watching = render::Progress::for_speakers(2);
+        let written = render_now(&job, &watching).expect("the render should succeed");
+        for slot in 0..2 {
+            assert_eq!(
+                watching.done(slot),
+                1.0,
+                "speaker {slot} was not watched to the end of their turns"
+            );
+        }
         assert!(!written.is_empty(), "a render that wrote nothing");
         for path in &written {
             let mode = std::fs::metadata(path).unwrap().permissions().mode() & 0o777;
@@ -1530,16 +1655,19 @@ mod tests {
         plan.add_speaker(Speaker::named("C")).unwrap();
         plan.save(&path).unwrap();
 
-        let error = render_now(&Job {
-            input: PathBuf::from("nothing.wav"),
-            plan_path: path.clone(),
-            names: vec!["one".to_string(), "two".to_string()],
-            title: String::new(),
-            outputs: Outputs::default(),
-            theme: veilvoice_video::palette::default_palette(),
-            voices: VoiceMode::default(),
-            config: DeidConfig::default(),
-        })
+        let error = render_now(
+            &Job {
+                input: PathBuf::from("nothing.wav"),
+                plan_path: path.clone(),
+                names: vec!["one".to_string(), "two".to_string()],
+                title: String::new(),
+                outputs: Outputs::default(),
+                theme: veilvoice_video::palette::default_palette(),
+                voices: VoiceMode::default(),
+                config: DeidConfig::default(),
+            },
+            &render::Progress::default(),
+        )
         .expect_err("three against two");
         assert!(error.contains("wrong voice"), "{error}");
         assert!(error.contains('3') && error.contains('2'), "{error}");
