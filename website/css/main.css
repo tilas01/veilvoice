@@ -1576,11 +1576,23 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
 
 /* ---------- the screenshot gallery ---------- */
 
+/* The gallery of window captures.
+ *
+ * The gap was 22px, which is close enough to the space inside each picture's
+ * own padding that the pictures read as one continuous field rather than as
+ * ten separate windows. Every capture is now the same height, so they tile
+ * exactly and that crowding is more obvious rather than less.
+ *
+ * 40px between columns and 48px between rows: more down than across, because
+ * each figure carries a caption under it, and a row gap that only matched the
+ * column gap put the next picture as close to a caption as the caption is to
+ * the picture it describes. */
 .shots {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 22px;
-  margin: 22px 0 0;
+  column-gap: 40px;
+  row-gap: 48px;
+  margin: 32px 0 0;
 }
 
 .shot, .cast { margin: 0; }

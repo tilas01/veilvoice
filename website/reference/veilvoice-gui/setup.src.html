@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/setup.rs</code></h1>
-<p style="color:var(--muted)"><a href="setup.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 986 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="setup.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1031 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1076,6 +1076,53 @@
 <span class="ln" id="L984">        }</span>
 <span class="ln" id="L985">    }</span>
 <span class="ln" id="L986">}</span>
+</span>
+<span class="ln" id="L987"></span>
+<span class="src-item" id="fn-typeface_tests">
+<span class="ln" id="L988"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L989"><span class="tok-kw">mod</span> typeface_tests {</span>
+<span class="ln" id="L990">    <span class="tok-com">/// The capture script refuses to photograph in the wrong face.</span></span>
+<span class="ln" id="L991">    <span class="tok-com">///</span></span>
+<span class="ln" id="L992">    <span class="tok-com">/// The window prefers JetBrains Mono and falls back to the built-in</span></span>
+<span class="ln" id="L993">    <span class="tok-com">/// monospace. That fallback is right for somebody running the program and</span></span>
+<span class="ln" id="L994">    <span class="tok-com">/// wrong for a screenshot: a capture in the wrong face looks subtly unlike</span></span>
+<span class="ln" id="L995">    <span class="tok-com">/// every other picture in the set and nothing about the run says so, so</span></span>
+<span class="ln" id="L996">    <span class="tok-com">/// half a set could be published before anybody noticed.</span></span>
+<span class="ln" id="L997">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L998">    <span class="tok-kw">fn</span> <span class="tok-fn">the_capture_script_will_not_photograph_in_the_fallback_face</span>() {</span>
+<span class="ln" id="L999">        <span class="tok-kw">let</span> script =</span>
+<span class="ln" id="L1000">            std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;../../tools/shots/gui.sh&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the Linux capture script&quot;</span>);</span>
+<span class="ln" id="L1001">        assert!(</span>
+<span class="ln" id="L1002">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface&quot;</span>),</span>
+<span class="ln" id="L1003">            <span class="tok-str">&quot;the script does not ask which face the window would use&quot;</span></span>
+<span class="ln" id="L1004">        );</span>
+<span class="ln" id="L1005">        assert!(</span>
+<span class="ln" id="L1006">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;JetBrains Mono&quot;</span>),</span>
+<span class="ln" id="L1007">            <span class="tok-str">&quot;the script does not check for the face it wants&quot;</span></span>
+<span class="ln" id="L1008">        );</span>
+<span class="ln" id="L1009">        assert!(</span>
+<span class="ln" id="L1010">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;exit 1&quot;</span>),</span>
+<span class="ln" id="L1011">            <span class="tok-str">&quot;the script does not refuse, so it would capture in the fallback&quot;</span></span>
+<span class="ln" id="L1012">        );</span>
+<span class="ln" id="L1013">    }</span>
+<span class="ln" id="L1014"></span>
+<span class="ln" id="L1015">    <span class="tok-com">/// The flag exists and is documented in the usage text.</span></span>
+<span class="ln" id="L1016">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1017">    <span class="tok-com">/// A flag the capture script depends on and the help does not mention is</span></span>
+<span class="ln" id="L1018">    <span class="tok-com">/// one somebody removes as unused.</span></span>
+<span class="ln" id="L1019">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1020">    <span class="tok-kw">fn</span> <span class="tok-fn">the_typeface_flag_is_documented_where_it_is_answered</span>() {</span>
+<span class="ln" id="L1021">        <span class="tok-kw">let</span> main = std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;src/main.rs&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the binary&#x27;s source&quot;</span>);</span>
+<span class="ln" id="L1022">        assert!(</span>
+<span class="ln" id="L1023">            main.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface&quot;</span>),</span>
+<span class="ln" id="L1024">            <span class="tok-str">&quot;the flag is not answered in main.rs&quot;</span></span>
+<span class="ln" id="L1025">        );</span>
+<span class="ln" id="L1026">        assert!(</span>
+<span class="ln" id="L1027">            main.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface    Say which face&quot;</span>),</span>
+<span class="ln" id="L1028">            <span class="tok-str">&quot;the flag is answered and not documented in the usage text&quot;</span></span>
+<span class="ln" id="L1029">        );</span>
+<span class="ln" id="L1030">    }</span>
+<span class="ln" id="L1031">}</span>
 </span>
 </code></pre>
 </main>

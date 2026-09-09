@@ -23,5 +23,5 @@ own: what it does, and the same thing in plain words.
 | [`website/js/theme.js`](website-js-theme-js.md) | 104 | Theme switching |
 | [`website/js/verify.js`](website-js-verify-js.md) | 211 | In-browser SHA-256 verification for downloaded release archives |
 | [`website/js/walkthrough.js`](website-js-walkthrough-js.md) | 162 | Every screen of the application as a photograph you pick between, and the command line as a list of jobs rather than a list of flags |
-| [`website/css/main.css`](website-css-main-css.md) | 2477 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
+| [`website/css/main.css`](website-css-main-css.md) | 2489 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
 | [`website/css/themes.css`](website-css-themes-css.md) | 174 | Colour schemes |

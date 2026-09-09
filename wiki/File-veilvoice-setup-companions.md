@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-setup/src/companions.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 1024 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs)
+[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 1029 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ before the question.
 
 ## What this file contains
 
-1024 lines defining **24 functions** (10 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1029 lines defining **24 functions** (10 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

@@ -431,6 +431,18 @@ fn user_font_paths() -> Vec<std::path::PathBuf> {
     paths
 }
 
+/// Where JetBrains Mono is on this machine, if it is anywhere.
+///
+/// Separated from [`install_fonts`] so the question can be asked **without
+/// opening a window**. `veilvoice-gui --typeface` answers from this, which is
+/// what `tools/shots/gui.sh` checks before it photographs anything: a capture
+/// taken with the built-in face instead looks subtly different from every other
+/// one and nothing about the run says so, which is the failure that made this
+/// worth having a flag for.
+pub fn jetbrains_mono_path() -> Option<std::path::PathBuf> {
+    user_font_paths().into_iter().find(|path| path.is_file())
+}
+
 /// Load JetBrains Mono if the system has it. Returns whether it was found.
 pub fn install_fonts(ctx: &egui::Context) -> bool {
     for path in user_font_paths() {
