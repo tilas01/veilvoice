@@ -180,8 +180,17 @@ pub fn run(
         } else {
             String::new()
         };
+        // **Marker 132.** What the platform said about the streams, on the
+        // line already being watched. A recording made while the microphone
+        // was taken away is a recording somebody has to know that about, and
+        // the report is repeated when it is stored.
+        let interfered = if s.interfered > 0 {
+            paint(colour::RED, &format!("  INTERRUPTED x{}", s.interfered))
+        } else {
+            String::new()
+        };
         print!(
-            "\r  {} {}   {} {}   {} {:>6.1}s{}   ",
+            "\r  {} {}   {} {}   {} {:>6.1}s{}{}   ",
             paint(colour::MUTED, " in"),
             in_meter.update(s.input_peak, WIDTH),
             paint(colour::MUTED, "out"),
@@ -189,11 +198,16 @@ pub fn run(
             paint(colour::MUTED, "length"),
             recorder.seconds(),
             lost,
+            interfered,
         );
         use std::io::Write;
         let _ = std::io::stdout().flush();
     }
 
+    // What the platform reported about the streams, taken before the session
+    // goes: the counter lives with the session, and the answer is wanted after
+    // it has been dropped.
+    let interfered = session.stats().interfered;
     // Stop the audio before sealing. Argon2id takes a noticeable moment, and
     // samples arriving during it would be recorded after the point the person
     // asked it to stop.
@@ -203,7 +217,9 @@ pub fn run(
 
     let length = recorder.seconds();
     let wav = recorder.wav().map_err(|e| e.to_string())?;
-    report(&recorder, length, wav.len());
+    // Read before the session is dropped, above, so this is the count for the
+    // take that was just made rather than for a session that no longer exists.
+    report(&recorder, length, wav.len(), interfered);
 
     if sealing.plaintext {
         crate::atrest::confirm_plaintext(sealing.yes)?;
@@ -228,9 +244,28 @@ pub fn run(
 /// The locking line is the honest one: it says what the operating system
 /// granted rather than what was asked for, because [`veilvoice_crypto::tape`]
 /// cannot promise a lock and neither can this.
-fn report(recorder: &record::Recorder, seconds: f32, bytes: usize) {
+fn report(recorder: &record::Recorder, seconds: f32, bytes: usize, interfered: u64) {
     println!("{}", field("length", &format!("{seconds:.1} s")));
     println!("{}", field("size", &format!("{} KiB", bytes / 1024)));
+    // **Marker 132.** Said here as well as on the meter line, because the
+    // meter line is gone by the time this is read and this is the moment
+    // somebody decides whether to keep what was recorded.
+    if interfered > 0 {
+        println!(
+            "{}",
+            warn(&format!(
+                "the audio path was interrupted {interfered} time(s) while this was \
+                 recording, so it may be short or may have gaps"
+            ))
+        );
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  What each interruption was is printed above, as the platform said it."
+            )
+        );
+    }
     if recorder.dropped() > 0 {
         println!(
             "{}",

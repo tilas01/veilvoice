@@ -1124,6 +1124,25 @@ impl eframe::App for VeilVoiceApp {
         // so this is the only reader and everything else is shown what it got.
         self.live_stats = self.studio.tick();
 
+        // **Marker 132.** Who else is holding the microphone, while a take is
+        // being made and only then. Outside one this is the Monitor tab's
+        // question and the safety catch's, and building a list every frame for
+        // a question nobody is asking is what marker 126 is about.
+        //
+        // Independent of the safety catch's posture on purpose. That is a
+        // setting about closing other programs; this is a fact about a
+        // recording being made now, and somebody who turned the catch off did
+        // not ask to be told less about their own take.
+        if self.studio.is_recording() {
+            self.studio.note_microphone_holders(
+                self.watch
+                    .active()
+                    .iter()
+                    .filter(|use_| use_.kind == veilvoice_watch::DeviceKind::Microphone)
+                    .map(|use_| use_.app.as_str()),
+            );
+        }
+
         // The live monitor, on every tab and above the panel. Docked by
         // default; a floating card or nothing if the reader has said so.
         //
@@ -1778,6 +1797,67 @@ impl VeilVoiceApp {
                 );
             }
         });
+
+        // **Marker 132.** What the platform said about the streams, where the
+        // person is looking when they are veiling. This used to go to standard
+        // error, which on Windows is a console the window does not have, so a
+        // microphone unplugged mid-call said nothing at all.
+        if let Some(trouble) = self.studio.trouble() {
+            ui.add_space(10.0);
+            ui.label(
+                RichText::new(if trouble.device_gone {
+                    format!(
+                        "The {} device this was using is gone. Nothing is reaching the \
+                         engine from it, and this will not come back on its own: choose \
+                         a device and start again.",
+                        trouble.side.word()
+                    )
+                } else {
+                    format!(
+                        "The {} stream reported: {}",
+                        trouble.side.word(),
+                        trouble.said
+                    )
+                })
+                .color(p::red()),
+            );
+            if trouble.count > 1 {
+                ui.label(
+                    RichText::new(format!(
+                        "  {} so far this session.",
+                        crate::studio::counted_interruptions(trouble.count)
+                    ))
+                    .small()
+                    .color(p::muted()),
+                );
+            }
+            // The limit, beside the report rather than after it. This is what
+            // VeilVoice's own path noticed happening to it; it is not a
+            // statement about the machine, and a microphone that was lying
+            // before this program opened it lies here too.
+            ui.label(
+                RichText::new(
+                    "  This is what VeilVoice's own audio path noticed. It cannot vouch \
+                     for a microphone that was already being intercepted before this \
+                     opened it.",
+                )
+                .small()
+                .color(p::muted()),
+            );
+        }
+
+        let intruders: Vec<&str> = self.studio.intruders().collect();
+        if !intruders.is_empty() {
+            ui.add_space(6.0);
+            ui.label(
+                RichText::new(format!(
+                    "Something else took the microphone while this take was running: {}. \
+                     That program heard your real voice.",
+                    intruders.join(", ")
+                ))
+                .color(p::yellow()),
+            );
+        }
 
         if let Some(stats) = self.live_stats {
             // The smoothing happens once a frame in `update`, so the strip and

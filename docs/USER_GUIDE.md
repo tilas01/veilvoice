@@ -307,6 +307,25 @@ you the voice has been changed. A working meter and a bypassed engine draw the
 same bar. The check for that is listening to the preview and hearing a voice
 that is not yours.
 
+**When something interferes with it, it says so.** A device unplugged or
+swapped while a session is running, and anything else the platform reports
+about either stream, is shown here in red rather than written to a log. A
+device that has gone does not come back on its own: choose another and start
+again. On the command line the same thing appears as `INTERRUPTED` on the meter
+line, and `veilvoice record` repeats it when the take is sealed.
+
+While a take is running, a program **other than VeilVoice** taking the
+microphone is named on this tab and again with the stored take. That program
+heard your real voice, whatever VeilVoice was sending to the cable.
+
+**The limit, which is stated beside the warning rather than after it.** This is
+what VeilVoice's own audio path noticed happening to it. It is not a statement
+about the machine: a microphone that was already being intercepted before
+VeilVoice opened it is intercepted here too, and nothing in this program can
+see that. The Monitor tab is the wider question of who is holding the
+microphone, and the honest answer there is also bounded by what each platform
+will say.
+
 #### The take
 
 Record straight into a locked vault, veiled on the way in. What reaches the

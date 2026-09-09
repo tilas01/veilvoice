@@ -51,6 +51,54 @@ use veilvoice_core::{DeidConfig, Deidentifier, ProcessStats};
 /// How much jitter the ring absorbs before it starts dropping samples.
 const RING_MILLIS: f32 = 120.0;
 
+/// Which side of the engine something happened to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Side {
+    /// The microphone.
+    Input,
+    /// Where the veiled voice goes.
+    Output,
+}
+
+impl Side {
+    /// The word for this side, as a person reading a warning would meet it.
+    pub fn word(self) -> &'static str {
+        match self {
+            Self::Input => "input",
+            Self::Output => "output",
+        }
+    }
+}
+
+/// Something that happened to the audio path while it was running.
+///
+/// **Marker 132.** The platform reports these on a callback of its own, and
+/// until now the only thing done with one was `eprintln!`: on Windows the
+/// desktop application is built with no console at all, so a microphone
+/// unplugged in the middle of a call was silent, and a recording carried on
+/// being made of nothing.
+///
+/// Not `Copy`, and deliberately kept out of [`LiveStats`]: the meters are read
+/// sixty times a second and this holds a `String`. The count is in the stats,
+/// so a caller learns that something happened at meter speed and asks what it
+/// was only when the answer changed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Interference {
+    /// Which stream it happened on.
+    pub side: Side,
+    /// Whether the device that side was using stopped existing.
+    ///
+    /// This is the swapped-device case and the unplugged-device case, and it
+    /// is the platform saying so rather than this crate polling for it: a
+    /// device list read once a second is a guess between reads, and on Windows
+    /// enumerating devices from another thread is what F-163 and F-165 were.
+    pub device_gone: bool,
+    /// What the platform said, verbatim.
+    pub said: String,
+    /// How many have happened on either side, this one included.
+    pub count: u64,
+}
+
 /// A snapshot of what the live path is doing, safe to read from the UI.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LiveStats {
@@ -65,6 +113,12 @@ pub struct LiveStats {
     pub dropped: u64,
     /// Times the output callback found the ring empty and emitted silence.
     pub starved: u64,
+    /// How many times the platform has reported trouble on either stream.
+    ///
+    /// **Marker 132.** A count rather than the reports themselves, so this
+    /// stays `Copy` and cheap to read every frame. A caller that sees it move
+    /// asks [`LiveSession::interference`] what happened.
+    pub interfered: u64,
 }
 
 /// Which sides of the engine a session keeps.
@@ -119,6 +173,35 @@ struct Shared {
     stats: Mutex<LiveStats>,
     dropped: AtomicU64,
     starved: AtomicU64,
+    /// How many times either stream has reported trouble.
+    troubles: AtomicU64,
+    /// The most recent one, for a caller that asks.
+    trouble: Mutex<Option<Interference>>,
+}
+
+impl Shared {
+    /// Record what the platform said about a stream.
+    ///
+    /// Called from cpal's error callback, which is **not** the realtime data
+    /// callback: it runs when something has gone wrong rather than every
+    /// block, so allocating a string and taking a lock here costs nothing that
+    /// is being timed. The guard that forbids both reads the data callbacks
+    /// and is right not to object to this one.
+    fn report(&self, side: Side, error: &cpal::StreamError) {
+        let count = self.troubles.fetch_add(1, Ordering::Relaxed) + 1;
+        // Still printed. The command line has a console and somebody watching
+        // it, and this is the only place `veilvoice live` can say anything
+        // once it is running.
+        eprintln!("veilvoice: {} stream error: {error}", side.word());
+        if let Ok(mut held) = self.trouble.lock() {
+            *held = Some(Interference {
+                side,
+                device_gone: matches!(error, cpal::StreamError::DeviceNotAvailable),
+                said: error.to_string(),
+                count,
+            });
+        }
+    }
 }
 
 impl LiveSession {
@@ -252,7 +335,10 @@ impl LiveSession {
                         s.input_peak = s.input_peak.max(peak);
                     }
                 },
-                move |e| eprintln!("veilvoice: input stream error: {e}"),
+                {
+                    let shared = Arc::clone(&shared);
+                    move |e| shared.report(Side::Input, &e)
+                },
                 None,
             )
             .map_err(|e| Error::Stream(e.to_string()))?;
@@ -308,7 +394,10 @@ impl LiveSession {
                         st.starved = play_shared.starved.load(Ordering::Relaxed);
                     }
                 },
-                move |e| eprintln!("veilvoice: output stream error: {e}"),
+                {
+                    let shared = Arc::clone(&shared);
+                    move |e| shared.report(Side::Output, &e)
+                },
                 None,
             )
             .map_err(|e| Error::Stream(e.to_string()))?;
@@ -341,10 +430,23 @@ impl LiveSession {
         let Ok(mut s) = self.shared.stats.lock() else {
             return LiveStats::default();
         };
-        let snapshot = *s;
+        let mut snapshot = *s;
         s.input_peak = 0.0;
         s.output_peak = 0.0;
+        // Read here rather than written by the output callback, which is where
+        // `dropped` and `starved` come from. A device that has gone stops
+        // calling that callback, and the one number that has to survive a
+        // stream which is no longer running is the one saying it stopped.
+        snapshot.interfered = self.shared.troubles.load(Ordering::Relaxed);
         snapshot
+    }
+
+    /// What the platform last reported about either stream.
+    ///
+    /// `None` until something goes wrong. Asked when [`LiveStats::interfered`]
+    /// moves, rather than every frame: this clones a `String`.
+    pub fn interference(&self) -> Option<Interference> {
+        self.shared.trouble.lock().ok()?.clone()
     }
 }
 
@@ -376,5 +478,109 @@ mod tests {
                 "{rate} Hz: {millis:.0} ms of latency is too much"
             );
         }
+    }
+
+    /// **Marker 132.** What the recorder is given is what the engine produced.
+    ///
+    /// The row this comes from asked for the samples reaching the recorder to
+    /// be *checked* against the engine's output. They cannot differ, and a
+    /// check would be a buffer compared with itself: the veiled sink is
+    /// written from inside the output callback, from the same slice
+    /// `Deidentifier::process` has just written into, and there is nothing
+    /// between the two to interfere with.
+    ///
+    /// That is a property worth keeping rather than one worth measuring, so it
+    /// is read out of the source. A change that took the recorder's samples
+    /// from anywhere else, the device being the obvious candidate, would be a
+    /// second unprotected copy of the audio and would fail here.
+    #[test]
+    fn the_recorder_is_fed_from_the_engine_and_from_nowhere_else() {
+        // The code, not this module. The needles below appear in this test's
+        // own assertion messages, and a guard that counts the strings it is
+        // looking for is counting itself: `dialog.rs`'s guard hit exactly this
+        // and it is recorded in the audit.
+        let whole = include_str!("live.rs").replace("\r\n", "\n");
+        let source = whole
+            .split("\n#[cfg(test)]")
+            .next()
+            .expect("the code above the tests");
+
+        // The engine writes into `scratch_out` and the veiled sink is written
+        // from it, adjacent, inside the output callback.
+        assert!(
+            source.contains("deid.process(&scratch_in[..frames], &mut scratch_out[..frames]);"),
+            "the engine no longer writes into `scratch_out`, so the assertion \
+             below is about a buffer that has moved"
+        );
+        assert!(
+            source.contains("sink.write(&scratch_out[..frames]);"),
+            "the veiled recorder is no longer fed from the engine's own output \
+             buffer. Whatever it is fed from now is a second copy of the audio, \
+             and marker 132 is the claim that there is not one"
+        );
+
+        // The microphone side, the same way: from the downmix inside the input
+        // callback, not from anything the platform hands back afterwards.
+        assert!(
+            source.contains("sink.write(&mono_scratch[..kept]);"),
+            "the plain recorder is no longer fed from the downmix in the input \
+             callback. That is the one moment the real voice exists in this \
+             process, and taking it anywhere else means it exists twice"
+        );
+        assert_eq!(
+            source.matches("sink.write(").count(),
+            2,
+            "there are exactly two sinks and two places they are written. A \
+             third write is a third copy of somebody's voice"
+        );
+    }
+
+    /// A stream error becomes something a caller can show.
+    ///
+    /// **Marker 132.** Before this, both error callbacks were `eprintln!` and
+    /// nothing else: on Windows the desktop application has no console, so a
+    /// device unplugged mid-call was silent and the recording carried on.
+    #[test]
+    fn trouble_is_recorded_rather_than_only_printed() {
+        let shared = Shared::default();
+        assert!(shared.trouble.lock().expect("a fresh lock").is_none());
+
+        shared.report(Side::Input, &cpal::StreamError::DeviceNotAvailable);
+        let first = shared
+            .trouble
+            .lock()
+            .expect("a fresh lock")
+            .clone()
+            .expect("the report was kept");
+        assert_eq!(first.side, Side::Input);
+        assert!(first.device_gone, "a device that has gone says so");
+        assert_eq!(first.count, 1);
+
+        shared.report(
+            Side::Output,
+            &cpal::StreamError::BackendSpecific {
+                err: cpal::BackendSpecificError {
+                    description: "the mixer said no".to_string(),
+                },
+            },
+        );
+        let second = shared
+            .trouble
+            .lock()
+            .expect("a fresh lock")
+            .clone()
+            .expect("the report was kept");
+        assert_eq!(second.side, Side::Output);
+        assert!(
+            !second.device_gone,
+            "only a missing device is a missing device"
+        );
+        assert!(
+            second.said.contains("the mixer said no"),
+            "what the platform said is passed through rather than summarised, \
+             and it said {:?}",
+            second.said
+        );
+        assert_eq!(second.count, 2, "the count is of both streams together");
     }
 }

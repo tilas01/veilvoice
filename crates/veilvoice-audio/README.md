@@ -83,7 +83,7 @@ flowchart TD
     n_lib(["lib.rs<br/>244 lines"])
     n_devices["devices.rs<br/>243 lines"]
     n_io["io.rs<br/>569 lines"]
-    n_live["live.rs<br/>380 lines"]
+    n_live["live.rs<br/>586 lines"]
     n_meter["meter.rs<br/>166 lines"]
     n_playback["playback.rs<br/>212 lines"]
     n_record["record.rs<br/>543 lines"]
@@ -107,12 +107,12 @@ flowchart TD
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 243 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 569 | Reading and writing audio files. |
 | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 244 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
-| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 380 | Live microphone scrambling. |
+| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 586 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 212 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
 
-**1,355 functional lines of Rust** in this crate. A functional line is a line
+**1,474 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -138,6 +138,8 @@ counts blank lines and comments too. Both are produced by
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Crate version string, surfaced in the About panel. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Everything that can go wrong in this crate. |
 | `fn deidentify` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | De-identify a whole buffer of audio in one call. |
+| `enum Side` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | Which side of the engine something happened to. |
+| `struct Interference` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | Something that happened to the audio path while it was running. |
 | `struct LiveStats` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | A snapshot of what the live path is doing, safe to read from the UI. |
 | `struct Keeping` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | Which sides of the engine a session keeps. |
 | `struct Kept` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | The recorders a session was asked for, one per side of Keeping. |

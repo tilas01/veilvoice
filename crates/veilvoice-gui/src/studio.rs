@@ -176,6 +176,18 @@ pub struct Studio {
     session: Option<veilvoice_audio::LiveSession>,
     /// What that session was started with, and `None` when none is running.
     setup: Option<Setup>,
+    /// The last thing the platform said about either stream, and how many it
+    /// has said. **Marker 132.**
+    trouble: Option<veilvoice_audio::Interference>,
+    /// How many interruptions this session has reported, so a new one is
+    /// noticed rather than the same one being shown again every frame.
+    troubles_seen: u64,
+    /// How many of them happened while the current take was running.
+    take_troubles: u64,
+    /// Other programs that took the microphone while the current take was
+    /// running. Names rather than processes, because Windows reports the use
+    /// per application and gives no process to compare.
+    intruders: std::collections::BTreeSet<String>,
     recorder: Option<veilvoice_audio::record::Recorder>,
     /// What the next take will be called.
     take_name: String,
@@ -261,6 +273,45 @@ impl Studio {
         &self.levels
     }
 
+    /// What the audio path last reported about itself, and whether it is new.
+    ///
+    /// **Marker 132.** The platform reports a stream error on a callback of
+    /// its own; before this the only thing done with one was a print to a
+    /// console the window does not have. Now the window asks, once a frame,
+    /// and says so.
+    pub fn trouble(&self) -> Option<&veilvoice_audio::Interference> {
+        self.trouble.as_ref()
+    }
+
+    /// The programs that took the microphone while this take has been running.
+    ///
+    /// Empty is the ordinary case and means nothing else asked for it.
+    pub fn intruders(&self) -> impl Iterator<Item = &str> {
+        self.intruders.iter().map(String::as_str)
+    }
+
+    /// Record which programs are holding the microphone right now.
+    ///
+    /// **Marker 132.** Called by the window only while a take is running:
+    /// outside one this is the Monitor tab's question and the safety catch's,
+    /// and building a list every frame for a question nobody is asking is what
+    /// marker 126 is about.
+    ///
+    /// VeilVoice itself is holding the microphone whenever this is called, so
+    /// it is not an intruder in its own recording. It is matched by name
+    /// rather than by process because Windows reports device use per
+    /// application and gives no process to compare with.
+    pub fn note_microphone_holders<'a>(&mut self, holders: impl Iterator<Item = &'a str>) {
+        for holder in holders {
+            if holder.to_ascii_lowercase().contains("veilvoice") {
+                continue;
+            }
+            if !self.intruders.contains(holder) {
+                self.intruders.insert(holder.to_owned());
+            }
+        }
+    }
+
     /// Read the session's counters, once a frame, and move the levels on.
     ///
     /// Called from the window rather than from this tab, because the monitor
@@ -270,6 +321,16 @@ impl Studio {
     pub fn tick(&mut self) -> Option<veilvoice_audio::LiveStats> {
         let stats = self.session.as_ref()?.stats();
         self.levels.update(stats.input_peak, stats.output_peak);
+        // **Marker 132.** The count is `Copy` and is read every frame; the
+        // report itself holds a string and is asked for only when the count
+        // has moved.
+        if stats.interfered > self.troubles_seen {
+            if self.is_recording() {
+                self.take_troubles += stats.interfered - self.troubles_seen;
+            }
+            self.troubles_seen = stats.interfered;
+            self.trouble = self.session.as_ref().and_then(|s| s.interference());
+        }
         Some(stats)
     }
 
@@ -539,6 +600,15 @@ impl Studio {
                 self.plain = kept.plain;
                 self.setup = Some(setup);
                 self.message = None;
+                // A new session reports on itself. The counter belongs to the
+                // `Shared` that went with the old one, so carrying either
+                // across would attribute the last stream's trouble to this one.
+                self.troubles_seen = 0;
+                self.trouble = None;
+                if keeping.is_anything() {
+                    self.take_troubles = 0;
+                    self.intruders.clear();
+                }
             }
             Err(error) => {
                 self.setup = None;
@@ -605,8 +675,48 @@ impl Studio {
             // and which would otherwise end in silence.
             return;
         }
+
+        // **Marker 132.** What happened to the audio while this was being
+        // recorded, said with the take rather than left in a log. A recording
+        // made while the microphone was taken away, or while another program
+        // was also holding it, is a recording somebody should know that about
+        // before they rely on it.
+        //
+        // Said even when it changes nothing about the file, because "nothing
+        // was noticed" and "nothing happened" are different sentences and only
+        // one of them is this program's to say.
+        let mut warned = false;
+        if self.take_troubles > 0 {
+            warned = true;
+            said.push(format!(
+                "The audio path reported {} while this was recording, so it may be short \
+                 or may have gaps.",
+                counted_interruptions(self.take_troubles)
+            ));
+        }
+        if !self.intruders.is_empty() {
+            warned = true;
+            let names: Vec<&str> = self.intruders.iter().map(String::as_str).collect();
+            said.push(format!(
+                "Something else was holding the microphone while this was recording: {}. \
+                 That program heard what you said in your own voice.",
+                names.join(", ")
+            ));
+        }
+        self.take_troubles = 0;
+        self.intruders.clear();
+
         self.take_name.clear();
-        self.message = Some((said.join(" "), if trouble { p::red() } else { p::green() }));
+        self.message = Some((
+            said.join(" "),
+            if trouble {
+                p::red()
+            } else if warned {
+                p::yellow()
+            } else {
+                p::green()
+            },
+        ));
     }
 
     /// Seal one recorder's audio into the vault under `name`.
@@ -1602,6 +1712,20 @@ enum Act {
     Export(String, Render),
     Play(String),
     Stop,
+}
+
+/// "one interruption" or "three interruptions".
+///
+/// Beside [`counted`] and [`counted_decoys`] for the reason those exist: a
+/// message reading "1 interruptions" is a message written by a computer, and
+/// this one is read at the moment somebody is deciding whether to trust a
+/// recording.
+pub fn counted_interruptions(n: u64) -> String {
+    if n == 1 {
+        "one interruption".to_string()
+    } else {
+        format!("{n} interruptions")
+    }
 }
 
 /// "One decoy" or "four decoys", so the interface does not say "1 decoys".
