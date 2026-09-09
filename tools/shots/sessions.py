@@ -59,6 +59,7 @@ Pure standard library.
 from __future__ import annotations
 
 import argparse
+import difflib
 import io
 import os
 import pty
@@ -397,6 +398,38 @@ def record(release_dir):
     return 0
 
 
+def difference(committed, fresh, most=24):
+    """The lines that differ, normalised, as a diff somebody can read.
+
+    Written because this check once failed on a loaded machine, once in
+    twenty-odd runs, and said only that the transcript "is not what the program
+    prints now". That is not enough to act on: a failure nobody can explain is
+    a failure that gets re-run until it passes, which is how a real change in
+    the program's output would be dismissed as a flake.
+
+    The comparison is on the *normalised* text, because that is what `check`
+    compares, so what is printed here is exactly what it disagreed about rather
+    than a second opinion. Capped, because a transcript that has diverged
+    entirely is a wall of output that says less than its first ten lines.
+    """
+    diff = list(difflib.unified_diff(
+        steady(committed).split("\n"),
+        steady(fresh).split("\n"),
+        fromfile="committed",
+        tofile="now",
+        lineterm="",
+    ))
+    if not diff:
+        # Equal here and unequal in `check` is impossible, and saying so is
+        # better than printing nothing and looking like there was no difference.
+        return "    (the normalised texts compare equal here, which cannot happen)\n"
+    shown = diff[:most]
+    out = "".join("    %s\n" % line for line in shown)
+    if len(diff) > most:
+        out += "    ... and %d more lines\n" % (len(diff) - most)
+    return out
+
+
 def check():
     problems = []
     for session in SESSIONS:
@@ -412,9 +445,9 @@ def check():
         fresh = record_one(session)
         if steady(fresh) != steady(committed):
             problems.append(
-                "%s is not what the program prints now.\n"
+                "%s is not what the program prints now.\n%s"
                 "    Run: tools/shots/sessions.py --record"
-                % os.path.relpath(path, ROOT))
+                % (os.path.relpath(path, ROOT), difference(committed, fresh)))
     if problems:
         for problem in problems:
             print("  " + problem, file=sys.stderr)

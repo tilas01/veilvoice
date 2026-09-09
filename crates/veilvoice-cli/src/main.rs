@@ -2595,8 +2595,18 @@ fn live(
         } else {
             String::new()
         };
+        // **Marker 132.** The platform's own report about the streams, on the
+        // line somebody is already watching. It is also printed in full, on
+        // its own line, by the error callback; this is the part that stays on
+        // screen, because a line that scrolled past is a line that was not
+        // read.
+        let interfered = if s.interfered > 0 {
+            paint(colour::RED, &format!("  INTERRUPTED x{}", s.interfered))
+        } else {
+            String::new()
+        };
         print!(
-            "\r  {} {}   {} {}   {} {:.1} ms{}{}   ",
+            "\r  {} {}   {} {}   {} {:.1} ms{}{}{}   ",
             paint(colour::MUTED, " in"),
             in_meter.update(s.input_peak, WIDTH),
             paint(colour::MUTED, "out"),
@@ -2604,7 +2614,8 @@ fn live(
             paint(colour::MUTED, "cpu"),
             s.process.ema_block_ms(),
             glitches,
-            clipped
+            clipped,
+            interfered
         );
         use std::io::Write;
         let _ = std::io::stdout().flush();

@@ -342,6 +342,86 @@ would need a global allocator hook and a running stream, which means a machine
 with a sound card, which is what F-163 and F-165 were about. This one finds the
 same mistake on a build machine with no audio at all.
 
+### A stream error printed to a console the window does not have
+
+Found while building marker 132, in code as old as the live path.
+
+`cpal` reports trouble on a stream through an error callback, and the three in
+this tree were each `move |e| eprintln!(...)` and nothing else. On the command
+line that is right: there is a console and somebody watching it. In the desktop
+application it is not. A release build on Windows declares
+`windows_subsystem = "windows"` and has **no console attached**, which is the
+same fact F-119 turned on: `println!` there writes to nothing.
+
+So the one case this feature exists for, a microphone unplugged or swapped in
+the middle of a call, produced no visible effect of any kind. The meters fell
+to zero, which is what a person who has stopped talking also looks like, and a
+take carried on being recorded.
+
+Not given a finding number, because nothing computed a wrong answer: the
+program did exactly what it was written to do, and what it was written to do
+was insufficient on a platform it ships for. It is recorded because the shape
+is worth recognising. A diagnostic that goes to a stream the front end does not
+have is a diagnostic that does not exist, and this project has now found that
+twice.
+
+The reports are now kept and shown: `LiveStats::interfered` counts them, which
+is `Copy` and is read every frame beside the meters, and
+`LiveSession::interference` returns the last one, which holds a string and is
+asked for only when the count moves. The device-is-gone case is named
+separately because it is the one that does not come back on its own. They are
+still printed, for the command line, where the console exists.
+
+### The check that would have compared a buffer with itself
+
+Marker 132 opened by asking for the samples reaching the recorder to be checked
+against what the engine produced. Reading the path to build that showed there
+is nothing to check: the veiled sink is written from inside the output
+callback, from the same `scratch_out` slice `Deidentifier::process` has just
+written into, and the microphone sink from the `mono_scratch` the downmix has
+just filled. A comparison would be a slice compared with itself.
+
+The row is corrected rather than the check written. What the row wanted is a
+property, and the property is now read out of the source: two sinks, two
+writes, each from the one place in this process where its samples exist, and a
+third write would be a third copy of somebody's voice.
+
+That is the third roadmap row this cycle whose opening sentence described
+something the code does not do, after marker 139's video and marker 133's live
+bars. All three were written before the code they describe.
+
+### A check that failed once and would not say why
+
+The recorded-session check failed once, on a machine that had just finished a
+release build, and passed on the next run and on the twenty-one after it. It
+has not been reproduced and is **not** written up here as fixed.
+
+What is written up is why that is unsatisfactory. The failure said:
+
+```
+assets/screenshots/session-anonymise.txt is not what the program prints now.
+    Run: tools/shots/sessions.py --record
+```
+
+That is not enough to act on. The transcript holds two values that vary by
+their nature, the throughput and the randomised roll range, and both are
+normalised before the comparison, so the honest possibilities were "something
+in the output changed" and "the normalising missed something", with no way to
+tell them apart. A failure nobody can explain is a failure that gets re-run
+until it passes, which is exactly how a real change in a program's output would
+be dismissed as a flake.
+
+The check now prints the differing lines, diffed on the same normalised text it
+compares, so the next occurrence explains itself. Proved by planting a changed
+line in a committed transcript and reading the diff it produced.
+
+The candidate causes were narrowed and none of them held. `getrandom` failing
+would print the fixed roll description instead of a range, and would fail every
+time it happened rather than once; a roll range that quantises onto a single
+frame still prints as a range and still normalises; the throughput line
+normalises whatever it says. So this is recorded as an open question with a
+better instrument attached to it, rather than as a defect that was found.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -377,7 +457,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1531 tests, 56569 functional lines. Both are measured and
+* **The counts**: 1533 tests, 56846 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4489,7 +4569,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1531 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1533 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
