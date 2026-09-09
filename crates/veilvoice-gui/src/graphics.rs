@@ -87,16 +87,38 @@ pub fn describe(gl: Option<&eframe::glow::Context>) -> String {
     }
 }
 
+/// What was asked of the platform, in the words the About tab uses.
+///
+/// **Marker 137.** Two settings and no third: asking, and not asking. The
+/// middle option, `Required`, is the one that sounds strongest and is wrong
+/// here for the reason in the module note, so it is not offered anywhere and
+/// this cannot express it.
+pub fn asked_for(acceleration: bool) -> &'static str {
+    if acceleration {
+        "hardware asked for, software accepted if the platform will not give it"
+    } else {
+        "software, because acceleration is switched off in Settings"
+    }
+}
+
 /// The options the window is created with.
 ///
 /// Takes the viewport rather than building it, because where the window opens
 /// is `window`'s business and this is only about how it is painted.
-pub fn options(viewport: egui::ViewportBuilder) -> eframe::NativeOptions {
+///
+/// `acceleration` is the person's setting, and it can only turn the request
+/// off. It is never `Required`: see the module note, where the whole point is
+/// that a machine which cannot give a GPU context must still open.
+pub fn options(viewport: egui::ViewportBuilder, acceleration: bool) -> eframe::NativeOptions {
     eframe::NativeOptions {
         viewport,
         vsync: VSYNC,
         multisampling: MULTISAMPLING,
-        hardware_acceleration: eframe::HardwareAcceleration::Preferred,
+        hardware_acceleration: if acceleration {
+            eframe::HardwareAcceleration::Preferred
+        } else {
+            eframe::HardwareAcceleration::Off
+        },
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     }
@@ -108,7 +130,7 @@ mod tests {
 
     #[test]
     fn the_gpu_is_asked_for_and_not_demanded() {
-        let options = options(egui::ViewportBuilder::default());
+        let options = options(egui::ViewportBuilder::default(), true);
         assert!(
             matches!(
                 options.hardware_acceleration,
@@ -120,22 +142,48 @@ mod tests {
     }
 
     #[test]
+    fn switching_it_off_asks_for_software_rather_than_demanding_hardware() {
+        // The setting turns the request off. It never turns it into a demand:
+        // `Required` refuses to open on a machine with no GPU context, and a
+        // privacy tool that will not run is not more private.
+        let off = options(egui::ViewportBuilder::default(), false);
+        assert!(matches!(
+            off.hardware_acceleration,
+            eframe::HardwareAcceleration::Off
+        ));
+        let on = options(egui::ViewportBuilder::default(), true);
+        assert!(matches!(
+            on.hardware_acceleration,
+            eframe::HardwareAcceleration::Preferred
+        ));
+    }
+
+    #[test]
+    fn what_was_asked_for_is_said_differently_each_way() {
+        // The About tab prints this beside what the driver actually gave, so
+        // the two settings have to read as two different requests.
+        assert_ne!(asked_for(true), asked_for(false));
+        assert!(asked_for(true).contains("hardware"));
+        assert!(asked_for(false).contains("software"));
+    }
+
+    #[test]
     fn frames_wait_for_the_display() {
-        let options = options(egui::ViewportBuilder::default());
+        let options = options(egui::ViewportBuilder::default(), true);
         assert!(options.vsync, "tearing while dragging is what VSYNC is for");
         assert_eq!(options.multisampling, MULTISAMPLING);
     }
 
     #[test]
     fn the_backend_is_named_rather_than_inherited() {
-        let options = options(egui::ViewportBuilder::default());
+        let options = options(egui::ViewportBuilder::default(), true);
         assert!(matches!(options.renderer, eframe::Renderer::Glow));
     }
 
     #[test]
     fn the_viewport_passes_through_untouched() {
         let viewport = egui::ViewportBuilder::default().with_title("VeilVoice");
-        let options = options(viewport);
+        let options = options(viewport, true);
         assert_eq!(options.viewport.title.as_deref(), Some("VeilVoice"));
     }
 

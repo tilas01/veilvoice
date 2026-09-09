@@ -66,6 +66,21 @@ pub struct Prefs {
     /// only indirectly: it says that something changed, where this says what.
     /// Empty means the tour has never run.
     pub toured_tabs: String,
+    /// Whether the window asks the platform for a hardware-drawn context.
+    ///
+    /// **Marker 137.** On, and the setting exists for the machines where on is
+    /// the wrong answer. Asking is already the safe direction: `Preferred`
+    /// takes a software context when no GPU one is available, so a virtual
+    /// machine, a remote desktop or a server with no card still opens.
+    ///
+    /// What it cannot survive is a driver that *accepts* the request and then
+    /// draws badly, which is a real class of machine: a hybrid-graphics laptop
+    /// handing over the wrong adapter, or a driver whose OpenGL path is broken
+    /// in a way that shows as a black window rather than as a refusal. Nothing
+    /// here can detect that, because from inside the process it looks like
+    /// success. So it is one setting, off in one place, and the About tab shows
+    /// what was asked for beside what the driver actually gave.
+    pub acceleration: bool,
     /// Whether the install tab is hidden even on a portable copy.
     ///
     /// The tab already disappears once VeilVoice is installed -- an installed
@@ -153,6 +168,7 @@ impl Default for Prefs {
             animated_icon: true,
             configured: false,
             toured_tabs: String::new(),
+            acceleration: true,
             hide_install_tab: false,
             always_group: false,
             seal_with_app_lock: false,
@@ -250,6 +266,12 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "acceleration" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.acceleration = on;
+                        understood += 1;
+                    }
+                }
                 "hide_install_tab" => {
                     if let Some(on) = parse_bool(value) {
                         prefs.hide_install_tab = on;
@@ -343,6 +365,7 @@ impl Prefs {
         out.push_str(&format!("animated_icon = {}\n", self.animated_icon));
         out.push_str(&format!("configured = {}\n", self.configured));
         out.push_str(&format!("toured_tabs = {}\n", self.toured_tabs));
+        out.push_str(&format!("acceleration = {}\n", self.acceleration));
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
         out.push_str(&format!(
@@ -465,6 +488,7 @@ mod tests {
             animated_icon: false,
             configured: true,
             toured_tabs: String::new(),
+            acceleration: true,
             hide_install_tab: true,
             always_group: true,
             seal_with_app_lock: false,
@@ -564,6 +588,7 @@ mod tests {
             notify_style: "overlay".into(),
             failsafe: "close".into(),
             live_monitor: "toolbar".into(),
+            acceleration: true,
             hide_install_tab: false,
             always_group: false,
             seal_with_app_lock: true,

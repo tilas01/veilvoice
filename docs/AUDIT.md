@@ -123,6 +123,35 @@ panel must come from the main thread, and asking from any other thread used to
 panic, which would take down the application in the middle of somebody's
 recording rather than declining to open a dialog.
 
+### F-163: a test that assumed the machine had no sound card
+
+Windows stayed red after F-162, with the same signature and a different cause,
+and the step added to name it did its job on the first run.
+
+```
+test studio::tests::locking_the_window_stops_a_take_that_is_playing ...
+```
+
+and then nothing: the process died inside it. Serially the crash follows the
+test that causes it, which is what that step is for.
+
+The test asserted that locking the window releases whatever is playing. It did
+so by playing a recording and then locking, under a comment that said in as
+many words:
+
+> No audio device in a test runner, so `play` will not start a stream.
+
+On the Windows runner there is one. A stream started, and tearing it down took
+the whole test binary with it: every test in the crate passed and the process
+exited with an access violation anyway, which reads as a defect in VeilVoice
+and is a defect in the test.
+
+**A test whose correctness depends on the machine not having a sound card is
+not testing the thing it names.** What it actually names is one line in
+`close`, and that is what it asserts now, by reading `close`'s own source, the
+same way its sibling asserts the first line of `play`. No device is opened by
+any test in this crate.
+
 ### The decoys that a folder listing would have identified
 
 Not a defect in shipped behaviour, and recorded because the design decision is
@@ -183,7 +212,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1517 tests, 55722 functional lines. Both are measured and
+* **The counts**: 1519 tests, 55826 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4295,7 +4324,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1517 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1519 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -5942,7 +5971,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-two defects found and fixed (F-1 to F-162), across
+**One hundred and sixty-three defects found and fixed (F-1 to F-163), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

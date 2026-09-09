@@ -8,6 +8,22 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Acceleration is a switch now, and the About tab shows both halves**
+
+- The window has always asked the platform for a hardware context and accepted
+  a software one, which is why it opens in a virtual machine, over a remote
+  desktop and on a server with no card. That was not settable.
+- One tick in Settings turns the asking off. It is for the case the request
+  cannot cover: a driver that accepts and then draws badly, which is a
+  hybrid-graphics laptop handing over the wrong adapter or a black window on a
+  broken OpenGL path. Nothing can detect that, because from inside the process
+  it looks like success, so it is a switch rather than a measurement and the
+  panel says so.
+- It never becomes a demand. `Required` refuses to open where no hardware
+  context exists, and a privacy tool that will not run is not more private.
+- The About tab shows what was asked for beside what the driver actually gave.
+  Either line alone answers half of "why is this slow".
+
 **Portable first, and the About tab says exactly where things are**
 
 - A folder called `veilvoice-data` beside the program makes the settings, the

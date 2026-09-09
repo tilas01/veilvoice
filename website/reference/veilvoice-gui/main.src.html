@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 205 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 213 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -248,23 +248,31 @@
 <span class="ln" id="L186">        }));</span>
 <span class="ln" id="L187">    }</span>
 <span class="ln" id="L188"></span>
-<span class="ln" id="L189">    <span class="tok-kw">let</span> result = eframe::<span class="tok-fn">run_native</span>(</span>
-<span class="ln" id="L190">        <span class="tok-str">&quot;VeilVoice&quot;</span>,</span>
-<span class="ln" id="L191">        veilvoice_gui::graphics::<span class="tok-fn">options</span>(viewport),</span>
-<span class="ln" id="L192">        Box::<span class="tok-fn">new</span>(|cc| <span class="tok-fn">Ok</span>(Box::<span class="tok-fn">new</span>(veilvoice_gui::VeilVoiceApp::<span class="tok-fn">new</span>(cc)))),</span>
-<span class="ln" id="L193">    );</span>
-<span class="ln" id="L194"></span>
-<span class="ln" id="L195">    <span class="tok-com">// `eframe` reports a failed start by returning, not by panicking, so the</span></span>
-<span class="ln" id="L196">    <span class="tok-com">// hook above never sees it -- and the `Err` a `main` returns is printed to</span></span>
-<span class="ln" id="L197">    <span class="tok-com">// a stderr that does not exist here. Creating the window is also the most</span></span>
-<span class="ln" id="L198">    <span class="tok-com">// likely thing to fail on somebody else&#x27;s machine: this renders through</span></span>
-<span class="ln" id="L199">    <span class="tok-com">// glow, which is OpenGL, and a virtual machine, a remote desktop session or</span></span>
-<span class="ln" id="L200">    <span class="tok-com">// hybrid graphics handing over the wrong adapter can all refuse a context.</span></span>
-<span class="ln" id="L201">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(error) = &amp;result {</span>
-<span class="ln" id="L202">        veilvoice_gui::crashlog::<span class="tok-fn">record_startup_failure</span>(&amp;format!(<span class="tok-str">&quot;{error}&quot;</span>));</span>
-<span class="ln" id="L203">    }</span>
-<span class="ln" id="L204">    result</span>
-<span class="ln" id="L205">}</span>
+<span class="ln" id="L189">    <span class="tok-com">// Read before the window is made, because it decides how the window is</span></span>
+<span class="ln" id="L190">    <span class="tok-com">// made. The settings file is the one place this is turned off, and a</span></span>
+<span class="ln" id="L191">    <span class="tok-com">// machine whose driver accepts the request and then draws badly is the case</span></span>
+<span class="ln" id="L192">    <span class="tok-com">// it exists for: from inside the process that looks like success.</span></span>
+<span class="ln" id="L193">    <span class="tok-kw">let</span> acceleration = veilvoice_gui::prefs::<span class="tok-fn">default_path</span>()</span>
+<span class="ln" id="L194">        .<span class="tok-fn">map</span>(|path| veilvoice_gui::prefs::Prefs::<span class="tok-fn">load</span>(&amp;path).acceleration)</span>
+<span class="ln" id="L195">        .<span class="tok-fn">unwrap_or</span>(true);</span>
+<span class="ln" id="L196"></span>
+<span class="ln" id="L197">    <span class="tok-kw">let</span> result = eframe::<span class="tok-fn">run_native</span>(</span>
+<span class="ln" id="L198">        <span class="tok-str">&quot;VeilVoice&quot;</span>,</span>
+<span class="ln" id="L199">        veilvoice_gui::graphics::<span class="tok-fn">options</span>(viewport, acceleration),</span>
+<span class="ln" id="L200">        Box::<span class="tok-fn">new</span>(|cc| <span class="tok-fn">Ok</span>(Box::<span class="tok-fn">new</span>(veilvoice_gui::VeilVoiceApp::<span class="tok-fn">new</span>(cc)))),</span>
+<span class="ln" id="L201">    );</span>
+<span class="ln" id="L202"></span>
+<span class="ln" id="L203">    <span class="tok-com">// `eframe` reports a failed start by returning, not by panicking, so the</span></span>
+<span class="ln" id="L204">    <span class="tok-com">// hook above never sees it -- and the `Err` a `main` returns is printed to</span></span>
+<span class="ln" id="L205">    <span class="tok-com">// a stderr that does not exist here. Creating the window is also the most</span></span>
+<span class="ln" id="L206">    <span class="tok-com">// likely thing to fail on somebody else&#x27;s machine: this renders through</span></span>
+<span class="ln" id="L207">    <span class="tok-com">// glow, which is OpenGL, and a virtual machine, a remote desktop session or</span></span>
+<span class="ln" id="L208">    <span class="tok-com">// hybrid graphics handing over the wrong adapter can all refuse a context.</span></span>
+<span class="ln" id="L209">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(error) = &amp;result {</span>
+<span class="ln" id="L210">        veilvoice_gui::crashlog::<span class="tok-fn">record_startup_failure</span>(&amp;format!(<span class="tok-str">&quot;{error}&quot;</span>));</span>
+<span class="ln" id="L211">    }</span>
+<span class="ln" id="L212">    result</span>
+<span class="ln" id="L213">}</span>
 </span>
 </code></pre>
 </main>

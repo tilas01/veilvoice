@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/main.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 205 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 213 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
 
 ## Contents
 
@@ -67,7 +67,7 @@ failure to open leaves a message behind.
 
 ## What this file contains
 
-205 lines defining **3 functions** (0 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+213 lines defining **3 functions** (0 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 

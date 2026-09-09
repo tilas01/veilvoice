@@ -2119,10 +2119,15 @@ impl VeilVoiceApp {
                 "built-in monospace"
             },
         );
-        // What was actually obtained, not what was asked for. The two agree on
-        // most machines and disagree on exactly the ones where somebody is
-        // asking why the window is slow.
-        field(ui, "drawing", &self.drawing);
+        // Both halves, side by side. The request and the result agree on most
+        // machines and disagree on exactly the ones where somebody is asking
+        // why the window is slow, and neither line answers that on its own.
+        field(
+            ui,
+            "drawing asked for",
+            crate::graphics::asked_for(self.preferences.acceleration()),
+        );
+        field(ui, "drawing obtained", &self.drawing);
 
         ui.add_space(16.0);
         paths_section(ui);
