@@ -123,6 +123,167 @@ impl VoiceMode {
     }
 }
 
+/// What the finished recording says about **who** was speaking.
+///
+/// # The question this answers, and the one it does not
+///
+/// It does **not** measure how well any one person's voice is disguised. That
+/// is what the engine does, every speaker is mapped onto a canonical
+/// destination, and it does not get weaker because somebody else joined the
+/// call. A recording of eight people hides each of their voiceprints exactly as
+/// well as a recording of one.
+///
+/// What it measures is the *other* leak, the one that does grow with the group:
+/// **how much of the conversation's structure a listener gets for free.** Give
+/// eight people eight tellable-apart voices and anybody who hears the output can
+/// count the participants, follow who said what, and line two recordings of the
+/// same group up against each other by voice. Give them all one voice and none
+/// of that is there to find.
+///
+/// # It is not cryptography, and this does not pretend it is
+///
+/// There is no key here, no work factor and no adversary bounded by
+/// computation. Nothing about this number gets better with a longer key or
+/// worse with a faster machine. It is an information count about one specific
+/// thing: which of the speakers a given turn belongs to. Calling that
+/// "cryptographic strength" would be the kind of sentence this project spends
+/// most of its documentation refusing to write.
+///
+/// # Where the bits come from
+///
+/// A listener who cannot tell the voices apart has to guess which of `classes`
+/// speakers produced a turn, and that guess costs `log2(classes)` bits. When
+/// the voices *are* tellable apart the output hands those bits over. So the
+/// leak is `log2(classes)` bits per turn: zero when everybody shares one voice,
+/// one bit for two, three bits for eight.
+///
+/// `classes` is not simply the number of speakers. Two speakers whose voices
+/// fall within [`voices::CLEAR_SEPARATION`] of each other cannot reliably be
+/// separated by ear, so they count as one class. That is the part of this that
+/// runs the other way from intuition: crowding the table makes the recording
+/// *leak less* and *follow worse* at the same time, which is the trade the two
+/// modes exist to let somebody choose between.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Exposure {
+    /// How many voice classes a listener can separate in the output.
+    ///
+    /// One in [`VoiceMode::Uniform`], whatever the group size. In
+    /// [`VoiceMode::Distinct`] it is the number of speakers, less any that were
+    /// given voices too close together to tell apart.
+    pub classes: usize,
+    /// Bits about the speaker of a turn that the output gives away, per turn.
+    ///
+    /// `log2(classes)`. Zero means the output says nothing about which of them
+    /// was talking.
+    pub bits: f32,
+    /// The same thing as a score out of a hundred, where a hundred is a
+    /// recording that says nothing about who is who.
+    ///
+    /// Measured against the widest the engine can go, which is
+    /// [`voices::MAX_VOICES`] classes, so the number means the same thing
+    /// whatever configuration it was asked about.
+    pub score: u8,
+    /// The closest pair among the voices actually handed out, as a ratio.
+    ///
+    /// The *usability* side, and it moves opposite to the score: below
+    /// [`voices::CLEAR_SEPARATION`] two people start sounding like one. Carried
+    /// here so a front end can show both halves of the trade rather than a
+    /// number that looks like it only goes one way.
+    pub crowding: f32,
+}
+
+impl Exposure {
+    /// What this recording gives away, for `speakers` people under `config`.
+    pub fn of(mode: VoiceMode, speakers: usize, config: &DeidConfig) -> Self {
+        let classes = match mode {
+            // One voice for everybody is one class however many people there
+            // are. There is no structure in the output to count.
+            VoiceMode::Uniform => 1,
+            VoiceMode::Distinct => separable(speakers, config),
+        };
+        let bits = if classes <= 1 {
+            0.0
+        } else {
+            (classes as f32).log2()
+        };
+        let widest = (voices::MAX_VOICES as f32).log2();
+        let score = if widest <= 0.0 {
+            100.0
+        } else {
+            100.0 * (1.0 - bits / widest)
+        };
+        Self {
+            classes,
+            bits,
+            score: score.clamp(0.0, 100.0).round() as u8,
+            crowding: voices::closest_pair(
+                match mode {
+                    VoiceMode::Uniform => 1,
+                    VoiceMode::Distinct => speakers,
+                },
+                config,
+            ),
+        }
+    }
+
+    /// Whether the voices handed out are too close to be told apart.
+    ///
+    /// The usability failure, not the privacy one. A recording in this state
+    /// leaks *less* and is harder to follow, which is why it is reported rather
+    /// than folded into the score.
+    pub fn crowded(&self) -> bool {
+        // One voice has nothing to be confused with. `closest_pair` answers
+        // 1.0 for a single voice, which is below the floor and is not a warning
+        // about anything: without this guard every solo recording carried a
+        // "two of these sound alike" notice about the one voice in it.
+        self.classes > 1 && self.crowding < voices::CLEAR_SEPARATION
+    }
+
+    /// One sentence for the interface, saying what the number means here.
+    pub fn note(&self) -> String {
+        if self.classes <= 1 {
+            return "Everybody is the same voice, so the recording does not say which \
+                    of them was speaking. A listener cannot pick anyone out, not even \
+                    as \"the third speaker\", and two recordings of this group cannot \
+                    be lined up against each other by voice."
+                .to_string();
+        }
+        format!(
+            "A listener can separate {} voices, which tells them which of the speakers \
+             each turn belongs to: {:.1} bits per turn. They can count the people in \
+             the room and follow who said what. This is about the shape of the \
+             conversation and not about the voices themselves, which are disguised the \
+             same either way.",
+            self.classes, self.bits
+        )
+    }
+}
+
+/// How many of the first `count` voices a listener can actually separate.
+///
+/// Voices are handed out in table order, so this walks them and puts each into
+/// an existing class when it is within [`voices::CLEAR_SEPARATION`] of one
+/// already there. Greedy and in table order deliberately: that is the order
+/// slots are given out in, so this counts the classes that will actually exist
+/// rather than the best packing of the same voices.
+fn separable(count: usize, config: &DeidConfig) -> usize {
+    if count == 0 {
+        return 0;
+    }
+    let table = voices::all();
+    let taken = &table[..count.min(table.len())];
+    let mut classes: Vec<Voice> = Vec::with_capacity(taken.len());
+    for voice in taken {
+        let merged = classes
+            .iter()
+            .any(|held| voices::separation(held, voice, config) < voices::CLEAR_SEPARATION);
+        if !merged {
+            classes.push(*voice);
+        }
+    }
+    classes.len().max(1)
+}
+
 /// Why a group cannot be rendered as asked.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TooMany {
@@ -282,5 +443,150 @@ mod tests {
         let uniform = VoiceMode::Uniform.note().to_lowercase();
         assert!(uniform.contains("the price is"), "{uniform}");
         assert!(uniform.contains("by ear alone, you cannot"), "{uniform}");
+    }
+}
+
+#[cfg(test)]
+mod exposure_tests {
+    use super::*;
+    #[test]
+    fn a_bigger_group_gives_more_away() {
+        let config = DeidConfig::default();
+        let mut last = 101u8;
+        for speakers in 1..=voices::MAX_VOICES {
+            let seen = Exposure::of(VoiceMode::Distinct, speakers, &config);
+            assert!(
+                seen.score <= last,
+                "{speakers} speakers scored {} after {last}, so the score went up as \
+                 the group grew",
+                seen.score
+            );
+            last = seen.score;
+        }
+    }
+
+    /// One voice for everybody says nothing about who is who, at any size.
+    #[test]
+    fn one_voice_for_everybody_gives_nothing_away() {
+        let config = DeidConfig::default();
+        for speakers in [1, 2, 8, voices::MAX_VOICES, 40] {
+            let seen = Exposure::of(VoiceMode::Uniform, speakers, &config);
+            assert_eq!(seen.classes, 1, "{speakers} in uniform mode");
+            assert_eq!(seen.bits, 0.0);
+            assert_eq!(seen.score, 100, "{speakers} in uniform mode");
+        }
+    }
+
+    /// The bits are the count they claim to be.
+    ///
+    /// A listener who cannot separate the voices guesses which of `classes`
+    /// spoke, and that guess costs `log2(classes)`. Checked against the
+    /// arithmetic rather than against a table somebody typed.
+    #[test]
+    fn the_bits_are_the_logarithm_of_the_classes() {
+        let config = DeidConfig::default();
+        for speakers in 1..=voices::MAX_VOICES {
+            let seen = Exposure::of(VoiceMode::Distinct, speakers, &config);
+            let expected = if seen.classes <= 1 {
+                0.0
+            } else {
+                (seen.classes as f32).log2()
+            };
+            assert!(
+                (seen.bits - expected).abs() < 1e-5,
+                "{speakers} speakers: {} bits for {} classes",
+                seen.bits,
+                seen.classes
+            );
+        }
+    }
+
+    /// Two people given voices too close to separate count as one class.
+    ///
+    /// This is the part that runs the other way from intuition, so it is
+    /// checked rather than asserted in a comment: crowding the table makes the
+    /// recording leak *less* while making it harder to follow, which is the
+    /// trade the two modes exist to let somebody choose between.
+    #[test]
+    fn voices_nobody_can_separate_are_one_class_and_leak_as_one() {
+        // A frame size coarse enough to collapse registers onto each other.
+        let coarse = DeidConfig {
+            frame_size: 256,
+            ..DeidConfig::default()
+        };
+
+        let asked = voices::MAX_VOICES;
+        let seen = Exposure::of(VoiceMode::Distinct, asked, &coarse);
+        let clear = voices::clear_voices(&coarse);
+
+        if clear < asked {
+            assert!(
+                seen.classes < asked,
+                "{asked} voices collapsed to {clear} clear ones, and this still counted \
+                 {} classes",
+                seen.classes
+            );
+            let fine = Exposure::of(VoiceMode::Distinct, asked, &DeidConfig::default());
+            assert!(
+                seen.score >= fine.score,
+                "the crowded configuration leaks more than the clear one, which is \
+                 backwards: {} against {}",
+                seen.score,
+                fine.score
+            );
+            assert!(seen.crowded(), "the crowding was not reported");
+        }
+    }
+
+    /// One voice has nothing to be confused with.
+    ///
+    /// `closest_pair` answers 1.0 when given fewer than two voices, which is
+    /// below the separation floor and means "nothing to compare" rather than
+    /// "too close". Read without that in mind, every solo recording carried a
+    /// warning that two of its voices sounded alike.
+    #[test]
+    fn one_speaker_is_never_reported_as_crowded() {
+        let config = DeidConfig::default();
+        for mode in [VoiceMode::Distinct, VoiceMode::Uniform] {
+            let alone = Exposure::of(mode, 1, &config);
+            assert!(
+                !alone.crowded(),
+                "{mode:?} with one speaker was called crowded, at {}",
+                alone.crowding
+            );
+            assert_eq!(alone.score, 100, "one speaker gives nothing away");
+        }
+        // And a group whose voices really are too close still says so.
+        let coarse = DeidConfig {
+            frame_size: 256,
+            ..DeidConfig::default()
+        };
+        if voices::clear_voices(&coarse) < voices::MAX_VOICES {
+            let many = Exposure::of(VoiceMode::Distinct, voices::MAX_VOICES, &coarse);
+            assert!(
+                many.crowded(),
+                "a genuinely crowded group stopped saying so"
+            );
+        }
+    }
+
+    /// The note says which question the number answers.
+    ///
+    /// The one thing this must never be read as is a claim about how well a
+    /// voice is disguised, so the words that would invite that reading are
+    /// checked for absence.
+    #[test]
+    fn the_note_does_not_claim_to_be_about_the_voices_themselves() {
+        let config = DeidConfig::default();
+        for mode in [VoiceMode::Distinct, VoiceMode::Uniform] {
+            let note = Exposure::of(mode, 4, &config).note().to_lowercase();
+            for wrong in ["encrypt", "cryptograph", "key", "unbreakable", "secure"] {
+                assert!(
+                    !note.contains(wrong),
+                    "{mode:?} note says {wrong:?}, which invites reading an information \
+                     count as a claim about strength"
+                );
+            }
+        }
     }
 }

@@ -106,7 +106,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>182 lines"])
     n_edit["edit.rs<br/>657 lines"]
-    n_mode["mode.rs<br/>286 lines"]
+    n_mode["mode.rs<br/>592 lines"]
     n_plan["plan.rs<br/>1201 lines"]
     n_render["render.rs<br/>1111 lines"]
     n_subtitles["subtitles.rs<br/>276 lines"]
@@ -129,12 +129,12 @@ flowchart TD
 |---|---:|---|
 | [`edit.rs`](../../docs/files/veilvoice-conversation/edit.md) | 657 | Correcting a plan: who is speaking when, what they are called, and in what colour. |
 | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | 182 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
-| [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 286 | How many voices a group gets, and the trade between the two answers. |
+| [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 592 | How many voices a group gets, and the trade between the two answers. |
 | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 1201 | Who is in the recording, and who is speaking when. |
 | [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | 1111 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [`subtitles.rs`](../../docs/files/veilvoice-conversation/subtitles.md) | 276 | Subtitles, from the same plan the audio is rendered from. |
 
-**2,463 functional lines of Rust** in this crate. A functional line is a line
+**2,650 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -151,6 +151,7 @@ counts blank lines and comments too. Both are produced by
 | `const SCOPE` | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | What this crate does to a recording, in the words a front end should show. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | Everything that can go wrong in this crate. |
 | `enum VoiceMode` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Whether speakers get different voices or one voice between them. |
+| `struct Exposure` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | What the finished recording says about who was speaking. |
 | `enum TooMany` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Why a group cannot be rendered as asked. |
 | `fn check` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Whether this many speakers can be rendered in this mode. |
 | `struct Speaker` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | One person in the recording. |
