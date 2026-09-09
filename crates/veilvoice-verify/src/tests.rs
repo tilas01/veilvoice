@@ -622,6 +622,54 @@ fn no_interface_string_has_a_gap_where_a_line_continuation_belongs() {
 ///
 /// Checks that no page tells you to run a program that was removed, while
 /// leaving the history that mentions it alone.
+/// Every command line drawing that gets made is shown somewhere.
+///
+/// `tools/shots/terminal.py` draws one picture per help screen in its
+/// `COMMANDS` list. The README lists them by hand, so a screen added to that
+/// list produced a drawing nobody ever saw: `cli-fix.svg` was generated,
+/// committed, checked against the program's own output, and referenced from no
+/// page at all.
+///
+/// The same shape as the tabs, one file along. A generated set and a
+/// hand-written list of it drift the moment the set grows.
+#[test]
+fn every_command_line_drawing_is_shown_in_the_readme() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .and_then(Path::parent)
+        .expect("the workspace root");
+
+    let tool = std::fs::read_to_string(root.join("tools/shots/terminal.py"))
+        .expect("the tool that draws them");
+    let names: Vec<String> = tool
+        .split("COMMANDS = [")
+        .nth(1)
+        .and_then(|rest| rest.split("\n]").next())
+        .expect("`COMMANDS` has to be findable")
+        .lines()
+        .filter_map(|line| {
+            let (_, rest) = line.trim().split_once("(\"")?;
+            let (name, _) = rest.split_once('"')?;
+            Some(name.to_string())
+        })
+        .collect();
+    assert!(!names.is_empty(), "no drawing names were found to check");
+
+    let readme = std::fs::read_to_string(root.join("README.md")).expect("the README");
+    let missing: Vec<&str> = names
+        .iter()
+        .map(String::as_str)
+        .filter(|name| !readme.contains(&format!("cli-{name}.svg")))
+        .collect();
+    assert!(
+        missing.is_empty(),
+        "README.md shows no drawing of these command line screens: {}. Every \
+         one that `tools/shots/terminal.py` draws is committed, so one nothing \
+         references is a picture nobody will ever see.",
+        missing.join(", ")
+    );
+}
+
 /// Every tab the window shows has a picture in the README and on the website.
 ///
 /// The count was checked and the *list* was not, so both carried a
