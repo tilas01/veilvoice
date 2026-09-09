@@ -94,9 +94,9 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>105 lines"])
+    n_lib(["lib.rs<br/>106 lines"])
     n_main(["main.rs<br/>205 lines"])
-    n_app["app.rs<br/>2849 lines"]
+    n_app["app.rs<br/>2913 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
@@ -111,12 +111,13 @@ flowchart TD
     n_monitor["monitor.rs<br/>496 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
+    n_paths["paths.rs<br/>234 lines"]
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>638 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
     n_security["security.rs<br/>2269 lines"]
     n_settings["settings.rs<br/>1272 lines"]
-    n_setup["setup.rs<br/>758 lines"]
+    n_setup["setup.rs<br/>882 lines"]
     n_soundbar["soundbar.rs<br/>766 lines"]
     n_storage["storage.rs<br/>659 lines"]
     n_studio["studio.rs<br/>1386 lines"]
@@ -138,6 +139,7 @@ flowchart TD
     n_app --> n_monitor
     n_app --> n_notify
     n_app --> n_palettes
+    n_app --> n_paths
     n_app --> n_policy
     n_app --> n_prefs
     n_app --> n_security
@@ -170,6 +172,11 @@ flowchart TD
     n_notify --> n_theme
     n_palettes --> n_prefs
     n_palettes --> n_theme
+    n_paths --> n_crashlog
+    n_paths --> n_palettes
+    n_paths --> n_policy
+    n_paths --> n_prefs
+    n_paths --> n_studio
     n_policy --> n_theme
     n_prefs --> n_autolock
     n_prefs --> n_monitor
@@ -189,6 +196,7 @@ flowchart TD
     n_settings --> n_soundbar
     n_settings --> n_storage
     n_settings --> n_theme
+    n_setup --> n_paths
     n_setup --> n_prefs
     n_setup --> n_theme
     n_soundbar --> n_prefs
@@ -222,6 +230,7 @@ flowchart TD
     click n_monitor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" "open the source"
     click n_notify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/notify.rs" "open the source"
     click n_palettes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs" "open the source"
+    click n_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs" "open the source"
     click n_prefs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" "open the source"
     click n_reduced_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" "open the source"
@@ -246,7 +255,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2849 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 2913 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 447 | Make a failure that produces no output produce some. |
@@ -258,17 +267,18 @@ flowchart TD
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1745 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 280 | Centring a row of widgets, which egui does not do by nesting. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 105 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 106 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 205 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 496 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
+| [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | 234 | Exactly where this copy of VeilVoice is keeping things. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 638 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 2269 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1272 | The settings panel: a menu of pages, each a titled group of choices. |
-| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 758 | The setup tab: install this copy, undo that, and the optional companions. |
+| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 882 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 766 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 1386 | The Recording Studio and the Recording Browser. |
@@ -280,7 +290,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**15,625 functional lines of Rust** in this crate. A functional line is a line
+**16,038 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -359,6 +369,10 @@ counts blank lines and comments too. Both are produced by
 | `fn contrast_problems` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Check a palette's contrast, returning one message per failing pair. |
 | `fn default_dir` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Where palettes live, beside the preferences file. |
 | `fn load` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Read every palette in dir, returning the usable ones and every complaint. |
+| `struct Where` | [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | One place VeilVoice keeps something, and what it keeps there. |
+| `fn arrangement` | [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | Which of the two arrangements this copy is using, in one sentence. |
+| `fn all` | [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | Every location, in the order the About tab shows them. |
+| `fn carry_over` | [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | Copy a portable copy's state into the platform's own configuration directory, without overwriting anything already there. |
 | `struct InForce` | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | The policy this machine is running under, if any. |
 | `fn default_dir` | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | Where the policy files live, beside everything else VeilVoice keeps. |
 | `struct Prefs` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Everything the user can choose about presentation. |

@@ -2125,6 +2125,9 @@ impl VeilVoiceApp {
         field(ui, "drawing", &self.drawing);
 
         ui.add_space(16.0);
+        paths_section(ui);
+
+        ui.add_space(16.0);
         self.updates.section(ui, env!("CARGO_PKG_VERSION"));
 
         ui.add_space(16.0);
@@ -2163,6 +2166,67 @@ impl VeilVoiceApp {
         ui.add_space(16.0);
         self.policy.panel(ui);
         self.report_a_fault(ui);
+    }
+}
+
+/// Where this copy is keeping things, on this machine.
+///
+/// Read out of the same functions the rest of the application calls, so the
+/// panel cannot say one thing while the program does another. See
+/// [`crate::paths`] for what is listed and for the one path that is
+/// deliberately not.
+fn paths_section(ui: &mut egui::Ui) {
+    ui.label(
+        RichText::new("Where this copy keeps things")
+            .color(p::blue())
+            .small(),
+    );
+    ui.label(
+        RichText::new(
+            "Worked out on this machine rather than written down, and different on \
+             every platform. The settings folder is the one to back up.",
+        )
+        .color(p::muted())
+        .small(),
+    );
+    ui.add_space(4.0);
+    ui.label(
+        RichText::new(crate::paths::arrangement())
+            .color(p::yellow())
+            .small(),
+    );
+    ui.add_space(6.0);
+
+    for place in crate::paths::all() {
+        ui.horizontal(|ui| {
+            ui.label(RichText::new(format!("{:<18}", place.label)).color(p::muted()));
+            match &place.path {
+                Some(path) => {
+                    // Selectable, because the point of showing a path is that
+                    // somebody can go to it, and typing one out from a
+                    // screenshot is how the wrong directory gets deleted.
+                    let mut text = path.display().to_string();
+                    ui.add(
+                        egui::TextEdit::singleline(&mut text)
+                            .desired_width(560.0)
+                            .frame(false)
+                            .text_color(p::cyan()),
+                    );
+                }
+                // Said rather than left blank. This system not saying where a
+                // configuration directory is has a consequence, which is that
+                // nothing here is kept between runs.
+                None => {
+                    ui.label(
+                        RichText::new("this system does not say, so nothing is kept here")
+                            .color(p::yellow()),
+                    );
+                }
+            }
+        });
+        ui.indent(place.label, |ui| {
+            ui.label(RichText::new(place.note).color(p::muted()).small());
+        });
     }
 }
 

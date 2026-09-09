@@ -148,6 +148,30 @@ something and a decoy's were called nothing. The sizes were the one thing this
 was meant to make identical. The names are now padded to the length the real
 index measured, and the test builds decoys and adds up the real files.
 
+### A state location that had to be opted into rather than detected
+
+Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
+The obvious implementation is to write beside the program when that directory
+is writable, and it is wrong in a way that is worth recording because it is the
+shape of several defects already in this document.
+
+An ordinary installation unpacked somewhere writable would silently move its
+settings, its vaults and its app lock the next time it started. Everything
+would still be on the disk and the program would be looking in the other place,
+so the symptom would be an empty vault and a lock that had vanished, which is
+F-141 and F-143 again from a third cause.
+
+So it is not detected. A folder called `veilvoice-data` beside the program
+turns it on and removing that folder turns it off, and both are things a person
+does deliberately and can see they have done. Neither switch moves anything.
+
+The About tab says which of the two is in force and lists the exact folders in
+use, because a state location that can change is a state location somebody has
+to be able to see. The one thing it does not print is the app lock's file
+names, which `veilvoice-crypto::vault` derives rather than fixes: what that
+buys is a search of a disk for a known filename missing, and printing the names
+in a window hands it straight back to anybody standing behind the reader.
+
 ### What the mechanical passes found
 
 * **`cargo clippy --workspace --all-targets`**: clean, after two findings in
@@ -159,7 +183,7 @@ index measured, and the test builds decoys and adds up the real files.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1502 tests, 55246 functional lines. Both are measured and
+* **The counts**: 1517 tests, 55722 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4271,7 +4295,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1502 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1517 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |

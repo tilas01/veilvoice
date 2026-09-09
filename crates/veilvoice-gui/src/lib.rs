@@ -82,6 +82,7 @@ pub mod layout;
 pub mod monitor;
 pub mod notify;
 pub mod palettes;
+pub mod paths;
 pub mod policy;
 pub mod prefs;
 pub mod reduced_motion;

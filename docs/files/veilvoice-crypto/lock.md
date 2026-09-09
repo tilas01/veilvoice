@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/lock.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1823 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1958 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
 
 ## Contents
 
@@ -130,7 +130,7 @@ protects them; this protects the session.
 
 ## What this file contains
 
-1823 lines defining **46 functions** (33 public), **3 types** and **15 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1958 lines defining **50 functions** (35 public), **3 types** and **16 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -177,9 +177,13 @@ protects them; this protects the session.
 - `LockStore::path` (line 835) -- Where this lock is stored.
 - `LockStore::every_copy_current` (line 862) -- Whether the last write reached every copy.
 - `open_default` (line 879) -- Open the lock at the default location, wherever this platform keeps it.
-  - reaches: `default_dir`, `open_in`, `default_path`, `read_legacy`, `config_path`, `parse`
+  - reaches: `default_dir`, `open_in`, `default_path`, `read_legacy`, `choose_base`, `config_path`, `portable_dir`, `parse`
 - `create_default` (line 948) -- Create a lock at the default location, refusing to replace one already there.
-  - reaches: `create_in`, `default_dir`, `read_legacy`, `default_path`, `parse`, `config_path`
+  - reaches: `create_in`, `default_dir`, `read_legacy`, `default_path`, `parse`, `choose_base`, `config_path`, `portable_dir`
+- `platform_dir` (line 1099) -- The platform's own configuration directory, whether or not it is the one in use.
+  - reaches: `config_path`
+- `is_portable` (line 1118) -- Whether this copy is keeping its state beside itself.
+  - reaches: `portable_dir`
 
 ## What calls what
 
@@ -189,7 +193,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_22 of 40 functions are drawn; the diagram is bounded at 22 so it
+_22 of 44 functions are drawn; the diagram is bounded at 22 so it
 stays readable. The full list is in the table below._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file._
@@ -225,7 +229,7 @@ flowchart TD
     n_open_in["open_in<br/>line 892"]
     n_create_default(["create_default<br/>line 948"])
     n_create_in["create_in<br/>line 958"]
-    n_default_dir["default_dir<br/>line 1043"]
+    n_default_dir["default_dir<br/>line 1088"]
     n_acknowledge --> n_verify
     n_change_password --> n_unlock
     n_create_default --> n_create_in
@@ -255,7 +259,7 @@ flowchart TD
     click n_open_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L892" "open the source"
     click n_create_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L948" "open the source"
     click n_create_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L958" "open the source"
-    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1043" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1088" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_create,n_store_key,n_acknowledge,n_cooldown,n_retag,n_to_bytes,n_open,n_create,n_acknowledge,n_change_password,n_remove,n_cooldown,n_store_key,n_open_default,n_create_default entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -330,8 +334,13 @@ flowchart TD
 | `create_in` <sub>pub fn</sub> | [958](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L958) | Create a vault-backed lock under base. |
 | `write_private` <sub>fn</sub> | [984](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L984) | Write the lock file so it is owner-only from the moment it exists. |
 | `config_path` <sub>fn</sub> | [1014](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1014) | Where the lock file lives, given a platform and an environment. |
-| `default_dir` <sub>pub fn</sub> | [1043](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1043) | The configuration directory the vault keeps its files in, if the environment says where one is. |
-| `default_path` <sub>pub fn</sub> | [1060](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1060) | Where the lock file lives on this platform, if the environment says. |
+| `PORTABLE_DIR` <sub>pub const</sub> | [1047](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1047) | The name of the folder that makes a copy of VeilVoice keep its state beside itself. |
+| `portable_dir` <sub>fn</sub> | [1063](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1063) | Where a portable copy keeps its state, when it is one. |
+| `choose_base` <sub>fn</sub> | [1082](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1082) | Which of the two locations a copy is using, given what is beside it and what the platform says. |
+| `default_dir` <sub>pub fn</sub> | [1088](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1088) | The configuration directory the vault keeps its files in, if the environment says where one is. |
+| `platform_dir` <sub>pub fn</sub> | [1099](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1099) | The platform's own configuration directory, whether or not it is the one in use. |
+| `is_portable` <sub>pub fn</sub> | [1118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1118) | Whether this copy is keeping its state beside itself. |
+| `default_path` <sub>pub fn</sub> | [1141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L1141) | Where the lock file lives, if there is anywhere for it. |
 
 ---
 

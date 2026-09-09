@@ -82,6 +82,13 @@ pub struct Setup {
     report: Option<(Vec<String>, bool)>,
     /// The uninstall confirmation, which is deliberately a second click.
     confirming_uninstall: bool,
+    /// Whether an install should carry a portable copy's settings across, once
+    /// the question has been answered.
+    ///
+    /// `None` until it is, and the install button waits for it: guessing here
+    /// either copies somebody's vault onto a machine they do not own, or leaves
+    /// somebody who moved off a stick wondering where their recordings went.
+    carry: Option<bool>,
 }
 
 impl Default for Setup {
@@ -98,6 +105,7 @@ impl Setup {
             rows: detect_all(),
             job: None,
             busy: None,
+            carry: None,
             report: None,
             confirming_uninstall: false,
         }
@@ -296,15 +304,37 @@ impl Setup {
             return;
         }
 
+        // Only where there is something to carry: a copy keeping its state
+        // beside itself. An ordinary copy already keeps it where an installed
+        // one looks, so there is no question to ask and none is asked.
+        let portable = veilvoice_crypto::lock::is_portable();
+        if portable {
+            self.carry_question(ui);
+        }
+
         ui.horizontal(|ui| {
-            let can_install = self.status.prefix.is_some() && !self.status.running_installed;
+            let can_install = can_install(
+                self.status.prefix.is_some(),
+                self.status.running_installed,
+                portable,
+                self.carry,
+            );
             let install_button = ui.add_enabled(
                 can_install,
                 egui::Button::new(RichText::new("install").color(p::green())),
             );
             if install_button.clicked() {
                 self.confirming_uninstall = false;
-                self.start("installing", install::install);
+                let carry = self.carry == Some(true);
+                self.start("installing", move || {
+                    let mut said = install::install()?;
+                    if carry {
+                        // Reported inside the same result, so one press gives
+                        // one account of what happened rather than two.
+                        said.extend(crate::paths::carry_over()?);
+                    }
+                    Ok(said)
+                });
             }
             if self.status.running_installed {
                 install_button
@@ -366,6 +396,59 @@ impl Setup {
                 );
             }
         }
+    }
+
+    /// Ask whether an install should take the settings with it.
+    ///
+    /// A question rather than a default, because the two right answers point in
+    /// opposite directions and nothing here can tell which one applies.
+    /// Somebody moving off a memory stick onto their own machine wants their
+    /// settings and vaults carried over. Somebody installing on a shared or
+    /// borrowed machine wants them left exactly where they are, and guessing
+    /// wrong there copies their vault onto a computer that is not theirs.
+    fn carry_question(&mut self, ui: &mut Ui) {
+        ui.label(
+            RichText::new("This copy keeps its settings beside itself")
+                .color(p::yellow())
+                .small(),
+        );
+        ui.label(
+            RichText::new(
+                "An installed copy looks in this platform's own configuration \
+                 directory instead. Say what should happen to what is beside \
+                 the program before installing.",
+            )
+            .color(p::fg()),
+        );
+        ui.add_space(6.0);
+        ui.horizontal(|ui| {
+            ui.selectable_value(&mut self.carry, Some(true), "carry them across");
+            ui.selectable_value(&mut self.carry, Some(false), "leave them here");
+        });
+        ui.label(
+            RichText::new(match self.carry {
+                Some(true) => {
+                    "Copied, never moved and never overwritten: anything already \
+                     in the configuration directory is left alone and named in \
+                     the report, and this copy keeps working from the folder \
+                     beside it."
+                }
+                Some(false) => {
+                    "Nothing is copied. The installed copy starts with no \
+                     settings, and this one carries on using the folder beside \
+                     it."
+                }
+                None => {
+                    "Unanswered, so the install button is waiting. There is no \
+                     sensible default: one answer is right when moving onto your \
+                     own machine and the other when installing on somebody \
+                     else's."
+                }
+            })
+            .color(p::muted())
+            .small(),
+        );
+        ui.add_space(10.0);
     }
 
     /// Start a worker, and remember what it is doing so the strip can say.
@@ -611,6 +694,23 @@ fn detect_all() -> Vec<Row> {
 /// Written out beside the button rather than in a manual. An installer that
 /// says "install?" and nothing else is asking somebody to consent to something
 /// they have not been told.
+/// Whether the install button is live.
+///
+/// A function rather than four conditions in a closure, so the rule that
+/// matters can be asserted: **a portable copy cannot be installed until the
+/// question about its settings has been answered**. An install that ran on the
+/// first click would have taken one of the two answers by default, and the
+/// wrong one either copies a vault onto somebody else's machine or leaves a
+/// person wondering where their recordings went.
+fn can_install(
+    somewhere_to_install: bool,
+    already_running_installed: bool,
+    portable: bool,
+    carry: Option<bool>,
+) -> bool {
+    somewhere_to_install && !already_running_installed && (!portable || carry.is_some())
+}
+
 fn install_changes() -> Vec<&'static str> {
     let mut lines = vec![
         "copies the VeilVoice programs beside this one into your own program directory",
@@ -635,6 +735,30 @@ mod tests {
     use super::*;
 
     /// The tab reads the machine on construction and must not change it.
+    #[test]
+    fn a_portable_copy_is_not_installed_until_the_question_is_answered() {
+        // The one thing this gate exists for. Unanswered means the button is
+        // dead, and either answer makes it live: both are real choices and
+        // neither is a default.
+        assert!(!can_install(true, false, true, None), "it installed anyway");
+        assert!(can_install(true, false, true, Some(true)));
+        assert!(can_install(true, false, true, Some(false)));
+
+        // A copy that is not portable has nothing to carry, so it is never
+        // asked and never waits.
+        assert!(can_install(true, false, false, None));
+    }
+
+    #[test]
+    fn nothing_installs_where_there_is_nowhere_to_install_it() {
+        assert!(!can_install(false, false, false, None));
+        assert!(!can_install(false, false, true, Some(true)));
+        assert!(
+            !can_install(true, true, false, None),
+            "the installed copy offered to install itself"
+        );
+    }
+
     #[test]
     fn opening_the_tab_changes_nothing() {
         let first = Setup::new();

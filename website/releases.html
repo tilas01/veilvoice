@@ -168,6 +168,14 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Portable first, and the About tab says exactly where things are</strong></p>
+<ul>
+<li>A folder called <code>veilvoice-data</code> beside the program makes the settings, the vaults, the policies, the palettes and the app lock live in it. A copy on a memory stick now stays a copy on a stick. Remove the folder and it goes back to the platform&#x27;s own configuration directory; neither switch moves anything that is already there.</li>
+<li>Opted into rather than detected. &quot;Beside the program if that is writable&quot; would have moved an ordinary installation&#x27;s state the day somebody unpacked it somewhere writable, and the symptom would have been an empty vault.</li>
+<li>The About tab lists the exact folders in use, worked out on the machine rather than written down, with a line saying which of the two arrangements is in force. The app lock&#x27;s file names are not among them: they are derived rather than fixed, on purpose, and printing them in a window would hand that back to anybody standing behind the reader.</li>
+<li>A test reads the crate&#x27;s own source for every place it keeps something and fails naming any the tab does not show, so a location added tomorrow cannot quietly stop being reported.</li>
+<li>Installing a portable copy now asks what should happen to that folder, and the button waits for the answer. There is no default because the two right answers point in opposite directions: carrying over is right when moving onto your own machine, and leaving is right when installing on somebody else&#x27;s. Carried means copied, never moved, and nothing already at the destination is replaced.</li>
+</ul>
 <p><strong>The build was red, and the offline proof had never run</strong></p>
 <ul>
 <li>The <code>offline-runtime</code> job proves the front page&#x27;s claim four ways. Its third step ran the command line inside an empty network namespace with <code>unshare -rn</code>, which asks for an unprivileged user namespace, and Ubuntu 24.04 refuses those by default. It failed on its first run and on every run since, and because a failed step ends a job, <strong>the two steps after it never ran</strong>: the syscall trace and the window&#x27;s socket families. The job existed, looked like it proved four things, and proved one.</li>

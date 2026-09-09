@@ -102,7 +102,7 @@ flowchart TD
     n_hoard["hoard.rs<br/>1037 lines"]
     n_hybrid["hybrid.rs<br/>460 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1823 lines"]
+    n_lock["lock.rs<br/>1958 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_studio["studio.rs<br/>1494 lines"]
@@ -149,7 +149,7 @@ flowchart TD
 | [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 460 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 525 | Password-based key derivation with Argon2id. |
 | [[`lib.rs`|File-veilvoice-crypto-lib]] | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [[`lock.rs`|File-veilvoice-crypto-lock]] | 1823 | The application lock: an Argon2id password verifier with a rate limit. |
+| [[`lock.rs`|File-veilvoice-crypto-lock]] | 1958 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
 | [[`studio.rs`|File-veilvoice-crypto-studio]] | 1494 | The studio vault: a key that exists only when both locks have been opened. |
@@ -160,7 +160,7 @@ flowchart TD
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |
 
-**6,130 functional lines of Rust** in this crate. A functional line is a line
+**6,193 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
