@@ -168,6 +168,14 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Two bars per speaker, while a group render runs</strong></p>
+<ul>
+<li>As the render walks the file, each person gets what went into the turn just finished and what the engine produced from it, with how far through their turns the render is. One bar answers &quot;is something being written&quot; and not &quot;is this person being veiled&quot;, which is the question somebody rendering an interview is asking.</li>
+<li>Drawn with the shared meter the live path uses, so it is the same bar rather than a second one that would drift from it, and the limit is printed under them in the same words.</li>
+<li>The render reports through a small structure of atomics: nothing allocates, nothing locks, and the render threads write to it while the window reads it every frame. A watched render and an unwatched one produce byte-identical audio, which is a test rather than a claim.</li>
+<li>A progress made for fewer speakers than the plan holds drops what it cannot keep rather than failing the render. A bar with nowhere to go is not worth a refused render.</li>
+<li>This is the half of marker 133 that could be built from what was here. The other half, several guests on several microphones at once, is now marker 147: the live path opens one input and everything downstream assumes one.</li>
+</ul>
 <p><strong>The audio path says when something interfered with it</strong></p>
 <ul>
 <li>A device unplugged or swapped mid-session, and anything else the platform reports about either stream, is now shown where the person is looking. Both error callbacks used to be <code>eprintln!</code> and nothing else: on Windows the desktop application is built with no console at all, so a microphone taken away in the middle of a call was completely silent and a recording carried on being made of nothing.</li>

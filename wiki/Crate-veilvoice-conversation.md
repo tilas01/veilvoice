@@ -95,7 +95,7 @@ flowchart TD
     n_edit["edit.rs<br/>657 lines"]
     n_mode["mode.rs<br/>286 lines"]
     n_plan["plan.rs<br/>1201 lines"]
-    n_render["render.rs<br/>851 lines"]
+    n_render["render.rs<br/>1111 lines"]
     n_subtitles["subtitles.rs<br/>276 lines"]
     n_edit --> n_plan
     n_plan --> n_edit
@@ -118,10 +118,10 @@ flowchart TD
 | [[`lib.rs`|File-veilvoice-conversation-lib]] | 182 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
 | [[`mode.rs`|File-veilvoice-conversation-mode]] | 286 | How many voices a group gets, and the trade between the two answers. |
 | [[`plan.rs`|File-veilvoice-conversation-plan]] | 1201 | Who is in the recording, and who is speaking when. |
-| [[`render.rs`|File-veilvoice-conversation-render]] | 851 | Turning a plan and a recording into veiled audio, one engine per speaker. |
+| [[`render.rs`|File-veilvoice-conversation-render]] | 1111 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] | 276 | Subtitles, from the same plan the audio is rendered from. |
 
-**2,301 functional lines of Rust** in this crate. A functional line is a line
+**2,463 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
