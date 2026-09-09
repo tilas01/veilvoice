@@ -168,6 +168,21 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Every platform is green again, and the crash is understood</strong></p>
+<ul>
+<li><code>test / windows-latest</code> was dying with an access violation after every test it printed had passed. A step that reran the desktop crate&#x27;s tests on one thread named the culprit on its first run: a test that played a recording and then locked the window, on the stated assumption that a build machine has no audio device. The Windows runner has one. A stream started and tearing it down took the whole test binary with it.</li>
+<li>A test whose correctness depends on the machine not having a sound card is not testing the thing it names. It reads <code>close</code>&#x27;s own source now, the way its sibling reads <code>play</code>&#x27;s, and no test in the crate opens a device.</li>
+<li>That step was there to identify the defect and is gone, as it said it would be. All thirteen jobs pass: the offline proof runs all four of its steps for the first time, and macOS and Windows are green.</li>
+</ul>
+<p><strong>A fifth setup card, and every number on it read from the machine</strong></p>
+<ul>
+<li>First run ends on &quot;What this machine says&quot;: where recordings will go and how much room is free there, how many devices there are to record from and play to, and what the window will ask the graphics driver for.</li>
+<li>Every figure is read at the moment the card is drawn. None of it is a default written into the program: a setup screen that asserts how much room there is, or that the graphics will be fine, is guessing on somebody else&#x27;s hardware and sounding certain about it.</li>
+<li>The free space is said as an hour of veiled audio rather than as a number of bytes, because that is the question somebody about to record actually has.</li>
+<li>Where the machine will not answer, the card says so instead of printing a figure nobody measured. A system that does not say where an application keeps its files is told plainly what that costs, which is that nothing is kept between runs.</li>
+<li>Nothing on the card has to be answered, and like the four before it there is a way past it.</li>
+<li>The guard that proves no card is a gate read a fixed four thousand characters after each function&#x27;s name, which is a length rather than a body. A card longer than that reported no way past it, and a shorter one was checked against the card after it as well. It ends where the function does now.</li>
+</ul>
 <p><strong>Acceleration is a switch now, and the About tab shows both halves</strong></p>
 <ul>
 <li>The window has always asked the platform for a hardware context and accepted a software one, which is why it opens in a virtual machine, over a remote desktop and on a server with no card. That was not settable.</li>

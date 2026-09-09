@@ -1098,6 +1098,14 @@ and whether the window locks itself when you walk away. Every one can be
 skipped and changed later, and the second one is worth reading rather than
 clicking past: it is also what encrypts VeilVoice's own files.
 
+A fifth card ends it and asks nothing. It reads this computer and says what it
+found: where recordings will go and how much room is free there, put as roughly
+how many hours of veiled audio that is; how many devices there are to record
+from and play to; and what the window will ask the graphics driver for, with
+the tick that turns that off. Nothing on it is a number written into the
+program, and where the machine will not answer it says so rather than showing a
+figure nobody measured.
+
 **3. Pick where output goes.** Settings, or the Anonymise tab. If you keep a
 Cryptomator vault or a VeraCrypt volume, point VeilVoice at it now and answer
 the hidden-volume question, because it will not write anything until you have
