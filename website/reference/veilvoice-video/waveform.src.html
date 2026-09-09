@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/waveform.rs</code></h1>
-<p style="color:var(--muted)"><a href="waveform.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 259 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="waveform.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 298 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -162,162 +162,203 @@
 <span class="ln" id="L104">}</span>
 </span>
 <span class="ln" id="L105"></span>
-<span class="src-item" id="fn-svg_path">
-<span class="ln" id="L106"><span class="tok-com">/// The envelope as an SVG path, filled, inside a box.</span></span>
+<span class="src-item" id="fn-level_at">
+<span class="ln" id="L106"><span class="tok-com">/// How loud the recording is at `progress`, from 0.0 to 1.0.</span></span>
 <span class="ln" id="L107"><span class="tok-com">///</span></span>
-<span class="ln" id="L108"><span class="tok-com">/// Traced left to right along the maxima and right to left along the minima,</span></span>
-<span class="ln" id="L109"><span class="tok-com">/// then closed: one filled shape rather than a thousand rectangles, which is a</span></span>
-<span class="ln" id="L110"><span class="tok-com">/// tenth of the markup and draws in one operation.</span></span>
-<span class="ln" id="L111"><span class="tok-com">///</span></span>
-<span class="ln" id="L112"><span class="tok-com">/// Coordinates are rounded to two decimals. A waveform does not need more, and</span></span>
-<span class="ln" id="L113"><span class="tok-com">/// full `f32` precision triples the size of the path for a difference nothing</span></span>
-<span class="ln" id="L114"><span class="tok-com">/// can display.</span></span>
-<span class="ln" id="L115"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">svg_path</span>(envelope: &amp;Envelope, x: f32, y: f32, width: f32, height: f32) -&gt; String {</span>
-<span class="ln" id="L116">    <span class="tok-kw">if</span> envelope.<span class="tok-fn">is_empty</span>() || width &lt;= <span class="tok-num">0.0</span> || height &lt;= <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L117">        <span class="tok-kw">return</span> String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L118">    }</span>
-<span class="ln" id="L119">    <span class="tok-kw">let</span> middle = y + height / <span class="tok-num">2.0</span>;</span>
-<span class="ln" id="L120">    <span class="tok-kw">let</span> half = height / <span class="tok-num">2.0</span>;</span>
-<span class="ln" id="L121">    <span class="tok-kw">let</span> step = width / envelope.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L122">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path = String::<span class="tok-fn">with_capacity</span>(envelope.<span class="tok-fn">len</span>() * <span class="tok-num">16</span>);</span>
-<span class="ln" id="L123"></span>
-<span class="ln" id="L124">    <span class="tok-kw">for</span> (column, high) <span class="tok-kw">in</span> envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L125">        <span class="tok-kw">let</span> px = x + column <span class="tok-kw">as</span> f32 * step;</span>
-<span class="ln" id="L126">        <span class="tok-kw">let</span> py = middle - high * half;</span>
-<span class="ln" id="L127">        path.<span class="tok-fn">push_str</span>(<span class="tok-kw">if</span> column == <span class="tok-num">0</span> { <span class="tok-str">&quot;M&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;L&quot;</span> });</span>
-<span class="ln" id="L128">        path.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;{px:.2} {py:.2} &quot;</span>));</span>
-<span class="ln" id="L129">    }</span>
-<span class="ln" id="L130">    <span class="tok-kw">for</span> (column, low) <span class="tok-kw">in</span> envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>().<span class="tok-fn">rev</span>() {</span>
-<span class="ln" id="L131">        <span class="tok-kw">let</span> px = x + column <span class="tok-kw">as</span> f32 * step;</span>
-<span class="ln" id="L132">        <span class="tok-kw">let</span> py = middle - low * half;</span>
-<span class="ln" id="L133">        path.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;L{px:.2} {py:.2} &quot;</span>));</span>
-<span class="ln" id="L134">    }</span>
-<span class="ln" id="L135">    path.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;Z&#x27;</span>);</span>
-<span class="ln" id="L136">    path</span>
-<span class="ln" id="L137">}</span>
+<span class="ln" id="L108"><span class="tok-com">/// **Marker 139.** The bar beside each speaker&#x27;s name is drawn from this. It</span></span>
+<span class="ln" id="L109"><span class="tok-com">/// reads the same envelope the waveform is drawn from rather than the samples,</span></span>
+<span class="ln" id="L110"><span class="tok-com">/// so the bar and the wave under it can never disagree: one array, two things</span></span>
+<span class="ln" id="L111"><span class="tok-com">/// drawn from it.</span></span>
+<span class="ln" id="L112"><span class="tok-com">///</span></span>
+<span class="ln" id="L113"><span class="tok-com">/// `progress` is a fraction of the recording rather than a time in seconds,</span></span>
+<span class="ln" id="L114"><span class="tok-com">/// because the envelope has no idea how long the audio is. The caller has the</span></span>
+<span class="ln" id="L115"><span class="tok-com">/// duration and does that division once.</span></span>
+<span class="ln" id="L116"><span class="tok-com">///</span></span>
+<span class="ln" id="L117"><span class="tok-com">/// # What this is, and what it is not</span></span>
+<span class="ln" id="L118"><span class="tok-com">///</span></span>
+<span class="ln" id="L119"><span class="tok-com">/// It is the loudness of the **mix** at that moment. The renderer produces one</span></span>
+<span class="ln" id="L120"><span class="tok-com">/// mixed track, so there is no separate signal per person to measure, and the</span></span>
+<span class="ln" id="L121"><span class="tok-com">/// picture attributes this to whoever the plan says is speaking.</span></span>
+<span class="ln" id="L122"><span class="tok-com">///</span></span>
+<span class="ln" id="L123"><span class="tok-com">/// While one person is talking those are the same thing. Where two turns</span></span>
+<span class="ln" id="L124"><span class="tok-com">/// overlap they are not: both speakers show the same bar, because that is one</span></span>
+<span class="ln" id="L125"><span class="tok-com">/// number and there are two of them. It is what a listener hears, and it is not</span></span>
+<span class="ln" id="L126"><span class="tok-com">/// a claim that each of them was that loud.</span></span>
+<span class="ln" id="L127"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">level_at</span>(envelope: &amp;Envelope, progress: f64) -&gt; f32 {</span>
+<span class="ln" id="L128">    <span class="tok-kw">if</span> envelope.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L129">        <span class="tok-kw">return</span> <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L130">    }</span>
+<span class="ln" id="L131">    <span class="tok-kw">let</span> last = envelope.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>;</span>
+<span class="ln" id="L132">    <span class="tok-com">// Clamped rather than wrapped: a progress past the end is the playhead at</span></span>
+<span class="ln" id="L133">    <span class="tok-com">// the end, which is the last column, and never the first.</span></span>
+<span class="ln" id="L134">    <span class="tok-kw">let</span> at = (progress.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>) * last <span class="tok-kw">as</span> f64).<span class="tok-fn">round</span>() <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L135">    <span class="tok-kw">let</span> at = at.<span class="tok-fn">min</span>(last);</span>
+<span class="ln" id="L136">    <span class="tok-com">// The peak either side of zero. A signal that only goes negative is as loud</span></span>
+<span class="ln" id="L137">    <span class="tok-com">// as one that only goes positive, and a bar that showed the second and not</span></span>
+<span class="ln" id="L138">    <span class="tok-com">// the first would sit at nothing through half of some recordings.</span></span>
+<span class="ln" id="L139">    envelope.max[at]</span>
+<span class="ln" id="L140">        .<span class="tok-fn">abs</span>()</span>
+<span class="ln" id="L141">        .<span class="tok-fn">max</span>(envelope.min[at].<span class="tok-fn">abs</span>())</span>
+<span class="ln" id="L142">        .<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>)</span>
+<span class="ln" id="L143">}</span>
 </span>
-<span class="ln" id="L138"></span>
-<span class="ln" id="L139"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L140"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L141">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L142"></span>
-<span class="ln" id="L143">    <span class="tok-kw">fn</span> <span class="tok-fn">ramp</span>(len: usize) -&gt; Vec&lt;f32&gt; {</span>
-<span class="ln" id="L144">        (<span class="tok-num">0</span>..len)</span>
-<span class="ln" id="L145">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 / len <span class="tok-kw">as</span> f32) * <span class="tok-num">2.0</span> - <span class="tok-num">1.0</span>)</span>
-<span class="ln" id="L146">            .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L147">    }</span>
-<span class="ln" id="L148"></span>
-<span class="ln" id="L149">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L150">    <span class="tok-kw">fn</span> <span class="tok-fn">an_envelope_has_one_pair_per_column</span>() {</span>
-<span class="ln" id="L151">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;<span class="tok-fn">ramp</span>(<span class="tok-num">10_000</span>), <span class="tok-num">200</span>);</span>
-<span class="ln" id="L152">        assert_eq!(envelope.<span class="tok-fn">len</span>(), <span class="tok-num">200</span>);</span>
-<span class="ln" id="L153">        assert_eq!(envelope.max.<span class="tok-fn">len</span>(), <span class="tok-num">200</span>);</span>
-<span class="ln" id="L154">        assert!(!envelope.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L155">    }</span>
-<span class="ln" id="L156"></span>
-<span class="ln" id="L157">    <span class="tok-com">/// The extremes are the point. An average over a symmetric waveform is</span></span>
-<span class="ln" id="L158">    <span class="tok-com">/// approximately zero however loud it was, and a waveform drawn from</span></span>
-<span class="ln" id="L159">    <span class="tok-com">/// averages is a flat line.</span></span>
-<span class="ln" id="L160">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L161">    <span class="tok-kw">fn</span> <span class="tok-fn">a_loud_symmetric_signal_does_not_average_away</span>() {</span>
-<span class="ln" id="L162">        <span class="tok-kw">let</span> alternating: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">4800</span>)</span>
-<span class="ln" id="L163">            .<span class="tok-fn">map</span>(|i| <span class="tok-kw">if</span> i % <span class="tok-num">2</span> == <span class="tok-num">0</span> { <span class="tok-num">0.9</span> } <span class="tok-kw">else</span> { -<span class="tok-num">0.9</span> })</span>
-<span class="ln" id="L164">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L165">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;alternating, <span class="tok-num">100</span>);</span>
-<span class="ln" id="L166">        <span class="tok-kw">for</span> column <span class="tok-kw">in</span> <span class="tok-num">0</span>..envelope.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L167">            assert!(envelope.max[column] &gt; <span class="tok-num">0.8</span>, <span class="tok-str">&quot;column {column} lost its peak&quot;</span>);</span>
-<span class="ln" id="L168">            assert!(envelope.min[column] &lt; -<span class="tok-num">0.8</span>, <span class="tok-str">&quot;column {column} lost its peak&quot;</span>);</span>
-<span class="ln" id="L169">        }</span>
-<span class="ln" id="L170">    }</span>
-<span class="ln" id="L171"></span>
-<span class="ln" id="L172">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L173">    <span class="tok-kw">fn</span> <span class="tok-fn">silence_is_flat_and_still_has_its_columns</span>() {</span>
-<span class="ln" id="L174">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;vec![<span class="tok-num">0</span>.0f32; <span class="tok-num">4800</span>], <span class="tok-num">64</span>);</span>
-<span class="ln" id="L175">        assert_eq!(envelope.<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
-<span class="ln" id="L176">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v == <span class="tok-num">0.0</span>));</span>
-<span class="ln" id="L177">        assert!(envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v == <span class="tok-num">0.0</span>));</span>
-<span class="ln" id="L178">    }</span>
-<span class="ln" id="L179"></span>
-<span class="ln" id="L180">    <span class="tok-com">/// One NaN would make a column NaN and the path unparseable, which fails</span></span>
-<span class="ln" id="L181">    <span class="tok-com">/// as a blank page rather than as a wrong one.</span></span>
-<span class="ln" id="L182">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L183">    <span class="tok-kw">fn</span> <span class="tok-fn">a_non_finite_sample_does_not_poison_its_column</span>() {</span>
-<span class="ln" id="L184">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> samples = vec![<span class="tok-num">0</span>.5f32; <span class="tok-num">1000</span>];</span>
-<span class="ln" id="L185">        samples[<span class="tok-num">10</span>] = f32::NAN;</span>
-<span class="ln" id="L186">        samples[<span class="tok-num">11</span>] = f32::INFINITY;</span>
-<span class="ln" id="L187">        samples[<span class="tok-num">12</span>] = f32::NEG_INFINITY;</span>
-<span class="ln" id="L188">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;samples, <span class="tok-num">10</span>);</span>
-<span class="ln" id="L189">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
-<span class="ln" id="L190">        assert!(envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
-<span class="ln" id="L191">        assert!(!<span class="tok-fn">svg_path</span>(&amp;envelope, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">40.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NaN&quot;</span>));</span>
-<span class="ln" id="L192">    }</span>
-<span class="ln" id="L193"></span>
-<span class="ln" id="L194">    <span class="tok-com">/// Samples outside full scale are clamped, so the path cannot escape its</span></span>
-<span class="ln" id="L195">    <span class="tok-com">/// box and draw over the rest of the page.</span></span>
-<span class="ln" id="L196">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L197">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signal_past_full_scale_stays_inside_its_box</span>() {</span>
-<span class="ln" id="L198">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">5.0</span>, -<span class="tok-num">5.0</span>, <span class="tok-num">3.0</span>, -<span class="tok-num">3.0</span>], <span class="tok-num">2</span>);</span>
-<span class="ln" id="L199">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v &lt;= <span class="tok-num">1.0</span>));</span>
-<span class="ln" id="L200">        assert!(envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v &gt;= -<span class="tok-num">1.0</span>));</span>
-<span class="ln" id="L201"></span>
-<span class="ln" id="L202">        <span class="tok-kw">let</span> path = <span class="tok-fn">svg_path</span>(&amp;envelope, <span class="tok-num">10.0</span>, <span class="tok-num">20.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">40.0</span>);</span>
-<span class="ln" id="L203">        <span class="tok-kw">for</span> pair <span class="tok-kw">in</span> path.<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&#x27;Z&#x27;</span>).<span class="tok-fn">split</span>([<span class="tok-str">&#x27;M&#x27;</span>, <span class="tok-str">&#x27;L&#x27;</span>]) {</span>
-<span class="ln" id="L204">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> parts = pair.<span class="tok-fn">split_whitespace</span>();</span>
-<span class="ln" id="L205">            <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(px), <span class="tok-fn">Some</span>(py)) = (parts.<span class="tok-fn">next</span>(), parts.<span class="tok-fn">next</span>()) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L206">                continue;</span>
-<span class="ln" id="L207">            };</span>
-<span class="ln" id="L208">            <span class="tok-kw">let</span> px: f32 = px.<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L209">            <span class="tok-kw">let</span> py: f32 = py.<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L210">            assert!((<span class="tok-num">10.0</span>..=<span class="tok-num">110.0</span>).<span class="tok-fn">contains</span>(&amp;px), <span class="tok-str">&quot;{px} is outside the box&quot;</span>);</span>
-<span class="ln" id="L211">            assert!((<span class="tok-num">20.0</span>..=<span class="tok-num">60.0</span>).<span class="tok-fn">contains</span>(&amp;py), <span class="tok-str">&quot;{py} is outside the box&quot;</span>);</span>
-<span class="ln" id="L212">        }</span>
-<span class="ln" id="L213">    }</span>
-<span class="ln" id="L214"></span>
-<span class="ln" id="L215">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L216">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_in_gives_nothing_out_rather_than_dividing_by_zero</span>() {</span>
-<span class="ln" id="L217">        assert!(<span class="tok-fn">envelope</span>(&amp;[], <span class="tok-num">100</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L218">        assert!(<span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.1</span>, <span class="tok-num">0.2</span>], <span class="tok-num">0</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L219">        assert!(<span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;[], <span class="tok-num">100</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">10.0</span>, <span class="tok-num">10.0</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L220">        assert!(<span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.5</span>], <span class="tok-num">4</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">10.0</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L221">        assert!(<span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.5</span>], <span class="tok-num">4</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">10.0</span>, <span class="tok-num">0.0</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L222">    }</span>
-<span class="ln" id="L223"></span>
-<span class="ln" id="L224">    <span class="tok-com">/// More columns than samples must still give a column each, so a very</span></span>
-<span class="ln" id="L225">    <span class="tok-com">/// short file draws as something rather than as nothing.</span></span>
-<span class="ln" id="L226">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L227">    <span class="tok-kw">fn</span> <span class="tok-fn">more_columns_than_samples_still_draws</span>() {</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.9</span>, -<span class="tok-num">0.9</span>], <span class="tok-num">16</span>);</span>
-<span class="ln" id="L229">        assert_eq!(envelope.<span class="tok-fn">len</span>(), <span class="tok-num">16</span>);</span>
-<span class="ln" id="L230">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|v| *v &gt; <span class="tok-num">0.5</span>));</span>
+<span class="ln" id="L144"></span>
+<span class="src-item" id="fn-svg_path">
+<span class="ln" id="L145"><span class="tok-com">/// The envelope as an SVG path, filled, inside a box.</span></span>
+<span class="ln" id="L146"><span class="tok-com">///</span></span>
+<span class="ln" id="L147"><span class="tok-com">/// Traced left to right along the maxima and right to left along the minima,</span></span>
+<span class="ln" id="L148"><span class="tok-com">/// then closed: one filled shape rather than a thousand rectangles, which is a</span></span>
+<span class="ln" id="L149"><span class="tok-com">/// tenth of the markup and draws in one operation.</span></span>
+<span class="ln" id="L150"><span class="tok-com">///</span></span>
+<span class="ln" id="L151"><span class="tok-com">/// Coordinates are rounded to two decimals. A waveform does not need more, and</span></span>
+<span class="ln" id="L152"><span class="tok-com">/// full `f32` precision triples the size of the path for a difference nothing</span></span>
+<span class="ln" id="L153"><span class="tok-com">/// can display.</span></span>
+<span class="ln" id="L154"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">svg_path</span>(envelope: &amp;Envelope, x: f32, y: f32, width: f32, height: f32) -&gt; String {</span>
+<span class="ln" id="L155">    <span class="tok-kw">if</span> envelope.<span class="tok-fn">is_empty</span>() || width &lt;= <span class="tok-num">0.0</span> || height &lt;= <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L156">        <span class="tok-kw">return</span> String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L157">    }</span>
+<span class="ln" id="L158">    <span class="tok-kw">let</span> middle = y + height / <span class="tok-num">2.0</span>;</span>
+<span class="ln" id="L159">    <span class="tok-kw">let</span> half = height / <span class="tok-num">2.0</span>;</span>
+<span class="ln" id="L160">    <span class="tok-kw">let</span> step = width / envelope.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L161">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path = String::<span class="tok-fn">with_capacity</span>(envelope.<span class="tok-fn">len</span>() * <span class="tok-num">16</span>);</span>
+<span class="ln" id="L162"></span>
+<span class="ln" id="L163">    <span class="tok-kw">for</span> (column, high) <span class="tok-kw">in</span> envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L164">        <span class="tok-kw">let</span> px = x + column <span class="tok-kw">as</span> f32 * step;</span>
+<span class="ln" id="L165">        <span class="tok-kw">let</span> py = middle - high * half;</span>
+<span class="ln" id="L166">        path.<span class="tok-fn">push_str</span>(<span class="tok-kw">if</span> column == <span class="tok-num">0</span> { <span class="tok-str">&quot;M&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;L&quot;</span> });</span>
+<span class="ln" id="L167">        path.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;{px:.2} {py:.2} &quot;</span>));</span>
+<span class="ln" id="L168">    }</span>
+<span class="ln" id="L169">    <span class="tok-kw">for</span> (column, low) <span class="tok-kw">in</span> envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>().<span class="tok-fn">rev</span>() {</span>
+<span class="ln" id="L170">        <span class="tok-kw">let</span> px = x + column <span class="tok-kw">as</span> f32 * step;</span>
+<span class="ln" id="L171">        <span class="tok-kw">let</span> py = middle - low * half;</span>
+<span class="ln" id="L172">        path.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;L{px:.2} {py:.2} &quot;</span>));</span>
+<span class="ln" id="L173">    }</span>
+<span class="ln" id="L174">    path.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;Z&#x27;</span>);</span>
+<span class="ln" id="L175">    path</span>
+<span class="ln" id="L176">}</span>
+</span>
+<span class="ln" id="L177"></span>
+<span class="ln" id="L178"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L179"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L180">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L181"></span>
+<span class="ln" id="L182">    <span class="tok-kw">fn</span> <span class="tok-fn">ramp</span>(len: usize) -&gt; Vec&lt;f32&gt; {</span>
+<span class="ln" id="L183">        (<span class="tok-num">0</span>..len)</span>
+<span class="ln" id="L184">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 / len <span class="tok-kw">as</span> f32) * <span class="tok-num">2.0</span> - <span class="tok-num">1.0</span>)</span>
+<span class="ln" id="L185">            .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L186">    }</span>
+<span class="ln" id="L187"></span>
+<span class="ln" id="L188">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L189">    <span class="tok-kw">fn</span> <span class="tok-fn">an_envelope_has_one_pair_per_column</span>() {</span>
+<span class="ln" id="L190">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;<span class="tok-fn">ramp</span>(<span class="tok-num">10_000</span>), <span class="tok-num">200</span>);</span>
+<span class="ln" id="L191">        assert_eq!(envelope.<span class="tok-fn">len</span>(), <span class="tok-num">200</span>);</span>
+<span class="ln" id="L192">        assert_eq!(envelope.max.<span class="tok-fn">len</span>(), <span class="tok-num">200</span>);</span>
+<span class="ln" id="L193">        assert!(!envelope.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L194">    }</span>
+<span class="ln" id="L195"></span>
+<span class="ln" id="L196">    <span class="tok-com">/// The extremes are the point. An average over a symmetric waveform is</span></span>
+<span class="ln" id="L197">    <span class="tok-com">/// approximately zero however loud it was, and a waveform drawn from</span></span>
+<span class="ln" id="L198">    <span class="tok-com">/// averages is a flat line.</span></span>
+<span class="ln" id="L199">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L200">    <span class="tok-kw">fn</span> <span class="tok-fn">a_loud_symmetric_signal_does_not_average_away</span>() {</span>
+<span class="ln" id="L201">        <span class="tok-kw">let</span> alternating: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">4800</span>)</span>
+<span class="ln" id="L202">            .<span class="tok-fn">map</span>(|i| <span class="tok-kw">if</span> i % <span class="tok-num">2</span> == <span class="tok-num">0</span> { <span class="tok-num">0.9</span> } <span class="tok-kw">else</span> { -<span class="tok-num">0.9</span> })</span>
+<span class="ln" id="L203">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L204">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;alternating, <span class="tok-num">100</span>);</span>
+<span class="ln" id="L205">        <span class="tok-kw">for</span> column <span class="tok-kw">in</span> <span class="tok-num">0</span>..envelope.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L206">            assert!(envelope.max[column] &gt; <span class="tok-num">0.8</span>, <span class="tok-str">&quot;column {column} lost its peak&quot;</span>);</span>
+<span class="ln" id="L207">            assert!(envelope.min[column] &lt; -<span class="tok-num">0.8</span>, <span class="tok-str">&quot;column {column} lost its peak&quot;</span>);</span>
+<span class="ln" id="L208">        }</span>
+<span class="ln" id="L209">    }</span>
+<span class="ln" id="L210"></span>
+<span class="ln" id="L211">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L212">    <span class="tok-kw">fn</span> <span class="tok-fn">silence_is_flat_and_still_has_its_columns</span>() {</span>
+<span class="ln" id="L213">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;vec![<span class="tok-num">0</span>.0f32; <span class="tok-num">4800</span>], <span class="tok-num">64</span>);</span>
+<span class="ln" id="L214">        assert_eq!(envelope.<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
+<span class="ln" id="L215">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v == <span class="tok-num">0.0</span>));</span>
+<span class="ln" id="L216">        assert!(envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v == <span class="tok-num">0.0</span>));</span>
+<span class="ln" id="L217">    }</span>
+<span class="ln" id="L218"></span>
+<span class="ln" id="L219">    <span class="tok-com">/// One NaN would make a column NaN and the path unparseable, which fails</span></span>
+<span class="ln" id="L220">    <span class="tok-com">/// as a blank page rather than as a wrong one.</span></span>
+<span class="ln" id="L221">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L222">    <span class="tok-kw">fn</span> <span class="tok-fn">a_non_finite_sample_does_not_poison_its_column</span>() {</span>
+<span class="ln" id="L223">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> samples = vec![<span class="tok-num">0</span>.5f32; <span class="tok-num">1000</span>];</span>
+<span class="ln" id="L224">        samples[<span class="tok-num">10</span>] = f32::NAN;</span>
+<span class="ln" id="L225">        samples[<span class="tok-num">11</span>] = f32::INFINITY;</span>
+<span class="ln" id="L226">        samples[<span class="tok-num">12</span>] = f32::NEG_INFINITY;</span>
+<span class="ln" id="L227">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;samples, <span class="tok-num">10</span>);</span>
+<span class="ln" id="L228">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
+<span class="ln" id="L229">        assert!(envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
+<span class="ln" id="L230">        assert!(!<span class="tok-fn">svg_path</span>(&amp;envelope, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">40.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NaN&quot;</span>));</span>
 <span class="ln" id="L231">    }</span>
 <span class="ln" id="L232"></span>
-<span class="ln" id="L233">    <span class="tok-com">/// One closed shape, not a thousand rectangles.</span></span>
-<span class="ln" id="L234">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L235">    <span class="tok-kw">fn</span> <span class="tok-fn">the_path_is_a_single_closed_shape</span>() {</span>
-<span class="ln" id="L236">        <span class="tok-kw">let</span> path = <span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;<span class="tok-fn">ramp</span>(<span class="tok-num">1000</span>), <span class="tok-num">50</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">40.0</span>);</span>
-<span class="ln" id="L237">        assert_eq!(path.<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;M&#x27;</span>).<span class="tok-fn">count</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;more than one subpath&quot;</span>);</span>
-<span class="ln" id="L238">        assert!(path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;Z&#x27;</span>));</span>
-<span class="ln" id="L239">        <span class="tok-com">// Out along the maxima and back along the minima: two points per</span></span>
-<span class="ln" id="L240">        <span class="tok-com">// column, less the one that starts with M.</span></span>
-<span class="ln" id="L241">        assert_eq!(path.<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;L&#x27;</span>).<span class="tok-fn">count</span>(), <span class="tok-num">50</span> * <span class="tok-num">2</span> - <span class="tok-num">1</span>);</span>
-<span class="ln" id="L242">    }</span>
-<span class="ln" id="L243"></span>
-<span class="ln" id="L244">    <span class="tok-com">/// Two decimals is all a waveform needs, and full precision triples the</span></span>
-<span class="ln" id="L245">    <span class="tok-com">/// markup for a difference nothing can display.</span></span>
-<span class="ln" id="L246">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L247">    <span class="tok-kw">fn</span> <span class="tok-fn">coordinates_are_rounded</span>() {</span>
-<span class="ln" id="L248">        <span class="tok-kw">let</span> path = <span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;<span class="tok-fn">ramp</span>(<span class="tok-num">999</span>), <span class="tok-num">7</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">41.0</span>);</span>
-<span class="ln" id="L249">        <span class="tok-kw">for</span> number <span class="tok-kw">in</span> path</span>
-<span class="ln" id="L250">            .<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&#x27;Z&#x27;</span>)</span>
-<span class="ln" id="L251">            .<span class="tok-fn">split</span>([<span class="tok-str">&#x27;M&#x27;</span>, <span class="tok-str">&#x27;L&#x27;</span>, <span class="tok-str">&#x27; &#x27;</span>])</span>
-<span class="ln" id="L252">            .<span class="tok-fn">filter</span>(|part| !part.<span class="tok-fn">is_empty</span>())</span>
-<span class="ln" id="L253">        {</span>
-<span class="ln" id="L254">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(point) = number.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;.&#x27;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>) {</span>
-<span class="ln" id="L255">                assert!(point.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">2</span>, <span class="tok-str">&quot;{number} has more than two decimals&quot;</span>);</span>
-<span class="ln" id="L256">            }</span>
-<span class="ln" id="L257">        }</span>
-<span class="ln" id="L258">    }</span>
-<span class="ln" id="L259">}</span>
+<span class="ln" id="L233">    <span class="tok-com">/// Samples outside full scale are clamped, so the path cannot escape its</span></span>
+<span class="ln" id="L234">    <span class="tok-com">/// box and draw over the rest of the page.</span></span>
+<span class="ln" id="L235">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L236">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signal_past_full_scale_stays_inside_its_box</span>() {</span>
+<span class="ln" id="L237">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">5.0</span>, -<span class="tok-num">5.0</span>, <span class="tok-num">3.0</span>, -<span class="tok-num">3.0</span>], <span class="tok-num">2</span>);</span>
+<span class="ln" id="L238">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v &lt;= <span class="tok-num">1.0</span>));</span>
+<span class="ln" id="L239">        assert!(envelope.min.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| *v &gt;= -<span class="tok-num">1.0</span>));</span>
+<span class="ln" id="L240"></span>
+<span class="ln" id="L241">        <span class="tok-kw">let</span> path = <span class="tok-fn">svg_path</span>(&amp;envelope, <span class="tok-num">10.0</span>, <span class="tok-num">20.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">40.0</span>);</span>
+<span class="ln" id="L242">        <span class="tok-kw">for</span> pair <span class="tok-kw">in</span> path.<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&#x27;Z&#x27;</span>).<span class="tok-fn">split</span>([<span class="tok-str">&#x27;M&#x27;</span>, <span class="tok-str">&#x27;L&#x27;</span>]) {</span>
+<span class="ln" id="L243">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> parts = pair.<span class="tok-fn">split_whitespace</span>();</span>
+<span class="ln" id="L244">            <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(px), <span class="tok-fn">Some</span>(py)) = (parts.<span class="tok-fn">next</span>(), parts.<span class="tok-fn">next</span>()) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L245">                continue;</span>
+<span class="ln" id="L246">            };</span>
+<span class="ln" id="L247">            <span class="tok-kw">let</span> px: f32 = px.<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L248">            <span class="tok-kw">let</span> py: f32 = py.<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L249">            assert!((<span class="tok-num">10.0</span>..=<span class="tok-num">110.0</span>).<span class="tok-fn">contains</span>(&amp;px), <span class="tok-str">&quot;{px} is outside the box&quot;</span>);</span>
+<span class="ln" id="L250">            assert!((<span class="tok-num">20.0</span>..=<span class="tok-num">60.0</span>).<span class="tok-fn">contains</span>(&amp;py), <span class="tok-str">&quot;{py} is outside the box&quot;</span>);</span>
+<span class="ln" id="L251">        }</span>
+<span class="ln" id="L252">    }</span>
+<span class="ln" id="L253"></span>
+<span class="ln" id="L254">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L255">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_in_gives_nothing_out_rather_than_dividing_by_zero</span>() {</span>
+<span class="ln" id="L256">        assert!(<span class="tok-fn">envelope</span>(&amp;[], <span class="tok-num">100</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L257">        assert!(<span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.1</span>, <span class="tok-num">0.2</span>], <span class="tok-num">0</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L258">        assert!(<span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;[], <span class="tok-num">100</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">10.0</span>, <span class="tok-num">10.0</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L259">        assert!(<span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.5</span>], <span class="tok-num">4</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">10.0</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L260">        assert!(<span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.5</span>], <span class="tok-num">4</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">10.0</span>, <span class="tok-num">0.0</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L261">    }</span>
+<span class="ln" id="L262"></span>
+<span class="ln" id="L263">    <span class="tok-com">/// More columns than samples must still give a column each, so a very</span></span>
+<span class="ln" id="L264">    <span class="tok-com">/// short file draws as something rather than as nothing.</span></span>
+<span class="ln" id="L265">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L266">    <span class="tok-kw">fn</span> <span class="tok-fn">more_columns_than_samples_still_draws</span>() {</span>
+<span class="ln" id="L267">        <span class="tok-kw">let</span> envelope = <span class="tok-fn">envelope</span>(&amp;[<span class="tok-num">0.9</span>, -<span class="tok-num">0.9</span>], <span class="tok-num">16</span>);</span>
+<span class="ln" id="L268">        assert_eq!(envelope.<span class="tok-fn">len</span>(), <span class="tok-num">16</span>);</span>
+<span class="ln" id="L269">        assert!(envelope.max.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|v| *v &gt; <span class="tok-num">0.5</span>));</span>
+<span class="ln" id="L270">    }</span>
+<span class="ln" id="L271"></span>
+<span class="ln" id="L272">    <span class="tok-com">/// One closed shape, not a thousand rectangles.</span></span>
+<span class="ln" id="L273">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L274">    <span class="tok-kw">fn</span> <span class="tok-fn">the_path_is_a_single_closed_shape</span>() {</span>
+<span class="ln" id="L275">        <span class="tok-kw">let</span> path = <span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;<span class="tok-fn">ramp</span>(<span class="tok-num">1000</span>), <span class="tok-num">50</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">40.0</span>);</span>
+<span class="ln" id="L276">        assert_eq!(path.<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;M&#x27;</span>).<span class="tok-fn">count</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;more than one subpath&quot;</span>);</span>
+<span class="ln" id="L277">        assert!(path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;Z&#x27;</span>));</span>
+<span class="ln" id="L278">        <span class="tok-com">// Out along the maxima and back along the minima: two points per</span></span>
+<span class="ln" id="L279">        <span class="tok-com">// column, less the one that starts with M.</span></span>
+<span class="ln" id="L280">        assert_eq!(path.<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;L&#x27;</span>).<span class="tok-fn">count</span>(), <span class="tok-num">50</span> * <span class="tok-num">2</span> - <span class="tok-num">1</span>);</span>
+<span class="ln" id="L281">    }</span>
+<span class="ln" id="L282"></span>
+<span class="ln" id="L283">    <span class="tok-com">/// Two decimals is all a waveform needs, and full precision triples the</span></span>
+<span class="ln" id="L284">    <span class="tok-com">/// markup for a difference nothing can display.</span></span>
+<span class="ln" id="L285">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L286">    <span class="tok-kw">fn</span> <span class="tok-fn">coordinates_are_rounded</span>() {</span>
+<span class="ln" id="L287">        <span class="tok-kw">let</span> path = <span class="tok-fn">svg_path</span>(&amp;<span class="tok-fn">envelope</span>(&amp;<span class="tok-fn">ramp</span>(<span class="tok-num">999</span>), <span class="tok-num">7</span>), <span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">100.0</span>, <span class="tok-num">41.0</span>);</span>
+<span class="ln" id="L288">        <span class="tok-kw">for</span> number <span class="tok-kw">in</span> path</span>
+<span class="ln" id="L289">            .<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&#x27;Z&#x27;</span>)</span>
+<span class="ln" id="L290">            .<span class="tok-fn">split</span>([<span class="tok-str">&#x27;M&#x27;</span>, <span class="tok-str">&#x27;L&#x27;</span>, <span class="tok-str">&#x27; &#x27;</span>])</span>
+<span class="ln" id="L291">            .<span class="tok-fn">filter</span>(|part| !part.<span class="tok-fn">is_empty</span>())</span>
+<span class="ln" id="L292">        {</span>
+<span class="ln" id="L293">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(point) = number.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;.&#x27;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L294">                assert!(point.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">2</span>, <span class="tok-str">&quot;{number} has more than two decimals&quot;</span>);</span>
+<span class="ln" id="L295">            }</span>
+<span class="ln" id="L296">        }</span>
+<span class="ln" id="L297">    }</span>
+<span class="ln" id="L298">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -8,6 +8,30 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**A level under every speaker's name** (marker 139, the first of its two halves)
+
+- The preview page lit whoever had the turn and said nothing more. A lit circle
+  cannot say whether that person is mid-sentence or mid-pause, and those look
+  identical for as long as the turn lasts, so under each name there is now a bar
+  that moves with the sound.
+- **Drawn from the same envelope as the waveform beneath it**, so the two cannot
+  disagree: one array, two things drawn from it, and the page is animated from
+  the numbers it drew rather than from a second copy.
+- **It is the mix, given to whoever is speaking**, and the guide says so. A
+  render produces one mixed track, so there is no separate signal per person to
+  measure. That is the same thing while one person talks; where two turns
+  overlap both show the same bar, which is what a listener hears and is not a
+  claim that each was that loud.
+- Somebody whose turn it is not shows **nothing**, rather than a small amount. A
+  bar moving for a person who is not speaking would be the one thing on the
+  picture actively saying something untrue.
+- The track is always drawn and only the filled part moves, so the layout does
+  not shift under the reader every time somebody stops talking.
+- **What is left is drawing the frames.** The video file is still veiled audio
+  over a black picture. That needs a rasteriser and a font, neither of which is
+  a small addition, and the roadmap row says what they are and why a full SVG
+  rasteriser is the wrong way to get them.
+
 **Dependabot, configured, and a check that keeps it true**
 
 - There was no `.github/dependabot.yml`. Nothing had ever raised a version

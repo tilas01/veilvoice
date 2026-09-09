@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/page.svg" alt="page.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/page.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1440 lines &middot; <a href="page.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1610 lines &middot; <a href="page.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-page-rather-than-a-video-file">Why a page rather than a video file</a>
@@ -78,12 +78,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1440 lines defining <strong>19 functions</strong> (9 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1610 lines defining <strong>19 functions</strong> (9 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Look</code> <span style="color:var(--muted)">line 62</span> &middot; What the picture looks like.</li>
 <li><code>enum Background</code> <span style="color:var(--muted)">line 94</span> &middot; What sits behind the picture.</li>
 <li><code>struct Layout</code> <span style="color:var(--muted)">line 175</span> &middot; Where each part of the picture goes.</li>
-<li><code>struct Drawn</code> <span style="color:var(--muted)">line 703</span> &middot; What a render produced, and anything the user should know about it.</li>
+<li><code>struct Drawn</code> <span style="color:var(--muted)">line 749</span> &middot; What a render produced, and anything the user should know about it.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Look::black</code> <span style="color:var(--muted)">line 103</span> &middot; Black, for somebody who wants the plainest possible picture.
@@ -95,7 +95,7 @@
 <li><code>inline_vtt</code> <span style="color:var(--muted)">line 326</span> &middot; A WebVTT track as a data: URI, so a page opened from disk still has it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base64</code></span>
 </li>
-<li><code>player</code> <span style="color:var(--muted)">line 821</span> &middot; The self-contained page that plays.
+<li><code>player</code> <span style="color:var(--muted)">line 878</span> &middot; The self-contained page that plays.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>escape</code>, <code>player_body</code>, <code>player_head</code>, <code>player_script</code>, <code>still</code>, <code>layout</code>, <code>names_array</code>, <code>background_markup</code>, <code>speaker_markup</code>, <code>js_string</code>, <code>data_uri</code>, <code>base64</code></span>
 </li>
 </ul>
@@ -206,27 +206,27 @@
 <a href="page.src.html#fn-names_array">
 <rect x="262.1" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="320.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">names_array</text>
-<text x="320.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 593</text>
+<text x="320.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 607</text>
 </a>
 <a href="page.src.html#fn-js_string">
 <rect x="270.2" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="320.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">js_string</text>
-<text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 603</text>
+<text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 617</text>
 </a>
 <a href="page.src.html#fn-speaker_markup">
 <rect x="211.0" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="281.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">speaker_markup</text>
-<text x="281.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 627</text>
+<text x="281.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 641</text>
 </a>
 <a href="page.src.html#fn-still">
 <rect x="377.8" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="424.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">still</text>
-<text x="424.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 717</text>
+<text x="424.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 763</text>
 </a>
 <a href="page.src.html#fn-player">
 <rect x="496.3" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="542.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">player</text>
-<text x="542.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 821</text>
+<text x="542.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 878</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -259,11 +259,11 @@ flowchart TD
     n_player_head[&quot;player_head&lt;br/&gt;line 384&quot;]
     n_player_body[&quot;player_body&lt;br/&gt;line 436&quot;]
     n_player_script[&quot;player_script&lt;br/&gt;line 506&quot;]
-    n_names_array[&quot;names_array&lt;br/&gt;line 593&quot;]
-    n_js_string[&quot;js_string&lt;br/&gt;line 603&quot;]
-    n_speaker_markup[&quot;speaker_markup&lt;br/&gt;line 627&quot;]
-    n_still[&quot;still&lt;br/&gt;line 717&quot;]
-    n_player([&quot;player&lt;br/&gt;line 821&quot;])
+    n_names_array[&quot;names_array&lt;br/&gt;line 607&quot;]
+    n_js_string[&quot;js_string&lt;br/&gt;line 617&quot;]
+    n_speaker_markup[&quot;speaker_markup&lt;br/&gt;line 641&quot;]
+    n_still[&quot;still&lt;br/&gt;line 763&quot;]
+    n_player([&quot;player&lt;br/&gt;line 878&quot;])
     n_background_markup --&gt; n_data_uri
     n_background_markup --&gt; n_escape
     n_data_uri --&gt; n_base64
@@ -298,11 +298,11 @@ flowchart TD
     click n_player_head href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L384&quot; &quot;open the source&quot;
     click n_player_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L436&quot; &quot;open the source&quot;
     click n_player_script href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L506&quot; &quot;open the source&quot;
-    click n_names_array href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L593&quot; &quot;open the source&quot;
-    click n_js_string href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L603&quot; &quot;open the source&quot;
-    click n_speaker_markup href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L627&quot; &quot;open the source&quot;
-    click n_still href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L717&quot; &quot;open the source&quot;
-    click n_player href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L821&quot; &quot;open the source&quot;
+    click n_names_array href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L607&quot; &quot;open the source&quot;
+    click n_js_string href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L617&quot; &quot;open the source&quot;
+    click n_speaker_markup href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L641&quot; &quot;open the source&quot;
+    click n_still href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L763&quot; &quot;open the source&quot;
+    click n_player href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L878&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_black,n_themed,n_checked,n_inline_vtt,n_player entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -332,13 +332,13 @@ flowchart TD
 <tr><td><code>player_head</code> <sub>fn</sub></td><td><a href="page.src.html#fn-player_head">384</a></td><td>The document head and the stylesheet.</td></tr>
 <tr><td><code>player_body</code> <sub>fn</sub></td><td><a href="page.src.html#fn-player_body">436</a></td><td>The visible page: the drawing, the audio, the transport and the panel.</td></tr>
 <tr><td><code>player_script</code> <sub>fn</sub></td><td><a href="page.src.html#fn-player_script">506</a></td><td>The script: lighting the right circle, the transport, and the corrections.</td></tr>
-<tr><td><code>names_array</code> <sub>fn</sub></td><td><a href="page.src.html#fn-names_array">593</a></td><td>The speakers&#x27; names as a JavaScript array literal.</td></tr>
-<tr><td><code>js_string</code> <sub>fn</sub></td><td><a href="page.src.html#fn-js_string">603</a></td><td>One name, safe to sit inside a double-quoted JavaScript string in HTML.</td></tr>
-<tr><td><code>speaker_markup</code> <sub>fn</sub></td><td><a href="page.src.html#fn-speaker_markup">627</a></td><td>One speaker&#x27;s circle and name, as SVG.</td></tr>
-<tr><td><code>Drawn</code> <sub>pub struct</sub></td><td><a href="page.src.html#fn-drawn">703</a></td><td>What a render produced, and anything the user should know about it.</td></tr>
-<tr><td><code>still</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-still">717</a></td><td>A single frame, as standalone SVG.</td></tr>
-<tr><td><code>player</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-player">821</a></td><td>The self-contained page that plays.</td></tr>
-<tr><td><code>player_tests</code> <sub>mod</sub></td><td><a href="page.src.html#fn-player_tests">1262</a></td><td></td></tr>
+<tr><td><code>names_array</code> <sub>fn</sub></td><td><a href="page.src.html#fn-names_array">607</a></td><td>The speakers&#x27; names as a JavaScript array literal.</td></tr>
+<tr><td><code>js_string</code> <sub>fn</sub></td><td><a href="page.src.html#fn-js_string">617</a></td><td>One name, safe to sit inside a double-quoted JavaScript string in HTML.</td></tr>
+<tr><td><code>speaker_markup</code> <sub>fn</sub></td><td><a href="page.src.html#fn-speaker_markup">641</a></td><td>One speaker&#x27;s circle and name, as SVG.</td></tr>
+<tr><td><code>Drawn</code> <sub>pub struct</sub></td><td><a href="page.src.html#fn-drawn">749</a></td><td>What a render produced, and anything the user should know about it.</td></tr>
+<tr><td><code>still</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-still">763</a></td><td>A single frame, as standalone SVG.</td></tr>
+<tr><td><code>player</code> <sub>pub fn</sub></td><td><a href="page.src.html#fn-player">878</a></td><td>The self-contained page that plays.</td></tr>
+<tr><td><code>player_tests</code> <sub>mod</sub></td><td><a href="page.src.html#fn-player_tests">1432</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

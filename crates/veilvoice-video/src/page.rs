@@ -503,10 +503,11 @@ fn player_body(plan: &Conversation, svg: &str, audio_href: &str, subtitles_href:
 ///
 /// So the page says what to run, the program does it, and the validation is the
 /// same validation everything else goes through.
-fn player_script(plan: &Conversation, look: &Look, turns: &str) -> String {
+fn player_script(plan: &Conversation, look: &Look, turns: &str, levels: &str) -> String {
     format!(
         "<script>\n(function () {{\n  \
          var turns = [{turns}];\n  \
+         var levels = [{levels}];\n  \
          var names = {names};\n  \
          var audio = document.getElementById('audio');\n  \
          var head = document.getElementById('playhead');\n  \
@@ -517,9 +518,14 @@ fn player_script(plan: &Conversation, look: &Look, turns: &str) -> String {
          var corrections = [];\n  \
          var CMD = 'veilvoice conversation fix PLAN';\n  \
          var groups = [];\n  \
+         var bars = [];\n  \
          for (var i = 0; ; i++) {{\n    \
            var g = document.getElementById('speaker' + i);\n    \
-           if (!g) break;\n    groups.push(g);\n  }}\n  \
+           if (!g) break;\n    groups.push(g);\n    \
+           bars.push(document.getElementById('level' + i));\n  }}\n  \
+         var track = bars[0] ? parseFloat(bars[0].getAttribute('width')) || 0 : 0;\n  \
+         if (bars[0] && bars[0].previousElementSibling) {{\n    \
+           track = parseFloat(bars[0].previousElementSibling.getAttribute('width')) || track;\n  }}\n  \
          var left = {wave_x}, span = {wave_width}, total = {duration};\n  \
          if (bar) bar.hidden = false;\n  \
          function speaking(t) {{\n    \
@@ -529,9 +535,17 @@ fn player_script(plan: &Conversation, look: &Look, turns: &str) -> String {
          function tick() {{\n    \
            var t = audio.currentTime;\n    \
            for (var i = 0; i < groups.length; i++) groups[i].setAttribute('opacity', '0.35');\n    \
+           for (var i = 0; i < bars.length; i++) {{\n      \
+             if (bars[i]) bars[i].setAttribute('width', '0');\n    }}\n    \
+           var loud = 0;\n    \
+           if (levels.length && total > 0) {{\n      \
+             var col = Math.round(Math.min(1, Math.max(0, t / total)) * (levels.length - 1));\n      \
+             loud = levels[col] || 0;\n    }}\n    \
            for (var j = 0; j < turns.length; j++) {{\n      \
              if (t >= turns[j][1] && t < turns[j][2] && groups[turns[j][0]]) {{\n        \
-               groups[turns[j][0]].setAttribute('opacity', '1');\n      }}\n    }}\n    \
+               groups[turns[j][0]].setAttribute('opacity', '1');\n        \
+               var b = bars[turns[j][0]];\n        \
+               if (b) b.setAttribute('width', (loud * track).toFixed(1));\n      }}\n    }}\n    \
            if (head && total > 0) {{\n      \
              var x = left + span * Math.min(1, Math.max(0, t / total));\n      \
              head.setAttribute('x1', x); head.setAttribute('x2', x);\n    }}\n    \
@@ -630,7 +644,11 @@ fn speaker_markup(
     centre_x: f32,
     layout: &Layout,
     active: bool,
-    ink: &str,
+    level: f32,
+    // The palette rather than two colours out of it. This wanted the ink for
+    // the name and the inset for the level's track, and passing each on its own
+    // was two arguments that are one decision: what this picture is drawn in.
+    look: &Look,
 ) -> (String, Vec<String>) {
     let speaker = &plan.speakers()[slot];
     // The speaker's own colour where somebody chose one, and their slot's
@@ -685,13 +703,41 @@ fn speaker_markup(
 
     let label_y = y + radius + (radius * 0.55).max(18.0);
     let font = (radius * 0.36).clamp(11.0, 34.0);
+
+    // **Marker 139.** A level beside the name, so the picture shows the shape
+    // of the conversation rather than only its cast. A lit circle says who has
+    // the turn; it says nothing about whether they are mid-sentence or mid-
+    // pause, and those look identical for as long as the turn lasts.
+    //
+    // Under the name rather than beside it, because a bar to one side makes a
+    // centred name no longer centred, and a row of eight of them would each sit
+    // at a different offset depending on how long the name is.
+    //
+    // Drawn always, at its track's full width, with only the filled part
+    // moving. A bar that appeared and vanished would move the layout under the
+    // reader every time somebody stopped talking.
+    let track_width = (radius * 1.9).max(24.0);
+    let track_height = (radius * 0.14).clamp(3.0, 10.0);
+    let track_x = centre_x - track_width / 2.0;
+    let track_y = label_y + font * 0.55;
+    let filled = track_width * level.clamp(0.0, 1.0);
+    let meter = format!(
+        "<rect x=\"{track_x:.1}\" y=\"{track_y:.1}\" width=\"{track_width:.1}\" \
+         height=\"{track_height:.1}\" rx=\"{r:.1}\" fill=\"{track}\"/>\
+         <rect id=\"level{slot}\" x=\"{track_x:.1}\" y=\"{track_y:.1}\" \
+         width=\"{filled:.1}\" height=\"{track_height:.1}\" rx=\"{r:.1}\" \
+         fill=\"{colour}\"/>",
+        r = track_height / 2.0,
+        track = look.palette.bg_inset,
+    );
+
     (
         format!(
             "<g class=\"speaker\" id=\"speaker{slot}\" opacity=\"{opacity}\">{body}\
              <text x=\"{centre_x:.1}\" y=\"{label_y:.1}\" text-anchor=\"middle\" \
              font-family=\"ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\" \
-             font-size=\"{font:.1}\" fill=\"{}\">{}</text></g>",
-            ink,
+             font-size=\"{font:.1}\" fill=\"{}\">{}</text>{meter}</g>",
+            look.palette.fg,
             escape(&speaker.name)
         ),
         notes,
@@ -757,17 +803,29 @@ pub fn still(
         .map(|turn| turn.speaker)
         .collect();
 
+    // **Marker 139.** How loud it is at this moment, given to whoever the plan
+    // says has the turn. One mixed track exists, so this is the mix; see
+    // `waveform::level_at` for what that does and does not claim when two turns
+    // overlap.
+    let duration = plan.duration().max(1e-9);
+    let level = waveform::level_at(envelope, at_secs / duration);
+
     let count = plan.len().max(1);
     let step = layout.wave_width / count as f32;
     for slot in 0..plan.len() {
         let centre_x = layout.wave_x + step * (slot as f32 + 0.5);
+        let talking = speaking.contains(&slot);
         let (markup, speaker_notes) = speaker_markup(
             plan,
             slot,
             centre_x,
             &layout,
-            speaking.contains(&slot),
-            look.palette.fg,
+            talking,
+            // Nothing, rather than the mix, for somebody whose turn it is not.
+            // A bar that moved for a person who is not speaking would be the
+            // one thing on the picture actively saying something untrue.
+            if talking { level } else { 0.0 },
+            look,
         );
         out.push_str(&markup);
         notes.extend(speaker_notes);
@@ -797,7 +855,6 @@ pub fn still(
             look.palette.muted
         ));
     }
-    let duration = plan.duration().max(1e-9);
     let progress = (at_secs / duration).clamp(0.0, 1.0) as f32;
     let head_x = layout.wave_x + layout.wave_width * progress;
     out.push_str(&format!(
@@ -837,12 +894,32 @@ pub fn player(
         .collect::<Vec<_>>()
         .join(",");
 
+    // **Marker 139.** The same envelope the waveform is drawn from, as the
+    // numbers the bars are moved by. Embedded rather than recomputed, and to
+    // two decimals: this is a bar a few tens of pixels wide, and full `f32`
+    // precision would be three times the bytes for a difference no screen has.
+    //
+    // One array for the whole recording rather than one per speaker, because
+    // there is one mixed track. Which speaker a column belongs to is `turns`,
+    // which is already here.
+    let levels = (0..envelope.len())
+        .map(|column| {
+            let progress = if envelope.len() > 1 {
+                column as f64 / (envelope.len() - 1) as f64
+            } else {
+                0.0
+            };
+            format!("{:.2}", waveform::level_at(envelope, progress))
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+
     let title = escape(plan.title.as_deref().unwrap_or("A veiled conversation"));
     let markup = format!(
         "{head}{body}{script}",
         head = player_head(&title, look),
         body = player_body(plan, &drawn.markup, audio_href, subtitles_href),
-        script = player_script(plan, look, &turns),
+        script = player_script(plan, look, &turns, &levels),
     );
 
     Ok(Drawn {
@@ -936,6 +1013,99 @@ mod tests {
                  shares"
             );
         }
+    }
+
+    /// **Marker 139.** The bar moves for whoever has the turn, and for nobody
+    /// else.
+    ///
+    /// A lit circle says who is speaking. It says nothing about whether they
+    /// are mid-sentence or mid-pause, and those look identical for as long as
+    /// the turn lasts, which is what this adds.
+    #[test]
+    fn only_the_speaker_with_the_turn_has_a_level() {
+        let drawn = still(&plan(), &envelope(), &Look::default(), 1.0).unwrap();
+
+        // At one second slot 0 has the turn. Both bars exist; only theirs is
+        // filled, because a track that appeared and vanished would move the
+        // layout under the reader every time somebody stopped talking.
+        let theirs = filled_width(&drawn.markup, 0).expect("slot 0 has a level bar");
+        let other = filled_width(&drawn.markup, 1).expect("slot 1 has a level bar");
+        assert!(
+            theirs > 0.0,
+            "the speaker with the turn has no level: {theirs}"
+        );
+        assert_eq!(
+            other, 0.0,
+            "a speaker whose turn it is not has a level, which is the one thing \
+             on this picture actively saying something untrue"
+        );
+
+        // And it swaps with the turn.
+        let later = still(&plan(), &envelope(), &Look::default(), 3.0).unwrap();
+        assert_eq!(filled_width(&later.markup, 0), Some(0.0));
+        assert!(filled_width(&later.markup, 1).unwrap() > 0.0);
+    }
+
+    /// Silence draws a bar of nothing, not a bar of something small.
+    #[test]
+    fn a_silent_moment_gives_the_speaker_no_level() {
+        let quiet = waveform::envelope(&vec![0.0f32; 48_000], 400);
+        let drawn = still(&plan(), &quiet, &Look::default(), 1.0).unwrap();
+        assert_eq!(
+            filled_width(&drawn.markup, 0),
+            Some(0.0),
+            "silence drew a level"
+        );
+    }
+
+    /// The numbers the page animates with are the ones it drew the wave from.
+    ///
+    /// Two arrays would be two things to keep in step, and the failure would be
+    /// a bar that disagreed with the waveform under it while both looked
+    /// plausible.
+    #[test]
+    fn the_page_moves_its_bars_from_the_envelope_it_drew() {
+        let envelope = envelope();
+        let drawn = player(
+            &plan(),
+            &envelope,
+            &Look::default(),
+            "veiled.wav",
+            "veiled.vtt",
+        )
+        .unwrap();
+        let at = drawn
+            .markup
+            .find("var levels = [")
+            .expect("the level array");
+        let end = drawn.markup[at..].find("]").unwrap() + at;
+        let embedded: Vec<f32> = drawn.markup[at + 14..end]
+            .split(',')
+            .map(|n| n.parse().expect("a number"))
+            .collect();
+        assert_eq!(
+            embedded.len(),
+            envelope.len(),
+            "the page animates from a different number of columns than it drew"
+        );
+        for (column, &value) in embedded.iter().enumerate() {
+            let progress = column as f64 / (envelope.len() - 1) as f64;
+            let expected = waveform::level_at(&envelope, progress);
+            assert!(
+                (value - expected).abs() <= 0.005,
+                "column {column} was animated as {value} and drawn from {expected}"
+            );
+        }
+    }
+
+    /// The filled part of slot `slot`'s level bar, if it has one.
+    fn filled_width(markup: &str, slot: usize) -> Option<f32> {
+        let needle = format!("id=\"level{slot}\"");
+        let at = markup.find(&needle)?;
+        let rest = &markup[at..];
+        let width = rest.find("width=\"")? + 7;
+        let end = rest[width..].find('"')? + width;
+        rest[width..end].parse().ok()
     }
 
     /// The circle that is lit must be the one whose turn it is.

@@ -103,6 +103,45 @@ pub fn envelope(samples: &[f32], columns: usize) -> Envelope {
     Envelope { min, max }
 }
 
+/// How loud the recording is at `progress`, from 0.0 to 1.0.
+///
+/// **Marker 139.** The bar beside each speaker's name is drawn from this. It
+/// reads the same envelope the waveform is drawn from rather than the samples,
+/// so the bar and the wave under it can never disagree: one array, two things
+/// drawn from it.
+///
+/// `progress` is a fraction of the recording rather than a time in seconds,
+/// because the envelope has no idea how long the audio is. The caller has the
+/// duration and does that division once.
+///
+/// # What this is, and what it is not
+///
+/// It is the loudness of the **mix** at that moment. The renderer produces one
+/// mixed track, so there is no separate signal per person to measure, and the
+/// picture attributes this to whoever the plan says is speaking.
+///
+/// While one person is talking those are the same thing. Where two turns
+/// overlap they are not: both speakers show the same bar, because that is one
+/// number and there are two of them. It is what a listener hears, and it is not
+/// a claim that each of them was that loud.
+pub fn level_at(envelope: &Envelope, progress: f64) -> f32 {
+    if envelope.is_empty() {
+        return 0.0;
+    }
+    let last = envelope.len() - 1;
+    // Clamped rather than wrapped: a progress past the end is the playhead at
+    // the end, which is the last column, and never the first.
+    let at = (progress.clamp(0.0, 1.0) * last as f64).round() as usize;
+    let at = at.min(last);
+    // The peak either side of zero. A signal that only goes negative is as loud
+    // as one that only goes positive, and a bar that showed the second and not
+    // the first would sit at nothing through half of some recordings.
+    envelope.max[at]
+        .abs()
+        .max(envelope.min[at].abs())
+        .clamp(0.0, 1.0)
+}
+
 /// The envelope as an SVG path, filled, inside a box.
 ///
 /// Traced left to right along the maxima and right to left along the minima,
