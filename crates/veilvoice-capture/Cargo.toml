@@ -14,4 +14,6 @@ description = "Which screen-recording programs are running, an allowlist for the
 veilvoice-proc = { path = "../veilvoice-proc" }
 
 [dev-dependencies]
+# Tests that write a file and read it back, in a directory that goes away with
+# them.
 tempfile = "3"

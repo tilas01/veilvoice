@@ -9,7 +9,11 @@ repository.workspace = true
 description = "Ransomware canaries and mass-change rate detection: an early warning that says plainly what it cannot do."
 
 [dependencies]
+# The SHA-256 a canary file is recognised by, and the digest the rate-limit
+# record is bound with.
 sha2 = "0.10"
 
 [dev-dependencies]
+# Tests that plant a canary or a rate-limit record and read it back, in a
+# directory that goes away with them.
 tempfile = "3"

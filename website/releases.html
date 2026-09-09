@@ -168,6 +168,13 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Optimisation stops being a pass and becomes how this is written</strong></p>
+<ul>
+<li>The practices marker 125&#x27;s reading established are now in <code>CLAUDE.md</code> as the standing way this project is written, and three of the four are enforced by a build rather than by somebody remembering.</li>
+<li><strong>No audio callback allocates, blocks or prints.</strong> A callback runs on the operating system&#x27;s audio thread with a deadline of a few milliseconds; allocating takes a lock in the allocator, blocking on a mutex hands the thread away, and printing takes the lock on standard output. Each of the three callbacks already carried a comment saying its buffers are sized once. A test now reads the callbacks themselves and fails naming the line and what it would cost.</li>
+<li><strong>Every dependency says what it is for, on the line that declares it</strong>, checked in CI. A dependency is code this project ships and does not review, build time on every machine that compiles this, and one more thing that has to work on the BSDs and the 32-bit targets. If there is no sentence to write, that is the answer.</li>
+<li>Writing those sentences found three dependencies no line of code referred to: <code>sha2</code> in <code>veilvoice-verify</code>, <code>hex</code> in its tests and <code>hex-literal</code> in the crypto crate&#x27;s. All three had been compiled by every build on every platform for as long as they had been there. They are gone.</li>
+</ul>
 <p><strong>Live scramble is the Studio now, not a tab beside it</strong></p>
 <ul>
 <li>Veiling as it runs has stopped being a separate tab. The Studio is where it happens, and the tab is the voice above and the take below: devices, engine settings, meters, performance figures and the preview button on top, the vault and the take under them.</li>

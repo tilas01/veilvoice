@@ -9,10 +9,14 @@ repository.workspace = true
 description = "Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles."
 
 [dependencies]
+# The engine each speaker's voice is a configuration of, and the voice table
+# slots are assigned from.
 veilvoice-core = { path = "../veilvoice-core" }
 # For `privatefile`. A plan holds every speaker's name and every word
 # somebody typed, which is the same content as the subtitles it produces.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 
 [dev-dependencies]
+# Tests that write a plan and read it back, in a directory that goes away with
+# them.
 tempfile = "3"
