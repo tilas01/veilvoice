@@ -52,9 +52,9 @@
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
 <span class="ln" id="L2"><span class="tok-com">//! The live monitor: what is going in, and what is coming out, wherever you are.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
-<span class="ln" id="L4"><span class="tok-com">//! # Why this is not just the meters on the live tab</span></span>
+<span class="ln" id="L4"><span class="tok-com">//! # Why this is not just the meters on the Studio tab</span></span>
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
-<span class="ln" id="L6"><span class="tok-com">//! The live tab has drawn an input and an output meter for some time, and they</span></span>
+<span class="ln" id="L6"><span class="tok-com">//! The Studio has drawn an input and an output meter for some time, and they</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! are the right meters. What they were not was *visible*: they are inside one</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! panel, and the moment somebody switched to Group to set up an interview, or</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! to Settings, or to Monitor, the only picture of what their microphone was</span></span>
@@ -77,7 +77,7 @@
 <span class="ln" id="L26"><span class="tok-com">//! the panel, bottom right, for somebody who would rather keep the full height</span></span>
 <span class="ln" id="L27"><span class="tok-com">//! for the panel and accept that it sits on top of a corner of it.</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! [`Style::Off`] is offered because a strip somebody does not want is a strip</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! they will resent, and the live tab still has the full meters either way.</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! they will resent, and the Studio still has the full meters either way.</span></span>
 <span class="ln" id="L30"><span class="tok-com">//!</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! The overlay is deliberately **not** click-through and **not** draggable: a</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! floating thing that moves is a floating thing somebody loses behind the</span></span>
@@ -90,7 +90,7 @@
 <span class="ln" id="L39"><span class="tok-com">//! working meter and a bypassed engine look identical, and saying so is the</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! difference between a monitor and a reassurance. What tells you the engine is</span></span>
 <span class="ln" id="L41"><span class="tok-com">//! running is that the output is a voice that is not yours, which is what the</span></span>
-<span class="ln" id="L42"><span class="tok-com">//! preview on the live tab is for.</span></span>
+<span class="ln" id="L42"><span class="tok-com">//! preview in the Studio is for.</span></span>
 <span class="ln" id="L43"><span class="tok-com">//!</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! # In plain words</span></span>
 <span class="ln" id="L45"><span class="tok-com">//!</span></span>
@@ -118,7 +118,7 @@
 <span class="ln" id="L66">    Toolbar,</span>
 <span class="ln" id="L67">    <span class="tok-com">/// Floating over the bottom right of the panel.</span></span>
 <span class="ln" id="L68">    Overlay,</span>
-<span class="ln" id="L69">    <span class="tok-com">/// Not shown. The live tab still has the full meters.</span></span>
+<span class="ln" id="L69">    <span class="tok-com">/// Not shown. The Studio still has the full meters.</span></span>
 <span class="ln" id="L70">    Off,</span>
 <span class="ln" id="L71">}</span>
 </span>
@@ -130,7 +130,7 @@
 <span class="ln" id="L76">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
 <span class="ln" id="L77">            Self::Toolbar =&gt; <span class="tok-str">&quot;a strip along the bottom&quot;</span>,</span>
 <span class="ln" id="L78">            Self::Overlay =&gt; <span class="tok-str">&quot;a card floating in the corner&quot;</span>,</span>
-<span class="ln" id="L79">            Self::Off =&gt; <span class="tok-str">&quot;only on the live tab&quot;</span>,</span>
+<span class="ln" id="L79">            Self::Off =&gt; <span class="tok-str">&quot;only on the Studio tab&quot;</span>,</span>
 <span class="ln" id="L80">        }</span>
 <span class="ln" id="L81">    }</span>
 </span>
@@ -150,7 +150,7 @@
 <span class="ln" id="L94"><span class="tok-str">                 sits on top of a corner of it.&quot;</span></span>
 <span class="ln" id="L95">            }</span>
 <span class="ln" id="L96">            Self::Off =&gt; {</span>
-<span class="ln" id="L97">                <span class="tok-str">&quot;The monitor is not shown. The live tab still has the full \</span></span>
+<span class="ln" id="L97">                <span class="tok-str">&quot;The monitor is not shown. The Studio still has the full \</span></span>
 <span class="ln" id="L98"><span class="tok-str">                 meters, so this means you see them when you are looking at \</span></span>
 <span class="ln" id="L99"><span class="tok-str">                 that tab and not otherwise.&quot;</span></span>
 <span class="ln" id="L100">            }</span>
@@ -192,7 +192,7 @@
 <span class="ln" id="L129">}</span>
 <span class="ln" id="L130"></span>
 <span class="src-item" id="fn-levels">
-<span class="ln" id="L131"><span class="tok-com">/// The smoothed levels the monitor and the live tab both draw.</span></span>
+<span class="ln" id="L131"><span class="tok-com">/// The smoothed levels the monitor and the Studio both draw.</span></span>
 <span class="ln" id="L132"><span class="tok-com">///</span></span>
 <span class="ln" id="L133"><span class="tok-com">/// One copy, updated once a frame from the session, because two copies is two</span></span>
 <span class="ln" id="L134"><span class="tok-com">/// bars that disagree by a frame and one of them is always the one somebody is</span></span>
@@ -266,9 +266,9 @@
 <span class="ln" id="L195">}</span>
 <span class="ln" id="L196"></span>
 <span class="src-item" id="fn-bar">
-<span class="ln" id="L197"><span class="tok-com">/// A compact bar, for the strip. The full-height one lives on the live tab.</span></span>
+<span class="ln" id="L197"><span class="tok-com">/// A compact bar, for the strip. The full-height one lives on the Studio tab.</span></span>
 <span class="ln" id="L198"><span class="tok-com">///</span></span>
-<span class="ln" id="L199"><span class="tok-com">/// Same scale as `veilvoice_audio::meter`, so this bar, the live tab&#x27;s bar and</span></span>
+<span class="ln" id="L199"><span class="tok-com">/// Same scale as `veilvoice_audio::meter`, so this bar, the Studio&#x27;s bar and</span></span>
 <span class="ln" id="L200"><span class="tok-com">/// the one `veilvoice live` draws in a terminal are the same bar at three</span></span>
 <span class="ln" id="L201"><span class="tok-com">/// sizes. A monitor that used a scale of its own would be a fourth opinion</span></span>
 <span class="ln" id="L202"><span class="tok-com">/// about the same number.</span></span>
@@ -372,7 +372,7 @@
 <span class="ln" id="L296">                <span class="tok-kw">if</span> ui</span>
 <span class="ln" id="L297">                    .<span class="tok-fn">small_button</span>(<span class="tok-str">&quot;close&quot;</span>)</span>
 <span class="ln" id="L298">                    .<span class="tok-fn">on_hover_text</span>(</span>
-<span class="ln" id="L299">                        <span class="tok-str">&quot;Hide this strip. The live tab keeps its meters, and \</span></span>
+<span class="ln" id="L299">                        <span class="tok-str">&quot;Hide this strip. The Studio keeps its meters, and \</span></span>
 <span class="ln" id="L300"><span class="tok-str">                         Settings brings the strip back.&quot;</span>,</span>
 <span class="ln" id="L301">                    )</span>
 <span class="ln" id="L302">                    .<span class="tok-fn">clicked</span>()</span>

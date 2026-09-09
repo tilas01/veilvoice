@@ -67,6 +67,45 @@ pub struct LiveStats {
     pub starved: u64,
 }
 
+/// Which sides of the engine a session keeps.
+///
+/// Both are named at construction rather than passed as a pair of positional
+/// flags, which is the property **marker 131** asked for and which two separate
+/// arguments used to give: no caller reaches a recording of somebody's real
+/// voice without writing the word `plain` next to it.
+///
+/// The default keeps neither, which is what [`LiveSession::start`] is.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Keeping {
+    /// Keep the veiled voice, taken from inside the output callback.
+    pub veiled: bool,
+    /// Keep the microphone, taken from inside the input callback after the
+    /// downmix to mono. This is the real voice, and it is the one thing in
+    /// this crate that records it.
+    pub plain: bool,
+}
+
+impl Keeping {
+    /// Whether anything at all is being kept.
+    pub fn is_anything(self) -> bool {
+        self.veiled || self.plain
+    }
+}
+
+/// The recorders a session was asked for, one per side of [`Keeping`].
+///
+/// Built by the session rather than by the caller, because the rate they are
+/// built at has to be the rate the device agreed to and only the session knows
+/// that. See [`LiveSession::start_recording`] for what went wrong when callers
+/// built their own.
+#[derive(Default)]
+pub struct Kept {
+    /// The veiled voice, present exactly when [`Keeping::veiled`] was set.
+    pub veiled: Option<crate::record::Recorder>,
+    /// The microphone, present exactly when [`Keeping::plain`] was set.
+    pub plain: Option<crate::record::Recorder>,
+}
+
 /// A running live-scramble session. Dropping it stops the audio.
 pub struct LiveSession {
     // Streams must outlive the session; dropping them stops the callbacks.
@@ -93,13 +132,12 @@ impl LiveSession {
         output: &cpal::Device,
         config: DeidConfig,
     ) -> Result<Self, Error> {
-        Self::start_recording(input, output, config, None, None)
+        Self::start_recording(input, output, config, Keeping::default()).map(|(session, _)| session)
     }
 
-    /// Start scrambling, copying the veiled voice into `veiled` and the
-    /// microphone into `plain`, as each is produced.
+    /// Start scrambling, keeping the sides of it [`Keeping`] asks for.
     ///
-    /// Each sink is fed from the callback where its samples exist and from
+    /// Each side is taken from the callback where its samples exist and from
     /// nowhere else. The veiled voice comes from inside the output callback,
     /// which is the only place it exists before it reaches the device; the
     /// microphone comes from inside the input callback, after the downmix to
@@ -107,11 +145,25 @@ impl LiveSession {
     /// mean a second copy of the audio living somewhere unprotected, which is
     /// the thing [`record`](crate::record) is for avoiding.
     ///
-    /// **Marker 131.** `plain` is the one thing in this crate that records the
-    /// real voice, and it is a separate argument rather than a flag on the
-    /// first for that reason: a caller cannot reach it without naming it. It is
-    /// `None` in every path that has not been asked for it, and the interface
-    /// that offers it says what it is before it is started.
+    /// **Marker 131.** [`Keeping::plain`] is the one thing in this crate that
+    /// records the real voice, and it is named at the call site for that
+    /// reason: a caller cannot reach it without writing the word. It is false
+    /// in every path that has not been asked for it, and the interface that
+    /// offers it says what it is before it is started.
+    ///
+    /// # The recorders are built here, and F-166 is why
+    ///
+    /// This used to take a pair of already-built sinks, which meant the caller
+    /// chose the rate the recording would be written at. Both callers passed
+    /// the rate they had *asked* for, `config.sample_rate`, and this function
+    /// then overwrites that with the rate the hardware agreed to. On any device
+    /// not running at 48 kHz the two disagreed, and a WAV header that disagrees
+    /// with its samples plays back at the wrong speed and the wrong pitch:
+    /// on a de-identified recording, a second voice change nobody chose.
+    ///
+    /// So the caller no longer has a rate to get wrong. It says which sides to
+    /// keep, and gets back the recorders for them, built from the rate this
+    /// function is about to run the engine at.
     ///
     /// [`Sink::write`](crate::record::Sink::write) is realtime-safe, so each
     /// costs its callback a memcpy into an already-allocated ring and nothing
@@ -121,9 +173,8 @@ impl LiveSession {
         input: &cpal::Device,
         output: &cpal::Device,
         mut config: DeidConfig,
-        mut veiled: Option<crate::record::Sink>,
-        mut plain: Option<crate::record::Sink>,
-    ) -> Result<Self, Error> {
+        keeping: Keeping,
+    ) -> Result<(Self, Kept), Error> {
         let in_cfg = input
             .default_input_config()
             .map_err(|e| Error::Device(e.to_string()))?;
@@ -135,6 +186,23 @@ impl LiveSession {
         config.sample_rate = sample_rate as f32;
         let in_channels = in_cfg.channels() as usize;
         let out_channels = out_cfg.channels() as usize;
+
+        // The recorders, at the rate the device agreed to rather than the rate
+        // that was asked for. This line is the whole of F-166: it is the first
+        // point at which the true rate exists, and building them anywhere
+        // earlier is building them from a guess.
+        let (veiled_recorder, mut veiled) = if keeping.veiled {
+            let (recorder, sink) = crate::record::start(sample_rate);
+            (Some(recorder), Some(sink))
+        } else {
+            (None, None)
+        };
+        let (plain_recorder, mut plain) = if keeping.plain {
+            let (recorder, sink) = crate::record::start(sample_rate);
+            (Some(recorder), Some(sink))
+        } else {
+            (None, None)
+        };
 
         let mut deid = Deidentifier::new(config).map_err(Error::Engine)?;
 
@@ -252,11 +320,17 @@ impl LiveSession {
             .play()
             .map_err(|e| Error::Stream(e.to_string()))?;
 
-        Ok(Self {
-            _input: input_stream,
-            _output: output_stream,
-            shared,
-        })
+        Ok((
+            Self {
+                _input: input_stream,
+                _output: output_stream,
+                shared,
+            },
+            Kept {
+                veiled: veiled_recorder,
+                plain: plain_recorder,
+            },
+        ))
     }
 
     /// Read the current statistics, resetting the peak meters.

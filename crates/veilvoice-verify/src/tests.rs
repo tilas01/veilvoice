@@ -1036,3 +1036,159 @@ fn no_desktop_test_opens_a_device_a_dialog_or_a_window() {
         offenders.join("\n")
     );
 }
+
+/// **F-166.** Nothing outside the session builds a recorder.
+///
+/// The rate a recorder is built with is written into the WAV header, and it has
+/// to be the rate the device agreed to. Only `LiveSession::start_recording`
+/// knows that, because it is the function that asks the device. Both front ends
+/// used to build their own from `config.sample_rate`, which is the rate that
+/// was asked for, and on any machine not running at 48 kHz the take came out
+/// fast and sharp.
+///
+/// The signature no longer carries a rate, so a third caller cannot repeat it
+/// by passing the wrong one. This is the other half: a third caller cannot
+/// repeat it by going around the session either.
+#[test]
+fn only_the_session_builds_a_recorder() {
+    let crates = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("the crates directory")
+        .to_path_buf();
+
+    /// Where the rate is known, and therefore the one place this may appear.
+    const HOME: &str = "veilvoice-audio";
+
+    let mut sources = Vec::new();
+    let mut pending = vec![crates.clone()];
+    while let Some(directory) = pending.pop() {
+        for entry in std::fs::read_dir(&directory).expect("a crate directory") {
+            let entry = entry.expect("a readable directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                pending.push(path);
+            } else if path.extension().is_some_and(|e| e == "rs") {
+                sources.push(path);
+            }
+        }
+    }
+    assert!(
+        sources.len() > 100,
+        "the walk found {} files, so it is not looking at the workspace",
+        sources.len()
+    );
+
+    let mut offenders = Vec::new();
+    for path in &sources {
+        if path.components().any(|c| c.as_os_str() == HOME) {
+            continue;
+        }
+        let text = std::fs::read_to_string(path)
+            .expect("a readable source file")
+            .replace("\r\n", "\n");
+        for (number, line) in text.lines().enumerate() {
+            let trimmed = line.trim_start();
+            if trimmed.starts_with("//") || trimmed.starts_with("///") {
+                continue;
+            }
+            let Some(at) = line.find("record::start(") else {
+                continue;
+            };
+            // A needle is not a call: this guard names the string it looks for.
+            if line[..at].matches('"').count() % 2 == 1 {
+                continue;
+            }
+            offenders.push(format!(
+                "{}:{}: {}",
+                path.display(),
+                number + 1,
+                line.trim()
+            ));
+        }
+    }
+
+    assert!(
+        offenders.is_empty(),
+        "these build a recorder outside `{HOME}`, so they choose the rate its \
+         WAV header is written with, and the only correct answer is the one the \
+         device gave `LiveSession::start_recording`. Ask that function for the \
+         recorders instead, with a `Keeping`:\n{}",
+        offenders.join("\n")
+    );
+}
+
+/// **Marker 130.** One place in the window starts a live session.
+///
+/// There were two: the live tab and the Studio, each with a session of its own,
+/// so veiling on one and recording on the other opened the same microphone
+/// twice. Live scramble is the Studio now, and `start_session` is the only
+/// starter, which is most of what moving it was worth.
+#[test]
+fn the_desktop_starts_a_live_session_in_exactly_one_place() {
+    let gui = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("the crates directory")
+        .join("veilvoice-gui")
+        .join("src");
+
+    let mut sources = Vec::new();
+    let mut pending = vec![gui.clone()];
+    while let Some(directory) = pending.pop() {
+        for entry in std::fs::read_dir(&directory).expect("the desktop crate's source") {
+            let entry = entry.expect("a readable directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                pending.push(path);
+            } else if path.extension().is_some_and(|e| e == "rs") {
+                sources.push(path);
+            }
+        }
+    }
+
+    let mut starters = Vec::new();
+    for path in &sources {
+        let name = path
+            .file_name()
+            .expect("a file")
+            .to_string_lossy()
+            .into_owned();
+        let text = std::fs::read_to_string(path)
+            .expect("a readable source file")
+            .replace("\r\n", "\n");
+        // Which function each line is in, so the message names it.
+        let mut current = String::new();
+        for (number, line) in text.lines().enumerate() {
+            let trimmed = line.trim_start();
+            if let Some(rest) = trimmed.strip_prefix("fn ") {
+                current = rest.split('(').next().unwrap_or("").to_string();
+            }
+            if trimmed.starts_with("//") {
+                continue;
+            }
+            for needle in ["LiveSession::start(", "LiveSession::start_recording("] {
+                let Some(at) = line.find(needle) else {
+                    continue;
+                };
+                if line[..at].matches('"').count() % 2 == 1 {
+                    continue;
+                }
+                starters.push(format!("{name}:{}: in {current}", number + 1));
+            }
+        }
+    }
+
+    assert_eq!(
+        starters.len(),
+        1,
+        "a live session is started in {} places in the desktop crate. Two \
+         starters is two opens of the same microphone, which is what having a \
+         live tab beside the Studio was:\n{}",
+        starters.len(),
+        starters.join("\n")
+    );
+    assert!(
+        starters[0].starts_with("studio.rs:"),
+        "the one starter should be the Studio's, and it is {}",
+        starters[0]
+    );
+}

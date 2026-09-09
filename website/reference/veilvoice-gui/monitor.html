@@ -50,7 +50,7 @@
 <p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 496 lines &middot; <a href="monitor.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
-  <a href="#why-this-is-not-just-the-meters-on-the-live-tab">Why this is not just the meters on the live tab</a>
+  <a href="#why-this-is-not-just-the-meters-on-the-studio-tab">Why this is not just the meters on the Studio tab</a>
   <a href="#two-places-it-can-sit-and-one-way-to-switch-it-off">Two places it can sit, and one way to switch it off</a>
   <a href="#what-it-does-not-claim">What it does not claim</a>
   <a href="#in-plain-words">In plain words</a>
@@ -61,15 +61,15 @@
 <div>
 <section id="s-about">
 <p>The live monitor: what is going in, and what is coming out, wherever you are.</p>
-<h2 id="why-this-is-not-just-the-meters-on-the-live-tab">Why this is not just the meters on the live tab</h2>
-<p>The live tab has drawn an input and an output meter for some time, and they are the right meters. What they were not was <em>visible</em>: they are inside one panel, and the moment somebody switched to Group to set up an interview, or to Settings, or to Monitor, the only picture of what their microphone was doing went off screen while the audio carried on.</p>
+<h2 id="why-this-is-not-just-the-meters-on-the-studio-tab">Why this is not just the meters on the Studio tab</h2>
+<p>The Studio has drawn an input and an output meter for some time, and they are the right meters. What they were not was <em>visible</em>: they are inside one panel, and the moment somebody switched to Group to set up an interview, or to Settings, or to Monitor, the only picture of what their microphone was doing went off screen while the audio carried on.</p>
 <p>That is the wrong way round for this feature in particular. Live scramble is the mode where the thing being protected is happening <em>now</em>, in real time, and where the two questions a person actually has are &quot;is it hearing me&quot; and &quot;is anything coming out&quot;. A meter you have to navigate to in order to answer them is a meter that answers them late.</p>
 <p>So the monitor rides the window. It is on by default, it shows on every tab, and it shows exactly two things plus their state: the level going in, and the level coming out.</p>
 <h2 id="two-places-it-can-sit-and-one-way-to-switch-it-off">Two places it can sit, and one way to switch it off</h2>
-<p><code>Style::Toolbar</code> docks it to the bottom of the window, where it takes a strip of height and never covers anything. <code>Style::Overlay</code> floats it over the panel, bottom right, for somebody who would rather keep the full height for the panel and accept that it sits on top of a corner of it. <code>Style::Off</code> is offered because a strip somebody does not want is a strip they will resent, and the live tab still has the full meters either way.</p>
+<p><code>Style::Toolbar</code> docks it to the bottom of the window, where it takes a strip of height and never covers anything. <code>Style::Overlay</code> floats it over the panel, bottom right, for somebody who would rather keep the full height for the panel and accept that it sits on top of a corner of it. <code>Style::Off</code> is offered because a strip somebody does not want is a strip they will resent, and the Studio still has the full meters either way.</p>
 <p>The overlay is deliberately <strong>not</strong> click-through and <strong>not</strong> draggable: a floating thing that moves is a floating thing somebody loses behind the window edge, and this one has a close button that sets the preference instead.</p>
 <h2 id="what-it-does-not-claim">What it does not claim</h2>
-<p>It shows levels. A level is not proof that the voice is being changed: a working meter and a bypassed engine look identical, and saying so is the difference between a monitor and a reassurance. What tells you the engine is running is that the output is a voice that is not yours, which is what the preview on the live tab is for.</p>
+<p>It shows levels. A level is not proof that the voice is being changed: a working meter and a bypassed engine look identical, and saying so is the difference between a monitor and a reassurance. What tells you the engine is running is that the output is a voice that is not yours, which is what the preview in the Studio is for.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>A small strip along the bottom of the window showing how loud your voice is going in and how loud the veiled voice is coming out, while live scramble is running.</p>
 <p>It follows you around the application, because the moment you want it is the moment you are doing something else and are not sure the microphone is still working.</p>
@@ -80,7 +80,7 @@
 <p>496 lines defining <strong>10 functions</strong> (8 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Style</code> <span style="color:var(--muted)">line 63</span> &middot; Where the monitor sits, or whether it is shown at all.</li>
-<li><code>struct Levels</code> <span style="color:var(--muted)">line 137</span> &middot; The smoothed levels the monitor and the live tab both draw.</li>
+<li><code>struct Levels</code> <span style="color:var(--muted)">line 137</span> &middot; The smoothed levels the monitor and the Studio both draw.</li>
 <li><code>enum Action</code> <span style="color:var(--muted)">line 259</span> &middot; What the reader did with the monitor this frame.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
@@ -221,7 +221,7 @@ flowchart TD
 <tr><td><code>Style::ALL</code> <sub>pub const</sub></td><td><a href="monitor.src.html#fn-style-all">105</a></td><td>Every style, in the order a picker should offer them.</td></tr>
 <tr><td><code>Style::key</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-key">108</a></td><td>The identifier written to the settings file.</td></tr>
 <tr><td><code>Style::from_key</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-from_key">122</a></td><td>Read a style back.</td></tr>
-<tr><td><code>Levels</code> <sub>pub struct</sub></td><td><a href="monitor.src.html#fn-levels">137</a></td><td>The smoothed levels the monitor and the live tab both draw.</td></tr>
+<tr><td><code>Levels</code> <sub>pub struct</sub></td><td><a href="monitor.src.html#fn-levels">137</a></td><td>The smoothed levels the monitor and the Studio both draw.</td></tr>
 <tr><td><code>HOLD</code> <sub>const</sub></td><td><a href="monitor.src.html#fn-hold">157</a></td><td>How long a held peak stays up before it falls back to the current level.</td></tr>
 <tr><td><code>Levels::update</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-levels-update">161</a></td><td>Take a new reading.</td></tr>
 <tr><td><code>Levels::clear</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-levels-clear">192</a></td><td>Back to nothing, for when a session stops.</td></tr>

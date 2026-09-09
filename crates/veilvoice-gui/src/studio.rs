@@ -7,6 +7,30 @@
 //! one module because they are one vault, and a vault opened in two places is
 //! two chances to get the unlocking wrong.
 //!
+//! # Marker 130: this is also where veiling as it runs happens
+//!
+//! Live scramble was a tab of its own, and it did not need to be. The Studio
+//! has always recorded through the same [`veilvoice_audio::LiveSession`] that
+//! tab ran, with the same engine and the same routing, so the two screens were
+//! one act performed in two rooms: pick the devices over there, come here,
+//! press record.
+//!
+//! Two sessions was the part that was actually wrong. Veiling on one tab and
+//! recording on the other opened the same microphone twice, and on the
+//! platforms that allow that at all the second stream gets a copy of the input
+//! nobody asked for. [`Studio::start_session`] is the only starter now, and a
+//! test reads this crate's source and fails if a second one appears.
+//!
+//! The voice half of the tab is drawn by the window rather than here, because
+//! the device lists and the engine settings belong to the window. What lives
+//! in this module is the session those controls drive, and everything about
+//! the vault.
+//!
+//! **The voice half works with the vault shut.** Veiling a call has never
+//! needed a recording vault, and making somebody set one up before they could
+//! disguise their voice on a call would be a worse program than the one that
+//! had two tabs.
+//!
 //! # The vault needs both passphrases, and asks for both here
 //!
 //! [`veilvoice_crypto::studio::StudioKey`] is derived from the app lock **and**
@@ -108,6 +132,26 @@ enum Phase {
     Recording,
 }
 
+/// What a live session was started with.
+///
+/// Held for as long as one is running, because sinks cannot be attached to a
+/// stream that has already started: beginning a take and ending one each
+/// restart the session, and it has to come back with the devices and the engine
+/// settings it was running with rather than with whatever the window happens to
+/// be set to a minute later.
+#[derive(Clone)]
+struct Setup {
+    /// The engine settings this session is running.
+    config: DeidConfig,
+    /// The chosen input device, or `None` for the default.
+    input: Option<String>,
+    /// The chosen output device, or `None` for the default.
+    output: Option<String>,
+    /// Whether this is a preview: the veiled voice goes to this machine's own
+    /// output and the chosen one is ignored. See [`Studio::start_session`].
+    preview: bool,
+}
+
 /// The Studio and the Browser.
 ///
 /// Every field's default is the shut, empty state, so this derives rather
@@ -126,8 +170,12 @@ pub struct Studio {
     app_entry: String,
     rest_entry: String,
 
-    // --- recording ---
+    // --- veiling, and recording ---
+    /// The running session: the veiled voice going out, whether or not a take
+    /// is being kept from it.
     session: Option<veilvoice_audio::LiveSession>,
+    /// What that session was started with, and `None` when none is running.
+    setup: Option<Setup>,
     recorder: Option<veilvoice_audio::record::Recorder>,
     /// What the next take will be called.
     take_name: String,
@@ -185,21 +233,86 @@ impl Studio {
         self.vault.is_some()
     }
 
-    /// Whether a recording is running.
+    /// Whether a take is being kept.
     ///
     /// The window asks, so that closing it, or locking, does not silently
-    /// abandon a recording somebody is in the middle of making.
+    /// abandon a recording somebody is in the middle of making. A session
+    /// running with nothing attached to it is not a recording: since marker 130
+    /// the Studio veils whether or not it is keeping anything, and treating
+    /// those as the same thing would refuse to close a window over a call
+    /// nobody was recording.
     pub fn is_recording(&self) -> bool {
+        self.recorder.is_some() || self.plain.is_some()
+    }
+
+    /// Whether the veiled voice is going out.
+    pub fn is_veiling(&self) -> bool {
         self.session.is_some()
     }
 
-    /// What phase the tab is in.
+    /// Whether what is going out is a preview to this machine's own output
+    /// rather than to the chosen one.
+    pub fn is_previewing(&self) -> bool {
+        self.setup.as_ref().is_some_and(|setup| setup.preview)
+    }
+
+    /// The smoothed levels, for the monitor strip and for this tab.
+    pub fn levels(&self) -> &crate::monitor::Levels {
+        &self.levels
+    }
+
+    /// Read the session's counters, once a frame, and move the levels on.
+    ///
+    /// Called from the window rather than from this tab, because the monitor
+    /// strip is drawn on every tab and this tab is drawn on one. Reading the
+    /// session only while the Studio was on screen would freeze the strip the
+    /// moment somebody navigated away, which is the exact moment it exists for.
+    pub fn tick(&mut self) -> Option<veilvoice_audio::LiveStats> {
+        let stats = self.session.as_ref()?.stats();
+        self.levels.update(stats.input_peak, stats.output_peak);
+        Some(stats)
+    }
+
+    /// What phase the take half of the tab is in.
     fn phase(&self) -> Phase {
-        match (&self.vault, &self.session) {
+        match (&self.vault, self.is_recording()) {
             (None, _) => Phase::Shut,
-            (Some(_), None) => Phase::Idle,
-            (Some(_), Some(_)) => Phase::Recording,
+            (Some(_), false) => Phase::Idle,
+            (Some(_), true) => Phase::Recording,
         }
+    }
+
+    /// Start veiling, keeping nothing.
+    ///
+    /// `preview` sends it to this machine's own output instead of the chosen
+    /// one, which is how somebody hears themselves veiled without whatever is
+    /// listening on the virtual cable hearing it too.
+    pub fn start_veiling(
+        &mut self,
+        config: DeidConfig,
+        input: Option<&str>,
+        output: Option<&str>,
+        preview: bool,
+    ) {
+        let setup = Setup {
+            config,
+            input: input.map(str::to_owned),
+            output: output.map(str::to_owned),
+            preview,
+        };
+        self.start_session(setup, veilvoice_audio::Keeping::default());
+    }
+
+    /// Stop the audio. A take still running is stored first, never discarded.
+    pub fn stop_veiling(&mut self) {
+        if self.is_recording() {
+            self.finish_take();
+        }
+        self.session = None;
+        self.setup = None;
+        // The bars go back to nothing rather than freezing at the last peak,
+        // which would read as a level still arriving.
+        self.levels.clear();
     }
 
     /// Shut the vault and forget the key.
@@ -209,9 +322,8 @@ impl Studio {
     /// throwing away a recording because the idle timer fired would be the
     /// worst thing this tab could do.
     pub fn close(&mut self) {
-        if self.session.is_some() {
-            self.finish_take();
-        }
+        // Everything the audio path is doing, including a take in progress.
+        self.stop_veiling();
         // Back to the safe side. A choice that survived a lock would be a
         // choice somebody made before lunch deciding what is recorded after it.
         self.keep = Keep::default();
@@ -358,59 +470,102 @@ impl Studio {
     }
 
     /// Start recording into the vault's holding area.
-    fn start_take(&mut self, config: DeidConfig, input: Option<&str>, output: Option<&str>) {
+    fn start_take(&mut self, setup: Setup) {
+        // One recorder per side that is being kept, and neither exists unless
+        // it was asked for. The session builds them, at the rate the device
+        // agreed to: this used to build them here from `config.sample_rate`,
+        // which is the rate that was *asked* for, and F-166 is what the two
+        // disagreeing costs.
+        let keeping = veilvoice_audio::Keeping {
+            veiled: self.keep.wants_veiled(),
+            plain: self.keep.wants_plain(),
+        };
+        self.start_session(setup, keeping);
+    }
+
+    /// Start, or restart, the live session `setup` describes.
+    ///
+    /// **The one place in the window a session is started.** Marker 130 moved
+    /// live scramble here, and one starter is most of what that is worth: two
+    /// of them meant two opens of the same microphone, and on the platforms
+    /// that allow that at all the second stream gets a copy of the input
+    /// nobody asked for.
+    ///
+    /// `keeping` decides whether this session keeps anything. Sinks cannot be
+    /// attached to a running stream, so starting and ending a take each restart
+    /// the session, which costs a short gap in the outgoing voice. That is said
+    /// on screen rather than hidden: a gap somebody can see explained is better
+    /// than one they cannot.
+    fn start_session(&mut self, setup: Setup, keeping: veilvoice_audio::Keeping) {
         use veilvoice_audio::devices::Direction;
 
-        let rate = config.sample_rate as u32;
-        // One recorder per side that is being kept, and neither exists unless
-        // it was asked for. A recorder made and then not used would still have
-        // a ring holding audio, which for the plain side is the real voice.
-        let (veiled_recorder, veiled_sink) = if self.keep.wants_veiled() {
-            let (r, s) = veilvoice_audio::record::start(rate);
-            (Some(r), Some(s))
-        } else {
-            (None, None)
-        };
-        let (plain_recorder, plain_sink) = if self.keep.wants_plain() {
-            let (r, s) = veilvoice_audio::record::start(rate);
-            (Some(r), Some(s))
-        } else {
-            (None, None)
-        };
+        // The running one goes first, and before the devices are opened rather
+        // than after: a second stream on the same microphone would exist for as
+        // long as the open took.
+        self.session = None;
 
-        let input = match veilvoice_audio::devices::open(Direction::Input, input) {
+        let input = match veilvoice_audio::devices::open(Direction::Input, setup.input.as_deref()) {
             Ok(device) => device,
             Err(error) => {
+                self.setup = None;
                 self.message = Some((error.to_string(), p::red()));
                 return;
             }
         };
-        let output = match veilvoice_audio::devices::open(Direction::Output, output) {
+        // A preview goes to this machine's own output and the chosen output is
+        // deliberately ignored: a preview sent to the virtual cable would be
+        // heard by whatever is listening on it, which is the one place somebody
+        // checking their setup does not want it to go. `None` asks the audio
+        // layer for the default device.
+        let chosen = if setup.preview {
+            None
+        } else {
+            setup.output.as_deref()
+        };
+        let output = match veilvoice_audio::devices::open(Direction::Output, chosen) {
             Ok(device) => device,
             Err(error) => {
+                self.setup = None;
                 self.message = Some((error.to_string(), p::red()));
                 return;
             }
         };
 
-        match veilvoice_audio::LiveSession::start_recording(
-            &input,
-            &output,
-            config,
-            veiled_sink,
-            plain_sink,
-        ) {
-            Ok(session) => {
+        match veilvoice_audio::LiveSession::start_recording(&input, &output, setup.config, keeping)
+        {
+            Ok((session, kept)) => {
                 self.session = Some(session);
-                self.recorder = veiled_recorder;
-                self.plain = plain_recorder;
+                self.recorder = kept.veiled;
+                self.plain = kept.plain;
+                self.setup = Some(setup);
                 self.message = None;
             }
-            Err(error) => self.message = Some((error.to_string(), p::red())),
+            Err(error) => {
+                self.setup = None;
+                self.message = Some((error.to_string(), p::red()));
+            }
+        }
+    }
+
+    /// Stop keeping, seal what was captured, and carry on veiling.
+    ///
+    /// Veiling continues deliberately. Somebody on a call who has just ended a
+    /// take has not asked to be heard in their own voice again, and a stop
+    /// button that unveiled them mid-sentence would be the worst control in
+    /// this window. The session comes back without recorders attached, which
+    /// costs the short gap [`Self::start_session`] describes.
+    fn stop_take(&mut self) {
+        self.finish_take();
+        if let Some(setup) = self.setup.clone() {
+            self.start_session(setup, veilvoice_audio::Keeping::default());
         }
     }
 
     /// Stop recording and seal what was captured into the vault.
+    ///
+    /// The audio stops with it. Callers that mean to carry on veiling use
+    /// [`Self::stop_take`], which restarts it; callers that are shutting
+    /// everything down use [`Self::stop_veiling`], which does not.
     fn finish_take(&mut self) {
         // The audio stops first. Sealing takes a noticeable moment, and samples
         // arriving during it would be dropped rather than kept.
@@ -737,7 +892,13 @@ impl Studio {
 }
 
 impl Studio {
-    /// The Recording Studio tab.
+    /// The take half of the Recording Studio tab.
+    ///
+    /// The voice half, which is the devices, the engine settings, the meters
+    /// and the buttons that start and stop the veiling, is drawn above this by
+    /// the window: marker 130 moved live scramble into this tab, and the device
+    /// lists and the settings widgets it needs are the window's rather than
+    /// this module's. What is here is everything to do with the vault.
     ///
     /// `config` is the engine setting the rest of the window is showing, so a
     /// take is recorded at the strength on screen rather than at a default this
@@ -762,7 +923,15 @@ impl Studio {
                     .button(RichText::new("  start recording  ").strong())
                     .clicked()
                 {
-                    self.start_take(config, input, output);
+                    // The routing the person is already hearing is kept: a take
+                    // started while previewing stays on the headphones rather
+                    // than being moved onto the cable by the act of recording.
+                    self.start_take(Setup {
+                        config,
+                        input: input.map(str::to_owned),
+                        output: output.map(str::to_owned),
+                        preview: self.is_previewing(),
+                    });
                 }
             }
             Phase::Recording => {
@@ -792,22 +961,14 @@ impl Studio {
                     ui.label(RichText::new(length(seconds as f64)).color(p::fg()));
                 });
 
-                // What is going in and what is coming out, while it happens.
-                //
-                // Two bars rather than one, and this is the reason: a single
-                // output meter answers "is something being recorded" and not
-                // "is it being veiled", which is the question somebody at this
-                // tab is actually asking. Seeing the input move and the output
-                // move differently is the only thing on screen that shows the
-                // engine is between them.
-                if let Some(session) = &self.session {
-                    let stats = session.stats();
-                    self.levels.update(stats.input_peak, stats.output_peak);
-                }
-                ui.add_space(8.0);
-                ui.label(RichText::new("Levels").color(p::blue()).small());
-                crate::monitor::meter(ui, "in ", self.levels.input, self.levels.hold_input);
-                crate::monitor::meter(ui, "out", self.levels.output, self.levels.hold_output);
+                // The two bars used to be drawn here as well. They are not any
+                // more, and nothing was lost: since marker 130 the voice half
+                // of this tab draws them whether or not a take is running, so
+                // drawing them again under the clock would be the same meter
+                // twice on one screen. The reading is taken once a frame by the
+                // window, in `tick`, for the same reason: `stats` resets the
+                // peaks as it reads them, so two readers would each see half
+                // the level.
                 if dropped > 0 {
                     ui.label(
                         RichText::new(format!(
@@ -822,7 +983,7 @@ impl Studio {
                     .button(RichText::new("  stop and store  ").strong())
                     .clicked()
                 {
-                    self.finish_take();
+                    self.stop_take();
                 }
                 // Repainting while the counter is running, and only then.
                 ui.ctx()

@@ -60,7 +60,7 @@ black bar.
 
 | File | What was covered | What it says instead |
 |---|---|---|
-| `gui-live.png` | the two audio device dropdowns | `your microphone`, `your virtual cable` |
+| `gui-studio.png` | the two audio device dropdowns | `your microphone`, `your virtual cable` |
 | `gui-install.png` | the running-from and install-to paths | the same paths, under a user called `you` |
 | `gui-lock.png` | where the app lock file lives | the same path, under a user called `you` |
 

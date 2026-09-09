@@ -157,12 +157,6 @@ window.VEILVOICE_DEMO = {
       "note": "Point it at a recording, choose how hard to push the voice, and write the result. Encryption at rest is already on."
     },
     {
-      "image": "assets/screenshots/gui-live.png",
-      "key": "live",
-      "label": "Live scramble",
-      "note": "The microphone, veiled as it runs, into a virtual cable other programs can hear. The meters say sound is arriving and leaving."
-    },
-    {
       "image": "assets/screenshots/gui-group.png",
       "key": "group",
       "label": "Group",
@@ -172,7 +166,7 @@ window.VEILVOICE_DEMO = {
       "image": "assets/screenshots/gui-studio.png",
       "key": "studio",
       "label": "Studio",
-      "note": "Record straight into a locked vault, veiled on the way in. The vault opens with both passphrases at once, and with neither on its own."
+      "note": "The microphone, veiled as it runs, into a virtual cable other programs can hear, and a take of it recorded straight into a locked vault if you ask for one. The vault opens with both passphrases at once, and with neither on its own."
     },
     {
       "image": "assets/screenshots/gui-browser.png",
@@ -221,10 +215,6 @@ window.VEILVOICE_DEMO = {
     {
       "key": "file",
       "label": "Anonymise file"
-    },
-    {
-      "key": "live",
-      "label": "Live scramble"
     },
     {
       "key": "group",

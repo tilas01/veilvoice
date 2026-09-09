@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! The live monitor: what is going in, and what is coming out, wherever you are.
 //!
-//! # Why this is not just the meters on the live tab
+//! # Why this is not just the meters on the Studio tab
 //!
-//! The live tab has drawn an input and an output meter for some time, and they
+//! The Studio has drawn an input and an output meter for some time, and they
 //! are the right meters. What they were not was *visible*: they are inside one
 //! panel, and the moment somebody switched to Group to set up an interview, or
 //! to Settings, or to Monitor, the only picture of what their microphone was
@@ -26,7 +26,7 @@
 //! the panel, bottom right, for somebody who would rather keep the full height
 //! for the panel and accept that it sits on top of a corner of it.
 //! [`Style::Off`] is offered because a strip somebody does not want is a strip
-//! they will resent, and the live tab still has the full meters either way.
+//! they will resent, and the Studio still has the full meters either way.
 //!
 //! The overlay is deliberately **not** click-through and **not** draggable: a
 //! floating thing that moves is a floating thing somebody loses behind the
@@ -39,7 +39,7 @@
 //! working meter and a bypassed engine look identical, and saying so is the
 //! difference between a monitor and a reassurance. What tells you the engine is
 //! running is that the output is a voice that is not yours, which is what the
-//! preview on the live tab is for.
+//! preview in the Studio is for.
 //!
 //! # In plain words
 //!
@@ -66,7 +66,7 @@ pub enum Style {
     Toolbar,
     /// Floating over the bottom right of the panel.
     Overlay,
-    /// Not shown. The live tab still has the full meters.
+    /// Not shown. The Studio still has the full meters.
     Off,
 }
 
@@ -76,7 +76,7 @@ impl Style {
         match self {
             Self::Toolbar => "a strip along the bottom",
             Self::Overlay => "a card floating in the corner",
-            Self::Off => "only on the live tab",
+            Self::Off => "only on the Studio tab",
         }
     }
 
@@ -94,7 +94,7 @@ impl Style {
                  sits on top of a corner of it."
             }
             Self::Off => {
-                "The monitor is not shown. The live tab still has the full \
+                "The monitor is not shown. The Studio still has the full \
                  meters, so this means you see them when you are looking at \
                  that tab and not otherwise."
             }
@@ -128,7 +128,7 @@ impl Style {
     }
 }
 
-/// The smoothed levels the monitor and the live tab both draw.
+/// The smoothed levels the monitor and the Studio both draw.
 ///
 /// One copy, updated once a frame from the session, because two copies is two
 /// bars that disagree by a frame and one of them is always the one somebody is
@@ -194,9 +194,9 @@ impl Levels {
     }
 }
 
-/// A compact bar, for the strip. The full-height one lives on the live tab.
+/// A compact bar, for the strip. The full-height one lives on the Studio tab.
 ///
-/// Same scale as `veilvoice_audio::meter`, so this bar, the live tab's bar and
+/// Same scale as `veilvoice_audio::meter`, so this bar, the Studio's bar and
 /// the one `veilvoice live` draws in a terminal are the same bar at three
 /// sizes. A monitor that used a scale of its own would be a fourth opinion
 /// about the same number.
@@ -296,7 +296,7 @@ fn row(ui: &mut egui::Ui, levels: &Levels, preview: bool, closable: bool) -> Act
                 if ui
                     .small_button("close")
                     .on_hover_text(
-                        "Hide this strip. The live tab keeps its meters, and \
+                        "Hide this strip. The Studio keeps its meters, and \
                          Settings brings the strip back.",
                     )
                     .clicked()

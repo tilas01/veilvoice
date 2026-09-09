@@ -15,7 +15,7 @@
 
 ## Contents
 
-- [Why this is not just the meters on the live tab](#why-this-is-not-just-the-meters-on-the-live-tab)
+- [Why this is not just the meters on the Studio tab](#why-this-is-not-just-the-meters-on-the-studio-tab)
 - [Two places it can sit, and one way to switch it off](#two-places-it-can-sit-and-one-way-to-switch-it-off)
 - [What it does not claim](#what-it-does-not-claim)
 - [In plain words](#in-plain-words)
@@ -25,9 +25,9 @@
 
 The live monitor: what is going in, and what is coming out, wherever you are.
 
-# Why this is not just the meters on the live tab
+# Why this is not just the meters on the Studio tab
 
-The live tab has drawn an input and an output meter for some time, and they
+The Studio has drawn an input and an output meter for some time, and they
 are the right meters. What they were not was *visible*: they are inside one
 panel, and the moment somebody switched to Group to set up an interview, or
 to Settings, or to Monitor, the only picture of what their microphone was
@@ -50,7 +50,7 @@ strip of height and never covers anything. `Style::Overlay` floats it over
 the panel, bottom right, for somebody who would rather keep the full height
 for the panel and accept that it sits on top of a corner of it.
 `Style::Off` is offered because a strip somebody does not want is a strip
-they will resent, and the live tab still has the full meters either way.
+they will resent, and the Studio still has the full meters either way.
 
 The overlay is deliberately **not** click-through and **not** draggable: a
 floating thing that moves is a floating thing somebody loses behind the
@@ -63,7 +63,7 @@ It shows levels. A level is not proof that the voice is being changed: a
 working meter and a bypassed engine look identical, and saying so is the
 difference between a monitor and a reassurance. What tells you the engine is
 running is that the output is a voice that is not yours, which is what the
-preview on the live tab is for.
+preview in the Studio is for.
 
 # In plain words
 
@@ -86,7 +86,7 @@ wrong.
 **The types it owns.**
 
 - `enum Style` (line 63) -- Where the monitor sits, or whether it is shown at all.
-- `struct Levels` (line 137) -- The smoothed levels the monitor and the live tab both draw.
+- `struct Levels` (line 137) -- The smoothed levels the monitor and the Studio both draw.
 - `enum Action` (line 259) -- What the reader did with the monitor this frame.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
@@ -161,7 +161,7 @@ flowchart TD
 | `Style::ALL` <sub>pub const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L105) | Every style, in the order a picker should offer them. |
 | `Style::key` <sub>pub fn</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L108) | The identifier written to the settings file. |
 | `Style::from_key` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L122) | Read a style back. |
-| `Levels` <sub>pub struct</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L137) | The smoothed levels the monitor and the live tab both draw. |
+| `Levels` <sub>pub struct</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L137) | The smoothed levels the monitor and the Studio both draw. |
 | `HOLD` <sub>const</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L157) | How long a held peak stays up before it falls back to the current level. |
 | `Levels::update` <sub>pub fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L161) | Take a new reading. |
 | `Levels::clear` <sub>pub fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L192) | Back to nothing, for when a session stops. |

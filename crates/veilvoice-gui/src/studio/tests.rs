@@ -516,20 +516,42 @@ fn starting_one_take_releases_the_one_before_it() {
 fn the_studio_meters_what_goes_in_as_well_as_what_comes_out() {
     // One output meter answers "is something being recorded" and not "is it
     // being veiled", which is the question somebody at this tab is asking.
-    let source = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    //
+    // Read out of `app.rs` rather than out of this module since marker 130:
+    // the voice half of the tab, which is where the meters are, is drawn by
+    // the window, because the device lists and the settings widgets it sits
+    // beside are the window's. The property is unchanged and so is this test;
+    // only the file it reads has moved.
+    let source = std::fs::read_to_string("src/app.rs").expect("the window's source");
+    let body = source
+        .split("fn studio_tab(&mut self, ui: &mut egui::Ui) {")
+        .nth(1)
+        .and_then(|rest| rest.split("\n    fn ").next())
+        .expect("the Studio tab has to be findable");
     assert!(
-        source.contains(r#"meter(ui, "in ""#),
+        body.contains(r#"meter(ui, "in ""#),
         "the Studio does not draw an input meter"
     );
     assert!(
-        source.contains(r#"meter(ui, "out""#),
+        body.contains(r#"meter(ui, "out""#),
         "the Studio does not draw an output meter"
     );
     // And through the shared one, rather than a second bar that would slowly
     // stop looking like the first.
     assert!(
-        source.contains("crate::monitor::meter"),
+        body.contains("crate::monitor::meter"),
         "the Studio draws its own meter instead of the shared one"
+    );
+    // Once a frame, in one place. `stats` resets the peaks as it reads them,
+    // so a second reader would see half the level and both bars would be
+    // wrong. The window takes the reading in `update` and everything else is
+    // shown what it got.
+    let studio = std::fs::read_to_string("src/studio.rs").expect("its own source");
+    assert_eq!(
+        studio.matches("self.levels.update(").count(),
+        1,
+        "the levels are updated in more than one place, so the peaks are being \
+         read twice a frame and each reader sees half of them"
     );
 }
 

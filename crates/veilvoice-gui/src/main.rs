@@ -79,9 +79,10 @@ Usage:
 
 Options:
   --tab <NAME>  Open on a named tab rather than the last one used.
-                Names are the ones the tabs carry: file, live, group,
-                studio, browser, monitor, lock, verify, settings,
-                install, about.
+                Names are the ones the tabs carry: file, group, studio,
+                browser, monitor, lock, verify, settings, install,
+                about. `live` is accepted and opens the Studio, which is
+                where live scramble went.
   --size <W>x<H>  Open at this size in logical pixels rather than the
                 default 1100x720. Both are clamped to the window's
                 minimum of 720x520.
