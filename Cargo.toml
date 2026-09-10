@@ -78,7 +78,7 @@ getrandom = "0.2"        # OS CSPRNG seed
 # The `Rng` traits the modulation stream is driven through. The randomness
 # itself is `rand_chacha`, seeded from `getrandom`; this is the interface, not
 # the source.
-rand = "0.8"
+rand = "0.10"
 rand_chacha = "0.3"      # ChaCha20 CSPRNG for parameter modulation
 # --- secret hygiene ---
 zeroize = { version = "1", features = ["derive"] }
