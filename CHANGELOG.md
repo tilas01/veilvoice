@@ -162,6 +162,37 @@ than a summary written afterwards.
   and would be one more file to keep true. `Cargo.toml` is this project's
   package manifest, and there are 28 of them.
 
+**One demonstration, the command line first and the window under it**
+
+- The demonstration was in three parts in the order: the command line typed
+  out, the window's screens, the command line one job at a time. The two halves
+  of the same thing had the other thing wedged between them, so a reader who
+  wanted to know what the commands are read about them, looked at pictures of a
+  window, and then read about the commands again.
+- It is one section now. **Both command-line parts are together and first, and
+  the window is below them.** The command line goes first because it is the half
+  that can be shown rather than depicted: those are recordings of the real
+  programs replayed at typing speed, and every byte in them is what the program
+  wrote. Somebody who reaches the photographs has already watched it run.
+- Nothing else about the page moved, and nothing went behind a button.
+
+**The terminal drawings share one width**
+
+- Each drawing was exactly as wide as its own longest line, which gave eleven
+  pictures at five widths: 651, 800, 817, 825 and 834. The README stacks all
+  eleven vertically and the website shows the same set, so what a reader saw was
+  a column of terminal windows whose edges did not line up.
+- They share one width now, measured across the set on every run, so a command
+  whose help grows moves all of them together instead of becoming the one
+  exception. Height still varies, because height is the content: a longer help
+  screen is a taller picture, which is the axis a page can afford.
+- These draw a **terminal window**, and a terminal window does not shrink to fit
+  whichever command printed the least. The shared width is the widest one's
+  content, which is the only shared width that re-wraps nothing.
+- Checked rather than asserted: the ten window captures are all 1400 by 1537 and
+  the eleven drawings are all 834 wide, and both are produced by tools that
+  measure the set rather than by a number written down somewhere.
+
 **The tag a release publishes now names the commit it built**
 
 - The release workflow ends by creating a GitHub release for a tag. Creating a
