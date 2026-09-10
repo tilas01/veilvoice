@@ -68,6 +68,28 @@ jobs:
       - name: Release build
         run: cargo build --workspace --release --locked
 
+      # Every `cargo` line above takes the default features, and nine of the
+      # twelve jobs in the release workflow do not: `cpal` has no backend for
+      # the BSDs and cannot be linked into a musl or cross build, so those
+      # targets turn `veilvoice-audio`'s `live` feature off. That configuration
+      # was built by nothing here, which meant code reachable only with the
+      # feature on passed every check on all three platforms and then failed
+      # nine release jobs at once.
+      #
+      # That is not hypothetical. `pub mod record;` lost its
+      # `#[cfg(feature = "live")]` when a `playback` module was inserted above
+      # it and took the attribute line that had belonged to `record`. The crate
+      # then built everywhere CI looked and nowhere it did not, and it was found
+      # by dispatching a release two days later. The tool reads the selections
+      # out of `release.yml` rather than repeating them, so a target added to
+      # that matrix is built here without anybody remembering to.
+      #
+      # Linux only: the selections are feature sets rather than architectures,
+      # and the one that was broken is broken identically on every host.
+      - name: Every feature selection a release builds must compile
+        if: runner.os == 'Linux'
+        run: python tools/audit/features.py --build
+
   # Two of this project's shipped defects were reachable only where a pointer
   # is 32 bits wide: F-4, an arithmetic overflow, and F-11, an erase loop that
   # never terminated and left the file it was destroying intact. Both were
