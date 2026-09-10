@@ -18,9 +18,9 @@ Input
 
 Result
   Written                veiled.veil
-  Speed                  133.0x realtime
+  Speed                  100.1x realtime
   Accent                 neutralised
-  Seed rolls             923-1296 ms, drawn fresh before every roll -- no period to observe
+  Seed rolls             587-757 ms, drawn fresh before every roll -- no period to observe
   At rest                sealed to a public key (X25519 + ML-KEM-768)
 
 ✓ done, and the voiceprint in this file is not recoverable
