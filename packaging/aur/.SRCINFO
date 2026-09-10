@@ -1,6 +1,6 @@
 pkgbase = veilvoice
 	pkgdesc = Irreversible voice de-identification, fully offline
-	pkgver = 0.1.20
+	pkgver = 0.1.21
 	pkgrel = 1
 	url = https://tilas01.github.io/veilvoice/
 	arch = x86_64

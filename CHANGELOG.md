@@ -6,7 +6,7 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
-## Unreleased
+## 0.1.21 - 2026-09-10
 
 **Every screenshot the same size, and in the face they were meant to be in**
 

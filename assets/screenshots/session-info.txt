@@ -1,11 +1,11 @@
 $ veilvoice info
 VeilVoice
-  Version                0.1.20
-  Engine                 0.1.20
-  Crypto                 0.1.20
-  Audio                  0.1.20
-  Metadata               0.1.20
-  Monitor                0.1.20
+  Version                0.1.21
+  Engine                 0.1.21
+  Crypto                 0.1.21
+  Audio                  0.1.21
+  Metadata               0.1.21
+  Monitor                0.1.21
   Licence                GPL-3.0-or-later
   Network access         none, by construction
   Live audio             available
