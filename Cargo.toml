@@ -74,7 +74,7 @@ realfft = "3"            # real-input FFT built on rustfft; re-exports num-compl
 # path.
 rustfft = "6"
 # --- cryptographic randomness ---
-getrandom = "0.2"        # OS CSPRNG seed
+getrandom = "0.4"        # OS CSPRNG seed
 # The `Rng` traits the modulation stream is driven through. The randomness
 # itself is `rand_chacha`, seeded from `getrandom`; this is the interface, not
 # the source.
