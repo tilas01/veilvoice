@@ -162,6 +162,29 @@ than a summary written afterwards.
   and would be one more file to keep true. `Cargo.toml` is this project's
   package manifest, and there are 28 of them.
 
+**The feature nine release jobs turn off, that nothing built**
+
+- `veilvoice-audio`'s live capture is an optional feature, off on nine of the
+  twelve targets a release builds: `cpal` has no backend for the BSDs, cannot be
+  linked into a static musl binary, and has no cross-architecture ALSA to build
+  against. Those nine build the command line with default features off.
+- **Nothing in CI built that.** Every `cargo` line took the default features, so
+  a module whose `#[cfg(feature = "live")]` had gone missing compiled on all
+  three platforms, passed every check twice over two days, and then failed nine
+  release jobs at once. The attribute had been taken by a `playback` declaration
+  inserted directly above it, because an attribute attaches to the item that
+  follows it.
+- The gate is back, and the gap it fell through is closed:
+  `tools/audit/features.py` reads the build arguments out of the release
+  workflow and compiles each selection, in CI beside the release build. Reading
+  the workflow rather than copying its arguments is what makes a target added to
+  that matrix built on every push without anybody remembering, and the tool
+  refuses to pass if it can read fewer than two selections, so a workflow
+  rewritten into a shape it cannot parse fails rather than checking nothing.
+- The existing platform guard could not have caught this. It varies the
+  operating system; this varies the features, and a guard covering one axis
+  reads as covering the other.
+
 **Several microphones at once, veiled and metered each** (marker 147)
 
 - `veilvoice_audio::room` opens one input per guest, veils each with its own

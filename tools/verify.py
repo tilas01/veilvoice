@@ -153,6 +153,15 @@ CHECKS = [
     # problem, because nobody is looking at it.
     ("every manifest is covered by a Dependabot entry",
      [sys.executable, "tools/audit/dependabot.py"]),
+    # And the third question about dependencies, which is whether the code
+    # still compiles without the optional ones. Nine of the twelve release
+    # jobs turn `veilvoice-audio`'s `live` feature off because `cpal` has no
+    # backend for them, and nothing built that configuration until a module
+    # lost its `#[cfg]` and failed all nine at once. Listed rather than built
+    # here: `--build` is a compile, which belongs in CI beside the release
+    # build rather than in a pass somebody runs before every commit.
+    ("every feature selection a release builds is still declared",
+     [sys.executable, "tools/audit/features.py"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
