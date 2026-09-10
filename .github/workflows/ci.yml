@@ -26,7 +26,7 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # cpal needs ALSA headers, and eframe needs the X11/Wayland stack.
       - name: Install Linux audio and windowing headers
@@ -148,7 +148,7 @@ jobs:
       CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_RUNNER: qemu-arm-static
       QEMU_LD_PREFIX: /usr/arm-linux-gnueabihf
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install the cross toolchain for ${{ matrix.target }}
         run: |
@@ -209,8 +209,8 @@ jobs:
       matrix:
         python: ['3.11', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       # Compares decoded pixels, not compressed bytes: zlib's output differs
@@ -341,8 +341,8 @@ jobs:
     name: website tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       - name: Characters, structure, rendering, hostile input, scroll reveal
@@ -361,7 +361,7 @@ jobs:
     name: parser campaigns
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       # Debug, not release: the release profile disables overflow checks, and
@@ -379,7 +379,7 @@ jobs:
     name: dependency advisories
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: rustsec/audit-check@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -391,7 +391,7 @@ jobs:
     name: no network dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       - name: Fail if a networking crate appears in the tree
@@ -495,7 +495,7 @@ jobs:
     name: the built program opens no network socket
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       - name: Install the windowing headers and the tracers
@@ -655,7 +655,7 @@ jobs:
     name: no RSA private-key operations
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Fail if any crate reaching pgp gains a private-key code path
         run: |
           set -euo pipefail
