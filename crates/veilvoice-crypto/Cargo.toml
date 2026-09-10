@@ -21,7 +21,7 @@ region = "3"
 argon2 = "0.5"
 # Deriving the separate keys each container, lock and vault uses from one
 # secret, with a distinct info string for each.
-hkdf = "0.12"
+hkdf = "0.13"
 # The hash HKDF runs over.
 sha2 = "0.10"
 # --- authenticated encryption ---
