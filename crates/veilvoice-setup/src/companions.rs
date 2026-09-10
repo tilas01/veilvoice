@@ -292,9 +292,11 @@ pub const ALL: &[Companion] = &[
         vendor: "the Audacity team",
         licence: "GPL-2.0-or-later",
         what: "A free audio editor and recorder.",
-        why: "Useful for recording a file and for trimming one before veiling it. It is \
-              recommended and never embedded: GPL-2.0-or-later cannot be combined with \
-              this project's GPL-3.0-or-later.",
+        why: "For editing a recording: trimming silence, cutting a section, joining takes. \
+              Recording is what the Recording Studio is for, and the reason it exists is \
+              that a take made in another program is a plaintext file on your disk until \
+              you remember to shred it. It is recommended and never embedded: \
+              GPL-2.0-or-later cannot be combined with this project's GPL-3.0-or-later.",
         page: "https://www.audacityteam.org/",
     },
 ];
@@ -522,6 +524,10 @@ fn detect_audacity() -> Presence {
 /// decision about which package managers this project recognises and in what
 /// order. A third copy is the point at which they start disagreeing.
 ///
+/// The managers below are the same set `install/install.sh` recognises, so the
+/// two agree about what this machine is rather than each having their own
+/// opinion of it.
+///
 /// `sudo` is in the command and the command is marked as needing privilege, so
 /// a front end shows it rather than running it. This program does not ask for a
 /// root password.
@@ -610,12 +616,6 @@ fn brew(arguments: &[&str]) -> Offer {
     }
 }
 
-/// The route to Audacity differs per platform, and on Linux per distribution.
-///
-/// The package managers here are the same list `install/install.sh` uses, in
-/// the same order, so the two agree about what this machine is. The ones that
-/// need `sudo` are marked as needing it rather than being run: this program is
-/// not going to prompt for a root password.
 /// GnuPG, which is on `PATH` or is not.
 ///
 /// No hunt through program directories, unlike the audio companions. A `gpg`
@@ -668,6 +668,7 @@ fn gnupg_offer() -> Offer {
     unix_package("gnupg", "GnuPG")
 }
 
+/// The route to Audacity differs per platform, and on Linux per distribution.
 fn audacity_offer() -> Offer {
     if cfg!(windows) {
         return if on_path("winget").is_some() {
@@ -713,6 +714,64 @@ const UNIX_PACKAGE_MANAGERS: &[(&str, &[&str])] = &[
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every probe and every offer says what it is for, on itself.
+    ///
+    /// **F-172.** `audacity_offer` lost its documentation and `detect_gnupg`
+    /// gained it, because factoring `unix_package` out of three copies left the
+    /// old block behind and the next item down inherited it. A doc comment
+    /// attaches to the item that follows it, which is F-169 in a different
+    /// syntax and the second time an insertion has taken a block from the item
+    /// it belonged to.
+    ///
+    /// It reached the published wiki, which listed "the route to Audacity
+    /// differs per platform" as the description of the function that looks for
+    /// GnuPG. Generated documentation does not know a sentence is about the
+    /// wrong thing; it repeats it faithfully, which is what makes this worth a
+    /// guard rather than a careful read.
+    ///
+    /// This reads the file rather than the items, because a private function
+    /// carries no documentation `rustdoc` or `missing_docs` can see. It cannot
+    /// tell whether a sentence is *about* the function it sits on, but it does
+    /// catch the half that is mechanical: an offer or a probe with nothing on
+    /// it at all.
+    #[test]
+    fn every_probe_and_offer_documents_itself() {
+        let source = include_str!("companions.rs");
+        let mut bare = Vec::new();
+        let lines: Vec<&str> = source.lines().collect();
+        for (at, line) in lines.iter().enumerate() {
+            let trimmed = line.trim_start();
+            let name = match trimmed.strip_prefix("fn ") {
+                Some(rest) => rest.split('(').next().unwrap_or("").trim(),
+                None => continue,
+            };
+            if !(name.starts_with("detect_") || name.ends_with("_offer")) {
+                continue;
+            }
+            // The line above it, skipping any attribute, must be a doc comment.
+            let mut above = at;
+            while above > 0 {
+                let previous = lines[above - 1].trim_start();
+                if previous.starts_with("#[") || previous.starts_with("#!") {
+                    above -= 1;
+                    continue;
+                }
+                if previous.starts_with("///") {
+                    break;
+                }
+                bare.push(name.to_string());
+                break;
+            }
+        }
+        assert!(
+            bare.is_empty(),
+            "these say nothing about themselves, so the generated wiki will \
+             carry an empty description for each: {bare:?}. A doc comment \
+             attaches to the item below it, so check whether an insertion took \
+             one from the function it belonged to."
+        );
+    }
 
     #[test]
     fn every_companion_has_a_probe_and_a_route() {

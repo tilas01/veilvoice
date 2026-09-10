@@ -197,8 +197,11 @@ untrustworthy.
   script only *opens their download page*: it will not silently fetch and run
   a third-party installer, which would be a strange thing to do inside a script
   whose whole subject is verifying what you run.
-- **Audacity** is a free audio editor, useful for recording and trimming before
-  veiling. It is not bundled because it is GPL-2.0-or-later, which cannot be
+- **Audacity** is a free audio editor, useful for *editing* a recording before
+  veiling it: trimming silence, cutting a section, joining takes. Recording is
+  what the Recording Studio does, and it does it because a take made in another
+  program is a plaintext file sitting on your disk until you remember to shred
+  it. Audacity is not bundled because it is GPL-2.0-or-later, which cannot be
   combined with this project's GPL-3.0-or-later.
 - **GnuPG**, where missing, because without it the signature cannot be checked
   at all. If you decline it, the script stops rather than falling back to
@@ -395,9 +398,11 @@ VeilVoice and none of them is required.**
 
 A virtual cable is what lets live mode feed a veiled microphone into a call.
 Without one live mode still runs; you simply have nowhere useful to send it.
-Audacity is a convenience for recording and trimming, and is **recommended,
-never embedded** -- GPL-2.0-or-later cannot be combined with this project's
-GPL-3.0-or-later.
+Audacity is a convenience for editing a file you already have, and is
+**recommended, never embedded** -- GPL-2.0-or-later cannot be combined with this
+project's GPL-3.0-or-later. It is not how you make a recording: the Recording
+Studio captures straight into the encrypted vault, so no unencrypted take is
+ever written anywhere.
 
 ```
 veilvoice companions                      # report only: what is here, and what is not

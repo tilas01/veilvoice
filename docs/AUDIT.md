@@ -665,6 +665,50 @@ The refusal in the workflow stays as the last line of defence, and
 Tested against all three ways to get it wrong: the dated heading that actually
 shipped, the same heading without the `v`, and no heading at all.
 
+### F-172: a doc comment moved to the wrong function, and the wiki repeated it
+
+The same shape as F-169, in a different syntax, four commits later.
+
+`462ca8b3` factored `unix_package` out of three copies of the same loop. The
+block documenting the old `audacity_offer` was left behind, and the next item
+down inherited it, so `detect_gnupg` was published as:
+
+> The route to Audacity differs per platform, and on Linux per distribution.
+
+with its own sentence, "GnuPG, which is on `PATH` or is not", stranded in the
+middle of the block. `audacity_offer` was left with nothing at all.
+
+**A doc comment attaches to the item that follows it.** That is the same rule
+that took `record`'s `#[cfg]` in F-169, and this is the second time in one
+release that an insertion has taken a block from the item it belonged to. The
+rule is not obscure and neither mistake was careless in the moment: both times
+the new item was written directly above an existing one and the block above it
+was read as belonging to the file rather than to the next function.
+
+**It reached the published wiki**, which is the part that makes this worth more
+than a correction. `wiki/File-veilvoice-setup-companions.md` listed "the route
+to Audacity differs per platform" as the description of the function that looks
+for GnuPG, and listed nothing at all for the one that installs Audacity.
+Generated documentation cannot tell that a sentence is about the wrong thing; it
+repeats it faithfully. Every check in this repository passed, because every
+check compares the generated pages to the source, and the source said this.
+
+The guard reads the file rather than the items, because these are private
+functions and carry no documentation `rustdoc` or `missing_docs` can see. It
+cannot judge whether a sentence is *about* the function it sits on, and it does
+not pretend to: what it catches is the mechanical half, a probe or an offer with
+nothing on it at all, which is what the losing item always ends up with. Proved
+by deleting the restored line and reading the failure, which names the function.
+
+**What this does not claim.** A scan of the tree for the same signature, an
+undocumented function among documented siblings, returns thirty-five files.
+Nearly all of them are `fmt`, `default` and `from`, which are trait
+implementations that conventionally carry no documentation, and the rest are
+small private helpers that appear never to have had any. None of them was found
+to be a moved block. The heuristic finds candidates; this one was found by
+reading, and the honest summary is that the guard now covers the one module
+where the mistake actually happened rather than the whole tree.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -700,7 +744,7 @@ in a window hands it straight back to anybody standing behind the reader.
 * **The interface-string guard** caught three strings whose line continuations
   had been eaten in the editing, which would have rendered source indentation
   into the middle of a sentence in the window.
-* **The counts**: 1601 tests, 60376 functional lines. Both are measured and
+* **The counts**: 1602 tests, 60415 functional lines. Both are measured and
   both are checked against the front page and the README by the site suite.
 
 ## The thirty-first round: the guards that did not guard
@@ -4812,7 +4856,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1601 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1602 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6459,7 +6503,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and seventy-one defects found and fixed (F-1 to F-171), across
+**One hundred and seventy-two defects found and fixed (F-1 to F-172), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
