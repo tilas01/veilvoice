@@ -64,6 +64,47 @@ Press **preview to my headphones** first. It runs the same engine and sends the
 result to your own output and nowhere else, so you can hear what you sound like
 before an interview rather than during one.
 
+## Can it record, or do I need another program for that?
+
+It records. The **Recording Studio** is a tab in the desktop application, and it
+is there for one reason: a recording made anywhere else is a plaintext file on
+your disk.
+
+That is not a small point, and it is the whole argument for building a recorder
+into a tool like this. Open Audacity, record an interview, save it, veil the
+result with VeilVoice, delete the original: the original was on the disk the
+whole time, and on flash storage deleting it does not reliably take it back.
+Every minute between pressing record and remembering to shred is a minute the
+unveiled voice exists in the clear, and the encryption VeilVoice does afterwards
+cannot reach backwards to cover it.
+
+So the Studio never writes one. The samples go from the audio callback into
+memory the operating system has been asked to keep out of the page file, the WAV
+is assembled inside that protected memory, and what leaves is already sealed.
+There is no point in the process at which an unencrypted recording exists as a
+file, and there is deliberately no route in the code that would produce one,
+because a route that existed would eventually be taken.
+
+**What it records.** Any input your system offers, chosen by name: a microphone,
+an interface, or a virtual cable carrying your computer's own audio, which is
+how you capture what is playing rather than what is spoken. Up to eight
+microphones at once, a person each, if you are recording a room. It keeps the
+veiled voice, the original, or both, and it says which before you start.
+
+**What it keeps.** Uncompressed PCM at whatever rate the device is actually
+running, so nothing is resampled and no lossy codec is involved. Nothing is
+resampled to a rate you did not ask for either: a mismatch between devices is
+refused with both numbers rather than quietly converted, because in a program
+about how a voice sounds, silently changing the pitch is a wrong answer rather
+than a small one.
+
+**What it does not do.** It is not an editor. There is no cutting, no fading, no
+multitrack arranging, and Audacity is recommended in the Setup tab for exactly
+that. This is not a comparison anybody has benchmarked, and this page is not
+going to claim it is faster or better than an editor that has had twenty years
+of work: it does one job, which is getting sound onto a disk without it ever
+being readable on the way.
+
 ## Can it make a video, and why does that need ffmpeg?
 
 Yes. A rendered conversation can be written as an MP4 whose picture is the same

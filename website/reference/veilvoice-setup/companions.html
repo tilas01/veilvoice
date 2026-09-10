@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-setup/companions.svg" alt="companions.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-setup/src/companions.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 1029 lines &middot; <a href="companions.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 1088 lines &middot; <a href="companions.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#three-rules-and-none-of-them-relaxes">Three rules, and none of them relaxes</a>
@@ -74,7 +74,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1029 lines defining <strong>24 functions</strong> (10 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1088 lines defining <strong>24 functions</strong> (10 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Presence</code> <span style="color:var(--muted)">line 59</span> &middot; What a probe found.</li>
 <li><code>enum Offer</code> <span style="color:var(--muted)">line 92</span> &middot; What VeilVoice can offer to do about a companion that is not there.</li>
@@ -95,13 +95,13 @@
 <li><code>Companion::offer</code> <span style="color:var(--muted)">line 182</span> &middot; What could be done about it on this platform.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>audacity_offer</code>, <code>brew</code>, <code>ffmpeg_offer</code>, <code>gnupg_offer</code>, <code>on_path</code>, <code>unix_package</code></span>
 </li>
-<li><code>for_this_platform</code> <span style="color:var(--muted)">line 307</span> &middot; The companions that mean anything on the platform this is running on.
+<li><code>for_this_platform</code> <span style="color:var(--muted)">line 309</span> &middot; The companions that mean anything on the platform this is running on.
 </li>
-<li><code>by_key</code> <span style="color:var(--muted)">line 314</span> &middot; Find one by Companion::key.
+<li><code>by_key</code> <span style="color:var(--muted)">line 316</span> &middot; Find one by Companion::key.
 </li>
-<li><code>run</code> <span style="color:var(--muted)">line 324</span> &middot; Run an offer, and return what it printed.
+<li><code>run</code> <span style="color:var(--muted)">line 326</span> &middot; Run an offer, and return what it printed.
 </li>
-<li><code>open_page</code> <span style="color:var(--muted)">line 365</span> &middot; Open a companion&#x27;s own page in the user&#x27;s browser.
+<li><code>open_page</code> <span style="color:var(--muted)">line 367</span> &middot; Open a companion&#x27;s own page in the user&#x27;s browser.
 </li>
 </ul>
 </section>
@@ -179,67 +179,67 @@
 <a href="companions.src.html#fn-for_this_platform">
 <rect x="29.3" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="111.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">for_this_platform</text>
-<text x="111.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 307</text>
+<text x="111.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
 </a>
 <a href="companions.src.html#fn-by_key">
 <rect x="220.3" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="266.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">by_key</text>
-<text x="266.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 314</text>
+<text x="266.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
 </a>
 <a href="companions.src.html#fn-on_path">
 <rect x="338.8" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="385.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">on_path</text>
-<text x="385.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 400</text>
+<text x="385.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 402</text>
 </a>
 <a href="companions.src.html#fn-first_existing">
 <rect x="457.2" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="527.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">first_existing</text>
-<text x="527.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 419</text>
+<text x="527.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 421</text>
 </a>
 <a href="companions.src.html#fn-env_path">
 <rect x="192.1" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="238.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">env_path</text>
-<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
+<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 425</text>
 </a>
 <a href="companions.src.html#fn-detect_vb_cable">
 <rect x="60.3" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="134.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_vb_cable</text>
-<text x="134.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 436</text>
+<text x="134.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 438</text>
 </a>
 <a href="companions.src.html#fn-detect_blackhole">
 <rect x="235.2" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="313.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_blackhole</text>
-<text x="313.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 459</text>
+<text x="313.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 461</text>
 </a>
 <a href="companions.src.html#fn-detect_pipewire">
 <rect x="418.2" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="492.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_pipewire</text>
-<text x="492.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 481</text>
+<text x="492.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 483</text>
 </a>
 <a href="companions.src.html#fn-detect_audacity">
 <rect x="84.5" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="158.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_audacity</text>
-<text x="158.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 492</text>
+<text x="158.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 494</text>
 </a>
 <a href="companions.src.html#fn-unix_package">
 <rect x="310.6" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="372.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unix_package</text>
-<text x="372.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 528</text>
+<text x="372.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 534</text>
 </a>
 <a href="companions.src.html#fn-detect_ffmpeg">
 <rect x="259.4" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="325.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_ffmpeg</text>
-<text x="325.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 554</text>
+<text x="325.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 560</text>
 </a>
 <a href="companions.src.html#fn-ffmpeg_offer">
 <rect x="418.2" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="480.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ffmpeg_offer</text>
-<text x="480.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 562</text>
+<text x="480.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 568</text>
 </a>
 <a href="companions.src.html#fn-brew">
 <rect x="267.4" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="313.7" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">brew</text>
-<text x="313.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 594</text>
+<text x="313.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 600</text>
 </a>
 <a href="companions.src.html#fn-detect_gnupg">
 <rect x="96.6" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
@@ -254,7 +254,7 @@
 <a href="companions.src.html#fn-audacity_offer">
 <rect x="390.0" y="620.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="460.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">audacity_offer</text>
-<text x="460.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 671</text>
+<text x="460.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 672</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -278,22 +278,22 @@ flowchart TD
     n_command_line([&quot;Offer::command_line&lt;br/&gt;line 136&quot;])
     n_detect([&quot;Companion::detect&lt;br/&gt;line 169&quot;])
     n_offer([&quot;Companion::offer&lt;br/&gt;line 182&quot;])
-    n_for_this_platform([&quot;for_this_platform&lt;br/&gt;line 307&quot;])
-    n_by_key([&quot;by_key&lt;br/&gt;line 314&quot;])
-    n_on_path[&quot;on_path&lt;br/&gt;line 400&quot;]
-    n_first_existing[&quot;first_existing&lt;br/&gt;line 419&quot;]
-    n_env_path[&quot;env_path&lt;br/&gt;line 423&quot;]
-    n_detect_vb_cable[&quot;detect_vb_cable&lt;br/&gt;line 436&quot;]
-    n_detect_blackhole[&quot;detect_blackhole&lt;br/&gt;line 459&quot;]
-    n_detect_pipewire[&quot;detect_pipewire&lt;br/&gt;line 481&quot;]
-    n_detect_audacity[&quot;detect_audacity&lt;br/&gt;line 492&quot;]
-    n_unix_package[&quot;unix_package&lt;br/&gt;line 528&quot;]
-    n_detect_ffmpeg[&quot;detect_ffmpeg&lt;br/&gt;line 554&quot;]
-    n_ffmpeg_offer[&quot;ffmpeg_offer&lt;br/&gt;line 562&quot;]
-    n_brew[&quot;brew&lt;br/&gt;line 594&quot;]
+    n_for_this_platform([&quot;for_this_platform&lt;br/&gt;line 309&quot;])
+    n_by_key([&quot;by_key&lt;br/&gt;line 316&quot;])
+    n_on_path[&quot;on_path&lt;br/&gt;line 402&quot;]
+    n_first_existing[&quot;first_existing&lt;br/&gt;line 421&quot;]
+    n_env_path[&quot;env_path&lt;br/&gt;line 425&quot;]
+    n_detect_vb_cable[&quot;detect_vb_cable&lt;br/&gt;line 438&quot;]
+    n_detect_blackhole[&quot;detect_blackhole&lt;br/&gt;line 461&quot;]
+    n_detect_pipewire[&quot;detect_pipewire&lt;br/&gt;line 483&quot;]
+    n_detect_audacity[&quot;detect_audacity&lt;br/&gt;line 494&quot;]
+    n_unix_package[&quot;unix_package&lt;br/&gt;line 534&quot;]
+    n_detect_ffmpeg[&quot;detect_ffmpeg&lt;br/&gt;line 560&quot;]
+    n_ffmpeg_offer[&quot;ffmpeg_offer&lt;br/&gt;line 568&quot;]
+    n_brew[&quot;brew&lt;br/&gt;line 600&quot;]
     n_detect_gnupg[&quot;detect_gnupg&lt;br/&gt;line 625&quot;]
     n_gnupg_offer[&quot;gnupg_offer&lt;br/&gt;line 640&quot;]
-    n_audacity_offer[&quot;audacity_offer&lt;br/&gt;line 671&quot;]
+    n_audacity_offer[&quot;audacity_offer&lt;br/&gt;line 672&quot;]
     n_audacity_offer --&gt; n_brew
     n_audacity_offer --&gt; n_on_path
     n_audacity_offer --&gt; n_unix_package
@@ -328,22 +328,22 @@ flowchart TD
     click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L136&quot; &quot;open the source&quot;
     click n_detect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L169&quot; &quot;open the source&quot;
     click n_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L182&quot; &quot;open the source&quot;
-    click n_for_this_platform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L307&quot; &quot;open the source&quot;
-    click n_by_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L314&quot; &quot;open the source&quot;
-    click n_on_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L400&quot; &quot;open the source&quot;
-    click n_first_existing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L419&quot; &quot;open the source&quot;
-    click n_env_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L423&quot; &quot;open the source&quot;
-    click n_detect_vb_cable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L436&quot; &quot;open the source&quot;
-    click n_detect_blackhole href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L459&quot; &quot;open the source&quot;
-    click n_detect_pipewire href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L481&quot; &quot;open the source&quot;
-    click n_detect_audacity href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L492&quot; &quot;open the source&quot;
-    click n_unix_package href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L528&quot; &quot;open the source&quot;
-    click n_detect_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L554&quot; &quot;open the source&quot;
-    click n_ffmpeg_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L562&quot; &quot;open the source&quot;
-    click n_brew href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L594&quot; &quot;open the source&quot;
+    click n_for_this_platform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L309&quot; &quot;open the source&quot;
+    click n_by_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L316&quot; &quot;open the source&quot;
+    click n_on_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L402&quot; &quot;open the source&quot;
+    click n_first_existing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L421&quot; &quot;open the source&quot;
+    click n_env_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L425&quot; &quot;open the source&quot;
+    click n_detect_vb_cable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L438&quot; &quot;open the source&quot;
+    click n_detect_blackhole href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L461&quot; &quot;open the source&quot;
+    click n_detect_pipewire href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L483&quot; &quot;open the source&quot;
+    click n_detect_audacity href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L494&quot; &quot;open the source&quot;
+    click n_unix_package href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L534&quot; &quot;open the source&quot;
+    click n_detect_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L560&quot; &quot;open the source&quot;
+    click n_ffmpeg_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L568&quot; &quot;open the source&quot;
+    click n_brew href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L600&quot; &quot;open the source&quot;
     click n_detect_gnupg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L625&quot; &quot;open the source&quot;
     click n_gnupg_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L640&quot; &quot;open the source&quot;
-    click n_audacity_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L671&quot; &quot;open the source&quot;
+    click n_audacity_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L672&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_present,n_describe,n_is_runnable,n_command_line,n_detect,n_offer,n_for_this_platform,n_by_key entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -364,26 +364,26 @@ flowchart TD
 <tr><td><code>Companion::detect</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-companion-detect">169</a></td><td>Look for it, without changing anything.</td></tr>
 <tr><td><code>Companion::offer</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-companion-offer">182</a></td><td>What could be done about it on this platform.</td></tr>
 <tr><td><code>ALL</code> <sub>pub const</sub></td><td><a href="companions.src.html#fn-all">228</a></td><td>Every companion this project knows about, in the order a front end should show them.</td></tr>
-<tr><td><code>for_this_platform</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-for_this_platform">307</a></td><td>The companions that mean anything on the platform this is running on.</td></tr>
-<tr><td><code>by_key</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-by_key">314</a></td><td>Find one by Companion::key.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-run">324</a></td><td>Run an offer, and return what it printed.</td></tr>
-<tr><td><code>open_page</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-open_page">365</a></td><td>Open a companion&#x27;s own page in the user&#x27;s browser.</td></tr>
-<tr><td><code>on_path</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-on_path">400</a></td><td>Is stem an executable on this process&#x27;s PATH?</td></tr>
-<tr><td><code>first_existing</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-first_existing">419</a></td><td>The first of candidates that exists.</td></tr>
-<tr><td><code>env_path</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-env_path">423</a></td><td></td></tr>
-<tr><td><code>detect_vb_cable</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_vb_cable">436</a></td><td>VB-CABLE installs an audio driver, and a driver is a file in a directory any user can read.</td></tr>
-<tr><td><code>detect_blackhole</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_blackhole">459</a></td><td>BlackHole is a HAL plug-in, and those live in exactly one place.</td></tr>
-<tr><td><code>detect_pipewire</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_pipewire">481</a></td><td>PipeWire is running or it is not, and pw-cli beside it is the sign that the userspace tools are installed.</td></tr>
-<tr><td><code>detect_audacity</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_audacity">492</a></td><td>Audacity is on PATH on Unix and in one of three directories on Windows.</td></tr>
-<tr><td><code>unix_package</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-unix_package">528</a></td><td>The install command for package from whichever Unix package manager is here.</td></tr>
-<tr><td><code>detect_ffmpeg</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_ffmpeg">554</a></td><td>ffmpeg, which is on PATH or is not.</td></tr>
-<tr><td><code>ffmpeg_offer</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-ffmpeg_offer">562</a></td><td>How ffmpeg would be installed here.</td></tr>
-<tr><td><code>brew</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-brew">594</a></td><td></td></tr>
-<tr><td><code>detect_gnupg</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_gnupg">625</a></td><td>The route to Audacity differs per platform, and on Linux per distribution.</td></tr>
+<tr><td><code>for_this_platform</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-for_this_platform">309</a></td><td>The companions that mean anything on the platform this is running on.</td></tr>
+<tr><td><code>by_key</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-by_key">316</a></td><td>Find one by Companion::key.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-run">326</a></td><td>Run an offer, and return what it printed.</td></tr>
+<tr><td><code>open_page</code> <sub>pub fn</sub></td><td><a href="companions.src.html#fn-open_page">367</a></td><td>Open a companion&#x27;s own page in the user&#x27;s browser.</td></tr>
+<tr><td><code>on_path</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-on_path">402</a></td><td>Is stem an executable on this process&#x27;s PATH?</td></tr>
+<tr><td><code>first_existing</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-first_existing">421</a></td><td>The first of candidates that exists.</td></tr>
+<tr><td><code>env_path</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-env_path">425</a></td><td></td></tr>
+<tr><td><code>detect_vb_cable</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_vb_cable">438</a></td><td>VB-CABLE installs an audio driver, and a driver is a file in a directory any user can read.</td></tr>
+<tr><td><code>detect_blackhole</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_blackhole">461</a></td><td>BlackHole is a HAL plug-in, and those live in exactly one place.</td></tr>
+<tr><td><code>detect_pipewire</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_pipewire">483</a></td><td>PipeWire is running or it is not, and pw-cli beside it is the sign that the userspace tools are installed.</td></tr>
+<tr><td><code>detect_audacity</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_audacity">494</a></td><td>Audacity is on PATH on Unix and in one of three directories on Windows.</td></tr>
+<tr><td><code>unix_package</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-unix_package">534</a></td><td>The install command for package from whichever Unix package manager is here.</td></tr>
+<tr><td><code>detect_ffmpeg</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_ffmpeg">560</a></td><td>ffmpeg, which is on PATH or is not.</td></tr>
+<tr><td><code>ffmpeg_offer</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-ffmpeg_offer">568</a></td><td>How ffmpeg would be installed here.</td></tr>
+<tr><td><code>brew</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-brew">600</a></td><td></td></tr>
+<tr><td><code>detect_gnupg</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-detect_gnupg">625</a></td><td>GnuPG, which is on PATH or is not.</td></tr>
 <tr><td><code>gnupg_offer</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-gnupg_offer">640</a></td><td>How GnuPG would be installed here.</td></tr>
-<tr><td><code>audacity_offer</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-audacity_offer">671</a></td><td></td></tr>
-<tr><td><code>UNIX_PACKAGE_MANAGERS</code> <sub>const</sub></td><td><a href="companions.src.html#fn-unix_package_managers">704</a></td><td>Package managers, and the arguments that install one named package non-interactively.</td></tr>
-<tr><td><code>ffmpeg_tests</code> <sub>mod</sub></td><td><a href="companions.src.html#fn-ffmpeg_tests">917</a></td><td></td></tr>
+<tr><td><code>audacity_offer</code> <sub>fn</sub></td><td><a href="companions.src.html#fn-audacity_offer">672</a></td><td>The route to Audacity differs per platform, and on Linux per distribution.</td></tr>
+<tr><td><code>UNIX_PACKAGE_MANAGERS</code> <sub>const</sub></td><td><a href="companions.src.html#fn-unix_package_managers">705</a></td><td>Package managers, and the arguments that install one named package non-interactively.</td></tr>
+<tr><td><code>ffmpeg_tests</code> <sub>mod</sub></td><td><a href="companions.src.html#fn-ffmpeg_tests">976</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
