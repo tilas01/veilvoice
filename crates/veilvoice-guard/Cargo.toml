@@ -14,7 +14,7 @@ description = "Integrity manifest and tamper detection for VeilVoice's own files
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 # The SHA-256 of every file the manifest lists, written in the same form
 # `sha256sum` prints so it can be checked without this program.
-sha2 = "0.10"
+sha2 = "0.11"
 
 [dev-dependencies]
 # Tests that write a manifest and check it, in a directory that goes away with

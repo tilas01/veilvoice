@@ -16,7 +16,7 @@ description = "Check a VeilVoice release: the SHA-256 of a file, its line in a s
 pgp = { version = "0.20", default-features = false }
 # The SHA-256 in `sha256_file`, which is the hash every published list is
 # written in.
-sha2 = "0.10"
+sha2 = "0.11"
 
 [dev-dependencies]
 # Tests that write a release layout and check it, in a directory that goes
