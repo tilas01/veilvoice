@@ -520,6 +520,71 @@ microphones that cannot be run together, which is what marker 147 will open. F-1
 and F-165 are why nothing here opens a device to answer a question that does
 not need one.
 
+### F-169: the feature nine release jobs turn off, that nothing built
+
+Found by dispatching the 0.1.21 release, which is the worst way this repository
+has ever found a compile error, and the finding is the reason it was found that
+way rather than the error itself.
+
+`veilvoice-audio` has a `live` feature, on by default and **off on nine of the
+twelve targets a release builds**: `cpal` has no backend for FreeBSD, OpenBSD or
+NetBSD, cannot be linked into a musl build that must stay static, and has no
+cross-architecture ALSA to build against on the armv7 and arm64 cross targets.
+Those nine build `-p veilvoice-cli --no-default-features`.
+
+Every `cargo` line in `ci.yml` takes the default features. Formatting, clippy,
+clippy again for platform-gated code, the tests, the release build, the 32-bit
+matrix: all of them, on all three platforms, with `live` on. So the
+configuration that nine release jobs use was compiled by **nothing** between
+releases.
+
+The defect it hid is three lines long. Markers 122 and 123 added a `playback`
+module, gated, and inserted it above `record`:
+
+```rust
+ #[cfg(feature = "live")]
+ pub mod live;
++#[cfg(feature = "live")]
++pub mod playback;
+ pub mod record;
+```
+
+`record` had carried `#[cfg(feature = "live")]` since it was written. The new
+declaration was inserted directly above it and took that attribute for itself,
+leaving `record` bare, and an attribute is attached to the item that follows it
+rather than to the one somebody meant. `record` uses `ringbuf`, an optional
+dependency of the feature, and two `Error` variants that are themselves gated,
+so with `live` off it is four compile errors: two unresolved imports and two
+missing variants.
+
+Then it sat there. It was pushed on 8 September, four commits and two days
+before the release that found it, and in between it passed every check this
+repository has, twice, on three operating systems. The `pub use record::{...}`
+line eight lines below kept its own gate, so the crate's public surface was
+right and only the module body was reachable when it should not have been,
+which is why nothing reading the API noticed either.
+
+**This is the same shape as F-22**, where a `#[cfg(windows)]` attached to the
+item above the one it was meant for, and the CI step written for that one
+(clippy on every platform, called out by name) cannot catch this one: it varies
+the *platform* and this varies the *features*. A guard that covers one axis
+reads as covering the other, which is how a gap survives having been thought
+about.
+
+**The fix is the guard, not the attribute.** The attribute is restored in one
+line. `tools/audit/features.py` reads the `CARGO_ARGS=` lines out of
+`release.yml` and compiles each selection it finds, and CI runs it beside the
+release build. Reading the workflow rather than repeating its arguments is what
+makes a target added to that matrix built here without anybody remembering to
+add it, and the tool refuses to pass on fewer than two selections, because a
+workflow rewritten into a shape it cannot read would otherwise report success
+over an empty list. Proved by putting the missing attribute back and watching
+it fail naming the cause.
+
+What this does not claim: the nine targets were not run, and this environment
+has no BSD and no 32-bit ARM. What is established is that the feature selection
+they build now compiles, checked on every push rather than at a release.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -6314,7 +6379,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-eight defects found and fixed (F-1 to F-168), across
+**One hundred and sixty-nine defects found and fixed (F-1 to F-169), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

@@ -50,6 +50,15 @@ pub mod io;
 pub mod live;
 #[cfg(feature = "live")]
 pub mod playback;
+// F-169. This attribute belongs to `record` and has been taken from it once
+// already, by a `playback` declaration inserted directly above it: an
+// attribute attaches to the item that follows, so the insertion left `record`
+// bare and the crate stopped compiling with the feature off. `record` needs
+// the gate because it uses `ringbuf`, which the feature brings in, and two
+// `Error` variants that are gated themselves. `tools/audit/features.py` builds
+// that configuration now, so the next insertion here fails a build rather than
+// nine release jobs.
+#[cfg(feature = "live")]
 pub mod record;
 /// Several microphones at once, a guest each. **Marker 147.**
 #[cfg(feature = "live")]
