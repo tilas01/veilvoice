@@ -3,13 +3,13 @@
 # RPM spec for VeilVoice (Fedora, RHEL, openSUSE).
 #
 #   rpmbuild -ba packaging/rpm/veilvoice.spec \
-#            --define "_sourcedir $PWD/dist" --define "vv_version 0.1.20"
+#            --define "_sourcedir $PWD/dist" --define "vv_version 0.1.21"
 #
 # Builds from the published source tarball rather than repackaging a binary,
 # which is what a distribution package is supposed to do: the person installing
 # it gets something their own machine compiled from source they can read.
 
-%global vv_version %{?vv_version}%{!?vv_version:0.1.20}
+%global vv_version %{?vv_version}%{!?vv_version:0.1.21}
 
 Name:           veilvoice
 Version:        %{vv_version}
@@ -97,6 +97,9 @@ cargo test --release --locked --workspace
 %{_datadir}/applications/veilvoice.desktop
 
 %changelog
+* Thu Sep 10 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.21-1
+- See CHANGELOG.md in the source for what changed in this release.
+
 * Tue Sep 08 2026 tilas01 <tilas01@users.noreply.github.com> - 0.1.20-1
 - See CHANGELOG.md in the source for what changed in this release.
 

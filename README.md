@@ -214,7 +214,7 @@ on faith.
 
 ```bash
 # 1. Download the archive, the hash list and the signature.
-V=v0.1.20
+V=v0.1.21
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
 curl -fsSLO $B/SHA256SUMS
@@ -255,7 +255,7 @@ the `musl-static` archive: it needs no system libraries at all.
 <summary><b>macOS</b> (Intel and Apple Silicon)</summary>
 
 ```bash
-V=v0.1.20
+V=v0.1.21
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 # arm64 for Apple Silicon, x86_64 for Intel.
 curl -fsSLO $B/veilvoice-$V-macos-arm64.tar.gz
@@ -278,7 +278,7 @@ and choose Open, rather than turning Gatekeeper off.
 <summary><b>Windows</b> (10 and 11)</summary>
 
 ```powershell
-$V = "v0.1.20"
+$V = "v0.1.21"
 $B = "https://github.com/tilas01/veilvoice/releases/download/$V"
 curl.exe -fsSLO "$B/veilvoice-$V-windows-x86_64.zip"
 curl.exe -fsSLO "$B/SHA256SUMS"
@@ -316,7 +316,7 @@ cannot work and the window is not shipped. Everything that operates on a file
 runs exactly as it does elsewhere.
 
 ```sh
-V=v0.1.20
+V=v0.1.21
 fetch https://github.com/tilas01/veilvoice/releases/download/$V/veilvoice-$V-freebsd-x86_64.tar.gz
 tar xzf veilvoice-$V-freebsd-x86_64.tar.gz
 cd veilvoice-$V-freebsd-x86_64
@@ -339,7 +339,7 @@ To prove your build is the published one, byte for byte:
 
 ```bash
 veilvoice verify --build-script > reproduce-veilvoice.sh
-sh reproduce-veilvoice.sh v0.1.20
+sh reproduce-veilvoice.sh v0.1.21
 ```
 
 That clones the tag, builds it with the committed lockfile and the commit's own
@@ -748,7 +748,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 ## Status
 
-**v0.1.20: early but real.** The engine, cryptography, audio path, metadata
+**v0.1.21: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
 destinations, CLI and GUI are implemented and tested (1601 tests across 27
 crates plus doctests, and 18 website suites, clippy clean, no `unsafe`), with
@@ -800,4 +800,7 @@ GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 None of the virtual audio cables listed under
 [Route it into a call](#route-it-into-a-call) is bundled here, and none of them
 is ours. Each is somebody else's software under its own licence, named there
-with what that licence is.
+with what that licence is. The same goes for `ffmpeg`, which the video render
+asks for its last step and which is not shipped, not vendored and not linked
+against: `veilvoice companions` names it, its vendor and its licence beside the
+rest, and installs it through the package manager your machine already has.

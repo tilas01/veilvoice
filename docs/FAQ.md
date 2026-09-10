@@ -56,11 +56,37 @@ around. What changes is who you sound like, not what you said.
 Yes, through a virtual audio cable: VeilVoice takes your microphone and writes
 the veiled voice to the cable, and the calling program listens to the cable
 instead of the microphone. VB-CABLE on Windows, BlackHole on macOS, PipeWire on
-Linux. VeilVoice detects them and never bundles them.
+Linux. VeilVoice detects them, never bundles them, and the Setup tab will
+install the ones that can be installed without accepting somebody else's
+licence on your behalf.
 
 Press **preview to my headphones** first. It runs the same engine and sends the
 result to your own output and nowhere else, so you can hear what you sound like
 before an interview rather than during one.
+
+## Can it make a video, and why does that need ffmpeg?
+
+Yes. A rendered conversation can be written as an MP4 whose picture is the same
+one the player page draws: a circle per speaker in their own colour, whoever is
+talking lit, a level under each name that moves with the sound, the waveform and
+a playhead. **VeilVoice draws every one of those pictures itself**, frame by
+frame, with its own drawing code and its own typeface.
+
+What it does not do is encode the video, and it asks `ffmpeg` for that one step.
+Every usable video encoder is a large piece of C, and carrying one would end the
+thing this project keeps saying about itself: that you can read the whole of it,
+and that `cargo tree` shows nothing large. So the last step belongs to a tool
+many people already have.
+
+Without `ffmpeg` nothing fails. A render still writes the audio, the subtitles,
+the player page and every picture, then hands you the exact command that turns
+them into the file. The Setup tab lists `ffmpeg` under companion software with
+the install command for your system, and `veilvoice companions --install ffmpeg`
+does the same from the command line.
+
+Nothing is downloaded by VeilVoice, there either. An install runs the package
+manager your machine already has, which is why the promise that this program
+ships no network client survives having an install button at all.
 
 ## What operating systems does it run on?
 
