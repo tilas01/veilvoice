@@ -30,7 +30,7 @@ ringbuf = { version = "0.5", optional = true }
 # WAV read/write.
 hound = "3"
 # Decoding for everything else on import.
-symphonia = { version = "0.5", features = ["mp3", "isomp4", "aac", "flac", "vorbis", "ogg", "wav", "pcm"] }
+symphonia = { version = "0.6", features = ["mp3", "isomp4", "aac", "flac", "vorbis", "ogg", "wav", "pcm"] }
 
 [dev-dependencies]
 # Tests that write a file and read it back, in a directory that goes away with
