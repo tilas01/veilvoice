@@ -322,6 +322,16 @@ jobs:
       - name: Every manifest must be covered by a Dependabot entry
         run: python tools/audit/dependabot.py
 
+      # F-170. A release is a claim that these binaries came from this source,
+      # and the tag is the load-bearing part of it. Creating a release for a
+      # tag that does not exist yet makes GitHub create the tag, and with no
+      # `target_commitish` it creates it at the default branch rather than at
+      # the commit the run built. v0.1.20 and v0.1.21 were both tagged that
+      # way. This reads the publishing step and fails if it stops naming the
+      # commit, or if it stops refusing to publish notes it could not read.
+      - name: The release step must tag the commit it built
+        run: python tools/audit/publishing.py
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a

@@ -585,6 +585,86 @@ What this does not claim: the nine targets were not run, and this environment
 has no BSD and no 32-bit ARM. What is established is that the feature selection
 they build now compiles, checked on every push rather than at a release.
 
+### F-170: the tag did not name the commit that was built
+
+Found by reading the release this round published, which is the first time
+anybody had looked at what the tag actually pointed at.
+
+`release.yml` ends with `softprops/action-gh-release`, given a `tag_name` and
+nothing else. Creating a release for a tag that does not exist yet makes GitHub
+create the tag, and with no `target_commitish` it creates it **at the default
+branch**, not at the commit the run compiled.
+
+So both of the last two releases are tagged at a commit they did not build:
+
+* **v0.1.21** was built from the branch this round's work is on. Its tag landed
+  on `main`, at a tree whose `Cargo.toml` still says `0.1.20`. A reader checking
+  out `v0.1.21` gets a source tree that is not version 0.1.21.
+* **v0.1.20** was dispatched from `main` and built `0aa9515b`. Thirteen minutes
+  later `main` moved to `39e4e09a` and the tag was created there. The commit it
+  names is, as it happens, the one that carries F-169, so a reader reproducing
+  v0.1.20 on FreeBSD from its tag gets a compile error rather than a binary to
+  compare.
+
+**This is the one defect in this repository that goes to the whole of what it
+claims.** Every binary is built twice in different directories and compared
+byte for byte; the hashes are signed; `docs/REPRODUCIBLE_BUILDS.md` tells a
+reader to check out the tag and rebuild. All of that is machinery for one
+sentence, and the sentence is false when the tag names a different tree. The
+reader who does the work gets different bytes and correctly concludes the
+release does not reproduce, which is worse than never having made the claim.
+
+Nothing was tampered with and nothing needs to be: the binaries are what the
+run built, and the run is public. What was wrong is the pointer.
+
+The fix is `target_commitish: ${{ github.sha }}`, one line, and
+`tools/audit/publishing.py`, which reads the publishing step and fails if it
+stops naming the commit or names something other than `github.sha`. Proved by
+deleting the line and by pointing it at `github.ref_name` instead, and reading
+what each said.
+
+The comment above that step already argued that "a tag is a commit somebody
+chose; a branch moves", and then the step did not say which commit. The
+reasoning was right and had not reached the configuration under it, which is
+its own thing to watch for: an argument written beside code is not the same as
+a guard over it.
+
+### F-171: a release published saying it had no release notes
+
+v0.1.21's notes on GitHub read, in full:
+
+> No changelog section found for `v0.1.21` in `CHANGELOG.md`.
+
+`release.yml` reads a release's notes out of `CHANGELOG.md` by matching
+`## v<version>` as a whole line. The 0.1.21 entry had been written
+`## 0.1.21 - 2026-09-10`, in a shape no other entry in the file uses, so the
+match failed and seven hundred lines of release notes were dropped.
+
+The workflow then **published anyway**, with a note saying the notes were
+missing. That is the defect. A note saying the notes are missing is not a
+smaller version of the notes; it is a published release whose contents nobody
+can tell, and `CLAUDE.md` says a release's notes live in `CHANGELOG.md` and
+everything else derives from it. Deriving nothing is a failure and now fails,
+on the path that publishes; a dry run publishes nothing and is still allowed to
+report the gap.
+
+Two readers of one file disagreeing is F-167's shape again: `tools/site/
+releases.py` builds the website's releases page from the same headings and
+tolerates both forms, so every local check passed while the workflow's reader
+found nothing. The one that mattered was the one nothing ran until a release
+was cut.
+
+So the question is asked twice, and the cheap one comes first.
+`tools/release/version.py --check` now requires `CHANGELOG.md` to carry a
+heading the workflow's reader can find for the workspace version, with
+something under it, and says which heading is there when it is the wrong shape.
+That runs in CI and in `tools/verify.py`, before any release is dispatched.
+The refusal in the workflow stays as the last line of defence, and
+`tools/audit/publishing.py` fails if somebody deletes it.
+
+Tested against all three ways to get it wrong: the dated heading that actually
+shipped, the same heading without the `v`, and no heading at all.
+
 ### A state location that had to be opted into rather than detected
 
 Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
@@ -6379,7 +6459,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and sixty-nine defects found and fixed (F-1 to F-169), across
+**One hundred and seventy-one defects found and fixed (F-1 to F-171), across
 thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
