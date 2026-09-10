@@ -27,7 +27,7 @@ sha2 = "0.10"
 # --- authenticated encryption ---
 chacha20poly1305 = "0.10"
 # --- hybrid key agreement ---
-x25519-dalek = { version = "2", features = ["static_secrets"] }
+x25519-dalek = { version = "3", features = ["static_secrets"] }
 # ML-KEM-768, the post-quantum half of the hybrid key exchange. X25519 is the
 # other half and neither alone is trusted.
 ml-kem = "0.2"
