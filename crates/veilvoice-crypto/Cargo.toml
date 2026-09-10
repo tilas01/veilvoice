@@ -25,7 +25,7 @@ hkdf = "0.12"
 # The hash HKDF runs over.
 sha2 = "0.10"
 # --- authenticated encryption ---
-chacha20poly1305 = "0.10"
+chacha20poly1305 = "0.11"
 # --- hybrid key agreement ---
 x25519-dalek = { version = "2", features = ["static_secrets"] }
 # ML-KEM-768, the post-quantum half of the hybrid key exchange. X25519 is the
