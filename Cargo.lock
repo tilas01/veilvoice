@@ -4689,15 +4689,15 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-accel"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-appctl"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-audio"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "cpal",
  "hound",
@@ -4710,7 +4710,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-capture"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "tempfile",
  "veilvoice-proc",
@@ -4718,7 +4718,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-check"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "pgp",
  "sha2",
@@ -4727,7 +4727,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-cli"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "clap",
  "rpassword",
@@ -4760,7 +4760,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-conversation"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "tempfile",
  "veilvoice-core",
@@ -4769,7 +4769,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-core"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "getrandom 0.2.17",
  "rand 0.8.7",
@@ -4780,7 +4780,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-crypto"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "argon2",
  "chacha20poly1305",
@@ -4798,32 +4798,32 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-decoy"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "veilvoice-crypto",
 ]
 
 [[package]]
 name = "veilvoice-drivers"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "tempfile",
 ]
 
 [[package]]
 name = "veilvoice-failsafe"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-gnupg"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "veilvoice-check",
 ]
 
 [[package]]
 name = "veilvoice-guard"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "sha2",
  "tempfile",
@@ -4832,7 +4832,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-gui"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "eframe",
  "egui",
@@ -4859,14 +4859,14 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-input"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "veilvoice-proc",
 ]
 
 [[package]]
 name = "veilvoice-meta"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "hound",
  "img-parts",
@@ -4876,7 +4876,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-policy"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "tempfile",
  "veilvoice-crypto",
@@ -4884,15 +4884,15 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-priv"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-proc"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-sentry"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "sha2",
  "tempfile",
@@ -4900,15 +4900,15 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-setup"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-update"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-verify"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "pgp",
  "tempfile",
@@ -4920,7 +4920,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-video"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "miniz_oxide",
  "tempfile",
@@ -4929,11 +4929,11 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-watch"
-version = "0.1.20"
+version = "0.1.21"
 
 [[package]]
 name = "veilvoice-workspace"
-version = "0.1.20"
+version = "0.1.21"
 dependencies = [
  "tempfile",
  "veilvoice-conversation",

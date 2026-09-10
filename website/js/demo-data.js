@@ -106,7 +106,7 @@ window.VEILVOICE_DEMO = {
           "typed": "veilvoice keygen"
         },
         {
-          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\nResult\n  Written                veiled.veil\n  Speed                  184.9x realtime\n  Accent                 neutralised\n  Seed rolls             1467-1515 ms, drawn fresh before every roll -- no period to observe\n  At rest                sealed to a public key (X25519 + ML-KEM-768)\n\n\u2713 done, and the voiceprint in this file is not recoverable\n  Open it again with: veilvoice decrypt <file> -o out.wav",
+          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\nResult\n  Written                veiled.veil\n  Speed                  133.0x realtime\n  Accent                 neutralised\n  Seed rolls             923-1296 ms, drawn fresh before every roll -- no period to observe\n  At rest                sealed to a public key (X25519 + ML-KEM-768)\n\n\u2713 done, and the voiceprint in this file is not recoverable\n  Open it again with: veilvoice decrypt <file> -o out.wav",
           "typed": "veilvoice anonymise interview.wav -o veiled.veil --encrypt-to veilvoice.pub"
         }
       ],
@@ -118,7 +118,7 @@ window.VEILVOICE_DEMO = {
       "programme": "veilvoice",
       "steps": [
         {
-          "output": "VeilVoice\n  Version                0.1.20\n  Engine                 0.1.20\n  Crypto                 0.1.20\n  Audio                  0.1.20\n  Metadata               0.1.20\n  Monitor                0.1.20\n  Licence                GPL-3.0-or-later\n  Network access         none, by construction\n  Live audio             available\n\n  VeilVoice destroys the voiceprint, not the words.\n  See docs/WHITEPAPER.md for what that does and does not\n  protect against.",
+          "output": "VeilVoice\n  Version                0.1.21\n  Engine                 0.1.21\n  Crypto                 0.1.21\n  Audio                  0.1.21\n  Metadata               0.1.21\n  Monitor                0.1.21\n  Licence                GPL-3.0-or-later\n  Network access         none, by construction\n  Live audio             available\n\n  VeilVoice destroys the voiceprint, not the words.\n  See docs/WHITEPAPER.md for what that does and does not\n  protect against.",
           "typed": "veilvoice info"
         }
       ],
@@ -142,7 +142,7 @@ window.VEILVOICE_DEMO = {
       "programme": "veilvoice",
       "steps": [
         {
-          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\n\u2717 WRITING THIS RECORDING UNENCRYPTED\n  The de-identified recording will be written to disk unencrypted.\n\n  VeilVoice destroys the voiceprint, not the words. Anyone who can read\n  this file can still hear everything that was said: another user, a\n  backup, a sync client, anyone who later gets the disk.\n\n  Deleting it afterwards is not a fix: on an SSD, SD card or USB stick\n  the original blocks can survive every overwrite. That is why at-rest\n  encryption is the default rather than an option you have to find.\n\n  The file will be created readable only by your account. That is a file\n  permission and nothing more. It does not survive a copy, a backup, or\n  anyone who has the disk.\n\nResult\n  Written                veiled.wav\n  Speed                  204.5x realtime\n  Accent                 neutralised\n  Seed rolls             91-336 ms, drawn fresh before every roll -- no period to observe\n  At rest                UNENCRYPTED\n\n\u2713 done, and the voiceprint in this file is not recoverable\n  The words are still there; that is deliberate. To hide the\n  message as well, encrypt it: veilvoice encrypt\n! continuing without at-rest encryption, as asked",
+          "output": "Input\n  File                   interview.wav\n  Duration               3.00 s\n  Sample rate            16000 Hz\n\n\u2717 WRITING THIS RECORDING UNENCRYPTED\n  The de-identified recording will be written to disk unencrypted.\n\n  VeilVoice destroys the voiceprint, not the words. Anyone who can read\n  this file can still hear everything that was said: another user, a\n  backup, a sync client, anyone who later gets the disk.\n\n  Deleting it afterwards is not a fix: on an SSD, SD card or USB stick\n  the original blocks can survive every overwrite. That is why at-rest\n  encryption is the default rather than an option you have to find.\n\n  The file will be created readable only by your account. That is a file\n  permission and nothing more. It does not survive a copy, a backup, or\n  anyone who has the disk.\n\nResult\n  Written                veiled.wav\n  Speed                  138.8x realtime\n  Accent                 neutralised\n  Seed rolls             389-640 ms, drawn fresh before every roll -- no period to observe\n  At rest                UNENCRYPTED\n\n\u2713 done, and the voiceprint in this file is not recoverable\n  The words are still there; that is deliberate. To hide the\n  message as well, encrypt it: veilvoice encrypt\n! continuing without at-rest encryption, as asked",
           "typed": "veilvoice anonymise interview.wav -o veiled.wav --encrypt false --yes"
         }
       ],
@@ -330,5 +330,5 @@ window.VEILVOICE_DEMO = {
       "typed": "veilvoice mandate status"
     }
   ],
-  "version": "0.1.20"
+  "version": "0.1.21"
 };
