@@ -287,14 +287,49 @@ def wrap_line(line, width):
     return out or [line[:width]]
 
 
-def draw(name, title, note, text):
-    """One terminal window, as SVG."""
+def laid_out(title, text):
+    """The wrapped lines of one drawing, and how many columns they need."""
     lines = text.replace("\r\n", "\n").rstrip("\n").split("\n")
     body = []
     for line in lines:
         body.extend(wrap_line(line.rstrip(), MAX_COLUMNS))
+    return body, max([len(line) for line in body] + [len(title) + 4])
 
-    columns = max([len(line) for line in body] + [len(title) + 4])
+
+def draw(name, title, note, text, columns=None):
+    """One terminal window, as SVG.
+
+    `columns` is the width the whole set shares. Passing None draws this one at
+    its own content width, which is what a single drawing on its own would want
+    and is kept for callers testing one in isolation.
+
+    # Why the set shares a width
+
+    Each drawing used to be exactly as wide as its own longest line, which gave
+    eleven pictures at five different widths: 651, 800, 817, 825 and 834. The
+    README stacks all eleven vertically, one after another, and the website
+    shows them in the same order, so what a reader sees is a column of terminal
+    windows whose right edges do not line up.
+
+    Height differing is content and is right: a longer help screen is a taller
+    picture, which is the axis a page can afford. Width differing is the frame,
+    and a frame that changes size between pictures reads as the pictures being
+    wrong rather than the commands being different.
+
+    The other argument is what these actually are. They draw a **terminal
+    window**, with a title bar and rounded corners, and a terminal window does
+    not shrink to fit whichever command printed the least. One that did would be
+    the odd thing.
+
+    The shared width is the widest one's content, for the same reason the window
+    captures take the tallest one's: it is the only shared size that re-wraps
+    nothing. Narrowing to the mean would push text in the widest drawings onto
+    extra lines to make the picture tidier, and this file already argues at
+    length that text is not a thing to lose for a better-looking picture.
+    """
+    body, own = laid_out(title, text)
+    if columns is None:
+        columns = own
     width = PAD_X * 2 + columns * CHAR_W
     height = PAD_TOP + len(body) * LINE_H + PAD_BOTTOM
 
@@ -334,6 +369,12 @@ def outputs():
     """Every drawing this tool owns, as {relative path: text}."""
     files = {}
     missing = []
+
+    # Read every capture first, because the width they share is measured across
+    # all of them and cannot be known while drawing the first. Measured on each
+    # run rather than written down, so a command whose help grows moves the
+    # whole set together instead of becoming the one exception.
+    captured = []
     for name, argv, note in COMMANDS:
         path = os.path.join(OUT, "cli-%s.txt" % name)
         if not os.path.exists(path):
@@ -341,8 +382,16 @@ def outputs():
             continue
         with io.open(path, encoding="utf-8") as handle:
             text = handle.read()
-        title = "veilvoice " + " ".join(argv)
-        files["assets/screenshots/cli-%s.svg" % name] = draw(name, title, note, text)
+        captured.append((name, "veilvoice " + " ".join(argv), note, text))
+
+    shared = max(
+        [laid_out(title, text)[1] for _, title, _, text in captured] or [MAX_COLUMNS]
+    )
+
+    for name, title, note, text in captured:
+        files["assets/screenshots/cli-%s.svg" % name] = draw(
+            name, title, note, text, shared
+        )
 
     # The website's copies, from the same run rather than by hand.
     for rel in list(files):
