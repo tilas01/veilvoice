@@ -715,6 +715,34 @@ jobs:
             ' CHANGELOG.md)"
           fi
 
+          # **A release that could not read its own changelog does not publish.**
+          #
+          # This used to print "No changelog section found" into the notes and
+          # carry on, and v0.1.21 was published that way: the heading had been
+          # written `## 0.1.21 - 2026-09-10` while this reads `## v0.1.21`
+          # exactly, so the whole entry, seven hundred lines of it, was silently
+          # dropped and the release went out describing nothing.
+          #
+          # A note saying the notes are missing is not a smaller version of the
+          # notes. It is a published release nobody can tell the contents of,
+          # and this project's own rule is that a release's notes live in
+          # CHANGELOG.md and everything else derives from it. Deriving nothing
+          # is a failure, so it fails here rather than shipping.
+          #
+          # A dry run is exempt: it publishes nothing, so it is allowed to
+          # report the gap instead of stopping. That is the same condition the
+          # gate below uses, written the same way: a tag push always publishes,
+          # and a dispatch publishes when it was given a version.
+          publishing=""
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] \
+             || [ -n "${{ github.event.inputs.tag }}" ]; then
+            publishing=yes
+          fi
+          if [ -z "$changes" ] && [ -n "$publishing" ]; then
+            echo "::error::CHANGELOG.md has no '## $tag' section, so this release would publish with no notes. The heading must be exactly '## $tag', matching every other entry in the file."
+            exit 1
+          fi
+
           {
             echo "## VeilVoice ${{ env.VERSION_TAG }}"
             echo
@@ -825,10 +853,28 @@ jobs:
           echo "publishing $tag from a workspace at $have"
           echo "publish=true" >> "$GITHUB_OUTPUT"
 
+      # **`target_commitish` is what makes the tag name the commit that was
+      # built**, and it was missing. Creating a release for a tag that does not
+      # exist yet makes GitHub create the tag, and with no target it creates it
+      # at the **default branch**, not at the commit this run compiled. So a
+      # release dispatched from a branch, or from `main` after `main` had moved
+      # on, published binaries from one commit under a tag pointing at another.
+      #
+      # Both v0.1.20 and v0.1.21 were tagged that way before this was found:
+      # v0.1.21's tag landed on a tree whose `Cargo.toml` still said 0.1.20, and
+      # v0.1.20's landed thirteen minutes ahead of what it published, on the
+      # commit that happens to be F-169.
+      #
+      # This is the one thing in this workflow that cannot be a small mistake.
+      # Everything above exists to let somebody rebuild these binaries from
+      # this source and compare; a tag pointing at different source means they
+      # get a different answer and correctly conclude that the release does not
+      # reproduce. The claim is the product here, so this line is the product.
       - uses: softprops/action-gh-release@v2
         if: steps.gate.outputs.publish == 'true'
         with:
           tag_name: ${{ env.VERSION_TAG }}
+          target_commitish: ${{ github.sha }}
           files: staging/*
           body_path: NOTES.md
           draft: false

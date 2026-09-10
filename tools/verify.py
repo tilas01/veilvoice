@@ -162,6 +162,11 @@ CHECKS = [
     # build rather than in a pass somebody runs before every commit.
     ("every feature selection a release builds is still declared",
      [sys.executable, "tools/audit/features.py"]),
+    # F-170. The tag a release publishes must name the commit that was built,
+    # or the reproducibility every other check exists to support is a claim
+    # about a different tree than the one somebody would check out.
+    ("the release step tags the commit it built",
+     [sys.executable, "tools/audit/publishing.py"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),

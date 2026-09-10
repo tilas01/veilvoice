@@ -6,7 +6,7 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
-## 0.1.21 - 2026-09-10
+## v0.1.21
 
 **Every screenshot the same size, and in the face they were meant to be in**
 
@@ -161,6 +161,46 @@ than a summary written afterwards.
   Python, so a `package.json` or a `Gemfile` here would declare no dependencies
   and would be one more file to keep true. `Cargo.toml` is this project's
   package manifest, and there are 28 of them.
+
+**The tag a release publishes now names the commit it built**
+
+- The release workflow ends by creating a GitHub release for a tag. Creating a
+  release for a tag that does not exist yet makes GitHub create the tag, and
+  with no target it creates it **at the default branch** rather than at the
+  commit the run compiled.
+- Both of the last two releases were tagged that way. v0.1.21's tag landed on a
+  tree whose `Cargo.toml` still said 0.1.20; v0.1.20's landed thirteen minutes
+  ahead of what it published, on a commit that does not compile on nine of the
+  twelve targets.
+- **This goes to the whole of what a release claims.** Every binary is built
+  twice in different directories and compared byte for byte, the hashes are
+  signed, and the reproducible-builds guide tells a reader to check out the tag
+  and rebuild. That is all machinery for one sentence, and the sentence is false
+  when the tag names a different tree: the reader who does the work gets
+  different bytes and correctly concludes the release does not reproduce.
+- Nothing was tampered with, and the binaries are what the run built. What was
+  wrong was the pointer, and it is one line: the release step names the commit
+  now, and `tools/audit/publishing.py` fails a build if it stops doing so or
+  starts naming something else.
+
+**A release published saying it had no release notes**
+
+- v0.1.21's notes on GitHub read, in full, that no changelog section could be
+  found for it. The workflow matches `## v<version>` as a whole line, the entry
+  had been written with a date after it and no `v` in front, and the match
+  failed, so seven hundred lines of notes were dropped.
+- It then published anyway. That is the defect rather than the heading: a note
+  saying the notes are missing is not a smaller version of the notes, it is a
+  release whose contents nobody can tell.
+- The heading is the shape every other entry uses. The workflow refuses to
+  publish without a section now, and because that refusal only fires after
+  twelve jobs have built and compared every binary, the same question is asked
+  first where it costs nothing: `tools/release/version.py --check` requires the
+  changelog to carry a heading the workflow's reader can find, and says which
+  heading is actually there when it is the wrong shape.
+- Two readers of one file disagreeing is why this survived. The website's
+  releases page is built from the same headings and tolerates both forms, so
+  every local check passed while the one that mattered found nothing.
 
 **The feature nine release jobs turn off, that nothing built**
 
