@@ -79,7 +79,7 @@ getrandom = "0.2"        # OS CSPRNG seed
 # itself is `rand_chacha`, seeded from `getrandom`; this is the interface, not
 # the source.
 rand = "0.8"
-rand_chacha = "0.3"      # ChaCha20 CSPRNG for parameter modulation
+rand_chacha = "0.9"      # ChaCha20 CSPRNG for parameter modulation
 # --- secret hygiene ---
 zeroize = { version = "1", features = ["derive"] }
 
