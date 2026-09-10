@@ -146,7 +146,66 @@ def disagreements(root: pathlib.Path, version: str) -> list[str]:
         elif found[0] != version:
             problems.append(f"{name}: {what} says {found[0]}, the workspace says {version}")
 
+    problems.extend(changelog_heading(root, version))
     return problems
+
+
+def changelog_heading(root: pathlib.Path, version: str) -> list[str]:
+    """`CHANGELOG.md` has a section the release workflow can actually find.
+
+    The workflow reads the notes for a release out of this file, matching
+    `## v<version>` as a whole line and taking everything up to the next `##`.
+    That reader is exact, so a heading written in any other shape produces an
+    empty section, and the workflow used to publish that as
+    "No changelog section found" rather than stopping.
+
+    v0.1.21 went out that way. Its heading had been written
+    `## 0.1.21 - 2026-09-10` while every other entry in the file is `## v0.1.20`,
+    `## v0.1.19` and so on, so seven hundred lines of release notes were
+    dropped and nobody reading the release could tell what was in it.
+
+    The workflow refuses to publish without a section now, but that is the last
+    line of defence and it fires after twelve jobs have built and compared
+    every binary. This is the same question asked here, where it costs nothing
+    and fails a pull request instead.
+
+    The reader is reimplemented rather than shared because the two live in
+    different languages, so what is checked is the *shape* the awk requires: an
+    exact heading line, and something under it.
+    """
+    path = root / "CHANGELOG.md"
+    if not path.is_file():
+        return ["CHANGELOG.md is missing, so a release would have no notes"]
+
+    want = f"## v{version}"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    try:
+        at = lines.index(want)
+    except ValueError:
+        near = [
+            line for line in lines
+            if line.startswith("## ") and version in line
+        ]
+        if near:
+            return [
+                "CHANGELOG.md: the heading for this release is "
+                f"{near[0]!r}, and the release workflow matches {want!r} "
+                "exactly, so it would publish with no notes at all"
+            ]
+        return [
+            f"CHANGELOG.md: no {want!r} heading, so a release of {version} "
+            "would publish with no notes at all"
+        ]
+
+    body = []
+    for line in lines[at + 1:]:
+        if line.startswith("## "):
+            break
+        body.append(line)
+    if not any(line.strip() for line in body):
+        return [f"CHANGELOG.md: {want} has nothing under it"]
+
+    return []
 
 
 def rewrite(root: pathlib.Path, old: str, new: str) -> list[str]:

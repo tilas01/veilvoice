@@ -100,13 +100,13 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <pre><code>veilvoice verify sums SHA256SUMS SHA256SUMS.asc</code></pre>
 <p>This is the step everything else rests on. <code>SHA256SUMS</code> is a list of numbers; <code>SHA256SUMS.asc</code> is the detached OpenPGP signature over it. Until that signature checks out against the signing key, the list is just numbers somebody sent you.</p>
 <p><strong>One file, against the signed list</strong></p>
-<pre><code>veilvoice verify file veilvoice-v0.1.20-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
+<pre><code>veilvoice verify file veilvoice-v0.1.21-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
 <p>The signature is verified <strong>first</strong>, and the file is compared against the list only after that passes. A pass means the download is <strong>INTACT</strong>: byte for byte the file that was published, signed by the VeilVoice key.</p>
 <p><strong>One file, with no hash list at all</strong></p>
-<pre><code>veilvoice verify file veilvoice-v0.1.20-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
+<pre><code>veilvoice verify file veilvoice-v0.1.21-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
 <p>For when you have a hash rather than a signed list. What a match proves depends entirely on where that hash came from, and only you know that, so the tool says so instead of guessing. If it came from somebody else&#x27;s independent build of the same tag, a match means the release is <strong>REPRODUCIBLE</strong>, which is the stronger claim.</p>
 <p><strong>Just the hash, verifying nothing</strong></p>
-<pre><code>veilvoice verify hash veilvoice-v0.1.20-linux-x86_64.tar.gz</code></pre>
+<pre><code>veilvoice verify hash veilvoice-v0.1.21-linux-x86_64.tar.gz</code></pre>
 <p>Prints the SHA-256 and checks nothing, for when you want to compare it against something yourself.</p>
 <p><strong>The same check through your own GnuPG</strong></p>
 <pre><code>veilvoice verify gnupg</code></pre>
@@ -165,6 +165,297 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <tr><td><a href="https://github.com/tilas01/veilvoice/blob/main/docs/AUDIT.md" rel="noopener noreferrer"><code>AUDIT.md</code></a></td><td>Every defect found and fixed, in order</td><td>&mdash;</td></tr>
 </tbody></table>
 <p class="muted">The generated reference for every crate and every source file is under <a href="wiki.html">the reference</a>, and the same pages are in <a href="https://github.com/tilas01/veilvoice/wiki" rel="noopener noreferrer">the wiki</a>.</p>
+</details>
+<details class="release" id="v0.1.21">
+<summary><strong>v0.1.21</strong> <span class="muted">Every screenshot the same size, and in the face they were meant to be in</span></summary>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.21-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.21-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.21-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.21-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.21-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.21-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.21-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.21" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+<details class="notes">
+<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.21, in full</span></summary>
+<p><strong>Every screenshot the same size, and in the face they were meant to be in</strong></p>
+<ul>
+<li>The captures were trimmed to each tab&#x27;s own content, with a floor. That gave eight pictures 1000 tall, one 1095 and one 1315, which is right for one picture and wrong for the grid the README and the website show them in: the row holding the group tab sat lower than the rows either side of it.</li>
+<li><strong>One height now, and it is the tallest one&#x27;s content</strong>, measured across the set on every run rather than written down. It is the only shared height that crops nothing: trimming to the shortest would cut the group panel off, and scaling would make the text in one picture a different size from the next. The cost is real and is paid on purpose: the short tabs carry background below their content. Empty space in a picture reads as the window having room; a stepped grid reads as a mistake.</li>
+<li><strong>The captures are in JetBrains Mono, and that is now proved rather than hoped.</strong> The window prefers it and falls back to the built-in monospace when it is absent, which is right for somebody running the program and wrong for a capture: half a set in the wrong face looks subtly off and nothing about the run says so. <code>veilvoice-gui --typeface</code> answers which face the window would draw with, without opening one, and the capture script asks first and refuses to photograph anything if the answer is the fallback, naming the package for each platform.</li>
+<li>All ten retaken, so they show what this release actually contains.</li>
+<li>More room between them on the website: 40px across and 48px down, more vertically because each picture has a caption under it and a matching row gap put the next picture as close to a caption as the caption is to its own picture. The README&#x27;s grid is a table GitHub renders and strips styles from, so there the equal heights are the whole of the fix.</li>
+</ul>
+<p><strong>ffmpeg joins the companion list, and the render points at it</strong></p>
+<ul>
+<li>The Setup tab lists the software VeilVoice works with, says who makes each and under what licence, and installs one on an explicit yes. <strong><code>ffmpeg</code> was not in it</strong>, which is the whole of this: a render told you <code>ffmpeg</code> was missing and the tab that installs things had never heard of the name, so the message pointed at nothing.</li>
+<li>It is there now, first in the list, with what it is for, what still works without it, and the install command for this system: <code>winget</code> on Windows, Homebrew on macOS, and whichever package manager is actually on PATH elsewhere. Every message about a missing <code>ffmpeg</code> now names the tab, and a test fails if one stops doing so.</li>
+<li>Both front ends read the same table, so <code>veilvoice companions</code> gained the entry at the same time and cannot disagree with the window about what exists.</li>
+<li>The loop that asks each package manager in turn existed twice and would have become three copies. It is written once, which is the point at which copies start disagreeing about which managers this project recognises.</li>
+<li><strong>&quot;Look again&quot; no longer freezes the window.</strong> It ran a command per companion inside the frame it was drawing, which on a machine with several of them is the window going white. The search moved to a worker and the button says it is working while it runs.</li>
+<li>Nothing here downloads anything. An install runs the package manager the machine already has, so the claim that VeilVoice ships no network client is unchanged and still checked three ways on every commit.</li>
+</ul>
+<p><strong>The video has a picture in it</strong> (marker 139, finished)</p>
+<ul>
+<li>A render produced veiled audio over a black rectangle. It now produces the same picture the preview page shows: a circle per speaker in their colour, whoever is talking lit, the level under each name, the waveform and a playhead. One layout function draws both, so the two cannot drift into being pictures of different recordings.</li>
+<li><strong>The frames are drawn here, as pixels.</strong> A canvas with rectangles, antialiased circles and a PNG writer, and a five-by-seven monospace face of ninety-five glyphs written out in the file. The drawing is SVG and no build of <code>ffmpeg</code> can be assumed to read SVG; converting it would have meant an SVG rasteriser, which is exactly the large library this project spends a page explaining why it will not carry. One dependency, <code>miniz_oxide</code>, for the deflate that PNG is made of, and it was already in this tree under <code>flate2</code>.</li>
+<li><strong>A picture is written when the picture changes</strong>, not once per frame of video. The playhead moves a pixel at a time rather than a frame at a time, so ten minutes at thirty frames writes hundreds of files instead of eighteen thousand. The saving is measured and reported rather than asserted, and a short recording holds nothing, which is correct: the playhead crosses the whole waveform however long the recording is.</li>
+<li>That is why the ffmpeg command is a <strong>concat list with a duration per picture</strong>. Held frames handed to the numbered-sequence reader would play an hour of conversation in the few seconds its distinct pictures cover, which is a video that is wrong rather than one that refuses to encode.</li>
+<li><strong>Names the face cannot draw are named.</strong> Printable ASCII only, so a name in another alphabet comes out as open boxes, and the render says which names before somebody watches an hour of video to find out. The preview page does not have this limit, because it is markup and uses the reader&#x27;s own fonts.</li>
+<li>Video is the one output <strong>off by default</strong>, because it is the one that needs a tool VeilVoice does not ship. Without <code>ffmpeg</code> the pictures and the list are still written and the exact command is handed over.</li>
+</ul>
+<p><strong>A score for what a recording gives away about who was speaking</strong></p>
+<ul>
+<li>Beside the voice controls in the Group tab there is now a percentage. A hundred means the finished recording says nothing about which of the people in it was talking. It falls as the group grows in &quot;a voice each&quot; mode: two people is 70 per cent, four is 40, eight is 10. One voice for everybody is a hundred at any size.</li>
+<li><strong>It is not a measure of how well a voice is disguised.</strong> That is the engine&#x27;s and it does not get weaker because somebody else joined the call: eight people are each hidden exactly as well as one. It is not cryptography either, and the module, the guide and the interface all say so rather than letting an information count be read as a claim about strength.</li>
+<li>What it counts is the other leak, the one that does grow with the group: how much of the conversation&#x27;s shape a listener gets free. Eight tellable-apart voices let anybody count the participants, follow who said what, and align two recordings of the same group by voice. <code>log2(classes)</code> bits per turn, measured against the widest the engine goes.</li>
+<li><strong>Two speakers whose voices are too close to separate count as one.</strong> So crowding the table makes a recording give <em>less</em> away while making it harder to follow. That runs backwards from the obvious reading, so it is shown on its own line rather than folded into the score, and a test pins it down.</li>
+<li>Fixed while building it: a solo recording was reported as &quot;crowded&quot;, because the closest-pair measure answers 1.0 when there is nothing to compare and that is below the separation floor. One voice has nothing to be confused with.</li>
+</ul>
+<p><strong>A level under every speaker&#x27;s name</strong> (marker 139, the first of its two halves)</p>
+<ul>
+<li>The preview page lit whoever had the turn and said nothing more. A lit circle cannot say whether that person is mid-sentence or mid-pause, and those look identical for as long as the turn lasts, so under each name there is now a bar that moves with the sound.</li>
+<li><strong>Drawn from the same envelope as the waveform beneath it</strong>, so the two cannot disagree: one array, two things drawn from it, and the page is animated from the numbers it drew rather than from a second copy.</li>
+<li><strong>It is the mix, given to whoever is speaking</strong>, and the guide says so. A render produces one mixed track, so there is no separate signal per person to measure. That is the same thing while one person talks; where two turns overlap both show the same bar, which is what a listener hears and is not a claim that each was that loud.</li>
+<li>Somebody whose turn it is not shows <strong>nothing</strong>, rather than a small amount. A bar moving for a person who is not speaking would be the one thing on the picture actively saying something untrue.</li>
+<li>The track is always drawn and only the filled part moves, so the layout does not shift under the reader every time somebody stops talking.</li>
+<li><strong>What is left is drawing the frames.</strong> The video file is still veiled audio over a black picture. That needs a rasteriser and a font, neither of which is a small addition, and the roadmap row says what they are and why a full SVG rasteriser is the wrong way to get them.</li>
+</ul>
+<p><strong>Dependabot, configured, and a check that keeps it true</strong></p>
+<ul>
+<li>There was no <code>.github/dependabot.yml</code>. Nothing had ever raised a version update or an alert against this tree. There is one now: the Cargo workspace, <code>fuzz/</code> separately (it is outside the workspace, so an entry on the root does not reach it), and the actions the workflows run, which hold a token that can publish signed artefacts and are monitored on the same terms as the code.</li>
+<li><strong>The configuration is checked rather than remembered.</strong> <code>tools/audit/dependabot.py</code> reads it against the tree and fails on a manifest no entry covers, or an entry naming a directory that has gone. It runs in CI beside the check that every dependency says what it is for, which is the other half of the same question: saying what a dependency is for does not make anything watch it.</li>
+<li>Two ecosystems, and the file says why there are only two. The website&#x27;s JavaScript and the site tests use Node&#x27;s own built-in modules and nothing else, and every script under <code>tools/</code> and <code>assets/</code> is standard-library Python, so a <code>package.json</code> or a <code>Gemfile</code> here would declare no dependencies and would be one more file to keep true. <code>Cargo.toml</code> is this project&#x27;s package manifest, and there are 28 of them.</li>
+</ul>
+<p><strong>The tag a release publishes now names the commit it built</strong></p>
+<ul>
+<li>The release workflow ends by creating a GitHub release for a tag. Creating a release for a tag that does not exist yet makes GitHub create the tag, and with no target it creates it <strong>at the default branch</strong> rather than at the commit the run compiled.</li>
+<li>Both of the last two releases were tagged that way. v0.1.21&#x27;s tag landed on a tree whose <code>Cargo.toml</code> still said 0.1.20; v0.1.20&#x27;s landed thirteen minutes ahead of what it published, on a commit that does not compile on nine of the twelve targets.</li>
+<li><strong>This goes to the whole of what a release claims.</strong> Every binary is built twice in different directories and compared byte for byte, the hashes are signed, and the reproducible-builds guide tells a reader to check out the tag and rebuild. That is all machinery for one sentence, and the sentence is false when the tag names a different tree: the reader who does the work gets different bytes and correctly concludes the release does not reproduce.</li>
+<li>Nothing was tampered with, and the binaries are what the run built. What was wrong was the pointer, and it is one line: the release step names the commit now, and <code>tools/audit/publishing.py</code> fails a build if it stops doing so or starts naming something else.</li>
+</ul>
+<p><strong>A release published saying it had no release notes</strong></p>
+<ul>
+<li>v0.1.21&#x27;s notes on GitHub read, in full, that no changelog section could be found for it. The workflow matches <code>## v&lt;version&gt;</code> as a whole line, the entry had been written with a date after it and no <code>v</code> in front, and the match failed, so seven hundred lines of notes were dropped.</li>
+<li>It then published anyway. That is the defect rather than the heading: a note saying the notes are missing is not a smaller version of the notes, it is a release whose contents nobody can tell.</li>
+<li>The heading is the shape every other entry uses. The workflow refuses to publish without a section now, and because that refusal only fires after twelve jobs have built and compared every binary, the same question is asked first where it costs nothing: <code>tools/release/version.py --check</code> requires the changelog to carry a heading the workflow&#x27;s reader can find, and says which heading is actually there when it is the wrong shape.</li>
+<li>Two readers of one file disagreeing is why this survived. The website&#x27;s releases page is built from the same headings and tolerates both forms, so every local check passed while the one that mattered found nothing.</li>
+</ul>
+<p><strong>The feature nine release jobs turn off, that nothing built</strong></p>
+<ul>
+<li><code>veilvoice-audio</code>&#x27;s live capture is an optional feature, off on nine of the twelve targets a release builds: <code>cpal</code> has no backend for the BSDs, cannot be linked into a static musl binary, and has no cross-architecture ALSA to build against. Those nine build the command line with default features off.</li>
+<li><strong>Nothing in CI built that.</strong> Every <code>cargo</code> line took the default features, so a module whose <code>#[cfg(feature = &quot;live&quot;)]</code> had gone missing compiled on all three platforms, passed every check twice over two days, and then failed nine release jobs at once. The attribute had been taken by a <code>playback</code> declaration inserted directly above it, because an attribute attaches to the item that follows it.</li>
+<li>The gate is back, and the gap it fell through is closed: <code>tools/audit/features.py</code> reads the build arguments out of the release workflow and compiles each selection, in CI beside the release build. Reading the workflow rather than copying its arguments is what makes a target added to that matrix built on every push without anybody remembering, and the tool refuses to pass if it can read fewer than two selections, so a workflow rewritten into a shape it cannot parse fails rather than checking nothing.</li>
+<li>The existing platform guard could not have caught this. It varies the operating system; this varies the features, and a guard covering one axis reads as covering the other.</li>
+</ul>
+<p><strong>Several microphones at once, veiled and metered each</strong> (marker 147)</p>
+<ul>
+<li><code>veilvoice_audio::room</code> opens one input per guest, veils each with its own engine, seed and destination voice, and mixes the results into the one output a call or a recorder hears. One microphone carrying four people is one signal, and whatever it is turned into, everybody in it is turned into the same thing.</li>
+<li><strong>The cost is a number rather than a promise.</strong> The output callback runs every guest&#x27;s engine before it returns, so they share one deadline of a few milliseconds and the cost is the sum. <code>RoomStats::load</code> is that sum measured against that deadline. At 1.0 the engines have used the whole block and what follows is dropouts. The guest limit is a bound on the arithmetic, not a claim about any machine.</li>
+<li><strong>The mix is summed and clipped, and never limited.</strong> Two people talking at once is two signals added, which can pass full scale; a render fixes that afterwards with one factor and a live path cannot see the rest of the conversation. So the peak <em>before</em> clipping is reported, the blocks that clipped are counted, and there is deliberately no limiter: a limiter is a dynamics processor, it changes the voice, and this program&#x27;s whole claim is about what changes a voice.</li>
+<li>Each guest has their own ring, so a microphone whose clock runs fast drops that guest&#x27;s samples rather than everybody&#x27;s, and a slow one starves and is padded. A rate <em>mismatch</em> is not absorbed: it is refused before anything opens, which is the fix in this same release.</li>
+<li>A recorder per guest, veiled or unveiled, and one for the mix. Marker 131&#x27;s warning about the unveiled side applies once per guest.</li>
+<li><strong>The Studio drives it.</strong> Ticking &quot;several microphones, a guest each&quot; in the Studio turns the input picker into a guest list: a name and a microphone per person, up to eight. Starting it opens all of them, and each guest is veiled into a voice of their own, from the same table a group render hands out and in the same order.</li>
+<li><strong>Two bars per guest</strong>, what went into their microphone and what their engine produced from it, with the mix under them and the load beside them. A room drawn as one pair of bars cannot say which microphone is dead, which is the reading somebody actually needs. The load is said as a percentage of the block every engine shares, and past 80 per cent it says what to do about it.</li>
+<li><strong>A take stores every guest separately, beside the mix.</strong> One name, and the recordings under it are the mix, called &quot;(everybody)&quot;, and one or two per guest called after them. The choice of which side to keep is the one the single microphone already has and applies to every guest at once, so an unveiled room is eight recordings of eight real voices and says so before it starts.</li>
+<li><strong>The Studio holds one session or the other and never both</strong>, as one field rather than two: two of them would be two streams on one output with every guest&#x27;s voice arriving twice, and a field that has to be remembered is a field that gets forgotten.</li>
+<li><strong>Two guests on one microphone is refused by name before anything opens.</strong> One microphone carrying two people is one signal, so veiling it would give both of them the same voice, which is what a microphone each was for. Two guests on the <em>default</em> device are the same refusal: <code>None</code> is a device, not an absence.</li>
+<li>Every recording of a take is named in one function, checked by a test that reads this module. A take now produces up to seventeen recordings from three loops, and a suffix added in two of them would leave an entry that is somebody&#x27;s real voice looking exactly like the veiled one beside it.</li>
+</ul>
+<p><strong>A microphone and an output that never compared their rates</strong></p>
+<ul>
+<li>The live path built the engine and the ring between its callbacks from the output device&#x27;s sample rate, and the input stream from the microphone&#x27;s, and never checked that the two were the same number.</li>
+<li>Where they are not, and a laptop with a 44.1 kHz microphone and 48 kHz speakers is an ordinary machine, the ring starves continuously and the veiled voice comes out about a semitone and a half sharp and stuttering.</li>
+<li>Invisible twice over: the starvation reads as &quot;this machine is too slow&quot;, and the pitch is <em>meant</em> to change, because this is a voice de-identifier.</li>
+<li>Both devices are now put on one rate: the one they already share, the output&#x27;s if the microphone will take it, or the microphone&#x27;s if the output will. If neither will move, it refuses and names both rates and what to do, rather than running them together and quietly shifting the voice.</li>
+<li>The output&#x27;s rate is preferred, because it is what the person hears through and what anything on a virtual cable expects.</li>
+<li>Nothing here resamples, and adding a resampler to paper over a mismatch would be a quality and latency decision taken to avoid saying something.</li>
+</ul>
+<p><strong>The Studio has a failsafe of its own, and a running take says what it keeps</strong></p>
+<ul>
+<li>Both are clauses of marker 145 that nothing had built, found by reading that row rather than treating it as a sum of the markers under it.</li>
+<li><strong>A device that goes stops the Studio, not the recording.</strong> Since the last change the Studio knows when the device a take is being recorded from has stopped existing; knowing was as far as it went, and the take carried on recording silence until somebody looked at the screen. It now stores what was captured and stops.</li>
+<li>It does not discard, retry or switch device. Not discard, because everything up to the fault is a real recording of something somebody said. Not retry or switch, because the person chose that microphone and moving a recording onto another one is this program deciding that for them, which on most machines means a laptop&#x27;s built-in microphone.</li>
+<li>Only a device that has gone. Anything else the platform reports is shown and left alone: an underrun is not a reason to end somebody&#x27;s recording.</li>
+<li>Separate from the application&#x27;s safety catch, which is about <em>other programs</em> taking the microphone. This one is about this tab.</li>
+<li><strong>A running take now says which voice it is keeping.</strong> The choice is made on a form that disappears when recording starts, so a take of somebody&#x27;s real voice looked exactly like one that is not for the whole of the recording. It is beside the clock, in yellow when the microphone is being kept.</li>
+<li>Marker 145 is still planned, and its row now says what it is waiting for rather than reading as a sum of the markers under it: group mode recording every guest with the same guarantees, which is marker 147.</li>
+</ul>
+<p><strong>A BSD reader was told to run a command their system does not have</strong></p>
+<ul>
+<li><code>veilvoice verify --script</code> writes a shell script that checks the signature and the hashes with the reader&#x27;s own GnuPG. It knew two systems, Linux and macOS, and every mapping onto it ended in a catch-all meaning Linux, so a reader on FreeBSD, OpenBSD or NetBSD was handed <code>sha256sum -c</code>.</li>
+<li>The same release&#x27;s <em>other</em> script, the one that reproduces the build, has always given the BSDs <code>sha256 -c</code> and has a test forbidding <code>sha256sum</code> there. Two scripts in one release, disagreeing about the reader&#x27;s machine.</li>
+<li>The cause was a copy: both modules answered the same question and one of them was not kept current. The copy is gone. There is one public <code>System::hash_check_command</code>, the verification script asks it, and the two catch-all matches are now one exhaustive function that will not compile if a system is added to one enumeration and not the other.</li>
+<li>The guard is that no system&#x27;s script may contain another system&#x27;s hash command, which fails on exactly the fall-through this was.</li>
+</ul>
+<p><strong>Checking a download, written up per system</strong></p>
+<ul>
+<li><code>veilvoice verify</code> on its own is the same command everywhere: it hashes and checks the signature itself, and needs no GnuPG, no network and none of the system&#x27;s own tools. A BSD reader has nothing to translate, which is why the guide now says so first.</li>
+<li>The second opinion is where systems differ, and the guide carries a table of which script each system gets and what it runs. The table is checked against the program in the test suite, so a command in the documentation that the program no longer prints fails a build.</li>
+<li>Installing GnuPG on OpenBSD and NetBSD is the one thing left unsaid. This project has not run those package managers and does not print commands it has not run; FreeBSD&#x27;s spelling is named because <code>install/install.sh</code> already uses it.</li>
+</ul>
+<p><strong>Two bars per speaker, while a group render runs</strong></p>
+<ul>
+<li>As the render walks the file, each person gets what went into the turn just finished and what the engine produced from it, with how far through their turns the render is. One bar answers &quot;is something being written&quot; and not &quot;is this person being veiled&quot;, which is the question somebody rendering an interview is asking.</li>
+<li>Drawn with the shared meter the live path uses, so it is the same bar rather than a second one that would drift from it, and the limit is printed under them in the same words.</li>
+<li>The render reports through a small structure of atomics: nothing allocates, nothing locks, and the render threads write to it while the window reads it every frame. A watched render and an unwatched one produce byte-identical audio, which is a test rather than a claim.</li>
+<li>A progress made for fewer speakers than the plan holds drops what it cannot keep rather than failing the render. A bar with nowhere to go is not worth a refused render.</li>
+<li>This is the half of marker 133 that could be built from what was here. The other half, several guests on several microphones at once, is now marker 147: the live path opens one input and everything downstream assumes one.</li>
+</ul>
+<p><strong>The audio path says when something interfered with it</strong></p>
+<ul>
+<li>A device unplugged or swapped mid-session, and anything else the platform reports about either stream, is now shown where the person is looking. Both error callbacks used to be <code>eprintln!</code> and nothing else: on Windows the desktop application is built with no console at all, so a microphone taken away in the middle of a call was completely silent and a recording carried on being made of nothing.</li>
+<li>The report is the platform&#x27;s own words, with the device-is-gone case named separately because it does not come back on its own.</li>
+<li>Detected by the platform telling us rather than by polling a device list. A list read once a second is a guess between reads, and enumerating devices from another thread on Windows is what F-163 and F-165 were.</li>
+<li>While a take is running, a program other than VeilVoice taking the microphone is named on the tab and again with the stored take. That program heard the real voice whatever was going to the cable. Independent of the safety catch&#x27;s posture: that setting is about closing other programs, and somebody who turned it off did not ask to be told less about their own recording.</li>
+<li>The command line shows the same thing as <code>INTERRUPTED</code> on the meter line, and <code>veilvoice record</code> repeats it when the take is sealed, because the meter line is gone by the time somebody decides whether to keep what was recorded.</li>
+<li>The limit is stated beside the warning rather than after it: this is what VeilVoice&#x27;s own path noticed, and it cannot vouch for a microphone that was already being intercepted before this opened it.</li>
+<li>The marker asked for the samples reaching the recorder to be <em>checked</em> against the engine&#x27;s output. They cannot differ, because the recorder is fed from inside the output callback from the same slice the engine has just written into, so the check would be a buffer compared with itself. That is a property worth keeping rather than measuring, and a test now reads the source for it: two sinks, two writes, each from the one place its samples exist.</li>
+</ul>
+<p><strong>A check that failed once now says what it disagreed about</strong></p>
+<ul>
+<li>The recorded-session check failed once on a loaded machine and passed on the twenty-two runs after it. It has not been reproduced and is not claimed to be fixed.</li>
+<li>What it said was that the transcript &quot;is not what the program prints now&quot;, and nothing else. It now prints the differing lines, diffed on the same normalised text it compares, so the next occurrence explains itself instead of being re-run until it passes.</li>
+</ul>
+<p><strong>Two roadmap rows corrected rather than built around</strong></p>
+<ul>
+<li>Marker 132&#x27;s opening sentence described a check that would compare a buffer with itself, and the row now says what was actually missing.</li>
+<li>Marker 133 asked for two <strong>live</strong> bars per speaker <strong>in group mode</strong>, and neither word survives reading the code: group mode is a panel for a recording that already exists and never opens a device, and the live path opens one input, so there is no per-guest live signal in this tree to draw. The row now says that this is two things: bars drawn during a render, which the plan already has the information for, and a multi-input capture path, which is the actual work. It stays planned.</li>
+</ul>
+<p><strong>Optimisation stops being a pass and becomes how this is written</strong></p>
+<ul>
+<li>The practices marker 125&#x27;s reading established are now in <code>CLAUDE.md</code> as the standing way this project is written, and three of the four are enforced by a build rather than by somebody remembering.</li>
+<li><strong>No audio callback allocates, blocks or prints.</strong> A callback runs on the operating system&#x27;s audio thread with a deadline of a few milliseconds; allocating takes a lock in the allocator, blocking on a mutex hands the thread away, and printing takes the lock on standard output. Each of the three callbacks already carried a comment saying its buffers are sized once. A test now reads the callbacks themselves and fails naming the line and what it would cost.</li>
+<li><strong>Every dependency says what it is for, on the line that declares it</strong>, checked in CI. A dependency is code this project ships and does not review, build time on every machine that compiles this, and one more thing that has to work on the BSDs and the 32-bit targets. If there is no sentence to write, that is the answer.</li>
+<li>Writing those sentences found three dependencies no line of code referred to: <code>sha2</code> in <code>veilvoice-verify</code>, <code>hex</code> in its tests and <code>hex-literal</code> in the crypto crate&#x27;s. All three had been compiled by every build on every platform for as long as they had been there. They are gone.</li>
+</ul>
+<p><strong>Live scramble is the Studio now, not a tab beside it</strong></p>
+<ul>
+<li>Veiling as it runs has stopped being a separate tab. The Studio is where it happens, and the tab is the voice above and the take below: devices, engine settings, meters, performance figures and the preview button on top, the vault and the take under them.</li>
+<li>The voice half works with the vault shut. Veiling a call has never needed a recording vault, and requiring one would be a worse program.</li>
+<li>Both screens always ran the same engine through the same session, which is what made two of them wrong rather than merely redundant. The Studio recorded with whichever devices the other tab happened to be set to, and nothing on its screen said so. Worse, each tab started a session of its own: veiling on one and recording on the other opened the same microphone twice.</li>
+<li>There is one starter now, and a test that reads the desktop crate&#x27;s source and fails if a second one appears.</li>
+<li>Ending a take leaves the veiling running. Somebody who has just stopped recording has not asked to be heard in their own voice again. <strong>stop</strong>, in the voice half, ends the veiling, and it stores a take still running rather than discarding it.</li>
+<li>Starting and ending a take each restart the audio, because a recorder cannot be attached to a stream that has already started. That costs a short gap in the outgoing voice, and it is said on screen and in the guide rather than hidden.</li>
+<li><code>veilvoice-gui --tab live</code> still opens a window. It opens the Studio, because the name is in shortcuts and scripts written before the tab moved and the honest destination is the tab that does the job today.</li>
+<li>The monitor strip works during a take, which it did not before: it read the live tab&#x27;s session, and a Studio recording was a different one, so the strip went blank over a recording that was running.</li>
+</ul>
+<p><strong>A recording was written with the rate it asked for, not the rate it got</strong></p>
+<ul>
+<li><code>record::start</code> takes the sample rate for the WAV header, and its own documentation says that has to be the rate the device agreed to. Both callers passed <code>config.sample_rate</code>, which is the rate the engine was configured for and is 48 kHz by default, and the session then overwrites that field with what the hardware actually gave. On a machine whose output runs at 44.1 kHz the take was written 48 kHz over 44.1 kHz samples: about nine per cent fast and a semitone and a half sharp, on top of the veiling.</li>
+<li>Fixed by construction rather than by care. <code>LiveSession::start_recording</code> builds the recorders itself, after the device has answered, and hands them back: it takes a <code>Keeping</code> saying which sides to keep and returns a <code>Kept</code> holding them. The caller has no rate to get wrong.</li>
+<li>The property marker 131 asked for survives: <code>Keeping</code>&#x27;s fields are named at the call site, so no caller reaches a recording of somebody&#x27;s real voice without writing the word <code>plain</code> next to it.</li>
+<li>A test reads the workspace and fails if a recorder is built anywhere outside the crate that knows the rate.</li>
+</ul>
+<p><strong>The Studio can keep the real voice, and asks before it does</strong></p>
+<ul>
+<li>&quot;What to keep&quot;: the veiled voice, both, or the microphone unveiled. Before the start button rather than after it, because a recording of somebody&#x27;s real voice is not a thing to discover having made.</li>
+<li>The veiled voice is what is selected. The choice is not remembered between runs and locking the window puts it back, for the reason group mode is not remembered: a mode somebody forgets is on eventually records what they did not mean to record.</li>
+<li>Anything that keeps the microphone says what that costs in the same words the plaintext path uses. It is sealed in the vault exactly as strongly as a veiled take, and it is still a recording anybody who opens the vault can hear who was speaking in.</li>
+<li>Keeping both gives two takes, and the unveiled one&#x27;s name ends in &quot;(unveiled)&quot;. The name is the only thing telling them apart, which the panel says where the choice is made.</li>
+<li>The microphone is copied into its recorder from inside the input callback, after the downmix and before anything else sees it, through a buffer sized once at startup so nothing allocates in a realtime path. It is a separate argument to <code>start_recording</code> rather than a flag on the existing one, so no caller can reach it without naming it, and every path that was not asked for it passes nothing.</li>
+<li><code>veilvoice record</code> on the command line keeps the veiled voice only and is unchanged. This is a Studio decision, made where the vault that receives it is.</li>
+<li>The panel that runs during a take drains <strong>both</strong> recorders every frame and takes the clock from whichever is running. Draining one of two would have made the second take quietly short, which is the failure the dropped-sample count exists to report; and reading the clock from the veiled recorder alone would have shown 0:00 for the whole of a microphone-only take.</li>
+</ul>
+<p><strong>A guard for it, rather than a third one at a time</strong></p>
+<ul>
+<li>No test in the desktop crate may open a device, a dialog or a window. The guard walks that crate&#x27;s test code and fails naming any line that reaches one, with a single exception by test name for the one place that enumerates devices on purpose.</li>
+<li>Proved both ways: it passes on the tree as it stands, and planting one line that enumerates a device makes it fail naming the file, the line and the test.</li>
+<li>Its own first false positive is recorded too. <code>dialog.rs</code>&#x27;s guard searches the source for <code>rfd::FileDialog</code>, and the string it searches for is not an opened dialog, so a match inside a string literal is skipped.</li>
+</ul>
+<p><strong>Windows, a second time, and the same mistake in a new place</strong></p>
+<ul>
+<li>A test written for the new setup card asked the machine how many audio devices it has, twice, to check the answer was stable. The desktop crate&#x27;s test binary already enumerates real devices once, deliberately, in one place; a second enumerator beside it killed the process on Windows with an access violation, exactly as the last one did.</li>
+<li>Gone rather than made conditional. It was checking that a call the machine answers does not fail, which is a fact about the machine. What is worth checking is that the card asks the machine rather than carrying a number, and a test reads the card&#x27;s source for that. &quot;One enumeration, in one place&quot; is now written where the counting function is.</li>
+</ul>
+<p><strong>Every platform is green again, and the crash is understood</strong></p>
+<ul>
+<li><code>test / windows-latest</code> was dying with an access violation after every test it printed had passed. A step that reran the desktop crate&#x27;s tests on one thread named the culprit on its first run: a test that played a recording and then locked the window, on the stated assumption that a build machine has no audio device. The Windows runner has one. A stream started and tearing it down took the whole test binary with it.</li>
+<li>A test whose correctness depends on the machine not having a sound card is not testing the thing it names. It reads <code>close</code>&#x27;s own source now, the way its sibling reads <code>play</code>&#x27;s, and no test in the crate opens a device.</li>
+<li>That step was there to identify the defect and is gone, as it said it would be. All thirteen jobs pass: the offline proof runs all four of its steps for the first time, and macOS and Windows are green.</li>
+</ul>
+<p><strong>A fifth setup card, and every number on it read from the machine</strong></p>
+<ul>
+<li>First run ends on &quot;What this machine says&quot;: where recordings will go and how much room is free there, how many devices there are to record from and play to, and what the window will ask the graphics driver for.</li>
+<li>Every figure is read at the moment the card is drawn. None of it is a default written into the program: a setup screen that asserts how much room there is, or that the graphics will be fine, is guessing on somebody else&#x27;s hardware and sounding certain about it.</li>
+<li>The free space is said as an hour of veiled audio rather than as a number of bytes, because that is the question somebody about to record actually has.</li>
+<li>Where the machine will not answer, the card says so instead of printing a figure nobody measured. A system that does not say where an application keeps its files is told plainly what that costs, which is that nothing is kept between runs.</li>
+<li>Nothing on the card has to be answered, and like the four before it there is a way past it.</li>
+<li>The guard that proves no card is a gate read a fixed four thousand characters after each function&#x27;s name, which is a length rather than a body. A card longer than that reported no way past it, and a shorter one was checked against the card after it as well. It ends where the function does now.</li>
+</ul>
+<p><strong>Acceleration is a switch now, and the About tab shows both halves</strong></p>
+<ul>
+<li>The window has always asked the platform for a hardware context and accepted a software one, which is why it opens in a virtual machine, over a remote desktop and on a server with no card. That was not settable.</li>
+<li>One tick in Settings turns the asking off. It is for the case the request cannot cover: a driver that accepts and then draws badly, which is a hybrid-graphics laptop handing over the wrong adapter or a black window on a broken OpenGL path. Nothing can detect that, because from inside the process it looks like success, so it is a switch rather than a measurement and the panel says so.</li>
+<li>It never becomes a demand. <code>Required</code> refuses to open where no hardware context exists, and a privacy tool that will not run is not more private.</li>
+<li>The About tab shows what was asked for beside what the driver actually gave. Either line alone answers half of &quot;why is this slow&quot;.</li>
+</ul>
+<p><strong>Portable first, and the About tab says exactly where things are</strong></p>
+<ul>
+<li>A folder called <code>veilvoice-data</code> beside the program makes the settings, the vaults, the policies, the palettes and the app lock live in it. A copy on a memory stick now stays a copy on a stick. Remove the folder and it goes back to the platform&#x27;s own configuration directory; neither switch moves anything that is already there.</li>
+<li>Opted into rather than detected. &quot;Beside the program if that is writable&quot; would have moved an ordinary installation&#x27;s state the day somebody unpacked it somewhere writable, and the symptom would have been an empty vault.</li>
+<li>The About tab lists the exact folders in use, worked out on the machine rather than written down, with a line saying which of the two arrangements is in force. The app lock&#x27;s file names are not among them: they are derived rather than fixed, on purpose, and printing them in a window would hand that back to anybody standing behind the reader.</li>
+<li>A test reads the crate&#x27;s own source for every place it keeps something and fails naming any the tab does not show, so a location added tomorrow cannot quietly stop being reported.</li>
+<li>Installing a portable copy now asks what should happen to that folder, and the button waits for the answer. There is no default because the two right answers point in opposite directions: carrying over is right when moving onto your own machine, and leaving is right when installing on somebody else&#x27;s. Carried means copied, never moved, and nothing already at the destination is replaced.</li>
+</ul>
+<p><strong>The build was red, and the offline proof had never run</strong></p>
+<ul>
+<li>The <code>offline-runtime</code> job proves the front page&#x27;s claim four ways. Its third step ran the command line inside an empty network namespace with <code>unshare -rn</code>, which asks for an unprivileged user namespace, and Ubuntu 24.04 refuses those by default. It failed on its first run and on every run since, and because a failed step ends a job, <strong>the two steps after it never ran</strong>: the syscall trace and the window&#x27;s socket families. The job existed, looked like it proved four things, and proved one.</li>
+<li>The namespace is now taken whichever way the kernel allows, with the program dropped back to the ordinary account inside it, and the step fails saying the claim is unproved rather than passing quietly if neither way works.</li>
+<li>The fourth step, never reached, had one quotation mark too many on its last line and would have failed the job the first time it ran.</li>
+<li>The desktop tests were opening a real file panel. On macOS that panics outright, and on Windows the dialog thread outlived the harness and took the process down with an access violation after every test had passed. Both platforms were red. A file panel is not opened where there is no window to open it on, and on macOS an ask from any thread but the main one now reads as a cancel rather than crashing the application.</li>
+<li>Three counts said on the front page and in the README had drifted from the tree: the tests, the functional lines and the defects. They are checked against it, and now agree with it.</li>
+</ul>
+<p><strong>Decoy vaults, and a real vault that is not found by its name</strong></p>
+<ul>
+<li>The Browser can now fill the vault folder with decoys: vaults whose contents never existed, sealed under a key made and dropped inside the call that writes them. Nobody holds that key, so there is nothing to find, to leak, or to be compelled to hand over, and cracking one yields bytes that parse as nothing.</li>
+<li><code>make_decoy</code> and <code>Shape::of</code> had been written, documented and tested since 0.1.20 and were reached by nothing. This is the half that was missing.</li>
+<li>How many is worked out from the room actually free where the vaults live, read from the operating system rather than guessed: one twentieth of it, up to a stated ceiling of thirty-two. Where the system will not say how much is free, the panel says that instead of showing an invented figure as though it had been measured.</li>
+<li>The real vault used to sit at a fixed name, <code>studio</code>, which would have made every decoy beside it pointless: the one directory called <code>studio</code> is the one worth attacking. Vaults now live in directories with opaque names and the real one is found by trying each in turn until one opens, which only the pair of passphrases does. A vault written the old way is moved down into a directory of its own on the next unlock, index last, so an interrupted move finishes on the following one rather than splitting the vault in two.</li>
+<li>A wrong pair of passphrases finds nothing and <strong>makes</strong> nothing. Creating a fresh vault there would show somebody who mistyped an empty vault, which reads exactly like their recordings having been lost.</li>
+<li>A decoy&#x27;s index is padded to the length the real one measured. Without it, every decoy in the folder would be the one with the smallest index file, and the sizes were the thing this was meant to make identical.</li>
+<li>The limit is stated where the button is: this raises the cost of a search. It does not hide the real vault from somebody watching you open it, from something already running inside the computer, or from a backup taken before the decoys were made.</li>
+</ul>
+<p><strong>The pictures of the window showed nine tabs, and there are eleven</strong></p>
+<ul>
+<li>Both the README&#x27;s table and the website&#x27;s &quot;what it looks like&quot; grid were hand-written lists. The Studio and the Browser shipped in 0.1.20 and appeared in neither, so the whole section quietly described a different application from the one released. Both now show all eleven, and a test reads the tab keys out of the window&#x27;s own source and fails if either page is missing one.</li>
+<li>The count was already checked and the <em>list</em> was not, which is why this got through: knowing there are eleven tabs does not notice that nine of them have pictures.</li>
+<li>The README also said the captures were taken on Windows 11 with <code>gui.ps1</code> and <code>PrintWindow</code>. That stopped being true when they were recaptured headlessly on Linux for this release. It now says which script took the committed ones and what the other is for, and keeps the Windows 11 note as what it actually is: the platform a person has run the application on, rather than the one a script photographed it on.</li>
+</ul>
+<p><strong>The two lists of command line screens became one</strong></p>
+<ul>
+<li><code>tools/shots/terminal.py</code> takes the pictures and <code>tools/site/demo.py</code> names them for the walkthrough, and each held its own copy of the same eleven entries. The comment in the second justified this by saying the first holds the command &quot;in a form no page can read&quot;, which is a list of arguments, and joining a list of arguments with spaces is not difficult.</li>
+<li>They had already drifted: the note under <code>render</code> said &quot;a plan, a recording and a page&quot; in one and &quot;a plan, a recording, and a page&quot; in the other. Adding a screen to one of them left the other unable to draw it, which is how this was found.</li>
+<li><code>veilvoice conversation fix --help</code> is now in the walkthrough, drawn from what the built program prints.</li>
+</ul>
+<p><strong>The verifier transcript, recorded against the published 0.1.20</strong></p>
+<ul>
+<li>It is the one recording that cannot be made before a release exists, because it verifies a real download: it fetches the published archive, the hash list and the signature, checks the embedded key&#x27;s fingerprint, checks the signature over the list, checks the archive against the list, and then does the whole thing again through the reader&#x27;s own GnuPG.</li>
+<li>The hash in the transcript is the hash GitHub reports for that asset. Nothing in it is staged.</li>
+</ul>
+<p><strong>The Studio meters what it is doing, and the Browser can play</strong></p>
+<ul>
+<li>Two bars while a take records, input and output. One output meter answers &quot;is something being recorded&quot; and not &quot;is it being veiled&quot;, which is the question somebody at that tab is actually asking; seeing the two move differently is the only thing on screen that shows the engine is between them. The bar itself moved out of the window&#x27;s private module into <code>monitor</code>, so there is one of it rather than a second that would slowly stop looking like the first.</li>
+<li>A take in the Browser plays, straight out of locked memory. <strong>Nothing is written to the disk</strong>, so there is no copy to remember to shred: the obvious way to hear a WAV is to put it somewhere and hand over the path, and that would leave an unencrypted recording lying about, which is what the vault exists to prevent.</li>
+<li>Said as built rather than as first imagined: the take is decrypted <strong>whole</strong>, not in blocks. The container is sealed and authenticated as one piece, and an encryption that let you open the first second without the rest would not be authenticating anything. What that buys is no plaintext file at any point. What it does not buy is a footprint smaller than the recording, and the roadmap entry now says that instead of the other thing.</li>
+<li>One take at a time, and starting a second releases the first: two decrypted recordings in memory at once is twice as much of somebody&#x27;s voice as the reason for it. Locking the window releases whatever is playing, along with the vault.</li>
+<li>Playing at the wrong sample rate is refused rather than done. It would make a voice sound higher or lower, and in a program whose whole point is that a voice cannot be traced back, that is a wrong answer rather than a small one.</li>
+</ul>
+<p class="muted">The same notes are in <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md" rel="noopener noreferrer"><code>CHANGELOG.md</code></a>, where they are written, and at the top of <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.21" rel="noopener noreferrer">this release on GitHub</a>.</p>
+</details>
 </details>
 <details class="release" id="v0.1.20">
 <summary><strong>v0.1.20</strong> <span class="muted">The offline claim is now proved by a machine, four ways</span></summary>
