@@ -55,7 +55,9 @@
     overlay.setAttribute("aria-labelledby", "legal-title");
 
     overlay.innerHTML = [
-      '<div class="legal-box">',
+      // The box takes focus when the gate opens, so `tabindex="-1"`: reachable
+      // by script, never by the Tab key. See `show`.
+      '<div class="legal-box" tabindex="-1">',
       '  <h2 id="legal-title">BEFORE YOU USE THIS</h2>',
 
       // Deliberately not the AI notice: the first thing a reader sees is the
@@ -182,7 +184,14 @@
       }
     });
 
-    waiver.focus();
+    // Focus goes to the box, not to the first checkbox. Script-driven focus
+    // counts as keyboard focus in every engine, so focusing the checkbox drew
+    // its focus ring before the reader had touched anything: the page opened
+    // with a box that looked selected for no reason (finding F-173). The
+    // dialog container is where a modal's focus is meant to land anyway. A
+    // screen reader announces the title from there, Tab reaches the first
+    // control, and the trap above still holds.
+    overlay.querySelector(".legal-box").focus();
   }
 
   document.addEventListener("DOMContentLoaded", function () {

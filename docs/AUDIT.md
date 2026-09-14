@@ -38,6 +38,41 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-third round: the whole tree again, read for what accumulates
+
+The round after 0.1.21. The thirty-first and thirty-second rounds were about
+guards: which drift checks did not fail a build, which one had never run. This
+one starts from the other end, with the brief written before it began, which
+lists every class of defect the earlier rounds established and every check the
+repository now runs, and asks of each file whether it is still held to them.
+The findings are written up as they are made, so the ordering here is the
+order of the reading rather than of importance.
+
+### F-173: the site opened with a checkbox that looked ticked on
+
+The first page anybody sees is the legal gate, and its first checkbox opened
+already wearing a focus ring. Nothing had been pressed. `legal.js` called
+`waiver.focus()` when the dialog was built, and a browser treats focus moved by
+script the same as focus moved by a keyboard: `:focus-visible` matches, and the
+ring that exists to tell a keyboard user where they are was shown to somebody
+who had done nothing yet. On a page that asks a reader to tick a box saying
+they have read something, a box that already looks selected is the wrong first
+impression to make.
+
+The call was there for a good reason. A modal that does not take focus leaves a
+keyboard reader behind it, with the page inert and no way to find out why. But
+a modal's focus is meant to land on the dialog itself, not on its first control:
+the container carries `tabindex="-1"`, so a script can focus it and the Tab key
+never stops on it, a screen reader announces the title from there, and the
+first Tab reaches the first checkbox in the ordinary way. That is what it does
+now, and `.legal-box:focus` draws no outline, because a ring around the whole
+dialog would say the same wrong thing at a larger size.
+
+Proved in a headless browser before and after: before, `document.activeElement`
+was the checkbox and it matched `:focus-visible`; after, it is the box, no input
+matches, and the box's computed outline is `none`. The site suite reads the
+script and the stylesheet and fails if either goes back.
+
 ## The thirty-second round: the guard that failed and the two behind it
 
 The round after 0.1.20, covering the decoy vaults and everything they touched,
@@ -6503,8 +6538,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and seventy-two defects found and fixed (F-1 to F-172), across
-thirty-two rounds.** Sixty of them, from the earliest rounds, are written up together in
+**One hundred and seventy-three defects found and fixed (F-1 to F-173), across
+thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

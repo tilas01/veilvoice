@@ -3,7 +3,7 @@
 
 # `website/js/legal.js`
 
-[[The website's source|Source-index]] &middot; 192 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/legal.js)
+[[The website's source|Source-index]] &middot; 201 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/legal.js)
 
 ## What it does
 
@@ -38,5 +38,5 @@ resolved one.
 | `accepted` | 42 |
 | `remember` | 46 |
 | `build` | 50 |
-| `show` | 138 |
-| `sync` | 153 |
+| `show` | 140 |
+| `sync` | 155 |
