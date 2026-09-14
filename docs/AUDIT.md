@@ -203,6 +203,42 @@ somebody will read it. A capture with an app lock in it would mean a capture
 run against a configured lock file, which is a larger change to the capture
 scripts than this finding justifies.
 
+### The checks this round ran, and where each one lives now
+
+The inventory is not a finding. It is here because the next round's reader
+needs to know what ran, and a check that found nothing is still worth listing:
+"we looked and there was nothing" is a result, and it is not the same as not
+having looked.
+
+| Check | Ran before | In a workflow | What it found |
+|---|---|---|---|
+| `cargo audit` | yes | yes | nothing new; one exception retired because the crate left the graph |
+| `cargo deny`, licences and sources | no | **now** | every licence compatible, every crate from crates.io |
+| the two advisory policies agree | no | **now** | they did; they cannot drift now |
+| `cargo clippy`, workspace, all targets | yes | yes | clean |
+| `cargo fmt` | yes | yes | clean |
+| `forbid(unsafe_code)` in every crate | yes | yes | present in all twenty-seven |
+| `warn(missing_docs)` in every crate | yes | yes | present in every library; the two `main.rs` files do not carry it, which is right |
+| the seven coverage-guided fuzz targets | by hand | **now, weekly** | ten minutes each, no crash, no hang, no out-of-memory |
+| the deterministic parser campaigns | yes | yes | clean |
+| **mutation testing** | no | not yet (marker 151) | **fifteen survivors; F-180** |
+| a state file written one place and read another | by hand | **now** | nothing |
+| the per-program guides against the user guide | by hand | **now** | nothing |
+| the questions page against `docs/FAQ.md` | by hand | **now** | nothing |
+| the app-manifest generator's self-test | by hand | **now** | nothing |
+| the local site serves every page | by hand | **now** | nothing |
+| the offline claim, on the built command line | yes | yes | no import, no syscall, works in an empty network namespace; each guard proved able to fail |
+| Miri | no | no | outstanding: the container's disk, not a finding |
+| a reproducible-build rebuild | yes, per release | yes, per release | not re-run here |
+
+Two checks stay out of a workflow on purpose and the reason is worth writing
+down rather than rediscovering. `tools/shots/sessions.py --check` runs the
+release binaries, and one of its sessions checks a *published* release, which
+needs the archive, the sums and the signature downloaded into one folder.
+`tools/measured/generate.py --check` runs the whole test suite a second time in
+order to count it. Both are in `tools/verify.py`, which is what somebody runs
+before a release; neither belongs in a job that should finish in minutes.
+
 ### What was read and found correct
 
 Not findings, and listed because "we looked and there was nothing" is a result.
