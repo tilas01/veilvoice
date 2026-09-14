@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/container.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 535 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 612 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs)
 
 ## Contents
 
@@ -62,7 +62,7 @@ check, so it cannot be edited to make the rest open more easily.
 
 ## What this file contains
 
-535 lines defining **9 functions** (8 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+612 lines defining **9 functions** (8 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

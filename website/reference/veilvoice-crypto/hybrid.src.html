@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/hybrid.rs</code></h1>
-<p style="color:var(--muted)"><a href="hybrid.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 475 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="hybrid.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 524 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -447,143 +447,192 @@
 <span class="ln" id="L336"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L337">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L338"></span>
-<span class="ln" id="L339">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L340">    <span class="tok-kw">fn</span> <span class="tok-fn">encapsulate_then_decapsulate_agrees</span>() {</span>
-<span class="ln" id="L341">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> (sender_secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L343">        <span class="tok-kw">let</span> recipient_secret = sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L344">        assert_eq!(sender_secret, recipient_secret);</span>
-<span class="ln" id="L345">        assert_eq!(sender_secret.<span class="tok-fn">len</span>(), <span class="tok-num">32</span>);</span>
-<span class="ln" id="L346">    }</span>
-<span class="ln" id="L347"></span>
-<span class="ln" id="L348">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L349">    <span class="tok-kw">fn</span> <span class="tok-fn">a_different_recipient_cannot_recover_it</span>() {</span>
-<span class="ln" id="L350">        <span class="tok-kw">let</span> (_, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L351">        <span class="tok-kw">let</span> (other_sk, _) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L352">        <span class="tok-kw">let</span> (sender_secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L353">        <span class="tok-com">// ML-KEM decapsulation is designed never to fail outright (implicit</span></span>
-<span class="ln" id="L354">        <span class="tok-com">// rejection), so the check that matters is that the *value* differs.</span></span>
-<span class="ln" id="L355">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(wrong) = other_sk.<span class="tok-fn">decapsulate</span>(&amp;enc) {</span>
-<span class="ln" id="L356">            assert_ne!(sender_secret, wrong);</span>
-<span class="ln" id="L357">        }</span>
-<span class="ln" id="L358">    }</span>
-<span class="ln" id="L359"></span>
-<span class="ln" id="L360">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L361">    <span class="tok-kw">fn</span> <span class="tok-fn">each_encapsulation_is_fresh</span>() {</span>
-<span class="ln" id="L362">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L363">        <span class="tok-kw">let</span> (s1, e1) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L364">        <span class="tok-kw">let</span> (s2, e2) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L365">        assert_ne!(s1, s2);</span>
-<span class="ln" id="L366">        assert_ne!(e1.<span class="tok-fn">to_bytes</span>(), e2.<span class="tok-fn">to_bytes</span>());</span>
-<span class="ln" id="L367">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;e1).<span class="tok-fn">unwrap</span>(), s1);</span>
-<span class="ln" id="L368">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;e2).<span class="tok-fn">unwrap</span>(), s2);</span>
-<span class="ln" id="L369">    }</span>
+<span class="ln" id="L339">    <span class="tok-com">/// The adapter that hands the operating system&#x27;s randomness to the KEM</span></span>
+<span class="ln" id="L340">    <span class="tok-com">/// crates actually hands over randomness.</span></span>
+<span class="ln" id="L341">    <span class="tok-com">///</span></span>
+<span class="ln" id="L342">    <span class="tok-com">/// **Round thirty-three.** Mutation testing replaced `next_u32` and</span></span>
+<span class="ln" id="L343">    <span class="tok-com">/// `next_u64` with functions returning a constant, and replaced</span></span>
+<span class="ln" id="L344">    <span class="tok-com">/// `try_fill_bytes` with one that returns `Ok(())` without touching the</span></span>
+<span class="ln" id="L345">    <span class="tok-com">/// buffer. All three survived the suite, which is to say nothing in this</span></span>
+<span class="ln" id="L346">    <span class="tok-com">/// crate checked that its only randomness adapter emits anything. A key</span></span>
+<span class="ln" id="L347">    <span class="tok-com">/// derived from a buffer these left alone would be a key an attacker</span></span>
+<span class="ln" id="L348">    <span class="tok-com">/// already knows, and every test here would still have passed.</span></span>
+<span class="ln" id="L349">    <span class="tok-com">///</span></span>
+<span class="ln" id="L350">    <span class="tok-com">/// Not a statistical test: this asks whether bytes arrive at all, which is</span></span>
+<span class="ln" id="L351">    <span class="tok-com">/// the failure a mutant (or a stubbed build) produces. `getrandom` is the</span></span>
+<span class="ln" id="L352">    <span class="tok-com">/// system&#x27;s own source and is not this crate&#x27;s to assess.</span></span>
+<span class="ln" id="L353">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L354">    <span class="tok-kw">fn</span> <span class="tok-fn">the_randomness_adapter_actually_fills_what_it_is_given</span>() {</span>
+<span class="ln" id="L355">        <span class="tok-kw">use</span> rand_core::RngCore <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L356">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rng = OsRng;</span>
+<span class="ln" id="L357"></span>
+<span class="ln" id="L358">        <span class="tok-com">// Distinct draws. Two equal `u32`s happen once in four billion; eight</span></span>
+<span class="ln" id="L359">        <span class="tok-com">// equal ones do not happen, and a constant gives exactly that.</span></span>
+<span class="ln" id="L360">        <span class="tok-kw">let</span> words: Vec&lt;u32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">8</span>).<span class="tok-fn">map</span>(|_| rng.<span class="tok-fn">next_u32</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L361">        assert!(</span>
+<span class="ln" id="L362">            words.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|w| *w != words[<span class="tok-num">0</span>]),</span>
+<span class="ln" id="L363">            <span class="tok-str">&quot;next_u32 returned the same value eight times: {words:?}&quot;</span></span>
+<span class="ln" id="L364">        );</span>
+<span class="ln" id="L365">        <span class="tok-kw">let</span> longs: Vec&lt;u64&gt; = (<span class="tok-num">0</span>..<span class="tok-num">8</span>).<span class="tok-fn">map</span>(|_| rng.<span class="tok-fn">next_u64</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L366">        assert!(</span>
+<span class="ln" id="L367">            longs.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|l| *l != longs[<span class="tok-num">0</span>]),</span>
+<span class="ln" id="L368">            <span class="tok-str">&quot;next_u64 returned the same value eight times: {longs:?}&quot;</span></span>
+<span class="ln" id="L369">        );</span>
 <span class="ln" id="L370"></span>
-<span class="ln" id="L371">    <span class="tok-com">/// The hybrid must fail if the classical half is tampered with, because otherwise</span></span>
-<span class="ln" id="L372">    <span class="tok-com">/// it would be no stronger than ML-KEM alone.</span></span>
-<span class="ln" id="L373">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L374">    <span class="tok-kw">fn</span> <span class="tok-fn">tampering_with_the_x25519_half_changes_the_secret</span>() {</span>
-<span class="ln" id="L375">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L376">        <span class="tok-kw">let</span> (secret, <span class="tok-kw">mut</span> enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L377">        enc.x_ephemeral[<span class="tok-num">0</span>] ^= <span class="tok-num">1</span>;</span>
-<span class="ln" id="L378">        <span class="tok-kw">let</span> got = sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L379">        assert_ne!(secret, got);</span>
-<span class="ln" id="L380">    }</span>
-<span class="ln" id="L381"></span>
-<span class="ln" id="L382">    <span class="tok-com">/// ...and equally if the post-quantum half is tampered with.</span></span>
-<span class="ln" id="L383">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L384">    <span class="tok-kw">fn</span> <span class="tok-fn">tampering_with_the_ml_kem_half_changes_the_secret</span>() {</span>
-<span class="ln" id="L385">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L386">        <span class="tok-kw">let</span> (secret, <span class="tok-kw">mut</span> enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L387">        enc.ml_ciphertext[<span class="tok-num">0</span>] ^= <span class="tok-num">1</span>;</span>
-<span class="ln" id="L388">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(got) = sk.<span class="tok-fn">decapsulate</span>(&amp;enc) {</span>
-<span class="ln" id="L389">            assert_ne!(secret, got);</span>
-<span class="ln" id="L390">        }</span>
-<span class="ln" id="L391">    }</span>
-<span class="ln" id="L392"></span>
-<span class="ln" id="L393">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L394">    <span class="tok-kw">fn</span> <span class="tok-fn">public_keys_round_trip_through_bytes</span>() {</span>
-<span class="ln" id="L395">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L396">        <span class="tok-kw">let</span> bytes = pk.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L397">        assert_eq!(bytes.<span class="tok-fn">len</span>(), PUBLIC_KEY_LEN);</span>
-<span class="ln" id="L398">        <span class="tok-kw">let</span> parsed = PublicKey::<span class="tok-fn">from_bytes</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L399">        <span class="tok-kw">let</span> (secret, enc) = parsed.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L400">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>(), secret);</span>
-<span class="ln" id="L401">    }</span>
-<span class="ln" id="L402"></span>
-<span class="ln" id="L403">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L404">    <span class="tok-kw">fn</span> <span class="tok-fn">encapsulations_round_trip_through_bytes</span>() {</span>
-<span class="ln" id="L405">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L406">        <span class="tok-kw">let</span> (secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L407">        <span class="tok-kw">let</span> bytes = enc.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L408">        assert_eq!(bytes.<span class="tok-fn">len</span>(), ENCAPSULATION_LEN);</span>
-<span class="ln" id="L409">        <span class="tok-kw">let</span> parsed = Encapsulation::<span class="tok-fn">from_bytes</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L410">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;parsed).<span class="tok-fn">unwrap</span>(), secret);</span>
-<span class="ln" id="L411">    }</span>
-<span class="ln" id="L412"></span>
-<span class="ln" id="L413">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L414">    <span class="tok-kw">fn</span> <span class="tok-fn">malformed_encodings_are_rejected</span>() {</span>
-<span class="ln" id="L415">        assert!(matches!(</span>
-<span class="ln" id="L416">            PublicKey::<span class="tok-fn">from_bytes</span>(&amp;[0u8; <span class="tok-num">10</span>]),</span>
-<span class="ln" id="L417">            <span class="tok-fn">Err</span>(Error::BadKeyEncoding)</span>
-<span class="ln" id="L418">        ));</span>
-<span class="ln" id="L419">        assert!(matches!(</span>
-<span class="ln" id="L420">            Encapsulation::<span class="tok-fn">from_bytes</span>(&amp;[0u8; <span class="tok-num">10</span>]),</span>
-<span class="ln" id="L421">            <span class="tok-fn">Err</span>(Error::BadKeyEncoding)</span>
-<span class="ln" id="L422">        ));</span>
-<span class="ln" id="L423">        assert!(matches!(</span>
-<span class="ln" id="L424">            SecretKey::<span class="tok-fn">from_bytes</span>(&amp;[0u8; <span class="tok-num">10</span>]),</span>
-<span class="ln" id="L425">            <span class="tok-fn">Err</span>(Error::BadKeyEncoding)</span>
-<span class="ln" id="L426">        ));</span>
-<span class="ln" id="L427">    }</span>
-<span class="ln" id="L428"></span>
-<span class="ln" id="L429">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L430">    <span class="tok-kw">fn</span> <span class="tok-fn">secret_keys_round_trip_through_bytes</span>() {</span>
-<span class="ln" id="L431">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L432">        <span class="tok-kw">let</span> encoded = sk.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L433">        assert_eq!(encoded.<span class="tok-fn">len</span>(), SECRET_KEY_LEN);</span>
-<span class="ln" id="L434"></span>
-<span class="ln" id="L435">        <span class="tok-kw">let</span> restored = SecretKey::<span class="tok-fn">from_bytes</span>(encoded.<span class="tok-fn">expose</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L436">        <span class="tok-kw">let</span> (secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L437">        assert_eq!(</span>
-<span class="ln" id="L438">            restored.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L439">            secret,</span>
-<span class="ln" id="L440">            <span class="tok-str">&quot;a reloaded key must open what the original could&quot;</span></span>
-<span class="ln" id="L441">        );</span>
-<span class="ln" id="L442">    }</span>
-<span class="ln" id="L443"></span>
-<span class="ln" id="L444">    <span class="tok-com">/// The encoded private key must come back in protected storage, not a bare</span></span>
-<span class="ln" id="L445">    <span class="tok-com">/// `Vec` that could be swapped to disk.</span></span>
-<span class="ln" id="L446">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L447">    <span class="tok-kw">fn</span> <span class="tok-fn">encoded_secret_key_is_protected_and_opaque</span>() {</span>
-<span class="ln" id="L448">        <span class="tok-kw">let</span> (sk, _) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L449">        <span class="tok-kw">let</span> encoded = sk.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L450">        assert!(format!(<span class="tok-str">&quot;{encoded:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>));</span>
-<span class="ln" id="L451">        assert!(</span>
-<span class="ln" id="L452">            encoded.<span class="tok-fn">expose</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|&amp;b| b != <span class="tok-num">0</span>),</span>
-<span class="ln" id="L453">            <span class="tok-str">&quot;encoding should not be empty&quot;</span></span>
-<span class="ln" id="L454">        );</span>
-<span class="ln" id="L455">    }</span>
-<span class="ln" id="L456"></span>
-<span class="ln" id="L457">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L458">    <span class="tok-kw">fn</span> <span class="tok-fn">public_key_can_be_recovered_from_the_secret_key</span>() {</span>
-<span class="ln" id="L459">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L460">        assert_eq!(sk.<span class="tok-fn">public_key</span>().<span class="tok-fn">to_bytes</span>(), pk.<span class="tok-fn">to_bytes</span>());</span>
+<span class="ln" id="L371">        <span class="tok-com">// And the fallible form fills rather than merely succeeding. A buffer</span></span>
+<span class="ln" id="L372">        <span class="tok-com">// of thirty-two zeros staying zero is the exact shape of the mutant.</span></span>
+<span class="ln" id="L373">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> buffer = [0u8; <span class="tok-num">32</span>];</span>
+<span class="ln" id="L374">        rng.<span class="tok-fn">try_fill_bytes</span>(&amp;<span class="tok-kw">mut</span> buffer)</span>
+<span class="ln" id="L375">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the OS randomness source is available in a test run&quot;</span>);</span>
+<span class="ln" id="L376">        assert!(</span>
+<span class="ln" id="L377">            buffer.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|b| *b != <span class="tok-num">0</span>),</span>
+<span class="ln" id="L378">            <span class="tok-str">&quot;try_fill_bytes returned Ok and left the buffer untouched&quot;</span></span>
+<span class="ln" id="L379">        );</span>
+<span class="ln" id="L380"></span>
+<span class="ln" id="L381">        <span class="tok-com">// The infallible form, which is the one the KEM crates call.</span></span>
+<span class="ln" id="L382">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> filled = [0u8; <span class="tok-num">32</span>];</span>
+<span class="ln" id="L383">        rng.<span class="tok-fn">fill_bytes</span>(&amp;<span class="tok-kw">mut</span> filled);</span>
+<span class="ln" id="L384">        assert!(filled.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|b| *b != <span class="tok-num">0</span>));</span>
+<span class="ln" id="L385">        assert_ne!(filled, buffer, <span class="tok-str">&quot;two draws produced identical bytes&quot;</span>);</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L389">    <span class="tok-kw">fn</span> <span class="tok-fn">encapsulate_then_decapsulate_agrees</span>() {</span>
+<span class="ln" id="L390">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L391">        <span class="tok-kw">let</span> (sender_secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L392">        <span class="tok-kw">let</span> recipient_secret = sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L393">        assert_eq!(sender_secret, recipient_secret);</span>
+<span class="ln" id="L394">        assert_eq!(sender_secret.<span class="tok-fn">len</span>(), <span class="tok-num">32</span>);</span>
+<span class="ln" id="L395">    }</span>
+<span class="ln" id="L396"></span>
+<span class="ln" id="L397">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L398">    <span class="tok-kw">fn</span> <span class="tok-fn">a_different_recipient_cannot_recover_it</span>() {</span>
+<span class="ln" id="L399">        <span class="tok-kw">let</span> (_, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L400">        <span class="tok-kw">let</span> (other_sk, _) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L401">        <span class="tok-kw">let</span> (sender_secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L402">        <span class="tok-com">// ML-KEM decapsulation is designed never to fail outright (implicit</span></span>
+<span class="ln" id="L403">        <span class="tok-com">// rejection), so the check that matters is that the *value* differs.</span></span>
+<span class="ln" id="L404">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(wrong) = other_sk.<span class="tok-fn">decapsulate</span>(&amp;enc) {</span>
+<span class="ln" id="L405">            assert_ne!(sender_secret, wrong);</span>
+<span class="ln" id="L406">        }</span>
+<span class="ln" id="L407">    }</span>
+<span class="ln" id="L408"></span>
+<span class="ln" id="L409">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L410">    <span class="tok-kw">fn</span> <span class="tok-fn">each_encapsulation_is_fresh</span>() {</span>
+<span class="ln" id="L411">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L412">        <span class="tok-kw">let</span> (s1, e1) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L413">        <span class="tok-kw">let</span> (s2, e2) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L414">        assert_ne!(s1, s2);</span>
+<span class="ln" id="L415">        assert_ne!(e1.<span class="tok-fn">to_bytes</span>(), e2.<span class="tok-fn">to_bytes</span>());</span>
+<span class="ln" id="L416">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;e1).<span class="tok-fn">unwrap</span>(), s1);</span>
+<span class="ln" id="L417">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;e2).<span class="tok-fn">unwrap</span>(), s2);</span>
+<span class="ln" id="L418">    }</span>
+<span class="ln" id="L419"></span>
+<span class="ln" id="L420">    <span class="tok-com">/// The hybrid must fail if the classical half is tampered with, because otherwise</span></span>
+<span class="ln" id="L421">    <span class="tok-com">/// it would be no stronger than ML-KEM alone.</span></span>
+<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">tampering_with_the_x25519_half_changes_the_secret</span>() {</span>
+<span class="ln" id="L424">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L425">        <span class="tok-kw">let</span> (secret, <span class="tok-kw">mut</span> enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L426">        enc.x_ephemeral[<span class="tok-num">0</span>] ^= <span class="tok-num">1</span>;</span>
+<span class="ln" id="L427">        <span class="tok-kw">let</span> got = sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L428">        assert_ne!(secret, got);</span>
+<span class="ln" id="L429">    }</span>
+<span class="ln" id="L430"></span>
+<span class="ln" id="L431">    <span class="tok-com">/// ...and equally if the post-quantum half is tampered with.</span></span>
+<span class="ln" id="L432">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L433">    <span class="tok-kw">fn</span> <span class="tok-fn">tampering_with_the_ml_kem_half_changes_the_secret</span>() {</span>
+<span class="ln" id="L434">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L435">        <span class="tok-kw">let</span> (secret, <span class="tok-kw">mut</span> enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L436">        enc.ml_ciphertext[<span class="tok-num">0</span>] ^= <span class="tok-num">1</span>;</span>
+<span class="ln" id="L437">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(got) = sk.<span class="tok-fn">decapsulate</span>(&amp;enc) {</span>
+<span class="ln" id="L438">            assert_ne!(secret, got);</span>
+<span class="ln" id="L439">        }</span>
+<span class="ln" id="L440">    }</span>
+<span class="ln" id="L441"></span>
+<span class="ln" id="L442">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L443">    <span class="tok-kw">fn</span> <span class="tok-fn">public_keys_round_trip_through_bytes</span>() {</span>
+<span class="ln" id="L444">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L445">        <span class="tok-kw">let</span> bytes = pk.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L446">        assert_eq!(bytes.<span class="tok-fn">len</span>(), PUBLIC_KEY_LEN);</span>
+<span class="ln" id="L447">        <span class="tok-kw">let</span> parsed = PublicKey::<span class="tok-fn">from_bytes</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L448">        <span class="tok-kw">let</span> (secret, enc) = parsed.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L449">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>(), secret);</span>
+<span class="ln" id="L450">    }</span>
+<span class="ln" id="L451"></span>
+<span class="ln" id="L452">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L453">    <span class="tok-kw">fn</span> <span class="tok-fn">encapsulations_round_trip_through_bytes</span>() {</span>
+<span class="ln" id="L454">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L455">        <span class="tok-kw">let</span> (secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L456">        <span class="tok-kw">let</span> bytes = enc.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L457">        assert_eq!(bytes.<span class="tok-fn">len</span>(), ENCAPSULATION_LEN);</span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> parsed = Encapsulation::<span class="tok-fn">from_bytes</span>(&amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L459">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;parsed).<span class="tok-fn">unwrap</span>(), secret);</span>
+<span class="ln" id="L460">    }</span>
 <span class="ln" id="L461"></span>
-<span class="ln" id="L462">        <span class="tok-com">// And the recovered public key really works.</span></span>
-<span class="ln" id="L463">        <span class="tok-kw">let</span> (secret, enc) = sk.<span class="tok-fn">public_key</span>().<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L464">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>(), secret);</span>
-<span class="ln" id="L465">    }</span>
-<span class="ln" id="L466"></span>
-<span class="ln" id="L467">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L468">    <span class="tok-kw">fn</span> <span class="tok-fn">declared_encoding_lengths_match_the_implementation</span>() {</span>
-<span class="ln" id="L469">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L470">        assert_eq!(pk.<span class="tok-fn">to_bytes</span>().<span class="tok-fn">len</span>(), PUBLIC_KEY_LEN);</span>
-<span class="ln" id="L471">        assert_eq!(sk.<span class="tok-fn">to_bytes</span>().<span class="tok-fn">len</span>(), SECRET_KEY_LEN);</span>
-<span class="ln" id="L472">        <span class="tok-kw">let</span> (_, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L473">        assert_eq!(enc.<span class="tok-fn">to_bytes</span>().<span class="tok-fn">len</span>(), ENCAPSULATION_LEN);</span>
-<span class="ln" id="L474">    }</span>
-<span class="ln" id="L475">}</span>
+<span class="ln" id="L462">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L463">    <span class="tok-kw">fn</span> <span class="tok-fn">malformed_encodings_are_rejected</span>() {</span>
+<span class="ln" id="L464">        assert!(matches!(</span>
+<span class="ln" id="L465">            PublicKey::<span class="tok-fn">from_bytes</span>(&amp;[0u8; <span class="tok-num">10</span>]),</span>
+<span class="ln" id="L466">            <span class="tok-fn">Err</span>(Error::BadKeyEncoding)</span>
+<span class="ln" id="L467">        ));</span>
+<span class="ln" id="L468">        assert!(matches!(</span>
+<span class="ln" id="L469">            Encapsulation::<span class="tok-fn">from_bytes</span>(&amp;[0u8; <span class="tok-num">10</span>]),</span>
+<span class="ln" id="L470">            <span class="tok-fn">Err</span>(Error::BadKeyEncoding)</span>
+<span class="ln" id="L471">        ));</span>
+<span class="ln" id="L472">        assert!(matches!(</span>
+<span class="ln" id="L473">            SecretKey::<span class="tok-fn">from_bytes</span>(&amp;[0u8; <span class="tok-num">10</span>]),</span>
+<span class="ln" id="L474">            <span class="tok-fn">Err</span>(Error::BadKeyEncoding)</span>
+<span class="ln" id="L475">        ));</span>
+<span class="ln" id="L476">    }</span>
+<span class="ln" id="L477"></span>
+<span class="ln" id="L478">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L479">    <span class="tok-kw">fn</span> <span class="tok-fn">secret_keys_round_trip_through_bytes</span>() {</span>
+<span class="ln" id="L480">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L481">        <span class="tok-kw">let</span> encoded = sk.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L482">        assert_eq!(encoded.<span class="tok-fn">len</span>(), SECRET_KEY_LEN);</span>
+<span class="ln" id="L483"></span>
+<span class="ln" id="L484">        <span class="tok-kw">let</span> restored = SecretKey::<span class="tok-fn">from_bytes</span>(encoded.<span class="tok-fn">expose</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L485">        <span class="tok-kw">let</span> (secret, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L486">        assert_eq!(</span>
+<span class="ln" id="L487">            restored.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L488">            secret,</span>
+<span class="ln" id="L489">            <span class="tok-str">&quot;a reloaded key must open what the original could&quot;</span></span>
+<span class="ln" id="L490">        );</span>
+<span class="ln" id="L491">    }</span>
+<span class="ln" id="L492"></span>
+<span class="ln" id="L493">    <span class="tok-com">/// The encoded private key must come back in protected storage, not a bare</span></span>
+<span class="ln" id="L494">    <span class="tok-com">/// `Vec` that could be swapped to disk.</span></span>
+<span class="ln" id="L495">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L496">    <span class="tok-kw">fn</span> <span class="tok-fn">encoded_secret_key_is_protected_and_opaque</span>() {</span>
+<span class="ln" id="L497">        <span class="tok-kw">let</span> (sk, _) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L498">        <span class="tok-kw">let</span> encoded = sk.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L499">        assert!(format!(<span class="tok-str">&quot;{encoded:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>));</span>
+<span class="ln" id="L500">        assert!(</span>
+<span class="ln" id="L501">            encoded.<span class="tok-fn">expose</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|&amp;b| b != <span class="tok-num">0</span>),</span>
+<span class="ln" id="L502">            <span class="tok-str">&quot;encoding should not be empty&quot;</span></span>
+<span class="ln" id="L503">        );</span>
+<span class="ln" id="L504">    }</span>
+<span class="ln" id="L505"></span>
+<span class="ln" id="L506">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L507">    <span class="tok-kw">fn</span> <span class="tok-fn">public_key_can_be_recovered_from_the_secret_key</span>() {</span>
+<span class="ln" id="L508">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L509">        assert_eq!(sk.<span class="tok-fn">public_key</span>().<span class="tok-fn">to_bytes</span>(), pk.<span class="tok-fn">to_bytes</span>());</span>
+<span class="ln" id="L510"></span>
+<span class="ln" id="L511">        <span class="tok-com">// And the recovered public key really works.</span></span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> (secret, enc) = sk.<span class="tok-fn">public_key</span>().<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L513">        assert_eq!(sk.<span class="tok-fn">decapsulate</span>(&amp;enc).<span class="tok-fn">unwrap</span>(), secret);</span>
+<span class="ln" id="L514">    }</span>
+<span class="ln" id="L515"></span>
+<span class="ln" id="L516">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L517">    <span class="tok-kw">fn</span> <span class="tok-fn">declared_encoding_lengths_match_the_implementation</span>() {</span>
+<span class="ln" id="L518">        <span class="tok-kw">let</span> (sk, pk) = SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L519">        assert_eq!(pk.<span class="tok-fn">to_bytes</span>().<span class="tok-fn">len</span>(), PUBLIC_KEY_LEN);</span>
+<span class="ln" id="L520">        assert_eq!(sk.<span class="tok-fn">to_bytes</span>().<span class="tok-fn">len</span>(), SECRET_KEY_LEN);</span>
+<span class="ln" id="L521">        <span class="tok-kw">let</span> (_, enc) = pk.<span class="tok-fn">encapsulate</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L522">        assert_eq!(enc.<span class="tok-fn">to_bytes</span>().<span class="tok-fn">len</span>(), ENCAPSULATION_LEN);</span>
+<span class="ln" id="L523">    }</span>
+<span class="ln" id="L524">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

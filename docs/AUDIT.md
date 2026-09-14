@@ -277,6 +277,64 @@ chosen rate it asks for that interval; a late frame is counted as late and an
 idle gap is not; and two seconds of late frames raises the notice while one,
 which is what every launch costs, does not.
 
+### F-180: the tests never stood at the edge of any boundary in the crypto
+
+Mutation testing, run over `aead.rs`, `kdf.rs`, `container.rs` and `hybrid.rs`:
+127 mutants, 91 caught, 21 that do not compile, and **15 that survived the
+whole suite**. A surviving mutant is a change to the code that no test
+objects to, which is a claim about the tests rather than about the code, and
+the fifteen fell into three groups.
+
+**Five were boundaries in the container header's parser.** `bytes.len() <
+HEADER_LEN` became `<=`, `bytes.len() < end` became `<=` and became `==`, and
+both mode guards, the one that refuses a password header claiming an
+encapsulation and the one that refuses a hybrid header of the wrong length,
+became `false`. Every one of those is reachable from a file somebody sends
+you. The suite tested what the parser accepts and threw a great deal of
+rubbish at it, including a fuzzing campaign; what it never did was hand it a
+buffer of exactly the length in question. The test added here does each of the
+five from both sides: a header of exactly `HEADER_LEN` parses, one byte short
+is truncated, a hybrid header whose encapsulation is exactly as long as it
+says parses and one byte short does not, a password header claiming an
+encapsulation is refused, and a hybrid header is refused at one less, one
+more, and zero.
+
+**Four were the ceilings on what a header may ask the key derivation for.**
+`>` became `>=` and `==` on the memory ceiling and on the unattended ceiling,
+and `||` became `&&` in the parallelism test, which would have let a header
+declaring zero lanes through on its own. These are the numbers that stop a
+`.veil` file from choosing how much memory this program allocates, and they
+had been tested at values that are obviously fine and obviously absurd and
+never at the number itself. Each ceiling now accepts its own value and refuses
+one past it, and zero is refused on its own.
+
+**Three were the randomness adapter**, and this is the one worth being blunt
+about. `next_u32` and `next_u64` were replaced by functions returning a
+constant, and `try_fill_bytes` by one returning `Ok(())` without touching the
+buffer, and all three passed. Nothing in the crate checked that its only
+source of randomness emits anything. A key drawn from a buffer those mutants
+left untouched is a key an attacker already knows, and the suite would have
+been green. It is not a statistical test that was missing, which `getrandom`
+is not this crate's to assess; it is the question of whether bytes arrive at
+all. They are asked for now, in both forms, and two draws are required to
+differ.
+
+**One of the fifteen cannot be killed, and saying why is the useful part.**
+`p_cost > MAX_P_COST` can never be the only test that fires: Argon2 wants
+eight KiB per lane, `checked` enforces that in widened arithmetic, and the
+memory ceiling is four gibibytes, so nothing above `MAX_M_COST / 8` reaches
+that line whatever it says. The guard stays, because it is the bound Argon2
+documents and because the argument it belongs to is about the order these
+checks run in: a later change that moved the lane relation would leave this as
+the only thing between a header and an overflow. What changes is the doc
+comment, which now says all of that, so that the next reader who mutates it
+and sees nothing happen finds the answer where they are standing rather than
+concluding the line is dead.
+
+The campaign is not yet part of any build. It takes half an hour over four
+files and there are twenty-seven crates; making it a check is the work, and
+the brief for the next round carries it.
+
 ## The thirty-second round: the guard that failed and the two behind it
 
 The round after 0.1.20, covering the decoy vaults and everything they touched,
@@ -5095,7 +5153,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1615 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1620 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6742,7 +6800,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and seventy-nine defects found and fixed (F-1 to F-179), across
+**One hundred and eighty defects found and fixed (F-1 to F-180), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
