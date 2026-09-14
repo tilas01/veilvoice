@@ -16,7 +16,7 @@ zeroize.workspace = true
 subtle = "2"
 # Page-locking wrapper. The one place this crate steps outside `forbid(unsafe)`;
 # see the `amnesia` module for why and how it is contained.
-region = "3"
+region = "4"
 # --- key derivation ---
 #
 # The RustCrypto crates below are held on the generation `pgp` 0.20 uses
