@@ -95,6 +95,24 @@ than a summary written afterwards.
   requests every week.
 - Every compatible update in the lock file taken.
 
+**The meters can sit above a call or a stream**
+
+- The live monitor had two places to be and both were inside the VeilVoice
+  window. On a call or while streaming, that window is behind the thing you are
+  talking into, so the only picture of what your microphone is doing was
+  covered exactly when it mattered.
+- **A third choice: a small window of its own, kept above other windows.** Off
+  the task bar, draggable, resizable, showing the same two levels and the same
+  sentence about what a level is not. It is not the default, because a window
+  that puts itself above everything is something to ask for rather than to be
+  given.
+- Closing it brings the strip back rather than turning the meters off. Its
+  close button belongs to the window manager, so pressing it means "not in my
+  way", and reading that as "never show me my microphone again" would take the
+  meters away from under a call without being asked.
+- Where a platform will not give a second window, it falls back to the floating
+  card, which is the same thing inside the window.
+
 **The window draws at the display's rate**
 
 - The animations ran at twenty frames a second, by design: a constant in the

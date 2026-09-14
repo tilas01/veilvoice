@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/monitor.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 496 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 579 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs)
 
 ## Contents
 
@@ -81,25 +81,25 @@ wrong.
 
 ## What this file contains
 
-496 lines defining **10 functions** (8 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+579 lines defining **10 functions** (8 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Style` (line 63) -- Where the monitor sits, or whether it is shown at all.
-- `struct Levels` (line 137) -- The smoothed levels the monitor and the Studio both draw.
-- `enum Action` (line 259) -- What the reader did with the monitor this frame.
+- `struct Levels` (line 153) -- The smoothed levels the monitor and the Studio both draw.
+- `enum Action` (line 275) -- What the reader did with the monitor this frame.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Style::label` (line 75) -- A short name, for a picker.
-- `Style::note` (line 84) -- What this choice costs and buys, in the words a front end should show.
-- `Style::key` (line 108) -- The identifier written to the settings file.
-- `Style::from_key` (line 122) -- Read a style back.
-- `Levels::update` (line 161) -- Take a new reading.
-- `Levels::clear` (line 192) -- Back to nothing, for when a session stops.
-- `show` (line 318) -- Draw the monitor for this frame.
+- `Style::label` (line 83) -- A short name, for a picker.
+- `Style::note` (line 93) -- What this choice costs and buys, in the words a front end should show.
+- `Style::key` (line 123) -- The identifier written to the settings file.
+- `Style::from_key` (line 138) -- Read a style back.
+- `Levels::update` (line 177) -- Take a new reading.
+- `Levels::clear` (line 208) -- Back to nothing, for when a session stops.
+- `show` (line 334) -- Draw the monitor for this frame.
   - reaches: `row`, `bar`
-- `meter` (line 379) -- One level meter: a bar on the decibel scale, and the number beside it.
+- `meter` (line 439) -- One level meter: a bar on the decibel scale, and the number beside it.
 
 ## What calls what
 
@@ -121,28 +121,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_label(["Style::label<br/>line 75"])
-    n_note(["Style::note<br/>line 84"])
-    n_key(["Style::key<br/>line 108"])
-    n_from_key(["Style::from_key<br/>line 122"])
-    n_update(["Levels::update<br/>line 161"])
-    n_clear(["Levels::clear<br/>line 192"])
-    n_bar["bar<br/>line 203"]
-    n_row["row<br/>line 273"]
-    n_show(["show<br/>line 318"])
-    n_meter(["meter<br/>line 379"])
+    n_label(["Style::label<br/>line 83"])
+    n_note(["Style::note<br/>line 93"])
+    n_key(["Style::key<br/>line 123"])
+    n_from_key(["Style::from_key<br/>line 138"])
+    n_update(["Levels::update<br/>line 177"])
+    n_clear(["Levels::clear<br/>line 208"])
+    n_bar["bar<br/>line 219"]
+    n_row["row<br/>line 289"]
+    n_show(["show<br/>line 334"])
+    n_meter(["meter<br/>line 439"])
     n_row --> n_bar
     n_show --> n_row
-    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L75" "open the source"
-    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L84" "open the source"
-    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L108" "open the source"
-    click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L122" "open the source"
-    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L161" "open the source"
-    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L192" "open the source"
-    click n_bar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L203" "open the source"
-    click n_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273" "open the source"
-    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318" "open the source"
-    click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L379" "open the source"
+    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L83" "open the source"
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L93" "open the source"
+    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L123" "open the source"
+    click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L138" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L177" "open the source"
+    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L208" "open the source"
+    click n_bar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L219" "open the source"
+    click n_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L289" "open the source"
+    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L334" "open the source"
+    click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L439" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_note,n_key,n_from_key,n_update,n_clear,n_show,n_meter entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -156,20 +156,20 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `Style` <sub>pub enum</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L63) | Where the monitor sits, or whether it is shown at all. |
-| `Style::label` <sub>pub fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L75) | A short name, for a picker. |
-| `Style::note` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L84) | What this choice costs and buys, in the words a front end should show. |
-| `Style::ALL` <sub>pub const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L105) | Every style, in the order a picker should offer them. |
-| `Style::key` <sub>pub fn</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L108) | The identifier written to the settings file. |
-| `Style::from_key` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L122) | Read a style back. |
-| `Levels` <sub>pub struct</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L137) | The smoothed levels the monitor and the Studio both draw. |
-| `HOLD` <sub>const</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L157) | How long a held peak stays up before it falls back to the current level. |
-| `Levels::update` <sub>pub fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L161) | Take a new reading. |
-| `Levels::clear` <sub>pub fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L192) | Back to nothing, for when a session stops. |
-| `bar` <sub>fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L203) | A compact bar, for the strip. |
-| `Action` <sub>pub enum</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L259) | What the reader did with the monitor this frame. |
-| `row` <sub>fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273) | Draw the row itself. |
-| `show` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318) | Draw the monitor for this frame. |
-| `meter` <sub>pub fn</sub> | [379](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L379) | One level meter: a bar on the decibel scale, and the number beside it. |
+| `Style::label` <sub>pub fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L83) | A short name, for a picker. |
+| `Style::note` <sub>pub fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L93) | What this choice costs and buys, in the words a front end should show. |
+| `Style::ALL` <sub>pub const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L120) | Every style, in the order a picker should offer them. |
+| `Style::key` <sub>pub fn</sub> | [123](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L123) | The identifier written to the settings file. |
+| `Style::from_key` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L138) | Read a style back. |
+| `Levels` <sub>pub struct</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L153) | The smoothed levels the monitor and the Studio both draw. |
+| `HOLD` <sub>const</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L173) | How long a held peak stays up before it falls back to the current level. |
+| `Levels::update` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L177) | Take a new reading. |
+| `Levels::clear` <sub>pub fn</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L208) | Back to nothing, for when a session stops. |
+| `bar` <sub>fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L219) | A compact bar, for the strip. |
+| `Action` <sub>pub enum</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L275) | What the reader did with the monitor this frame. |
+| `row` <sub>fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L289) | Draw the row itself. |
+| `show` <sub>pub fn</sub> | [334](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L334) | Draw the monitor for this frame. |
+| `meter` <sub>pub fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L439) | One level meter: a bar on the decibel scale, and the number beside it. |
 
 ---
 

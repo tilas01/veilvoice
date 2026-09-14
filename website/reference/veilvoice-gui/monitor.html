@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/monitor.svg" alt="monitor.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/monitor.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 496 lines &middot; <a href="monitor.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 579 lines &middot; <a href="monitor.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-not-just-the-meters-on-the-studio-tab">Why this is not just the meters on the Studio tab</a>
@@ -77,29 +77,29 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>496 lines defining <strong>10 functions</strong> (8 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>579 lines defining <strong>10 functions</strong> (8 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Style</code> <span style="color:var(--muted)">line 63</span> &middot; Where the monitor sits, or whether it is shown at all.</li>
-<li><code>struct Levels</code> <span style="color:var(--muted)">line 137</span> &middot; The smoothed levels the monitor and the Studio both draw.</li>
-<li><code>enum Action</code> <span style="color:var(--muted)">line 259</span> &middot; What the reader did with the monitor this frame.</li>
+<li><code>struct Levels</code> <span style="color:var(--muted)">line 153</span> &middot; The smoothed levels the monitor and the Studio both draw.</li>
+<li><code>enum Action</code> <span style="color:var(--muted)">line 275</span> &middot; What the reader did with the monitor this frame.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Style::label</code> <span style="color:var(--muted)">line 75</span> &middot; A short name, for a picker.
+<li><code>Style::label</code> <span style="color:var(--muted)">line 83</span> &middot; A short name, for a picker.
 </li>
-<li><code>Style::note</code> <span style="color:var(--muted)">line 84</span> &middot; What this choice costs and buys, in the words a front end should show.
+<li><code>Style::note</code> <span style="color:var(--muted)">line 93</span> &middot; What this choice costs and buys, in the words a front end should show.
 </li>
-<li><code>Style::key</code> <span style="color:var(--muted)">line 108</span> &middot; The identifier written to the settings file.
+<li><code>Style::key</code> <span style="color:var(--muted)">line 123</span> &middot; The identifier written to the settings file.
 </li>
-<li><code>Style::from_key</code> <span style="color:var(--muted)">line 122</span> &middot; Read a style back.
+<li><code>Style::from_key</code> <span style="color:var(--muted)">line 138</span> &middot; Read a style back.
 </li>
-<li><code>Levels::update</code> <span style="color:var(--muted)">line 161</span> &middot; Take a new reading.
+<li><code>Levels::update</code> <span style="color:var(--muted)">line 177</span> &middot; Take a new reading.
 </li>
-<li><code>Levels::clear</code> <span style="color:var(--muted)">line 192</span> &middot; Back to nothing, for when a session stops.
+<li><code>Levels::clear</code> <span style="color:var(--muted)">line 208</span> &middot; Back to nothing, for when a session stops.
 </li>
-<li><code>show</code> <span style="color:var(--muted)">line 318</span> &middot; Draw the monitor for this frame.
+<li><code>show</code> <span style="color:var(--muted)">line 334</span> &middot; Draw the monitor for this frame.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>row</code>, <code>bar</code></span>
 </li>
-<li><code>meter</code> <span style="color:var(--muted)">line 379</span> &middot; One level meter: a bar on the decibel scale, and the number beside it.
+<li><code>meter</code> <span style="color:var(--muted)">line 439</span> &middot; One level meter: a bar on the decibel scale, and the number beside it.
 </li>
 </ul>
 </section>
@@ -121,52 +121,52 @@
 <a href="monitor.src.html#fn-style-label">
 <rect x="20.0" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="82.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Style::label</text>
-<text x="82.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
+<text x="82.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 83</text>
 </a>
 <a href="monitor.src.html#fn-style-note">
 <rect x="170.7" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="229.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Style::note</text>
-<text x="229.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 84</text>
+<text x="229.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 93</text>
 </a>
 <a href="monitor.src.html#fn-style-key">
 <rect x="313.4" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="367.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Style::key</text>
-<text x="367.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 108</text>
+<text x="367.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
 </a>
 <a href="monitor.src.html#fn-style-from_key">
 <rect x="448.0" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="522.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Style::from_key</text>
-<text x="522.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+<text x="522.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
 </a>
 <a href="monitor.src.html#fn-levels-update">
 <rect x="40.1" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="110.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Levels::update</text>
-<text x="110.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+<text x="110.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 177</text>
 </a>
 <a href="monitor.src.html#fn-levels-clear">
 <rect x="207.0" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="273.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Levels::clear</text>
-<text x="273.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
+<text x="273.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 208</text>
 </a>
 <a href="monitor.src.html#fn-bar">
 <rect x="365.8" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="412.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">bar</text>
-<text x="412.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
+<text x="412.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
 </a>
 <a href="monitor.src.html#fn-row">
 <rect x="484.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="530.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">row</text>
-<text x="530.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
+<text x="530.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
 </a>
 <a href="monitor.src.html#fn-show">
 <rect x="203.0" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="249.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">show</text>
-<text x="249.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 318</text>
+<text x="249.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 334</text>
 </a>
 <a href="monitor.src.html#fn-meter">
 <rect x="321.4" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="367.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">meter</text>
-<text x="367.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 379</text>
+<text x="367.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 439</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -183,28 +183,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_label([&quot;Style::label&lt;br/&gt;line 75&quot;])
-    n_note([&quot;Style::note&lt;br/&gt;line 84&quot;])
-    n_key([&quot;Style::key&lt;br/&gt;line 108&quot;])
-    n_from_key([&quot;Style::from_key&lt;br/&gt;line 122&quot;])
-    n_update([&quot;Levels::update&lt;br/&gt;line 161&quot;])
-    n_clear([&quot;Levels::clear&lt;br/&gt;line 192&quot;])
-    n_bar[&quot;bar&lt;br/&gt;line 203&quot;]
-    n_row[&quot;row&lt;br/&gt;line 273&quot;]
-    n_show([&quot;show&lt;br/&gt;line 318&quot;])
-    n_meter([&quot;meter&lt;br/&gt;line 379&quot;])
+    n_label([&quot;Style::label&lt;br/&gt;line 83&quot;])
+    n_note([&quot;Style::note&lt;br/&gt;line 93&quot;])
+    n_key([&quot;Style::key&lt;br/&gt;line 123&quot;])
+    n_from_key([&quot;Style::from_key&lt;br/&gt;line 138&quot;])
+    n_update([&quot;Levels::update&lt;br/&gt;line 177&quot;])
+    n_clear([&quot;Levels::clear&lt;br/&gt;line 208&quot;])
+    n_bar[&quot;bar&lt;br/&gt;line 219&quot;]
+    n_row[&quot;row&lt;br/&gt;line 289&quot;]
+    n_show([&quot;show&lt;br/&gt;line 334&quot;])
+    n_meter([&quot;meter&lt;br/&gt;line 439&quot;])
     n_row --&gt; n_bar
     n_show --&gt; n_row
-    click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L75&quot; &quot;open the source&quot;
-    click n_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L84&quot; &quot;open the source&quot;
-    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L108&quot; &quot;open the source&quot;
-    click n_from_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L122&quot; &quot;open the source&quot;
-    click n_update href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L161&quot; &quot;open the source&quot;
-    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L192&quot; &quot;open the source&quot;
-    click n_bar href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L203&quot; &quot;open the source&quot;
-    click n_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L273&quot; &quot;open the source&quot;
-    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L318&quot; &quot;open the source&quot;
-    click n_meter href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L379&quot; &quot;open the source&quot;
+    click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L83&quot; &quot;open the source&quot;
+    click n_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L93&quot; &quot;open the source&quot;
+    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L123&quot; &quot;open the source&quot;
+    click n_from_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L138&quot; &quot;open the source&quot;
+    click n_update href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L177&quot; &quot;open the source&quot;
+    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L208&quot; &quot;open the source&quot;
+    click n_bar href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L219&quot; &quot;open the source&quot;
+    click n_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L289&quot; &quot;open the source&quot;
+    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L334&quot; &quot;open the source&quot;
+    click n_meter href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs#L439&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_note,n_key,n_from_key,n_update,n_clear,n_show,n_meter entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -216,20 +216,20 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Style</code> <sub>pub enum</sub></td><td><a href="monitor.src.html#fn-style">63</a></td><td>Where the monitor sits, or whether it is shown at all.</td></tr>
-<tr><td><code>Style::label</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-label">75</a></td><td>A short name, for a picker.</td></tr>
-<tr><td><code>Style::note</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-note">84</a></td><td>What this choice costs and buys, in the words a front end should show.</td></tr>
-<tr><td><code>Style::ALL</code> <sub>pub const</sub></td><td><a href="monitor.src.html#fn-style-all">105</a></td><td>Every style, in the order a picker should offer them.</td></tr>
-<tr><td><code>Style::key</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-key">108</a></td><td>The identifier written to the settings file.</td></tr>
-<tr><td><code>Style::from_key</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-from_key">122</a></td><td>Read a style back.</td></tr>
-<tr><td><code>Levels</code> <sub>pub struct</sub></td><td><a href="monitor.src.html#fn-levels">137</a></td><td>The smoothed levels the monitor and the Studio both draw.</td></tr>
-<tr><td><code>HOLD</code> <sub>const</sub></td><td><a href="monitor.src.html#fn-hold">157</a></td><td>How long a held peak stays up before it falls back to the current level.</td></tr>
-<tr><td><code>Levels::update</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-levels-update">161</a></td><td>Take a new reading.</td></tr>
-<tr><td><code>Levels::clear</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-levels-clear">192</a></td><td>Back to nothing, for when a session stops.</td></tr>
-<tr><td><code>bar</code> <sub>fn</sub></td><td><a href="monitor.src.html#fn-bar">203</a></td><td>A compact bar, for the strip.</td></tr>
-<tr><td><code>Action</code> <sub>pub enum</sub></td><td><a href="monitor.src.html#fn-action">259</a></td><td>What the reader did with the monitor this frame.</td></tr>
-<tr><td><code>row</code> <sub>fn</sub></td><td><a href="monitor.src.html#fn-row">273</a></td><td>Draw the row itself.</td></tr>
-<tr><td><code>show</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-show">318</a></td><td>Draw the monitor for this frame.</td></tr>
-<tr><td><code>meter</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-meter">379</a></td><td>One level meter: a bar on the decibel scale, and the number beside it.</td></tr>
+<tr><td><code>Style::label</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-label">83</a></td><td>A short name, for a picker.</td></tr>
+<tr><td><code>Style::note</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-note">93</a></td><td>What this choice costs and buys, in the words a front end should show.</td></tr>
+<tr><td><code>Style::ALL</code> <sub>pub const</sub></td><td><a href="monitor.src.html#fn-style-all">120</a></td><td>Every style, in the order a picker should offer them.</td></tr>
+<tr><td><code>Style::key</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-key">123</a></td><td>The identifier written to the settings file.</td></tr>
+<tr><td><code>Style::from_key</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-style-from_key">138</a></td><td>Read a style back.</td></tr>
+<tr><td><code>Levels</code> <sub>pub struct</sub></td><td><a href="monitor.src.html#fn-levels">153</a></td><td>The smoothed levels the monitor and the Studio both draw.</td></tr>
+<tr><td><code>HOLD</code> <sub>const</sub></td><td><a href="monitor.src.html#fn-hold">173</a></td><td>How long a held peak stays up before it falls back to the current level.</td></tr>
+<tr><td><code>Levels::update</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-levels-update">177</a></td><td>Take a new reading.</td></tr>
+<tr><td><code>Levels::clear</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-levels-clear">208</a></td><td>Back to nothing, for when a session stops.</td></tr>
+<tr><td><code>bar</code> <sub>fn</sub></td><td><a href="monitor.src.html#fn-bar">219</a></td><td>A compact bar, for the strip.</td></tr>
+<tr><td><code>Action</code> <sub>pub enum</sub></td><td><a href="monitor.src.html#fn-action">275</a></td><td>What the reader did with the monitor this frame.</td></tr>
+<tr><td><code>row</code> <sub>fn</sub></td><td><a href="monitor.src.html#fn-row">289</a></td><td>Draw the row itself.</td></tr>
+<tr><td><code>show</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-show">334</a></td><td>Draw the monitor for this frame.</td></tr>
+<tr><td><code>meter</code> <sub>pub fn</sub></td><td><a href="monitor.src.html#fn-meter">439</a></td><td>One level meter: a bar on the decibel scale, and the number beside it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

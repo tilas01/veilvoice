@@ -1278,12 +1278,26 @@ impl eframe::App for VeilVoiceApp {
             self.studio.levels(),
         ) == crate::monitor::Action::Dismiss
         {
-            self.preferences
-                .set_live_monitor(crate::monitor::Style::Off);
-            self.notice = Some(crate::notify::Notice::note(
-                "The live monitor is off. Settings brings it back, and the Studio still \
-                 has the full meters.",
-            ));
+            // Closing the always-on-top window brings the strip back rather
+            // than turning the meters off. Its close button is the window
+            // manager's, so somebody pressing it means "not in my way", and
+            // reading that as "never show me my microphone again" would take
+            // the meters away from under a call without being asked.
+            if self.preferences.live_monitor() == crate::monitor::Style::OnTop {
+                self.preferences
+                    .set_live_monitor(crate::monitor::Style::Toolbar);
+                self.notice = Some(crate::notify::Notice::note(
+                    "The monitor is back in the window, along the bottom. Settings can put \
+                     it above other windows again, or turn it off.",
+                ));
+            } else {
+                self.preferences
+                    .set_live_monitor(crate::monitor::Style::Off);
+                self.notice = Some(crate::notify::Notice::note(
+                    "The live monitor is off. Settings brings it back, and the Studio still \
+                     has the full meters.",
+                ));
+            }
         }
 
         // The antivirus notice, promoted into the ordinary notice slot once the

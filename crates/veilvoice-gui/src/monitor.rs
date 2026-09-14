@@ -66,6 +66,14 @@ pub enum Style {
     Toolbar,
     /// Floating over the bottom right of the panel.
     Overlay,
+    /// A small window of its own, kept above other windows.
+    ///
+    /// **Marker 150.** The other two are inside the VeilVoice window, which is
+    /// behind whatever you are talking into. Somebody on a call or streaming
+    /// has the meeting or the streaming software in front, and the only
+    /// picture of what their microphone is doing is covered by it exactly when
+    /// they need it.
+    OnTop,
     /// Not shown. The Studio still has the full meters.
     Off,
 }
@@ -76,6 +84,7 @@ impl Style {
         match self {
             Self::Toolbar => "a strip along the bottom",
             Self::Overlay => "a card floating in the corner",
+            Self::OnTop => "a small window kept above everything",
             Self::Off => "only on the Studio tab",
         }
     }
@@ -93,6 +102,12 @@ impl Style {
                  scramble is running. Keeps the full height for the panel and \
                  sits on top of a corner of it."
             }
+            Self::OnTop => {
+                "A small window of its own that stays above other windows, so \
+                 the meters are still visible with a call or streaming \
+                 software in front. Move it where you like; closing it brings \
+                 the strip back."
+            }
             Self::Off => {
                 "The monitor is not shown. The Studio still has the full \
                  meters, so this means you see them when you are looking at \
@@ -102,13 +117,14 @@ impl Style {
     }
 
     /// Every style, in the order a picker should offer them.
-    pub const ALL: &'static [Style] = &[Style::Toolbar, Style::Overlay, Style::Off];
+    pub const ALL: &'static [Style] = &[Style::Toolbar, Style::Overlay, Style::OnTop, Style::Off];
 
     /// The identifier written to the settings file.
     pub fn key(self) -> &'static str {
         match self {
             Self::Toolbar => "toolbar",
             Self::Overlay => "overlay",
+            Self::OnTop => "on-top",
             Self::Off => "off",
         }
     }
@@ -349,6 +365,50 @@ pub fn show(
                         });
                 });
         }
+        Style::OnTop => {
+            // Marker 150. A window of its own, above the others.
+            //
+            // Immediate rather than deferred, because a deferred viewport's
+            // closure has to be `'static` and these levels are borrowed from
+            // the Studio for exactly this frame. Immediate draws it inside
+            // this pass, with the same numbers the rest of the window is
+            // drawing, which is the whole point: two copies of a meter are two
+            // meters that disagree by a frame.
+            //
+            // Where the platform cannot give a second window, `egui` embeds it
+            // in this one instead and says so through `ViewportClass`, which
+            // is a floating card over the panel: the same thing `Overlay`
+            // does, which is the right thing to fall back to.
+            let viewport = egui::ViewportBuilder::default()
+                .with_title("VeilVoice monitor")
+                .with_inner_size([300.0, 96.0])
+                .with_min_inner_size([240.0, 80.0])
+                .with_always_on_top()
+                // Off the task bar: this is an instrument that rides above a
+                // call, not a second application somebody alt-tabs to.
+                .with_taskbar(false)
+                .with_resizable(true);
+            root.ctx().show_viewport_immediate(
+                egui::ViewportId::from_hash_of("veilvoice-monitor"),
+                viewport,
+                |ui, _class| {
+                    ui.add_space(6.0);
+                    // Not closable from inside: the window's own close button
+                    // is the obvious way out, and two ways to dismiss one
+                    // thing is one of them somebody has to discover.
+                    action = row(ui, levels, preview, false);
+                    ui.add_space(4.0);
+                    ui.label(
+                        RichText::new("levels only, not proof the voice is changed")
+                            .small()
+                            .color(p::muted()),
+                    );
+                    if ui.input(|i| i.viewport().close_requested()) {
+                        action = Action::Dismiss;
+                    }
+                },
+            );
+        }
         Style::Off => {}
     }
     action
@@ -434,6 +494,29 @@ pub fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **Marker 150.** The always-on-top window is offered and is not the
+    /// default.
+    ///
+    /// Not the default because a window that puts itself above everything is
+    /// a thing somebody should ask for. Offered because the other two live
+    /// inside the VeilVoice window, and somebody on a call has the call in
+    /// front of that window.
+    #[test]
+    fn the_monitor_can_be_kept_above_other_windows() {
+        assert!(Style::ALL.contains(&Style::OnTop));
+        assert_ne!(Style::default(), Style::OnTop);
+        assert_eq!(Style::from_key("on-top"), Style::OnTop);
+        assert_eq!(Style::OnTop.key(), "on-top");
+        // It has to say what it is for, in the words a picker shows, and the
+        // words have to name the thing that makes it different.
+        assert!(Style::OnTop.note().contains("above other windows"));
+        assert!(
+            Style::OnTop.note().contains("closing it"),
+            "somebody pressing the window's close button must be told what \
+             that does, because it is not the same as turning the monitor off"
+        );
+    }
 
     /// Every style survives a round trip through the settings file.
     #[test]
