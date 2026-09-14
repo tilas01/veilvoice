@@ -203,6 +203,39 @@ somebody will read it. A capture with an app lock in it would mean a capture
 run against a configured lock file, which is a larger change to the capture
 scripts than this finding justifies.
 
+### What was read and found correct
+
+Not findings, and listed because "we looked and there was nothing" is a result.
+
+**The three ways into a video now have to agree.** `ffmpeg::command` builds the
+invocation that `veilvoice conversation` **prints for a person to run by hand**,
+under a line saying VeilVoice never runs it for them; `concat_command` builds
+the one the window actually runs; `black_command` builds the one that puts a
+recording behind a black frame. All three were correct and all three worked
+their encoder settings out separately, with only the frame size compared across
+two of them. If the printed one and the run one ever drifted, the instruction
+this program gives would stop being the thing this program does, and no build
+would say so. They agree today and now have to: a test compares the codec, the
+quality, the scale filter, the pixel format and the audio settings across them,
+and asserts that the black-frame command has no scale filter, which is right
+because there is nothing to scale.
+
+**`ffmpeg::command` is not the dead public item the brief expected.** It was
+the candidate on the list, on the ground that its only caller prints it.
+Printing it *is* the feature: the command line's whole posture there is to hand
+somebody a command and not run it. Reached, argued, and staying.
+
+**The private-file helper.** Creates owner-only with `create_new`, so a
+symlink planted at the path is refused rather than followed, and replaces by
+renaming inside the same directory, so the replacement is atomic and cannot
+cross a filesystem. Both already tested, including the symlink case.
+
+**The panic sites in the parsers.** The WAV chunk walker's two `expect("4
+bytes")` calls are on slices whose length the line above them fixed at four;
+the FFT's are on buffers the constructor sized; the conversation editor's are
+on a turn inserted two lines earlier. Each is an invariant established locally
+rather than assumed, which is the standard this document sets for them.
+
 ### F-179: the window drew at twenty frames a second, by construction
 
 Reported as "8 to 40 fps instead of a consistent 60". The cause was not a slow
@@ -5062,7 +5095,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1613 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1614 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
