@@ -184,6 +184,14 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>The hybrid key exchange&#x27;s documentation said both public keys went into the combiner. The recipient&#x27;s X25519 key does; the recipient&#x27;s ML-KEM key does not, and does not need to, because FIPS 203 binds it through the shared secret itself. The doc comment now says exactly what is bound, why the omission is not a weakness, and why the transcript is not changed: every key and container already made would change with it, for no gain.</li>
 <li>The command line&#x27;s offline claim was proved again on the built binary, four ways, and each guard was shown to fail when given something to catch.</li>
 </ul>
+<p><strong>The tests now stand at the edge of every boundary in the cryptography</strong></p>
+<ul>
+<li>Mutation testing over the four files that matter most, which changes the code a line at a time and asks whether any test objects: 127 changes, 91 objected to, 21 that do not compile, and <strong>fifteen that the whole suite accepted</strong>.</li>
+<li><strong>Five were boundaries in the parser that reads a file somebody sends you</strong>: the length tests and both checks on what a header claims to carry. Each is now tested from both sides, at exactly the length in question rather than near it.</li>
+<li><strong>Four were the ceilings that stop a file from choosing how much memory this program allocates.</strong> Each now accepts its own value and refuses one past it, and a header asking for zero lanes is refused on its own rather than only in company.</li>
+<li><strong>Three were the randomness adapter, and that is the one worth saying plainly.</strong> Replacing it with something that returns a constant, or that claims success without writing a byte, passed every test this project had. A key drawn from a buffer left untouched is a key somebody else already knows. It is now asked, in both forms, whether bytes actually arrive.</li>
+<li>One of the fifteen cannot be killed and the reason is now written where it lives: a ceiling on parallelism that the memory ceiling always reaches first. It stays, because a guard that is only redundant today is not a guard to delete, and the next person who changes it and sees nothing happen will find the answer in the comment rather than concluding the line is dead.</li>
+</ul>
 <p><strong>The command it prints and the command it runs cannot drift apart</strong></p>
 <ul>
 <li><code>veilvoice conversation</code> prints an <code>ffmpeg</code> command for you to run yourself, under a line saying VeilVoice never runs it for you. The window runs a different one, because it feeds the pictures in by a list rather than by a numbered pattern. Everything after the inputs was the same decision made separately in three places, with only the frame size compared across two of them.</li>

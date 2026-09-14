@@ -222,6 +222,19 @@ impl KdfParams {
     /// property to rely on, and it is not true for anyone building against
     /// these crates. So the bound is enforced here, in the one place every
     /// derivation passes through, in arithmetic that cannot overflow.
+    ///
+    /// # Why mutating the parallelism ceiling changes nothing
+    ///
+    /// Worth saying, because a reader who tries it will find it out and
+    /// wonder. `p_cost > MAX_P_COST` can never be the *only* test that fires:
+    /// the lane relation below requires `m_cost >= p_cost * 8`, and `m_cost`
+    /// is itself capped at [`MAX_M_COST`](Self::MAX_M_COST), so nothing above
+    /// `MAX_M_COST / 8` can get past this function whatever this line says.
+    /// It stays because it is the bound `argon2` itself documents and because
+    /// the argument above is about the order the checks run in: a later change
+    /// that moved the lane relation would leave this as the thing standing
+    /// between a header and the overflow, and a guard that is only redundant
+    /// today is not a guard to delete.
     pub fn checked(&self) -> Result<(), Error> {
         if self.p_cost == 0 || self.p_cost > Self::MAX_P_COST {
             return Err(Error::KdfParams);
@@ -289,6 +302,101 @@ mod tests {
 
     fn weak() -> KdfParams {
         KdfParams::weak_for_tests()
+    }
+
+    /// Every ceiling in this module, from both sides of it.
+    ///
+    /// **Round thirty-three.** Mutation testing turned `>` into `>=` and into
+    /// `==` in the cost tests and `||` into `&&` in the parallelism test, and
+    /// all four mutants survived: the suite tested values that are obviously
+    /// wrong and values that are obviously right, and never the one at the
+    /// edge. A ceiling nobody tests at the edge is a ceiling that can move by
+    /// one without anybody noticing, and these ceilings are what stop a header
+    /// somebody sends you from choosing how much memory this program
+    /// allocates.
+    #[test]
+    fn every_ceiling_accepts_its_own_value_and_refuses_one_past_it() {
+        let at = |m_cost, t_cost, p_cost| KdfParams {
+            m_cost,
+            t_cost,
+            p_cost,
+        };
+
+        // Memory. `MAX_M_COST` itself is allowed; one more is not.
+        assert!(at(KdfParams::MAX_M_COST, 3, 1).checked().is_ok());
+        assert!(at(KdfParams::MAX_M_COST + 1, 3, 1).checked().is_err());
+
+        // Passes. Zero is not a number of passes and neither is one past the
+        // ceiling; the ceiling itself is fine.
+        assert!(at(8, KdfParams::MAX_T_COST, 1).checked().is_ok());
+        assert!(at(8, KdfParams::MAX_T_COST + 1, 1).checked().is_err());
+        assert!(
+            at(8, 0, 1).checked().is_err(),
+            "zero passes finishes nothing"
+        );
+
+        // Parallelism, which is the one the `||` mutant was hiding in. Zero
+        // must be refused on its own rather than only in company, which is
+        // what `&&` in place of `||` would have allowed.
+        assert!(
+            at(8, 3, 0).checked().is_err(),
+            "zero lanes is not a degree of parallelism"
+        );
+
+        // The most lanes that can actually get through, which is set by the
+        // lane relation and not by `MAX_P_COST`: Argon2 wants eight KiB per
+        // lane, and memory is capped, so the real ceiling on lanes is the
+        // memory ceiling divided by eight. One more lane than the memory
+        // allows is refused.
+        let most = KdfParams::MAX_M_COST / 8;
+        assert!(at(KdfParams::MAX_M_COST, 3, most).checked().is_ok());
+        assert!(at(KdfParams::MAX_M_COST, 3, most + 1).checked().is_err());
+        assert!(
+            most < KdfParams::MAX_P_COST,
+            "the memory ceiling binds before Argon2's own lane ceiling, which \
+             is why mutating `MAX_P_COST` changes no behaviour; see `checked`"
+        );
+    }
+
+    /// The unattended ceiling lets through exactly what it names.
+    ///
+    /// `within` is what the desktop application opens a container with when
+    /// nobody has asked for it, so the value it is given is the largest wait
+    /// this build will sit through unattended. Off by one here is either a
+    /// container refused that should open, or a wait somebody did not choose.
+    #[test]
+    fn the_unattended_ceiling_is_inclusive() {
+        let params = KdfParams {
+            m_cost: KdfParams::UNATTENDED_MAX_M_COST,
+            t_cost: 3,
+            p_cost: 1,
+        };
+        assert!(
+            params.within(KdfParams::UNATTENDED_MAX_M_COST).is_ok(),
+            "the ceiling must accept its own value"
+        );
+        let over = KdfParams {
+            m_cost: KdfParams::UNATTENDED_MAX_M_COST + 1,
+            ..params
+        };
+        assert!(matches!(
+            over.within(KdfParams::UNATTENDED_MAX_M_COST),
+            Err(Error::KdfCostRefused { .. })
+        ));
+    }
+
+    /// The shortest salt this accepts is the one it documents.
+    ///
+    /// Argon2 requires eight bytes. `derive_key` refuses anything shorter, and
+    /// a mutant that made the test `<=` would refuse a salt of exactly eight,
+    /// which is legal and which nothing in the suite was using.
+    #[test]
+    fn a_salt_of_exactly_eight_bytes_is_accepted_and_seven_is_not() {
+        assert!(derive_key(P, &[0u8; 8], weak()).is_ok());
+        assert!(matches!(
+            derive_key(P, &[0u8; 7], weak()),
+            Err(Error::KdfParams)
+        ));
     }
 
     #[test]
