@@ -332,6 +332,18 @@ the candidate on the list, on the ground that its only caller prints it.
 Printing it *is* the feature: the command line's whole posture there is to hand
 somebody a command and not run it. Reached, argued, and staying.
 
+**Four hand-typed numbers, checked but not written.** The functional line
+count and the test count appear in the README, on the front page and in one
+row of this document, and the website suite compares all four against the
+tree. The comparison is right. The typing is not: every change to any Rust
+file moves the line count, so a commit that touches code and forgets those
+four places fails a check that has nothing to do with what the commit was
+about. That happened four times in this round alone, which is a measurement
+rather than an impression. `docs/MEASURED.md` is already generated from the
+same counters; writing the other four from them is marker 152, and the suite's
+comparison stays where it is, as the guard rather than as the thing that
+catches a person every time.
+
 **The private-file helper.** Creates owner-only with `create_new`, so a
 symlink planted at the path is refused rather than followed, and replaces by
 renaming inside the same directory, so the replacement is atomic and cannot
