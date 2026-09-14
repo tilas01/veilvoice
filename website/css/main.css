@@ -1939,6 +1939,10 @@ body.legal-locked { overflow: hidden; }
   padding: 26px 28px;
   animation: rise 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+/* The box is what `legal.js` focuses when the gate opens, so that no control
+ * inside it looks pressed before the reader has done anything. A ring around
+ * the whole dialog would say the same wrong thing at a larger size. */
+.legal-box:focus { outline: none; }
 
 .legal-box h2 { margin-top: 0; color: var(--accent); letter-spacing: 0.05em; }
 .legal-box p { font-size: 13.5px; }

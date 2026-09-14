@@ -6,6 +6,73 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## Unreleased
+
+**The website no longer opens on a ticked-looking box**
+
+- The first thing the site shows is the notice a reader has to accept, and the
+  first checkbox in it opened already wearing its focus ring, as if somebody
+  had just tabbed onto it. Nobody had. The script moved focus to that checkbox
+  when the dialog opened, and focus moved by a script is drawn the same way as
+  focus moved by a keyboard, in every engine.
+- Focus now lands on the dialog itself, which is where a modal's focus belongs:
+  a screen reader announces its title from there, the first Tab reaches the
+  first control, and the trap that keeps focus inside the notice still holds.
+  Nothing looks pressed until the reader presses it.
+- Checked by the website's own suite, which reads the script and the
+  stylesheet and fails if either goes back.
+
+**The site can be claimed in Search Console**
+
+- The ownership tag Google asks for sits in the head of every page, so the site
+  can be verified and indexed. It is a string with no behaviour: nothing is
+  loaded, sent or run because of it.
+
+
+**The Studio is in the documentation, and so is the reason for it**
+
+- The companion list recommended Audacity as being "useful for recording a file
+  and for trimming one before veiling it". The first half stopped being true
+  when the Recording Studio landed, and it was worse than merely out of date: it
+  pointed a reader at exactly the thing the Studio exists to avoid.
+- **A recording made in another program is a plaintext file on your disk.** Open
+  an editor, record an interview, save it, veil the result, delete the original:
+  the original was on the disk the whole time, and on flash storage deleting it
+  does not reliably take it back. The encryption that happens afterwards cannot
+  reach backwards to cover it.
+- So the Studio never writes one. The samples go from the audio callback into
+  memory the operating system has been asked to keep out of the page file, the
+  WAV is assembled inside that protected memory, and what leaves is already
+  sealed. There is deliberately no route in the code that would produce a plain
+  copy, because a route that existed would eventually be taken.
+- Audacity is still recommended, for what it is actually for here: editing a
+  file you already have. The install guide said the same thing twice and now
+  says this instead.
+- The questions page gains the question a reader actually arrives with, which is
+  whether it can record at all. It says what it captures (any input the system
+  offers, chosen by name, so a microphone or a virtual cable carrying the
+  computer's own audio, up to eight at once for a room), and what it keeps
+  (uncompressed PCM at whatever rate the device is really running, nothing
+  resampled, no lossy codec).
+- **It does not claim to be an editor, or to be better than one.** There is no
+  cutting, fading or arranging, and the page says so rather than implying
+  otherwise. No comparison with any other program has been benchmarked, so none
+  is made.
+
+**A doc comment that had moved to the wrong function**
+
+- Factoring one loop out of three copies left a documentation block behind, and
+  the next function down inherited it. The function that looks for GnuPG was
+  documented as "the route to Audacity differs per platform"; the function that
+  installs Audacity was documented as nothing at all.
+- **The generated wiki repeated it**, which is the part worth recording. Every
+  check passed, because every check compares the generated pages to the source,
+  and the source said this.
+- This is the second time in one release that an insertion has taken a block from
+  the item below it, after the missing feature gate earlier. A test now reads the
+  module and fails if a probe or an offer carries no documentation, which is the
+  mechanical half of the mistake and the half a losing item always shows.
+
 ## v0.1.21
 
 **Every screenshot the same size, and in the face they were meant to be in**
@@ -192,50 +259,6 @@ than a summary written afterwards.
 - Checked rather than asserted: the ten window captures are all 1400 by 1537 and
   the eleven drawings are all 834 wide, and both are produced by tools that
   measure the set rather than by a number written down somewhere.
-
-**The Studio is in the documentation, and so is the reason for it**
-
-- The companion list recommended Audacity as being "useful for recording a file
-  and for trimming one before veiling it". The first half stopped being true
-  when the Recording Studio landed, and it was worse than merely out of date: it
-  pointed a reader at exactly the thing the Studio exists to avoid.
-- **A recording made in another program is a plaintext file on your disk.** Open
-  an editor, record an interview, save it, veil the result, delete the original:
-  the original was on the disk the whole time, and on flash storage deleting it
-  does not reliably take it back. The encryption that happens afterwards cannot
-  reach backwards to cover it.
-- So the Studio never writes one. The samples go from the audio callback into
-  memory the operating system has been asked to keep out of the page file, the
-  WAV is assembled inside that protected memory, and what leaves is already
-  sealed. There is deliberately no route in the code that would produce a plain
-  copy, because a route that existed would eventually be taken.
-- Audacity is still recommended, for what it is actually for here: editing a
-  file you already have. The install guide said the same thing twice and now
-  says this instead.
-- The questions page gains the question a reader actually arrives with, which is
-  whether it can record at all. It says what it captures (any input the system
-  offers, chosen by name, so a microphone or a virtual cable carrying the
-  computer's own audio, up to eight at once for a room), and what it keeps
-  (uncompressed PCM at whatever rate the device is really running, nothing
-  resampled, no lossy codec).
-- **It does not claim to be an editor, or to be better than one.** There is no
-  cutting, fading or arranging, and the page says so rather than implying
-  otherwise. No comparison with any other program has been benchmarked, so none
-  is made.
-
-**A doc comment that had moved to the wrong function**
-
-- Factoring one loop out of three copies left a documentation block behind, and
-  the next function down inherited it. The function that looks for GnuPG was
-  documented as "the route to Audacity differs per platform"; the function that
-  installs Audacity was documented as nothing at all.
-- **The generated wiki repeated it**, which is the part worth recording. Every
-  check passed, because every check compares the generated pages to the source,
-  and the source said this.
-- This is the second time in one release that an insertion has taken a block from
-  the item below it, after the missing feature gate earlier. A test now reads the
-  module and fails if a probe or an offer carries no documentation, which is the
-  mechanical half of the mistake and the half a losing item always shows.
 
 **The tag a release publishes now names the commit it built**
 

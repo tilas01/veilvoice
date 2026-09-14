@@ -11,7 +11,7 @@
 
 # `website/js/legal.js`
 
-[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/legal.js) &middot; 192 lines
+[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/legal.js) &middot; 201 lines
 
 ## What it does
 
@@ -48,5 +48,5 @@ resolved one, so a call made through a variable will not appear.
 | `accepted` | 42 |
 | `remember` | 46 |
 | `build` | 50 |
-| `show` | 138 |
-| `sync` | 153 |
+| `show` | 140 |
+| `sync` | 155 |

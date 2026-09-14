@@ -210,6 +210,32 @@ function run() {
     }
   }
 
+  // --- the legal gate opens with nothing looking pressed ------------------
+  //
+  // `legal.js` used to focus the first checkbox when the gate opened. Focus
+  // moved by script counts as keyboard focus in every engine, so the checkbox
+  // drew its ring before the reader had touched anything, and the site opened
+  // on a box that looked selected for no reason (finding F-173). A modal's
+  // focus lands on the dialog itself; from there Tab reaches the first
+  // control, and the reader ticks what they have read.
+  {
+    const legal = read("website/js/legal.js");
+    const css = read("website/css/main.css");
+    if (/querySelector\("#legal-(waiver|licence)"\)\.focus\(\)|\b(waiver|licence)\.focus\(\)/.test(legal)) {
+      fail("legal.js focuses a checkbox when the gate opens, which draws its " +
+           "focus ring before the reader has done anything");
+    } else if (!/querySelector\("\.legal-box"\)\.focus\(\)/.test(legal)) {
+      fail("legal.js does not move focus into the dialog when the gate opens, " +
+           "so a keyboard reader starts behind it");
+    } else if (!/class="legal-box" tabindex="-1"/.test(legal)) {
+      fail("the legal box has no tabindex=\"-1\", so focus() on it does nothing");
+    } else if (!/\.legal-box:focus\s*\{\s*outline:\s*none;?\s*\}/.test(css)) {
+      fail("main.css draws a focus ring around the whole legal box");
+    } else {
+      pass("the legal gate opens with focus on the dialog and no ring");
+    }
+  }
+
   return failures;
 }
 
