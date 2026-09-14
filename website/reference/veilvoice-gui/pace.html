@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/pace.svg" alt="pace.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/pace.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 480 lines &middot; <a href="pace.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 489 lines &middot; <a href="pace.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-number-this-replaces">The number this replaces</a>
@@ -76,7 +76,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>480 lines defining <strong>19 functions</strong> (16 public), <strong>2 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>489 lines defining <strong>19 functions</strong> (16 public), <strong>2 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Target</code> <span style="color:var(--muted)">line 121</span> &middot; What a person chose in Settings.</li>
 <li><code>struct Pace</code> <span style="color:var(--muted)">line 157</span> &middot; The measurement, kept across frames.</li>
@@ -110,7 +110,7 @@
 <li><code>Pace::frame</code> <span style="color:var(--muted)">line 268</span> &middot; Record that a frame is being drawn at time, egui&#x27;s clock in seconds.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>median_hz</code>, <code>publish</code>, <code>target_hz</code></span>
 </li>
-<li><code>Pace::interval</code> <span style="color:var(--muted)">line 351</span> &middot; The interval animations currently pace by, for tests and the About tab.
+<li><code>Pace::interval</code> <span style="color:var(--muted)">line 360</span> &middot; The interval animations currently pace by, for tests and the About tab.
 </li>
 </ul>
 </section>
@@ -220,12 +220,12 @@
 <a href="pace.src.html#fn-pace-publish">
 <rect x="385.9" y="620.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="452.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::publish</text>
-<text x="452.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
+<text x="452.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 350</text>
 </a>
 <a href="pace.src.html#fn-pace-interval">
 <rect x="231.2" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="301.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::interval</text>
-<text x="301.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 351</text>
+<text x="301.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 360</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -261,8 +261,8 @@ flowchart TD
     n_dropping_seconds([&quot;Pace::dropping_seconds&lt;br/&gt;line 256&quot;])
     n_frame([&quot;Pace::frame&lt;br/&gt;line 268&quot;])
     n_median_hz[&quot;Pace::median_hz&lt;br/&gt;line 327&quot;]
-    n_publish[&quot;Pace::publish&lt;br/&gt;line 341&quot;]
-    n_interval([&quot;Pace::interval&lt;br/&gt;line 351&quot;])
+    n_publish[&quot;Pace::publish&lt;br/&gt;line 350&quot;]
+    n_interval([&quot;Pace::interval&lt;br/&gt;line 360&quot;])
     n_default --&gt; n_new
     n_frame --&gt; n_median_hz
     n_frame --&gt; n_publish
@@ -285,8 +285,8 @@ flowchart TD
     click n_dropping_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L256&quot; &quot;open the source&quot;
     click n_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L268&quot; &quot;open the source&quot;
     click n_median_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L327&quot; &quot;open the source&quot;
-    click n_publish href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L341&quot; &quot;open the source&quot;
-    click n_interval href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L351&quot; &quot;open the source&quot;
+    click n_publish href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L350&quot; &quot;open the source&quot;
+    click n_interval href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L360&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_next_frame,n_from_setting,n_to_setting,n_label,n_set_target,n_target,n_display_hz,n_fps,n_dropped_total,n_dropped_last_second,n_is_dropping,n_dropping_seconds,n_frame,n_interval entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -327,8 +327,8 @@ flowchart TD
 <tr><td><code>Pace::dropping_seconds</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropping_seconds">256</a></td><td>How many consecutive seconds have been dropping frames.</td></tr>
 <tr><td><code>Pace::frame</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-frame">268</a></td><td>Record that a frame is being drawn at time, egui&#x27;s clock in seconds.</td></tr>
 <tr><td><code>Pace::median_hz</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-median_hz">327</a></td><td>The display&#x27;s rate from the median interval, clamped to sense.</td></tr>
-<tr><td><code>Pace::publish</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-publish">341</a></td><td>Tell the animations what to ask for.</td></tr>
-<tr><td><code>Pace::interval</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-interval">351</a></td><td>The interval animations currently pace by, for tests and the About tab.</td></tr>
+<tr><td><code>Pace::publish</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-publish">350</a></td><td>Tell the animations what to ask for.</td></tr>
+<tr><td><code>Pace::interval</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-interval">360</a></td><td>The interval animations currently pace by, for tests and the About tab.</td></tr>
 </tbody></table>
 </section>
 </div></div>

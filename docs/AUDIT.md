@@ -203,6 +203,36 @@ somebody will read it. A capture with an app lock in it would mean a capture
 run against a configured lock file, which is a larger change to the capture
 scripts than this finding justifies.
 
+### F-181: a promise about allocation, broken in the same file that made it
+
+`pace.rs` was written this round with a note at the top saying that `frame`
+runs once per drawn frame and "allocates nothing, locks nothing and prints
+nothing", and that the median "is taken over a copy of it on the stack". Both
+sentences were written by somebody who had just read the rule in `CLAUDE.md`
+about realtime paths and meant them.
+
+The median was taken with `slice::sort_by` over a thirty-two element array.
+Rust's stable sort takes a scratch buffer for a slice that long. So the
+function allocated, once a frame, in the one module whose documentation had
+just promised it did not.
+
+Nothing was slow and nothing was wrong on screen: an allocation a frame is not
+a defect anybody would notice in a window. It is a defect in the sense this
+document cares about, which is that a sentence in the repository was not true
+about the code beneath it, and the sentence was fourteen lines above the code.
+
+The fix is `select_nth_unstable_by`, which sorts nothing, allocates nothing
+and only has to get the middle element right, which is all a median wants. The
+comment beside it now says which of the two functions allocates and why the
+choice is not a micro-optimisation.
+
+**Worth naming because of where it came from.** This is not old code that
+drifted; it is code written in this round, by the reading that the same round
+was doing. A rule you have just read is easiest to break while writing the
+thing you read it for, and the guard that catches this class today reads audio
+callbacks rather than the window's draw path. Extending it is marker 151's
+neighbour and is not done here.
+
 ### The checks this round ran, and where each one lives now
 
 The inventory is not a finding. It is here because the next round's reader
@@ -6842,7 +6872,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty defects found and fixed (F-1 to F-180), across
+**One hundred and eighty-one defects found and fixed (F-1 to F-181), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

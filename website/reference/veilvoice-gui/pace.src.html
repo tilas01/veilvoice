@@ -46,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/pace.rs</code></h1>
-<p style="color:var(--muted)"><a href="pace.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 480 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="pace.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 489 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -431,164 +431,173 @@
 <span class="src-item" id="fn-pace-median_hz">
 <span class="ln" id="L326">    <span class="tok-com">/// The display&#x27;s rate from the median interval, clamped to sense.</span></span>
 <span class="ln" id="L327">    <span class="tok-kw">fn</span> <span class="tok-fn">median_hz</span>(&amp;<span class="tok-kw">self</span>) -&gt; u32 {</span>
-<span class="ln" id="L328">        <span class="tok-com">// A copy on the stack: the ring must not be reordered, and sorting a</span></span>
-<span class="ln" id="L329">        <span class="tok-com">// fixed array allocates nothing.</span></span>
-<span class="ln" id="L330">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sorted = <span class="tok-kw">self</span>.intervals;</span>
-<span class="ln" id="L331">        sorted.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">partial_cmp</span>(b).<span class="tok-fn">unwrap_or</span>(std::cmp::Ordering::Equal));</span>
-<span class="ln" id="L332">        <span class="tok-kw">let</span> median = sorted[WINDOW / <span class="tok-num">2</span>];</span>
-<span class="ln" id="L333">        <span class="tok-kw">if</span> !median.<span class="tok-fn">is_finite</span>() || median &lt;= <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L334">            <span class="tok-kw">return</span> ASSUMED;</span>
-<span class="ln" id="L335">        }</span>
-<span class="ln" id="L336">        <span class="tok-kw">let</span> hz = (<span class="tok-num">1.0</span> / median).<span class="tok-fn">round</span>();</span>
-<span class="ln" id="L337">        (hz <span class="tok-kw">as</span> u32).<span class="tok-fn">clamp</span>(DISPLAY_FLOOR, DISPLAY_CEILING)</span>
-<span class="ln" id="L338">    }</span>
-</span>
-<span class="ln" id="L339"></span>
-<span class="src-item" id="fn-pace-publish">
-<span class="ln" id="L340">    <span class="tok-com">/// Tell the animations what to ask for.</span></span>
-<span class="ln" id="L341">    <span class="tok-kw">fn</span> <span class="tok-fn">publish</span>(&amp;<span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> micros = <span class="tok-kw">match</span> <span class="tok-kw">self</span>.target {</span>
-<span class="ln" id="L343">            Target::Display =&gt; <span class="tok-num">0</span>,</span>
-<span class="ln" id="L344">            Target::<span class="tok-fn">Fixed</span>(hz) =&gt; <span class="tok-num">1_000_000</span> / hz.<span class="tok-fn">max</span>(<span class="tok-num">1</span>),</span>
-<span class="ln" id="L345">        };</span>
-<span class="ln" id="L346">        INTERVAL_MICROS.<span class="tok-fn">store</span>(micros, Ordering::Relaxed);</span>
+<span class="ln" id="L328">        <span class="tok-com">// A copy on the stack: the ring must not be reordered.</span></span>
+<span class="ln" id="L329">        <span class="tok-com">//</span></span>
+<span class="ln" id="L330">        <span class="tok-com">// `select_nth_unstable_by` rather than a sort, and that is not a</span></span>
+<span class="ln" id="L331">        <span class="tok-com">// micro-optimisation, it is the difference between allocating and</span></span>
+<span class="ln" id="L332">        <span class="tok-com">// not. The stable `sort_by` takes a scratch buffer for a slice this</span></span>
+<span class="ln" id="L333">        <span class="tok-com">// long, which would put an allocation in a function this file&#x27;s own</span></span>
+<span class="ln" id="L334">        <span class="tok-com">// notes promise does not allocate; the unstable selection is in</span></span>
+<span class="ln" id="L335">        <span class="tok-com">// place and only has to get the middle element right, which is all a</span></span>
+<span class="ln" id="L336">        <span class="tok-com">// median needs.</span></span>
+<span class="ln" id="L337">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> window = <span class="tok-kw">self</span>.intervals;</span>
+<span class="ln" id="L338">        <span class="tok-kw">let</span> (_, median, _) = window.<span class="tok-fn">select_nth_unstable_by</span>(WINDOW / <span class="tok-num">2</span>, |a, b| {</span>
+<span class="ln" id="L339">            a.<span class="tok-fn">partial_cmp</span>(b).<span class="tok-fn">unwrap_or</span>(std::cmp::Ordering::Equal)</span>
+<span class="ln" id="L340">        });</span>
+<span class="ln" id="L341">        <span class="tok-kw">let</span> median = *median;</span>
+<span class="ln" id="L342">        <span class="tok-kw">if</span> !median.<span class="tok-fn">is_finite</span>() || median &lt;= <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L343">            <span class="tok-kw">return</span> ASSUMED;</span>
+<span class="ln" id="L344">        }</span>
+<span class="ln" id="L345">        <span class="tok-kw">let</span> hz = (<span class="tok-num">1.0</span> / median).<span class="tok-fn">round</span>();</span>
+<span class="ln" id="L346">        (hz <span class="tok-kw">as</span> u32).<span class="tok-fn">clamp</span>(DISPLAY_FLOOR, DISPLAY_CEILING)</span>
 <span class="ln" id="L347">    }</span>
 </span>
 <span class="ln" id="L348"></span>
-<span class="src-item" id="fn-pace-interval">
-<span class="ln" id="L349">    <span class="tok-com">/// The interval animations currently pace by, for tests and the About</span></span>
-<span class="ln" id="L350">    <span class="tok-com">/// tab. `None` is &quot;vsync decides&quot;.</span></span>
-<span class="ln" id="L351">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">interval</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;Duration&gt; {</span>
-<span class="ln" id="L352">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.target {</span>
-<span class="ln" id="L353">            Target::Display =&gt; None,</span>
-<span class="ln" id="L354">            Target::<span class="tok-fn">Fixed</span>(hz) =&gt; <span class="tok-fn">Some</span>(Duration::<span class="tok-fn">from_micros</span>(<span class="tok-num">1_000_000</span> / u64::<span class="tok-fn">from</span>(hz.<span class="tok-fn">max</span>(<span class="tok-num">1</span>)))),</span>
-<span class="ln" id="L355">        }</span>
+<span class="src-item" id="fn-pace-publish">
+<span class="ln" id="L349">    <span class="tok-com">/// Tell the animations what to ask for.</span></span>
+<span class="ln" id="L350">    <span class="tok-kw">fn</span> <span class="tok-fn">publish</span>(&amp;<span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L351">        <span class="tok-kw">let</span> micros = <span class="tok-kw">match</span> <span class="tok-kw">self</span>.target {</span>
+<span class="ln" id="L352">            Target::Display =&gt; <span class="tok-num">0</span>,</span>
+<span class="ln" id="L353">            Target::<span class="tok-fn">Fixed</span>(hz) =&gt; <span class="tok-num">1_000_000</span> / hz.<span class="tok-fn">max</span>(<span class="tok-num">1</span>),</span>
+<span class="ln" id="L354">        };</span>
+<span class="ln" id="L355">        INTERVAL_MICROS.<span class="tok-fn">store</span>(micros, Ordering::Relaxed);</span>
 <span class="ln" id="L356">    }</span>
 </span>
-<span class="ln" id="L357">}</span>
-<span class="ln" id="L358"></span>
-<span class="ln" id="L359"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L360"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L361">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L362"></span>
-<span class="ln" id="L363">    <span class="tok-com">/// Frames an animation asked for, at `hz`.</span></span>
-<span class="ln" id="L364">    <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(pace: &amp;<span class="tok-kw">mut</span> Pace, hz: f64, frames: usize) {</span>
-<span class="ln" id="L365">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> t = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L366">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..frames {</span>
-<span class="ln" id="L367">            ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
-<span class="ln" id="L368">            pace.<span class="tok-fn">frame</span>(t);</span>
-<span class="ln" id="L369">            t += <span class="tok-num">1.0</span> / hz;</span>
-<span class="ln" id="L370">        }</span>
-<span class="ln" id="L371">    }</span>
-<span class="ln" id="L372"></span>
-<span class="ln" id="L373">    <span class="tok-com">/// One frame nothing asked for: somebody moved the mouse.</span></span>
-<span class="ln" id="L374">    <span class="tok-kw">fn</span> <span class="tok-fn">idle_frame</span>(pace: &amp;<span class="tok-kw">mut</span> Pace, t: f64) {</span>
-<span class="ln" id="L375">        ANIMATING.<span class="tok-fn">store</span>(false, Ordering::Relaxed);</span>
-<span class="ln" id="L376">        pace.<span class="tok-fn">frame</span>(t);</span>
-<span class="ln" id="L377">    }</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L380">    <span class="tok-kw">fn</span> <span class="tok-fn">the_display_is_measured_from_the_frames_it_paced</span>() {</span>
-<span class="ln" id="L381">        <span class="tok-kw">for</span> hz <span class="tok-kw">in</span> [<span class="tok-num">60.0</span>, <span class="tok-num">120.0</span>, <span class="tok-num">144.0</span>, <span class="tok-num">165.0</span>, <span class="tok-num">240.0</span>] {</span>
-<span class="ln" id="L382">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
-<span class="ln" id="L383">            <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, hz, WINDOW + <span class="tok-num">2</span>);</span>
-<span class="ln" id="L384">            assert_eq!(pace.<span class="tok-fn">display_hz</span>(), <span class="tok-fn">Some</span>(hz <span class="tok-kw">as</span> u32), <span class="tok-str">&quot;{hz}&quot;</span>);</span>
-<span class="ln" id="L385">            assert_eq!(pace.<span class="tok-fn">target_hz</span>(), hz <span class="tok-kw">as</span> u32);</span>
-<span class="ln" id="L386">        }</span>
-<span class="ln" id="L387">    }</span>
-<span class="ln" id="L388"></span>
-<span class="ln" id="L389">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L390">    <span class="tok-kw">fn</span> <span class="tok-fn">one_slow_frame_does_not_move_the_measurement</span>() {</span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
-<span class="ln" id="L392">        <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">144.0</span>, WINDOW);</span>
-<span class="ln" id="L393">        <span class="tok-kw">let</span> t = WINDOW <span class="tok-kw">as</span> f64 / <span class="tok-num">144.0</span>;</span>
-<span class="ln" id="L394">        ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
-<span class="ln" id="L395">        pace.<span class="tok-fn">frame</span>(t + <span class="tok-num">0.2</span>);</span>
-<span class="ln" id="L396">        assert_eq!(pace.<span class="tok-fn">display_hz</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">144</span>));</span>
-<span class="ln" id="L397">        assert_eq!(pace.<span class="tok-fn">dropped_total</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;the slow frame is a dropped one&quot;</span>);</span>
-<span class="ln" id="L398">    }</span>
-<span class="ln" id="L399"></span>
-<span class="ln" id="L400">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L401">    <span class="tok-kw">fn</span> <span class="tok-fn">a_fixed_target_paces_by_its_own_interval_and_measures_nothing</span>() {</span>
-<span class="ln" id="L402">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">30</span>));</span>
-<span class="ln" id="L403">        assert_eq!(pace.<span class="tok-fn">interval</span>(), <span class="tok-fn">Some</span>(Duration::<span class="tok-fn">from_micros</span>(<span class="tok-num">33_333</span>)));</span>
-<span class="ln" id="L404">        <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">30.0</span>, WINDOW + <span class="tok-num">2</span>);</span>
-<span class="ln" id="L405">        assert_eq!(pace.<span class="tok-fn">display_hz</span>(), None, <span class="tok-str">&quot;a timer is not a display&quot;</span>);</span>
-<span class="ln" id="L406">        assert_eq!(pace.<span class="tok-fn">target_hz</span>(), <span class="tok-num">30</span>);</span>
-<span class="ln" id="L407">        assert_eq!(pace.<span class="tok-fn">dropped_total</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L408">    }</span>
-<span class="ln" id="L409"></span>
-<span class="ln" id="L410">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L411">    <span class="tok-kw">fn</span> <span class="tok-fn">the_setting_round_trips_and_is_clamped</span>() {</span>
-<span class="ln" id="L412">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">0</span>), Target::Display);</span>
-<span class="ln" id="L413">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">144</span>), Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">144</span>));</span>
-<span class="ln" id="L414">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">1</span>), Target::<span class="tok-fn">Fixed</span>(DISPLAY_FLOOR));</span>
-<span class="ln" id="L415">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">1000</span>), Target::<span class="tok-fn">Fixed</span>(DISPLAY_CEILING));</span>
-<span class="ln" id="L416">        <span class="tok-kw">for</span> hz <span class="tok-kw">in</span> TARGETS {</span>
-<span class="ln" id="L417">            assert_eq!(Target::<span class="tok-fn">from_setting</span>(*hz).<span class="tok-fn">to_setting</span>(), *hz);</span>
-<span class="ln" id="L418">        }</span>
-<span class="ln" id="L419">        assert_eq!(Target::Display.<span class="tok-fn">to_setting</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L420">    }</span>
-<span class="ln" id="L421"></span>
-<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">idle_gaps_are_not_dropped_frames</span>() {</span>
-<span class="ln" id="L424">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
-<span class="ln" id="L425">        <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">60.0</span>, <span class="tok-num">8</span>);</span>
-<span class="ln" id="L426">        <span class="tok-com">// The window sat idle for a while, then drew because the mouse moved.</span></span>
-<span class="ln" id="L427">        <span class="tok-fn">idle_frame</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">30.0</span>);</span>
-<span class="ln" id="L428">        assert_eq!(pace.<span class="tok-fn">dropped_total</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L357"></span>
+<span class="src-item" id="fn-pace-interval">
+<span class="ln" id="L358">    <span class="tok-com">/// The interval animations currently pace by, for tests and the About</span></span>
+<span class="ln" id="L359">    <span class="tok-com">/// tab. `None` is &quot;vsync decides&quot;.</span></span>
+<span class="ln" id="L360">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">interval</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;Duration&gt; {</span>
+<span class="ln" id="L361">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.target {</span>
+<span class="ln" id="L362">            Target::Display =&gt; None,</span>
+<span class="ln" id="L363">            Target::<span class="tok-fn">Fixed</span>(hz) =&gt; <span class="tok-fn">Some</span>(Duration::<span class="tok-fn">from_micros</span>(<span class="tok-num">1_000_000</span> / u64::<span class="tok-fn">from</span>(hz.<span class="tok-fn">max</span>(<span class="tok-num">1</span>)))),</span>
+<span class="ln" id="L364">        }</span>
+<span class="ln" id="L365">    }</span>
+</span>
+<span class="ln" id="L366">}</span>
+<span class="ln" id="L367"></span>
+<span class="ln" id="L368"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L369"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L370">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L371"></span>
+<span class="ln" id="L372">    <span class="tok-com">/// Frames an animation asked for, at `hz`.</span></span>
+<span class="ln" id="L373">    <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(pace: &amp;<span class="tok-kw">mut</span> Pace, hz: f64, frames: usize) {</span>
+<span class="ln" id="L374">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> t = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L375">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..frames {</span>
+<span class="ln" id="L376">            ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
+<span class="ln" id="L377">            pace.<span class="tok-fn">frame</span>(t);</span>
+<span class="ln" id="L378">            t += <span class="tok-num">1.0</span> / hz;</span>
+<span class="ln" id="L379">        }</span>
+<span class="ln" id="L380">    }</span>
+<span class="ln" id="L381"></span>
+<span class="ln" id="L382">    <span class="tok-com">/// One frame nothing asked for: somebody moved the mouse.</span></span>
+<span class="ln" id="L383">    <span class="tok-kw">fn</span> <span class="tok-fn">idle_frame</span>(pace: &amp;<span class="tok-kw">mut</span> Pace, t: f64) {</span>
+<span class="ln" id="L384">        ANIMATING.<span class="tok-fn">store</span>(false, Ordering::Relaxed);</span>
+<span class="ln" id="L385">        pace.<span class="tok-fn">frame</span>(t);</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L389">    <span class="tok-kw">fn</span> <span class="tok-fn">the_display_is_measured_from_the_frames_it_paced</span>() {</span>
+<span class="ln" id="L390">        <span class="tok-kw">for</span> hz <span class="tok-kw">in</span> [<span class="tok-num">60.0</span>, <span class="tok-num">120.0</span>, <span class="tok-num">144.0</span>, <span class="tok-num">165.0</span>, <span class="tok-num">240.0</span>] {</span>
+<span class="ln" id="L391">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
+<span class="ln" id="L392">            <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, hz, WINDOW + <span class="tok-num">2</span>);</span>
+<span class="ln" id="L393">            assert_eq!(pace.<span class="tok-fn">display_hz</span>(), <span class="tok-fn">Some</span>(hz <span class="tok-kw">as</span> u32), <span class="tok-str">&quot;{hz}&quot;</span>);</span>
+<span class="ln" id="L394">            assert_eq!(pace.<span class="tok-fn">target_hz</span>(), hz <span class="tok-kw">as</span> u32);</span>
+<span class="ln" id="L395">        }</span>
+<span class="ln" id="L396">    }</span>
+<span class="ln" id="L397"></span>
+<span class="ln" id="L398">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L399">    <span class="tok-kw">fn</span> <span class="tok-fn">one_slow_frame_does_not_move_the_measurement</span>() {</span>
+<span class="ln" id="L400">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
+<span class="ln" id="L401">        <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">144.0</span>, WINDOW);</span>
+<span class="ln" id="L402">        <span class="tok-kw">let</span> t = WINDOW <span class="tok-kw">as</span> f64 / <span class="tok-num">144.0</span>;</span>
+<span class="ln" id="L403">        ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
+<span class="ln" id="L404">        pace.<span class="tok-fn">frame</span>(t + <span class="tok-num">0.2</span>);</span>
+<span class="ln" id="L405">        assert_eq!(pace.<span class="tok-fn">display_hz</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">144</span>));</span>
+<span class="ln" id="L406">        assert_eq!(pace.<span class="tok-fn">dropped_total</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;the slow frame is a dropped one&quot;</span>);</span>
+<span class="ln" id="L407">    }</span>
+<span class="ln" id="L408"></span>
+<span class="ln" id="L409">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L410">    <span class="tok-kw">fn</span> <span class="tok-fn">a_fixed_target_paces_by_its_own_interval_and_measures_nothing</span>() {</span>
+<span class="ln" id="L411">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">30</span>));</span>
+<span class="ln" id="L412">        assert_eq!(pace.<span class="tok-fn">interval</span>(), <span class="tok-fn">Some</span>(Duration::<span class="tok-fn">from_micros</span>(<span class="tok-num">33_333</span>)));</span>
+<span class="ln" id="L413">        <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">30.0</span>, WINDOW + <span class="tok-num">2</span>);</span>
+<span class="ln" id="L414">        assert_eq!(pace.<span class="tok-fn">display_hz</span>(), None, <span class="tok-str">&quot;a timer is not a display&quot;</span>);</span>
+<span class="ln" id="L415">        assert_eq!(pace.<span class="tok-fn">target_hz</span>(), <span class="tok-num">30</span>);</span>
+<span class="ln" id="L416">        assert_eq!(pace.<span class="tok-fn">dropped_total</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L417">    }</span>
+<span class="ln" id="L418"></span>
+<span class="ln" id="L419">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">the_setting_round_trips_and_is_clamped</span>() {</span>
+<span class="ln" id="L421">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">0</span>), Target::Display);</span>
+<span class="ln" id="L422">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">144</span>), Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">144</span>));</span>
+<span class="ln" id="L423">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">1</span>), Target::<span class="tok-fn">Fixed</span>(DISPLAY_FLOOR));</span>
+<span class="ln" id="L424">        assert_eq!(Target::<span class="tok-fn">from_setting</span>(<span class="tok-num">1000</span>), Target::<span class="tok-fn">Fixed</span>(DISPLAY_CEILING));</span>
+<span class="ln" id="L425">        <span class="tok-kw">for</span> hz <span class="tok-kw">in</span> TARGETS {</span>
+<span class="ln" id="L426">            assert_eq!(Target::<span class="tok-fn">from_setting</span>(*hz).<span class="tok-fn">to_setting</span>(), *hz);</span>
+<span class="ln" id="L427">        }</span>
+<span class="ln" id="L428">        assert_eq!(Target::Display.<span class="tok-fn">to_setting</span>(), <span class="tok-num">0</span>);</span>
 <span class="ln" id="L429">    }</span>
 <span class="ln" id="L430"></span>
 <span class="ln" id="L431">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L432">    <span class="tok-kw">fn</span> <span class="tok-fn">a_second_of_late_frames_is_worth_saying</span>() {</span>
-<span class="ln" id="L433">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">60</span>));</span>
-<span class="ln" id="L434">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> t = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L435">        <span class="tok-com">// Every frame at half the rate asked for, for more than two seconds:</span></span>
-<span class="ln" id="L436">        <span class="tok-com">// one bad second is a hitch and deliberately does not raise this.</span></span>
-<span class="ln" id="L437">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">70</span> {</span>
-<span class="ln" id="L438">            ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
-<span class="ln" id="L439">            pace.<span class="tok-fn">frame</span>(t);</span>
-<span class="ln" id="L440">            t += <span class="tok-num">1.0</span> / <span class="tok-num">30.0</span>;</span>
-<span class="ln" id="L441">        }</span>
-<span class="ln" id="L442">        assert!(pace.<span class="tok-fn">dropped_last_second</span>() &gt; NOTICE_AT);</span>
-<span class="ln" id="L443">        assert!(</span>
-<span class="ln" id="L444">            pace.<span class="tok-fn">is_dropping</span>(),</span>
-<span class="ln" id="L445">            <span class="tok-str">&quot;two seconds of late frames is worth saying&quot;</span></span>
-<span class="ln" id="L446">        );</span>
-<span class="ln" id="L447">        assert!((pace.<span class="tok-fn">fps</span>() - <span class="tok-num">30.0</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">2.0</span>, <span class="tok-str">&quot;{}&quot;</span>, pace.<span class="tok-fn">fps</span>());</span>
-<span class="ln" id="L448">    }</span>
-<span class="ln" id="L449"></span>
-<span class="ln" id="L450">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L451">    <span class="tok-kw">fn</span> <span class="tok-fn">one_bad_second_at_launch_is_not_an_alarm</span>() {</span>
-<span class="ln" id="L452">        <span class="tok-com">// Opening a window costs a hitch. One second of it must not tell</span></span>
-<span class="ln" id="L453">        <span class="tok-com">// somebody their machine is struggling.</span></span>
-<span class="ln" id="L454">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">60</span>));</span>
-<span class="ln" id="L455">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> t = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L456">        <span class="tok-com">// One whole second of late frames and a little more, which is what a</span></span>
-<span class="ln" id="L457">        <span class="tok-com">// launch looks like.</span></span>
-<span class="ln" id="L458">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">40</span> {</span>
-<span class="ln" id="L459">            ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
-<span class="ln" id="L460">            pace.<span class="tok-fn">frame</span>(t);</span>
-<span class="ln" id="L461">            t += <span class="tok-num">1.0</span> / <span class="tok-num">30.0</span>;</span>
-<span class="ln" id="L462">        }</span>
-<span class="ln" id="L463">        assert!(</span>
-<span class="ln" id="L464">            pace.<span class="tok-fn">dropped_last_second</span>() &gt; NOTICE_AT,</span>
-<span class="ln" id="L465">            <span class="tok-str">&quot;the second did drop frames&quot;</span></span>
-<span class="ln" id="L466">        );</span>
-<span class="ln" id="L467">        assert_eq!(pace.<span class="tok-fn">dropping_seconds</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L468">        assert!(!pace.<span class="tok-fn">is_dropping</span>(), <span class="tok-str">&quot;one second is a hitch, not a struggle&quot;</span>);</span>
-<span class="ln" id="L469">    }</span>
-<span class="ln" id="L470"></span>
-<span class="ln" id="L471">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L472">    <span class="tok-kw">fn</span> <span class="tok-fn">the_published_interval_follows_the_target</span>() {</span>
-<span class="ln" id="L473">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
-<span class="ln" id="L474">        assert_eq!(INTERVAL_MICROS.<span class="tok-fn">load</span>(Ordering::Relaxed), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L475">        pace.<span class="tok-fn">set_target</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">120</span>));</span>
-<span class="ln" id="L476">        assert_eq!(INTERVAL_MICROS.<span class="tok-fn">load</span>(Ordering::Relaxed), <span class="tok-num">8_333</span>);</span>
-<span class="ln" id="L477">        pace.<span class="tok-fn">set_target</span>(Target::Display);</span>
-<span class="ln" id="L478">        assert_eq!(INTERVAL_MICROS.<span class="tok-fn">load</span>(Ordering::Relaxed), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L479">    }</span>
-<span class="ln" id="L480">}</span>
+<span class="ln" id="L432">    <span class="tok-kw">fn</span> <span class="tok-fn">idle_gaps_are_not_dropped_frames</span>() {</span>
+<span class="ln" id="L433">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
+<span class="ln" id="L434">        <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">60.0</span>, <span class="tok-num">8</span>);</span>
+<span class="ln" id="L435">        <span class="tok-com">// The window sat idle for a while, then drew because the mouse moved.</span></span>
+<span class="ln" id="L436">        <span class="tok-fn">idle_frame</span>(&amp;<span class="tok-kw">mut</span> pace, <span class="tok-num">30.0</span>);</span>
+<span class="ln" id="L437">        assert_eq!(pace.<span class="tok-fn">dropped_total</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L438">    }</span>
+<span class="ln" id="L439"></span>
+<span class="ln" id="L440">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">a_second_of_late_frames_is_worth_saying</span>() {</span>
+<span class="ln" id="L442">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">60</span>));</span>
+<span class="ln" id="L443">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> t = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L444">        <span class="tok-com">// Every frame at half the rate asked for, for more than two seconds:</span></span>
+<span class="ln" id="L445">        <span class="tok-com">// one bad second is a hitch and deliberately does not raise this.</span></span>
+<span class="ln" id="L446">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">70</span> {</span>
+<span class="ln" id="L447">            ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
+<span class="ln" id="L448">            pace.<span class="tok-fn">frame</span>(t);</span>
+<span class="ln" id="L449">            t += <span class="tok-num">1.0</span> / <span class="tok-num">30.0</span>;</span>
+<span class="ln" id="L450">        }</span>
+<span class="ln" id="L451">        assert!(pace.<span class="tok-fn">dropped_last_second</span>() &gt; NOTICE_AT);</span>
+<span class="ln" id="L452">        assert!(</span>
+<span class="ln" id="L453">            pace.<span class="tok-fn">is_dropping</span>(),</span>
+<span class="ln" id="L454">            <span class="tok-str">&quot;two seconds of late frames is worth saying&quot;</span></span>
+<span class="ln" id="L455">        );</span>
+<span class="ln" id="L456">        assert!((pace.<span class="tok-fn">fps</span>() - <span class="tok-num">30.0</span>).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">2.0</span>, <span class="tok-str">&quot;{}&quot;</span>, pace.<span class="tok-fn">fps</span>());</span>
+<span class="ln" id="L457">    }</span>
+<span class="ln" id="L458"></span>
+<span class="ln" id="L459">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L460">    <span class="tok-kw">fn</span> <span class="tok-fn">one_bad_second_at_launch_is_not_an_alarm</span>() {</span>
+<span class="ln" id="L461">        <span class="tok-com">// Opening a window costs a hitch. One second of it must not tell</span></span>
+<span class="ln" id="L462">        <span class="tok-com">// somebody their machine is struggling.</span></span>
+<span class="ln" id="L463">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">60</span>));</span>
+<span class="ln" id="L464">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> t = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L465">        <span class="tok-com">// One whole second of late frames and a little more, which is what a</span></span>
+<span class="ln" id="L466">        <span class="tok-com">// launch looks like.</span></span>
+<span class="ln" id="L467">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">40</span> {</span>
+<span class="ln" id="L468">            ANIMATING.<span class="tok-fn">store</span>(true, Ordering::Relaxed);</span>
+<span class="ln" id="L469">            pace.<span class="tok-fn">frame</span>(t);</span>
+<span class="ln" id="L470">            t += <span class="tok-num">1.0</span> / <span class="tok-num">30.0</span>;</span>
+<span class="ln" id="L471">        }</span>
+<span class="ln" id="L472">        assert!(</span>
+<span class="ln" id="L473">            pace.<span class="tok-fn">dropped_last_second</span>() &gt; NOTICE_AT,</span>
+<span class="ln" id="L474">            <span class="tok-str">&quot;the second did drop frames&quot;</span></span>
+<span class="ln" id="L475">        );</span>
+<span class="ln" id="L476">        assert_eq!(pace.<span class="tok-fn">dropping_seconds</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L477">        assert!(!pace.<span class="tok-fn">is_dropping</span>(), <span class="tok-str">&quot;one second is a hitch, not a struggle&quot;</span>);</span>
+<span class="ln" id="L478">    }</span>
+<span class="ln" id="L479"></span>
+<span class="ln" id="L480">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L481">    <span class="tok-kw">fn</span> <span class="tok-fn">the_published_interval_follows_the_target</span>() {</span>
+<span class="ln" id="L482">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pace = Pace::<span class="tok-fn">new</span>(Target::Display);</span>
+<span class="ln" id="L483">        assert_eq!(INTERVAL_MICROS.<span class="tok-fn">load</span>(Ordering::Relaxed), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L484">        pace.<span class="tok-fn">set_target</span>(Target::<span class="tok-fn">Fixed</span>(<span class="tok-num">120</span>));</span>
+<span class="ln" id="L485">        assert_eq!(INTERVAL_MICROS.<span class="tok-fn">load</span>(Ordering::Relaxed), <span class="tok-num">8_333</span>);</span>
+<span class="ln" id="L486">        pace.<span class="tok-fn">set_target</span>(Target::Display);</span>
+<span class="ln" id="L487">        assert_eq!(INTERVAL_MICROS.<span class="tok-fn">load</span>(Ordering::Relaxed), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L488">    }</span>
+<span class="ln" id="L489">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -325,11 +325,20 @@ impl Pace {
 
     /// The display's rate from the median interval, clamped to sense.
     fn median_hz(&self) -> u32 {
-        // A copy on the stack: the ring must not be reordered, and sorting a
-        // fixed array allocates nothing.
-        let mut sorted = self.intervals;
-        sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-        let median = sorted[WINDOW / 2];
+        // A copy on the stack: the ring must not be reordered.
+        //
+        // `select_nth_unstable_by` rather than a sort, and that is not a
+        // micro-optimisation, it is the difference between allocating and
+        // not. The stable `sort_by` takes a scratch buffer for a slice this
+        // long, which would put an allocation in a function this file's own
+        // notes promise does not allocate; the unstable selection is in
+        // place and only has to get the middle element right, which is all a
+        // median needs.
+        let mut window = self.intervals;
+        let (_, median, _) = window.select_nth_unstable_by(WINDOW / 2, |a, b| {
+            a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+        });
+        let median = *median;
         if !median.is_finite() || median <= 0.0 {
             return ASSUMED;
         }
