@@ -182,6 +182,13 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>The generator that already takes those numbers now writes the sentences from them too, using the same patterns the suite checks with, so the tool that writes a claim and the check that reads it cannot disagree about where the claim is. The check is unchanged and still runs.</li>
 <li>Nothing a reader sees is different, and that is the point: the numbers were right before and are right now without anybody having to remember them.</li>
 </ul>
+<p><strong>The undefined-behaviour checker can now look at the cryptography</strong></p>
+<ul>
+<li>VeilVoice keeps every key and passphrase in a type that locks its pages out of swap, so the operating system cannot write them to disk. That lock is made with a system call the interpreter used to check for undefined behaviour cannot make, so the first key any test created stopped the check dead, and the part of the program that does the encrypting was the one part that could not be checked this way at all.</li>
+<li>The lock is now skipped when running under that interpreter, which is the same thing that already happens on a machine with no budget for it or a platform without the call. The program reports honestly that the pages are not locked, and nothing about what it stores or wipes changes. Ordinary runs are untouched and still lock.</li>
+<li>The checker then read the reversible encodings, the authenticated encryption, the protected-memory type itself, the chunked store, the file shredder and the private-file helper, and found nothing wrong in any of them.</li>
+<li>Two tests keep it that way: one fails if the lock is ever taken outside the one place that knows about this, and one proves a secret holds and wipes the same bytes whether the lock happened or not.</li>
+</ul>
 <p><strong>Code that nothing reached, taken out, and a check so it cannot come back</strong></p>
 <ul>
 <li>Five public items were compiled into every binary on every platform, documented, published into the generated reference and the wiki, and called by nothing: not by the programs, not by a test, not by anything. Each had been superseded by a path that does the same job, and none of them was wrong, which is why nobody had noticed.</li>
