@@ -285,6 +285,30 @@ function nothing called and watching it name the file and line.
 worth exactly nothing next to the sweep that answers it for all 1631 at once,
 and the sweep is the part that is now repeatable.
 
+### F-184: the site proved its own ownership on nine pages out of fourteen
+
+Search Console verifies that somebody owns a site by fetching a page and
+looking for one meta tag. The tag was added this round and recorded as being in
+the head of every page. It was on nine of the fourteen hand-written pages and
+on none of the 383 generated ones: `404.html`, `search.html`, `wiki.html` and
+both editions of the JavaScript-free site did not carry it, and neither did the
+whole generated reference.
+
+**Why that is a defect rather than an untidiness.** Which URL a crawler fetches
+is not this project's decision. An ownership proof that holds on the home page
+and not on the page somebody actually asked about fails in the one way that is
+hardest to diagnose from outside: nothing is broken, nothing is logged, the tag
+simply is not there. The claim in the notes that it was on every page was also
+not true, and this document's standing rule is that no part of this repository
+may say something that is not.
+
+The two generators now emit it, the four remaining hand-written pages carry it,
+and `tools/site-tests/html.test.js` checks that **all 397 pages have it and
+that every one of them names the same token**. The second half matters as much
+as the first: one property has one token, and two different tokens across a
+site is the failure mode where verification works until the day somebody opens
+the wrong page.
+
 ### F-183: the crate the whole program's security rests on could not be checked for undefined behaviour
 
 Miri interprets a program and reports undefined behaviour. It was run here for
@@ -375,6 +399,7 @@ having looked.
 | the deterministic parser campaigns | yes | yes | clean |
 | **mutation testing** | no | not yet (marker 151) | **fifteen survivors; F-180** |
 | **a public item reached by nothing** | no | **now** | **five; F-182** |
+| **every page proves the site's ownership** | no | **now** | **five pages and the whole generated reference had no tag; F-184** |
 | a state file written one place and read another | by hand | **now** | nothing |
 | the per-program guides against the user guide | by hand | **now** | nothing |
 | the questions page against `docs/FAQ.md` | by hand | **now** | nothing |
@@ -7116,7 +7141,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-three defects found and fixed (F-1 to F-183), across
+**One hundred and eighty-four defects found and fixed (F-1 to F-184), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
