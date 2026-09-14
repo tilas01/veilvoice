@@ -919,8 +919,8 @@
 <span class="ln" id="L828">    <span class="tok-com">/// seen on somebody&#x27;s desktop, mid-install.</span></span>
 <span class="ln" id="L829">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(setup: &amp;<span class="tok-kw">mut</span> Setup, motion: <span class="tok-kw">crate</span>::prefs::Motion) {</span>
 <span class="ln" id="L830">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L831">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L832">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| setup.<span class="tok-fn">tab</span>(ui, motion));</span>
+<span class="ln" id="L831">        <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
+<span class="ln" id="L832">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| setup.<span class="tok-fn">tab</span>(ui, motion));</span>
 <span class="ln" id="L833">        });</span>
 <span class="ln" id="L834">    }</span>
 <span class="ln" id="L835"></span>

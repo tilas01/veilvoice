@@ -223,6 +223,26 @@ impl Settings {
         self.persist();
     }
 
+    /// How often the window draws while something in it is moving.
+    pub fn frame_target(&self) -> crate::pace::Target {
+        crate::pace::Target::from_setting(self.prefs.frame_rate)
+    }
+
+    /// Record a new frame-rate target.
+    pub fn set_frame_target(&mut self, target: crate::pace::Target) {
+        let value = target.to_setting();
+        if self.prefs.frame_rate == value {
+            return;
+        }
+        self.prefs.frame_rate = value;
+        self.persist();
+    }
+
+    /// Whether the header carries a live frame-rate readout.
+    pub fn show_frame_rate(&self) -> bool {
+        self.prefs.show_frame_rate
+    }
+
     /// Whether the app should open in group mode.
     pub fn always_group(&self) -> bool {
         self.prefs.always_group
@@ -767,10 +787,14 @@ impl Settings {
     /// room and belong on the page. Two controls for one setting is worth it
     /// here: the header is where the website puts this, and a reader who has
     /// used the site looks in the same place.
-    pub fn theme_picker(&mut self, ui: &mut Ui, ctx: &egui::Context) {
+    ///
+    /// Returns the picker's own rectangle. The controls beside it in the
+    /// header take their height from it rather than working one out
+    /// separately, which is what left them a pixel apart (finding F-178).
+    pub fn theme_picker(&mut self, ui: &mut Ui, ctx: &egui::Context) -> egui::Rect {
         let current = crate::theme::active();
         let mut chosen = None;
-        egui::ComboBox::from_id_salt("header-theme")
+        let picker = egui::ComboBox::from_id_salt("header-theme")
             .selected_text(RichText::new(current.name).small())
             .width(132.0)
             .show_ui(ui, |ui| {
@@ -789,6 +813,7 @@ impl Settings {
                 self.persist();
             }
         }
+        picker.response.rect
     }
 
     fn appearance_page(&mut self, ui: &mut Ui, ctx: &egui::Context) {
@@ -872,6 +897,67 @@ impl Settings {
                 ui.input(|i| i.time) as f32,
             );
         });
+
+        ui.add_space(18.0);
+        section(
+            ui,
+            "How often it draws",
+            "While something is moving. An idle window still draws nothing at all.",
+        );
+
+        let mut target = self.frame_target();
+        egui::ComboBox::from_id_salt("frame-rate")
+            .selected_text(target.label())
+            .width(200.0)
+            .show_ui(ui, |ui| {
+                if ui
+                    .selectable_label(
+                        target == crate::pace::Target::Display,
+                        crate::pace::Target::Display.label(),
+                    )
+                    .clicked()
+                {
+                    target = crate::pace::Target::Display;
+                }
+                for hz in crate::pace::TARGETS {
+                    let choice = crate::pace::Target::Fixed(*hz);
+                    if ui
+                        .selectable_label(target == choice, choice.label())
+                        .clicked()
+                    {
+                        target = choice;
+                    }
+                }
+            });
+        if target != self.frame_target() {
+            self.set_frame_target(target);
+        }
+        ui.label(
+            RichText::new(
+                "  Matching the display is the default and is what looks right: the \
+                 window waits for the screen either way, so asking for fewer frames \
+                 than it shows is a choice to make for a battery rather than for \
+                 smoothness.",
+            )
+            .small()
+            .color(p::muted()),
+        );
+
+        ui.add_space(10.0);
+        changed |= ui
+            .checkbox(
+                &mut self.prefs.show_frame_rate,
+                "Show the frame rate in the header",
+            )
+            .changed();
+        ui.label(
+            RichText::new(
+                "  The rate as drawn, and a count of frames that arrived late. The \
+                 About tab carries the same numbers without this being on.",
+            )
+            .small()
+            .color(p::muted()),
+        );
 
         // If the system has asked for reduced motion, say so. Otherwise the
         // toggle looks broken: it is ticked and nothing moves.
@@ -1108,8 +1194,11 @@ mod tests {
     /// Drive the settings tab once, with no window.
     fn render(settings: &mut Settings) {
         let ctx = egui::Context::default();
-        let _ = ctx.run(Default::default(), |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| settings.tab(ui, ctx));
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                let ctx = ui.ctx().clone();
+                settings.tab(ui, &ctx)
+            });
         });
     }
 
@@ -1126,8 +1215,8 @@ mod tests {
     fn the_first_run_appearance_choices_render() {
         let mut settings = Settings::default();
         let ctx = egui::Context::default();
-        let _ = ctx.run(Default::default(), |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| settings.first_run_appearance(ui));
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| settings.first_run_appearance(ui));
         });
     }
 
@@ -1292,6 +1381,8 @@ mod tests {
                 autolock_after: 15 * 60,
                 autolock_floor: crate::autolock::FLOOR_SECS,
                 autolock_ceiling: crate::autolock::CEILING_SECS,
+                frame_rate: 0,
+                show_frame_rate: false,
                 recovered_from_corrupt_file: false,
             },
             page: Page::Storage,

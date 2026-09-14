@@ -18,6 +18,16 @@ subtle = "2"
 # see the `amnesia` module for why and how it is contained.
 region = "3"
 # --- key derivation ---
+#
+# The RustCrypto crates below are held on the generation `pgp` 0.20 uses
+# (`sha2` 0.10, `hkdf` 0.12, `argon2` 0.5, `x25519-dalek` 2, `rand_core` 0.6)
+# rather than moved to the current one. `pgp` is the release-signature
+# verifier and pins that generation; taking the newer one here would compile
+# two copies of every primitive into both binaries, which is the one thing
+# `deny.toml` exists to notice. None of the newer versions fixes a
+# vulnerability: they are API generations, and `cargo audit` is clean on this
+# one. The whole line moves together the day `pgp` moves, or the day the
+# signature check stops needing it (marker 149).
 argon2 = "0.5"
 # Deriving the separate keys each container, lock and vault uses from one
 # secret, with a distinct info string for each.

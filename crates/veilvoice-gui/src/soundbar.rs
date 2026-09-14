@@ -51,9 +51,11 @@
 //! - **Not while the window is being moved or resized.** Detected from the
 //!   window's own rectangle changing between frames, and resumed a quarter of
 //!   a second after it stops. This is the drag case specifically.
-//! - **Not faster than [`FRAMES_PER_SECOND`].** The cycle is 1.9 seconds long
-//!   and eased; twenty frames a second is indistinguishable from thirty here,
-//!   and costs two thirds as much.
+//! - **Not faster than the window's frame target.** [`crate::pace`] owns that
+//!   number: the display's own rate by default, or whatever was chosen in
+//!   Settings. This module carried its own constant of twenty a second, which
+//!   made the mark the slowest-moving thing on any modern display and was the
+//!   judder people reported (finding F-179).
 //!
 //! Resting is not the same as resetting. Freezing at the midpoint would make
 //! every click into another window snap the row flat, so a paused mark holds
@@ -76,14 +78,6 @@ use egui::{Color32, CornerRadius, Rect, Sense, Ui, Vec2};
 
 /// Seconds for one full rise and fall. Matches the website's `1.9s`.
 const PERIOD: f32 = 1.9;
-
-/// How often the mark is redrawn while it is moving.
-///
-/// Twenty rather than the thirty it used to ask for. Over a 1.9 second eased
-/// cycle the two are not tellable apart, and every one of these frames is a
-/// redraw of the whole window, not of the 46 by 22 pixels that changed: egui
-/// has no partial repaint, so the cheapest frame is the one not drawn.
-pub const FRAMES_PER_SECOND: u64 = 20;
 
 /// How long the window must hold still before the mark starts moving again.
 ///
@@ -276,8 +270,7 @@ pub fn draw(ui: &mut Ui, size: Vec2, motion: Motion, time: f32) -> egui::Respons
     // going to look different next frame, and asking anyway is how a window
     // that appears to be doing nothing keeps a processor busy.
     if moving {
-        ui.ctx()
-            .request_repaint_after(std::time::Duration::from_millis(1000 / FRAMES_PER_SECOND));
+        crate::pace::next_frame(ui.ctx());
     }
 
     response
@@ -334,8 +327,8 @@ mod tests {
         motion: Motion,
         time: f32,
     ) -> Vec<u32> {
-        let output = ctx.run(input, |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| {
+        let output = crate::headless_frame(ctx, input, |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
                 draw(ui, egui::vec2(120.0, 40.0), motion, time);
             });
         });
@@ -355,8 +348,8 @@ mod tests {
         motion: Motion,
         time: f32,
     ) -> std::time::Duration {
-        let output = ctx.run(input, |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| {
+        let output = crate::headless_frame(ctx, input, |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
                 draw(ui, egui::vec2(120.0, 40.0), motion, time);
             });
         });
@@ -474,8 +467,8 @@ mod tests {
             let ctx = egui::Context::default();
             let mut delay = std::time::Duration::MAX;
             for _ in 0..4 {
-                let output = ctx.run(Default::default(), |ctx| {
-                    egui::CentralPanel::default().show(ctx, |ui| {
+                let output = crate::headless_frame(&ctx, Default::default(), |ui| {
+                    egui::CentralPanel::default().show(ui, |ui| {
                         draw(ui, egui::vec2(120.0, 32.0), motion, 1.0);
                     });
                 });
@@ -518,8 +511,8 @@ mod tests {
             egui::vec2(120.0, 32.0),
             egui::vec2(4000.0, 2.0),
         ] {
-            let _ = ctx.run(Default::default(), |ctx| {
-                egui::CentralPanel::default().show(ctx, |ui| {
+            let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
                     draw(ui, size, moving(), 3.0);
                 });
             });
@@ -671,15 +664,20 @@ mod tests {
             );
         }
         assert!(
-            delay <= std::time::Duration::from_millis(1000 / FRAMES_PER_SECOND + 10),
+            delay <= std::time::Duration::from_millis(1000 / u64::from(crate::pace::ASSUMED) + 10),
             "a platform reporting neither focus nor geometry stopped the mark: {delay:?}"
         );
     }
 
     #[test]
-    fn the_frame_rate_is_the_documented_one() {
+    fn the_mark_is_paced_by_the_window_and_not_by_a_number_of_its_own() {
         let ctx = egui::Context::default();
         let rect = SOMEWHERE();
+
+        // With the target on the display, the mark asks for the next frame
+        // now and vsync spaces it: what comes back is zero, or as near as
+        // egui's own one-frame subtraction allows.
+        crate::pace::Pace::new(crate::pace::Target::Display);
         let mut delay = std::time::Duration::MAX;
         for step in 0..6 {
             delay = soonest_after(
@@ -689,27 +687,42 @@ mod tests {
                 step as f32 * 0.2,
             );
         }
-        // What comes back is not what was asked for, and the difference is
-        // deliberate on egui's side: it subtracts one predicted frame from
-        // every delay so a repaint does not land late. So the reported figure
-        // is up to one frame short of the request, and a test comparing them
-        // for equality is asserting the frame rate of the machine it runs on.
-        let requested = std::time::Duration::from_millis(1000 / FRAMES_PER_SECOND);
+        assert_eq!(
+            delay,
+            std::time::Duration::ZERO,
+            "on the display's own rate the mark must not put a timer in the way"
+        );
+
+        // With a target chosen in Settings, the mark asks for that interval.
+        // What comes back is up to one frame short of it, deliberately on
+        // egui's side: it subtracts a predicted frame so a repaint does not
+        // land late. A test comparing them for equality would be asserting
+        // the frame rate of the machine it runs on.
+        crate::pace::Pace::new(crate::pace::Target::Fixed(30));
+        let ctx = egui::Context::default();
+        for step in 0..6 {
+            delay = soonest_after(
+                &ctx,
+                frame(Some(true), Some(rect), step as f64 * 0.2),
+                moving(),
+                step as f32 * 0.2,
+            );
+        }
+        let requested = std::time::Duration::from_millis(1000 / 30);
         let one_frame = std::time::Duration::from_millis(17);
         assert!(
             delay <= requested,
-            "asked to be repainted later than the rate this module documents: \
+            "asked to be repainted later than the chosen target: \
              {delay:?} against {requested:?}"
         );
         assert!(
             delay + one_frame >= requested,
-            "asked to be repainted far sooner than this module documents: \
+            "asked to be repainted far sooner than the chosen target: \
              {delay:?} against {requested:?}"
         );
-        // A constant, so the compiler settles it: the whole point of this
-        // change was to ask for fewer whole-window redraws than the thirty a
-        // second it used to.
-        const { assert!(FRAMES_PER_SECOND < 30) };
+
+        // And back, so a later test in this file does not inherit a timer.
+        crate::pace::Pace::new(crate::pace::Target::Display);
     }
 
     #[test]
@@ -748,8 +761,8 @@ mod tests {
 
     /// Render once and read the bar heights back out of the paint list.
     fn render_heights(ctx: &egui::Context, motion: Motion, time: f32) -> Vec<u32> {
-        let output = ctx.run(Default::default(), |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| {
+        let output = crate::headless_frame(ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
                 draw(ui, egui::vec2(120.0, 40.0), motion, time);
             });
         });

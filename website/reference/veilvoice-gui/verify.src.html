@@ -423,7 +423,7 @@
 <span class="ln" id="L337">                i.raw</span>
 <span class="ln" id="L338">                    .dropped_files</span>
 <span class="ln" id="L339">                    .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L340">                    .<span class="tok-fn">filter_map</span>(|f| f.path.<span class="tok-fn">clone</span>())</span>
+<span class="ln" id="L340">                    .<span class="tok-fn">map</span>(|f| f.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>())</span>
 <span class="ln" id="L341">                    .collect::&lt;Vec&lt;_&gt;&gt;(),</span>
 <span class="ln" id="L342">            )</span>
 <span class="ln" id="L343">        });</span>

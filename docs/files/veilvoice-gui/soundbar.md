@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/soundbar.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 766 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 779 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
 
 ## Contents
 
@@ -76,9 +76,11 @@ moving, and rests otherwise:
 - **Not while the window is being moved or resized.** Detected from the
 window's own rectangle changing between frames, and resumed a quarter of
 a second after it stops. This is the drag case specifically.
-- **Not faster than `FRAMES_PER_SECOND`.** The cycle is 1.9 seconds long
-and eased; twenty frames a second is indistinguishable from thirty here,
-and costs two thirds as much.
+- **Not faster than the window's frame target.** `crate::pace` owns that
+number: the display's own rate by default, or whatever was chosen in
+Settings. This module carried its own constant of twenty a second, which
+made the mark the slowest-moving thing on any modern display and was the
+judder people reported (finding F-179).
 
 Resting is not the same as resetting. Freezing at the midpoint would make
 every click into another window snap the row flat, so a paused mark holds
@@ -97,11 +99,11 @@ ignores it is animation that makes an application unusable for them.
 
 ## What this file contains
 
-766 lines defining **6 functions** (2 public), **0 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+779 lines defining **6 functions** (2 public), **0 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `badge` (line 202) -- Draw the mark at size, returning the response so it can carry a tooltip.
+- `badge` (line 196) -- Draw the mark at size, returning the response so it can carry a tooltip.
   - reaches: `draw`, `animation_clock`, `colour_for`, `height_fraction`, `window_is_settled`
 
 ## What calls what
@@ -124,23 +126,23 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_height_fraction["height_fraction<br/>line 109"]
-    n_window_is_settled["window_is_settled<br/>line 136"]
-    n_animation_clock["animation_clock<br/>line 174"]
-    n_badge(["badge<br/>line 202"])
-    n_draw["draw<br/>line 234"]
-    n_colour_for["colour_for<br/>line 288"]
+    n_height_fraction["height_fraction<br/>line 103"]
+    n_window_is_settled["window_is_settled<br/>line 130"]
+    n_animation_clock["animation_clock<br/>line 168"]
+    n_badge(["badge<br/>line 196"])
+    n_draw["draw<br/>line 228"]
+    n_colour_for["colour_for<br/>line 281"]
     n_badge --> n_draw
     n_draw --> n_animation_clock
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
     n_draw --> n_window_is_settled
-    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109" "open the source"
-    click n_window_is_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136" "open the source"
-    click n_animation_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174" "open the source"
-    click n_badge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L202" "open the source"
-    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L234" "open the source"
-    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L288" "open the source"
+    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L103" "open the source"
+    click n_window_is_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L130" "open the source"
+    click n_animation_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L168" "open the source"
+    click n_badge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L196" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L228" "open the source"
+    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L281" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_badge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -155,18 +157,17 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `PERIOD` <sub>const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L78) | Seconds for one full rise and fall. |
-| `FRAMES_PER_SECOND` <sub>pub const</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L86) | How often the mark is redrawn while it is moving. |
-| `SETTLE` <sub>const</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L94) | How long the window must hold still before the mark starts moving again. |
-| `DELAYS` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L99) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
-| `MIN_FRACTION` <sub>const</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L104) | Height as a fraction of the available box, matching 16% and 82%. |
-| `MAX_FRACTION` <sub>const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L105) |  |
-| `height_fraction` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
-| `window_is_settled` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136) | Whether the window is holding still enough for the mark to move. |
-| `animation_clock` <sub>fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174) | The clock the bars are drawn against, which is not always the real one. |
-| `badge` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L202) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `draw` <sub>pub fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L234) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `colour_for` <sub>fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L288) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
+| `PERIOD` <sub>const</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L80) | Seconds for one full rise and fall. |
+| `SETTLE` <sub>const</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L88) | How long the window must hold still before the mark starts moving again. |
+| `DELAYS` <sub>const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L93) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
+| `MIN_FRACTION` <sub>const</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L98) | Height as a fraction of the available box, matching 16% and 82%. |
+| `MAX_FRACTION` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L99) |  |
+| `height_fraction` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L103) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
+| `window_is_settled` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L130) | Whether the window is holding still enough for the mark to move. |
+| `animation_clock` <sub>fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L168) | The clock the bars are drawn against, which is not always the real one. |
+| `badge` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L196) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `draw` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L228) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `colour_for` <sub>fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L281) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
 
 ---
 

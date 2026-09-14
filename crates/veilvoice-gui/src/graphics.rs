@@ -112,14 +112,19 @@ pub fn asked_for(acceleration: bool) -> &'static str {
 pub fn options(viewport: egui::ViewportBuilder, acceleration: bool) -> eframe::NativeOptions {
     eframe::NativeOptions {
         viewport,
-        vsync: VSYNC,
         multisampling: MULTISAMPLING,
-        hardware_acceleration: if acceleration {
-            eframe::HardwareAcceleration::Preferred
-        } else {
-            eframe::HardwareAcceleration::Off
-        },
         renderer: eframe::Renderer::Glow,
+        // The two choices that belong to the OpenGL context live with it
+        // since eframe 0.36, where they used to sit on the options directly.
+        glow_options: eframe::egui_glow::GlowConfiguration {
+            vsync: VSYNC,
+            hardware_acceleration: if acceleration {
+                eframe::egui_glow::HardwareAcceleration::Preferred
+            } else {
+                eframe::egui_glow::HardwareAcceleration::Off
+            },
+            ..Default::default()
+        },
         ..Default::default()
     }
 }
@@ -133,8 +138,8 @@ mod tests {
         let options = options(egui::ViewportBuilder::default(), true);
         assert!(
             matches!(
-                options.hardware_acceleration,
-                eframe::HardwareAcceleration::Preferred
+                options.glow_options.hardware_acceleration,
+                eframe::egui_glow::HardwareAcceleration::Preferred
             ),
             "Required would refuse to open in a VM or over a remote desktop, \
              and Off would never use the GPU at all"
@@ -148,13 +153,13 @@ mod tests {
         // privacy tool that will not run is not more private.
         let off = options(egui::ViewportBuilder::default(), false);
         assert!(matches!(
-            off.hardware_acceleration,
-            eframe::HardwareAcceleration::Off
+            off.glow_options.hardware_acceleration,
+            eframe::egui_glow::HardwareAcceleration::Off
         ));
         let on = options(egui::ViewportBuilder::default(), true);
         assert!(matches!(
-            on.hardware_acceleration,
-            eframe::HardwareAcceleration::Preferred
+            on.glow_options.hardware_acceleration,
+            eframe::egui_glow::HardwareAcceleration::Preferred
         ));
     }
 
@@ -170,7 +175,10 @@ mod tests {
     #[test]
     fn frames_wait_for_the_display() {
         let options = options(egui::ViewportBuilder::default(), true);
-        assert!(options.vsync, "tearing while dragging is what VSYNC is for");
+        assert!(
+            options.glow_options.vsync,
+            "tearing while dragging is what VSYNC is for"
+        );
         assert_eq!(options.multisampling, MULTISAMPLING);
     }
 

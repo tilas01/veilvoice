@@ -24,13 +24,6 @@ ignore = [
     # away. Drops out when upstream crates migrate.
     "RUSTSEC-2024-0436",
 
-    # ttf-parser 0.25.1, transitive through egui's font rasteriser. It does
-    # parse untrusted input (font files), but the only fonts VeilVoice loads are
-    # egui's own embedded face and, optionally, a JetBrains Mono the user
-    # already installed system-wide. No attacker-supplied font ever reaches it.
-    # Revisit whenever egui updates its text stack.
-    "RUSTSEC-2026-0192",
-
     # --- category 2: a vulnerability, judged unreachable -------------------
     #
     # rsa 0.9.10 -- RUSTSEC-2023-0071, the Marvin attack: key recovery through
@@ -57,6 +50,13 @@ ignore = [
     # true, the build stops with it rather than this comment quietly ageing.
     "RUSTSEC-2023-0071",
 ]
+
+# `ttf-parser` was the third entry here, accepted on the ground that no
+# attacker-supplied font ever reaches it. It left the dependency graph with the
+# move to egui 0.36, which rasterises text without it, so the argument is not
+# needed rather than being weaker: the crate is gone. This note is the record
+# that the exception existed and why it stopped being one, since an entry that
+# simply disappears reads as one nobody re-read.
 
 # Unsound and yanked crates should still stop a release.
 informational_warnings = ["unsound", "notice"]

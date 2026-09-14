@@ -828,8 +828,8 @@ mod tests {
     /// seen on somebody's desktop, mid-install.
     fn render(setup: &mut Setup, motion: crate::prefs::Motion) {
         let ctx = egui::Context::default();
-        let _ = ctx.run(Default::default(), |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| setup.tab(ui, motion));
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| setup.tab(ui, motion));
         });
     }
 

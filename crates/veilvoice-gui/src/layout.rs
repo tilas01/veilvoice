@@ -174,8 +174,8 @@ mod tests {
         let mut lefts = Vec::new();
         let mut available = 0.0_f32;
         for _ in 0..2 {
-            let _ = ctx.run(input(width), |ctx| {
-                egui::CentralPanel::default().show(ctx, |ui| {
+            let _ = crate::headless_frame(&ctx, input(width), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
                     let origin = ui.min_rect().left();
                     available = ui.available_width();
                     let left = centred_row(ui, |ui| body(ui)).response.rect.left();
@@ -222,8 +222,8 @@ mod tests {
         let ctx = egui::Context::default();
         let mut gaps = (0.0_f32, 0.0_f32);
         for _ in 0..2 {
-            let _ = ctx.run(input(600.0), |ctx| {
-                egui::CentralPanel::default().show(ctx, |ui| {
+            let _ = crate::headless_frame(&ctx, input(600.0), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
                     let origin = ui.min_rect().left();
                     let room = ui.available_width();
                     let rect = centred_row(ui, |ui| {
@@ -266,8 +266,8 @@ mod tests {
         let ctx = egui::Context::default();
         let mut runs = 0_u32;
         for _ in 0..3 {
-            let _ = ctx.run(Default::default(), |ctx| {
-                egui::CentralPanel::default().show(ctx, |ui| {
+            let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
                     centred_row(ui, |ui| {
                         runs += 1;
                         ui.label("once");

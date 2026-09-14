@@ -53,12 +53,12 @@
 use crate::Error;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
-use symphonia::core::audio::SampleBuffer;
-use symphonia::core::codecs::DecoderOptions;
+use symphonia::core::codecs::audio::AudioDecoderOptions;
+use symphonia::core::codecs::CodecParameters;
+use symphonia::core::formats::probe::Hint;
 use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
-use symphonia::core::probe::Hint;
 
 /// The most decoded audio [`load`] will hold, in mono `f32` samples.
 ///
@@ -195,35 +195,43 @@ pub fn load(path: &Path) -> Result<Audio, Error> {
         hint.with_extension(ext);
     }
 
-    let probed = symphonia::default::get_probe()
-        .format(
+    let mut format = symphonia::default::get_probe()
+        .probe(
             &hint,
             stream,
-            &FormatOptions::default(),
-            &MetadataOptions::default(),
+            FormatOptions::default(),
+            MetadataOptions::default(),
         )
         .map_err(|e| Error::Decode(e.to_string()))?;
-    let mut format = probed.format;
 
-    let track = format
+    // The first track that is audio at all. A container can carry video and
+    // subtitle tracks ahead of the sound, and a track whose parameters the
+    // demuxer could not read carries none.
+    let (track_id, params) = format
         .tracks()
         .iter()
-        .find(|t| t.codec_params.codec != symphonia::core::codecs::CODEC_TYPE_NULL)
+        .find_map(|t| match &t.codec_params {
+            Some(CodecParameters::Audio(p)) => Some((t.id, p.clone())),
+            _ => None,
+        })
         .ok_or_else(|| Error::Decode("no decodable audio track".into()))?;
-    let track_id = track.id;
     let mut decoder = symphonia::default::get_codecs()
-        .make(&track.codec_params, &DecoderOptions::default())
+        .make_audio_decoder(&params, &AudioDecoderOptions::default())
         .map_err(|e| Error::Decode(e.to_string()))?;
 
     let mut samples = Vec::new();
-    let mut sample_rate = track.codec_params.sample_rate.unwrap_or(48_000);
-    let mut buffer: Option<SampleBuffer<f32>> = None;
+    let mut sample_rate = params.sample_rate.unwrap_or(48_000);
+    // Reused across packets: the decoder hands back a borrowed buffer in the
+    // codec's own sample format, and this is the one interleaved `f32` copy
+    // of it, sized by the first packet and never shrunk.
+    let mut interleaved: Vec<f32> = Vec::new();
 
     loop {
         let packet = match format.next_packet() {
-            Ok(p) => p,
-            // A clean end of stream, or a truncated file we have already read
-            // the useful part of.
+            Ok(Some(p)) => p,
+            // The end of the stream, said plainly.
+            Ok(None) => break,
+            // A truncated file we have already read the useful part of.
             Err(symphonia::core::errors::Error::IoError(e))
                 if e.kind() == std::io::ErrorKind::UnexpectedEof =>
             {
@@ -232,19 +240,16 @@ pub fn load(path: &Path) -> Result<Audio, Error> {
             Err(symphonia::core::errors::Error::ResetRequired) => break,
             Err(e) => return Err(Error::Decode(e.to_string())),
         };
-        if packet.track_id() != track_id {
+        if packet.track_id != track_id {
             continue;
         }
         match decoder.decode(&packet) {
             Ok(decoded) => {
-                let spec = *decoded.spec();
-                sample_rate = spec.rate;
-                let channels = spec.channels.count().max(1);
-                let buf = buffer.get_or_insert_with(|| {
-                    SampleBuffer::<f32>::new(decoded.capacity() as u64, spec)
-                });
-                buf.copy_interleaved_ref(decoded);
-                for frame in buf.samples().chunks(channels) {
+                let spec = decoded.spec();
+                sample_rate = spec.rate();
+                let channels = spec.channels().count().max(1);
+                decoded.copy_to_vec_interleaved(&mut interleaved);
+                for frame in interleaved.chunks(channels) {
                     // Bounded so a compressed file cannot expand into an
                     // allocation failure, which aborts rather than errors.
                     if samples.len() >= MAX_DECODED_SAMPLES {

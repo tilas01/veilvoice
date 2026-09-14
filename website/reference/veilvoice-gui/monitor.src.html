@@ -394,7 +394,7 @@
 <span class="ln" id="L316"><span class="tok-com">/// there is nothing to show, so the caller has one line rather than a</span></span>
 <span class="ln" id="L317"><span class="tok-com">/// condition it can get wrong in one place and not the other.</span></span>
 <span class="ln" id="L318"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">show</span>(</span>
-<span class="ln" id="L319">    ctx: &amp;egui::Context,</span>
+<span class="ln" id="L319">    root: &amp;<span class="tok-kw">mut</span> egui::Ui,</span>
 <span class="ln" id="L320">    style: Style,</span>
 <span class="ln" id="L321">    running: bool,</span>
 <span class="ln" id="L322">    preview: bool,</span>
@@ -406,7 +406,7 @@
 <span class="ln" id="L328">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> action = Action::None;</span>
 <span class="ln" id="L329">    <span class="tok-kw">match</span> style {</span>
 <span class="ln" id="L330">        Style::Toolbar =&gt; {</span>
-<span class="ln" id="L331">            egui::TopBottomPanel::<span class="tok-fn">bottom</span>(<span class="tok-str">&quot;live_monitor&quot;</span>).<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L331">            egui::Panel::<span class="tok-fn">bottom</span>(<span class="tok-str">&quot;live_monitor&quot;</span>).<span class="tok-fn">show</span>(root, |ui| {</span>
 <span class="ln" id="L332">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
 <span class="ln" id="L333">                action = <span class="tok-fn">row</span>(ui, levels, preview, true);</span>
 <span class="ln" id="L334">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
@@ -416,7 +416,7 @@
 <span class="ln" id="L338">            egui::Area::<span class="tok-fn">new</span>(egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;live_monitor_overlay&quot;</span>))</span>
 <span class="ln" id="L339">                .<span class="tok-fn">anchor</span>(egui::Align2::RIGHT_BOTTOM, egui::<span class="tok-fn">vec2</span>(-<span class="tok-num">16.0</span>, -<span class="tok-num">16.0</span>))</span>
 <span class="ln" id="L340">                .<span class="tok-fn">order</span>(egui::Order::Foreground)</span>
-<span class="ln" id="L341">                .<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L341">                .<span class="tok-fn">show</span>(root.<span class="tok-fn">ctx</span>(), |ui| {</span>
 <span class="ln" id="L342">                    egui::Frame::<span class="tok-fn">new</span>()</span>
 <span class="ln" id="L343">                        .<span class="tok-fn">fill</span>(p::<span class="tok-fn">surface</span>())</span>
 <span class="ln" id="L344">                        .<span class="tok-fn">stroke</span>(egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()))</span>

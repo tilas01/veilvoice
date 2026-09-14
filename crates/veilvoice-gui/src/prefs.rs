@@ -153,6 +153,12 @@ pub struct Prefs {
     /// which is on -- a settings file this build cannot parse must never be
     /// the reason the safety catch is off.
     pub failsafe: String,
+    /// Frames a second to aim for while something is moving. Zero means the
+    /// display's own rate, measured rather than asked for: see
+    /// [`crate::pace`].
+    pub frame_rate: u32,
+    /// Whether the header carries a live frame-rate readout.
+    pub show_frame_rate: bool,
     /// Set when the file on disk could not be understood, so the settings
     /// panel can say the defaults are in force and why. Never persisted.
     pub recovered_from_corrupt_file: bool,
@@ -186,6 +192,14 @@ impl Default for Prefs {
             // answered by a strip that is already on screen.
             live_monitor: crate::monitor::Style::default().key().to_string(),
             failsafe: veilvoice_failsafe::Posture::default().key().to_string(),
+            // The display's own rate. A number here would be a guess about
+            // somebody else's monitor, and the whole point of `pace` is that
+            // the window measures it instead.
+            frame_rate: 0,
+            // Off: a number that changes sixty times a second in the corner of
+            // a privacy tool is a distraction for everybody who is not
+            // diagnosing it.
+            show_frame_rate: false,
             recovered_from_corrupt_file: false,
         }
     }
@@ -327,6 +341,25 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "frame_rate" => {
+                    // Clamped on the way in, so a hand-edited file cannot ask
+                    // for one frame a second or ten thousand. Zero is the
+                    // display and is left alone.
+                    if let Ok(hz) = value.parse::<u32>() {
+                        prefs.frame_rate = if hz == 0 {
+                            0
+                        } else {
+                            hz.clamp(crate::pace::DISPLAY_FLOOR, crate::pace::DISPLAY_CEILING)
+                        };
+                        understood += 1;
+                    }
+                }
+                "show_frame_rate" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.show_frame_rate = on;
+                        understood += 1;
+                    }
+                }
                 "autolock_after" => {
                     if let Ok(secs) = value.parse() {
                         prefs.autolock_after = secs;
@@ -382,6 +415,8 @@ impl Prefs {
         out.push_str(&format!("notify_style = {}\n", self.notify_style));
         out.push_str(&format!("live_monitor = {}\n", self.live_monitor));
         out.push_str(&format!("failsafe = {}\n", self.failsafe));
+        out.push_str(&format!("frame_rate = {}\n", self.frame_rate));
+        out.push_str(&format!("show_frame_rate = {}\n", self.show_frame_rate));
         out
     }
 
@@ -502,10 +537,38 @@ mod tests {
             notify_style: "alert".to_string(),
             failsafe: "warn".to_string(),
             live_monitor: "toolbar".to_string(),
+            frame_rate: 144,
+            show_frame_rate: true,
             recovered_from_corrupt_file: false,
         };
         let back = Prefs::parse(&prefs.to_text());
         assert_eq!(back, prefs);
+    }
+
+    #[test]
+    fn a_hand_edited_frame_rate_is_clamped_and_zero_is_left_alone() {
+        // The file is plain text on purpose and says so, so somebody will
+        // edit it. One frame a second and ten thousand are both answers the
+        // window must not act on.
+        assert_eq!(
+            Prefs::parse("frame_rate = 1\n").frame_rate,
+            crate::pace::DISPLAY_FLOOR
+        );
+        assert_eq!(
+            Prefs::parse("frame_rate = 10000\n").frame_rate,
+            crate::pace::DISPLAY_CEILING
+        );
+        assert_eq!(
+            Prefs::parse("frame_rate = 0\n").frame_rate,
+            0,
+            "zero is the display"
+        );
+        assert_eq!(Prefs::parse("frame_rate = 144\n").frame_rate, 144);
+        // Nonsense leaves the default in place rather than being stored.
+        assert_eq!(
+            Prefs::parse("frame_rate = fast\n").frame_rate,
+            Prefs::default().frame_rate
+        );
     }
 
     #[test]
@@ -599,6 +662,8 @@ mod tests {
             autolock_after: 3_600,
             autolock_floor: 60,
             autolock_ceiling: 7 * 86_400,
+            frame_rate: 0,
+            show_frame_rate: false,
             recovered_from_corrupt_file: false,
         };
         prefs.save(&path).unwrap();

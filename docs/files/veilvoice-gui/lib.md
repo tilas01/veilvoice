@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 114 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 136 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ another thread, so the window keeps answering while it is busy.
 
 ## What this file contains
 
-114 lines defining **2 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+136 lines defining **3 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -93,7 +93,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 <p align="center">
   <img src="../../../assets/diagrams/veilvoice-gui/lib.svg" alt="what calls what in lib.rs" width="640">
@@ -107,10 +107,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 flowchart TD
     n_tabs(["tabs<br/>line 68"])
     n_jetbrains_mono_path(["jetbrains_mono_path<br/>line 76"])
+    n_headless_frame["headless_frame<br/>line 128"]
     click n_tabs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68" "open the source"
     click n_jetbrains_mono_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L76" "open the source"
+    click n_headless_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L128" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_tabs,n_jetbrains_mono_path entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_headless_frame helper
 ```
 
 </details>
@@ -121,7 +125,8 @@ flowchart TD
 |---|---:|---|
 | `tabs` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68) | The name of every tab the window shows, in the order it shows them. |
 | `jetbrains_mono_path` <sub>pub fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L76) | Where JetBrains Mono is on this machine, if it is anywhere. |
-| `VERSION` <sub>pub const</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L114) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L115) | Crate version string, surfaced in the About panel. |
+| `headless_frame` <sub>pub(crate) fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L128) | Draw one frame with no window, and discard what a real backend would have uploaded. |
 
 ---
 

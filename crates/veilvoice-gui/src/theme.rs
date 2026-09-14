@@ -506,12 +506,15 @@ pub fn install(ctx: &egui::Context) {
     visuals.widgets.active.bg_stroke = Stroke::new(1.0, p::blue());
     visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0, p::muted());
 
-    ctx.set_visuals(visuals);
+    // Both of egui's modes get the same look: the palette is this
+    // application's own, light or dark by its own choice, and egui's
+    // dark/light split underneath it must not disagree with it.
+    ctx.all_styles_mut(|style| style.visuals = visuals.clone());
 
     // Monospace throughout: this is a tool for people who care what the numbers
     // say, and a fixed advance keeps live readouts from jittering as they
     // update.
-    let mut style = (*ctx.style()).clone();
+    let mut style = (*ctx.global_style()).clone();
     style.text_styles = [
         (TextStyle::Heading, FontId::new(20.0, FontFamily::Monospace)),
         (TextStyle::Body, FontId::new(13.0, FontFamily::Monospace)),
@@ -525,7 +528,7 @@ pub fn install(ctx: &egui::Context) {
     .into();
     style.spacing.item_spacing = egui::vec2(8.0, 8.0);
     style.spacing.button_padding = egui::vec2(10.0, 6.0);
-    ctx.set_style(style);
+    ctx.all_styles_mut(|s| *s = style.clone());
 }
 
 #[cfg(test)]
@@ -721,7 +724,7 @@ mod tests {
 
         assert!(set_by_id(&ctx, "paper"));
         assert_ne!(palette::bg(), tokyo, "the palette did not change");
-        assert_eq!(ctx.style().visuals.panel_fill, palette::bg());
+        assert_eq!(ctx.global_style().visuals.panel_fill, palette::bg());
         assert!(active().light, "paper is a light scheme");
 
         // An unknown identifier must be ignored rather than fatal: a
@@ -781,8 +784,11 @@ mod tests {
         reset();
         let ctx = egui::Context::default();
         install(&ctx);
-        assert_eq!(ctx.style().visuals.panel_fill, palette::bg());
-        assert!(ctx.style().text_styles.contains_key(&TextStyle::Monospace));
+        assert_eq!(ctx.global_style().visuals.panel_fill, palette::bg());
+        assert!(ctx
+            .global_style()
+            .text_styles
+            .contains_key(&TextStyle::Monospace));
     }
 
     /// Missing JetBrains Mono must degrade to the built-in face, never panic.

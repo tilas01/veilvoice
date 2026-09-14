@@ -58,14 +58,14 @@ jobs:
       # otherwise be the commit that triggered the release, which is a tag; the
       # site is published from `main`, and for a release those are the same
       # commit until they are not.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
 
       # The banner and icons are generated, and the site is the most visible
       # place a stale copy would show. Regenerating and diffing here keeps the
       # published artwork honest to the script that claims to produce it.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Artwork must match the generator
@@ -103,8 +103,8 @@ jobs:
           done
           exit $missing
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: website
 
@@ -116,4 +116,4 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

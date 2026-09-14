@@ -331,7 +331,13 @@ pub struct VeilVoiceApp {
     /// an interface is not measuring it, and this is the smallest thing that
     /// turns one into the other.
     frame_ms: f32,
-
+    /// How often the window draws while something moves, what the display
+    /// turned out to be, and how many frames arrived late. See [`crate::pace`].
+    pace: crate::pace::Pace,
+    /// Whether the dropped-frame notice has already been shown this run. Once
+    /// per launch: a window that is struggling is struggling continuously, and
+    /// a notice that returned every few seconds would be the worse problem.
+    said_dropping: bool,
     // The app lock, and at-rest encryption of what jobs write.
     security: Security,
     /// The integrity record, taken at the first launch and checked at every
@@ -445,6 +451,60 @@ impl VeilVoiceApp {
         }
     }
 
+    /// Marker 148. The frame rate in the header, when it has been asked for.
+    ///
+    /// Two numbers and no more: the rate as drawn, and how many frames arrived
+    /// late in the last second. The second one turns yellow rather than
+    /// appearing, because a readout that changes shape is harder to read at a
+    /// glance than one that changes colour, and somebody who turned this on is
+    /// watching it.
+    ///
+    /// Nothing is formatted unless the readout is on, and nothing here is
+    /// measured: `Pace` did that once at the top of the frame.
+    fn frame_readout(&mut self, ui: &mut egui::Ui) {
+        if !self.preferences.show_frame_rate() {
+            return;
+        }
+        let fps = self.pace.fps();
+        if fps <= 0.0 {
+            return;
+        }
+        let dropped = self.pace.dropped_last_second();
+        let colour = if self.pace.is_dropping() {
+            p::yellow()
+        } else {
+            p::muted()
+        };
+        let text = if dropped > 0 {
+            format!("{fps:.0} fps, {dropped} late")
+        } else {
+            format!("{fps:.0} fps")
+        };
+        ui.label(RichText::new(text).color(colour).small())
+            .on_hover_text(self.frame_rate_detail());
+    }
+
+    /// The sentence behind the readout, and the one the About tab prints.
+    ///
+    /// Says what the window is aiming at, what it measured the display to be,
+    /// and what it is drawing with, because a rate well under the target on
+    /// software rendering is a different conversation from the same rate on a
+    /// GPU.
+    fn frame_rate_detail(&self) -> String {
+        let target = match self.pace.target() {
+            crate::pace::Target::Display => match self.pace.display_hz() {
+                Some(hz) => format!("the display, measured at {hz} a second"),
+                None => "the display, not measured yet".to_string(),
+            },
+            crate::pace::Target::Fixed(hz) => format!("{hz} a second, chosen in Settings"),
+        };
+        format!(
+            "Aiming at {target}. {} frames arrived late since this window opened. \nDrawing with {}.",
+            self.pace.dropped_total(),
+            self.drawing
+        )
+    }
+
     /// The application with no devices enumerated.
     ///
     /// `Default` calls this after asking the system what it has. Tests that are
@@ -488,6 +548,8 @@ impl VeilVoiceApp {
             studio: crate::studio::Studio::default(),
             reading: None,
             frame_ms: 0.0,
+            pace: crate::pace::Pace::default(),
+            said_dropping: false,
             security: Security::default(),
             integrity: crate::integrity::Integrity::default(),
             storage: crate::storage::Storage::default(),
@@ -700,6 +762,11 @@ impl VeilVoiceApp {
             watch: WatchFeed::start(cc.egui_ctx.clone()),
             ..Default::default()
         };
+        // Marker 148. The saved frame-rate target, before the first frame, so
+        // the first animation is paced by what was chosen rather than by the
+        // default for one frame.
+        app.pace.set_target(app.preferences.frame_target());
+
         // Marker 86. Before the first frame, and so before anything can be
         // unlocked: `Security` captures the app-lock passphrase as the lock
         // opens, and only when this mode is already the chosen one.
@@ -836,6 +903,28 @@ impl VeilVoiceApp {
     }
 }
 
+/// A small-text button drawn to the height of the control beside it.
+///
+/// **Finding F-178.** The header's right-hand controls sit in one centred row,
+/// and the theme picker is the tallest thing in it. A button around small text
+/// works its own height out from the padding in the style and lands a pixel
+/// short of the picker, which is enough for two boxes side by side to read as
+/// not quite lining up, and nothing anywhere said the two should match.
+///
+/// So the height is passed in from the picker's own rectangle rather than
+/// written down: whatever the picker turns out to be, the button is that. The
+/// width is left alone, because a button as wide as the picker would be a
+/// different complaint.
+fn header_button(
+    ui: &mut egui::Ui,
+    text: &str,
+    colour: egui::Color32,
+    height: f32,
+) -> egui::Response {
+    let same = egui::vec2(0.0, height);
+    ui.add(egui::Button::new(RichText::new(text).color(colour).small()).min_size(same))
+}
+
 impl eframe::App for VeilVoiceApp {
     fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
         // A clean close removes the session marker, so the next launch does not
@@ -847,9 +936,19 @@ impl eframe::App for VeilVoiceApp {
         }
     }
 
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, root: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        // eframe 0.36 hands the root `Ui` rather than the context. The
+        // context is what most of this reads, so it is taken once; panels
+        // are laid into `root`.
+        let ctx = &root.ctx().clone();
         self.fit_to_the_screen(ctx);
         self.count_frames(ctx);
+
+        // Marker 148. One reading per drawn frame, before anything is
+        // painted, so the header and the About tab report the same frame.
+        // Whether this frame was one an animation asked for is read from the
+        // flag `pace::next_frame` set at the end of the frame before.
+        self.pace.frame(ctx.input(|i| i.time));
 
         // How long the last frame took, smoothed. `stable_dt` rather than `dt`
         // because the raw one spikes whenever the window has been idle and the
@@ -863,13 +962,32 @@ impl eframe::App for VeilVoiceApp {
             };
         }
 
+        // Marker 148. Frames have been arriving late for two seconds running.
+        // Said once, and only where a notice is not already in the way: the
+        // first-run cards and a crash report are both more urgent than this.
+        if self.pace.is_dropping()
+            && !self.said_dropping
+            && self.notice.is_none()
+            && !self.preferences.needs_first_run()
+        {
+            self.said_dropping = true;
+            self.notice = Some(crate::notify::Notice::note(format!(
+                "Frames are arriving late: {:.0} a second against {} asked for. \
+                 Drawing with {}. Settings can lower the rate, and the About tab \
+                 has the numbers.",
+                self.pace.fps(),
+                self.pace.target_hz(),
+                self.drawing
+            )));
+        }
+
         // Marker 92. Any input at all is use; the passage of a job is not.
         // Somebody who starts a long render and walks away has walked away, and
         // what they are producing is the thing worth locking away.
         let (touched, dt) = ctx.input(|i| {
             let touched = !i.events.is_empty()
                 || i.pointer.velocity() != egui::Vec2::ZERO
-                || i.raw_scroll_delta != egui::Vec2::ZERO;
+                || i.smooth_scroll_delta != egui::Vec2::ZERO;
             (touched, i.stable_dt)
         });
         if touched || self.security.is_locked() {
@@ -966,7 +1084,7 @@ impl eframe::App for VeilVoiceApp {
             // and the setting belongs to the application rather than to the
             // lock.
             let motion = self.preferences.motion(ctx);
-            egui::CentralPanel::default().show(ctx, |ui| self.security.unlock_screen(ui, motion));
+            egui::CentralPanel::default().show(root, |ui| self.security.unlock_screen(ui, motion));
             // The rate limit counts down whether or not anything else moves.
             ctx.request_repaint_after(std::time::Duration::from_millis(500));
             return;
@@ -984,7 +1102,7 @@ impl eframe::App for VeilVoiceApp {
         // maximising and the accessibility that comes with them, and gets some
         // of it subtly wrong on somebody else's machine. This is the band below
         // that, which is ours to make pleasant.
-        egui::TopBottomPanel::top("header")
+        egui::Panel::top("header")
             .frame(
                 egui::Frame::new()
                     .fill(p::bg_dark())
@@ -1001,7 +1119,7 @@ impl eframe::App for VeilVoiceApp {
                         se: 10,
                     }),
             )
-            .show(ctx, |ui| {
+            .show(root, |ui| {
                 let motion = self.preferences.motion(ctx);
                 let time = ui.input(|i| i.time) as f32;
                 ui.horizontal(|ui| {
@@ -1025,6 +1143,7 @@ impl eframe::App for VeilVoiceApp {
                     );
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.label(RichText::new("offline").color(p::green()).small());
+                        self.frame_readout(ui);
                         // **Marker 78.** The colour scheme, in the header.
                         //
                         // Every one of the website's themes has been in this
@@ -1035,10 +1154,9 @@ impl eframe::App for VeilVoiceApp {
                         // every page; so does this now, and Settings keeps the
                         // fuller panel with the swatches and the custom
                         // palettes.
-                        self.preferences.theme_picker(ui, ctx);
+                        let picker = self.preferences.theme_picker(ui, ctx);
                         if self.security.has_lock()
-                            && ui
-                                .button(RichText::new("lock").color(p::yellow()).small())
+                            && header_button(ui, "lock", p::yellow(), picker.height())
                                 .on_hover_text("Lock the app and clear the session passphrase")
                                 .clicked()
                         {
@@ -1153,7 +1271,7 @@ impl eframe::App for VeilVoiceApp {
         // Drawn before the central panel so the panel is laid out inside what
         // is left, rather than under a strip that arrives after it.
         if crate::monitor::show(
-            ctx,
+            root,
             self.preferences.live_monitor(),
             self.studio.is_veiling(),
             self.studio.is_previewing(),
@@ -1185,7 +1303,7 @@ impl eframe::App for VeilVoiceApp {
         // late and half a window away.
         if let Some(notice) = self.notice.clone() {
             let style = self.preferences.notify_style();
-            egui::TopBottomPanel::top("notice").show(ctx, |ui| {
+            egui::Panel::top("notice").show(root, |ui| {
                 ui.add_space(6.0);
                 if crate::notify::show(ui, style, &notice) {
                     self.notice = None;
@@ -1206,14 +1324,14 @@ impl eframe::App for VeilVoiceApp {
         // is there when they are made.
         self.crash.look();
         if self.crash.waiting() && !self.preferences.needs_first_run() {
-            egui::TopBottomPanel::top("crash").show(ctx, |ui| {
+            egui::Panel::top("crash").show(root, |ui| {
                 ui.add_space(8.0);
                 self.crash.panel(ui);
                 ui.add_space(8.0);
             });
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::CentralPanel::default().show(root, |ui| {
             // While the "unencrypted?" question is open, clicks must not land
             // on the window behind it.
             ui.add_enabled_ui(!dialogue_open, |ui| {
@@ -1320,7 +1438,12 @@ impl eframe::App for VeilVoiceApp {
         // here, which is why the About tab now shows it. A number the person
         // with the problem can read is worth more than a change made blind.
         if self.studio.is_veiling() {
-            ctx.request_repaint_after(std::time::Duration::from_millis(16));
+            // The next frame, paced by the display or by the chosen target.
+            // This used to ask for one "in sixteen milliseconds", which on a
+            // display at sixty is just after the frame it could have joined,
+            // so the drawing landed on the one after and the window ran at
+            // thirty (finding F-179).
+            crate::pace::next_frame(ctx);
         } else if self.updates.is_busy()
             // Hovering, not only busy. An idle window requests no repaint, so
             // dragging a file over it lit nothing up and the file did not
@@ -1334,7 +1457,10 @@ impl eframe::App for VeilVoiceApp {
             || self.integrity.is_busy()
             || self.setup.is_busy()
         {
-            ctx.request_repaint_after(std::time::Duration::from_millis(50));
+            // Progress bars and spinners, at the same rate as everything else
+            // that moves. Fifty milliseconds here was twenty a second beside a
+            // header animating at its own rate, which is what the judder was.
+            crate::pace::next_frame(ctx);
         } else if autolock.enabled && !self.security.is_locked() {
             // Marker 92. Once a second is enough to notice a delay measured in
             // minutes, and it is what makes the lock actually engage: an idle
@@ -2424,6 +2550,33 @@ impl VeilVoiceApp {
                 "not measured yet".to_string()
             },
         );
+        // Marker 148. What the window is aiming at, what it got, and how many
+        // frames missed. The frame time above answers "is drawing slow"; these
+        // answer "is it drawing as often as the screen shows".
+        field(
+            ui,
+            "frame rate",
+            &match self.pace.target() {
+                crate::pace::Target::Display => match self.pace.display_hz() {
+                    Some(hz) => format!("the display, measured at {hz} a second"),
+                    None => "the display, not measured yet".to_string(),
+                },
+                crate::pace::Target::Fixed(hz) => format!("{hz} a second, chosen in Settings"),
+            },
+        );
+        field(
+            ui,
+            "frames drawn",
+            &if self.pace.fps() > 0.0 {
+                format!(
+                    "{:.0} a second, {} arrived late",
+                    self.pace.fps(),
+                    self.pace.dropped_total()
+                )
+            } else {
+                "not measured yet".to_string()
+            },
+        );
         // Precise rather than short. "None" stopped being true the moment the
         // update button existed, and a version string that overstates the thing
         // it is printed beside is worse than no version screen at all.
@@ -2536,7 +2689,11 @@ fn paths_section(ui: &mut egui::Ui) {
                     ui.add(
                         egui::TextEdit::singleline(&mut text)
                             .desired_width(560.0)
-                            .frame(false)
+                            // No box around it: this is a path to read and
+                            // copy, not a field to fill in. `frame` takes the
+                            // frame itself since egui 0.36, where it used to
+                            // take a flag.
+                            .frame(egui::Frame::NONE)
                             .text_color(p::cyan()),
                     );
                 }
@@ -2590,6 +2747,93 @@ fn field(ui: &mut egui::Ui, label: &str, value: &str) {
 }
 
 #[cfg(test)]
+mod header_layout_tests {
+    use super::*;
+
+    /// **Finding F-178.** The lock button is the theme picker's height.
+    ///
+    /// Measured from the widgets rather than from a photograph: the capture
+    /// scripts photograph a window with no app lock set, and the lock button
+    /// is only drawn when there is one, so no screenshot this repository
+    /// produces contains the control in question.
+    ///
+    /// The theme is installed first. Without it the default spacing makes
+    /// every control the same height and the test would pass while measuring
+    /// nothing about this application.
+    #[test]
+    fn the_lock_button_is_the_theme_pickers_height() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let mut picker = egui::Rect::NOTHING;
+        let mut button = egui::Rect::NOTHING;
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        picker = egui::ComboBox::from_id_salt("header-theme")
+                            .selected_text(RichText::new("Tokyo Night").small())
+                            .width(132.0)
+                            .show_ui(ui, |_| {})
+                            .response
+                            .rect;
+                        button = header_button(ui, "lock", p::yellow(), picker.height()).rect;
+                    });
+                });
+            });
+        });
+
+        assert!(
+            picker.height() > 0.0 && button.height() > 0.0,
+            "nothing was drawn"
+        );
+        assert!(
+            (picker.height() - button.height()).abs() < 0.5,
+            "the two controls are different heights: {:.1} against {:.1}",
+            picker.height(),
+            button.height()
+        );
+        assert!(
+            (picker.center().y - button.center().y).abs() < 0.5,
+            "the lock button sits {:.1} pixels off the picker's middle",
+            picker.center().y - button.center().y
+        );
+    }
+
+    /// And the shape this corrects, so the assertion above is known to be able
+    /// to fail: a button that works its own height out from padding is a pixel
+    /// shorter than the picker beside it.
+    #[test]
+    fn a_button_left_to_size_itself_does_not_match_the_picker() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let mut picker = egui::Rect::NOTHING;
+        let mut bare = egui::Rect::NOTHING;
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        picker = egui::ComboBox::from_id_salt("header-theme")
+                            .selected_text(RichText::new("Tokyo Night").small())
+                            .width(132.0)
+                            .show_ui(ui, |_| {})
+                            .response
+                            .rect;
+                        bare = ui.button(RichText::new("lock").small()).rect;
+                    });
+                });
+            });
+        });
+        assert!(
+            (bare.height() - picker.height()).abs() >= 0.5,
+            "the two are the same height without being made to match, so the \
+             test above would pass either way: {:.1} against {:.1}",
+            bare.height(),
+            picker.height()
+        );
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2623,7 +2867,7 @@ mod tests {
         // The draw path is `update` and everything it reaches. Device
         // enumeration is the one filesystem-shaped call in this file and it
         // lives in `Default`, which runs once before the window opens.
-        let update_at = body.find("fn update(&mut self").expect("update exists");
+        let update_at = body.find("fn ui(&mut self").expect("update exists");
         let drawing = &body[update_at..];
 
         for waits in [
@@ -2693,7 +2937,7 @@ mod tests {
         // assertion below is itself a match: the first version of this test
         // failed on its own message.
         let source = source.split("\n#[cfg(test)]").next().unwrap();
-        let update_at = source.find("fn update(&mut self").expect("update exists");
+        let update_at = source.find("fn ui(&mut self").expect("update exists");
         let drawing = &source[update_at..];
         assert!(
             !drawing.contains("self.watch.is_watching()"),
@@ -2890,7 +3134,7 @@ mod tests {
              the launch run has to stand aside when a lock is set"
         );
 
-        let update_at = source.find("fn update(&mut self").expect("update exists");
+        let update_at = source.find("fn ui(&mut self").expect("update exists");
         let drawing = &source[update_at..];
         assert!(
             drawing.contains("self.security.take_unlock_passphrase()"),

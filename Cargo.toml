@@ -74,6 +74,13 @@ realfft = "3"            # real-input FFT built on rustfft; re-exports num-compl
 # path.
 rustfft = "6"
 # --- cryptographic randomness ---
+#
+# Held with the crypto generation in `crates/veilvoice-crypto/Cargo.toml`, and
+# for the same reason: `pgp` 0.20 pins `rand` 0.8, and a second `rand` in the
+# graph is a second copy of the same code in both binaries. `rand` 0.9 also
+# changed how `gen_range` draws, so the same seed would produce a different
+# modulation stream across the bump; that is not a promise this project makes,
+# but it is worth moving on purpose rather than by accident.
 getrandom = "0.2"        # OS CSPRNG seed
 # The `Rng` traits the modulation stream is driven through. The randomness
 # itself is `rand_chacha`, seeded from `getrandom`; this is the interface, not

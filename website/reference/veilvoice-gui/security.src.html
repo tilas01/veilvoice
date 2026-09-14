@@ -1749,8 +1749,8 @@
 <span class="ln" id="L1596">        };</span>
 <span class="ln" id="L1597">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> field_x = <span class="tok-num">0</span>.0f32;</span>
 <span class="ln" id="L1598">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> button_x = <span class="tok-num">0</span>.0f32;</span>
-<span class="ln" id="L1599">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
-<span class="ln" id="L1600">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L1599">        <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, input, |ui| {</span>
+<span class="ln" id="L1600">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L1601">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> value = String::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L1602">                field_x = <span class="tok-fn">password_row</span>(ui, <span class="tok-str">&quot;current&quot;</span>, &amp;<span class="tok-kw">mut</span> value).rect.<span class="tok-fn">left</span>();</span>
 <span class="ln" id="L1603">                button_x = <span class="tok-fn">button_column</span>(ui, |ui| ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;change password&quot;</span>))</span>
@@ -1786,8 +1786,8 @@
 <span class="ln" id="L1633">        };</span>
 <span class="ln" id="L1634"></span>
 <span class="ln" id="L1635">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> starts: Vec&lt;(&amp;str, f32)&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1636">        <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
-<span class="ln" id="L1637">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L1636">        <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, input, |ui| {</span>
+<span class="ln" id="L1637">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L1638">                <span class="tok-kw">for</span> label <span class="tok-kw">in</span> [<span class="tok-str">&quot;new&quot;</span>, <span class="tok-str">&quot;password&quot;</span>, <span class="tok-str">&quot;passphrase&quot;</span>] {</span>
 <span class="ln" id="L1639">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> value = String::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L1640">                    <span class="tok-com">// Where the field actually landed, read back from the</span></span>
@@ -2172,8 +2172,8 @@
 <span class="ln" id="L2019">            ..Default::<span class="tok-fn">default</span>()</span>
 <span class="ln" id="L2020">        };</span>
 <span class="ln" id="L2021">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L2022">        <span class="tok-kw">let</span> output = ctx.<span class="tok-fn">run</span>(input, |ctx| {</span>
-<span class="ln" id="L2023">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| <span class="tok-fn">draw</span>(security, ui));</span>
+<span class="ln" id="L2022">        <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, input, |ui| {</span>
+<span class="ln" id="L2023">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(security, ui));</span>
 <span class="ln" id="L2024">        });</span>
 <span class="ln" id="L2025">        <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> output.shapes {</span>
 <span class="ln" id="L2026">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::epaint::Shape::<span class="tok-fn">Text</span>(t) = shape.shape {</span>

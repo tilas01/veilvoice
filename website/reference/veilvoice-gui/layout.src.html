@@ -229,8 +229,8 @@
 <span class="ln" id="L174">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lefts = Vec::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L175">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> available = <span class="tok-num">0</span>.0_f32;</span>
 <span class="ln" id="L176">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L177">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(<span class="tok-fn">input</span>(width), |ctx| {</span>
-<span class="ln" id="L178">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L177">            <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, <span class="tok-fn">input</span>(width), |ui| {</span>
+<span class="ln" id="L178">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L179">                    <span class="tok-kw">let</span> origin = ui.<span class="tok-fn">min_rect</span>().<span class="tok-fn">left</span>();</span>
 <span class="ln" id="L180">                    available = ui.<span class="tok-fn">available_width</span>();</span>
 <span class="ln" id="L181">                    <span class="tok-kw">let</span> left = <span class="tok-fn">centred_row</span>(ui, |ui| <span class="tok-fn">body</span>(ui)).response.rect.<span class="tok-fn">left</span>();</span>
@@ -277,8 +277,8 @@
 <span class="ln" id="L222">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
 <span class="ln" id="L223">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> gaps = (<span class="tok-num">0</span>.0_f32, <span class="tok-num">0</span>.0_f32);</span>
 <span class="ln" id="L224">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L225">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(<span class="tok-fn">input</span>(<span class="tok-num">600.0</span>), |ctx| {</span>
-<span class="ln" id="L226">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L225">            <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, <span class="tok-fn">input</span>(<span class="tok-num">600.0</span>), |ui| {</span>
+<span class="ln" id="L226">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L227">                    <span class="tok-kw">let</span> origin = ui.<span class="tok-fn">min_rect</span>().<span class="tok-fn">left</span>();</span>
 <span class="ln" id="L228">                    <span class="tok-kw">let</span> room = ui.<span class="tok-fn">available_width</span>();</span>
 <span class="ln" id="L229">                    <span class="tok-kw">let</span> rect = <span class="tok-fn">centred_row</span>(ui, |ui| {</span>
@@ -321,8 +321,8 @@
 <span class="ln" id="L266">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
 <span class="ln" id="L267">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> runs = 0_u32;</span>
 <span class="ln" id="L268">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
-<span class="ln" id="L269">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L270">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L269">            <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
+<span class="ln" id="L270">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L271">                    <span class="tok-fn">centred_row</span>(ui, |ui| {</span>
 <span class="ln" id="L272">                        runs += <span class="tok-num">1</span>;</span>
 <span class="ln" id="L273">                        ui.<span class="tok-fn">label</span>(<span class="tok-str">&quot;once&quot;</span>);</span>

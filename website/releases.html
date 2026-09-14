@@ -175,6 +175,44 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>Focus now lands on the dialog itself, which is where a modal&#x27;s focus belongs: a screen reader announces its title from there, the first Tab reaches the first control, and the trap that keeps focus inside the notice still holds. Nothing looks pressed until the reader presses it.</li>
 <li>Checked by the website&#x27;s own suite, which reads the script and the stylesheet and fails if either goes back.</li>
 </ul>
+<p><strong>The audit, round thirty-three: the whole tree read again</strong></p>
+<ul>
+<li>The round after 0.1.21, run against the brief written before it began: every class of defect the earlier rounds established and every check the repository runs, asked of each file. What it found is written up in <code>docs/AUDIT.md</code>; what changed because of it is below.</li>
+<li><strong>Licences, sources and duplicate versions are checked now.</strong> <code>cargo audit</code> answers whether anything in the graph has an advisory against it and nothing asked the other three questions: whether every licence can ship under GPL-3.0-or-later, whether every crate comes from crates.io, and whether one crate is compiled at two versions. <code>deny.toml</code> answers them, <code>cargo deny</code> runs in CI beside the advisory check, and the two policy files are checked against each other so their advisory exceptions cannot drift apart.</li>
+<li><strong>Five checks that ran only when somebody ran them are in CI.</strong> The guard for a state file written one place and read from another, the per-program guides, the questions page, the app-manifest self-test and the local site host were all in <code>tools/verify.py</code> and none was in a workflow, so each caught drift only when somebody remembered to look.</li>
+<li><strong>The seven coverage-guided fuzz targets run weekly</strong>, two minutes each from the committed corpus, in a workflow of their own that can also be dispatched before a release. They had only ever run by hand.</li>
+<li>The hybrid key exchange&#x27;s documentation said both public keys went into the combiner. The recipient&#x27;s X25519 key does; the recipient&#x27;s ML-KEM key does not, and does not need to, because FIPS 203 binds it through the shared secret itself. The doc comment now says exactly what is bound, why the omission is not a weakness, and why the transcript is not changed: every key and container already made would change with it, for no gain.</li>
+<li>The command line&#x27;s offline claim was proved again on the built binary, four ways, and each guard was shown to fail when given something to catch.</li>
+</ul>
+<p><strong>Dependencies, reviewed one by one</strong></p>
+<ul>
+<li><strong>egui and eframe 0.36</strong>, and this one is a security change as much as an upgrade: 0.36 rasterises text without <code>ttf-parser</code>, so that crate has left the dependency graph and its advisory leaves the exception list with it. Two accepted advisories remain where there were three. The port was real work: the application now draws into a root panel rather than taking the context, the OpenGL choices moved to where the OpenGL backend is configured, panels and styles are set differently, a dropped file reports its path through a trait, and every headless test had to learn that a frame&#x27;s texture uploads must be accounted for. 1611 tests pass on it.</li>
+<li><strong><code>symphonia</code> 0.6</strong>, the decoder for everything that is not a WAV. The 0.6 API changed how a stream is probed, how a decoder is made and how decoded audio is read; the port keeps one interleaved buffer across packets rather than one per packet, and every audio test passes on it.</li>
+<li><strong>The GitHub Actions the workflows use</strong>, nine of them, to their current majors.</li>
+<li><strong>The cryptographic line is held, on purpose, and the reason is written where it will be read.</strong> <code>sha2</code>, <code>hkdf</code>, <code>chacha20poly1305</code>, <code>argon2</code>, <code>x25519-dalek</code>, <code>ml-kem</code>, <code>rand</code>, <code>rand_core</code>, <code>rand_chacha</code> and <code>getrandom</code> all have a newer major. <code>pgp</code>, which verifies release signatures, pins the generation this project uses, and taking the newer one would compile two copies of every primitive into both binaries. None of the newer versions fixes a vulnerability. The line moves together the day <code>pgp</code> moves, or the day the signature check stops needing it, which is marker 149 on the roadmap: a reader for exactly what a detached signature over a text file is, with nothing else in it. Dependabot is told not to reopen the same ten pull requests every week.</li>
+<li>Every compatible update in the lock file taken.</li>
+</ul>
+<p><strong>The window draws at the display&#x27;s rate</strong></p>
+<ul>
+<li>The animations ran at twenty frames a second, by design: a constant in the mark, a fifty-millisecond cadence for anything busy, and sixteen for veiling. On a display faster than sixty that is judder, and the sixteen was wrong even at sixty, because a display at sixty shows a frame every 16.67 ms and a request for one &quot;within sixteen&quot; misses the frame it wanted and lands on the next. Thirty a second, asked for as sixty.</li>
+<li><strong>The fix is not a bigger number.</strong> While anything is moving, the window asks for the next frame now and lets the screen space it: a window that waits for the display cannot draw faster than the display shows, so this is one frame per refresh and no more, at whatever rate the screen runs.</li>
+<li>That is also what makes the display measurable. Nothing in the libraries this window is built on will say what the refresh rate is, so it is measured: frames paced that way are the display&#x27;s own, and the middle value of the last thirty-two is a figure a single slow frame cannot move.</li>
+<li><strong>Settings can lower it</strong>, to 30, 60, 90, 120, 144, 165 or 240, which is a choice to make for a battery rather than for smoothness.</li>
+<li><strong>A live readout in the header</strong> when you turn it on, and the About tab now carries what the window is aiming at, what the display measured, the rate as drawn and how many frames arrived late.</li>
+<li><strong>It says when it is struggling.</strong> A frame more than half again later than it should have been is counted late; two seconds of that shows a notice once, naming the rate, the target and what the window is drawing with, because software rendering and a slow GPU are different problems. One bad second is not enough, since every launch costs one.</li>
+<li>Idle is unchanged: a window with nothing moving asks for no frames and draws none.</li>
+</ul>
+<p><strong>The lock button and the theme picker agree on a height</strong></p>
+<ul>
+<li>The manual lock button in the header did not line up with the picker beside it. Measured properly, in a frame laid out the way the header lays it out: the two share a centre exactly and the picker is one pixel taller, because each control worked its own height out from padding and nothing said the two should match.</li>
+<li>The button now takes its height from the picker&#x27;s own rectangle rather than from a number written down twice, so they cannot drift apart at a font size or on a platform nobody here has tried. Two tests hold it, one of which proves the other can fail.</li>
+<li>No screenshot can show this: the captures photograph a window with no app lock set, and the button is only drawn when there is one.</li>
+</ul>
+<p><strong>Two markers on the roadmap</strong></p>
+<ul>
+<li>Marker 148, the window drawing at the display&#x27;s rate and saying so: the animations ran at twenty frames a second by design, and what to build instead is specified in full.</li>
+<li>Marker 149, the signature check that needs only a signature check, which is what unblocks the cryptographic line above.</li>
+</ul>
 <p><strong>The site can be claimed in Search Console</strong></p>
 <ul>
 <li>The ownership tag Google asks for sits in the head of every page, so the site can be verified and indexed. It is a string with no behaviour: nothing is loaded, sent or run because of it.</li>

@@ -73,6 +73,177 @@ was the checkbox and it matched `:focus-visible`; after, it is the box, no input
 matches, and the box's computed outline is `none`. The site suite reads the
 script and the stylesheet and fails if either goes back.
 
+### F-174: two changes written under the heading of a release that did not carry them
+
+`CHANGELOG.md` is the one file this repository allows to describe the past,
+and the rule that goes with that is the strict one: it is not edited to agree
+with the present. Two entries, the Studio's place in the documentation and the
+doc comment that had moved to the wrong function, were written after v0.1.21
+was tagged at `addea46f` and were written under `## v0.1.21`. The release notes
+GitHub published for that tag were derived from the file before those entries
+existed, so a reader comparing the page with the file would find the file
+claiming two changes the release does not contain.
+
+The shape is the ordinary one, and the reason it is worth an entry is that the
+file has a section for exactly this and it was not used. `## Unreleased` is
+what `tools/site/releases.py` reads for the next version's notes, and it
+renders as its own dropdown on the releases page when there is something in
+it. Both entries are under it now, with everything else this round adds.
+
+Nothing checks this and nothing easily can: the tag is the only thing that
+says which commit a section's entries were written after, and a commit that
+edits a released section is sometimes right (a typo, a link). The rule stays a
+rule, and this entry is the reminder that it was broken once.
+
+### F-175: the hybrid combiner's documentation claimed more than the code binds
+
+`hybrid.rs` said: "Both secrets, both ciphertexts and both public keys go into
+the input". The transcript the combiner salts HKDF with is the ephemeral X25519
+public key, the ML-KEM ciphertext and the recipient's X25519 public key. The
+recipient's ML-KEM encapsulation key is not in it.
+
+This is a documentation defect and not a cryptographic one, and the write-up
+has to be careful to say which. FIPS 203 derives the ML-KEM shared secret from
+the message and a hash of the encapsulation key, so that key is bound through
+the secret itself, and the X-Wing combiner, which is the reference shape for
+this construction, omits it for that reason. X25519 makes no such promise,
+which is why its public key is bound by hand. The construction is sound as it
+stands and it is not changed: changing the transcript would change every key
+and every container already made, for no difference in what an attacker can do.
+
+The doc comment now says what is in the salt, what is not, why the omission is
+not a weakness, and why the transcript is not going to change. A sentence in a
+module note that claims a binding the code does not perform is exactly the kind
+of thing a reader auditing this crate would find first and trust the rest of
+the crate less for, and it was there through five rounds that read the file.
+
+### F-176: five of the repository's own drift checks ran only when somebody ran them
+
+`tools/verify.py` runs thirty-odd checks before a commit. Comparing its list
+with `ci.yml` found five that were in it and in no workflow: the guard for a
+state file written in one place and read from another (F-141 and F-142, the
+defect this project has shipped twice), the per-program guides against the
+user guide, the questions page against `docs/FAQ.md`, the app-manifest
+generator's self-test, and the local site host fetching every page.
+
+The thirty-first round found eleven of these and wired ten into CI, and wrote
+that "a check that exists and is not in CI catches things eventually". Five
+more were missed then, so the same sentence applies to the round that wrote
+it. Each of the five needs nothing but the tree and an interpreter and each is
+in the `assets` or `site` job now.
+
+Two remain out on purpose, and the reason is written here rather than left for
+the next round to rediscover. `tools/shots/sessions.py --check` runs the
+release binaries and one of its sessions checks a published release, which
+needs the archive, the sums and the signature downloaded into a folder;
+`tools/measured/generate.py --check` runs the whole test suite a second time
+to count it. Both are in `tools/verify.py`, and neither belongs in a job that
+should finish in minutes.
+
+### F-177: the seven coverage-guided fuzz targets had never run in CI
+
+`fuzz/fuzz_targets/` holds seven libFuzzer targets and a committed corpus for
+each. The thirty-second round's inventory listed them as an existing check.
+They were: they ran before releases, by hand, and `docs/AUDIT.md` records the
+durations. No workflow ran them, so between releases a regression the corpus
+already reached would wait for the next person to remember.
+
+`fuzz.yml` runs every target for two minutes from its corpus, weekly and on
+dispatch, with nightly and `cargo-fuzz` installed in the job and the memory
+limit the recorded campaigns used. Two minutes is not a campaign and the
+workflow's own comment says so; it is enough to fail on what the corpus
+reaches, which is the thing a scheduled run is for.
+
+The memory limit is worth one sentence. Run with libFuzzer's default of two
+gibibytes, `container_header` reports an out-of-memory at once, on an input
+whose header declares an Argon2 memory cost of two gibibytes. That is not a
+defect: the attended ceiling is four gibibytes by design (F-82, F-83), the
+harness deliberately reaches the KDF with attacker-chosen parameters, and the
+campaigns in the record were run at six. The workflow uses six, and this note
+is here so that the next person who runs it at two does not write F-178 about
+it.
+
+### F-178: the lock button and the theme picker never agreed on a height
+
+Reported by the person who uses the window, in v0.1.21, after it had been asked
+for once before: the manual lock button in the header does not line up with the
+theme picker beside it.
+
+**The first measurement was wrong, and that is the more useful half of this
+entry.** The screenshots were read for the two controls and gave a picker
+twenty-seven pixels tall centred at y=30 against a lock button eight pixels
+tall centred at y=25, which is a five-pixel misalignment and a clear defect. It
+is also impossible: the header lays those controls out in one row centred on a
+common line. What the second run of the tool found is that `gui-file.png` has
+no lock button in it at all. **The captures photograph a window with no app
+lock set**, and the button is only drawn when there is one, so the run that
+"measured the lock button" had measured the word "offline" three controls
+further right.
+
+A photograph of a window is not a measurement of a widget, and a reading that
+produces an arithmetically impossible answer is a reading to distrust rather
+than to write up. It was written up. This is what that correction looks like.
+
+Measured properly, by laying the two controls out in the same row in a headless
+frame with this application's own theme installed: they share a centre exactly,
+and the picker is 26 pixels tall against the button's 25. One pixel, which is
+small and is not nothing when two boxes sit side by side, and which comes from
+each control working its height out from padding with nothing anywhere saying
+the two should match.
+
+So the button is given the picker's own rectangle to take its height from,
+rather than a number written down twice. Whatever the picker turns out to be on
+a platform or at a font size nobody here has tried, the button is that. Two
+tests hold it: one that the heights and the centres agree, and one that a
+button left to size itself does *not* agree, so the first cannot pass by
+accident.
+
+Nothing about this can be proved from a screenshot, and the test says so where
+somebody will read it. A capture with an app lock in it would mean a capture
+run against a configured lock file, which is a larger change to the capture
+scripts than this finding justifies.
+
+### F-179: the window drew at twenty frames a second, by construction
+
+Reported as "8 to 40 fps instead of a consistent 60". The cause was not a slow
+frame anywhere; it was three numbers.
+
+`soundbar.rs` carried `FRAMES_PER_SECOND = 20` and asked for its next frame
+fifty milliseconds out. The busy path in `app.rs` asked for one every fifty
+milliseconds. The veiling path asked for one every sixteen. Each was argued
+where it was written, and the arguments were about cost rather than about the
+display: twenty a second is indistinguishable from thirty *for that animation
+in isolation*, and it is plainly distinguishable from a hundred and forty-four
+when it is the only thing moving on a display running at that.
+
+The sixteen is the one worth naming, because it looks correct. A display at
+sixty shows a frame every 16.67 ms, so a request for a repaint "no later than
+sixteen milliseconds from now" wakes the loop just before the frame it wanted
+and then misses it, and the drawing lands on the next one. That is thirty a
+second, asked for as sixty, which is the shape of every number in the report.
+
+**What replaces them is not a bigger constant.** `crate::pace` asks for the
+next frame *now* while anything is animating, and vsync spaces it: a window
+that waits for the display cannot draw faster than the display shows, so this
+costs one frame per refresh and no more, at whatever rate the screen runs. The
+same fact is what makes the display measurable, which matters because neither
+`egui` 0.32 nor `eframe` exposes a refresh rate: the interval between frames
+paced this way *is* the display's, and the median of the last thirty-two is a
+figure one slow frame cannot move. Settings offers the fixed rates for somebody
+who wants fewer frames on a battery, and that is the only thing a timer is used
+for now.
+
+Idle is unchanged and deliberately so: a window with nothing moving requests no
+frame and draws none, which is the finding from the twenty-third round and is
+the reason this file could say what an idle window costs.
+
+Measured rather than assumed, both ways: the module's tests drive the
+measurement at 60, 120, 144, 165 and 240 and get each back; the soundbar's test
+asserts that on the display's rate it puts no timer in the way and that on a
+chosen rate it asks for that interval; a late frame is counted as late and an
+idle gap is not; and two seconds of late frames raises the notice while one,
+which is what every launch costs, does not.
+
 ## The thirty-second round: the guard that failed and the two behind it
 
 The round after 0.1.20, covering the decoy vaults and everything they touched,
@@ -4891,7 +5062,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1602 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1613 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6538,7 +6709,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and seventy-three defects found and fixed (F-1 to F-173), across
+**One hundred and seventy-nine defects found and fixed (F-1 to F-179), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

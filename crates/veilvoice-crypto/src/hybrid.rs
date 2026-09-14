@@ -19,11 +19,23 @@
 //! # The combiner
 //!
 //! The two shared secrets are mixed with HKDF-SHA256 rather than concatenated
-//! or XORed. Both secrets, both ciphertexts and both public keys go into the
-//! input, which binds the derived key to the exact transcript that produced it
-//! and prevents an attacker who can substitute one half from steering the
-//! result. Feeding the full transcript is what makes the combiner robust when
-//! one KEM's ciphertexts are malleable.
+//! or XORed. The input keying material is the X25519 shared secret followed by
+//! the ML-KEM one. The salt is the transcript of the exchange: the ephemeral
+//! X25519 public key, the ML-KEM ciphertext and the recipient's X25519 public
+//! key. The info string names the construction and its version. Binding the
+//! transcript is what stops an attacker who can substitute one half of the
+//! exchange from steering the result, and is what keeps the combiner robust if
+//! one KEM's ciphertexts turn out to be malleable.
+//!
+//! The recipient's ML-KEM encapsulation key is not in the salt, and does not
+//! need to be. FIPS 203 derives the ML-KEM shared secret from the message and
+//! a hash of the encapsulation key, so that key is bound through the secret
+//! itself. X25519 makes no such promise, which is why its public key is bound
+//! here by hand. This is the shape of the X-Wing combiner, the ML-KEM secret,
+//! the X25519 secret, the X25519 ciphertext and public key under a label, with
+//! HKDF in place of one SHA3-256 call. Changing it now would change every key
+//! and every container already made, and would not change what an attacker can
+//! do.
 //!
 //! # In plain words
 //!
@@ -247,7 +259,10 @@ impl PublicKey {
     }
 }
 
-/// Mix both shared secrets with the full transcript.
+/// Mix both shared secrets, with the exchange's transcript as the salt.
+///
+/// What is and is not in the transcript, and why, is argued in the module
+/// note under "The combiner".
 fn combine(
     x_shared: &[u8; 32],
     ml_shared: &[u8],
