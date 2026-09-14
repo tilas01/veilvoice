@@ -2055,6 +2055,27 @@ impl VeilVoiceApp {
                         p::green()
                     }),
                 );
+                // **Marker 150.** The way to the always-on-top meters, where
+                // the session is started rather than only in Settings.
+                //
+                // This is the moment somebody is about to put a call or a
+                // stream in front of this window, which is the moment the
+                // meters are about to disappear behind it. A setting they
+                // have to go looking for afterwards is a setting they find
+                // after the call.
+                if self.preferences.live_monitor() != crate::monitor::Style::OnTop
+                    && ui
+                        .button(RichText::new("keep the meters on top").small())
+                        .on_hover_text(
+                            "Puts the two levels in a small window above other windows, so \
+                             they stay visible with a call or streaming software in front. \
+                             Closing that window brings the strip back.",
+                        )
+                        .clicked()
+                {
+                    self.preferences
+                        .set_live_monitor(crate::monitor::Style::OnTop);
+                }
             }
         });
 

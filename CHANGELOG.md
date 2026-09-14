@@ -137,6 +137,11 @@ than a summary written afterwards.
   meters away from under a call without being asked.
 - Where a platform will not give a second window, it falls back to the floating
   card, which is the same thing inside the window.
+- **Offered where the session starts**, not only in Settings: while the voice is
+  being veiled, a **keep the meters on top** button sits beside the live
+  indicator. That is the moment somebody is about to put a call in front of
+  this window, and a setting they have to go looking for afterwards is one they
+  find after the call.
 
 **The window draws at the display's rate**
 
