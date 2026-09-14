@@ -78,6 +78,54 @@ pub struct Secret {
     locked_span: usize,
 }
 
+/// Lock `span` bytes at `at` out of swap, answering whether it happened.
+///
+/// # Why this is a function rather than the call it wraps
+///
+/// Under Miri it does nothing and answers false. Miri interprets the program
+/// rather than running it, and it cannot call a foreign function it has no
+/// shim for: `mlock` is one of those, so the first `Secret` any test built
+/// ended the run with "unsupported operation", and the whole crate was
+/// therefore unexaminable by the one tool this project has for finding
+/// undefined behaviour. That is a large amount of parsing, framing and
+/// encoding left unchecked in exchange for exercising one system call that
+/// Miri could not have executed anyway.
+///
+/// Nothing is weakened by it. Locking has always been best effort here, as the
+/// module note says at length: a machine with no lock budget, a platform with
+/// no such call, and an allocation that will not align all take this same path
+/// already, `is_locked` answers false, and correctness has never depended on
+/// the answer. The interpreter is one more environment where the lock does not
+/// happen, and it is the only one that is a build rather than a machine.
+///
+/// The zeroing is untouched and is the part that matters for the guarantee
+/// this type makes, so Miri still sees every write and every drop.
+fn lock_pages(at: *const u8, span: usize) -> bool {
+    #[cfg(miri)]
+    {
+        let _ = (at, span);
+        false
+    }
+    #[cfg(not(miri))]
+    {
+        region::lock(at, span).map(std::mem::forget).is_ok()
+    }
+}
+
+/// Release a lock taken by [`lock_pages`]. Never reached under Miri, because
+/// nothing is locked there for `Drop` to release.
+fn unlock_pages(at: *const u8, span: usize) {
+    #[cfg(miri)]
+    {
+        let _ = (at, span);
+    }
+    #[cfg(not(miri))]
+    {
+        // Ignored on purpose: see the module note on not panicking here.
+        let _ = region::unlock(at, span);
+    }
+}
+
 impl Secret {
     /// Wrap `bytes`, taking ownership and wiping the caller's copy.
     pub fn new(bytes: &mut [u8]) -> Self {
@@ -110,9 +158,7 @@ impl Secret {
         } else {
             // Best-effort. `forget` keeps the lock in place without keeping the
             // panicking guard around; `Drop` releases it explicitly.
-            let ok = region::lock(backing[offset..].as_ptr(), span)
-                .map(std::mem::forget)
-                .is_ok();
+            let ok = lock_pages(backing[offset..].as_ptr(), span);
             (offset, if ok { span } else { 0 })
         };
         Self {
@@ -175,7 +221,7 @@ impl Drop for Secret {
         self.backing[..].zeroize();
         if self.locked_span > 0 {
             // Ignored on purpose: see the module note on not panicking here.
-            let _ = region::unlock(self.backing[self.offset..].as_ptr(), self.locked_span);
+            unlock_pages(self.backing[self.offset..].as_ptr(), self.locked_span);
         }
     }
 }
@@ -208,6 +254,73 @@ impl std::fmt::Debug for Secret {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The page lock is taken in one place, so the interpreter can be told
+    /// about it in one place.
+    ///
+    /// `lock_pages` and `unlock_pages` exist so that a Miri run does not stop
+    /// at the first `Secret` a test builds. That only holds while they are the
+    /// only callers: a second `region::lock` written straight into a
+    /// constructor would be invisible until somebody ran Miri again and found
+    /// the whole crate unexaminable for the second time. This reads the file
+    /// and fails naming the line, rather than leaving it to be rediscovered.
+    #[test]
+    fn the_page_lock_is_taken_in_exactly_one_place() {
+        let source = include_str!("amnesia.rs").replace("\r\n", "\n");
+        // Assembled at run time from halves. Written out whole, the needles
+        // would occur in this test's own body and it would report itself, which
+        // it did on the first run.
+        let taking = ["region", "::lock("].concat();
+        let releasing = ["region", "::unlock("].concat();
+        for (number, line) in source.split('\n').enumerate() {
+            let code = line.split("//").next().unwrap_or("");
+            if !code.contains(&taking) && !code.contains(&releasing) {
+                continue;
+            }
+            let before = source
+                .split('\n')
+                .take(number)
+                .collect::<Vec<_>>()
+                .join("\n");
+            let holder = before
+                .rsplit("fn ")
+                .next()
+                .and_then(|rest| rest.split('(').next())
+                .unwrap_or("");
+            assert!(
+                holder == "lock_pages" || holder == "unlock_pages",
+                "amnesia.rs:{}: region::lock or region::unlock is called from \
+                 `{holder}` rather than from lock_pages or unlock_pages. Route \
+                 it through those, or Miri stops at the first Secret built and \
+                 this crate cannot be checked for undefined behaviour at all.",
+                number + 1
+            );
+        }
+    }
+
+    /// A secret is correct whether or not its pages were locked.
+    ///
+    /// Locking is best effort everywhere: a machine with no budget, a platform
+    /// without the call, an allocation that will not align, and now an
+    /// interpreter that cannot make the call all take the same path. None of
+    /// them may change what the type stores or hands back.
+    #[test]
+    fn locking_or_not_changes_nothing_about_what_is_stored() {
+        let mut bytes = [7u8; 64];
+        let secret = Secret::new(&mut bytes);
+        assert_eq!(bytes, [0u8; 64], "the caller's copy was not wiped");
+        assert_eq!(secret.expose(), &[7u8; 64]);
+        assert_eq!(secret.expose().len(), 64);
+        // The one thing that legitimately differs, asserted as a fact about the
+        // build rather than about the machine, so that a locked run and an
+        // unlocked one both pass and neither claims the other's answer.
+        if cfg!(miri) {
+            assert!(
+                !secret.is_locked(),
+                "Miri cannot lock and must not say it did"
+            );
+        }
+    }
 
     #[test]
     fn new_wipes_the_callers_copy() {
