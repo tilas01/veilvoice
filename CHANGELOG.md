@@ -52,6 +52,16 @@ than a summary written afterwards.
 - The command line's offline claim was proved again on the built binary, four
   ways, and each guard was shown to fail when given something to catch.
 
+**A promise about allocation, kept**
+
+- The frame-pacing code carried a note saying it allocates nothing once a
+  frame, and then took its median with a sort that takes a scratch buffer for
+  a slice that long. Nothing looked wrong and nothing was slow; what was wrong
+  is that a sentence in this repository was not true about the code fourteen
+  lines beneath it.
+- It now selects the middle element in place instead, which allocates nothing
+  and is all a median needs.
+
 **The tests now stand at the edge of every boundary in the cryptography**
 
 - Mutation testing over the four files that matter most, which changes the

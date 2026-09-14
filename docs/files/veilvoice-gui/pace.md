@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/pace.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 480 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 489 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs)
 
 ## Contents
 
@@ -85,7 +85,7 @@ file.
 
 ## What this file contains
 
-480 lines defining **19 functions** (16 public), **2 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+489 lines defining **19 functions** (16 public), **2 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -109,7 +109,7 @@ file.
 - `Pace::dropping_seconds` (line 256) -- How many consecutive seconds have been dropping frames.
 - `Pace::frame` (line 268) -- Record that a frame is being drawn at time, egui's clock in seconds.
   - reaches: `median_hz`, `publish`, `target_hz`
-- `Pace::interval` (line 351) -- The interval animations currently pace by, for tests and the About tab.
+- `Pace::interval` (line 360) -- The interval animations currently pace by, for tests and the About tab.
 
 ## What calls what
 
@@ -148,8 +148,8 @@ flowchart TD
     n_dropping_seconds(["Pace::dropping_seconds<br/>line 256"])
     n_frame(["Pace::frame<br/>line 268"])
     n_median_hz["Pace::median_hz<br/>line 327"]
-    n_publish["Pace::publish<br/>line 341"]
-    n_interval(["Pace::interval<br/>line 351"])
+    n_publish["Pace::publish<br/>line 350"]
+    n_interval(["Pace::interval<br/>line 360"])
     n_default --> n_new
     n_frame --> n_median_hz
     n_frame --> n_publish
@@ -172,8 +172,8 @@ flowchart TD
     click n_dropping_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L256" "open the source"
     click n_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L268" "open the source"
     click n_median_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L327" "open the source"
-    click n_publish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L341" "open the source"
-    click n_interval href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L351" "open the source"
+    click n_publish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L350" "open the source"
+    click n_interval href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L360" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_next_frame,n_from_setting,n_to_setting,n_label,n_set_target,n_target,n_display_hz,n_fps,n_dropped_total,n_dropped_last_second,n_is_dropping,n_dropping_seconds,n_frame,n_interval entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -216,8 +216,8 @@ flowchart TD
 | `Pace::dropping_seconds` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L256) | How many consecutive seconds have been dropping frames. |
 | `Pace::frame` <sub>pub fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L268) | Record that a frame is being drawn at time, egui's clock in seconds. |
 | `Pace::median_hz` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L327) | The display's rate from the median interval, clamped to sense. |
-| `Pace::publish` <sub>fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L341) | Tell the animations what to ask for. |
-| `Pace::interval` <sub>pub fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L351) | The interval animations currently pace by, for tests and the About tab. |
+| `Pace::publish` <sub>fn</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L350) | Tell the animations what to ask for. |
+| `Pace::interval` <sub>pub fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L360) | The interval animations currently pace by, for tests and the About tab. |
 
 ---
 
