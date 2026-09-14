@@ -24,7 +24,7 @@ veilvoice-core = { path = "../veilvoice-core" }
 # file or a plaintext temporary. See `record`.
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 # Cross-platform audio I/O: WASAPI, CoreAudio, ALSA/JACK.
-cpal = { version = "0.15", optional = true }
+cpal = { version = "0.18", optional = true }
 # Lock-free SPSC ring buffer between the audio callbacks and the DSP thread.
 ringbuf = { version = "0.5", optional = true }
 # WAV read/write.
