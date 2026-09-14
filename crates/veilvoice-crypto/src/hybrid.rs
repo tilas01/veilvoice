@@ -336,6 +336,55 @@ impl rand_core::CryptoRng for OsRng {}
 mod tests {
     use super::*;
 
+    /// The adapter that hands the operating system's randomness to the KEM
+    /// crates actually hands over randomness.
+    ///
+    /// **Round thirty-three.** Mutation testing replaced `next_u32` and
+    /// `next_u64` with functions returning a constant, and replaced
+    /// `try_fill_bytes` with one that returns `Ok(())` without touching the
+    /// buffer. All three survived the suite, which is to say nothing in this
+    /// crate checked that its only randomness adapter emits anything. A key
+    /// derived from a buffer these left alone would be a key an attacker
+    /// already knows, and every test here would still have passed.
+    ///
+    /// Not a statistical test: this asks whether bytes arrive at all, which is
+    /// the failure a mutant (or a stubbed build) produces. `getrandom` is the
+    /// system's own source and is not this crate's to assess.
+    #[test]
+    fn the_randomness_adapter_actually_fills_what_it_is_given() {
+        use rand_core::RngCore as _;
+        let mut rng = OsRng;
+
+        // Distinct draws. Two equal `u32`s happen once in four billion; eight
+        // equal ones do not happen, and a constant gives exactly that.
+        let words: Vec<u32> = (0..8).map(|_| rng.next_u32()).collect();
+        assert!(
+            words.iter().any(|w| *w != words[0]),
+            "next_u32 returned the same value eight times: {words:?}"
+        );
+        let longs: Vec<u64> = (0..8).map(|_| rng.next_u64()).collect();
+        assert!(
+            longs.iter().any(|l| *l != longs[0]),
+            "next_u64 returned the same value eight times: {longs:?}"
+        );
+
+        // And the fallible form fills rather than merely succeeding. A buffer
+        // of thirty-two zeros staying zero is the exact shape of the mutant.
+        let mut buffer = [0u8; 32];
+        rng.try_fill_bytes(&mut buffer)
+            .expect("the OS randomness source is available in a test run");
+        assert!(
+            buffer.iter().any(|b| *b != 0),
+            "try_fill_bytes returned Ok and left the buffer untouched"
+        );
+
+        // The infallible form, which is the one the KEM crates call.
+        let mut filled = [0u8; 32];
+        rng.fill_bytes(&mut filled);
+        assert!(filled.iter().any(|b| *b != 0));
+        assert_ne!(filled, buffer, "two draws produced identical bytes");
+    }
+
     #[test]
     fn encapsulate_then_decapsulate_agrees() {
         let (sk, pk) = SecretKey::generate().unwrap();

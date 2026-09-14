@@ -52,6 +52,31 @@ than a summary written afterwards.
 - The command line's offline claim was proved again on the built binary, four
   ways, and each guard was shown to fail when given something to catch.
 
+**The tests now stand at the edge of every boundary in the cryptography**
+
+- Mutation testing over the four files that matter most, which changes the
+  code a line at a time and asks whether any test objects: 127 changes, 91
+  objected to, 21 that do not compile, and **fifteen that the whole suite
+  accepted**.
+- **Five were boundaries in the parser that reads a file somebody sends you**:
+  the length tests and both checks on what a header claims to carry. Each is
+  now tested from both sides, at exactly the length in question rather than
+  near it.
+- **Four were the ceilings that stop a file from choosing how much memory this
+  program allocates.** Each now accepts its own value and refuses one past it,
+  and a header asking for zero lanes is refused on its own rather than only in
+  company.
+- **Three were the randomness adapter, and that is the one worth saying
+  plainly.** Replacing it with something that returns a constant, or that
+  claims success without writing a byte, passed every test this project had. A
+  key drawn from a buffer left untouched is a key somebody else already knows.
+  It is now asked, in both forms, whether bytes actually arrive.
+- One of the fifteen cannot be killed and the reason is now written where it
+  lives: a ceiling on parallelism that the memory ceiling always reaches
+  first. It stays, because a guard that is only redundant today is not a guard
+  to delete, and the next person who changes it and sees nothing happen will
+  find the answer in the comment rather than concluding the line is dead.
+
 **The command it prints and the command it runs cannot drift apart**
 
 - `veilvoice conversation` prints an `ffmpeg` command for you to run yourself,

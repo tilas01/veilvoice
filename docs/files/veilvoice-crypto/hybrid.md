@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/hybrid.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 475 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 524 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs)
 
 ## Contents
 
@@ -75,7 +75,7 @@ if the old one falls to a quantum computer, the newer one still holds.
 
 ## What this file contains
 
-475 lines defining **15 functions** (10 public), **4 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+524 lines defining **15 functions** (10 public), **4 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

@@ -290,6 +290,83 @@ mod tests {
 
     const MSG: &[u8] = b"a recording that must never leak";
 
+    /// A header built byte by byte, so a test can say exactly what is wrong
+    /// with it.
+    ///
+    /// `Header::to_bytes` cannot express the malformed cases: it takes the
+    /// encapsulation's length from the vector, so it can never produce a
+    /// password-mode header that claims one. These bytes can.
+    fn raw_header(mode: u8, enc_len: u32) -> Vec<u8> {
+        let mut out = Vec::with_capacity(HEADER_LEN);
+        out.extend_from_slice(MAGIC);
+        out.push(FORMAT_VERSION);
+        out.push(mode);
+        out.extend_from_slice(&[0, 0]); // reserved
+        out.extend_from_slice(&weak().m_cost.to_le_bytes());
+        out.extend_from_slice(&weak().t_cost.to_le_bytes());
+        out.extend_from_slice(&weak().p_cost.to_le_bytes());
+        out.extend_from_slice(&[7u8; kdf::SALT_LEN]);
+        out.extend_from_slice(&[9u8; aead::NONCE_LEN]);
+        out.extend_from_slice(&enc_len.to_le_bytes());
+        assert_eq!(out.len(), HEADER_LEN);
+        out
+    }
+
+    /// The boundaries of every length test in `parse`, each from both sides.
+    ///
+    /// **Round thirty-three.** Mutation testing replaced `<` with `<=` in both
+    /// length tests, and `!=` with `false` in both mode guards, and every one
+    /// of those five mutants survived the suite: the parser was tested for
+    /// what it accepts and for input that is wildly wrong, and not at the one
+    /// byte where an off-by-one lives. These are the five cases that kill
+    /// them.
+    #[test]
+    fn the_length_tests_in_parse_are_exact_at_the_boundary() {
+        // Exactly a header and nothing more is a whole header: `<=` here
+        // would refuse the shortest valid container this format can hold.
+        let exact = raw_header(MODE_PASSWORD, 0);
+        let (header, body) = Header::parse(&exact).expect("a header of exactly HEADER_LEN parses");
+        assert_eq!(body, HEADER_LEN);
+        assert_eq!(header.mode, Mode::Password);
+
+        // One byte short is truncated, and stays truncated: `==` in the second
+        // test would let a short buffer through to a slice that is not there.
+        let short = &exact[..exact.len() - 1];
+        assert!(matches!(Header::parse(short), Err(Error::Truncated)));
+
+        // A hybrid header whose encapsulation is exactly as long as it says
+        // parses, and one byte short of it does not.
+        let mut hybrid_exact = raw_header(MODE_HYBRID, hybrid::ENCAPSULATION_LEN as u32);
+        hybrid_exact.extend(std::iter::repeat_n(0x5a, hybrid::ENCAPSULATION_LEN));
+        let (_, body) = Header::parse(&hybrid_exact).expect("a whole hybrid header parses");
+        assert_eq!(body, HEADER_LEN + hybrid::ENCAPSULATION_LEN);
+        assert!(matches!(
+            Header::parse(&hybrid_exact[..hybrid_exact.len() - 1]),
+            Err(Error::Truncated)
+        ));
+
+        // A password header that claims an encapsulation is malformed. There
+        // is nothing to encapsulate to: the key came from a passphrase.
+        let mut lying = raw_header(MODE_PASSWORD, 1);
+        lying.push(0);
+        assert!(matches!(Header::parse(&lying), Err(Error::BadHeader)));
+
+        // And a hybrid header whose encapsulation is the wrong length is
+        // malformed whichever side of the right length it falls.
+        for wrong in [
+            hybrid::ENCAPSULATION_LEN - 1,
+            hybrid::ENCAPSULATION_LEN + 1,
+            0,
+        ] {
+            let mut odd = raw_header(MODE_HYBRID, wrong as u32);
+            odd.extend(std::iter::repeat_n(0x5a, wrong));
+            assert!(
+                matches!(Header::parse(&odd), Err(Error::BadHeader)),
+                "a hybrid header declaring {wrong} bytes of encapsulation was accepted"
+            );
+        }
+    }
+
     #[test]
     fn password_round_trip() {
         let ct = seal_with_password(b"hunter2", MSG, weak()).unwrap();

@@ -132,7 +132,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="veilvoice-crypto/container.src.html">
 <rect x="407.7" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="470.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">container.rs</text>
-<text x="470.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">535 lines</text>
+<text x="470.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">612 lines</text>
 </a>
 <a href="veilvoice-crypto/hoard.src.html">
 <rect x="28.1" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -142,12 +142,12 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="veilvoice-crypto/hybrid.src.html">
 <rect x="162.7" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="212.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hybrid.rs</text>
-<text x="212.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">475 lines</text>
+<text x="212.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">524 lines</text>
 </a>
 <a href="veilvoice-crypto/kdf.src.html">
 <rect x="289.2" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="339.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">kdf.rs</text>
-<text x="339.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">525 lines</text>
+<text x="339.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">633 lines</text>
 </a>
 <a href="veilvoice-crypto/lock.src.html">
 <rect x="415.7" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -195,10 +195,10 @@ flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;240 lines&quot;])
     n_aead[&quot;aead.rs&lt;br/&gt;276 lines&quot;]
     n_amnesia[&quot;amnesia.rs&lt;br/&gt;327 lines&quot;]
-    n_container[&quot;container.rs&lt;br/&gt;535 lines&quot;]
+    n_container[&quot;container.rs&lt;br/&gt;612 lines&quot;]
     n_hoard[&quot;hoard.rs&lt;br/&gt;1037 lines&quot;]
-    n_hybrid[&quot;hybrid.rs&lt;br/&gt;475 lines&quot;]
-    n_kdf[&quot;kdf.rs&lt;br/&gt;525 lines&quot;]
+    n_hybrid[&quot;hybrid.rs&lt;br/&gt;524 lines&quot;]
+    n_kdf[&quot;kdf.rs&lt;br/&gt;633 lines&quot;]
     n_lock[&quot;lock.rs&lt;br/&gt;1958 lines&quot;]
     n_privatefile[&quot;privatefile.rs&lt;br/&gt;308 lines&quot;]
     n_shred[&quot;shred.rs&lt;br/&gt;415 lines&quot;]
@@ -239,10 +239,10 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-crypto/aead.html"><code>aead.rs</code></a></td><td>276</td><td>Authenticated encryption with XChaCha20-Poly1305.</td></tr>
 <tr><td><a href="veilvoice-crypto/amnesia.html"><code>amnesia.rs</code></a></td><td>327</td><td>Amnesic secret storage: page-locked, zeroized, and never printed.</td></tr>
-<tr><td><a href="veilvoice-crypto/container.html"><code>container.rs</code></a></td><td>535</td><td>The .veil encrypted container format.</td></tr>
+<tr><td><a href="veilvoice-crypto/container.html"><code>container.rs</code></a></td><td>612</td><td>The .veil encrypted container format.</td></tr>
 <tr><td><a href="veilvoice-crypto/hoard.html"><code>hoard.rs</code></a></td><td>1037</td><td>The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing.</td></tr>
-<tr><td><a href="veilvoice-crypto/hybrid.html"><code>hybrid.rs</code></a></td><td>475</td><td>Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.</td></tr>
-<tr><td><a href="veilvoice-crypto/kdf.html"><code>kdf.rs</code></a></td><td>525</td><td>Password-based key derivation with Argon2id.</td></tr>
+<tr><td><a href="veilvoice-crypto/hybrid.html"><code>hybrid.rs</code></a></td><td>524</td><td>Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.</td></tr>
+<tr><td><a href="veilvoice-crypto/kdf.html"><code>kdf.rs</code></a></td><td>633</td><td>Password-based key derivation with Argon2id.</td></tr>
 <tr><td><a href="veilvoice-crypto/lib.html"><code>lib.rs</code></a></td><td>240</td><td>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</td></tr>
 <tr><td><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a></td><td>1958</td><td>The application lock: an Argon2id password verifier with a rate limit.</td></tr>
 <tr><td><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a></td><td>308</td><td>Writing a file that only its owner can read.</td></tr>

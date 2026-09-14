@@ -111,10 +111,10 @@ flowchart TD
     n_lib(["lib.rs<br/>240 lines"])
     n_aead["aead.rs<br/>276 lines"]
     n_amnesia["amnesia.rs<br/>327 lines"]
-    n_container["container.rs<br/>535 lines"]
+    n_container["container.rs<br/>612 lines"]
     n_hoard["hoard.rs<br/>1037 lines"]
-    n_hybrid["hybrid.rs<br/>475 lines"]
-    n_kdf["kdf.rs<br/>525 lines"]
+    n_hybrid["hybrid.rs<br/>524 lines"]
+    n_kdf["kdf.rs<br/>633 lines"]
     n_lock["lock.rs<br/>1958 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
@@ -157,10 +157,10 @@ flowchart TD
 |---|---:|---|
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 276 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 327 | Amnesic secret storage: page-locked, zeroized, and never printed. |
-| [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 535 | The .veil encrypted container format. |
+| [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 612 | The .veil encrypted container format. |
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1037 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
-| [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 475 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
-| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
+| [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 524 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
+| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1958 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 308 | Writing a file that only its owner can read. |
@@ -173,7 +173,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**6,193 functional lines of Rust** in this crate. A functional line is a line
+**6,322 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
