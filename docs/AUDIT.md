@@ -258,7 +258,7 @@ having looked.
 | the app-manifest generator's self-test | by hand | **now** | nothing |
 | the local site serves every page | by hand | **now** | nothing |
 | the offline claim, on the built command line | yes | yes | no import, no syscall, works in an empty network namespace; each guard proved able to fail |
-| Miri | no | no | outstanding: the container's disk, not a finding |
+| Miri | no | no | **run, first time**: `veilvoice-check` clean, `veilvoice-meta` clean but for four tests Miri's filesystem shim will not let write; `veilvoice-conversation` did not finish |
 | a reproducible-build rebuild | yes, per release | yes, per release | not re-run here |
 
 Two checks stay out of a workflow on purpose and the reason is worth writing
@@ -268,6 +268,39 @@ needs the archive, the sums and the signature downloaded into one folder.
 `tools/measured/generate.py --check` runs the whole test suite a second time in
 order to count it. Both are in `tools/verify.py`, which is what somebody runs
 before a release; neither belongs in a job that should finish in minutes.
+
+### Miri, and what it could and could not say
+
+**V5 in the brief, and the first time this project has run it.** `cargo
++nightly miri test` interprets the program and reports undefined behaviour.
+In a workspace where every crate forbids `unsafe`, anything it found would
+belong to a dependency, which makes a hit here a supply-chain finding rather
+than a code one.
+
+`veilvoice-check`, which holds the release-signature and contents-manifest
+readers: **29 tests, no failures, no undefined behaviour**, in 273 seconds.
+
+`veilvoice-meta`, which holds the WAV chunk walker and the metadata stripper:
+**20 of 24 passed with no undefined behaviour reported anywhere**. The four
+that did not pass all fail the same way and it is worth being precise about
+what that does and does not mean. Each is a test that writes tags into a real
+file through `lofty`, and each fails with `Malformed("failed to write to
+file")`. Miri reported no undefined behaviour and no unsupported operation:
+what failed is a write through Miri's filesystem shim, and the same four tests
+pass in seconds outside it. So this is the interpreter's environment rather
+than a defect, and it is recorded as a limit on the coverage rather than as a
+result: **the tag writer is the one part of this crate Miri did not get to
+examine.**
+
+`veilvoice-conversation` did not finish. Its render tests process audio, which
+under an interpreter is slow enough that one of them held the run for a
+quarter of an hour, and the container's clock ran out. Not a finding, and not
+a pass either: it is simply not done, and saying so is the rule this document
+is held to.
+
+The honest summary is that Miri has now been run here for the first time, it
+found nothing, and it covered two crates of the five the brief names. The
+brief carries the rest.
 
 ### What was read and found correct
 
