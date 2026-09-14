@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/edit.svg" alt="edit.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/edit.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 657 lines &middot; <a href="edit.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 649 lines &middot; <a href="edit.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-plan-needs-correcting-at-all">Why a plan needs correcting at all</a>
@@ -82,7 +82,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>657 lines defining <strong>12 functions</strong> (11 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>649 lines defining <strong>11 functions</strong> (10 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>check_colour</code> <span style="color:var(--muted)">line 63</span> &middot; A colour a speaker can be given, as #rrggbb.
 </li>
@@ -102,8 +102,6 @@
 <li><code>Conversation::set_name</code> <span style="color:var(--muted)">line 281</span> &middot; Rename one speaker.
 </li>
 <li><code>Conversation::set_colour</code> <span style="color:var(--muted)">line 309</span> &middot; Give a speaker a colour, or take it away again.
-</li>
-<li><code>speaker_with_colour</code> <span style="color:var(--muted)">line 346</span> &middot; A speaker with a colour, for building one in a front end.
 </li>
 </ul>
 </section>
@@ -172,19 +170,14 @@
 <text x="433.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 281</text>
 </a>
 <a href="edit.src.html#fn-conversation-set_colour">
-<rect x="95.4" y="420.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="206.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::set_colour</text>
-<text x="206.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<rect x="198.9" y="420.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="309.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::set_colour</text>
+<text x="309.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
 </a>
 <a href="edit.src.html#fn-conversation-nearest_hint">
 <rect x="190.9" y="520.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="309.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::nearest_hint</text>
 <text x="309.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
-</a>
-<a href="edit.src.html#fn-speaker_with_colour">
-<rect x="342.8" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="433.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">speaker_with_colour</text>
-<text x="433.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 346</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -214,7 +207,6 @@ flowchart TD
     n_set_name([&quot;Conversation::set_name&lt;br/&gt;line 281&quot;])
     n_set_colour([&quot;Conversation::set_colour&lt;br/&gt;line 309&quot;])
     n_nearest_hint[&quot;Conversation::nearest_hint&lt;br/&gt;line 327&quot;]
-    n_speaker_with_colour([&quot;speaker_with_colour&lt;br/&gt;line 346&quot;])
     n_merge --&gt; n_turn_at
     n_reassign_at --&gt; n_nearest_hint
     n_reassign_at --&gt; n_reassign
@@ -232,9 +224,8 @@ flowchart TD
     click n_set_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L281&quot; &quot;open the source&quot;
     click n_set_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L309&quot; &quot;open the source&quot;
     click n_nearest_hint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L327&quot; &quot;open the source&quot;
-    click n_speaker_with_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L346&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_check_colour,n_turns_at,n_reassign_at,n_split_at,n_merge,n_move_edges,n_set_name,n_set_colour,n_speaker_with_colour entry
+    class n_check_colour,n_turns_at,n_reassign_at,n_split_at,n_merge,n_move_edges,n_set_name,n_set_colour entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_turn_at,n_reassign api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -256,7 +247,6 @@ flowchart TD
 <tr><td><code>Conversation::set_name</code> <sub>pub fn</sub></td><td><a href="edit.src.html#fn-conversation-set_name">281</a></td><td>Rename one speaker.</td></tr>
 <tr><td><code>Conversation::set_colour</code> <sub>pub fn</sub></td><td><a href="edit.src.html#fn-conversation-set_colour">309</a></td><td>Give a speaker a colour, or take it away again.</td></tr>
 <tr><td><code>Conversation::nearest_hint</code> <sub>fn</sub></td><td><a href="edit.src.html#fn-conversation-nearest_hint">327</a></td><td>Where to look, for a timestamp that landed in no span.</td></tr>
-<tr><td><code>speaker_with_colour</code> <sub>pub fn</sub></td><td><a href="edit.src.html#fn-speaker_with_colour">346</a></td><td>A speaker with a colour, for building one in a front end.</td></tr>
 </tbody></table>
 </section>
 </div></div>

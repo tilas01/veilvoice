@@ -126,18 +126,12 @@ pub struct VaultStore {
     dir: Option<PathBuf>,
     /// The obfuscated store, once a passphrase has produced its key.
     hoard: Option<Hoard>,
-    /// What the last audit found, for the security tab to show.
-    audit: Option<Audit>,
 }
 
 impl VaultStore {
     /// Point at the program folder. Nothing is read or written yet.
     pub fn new(dir: Option<PathBuf>) -> Self {
-        Self {
-            dir,
-            hoard: None,
-            audit: None,
-        }
+        Self { dir, hoard: None }
     }
 
     /// The program folder, if this platform has one.
@@ -192,7 +186,6 @@ impl VaultStore {
         }
 
         let audit = hoard.audit().map_err(|e| e.to_string())?;
-        self.audit = Some(audit.clone());
         self.hoard = Some(hoard);
         Ok(audit)
     }
@@ -200,11 +193,6 @@ impl VaultStore {
     /// Forget the key. Called when the window locks.
     pub fn locked(&mut self) {
         self.hoard = None;
-    }
-
-    /// What the last audit found, if one has run this session.
-    pub fn last_audit(&self) -> Option<&Audit> {
-        self.audit.as_ref()
     }
 
     /// Read a record, from the hoard if it is open and from the plain file if

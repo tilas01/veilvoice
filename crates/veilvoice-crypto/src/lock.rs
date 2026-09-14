@@ -330,12 +330,6 @@ impl AppLock {
         Ok(())
     }
 
-    /// True when this record predates the authentication tag and should be
-    /// rewritten once the passphrase is in hand.
-    pub fn needs_upgrade(&self) -> bool {
-        self.version < FORMAT_VERSION
-    }
-
     fn tag_matches(&self, tag_key: &Secret) -> bool {
         let Ok(want) = self.tag(tag_key) else {
             // A failure to compute the tag is a broken build or an exhausted

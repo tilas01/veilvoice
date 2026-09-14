@@ -175,6 +175,20 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>Focus now lands on the dialog itself, which is where a modal&#x27;s focus belongs: a screen reader announces its title from there, the first Tab reaches the first control, and the trap that keeps focus inside the notice still holds. Nothing looks pressed until the reader presses it.</li>
 <li>Checked by the website&#x27;s own suite, which reads the script and the stylesheet and fails if either goes back.</li>
 </ul>
+<p><strong>The numbers this project states about itself are written by the tool that measures them</strong></p>
+<ul>
+<li>The README, the front page and one row of the audit state how many tests this tree has, how many crates, how many website suites and how many functional lines of Rust. Ten sentences in all, and every one of them was typed by hand and compared against the tree by the website suite.</li>
+<li>The comparison was doing its job. The typing was not: every change to any Rust file moves the line count, so a commit that changed code and not those ten places failed a check that had nothing to do with what the commit was for. It happened four times in a single round.</li>
+<li>The generator that already takes those numbers now writes the sentences from them too, using the same patterns the suite checks with, so the tool that writes a claim and the check that reads it cannot disagree about where the claim is. The check is unchanged and still runs.</li>
+<li>Nothing a reader sees is different, and that is the point: the numbers were right before and are right now without anybody having to remember them.</li>
+</ul>
+<p><strong>Code that nothing reached, taken out, and a check so it cannot come back</strong></p>
+<ul>
+<li>Five public items were compiled into every binary on every platform, documented, published into the generated reference and the wiki, and called by nothing: not by the programs, not by a test, not by anything. Each had been superseded by a path that does the same job, and none of them was wrong, which is why nobody had noticed.</li>
+<li>One of them was costing something. An accessor for the last vault audit kept alive a private field, and that field was filled by a copy of the audit result made every time the vault was opened, for a value no line of code ever read. The accessor, the field and the copy are all gone.</li>
+<li>The compiler cannot report this. Its dead-code warning stops at the edge of a library, because a public item might be called by a program the compiler cannot see, and an accessor that reads a private field keeps that field looking used while it does.</li>
+<li>So a check now asks it: every public item has to be named somewhere other than the line that declares it. An item used only by its tests passes, which is a normal thing for a reader kept beside a writer. An item used by nothing fails the build, naming the file and the line. It runs in CI and before every commit, and it was proved able to fail before it was trusted.</li>
+</ul>
 <p><strong>The audit, round thirty-three: the whole tree read again</strong></p>
 <ul>
 <li>The round after 0.1.21, run against the brief written before it began: every class of defect the earlier rounds established and every check the repository runs, asked of each file. What it found is written up in <code>docs/AUDIT.md</code>; what changed because of it is below.</li>

@@ -29,15 +29,32 @@ with a new reason.
 What is generated
 -----------------
 
-``docs/MEASURED.md``, a small table. Nothing prose-like: it is data, and the
-documents that make claims are checked against it rather than rewritten by it.
-``docs/AUDIT.md`` is written by a person and stays that way; the site suite
-fails the build when what it says disagrees with what is here.
+``docs/MEASURED.md``, a small table of the measurements themselves.
+
+And, from it, the ten places in ``README.md``, ``website/index.html`` and
+``docs/AUDIT.md`` that state one of those numbers in a sentence. Those used to
+be typed, with ``tools/site-tests/css.test.js`` comparing each against this
+file and failing the build on a disagreement. The comparison was right and it
+stays. The typing was the defect: every change to any Rust file moves the
+functional line count, so a commit that touched code and not those ten places
+failed a check that had nothing to do with what the commit was for. It happened
+four times in round thirty-three alone, which is the measurement that made this
+worth doing. Marker 152.
+
+So the writer and the checker read the same anchors, and a claim can now drift
+only if this tool is not run -- which ``tools/verify.py`` and CI both do.
+
+``docs/AUDIT.md`` is otherwise written by a person and stays that way. The one
+row touched here is the "Test suite" row of its state-of-the-tree table, which
+is a description of now rather than a record of the past, and the regular
+expression is anchored to that row so that no past number elsewhere in the
+document is within reach of it.
 
 Usage
 -----
 
-    python tools/measured/generate.py            # measure and write
+    python tools/measured/generate.py            # measure, write, and rewrite
+                                                 # every claim from the result
     python tools/measured/generate.py --check    # measure and compare
 """
 
@@ -199,15 +216,94 @@ def host_triple() -> str:
     return found.group(1) if found else "unknown"
 
 
-def render() -> str:
+# Every place one of the measured numbers is stated in a sentence, and the
+# pattern that finds it. The first capture group is the number, and only that
+# group is rewritten: the words around it belong to whoever wrote them.
+#
+# These are the same anchors `tools/site-tests/css.test.js` checks against
+# `docs/MEASURED.md`, deliberately, so that the tool which writes a claim and
+# the suite which checks it cannot disagree about where the claim is. If one of
+# these patterns stops matching, the suite says so by name before this tool can
+# quietly write nothing.
+#
+# The audit's three are anchored to the "Test suite" row. That document
+# discusses past numbers, F-71's own write-up quotes "354 tests across 9
+# crates", and a looser pattern reads the history instead of the claim; it did
+# exactly that the first time the suite was written.
+CLAIMS = [
+    ("website/index.html", r"(\d+) tests, and \d+ more suites", "tests"),
+    ("website/index.html", r"\d+ tests, and (\d+) more suites", "suites"),
+    ("website/index.html", r"in any of the (\d+) crates", "crates"),
+    ("docs/AUDIT.md", r"\| Test suite \| (\d+) tests across \d+ crates", "tests"),
+    ("docs/AUDIT.md", r"\| Test suite \| \d+ tests across (\d+) crates", "crates"),
+    ("docs/AUDIT.md", r"\| Test suite \|[^|]*?and (\d+) site-test suites", "suites"),
+    ("README.md", r"\((\d+) tests across \d+\ncrates", "tests"),
+    ("README.md", r"\(\d+ tests across (\d+)\ncrates", "crates"),
+    ("README.md", r"and (\d+) website suites", "suites"),
+    ("README.md", r"\*\*(\d+) functional lines of Rust\*\*", "lines"),
+]
+
+
+def claimed(measurements: dict, check: bool) -> list:
+    """Write every claim from the measurements, or report the ones that drifted.
+
+    One file is read, rewritten and written back per claim rather than all at
+    once, because replacing a number changes every offset after it and a batch
+    of spans taken from one read would land in the wrong places. Ten small
+    passes over three files is not a cost worth optimising away.
+    """
+    problems = []
+    for name, pattern, key in CLAIMS:
+        path = ROOT / name
+        text = path.read_text(encoding="utf-8")
+        found = re.search(pattern, text)
+        if not found:
+            problems.append(
+                f"{name}: nothing matches the pattern for the {key} count, "
+                "so that claim is no longer being written or watched"
+            )
+            continue
+        want = str(measurements[key])
+        if found.group(1) == want:
+            continue
+        if check:
+            problems.append(
+                f"{name}: the {key} count says {found.group(1)}, "
+                f"the tree measures {want}"
+            )
+            continue
+        start, end = found.span(1)
+        with io.open(path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text[:start] + want + text[end:])
+    return problems
+
+
+def measure() -> dict:
+    """Every number, taken once.
+
+    Returned as a mapping rather than rendered straight into the table, because
+    the same four values are also written into the sentences that state them and
+    measuring twice would be two answers to one question.
+    """
     written_up, highest = audit_findings()
+    return {
+        "tests": measured_tests(),
+        "crates": workspace_crates(),
+        "suites": site_suites(),
+        "lines": sum(loc.per_crate().values()),
+        "written_up": written_up,
+        "highest": highest,
+    }
+
+
+def render(measurements: dict) -> str:
     rows = [
-        ("Tests, measured by running them", measured_tests()),
-        ("Crates in the workspace", workspace_crates()),
-        ("Website suites", site_suites()),
-        ("Functional lines of Rust", sum(loc.per_crate().values())),
-        ("Findings written up in the audit", written_up),
-        ("Highest finding number used", highest),
+        ("Tests, measured by running them", measurements["tests"]),
+        ("Crates in the workspace", measurements["crates"]),
+        ("Website suites", measurements["suites"]),
+        ("Functional lines of Rust", measurements["lines"]),
+        ("Findings written up in the audit", measurements["written_up"]),
+        ("Highest finding number used", measurements["highest"]),
     ]
     body = "".join(f"| {name} | {value} |\n" for name, value in rows)
     body += f"| Measured on | `{host_triple()}` |\n"
@@ -216,7 +312,9 @@ def render() -> str:
 
 def main() -> int:
     check = "--check" in sys.argv
-    fresh = render()
+    measurements = measure()
+    fresh = render(measurements)
+
     if check:
         if not OUTPUT.is_file():
             print(f"{OUTPUT.relative_to(ROOT)} is missing", file=sys.stderr)
@@ -229,13 +327,31 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 1
+        problems = claimed(measurements, check=True)
+        if problems:
+            for problem in problems:
+                print(problem, file=sys.stderr)
+            print(
+                "Regenerate them with:\n    python tools/measured/generate.py",
+                file=sys.stderr,
+            )
+            return 1
         print("measured numbers match the tree")
         return 0
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with io.open(OUTPUT, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(fresh)
-    print(f"wrote {OUTPUT.relative_to(ROOT)}")
+    problems = claimed(measurements, check=False)
+    if problems:
+        # Only a pattern that no longer matches reaches here when writing. That
+        # is a claim nothing is writing and nothing is watching, which is the
+        # state this tool exists to make impossible, so it fails rather than
+        # reporting a successful write of nine out of ten.
+        for problem in problems:
+            print(problem, file=sys.stderr)
+        return 1
+    print(f"wrote {OUTPUT.relative_to(ROOT)}, and every claim taken from it")
     return 0
 
 

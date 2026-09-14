@@ -52,7 +52,7 @@
 //! So it has to be right before you render, and that means it has to be easy to
 //! correct.
 
-use crate::plan::{Conversation, Speaker, Turn};
+use crate::plan::{Conversation, Turn};
 use crate::Error;
 
 /// A colour a speaker can be given, as `#rrggbb`.
@@ -342,18 +342,10 @@ impl Conversation {
     }
 }
 
-/// A speaker with a colour, for building one in a front end.
-pub fn speaker_with_colour(name: &str, colour: Option<&str>) -> Result<Speaker, Error> {
-    Ok(Speaker {
-        name: name.trim().to_string(),
-        picture: None,
-        colour: colour.map(check_colour).transpose()?,
-    })
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::plan::Speaker;
 
     /// Three speakers and four spans, the shape most corrections happen on.
     fn plan() -> Conversation {

@@ -200,11 +200,6 @@ impl WatchFeed {
         std::mem::take(&mut self.unseen)
     }
 
-    /// Whether anything is waiting to be shown.
-    pub fn has_unseen(&self) -> bool {
-        !self.unseen.is_empty()
-    }
-
     /// Take whatever has arrived. Never waits.
     ///
     /// Returns true when something new came in, so the caller can decide
