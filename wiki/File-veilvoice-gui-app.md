@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 3527 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 3548 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -146,7 +146,7 @@ started on another thread and the answer is collected later.
 
 ## What this file contains
 
-3527 lines defining **34 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+3548 lines defining **34 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -284,13 +284,13 @@ flowchart TD
 | `VeilVoiceApp::start_job` <sub>fn</sub> | [1749](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1749) |  |
 | `VeilVoiceApp::guest_list` <sub>fn</sub> | [1860](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1860) | The Recording Studio: the voice first, then the take. |
 | `VeilVoiceApp::studio_tab` <sub>fn</sub> | [1936](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1936) |  |
-| `VeilVoiceApp::start_preview` <sub>fn</sub> | [2278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2278) | Veil to this machine's own output, and say where it is going. |
-| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [2330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2330) | Ask the safety catch what it makes of what is holding a microphone. |
-| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [2406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2406) | Re-scan on a timer rather than every frame. |
-| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [2436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2436) |  |
-| `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [2526](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2526) | Say so if the last run ended badly, and offer the file. |
-| `VeilVoiceApp::about_tab` <sub>fn</sub> | [2542](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2542) |  |
-| `paths_section` <sub>fn</sub> | [2672](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2672) | Where this copy is keeping things, on this machine. |
-| `device_picker` <sub>fn</sub> | [2731](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2731) |  |
-| `field` <sub>fn</sub> | [2756](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2756) |  |
-| `header_layout_tests` <sub>mod</sub> | [2764](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2764) |  |
+| `VeilVoiceApp::start_preview` <sub>fn</sub> | [2299](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2299) | Veil to this machine's own output, and say where it is going. |
+| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [2351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2351) | Ask the safety catch what it makes of what is holding a microphone. |
+| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [2427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2427) | Re-scan on a timer rather than every frame. |
+| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [2457](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2457) |  |
+| `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [2547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2547) | Say so if the last run ended badly, and offer the file. |
+| `VeilVoiceApp::about_tab` <sub>fn</sub> | [2563](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2563) |  |
+| `paths_section` <sub>fn</sub> | [2693](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2693) | Where this copy is keeping things, on this machine. |
+| `device_picker` <sub>fn</sub> | [2752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2752) |  |
+| `field` <sub>fn</sub> | [2777](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2777) |  |
+| `header_layout_tests` <sub>mod</sub> | [2785](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2785) |  |
