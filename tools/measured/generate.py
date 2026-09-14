@@ -241,6 +241,18 @@ CLAIMS = [
     ("README.md", r"\(\d+ tests across (\d+)\ncrates", "crates"),
     ("README.md", r"and (\d+) website suites", "suites"),
     ("README.md", r"\*\*(\d+) functional lines of Rust\*\*", "lines"),
+    # The defect count, in the two places that state it outside the audit. Its
+    # measurement is `audit_findings`, which counts entries rather than
+    # mentions, because F-93 and F-94 were fixed, described in their commits,
+    # referred to by a later round, and never given an entry of their own: any
+    # count taken by grepping for a finding number said they were documented.
+    #
+    # The audit's own verdict is not written from here and will not be. It is
+    # the sentence the count is taken from, so writing it from the count would
+    # be the tool agreeing with itself, which is the failure this file was
+    # written after (F-61, F-63, F-71).
+    ("README.md", r"\*\*(\d+) defects\*\*", "written_up"),
+    ("website/index.html", r"(\d+) defects found and fixed across", "written_up"),
 ]
 
 

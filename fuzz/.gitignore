@@ -10,4 +10,16 @@ target/
 corpus/
 artifacts/
 coverage/
+
+# The one entry here that is not a working directory, so it gets its own
+# sentence rather than sitting at the end of that list unexplained.
+#
+# The workspace commits its lock file, because a released binary has to be
+# rebuildable from the same dependency versions years later and that is the
+# whole basis of the reproducibility claim. Nothing here is released. These
+# targets exist to find defects, and a campaign run against last year's pinned
+# dependencies is a campaign that cannot find a defect introduced since. So
+# `fuzz/` resolves fresh, the weekly workflow does not pass `--locked`, and
+# Dependabot watches `fuzz/Cargo.toml` so a version range that stops making
+# sense is still raised.
 Cargo.lock

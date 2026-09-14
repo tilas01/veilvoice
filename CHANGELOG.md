@@ -40,6 +40,26 @@ measures them**
 - Nothing a reader sees is different, and that is the point: the numbers were
   right before and are right now without anybody having to remember them.
 
+**The undefined-behaviour checker can now look at the cryptography**
+
+- VeilVoice keeps every key and passphrase in a type that locks its pages out
+  of swap, so the operating system cannot write them to disk. That lock is made
+  with a system call the interpreter used to check for undefined behaviour
+  cannot make, so the first key any test created stopped the check dead, and
+  the part of the program that does the encrypting was the one part that could
+  not be checked this way at all.
+- The lock is now skipped when running under that interpreter, which is the
+  same thing that already happens on a machine with no budget for it or a
+  platform without the call. The program reports honestly that the pages are
+  not locked, and nothing about what it stores or wipes changes. Ordinary runs
+  are untouched and still lock.
+- The checker then read the reversible encodings, the authenticated encryption,
+  the protected-memory type itself, the chunked store, the file shredder and
+  the private-file helper, and found nothing wrong in any of them.
+- Two tests keep it that way: one fails if the lock is ever taken outside the
+  one place that knows about this, and one proves a secret holds and wipes the
+  same bytes whether the lock happened or not.
+
 **Code that nothing reached, taken out, and a check so it cannot come back**
 
 - Five public items were compiled into every binary on every platform,

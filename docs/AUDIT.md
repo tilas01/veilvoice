@@ -285,6 +285,76 @@ function nothing called and watching it name the file and line.
 worth exactly nothing next to the sweep that answers it for all 1631 at once,
 and the sweep is the part that is now repeatable.
 
+### F-183: the crate the whole program's security rests on could not be checked for undefined behaviour
+
+Miri interprets a program and reports undefined behaviour. It was run here for
+the first time this round, and `veilvoice-crypto` was on the list of crates
+still to do. Running it produced this, on the first test that built anything:
+
+```
+error: unsupported operation: can't call foreign function `mlock` on OS `linux`
+   region::os::unix::lock
+   region::lock::<u8>
+   amnesia::Secret::zeroed
+   amnesia::Secret::new
+   aead::tests::key
+```
+
+`Secret` is the type every key, every passphrase-derived value and every
+plaintext buffer in this project lives in. `Secret::zeroed` locks its pages out
+of swap through `region::lock`, which is `mlock`, and Miri has no shim for it.
+So the first `Secret` any test constructed ended the entire run, and the crate
+holding the AEAD, the container format, the key derivation, the hybrid
+encapsulation, the reversible encodings and the file shredder was the one crate
+in this workspace that the undefined-behaviour checker could not examine at
+all.
+
+**Nothing had said so, because nothing had asked.** Miri had never been run in
+this repository until this round; before that there was no observation to be
+missing. The defect is the state, not the omission: a large amount of parsing,
+framing and constant-time comparison was outside the reach of the one tool this
+project has for that class of question, and it would have stayed outside it for
+as long as nobody tried.
+
+**The fix, and why it weakens nothing.** `lock_pages` and `unlock_pages` now
+wrap the two calls, and under `cfg(miri)` they do nothing and answer false.
+That is not a new path. Locking has been best effort here since the type was
+written, and the module says so at length: a machine with no memlock budget, a
+platform without the call, and an allocation that will not align all take this
+same path already, `is_locked` answers false, and no correctness property has
+ever depended on the answer. The interpreter is one more environment in which
+the lock does not happen, and the only one that is a build rather than a
+machine. The zeroing, which is the guarantee the type actually makes, is
+untouched, so Miri still watches every write and every drop.
+
+**Two tests, because the fix is only worth what keeps it true.** One reads the
+file and fails, naming the function and the line, if `region::lock` or
+`region::unlock` is called from anywhere but those two wrappers: a second
+direct call written into a constructor would be invisible until somebody ran
+Miri again and found the crate unexaminable for a second time. It needed its
+needles assembled from halves at run time, because written out whole they occur
+in the test's own body and it reported itself on the first run. The other
+asserts that a secret stores, returns and wipes the same bytes whether or not
+locking happened, and that under Miri the type says it is not locked rather
+than claiming a guarantee it did not obtain.
+
+**Also seen, and not a finding.** Miri warns that `region` casts an integer to
+a pointer inside `round_to_page_boundaries`, which weakens its provenance
+tracking around that call. It is moot under the fix, since the call no longer
+happens there.
+
+**What the interpreter then saw, and what it still cannot reach.** With the
+lock out of its way it ran 72 of this crate's 240 tests and reported no
+undefined behaviour in any of them: the reversible encodings (18), the AEAD
+(12), the protected-memory type itself (11), the chunked tape (10), the file
+shredder (10), the private-file helper (9) and two of the container's. The
+container's remaining tests and the key derivation are the same wall the
+engine's transform was, in a harsher form: Argon2id at 256 MiB is memory-hard
+on purpose, and a memory-hard function under an interpreter is not slow but
+unfinishable. That half of the crate stays outside Miri's reach and the reason
+is arithmetic rather than arrangement, so it is recorded as a limit rather than
+carried as work.
+
 ### The checks this round ran, and where each one lives now
 
 The inventory is not a finding. It is here because the next round's reader
@@ -311,7 +381,7 @@ having looked.
 | the app-manifest generator's self-test | by hand | **now** | nothing |
 | the local site serves every page | by hand | **now** | nothing |
 | the offline claim, on the built command line | yes | yes | no import, no syscall, works in an empty network namespace; each guard proved able to fail |
-| Miri | no | no | **run, first time**: `veilvoice-check` and `veilvoice-conversation` clean, `veilvoice-meta` clean but for four tests Miri's filesystem shim will not let write; the engine and the cryptography not reached |
+| Miri | no | no | **run, first time**: five crates, nothing found; `veilvoice-crypto` could not be run at all until F-183, and Argon2id and the transform stay out of reach |
 | a reproducible-build rebuild | yes, per release | yes, per release | not re-run here |
 
 Two checks stay out of a workflow on purpose and the reason is worth writing
@@ -358,10 +428,40 @@ rather than a result: run per crate, and a crate that takes thirty seconds
 takes thirty seconds. Written down here because the next person to reach for
 this tool will otherwise arrange it the same way.
 
-The honest summary is that Miri has been run here for the first time, it found
-nothing, and it covered three crates. The render path of the conversation
-crate, the engine and the cryptography are not done, and the brief carries
-them with the arrangement note above.
+`veilvoice-core`, the engine: **33 tests, no failures, no undefined
+behaviour**, in 743 seconds, with 52 of its 85 skipped.
+
+The 52 are every test that drives the short-time Fourier transform over more
+than a frame or two, and skipping them is not a preference. The first attempt
+ran the whole crate and reached **two tests in twenty-nine minutes**, with the
+second still running; at that rate the crate is days rather than hours, and the
+run was stopped rather than left to expire against its own timeout. What did
+run is the window function, the voice table, the reseed range arithmetic and
+the transform's own three tests, which exercise `realfft` and `rustfft` at a
+512-point transform and are the part of this crate where a dependency's
+`unsafe` actually lives. So the interpreter did reach the numerical library;
+what it did not reach is the engine driven over seconds of audio, and there is
+no reason to expect those paths to differ in kind from the ones that passed.
+
+**The general shape, after four crates.** Miri costs roughly a thousand times
+the wall clock, so what it can cover is decided by which tests process how much
+data rather than by which code is worth checking. Every crate here has been
+approached the same way: run it alone, and where a subset has to be skipped,
+say which subset and why, rather than reporting a clean run over an unnamed
+fraction of it.
+
+`veilvoice-crypto`, once it could be run at all: **72 of 240 tests, no
+failures, no undefined behaviour**, over the reversible encodings, the AEAD, the
+protected-memory type, the chunked tape, the shredder and the private-file
+helper. It could not be run at all before this round, which is F-183 above.
+
+The honest summary is that Miri has been run here for the first time, it has
+found nothing anywhere, and it has now covered five crates in part or in whole.
+What it cannot reach is now a short and specific list rather than an open
+question: the conversation crate's render path, the engine driven over more
+than a frame or two, and everything in the cryptography that runs Argon2id.
+All three are the same cause, which is that an interpreter costs about a
+thousand times the wall clock and these are the parts written to be expensive.
 
 ### What was read and found correct
 
@@ -405,6 +505,35 @@ ten and report success. The one row it touches in this document is the "Test
 suite" row of the state-of-the-tree table, which describes now rather than
 recording the past, and the pattern is anchored to that row so no older number
 further up the page is within its reach. Marker 152, done.
+
+**The reproducible-build machinery, read end to end.** `Cargo.lock` is
+committed, every `cargo build` in the release workflow passes `--locked`, the
+toolchain is pinned in `rust-toolchain.toml`, `SOURCE_DATE_EPOCH` comes from
+the commit date, and `--remap-path-prefix` maps both the source tree and the
+Cargo home. The rebuild is not a thing this project intends to do: it already
+happens on every release, for every published binary, on every target
+including the three BSDs, building twice in different directories and comparing
+byte for byte. The verdict per target goes into the release notes.
+
+It warns rather than failing the release, and that is a decision written into
+the top of the workflow rather than an oversight: a target that is not
+reproducible still ships and says which one it was, on the ground that quietly
+claiming reproducibility would be worse than publishing the gap. Read again
+this round and it still reads as the right call.
+
+What is not established, and is the one thing that workflow cannot establish
+about itself, is a rebuild of a **published** release from its tag on a
+different machine, compared against the artefacts actually on the release page.
+That needs disk this round did not have and stays open.
+
+**The fuzz project's lock file.** Ignored rather than committed, which is the
+opposite of the workspace's choice and had no sentence beside it in a file
+where every other entry has one. The reason is real and is now written where
+the rule is: nothing in `fuzz/` is released, so nothing there needs rebuilding
+years later, and a campaign pinned to last year's dependencies is a campaign
+that cannot find a defect introduced since. The weekly workflow passes no
+`--locked` to match, and Dependabot watches the manifest so a version range
+that stops making sense is still raised.
 
 **The private-file helper.** Creates owner-only with `create_new`, so a
 symlink planted at the path is refused rather than followed, and replaces by
@@ -5340,7 +5469,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1620 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1622 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6987,7 +7116,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-two defects found and fixed (F-1 to F-182), across
+**One hundred and eighty-three defects found and fixed (F-1 to F-183), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
