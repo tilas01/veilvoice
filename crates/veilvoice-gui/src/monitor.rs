@@ -316,7 +316,7 @@ fn row(ui: &mut egui::Ui, levels: &Levels, preview: bool, closable: bool) -> Act
 /// there is nothing to show, so the caller has one line rather than a
 /// condition it can get wrong in one place and not the other.
 pub fn show(
-    ctx: &egui::Context,
+    root: &mut egui::Ui,
     style: Style,
     running: bool,
     preview: bool,
@@ -328,7 +328,7 @@ pub fn show(
     let mut action = Action::None;
     match style {
         Style::Toolbar => {
-            egui::TopBottomPanel::bottom("live_monitor").show(ctx, |ui| {
+            egui::Panel::bottom("live_monitor").show(root, |ui| {
                 ui.add_space(4.0);
                 action = row(ui, levels, preview, true);
                 ui.add_space(4.0);
@@ -338,7 +338,7 @@ pub fn show(
             egui::Area::new(egui::Id::new("live_monitor_overlay"))
                 .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-16.0, -16.0))
                 .order(egui::Order::Foreground)
-                .show(ctx, |ui| {
+                .show(root.ctx(), |ui| {
                     egui::Frame::new()
                         .fill(p::surface())
                         .stroke(egui::Stroke::new(1.0, p::border()))

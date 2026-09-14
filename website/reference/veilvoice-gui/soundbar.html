@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/soundbar.svg" alt="soundbar.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/soundbar.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 766 lines &middot; <a href="soundbar.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 779 lines &middot; <a href="soundbar.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-same-mark-as-the-website">The same mark as the website</a>
@@ -76,7 +76,7 @@
 <ul>
 <li><strong>Not while the window is unfocused.</strong> A background window is still.</li>
 <li><strong>Not while the window is being moved or resized.</strong> Detected from the window&#x27;s own rectangle changing between frames, and resumed a quarter of a second after it stops. This is the drag case specifically.</li>
-<li><strong>Not faster than <code>FRAMES_PER_SECOND</code>.</strong> The cycle is 1.9 seconds long and eased; twenty frames a second is indistinguishable from thirty here, and costs two thirds as much.</li>
+<li><strong>Not faster than the window&#x27;s frame target.</strong> <code>crate::pace</code> owns that number: the display&#x27;s own rate by default, or whatever was chosen in Settings. This module carried its own constant of twenty a second, which made the mark the slowest-moving thing on any modern display and was the judder people reported (finding F-179).</li>
 </ul>
 <p>Resting is not the same as resetting. Freezing at the midpoint would make every click into another window snap the row flat, so a paused mark holds the shape it had when it paused and picks the cycle up from there.</p>
 <h2 id="in-plain-words">In plain words</h2>
@@ -86,9 +86,9 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>766 lines defining <strong>6 functions</strong> (2 public), <strong>0 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>779 lines defining <strong>6 functions</strong> (2 public), <strong>0 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>badge</code> <span style="color:var(--muted)">line 202</span> &middot; Draw the mark at size, returning the response so it can carry a tooltip.
+<li><code>badge</code> <span style="color:var(--muted)">line 196</span> &middot; Draw the mark at size, returning the response so it can carry a tooltip.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>draw</code>, <code>animation_clock</code>, <code>colour_for</code>, <code>height_fraction</code>, <code>window_is_settled</code></span>
 </li>
 </ul>
@@ -114,32 +114,32 @@
 <a href="soundbar.src.html#fn-height_fraction">
 <rect x="28.0" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="102.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">height_fraction</text>
-<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
+<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
 </a>
 <a href="soundbar.src.html#fn-window_is_settled">
 <rect x="202.9" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="285.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">window_is_settled</text>
-<text x="285.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
+<text x="285.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
 </a>
 <a href="soundbar.src.html#fn-animation_clock">
 <rect x="393.9" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="468.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">animation_clock</text>
-<text x="468.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 174</text>
+<text x="468.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
 <a href="soundbar.src.html#fn-badge">
 <rect x="239.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="285.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">badge</text>
-<text x="285.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
+<text x="285.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 196</text>
 </a>
 <a href="soundbar.src.html#fn-draw">
 <rect x="239.2" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="285.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">draw</text>
-<text x="285.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 234</text>
+<text x="285.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
 </a>
 <a href="soundbar.src.html#fn-colour_for">
 <rect x="231.1" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="285.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">colour_for</text>
-<text x="285.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+<text x="285.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 281</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -158,23 +158,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_height_fraction[&quot;height_fraction&lt;br/&gt;line 109&quot;]
-    n_window_is_settled[&quot;window_is_settled&lt;br/&gt;line 136&quot;]
-    n_animation_clock[&quot;animation_clock&lt;br/&gt;line 174&quot;]
-    n_badge([&quot;badge&lt;br/&gt;line 202&quot;])
-    n_draw[&quot;draw&lt;br/&gt;line 234&quot;]
-    n_colour_for[&quot;colour_for&lt;br/&gt;line 288&quot;]
+    n_height_fraction[&quot;height_fraction&lt;br/&gt;line 103&quot;]
+    n_window_is_settled[&quot;window_is_settled&lt;br/&gt;line 130&quot;]
+    n_animation_clock[&quot;animation_clock&lt;br/&gt;line 168&quot;]
+    n_badge([&quot;badge&lt;br/&gt;line 196&quot;])
+    n_draw[&quot;draw&lt;br/&gt;line 228&quot;]
+    n_colour_for[&quot;colour_for&lt;br/&gt;line 281&quot;]
     n_badge --&gt; n_draw
     n_draw --&gt; n_animation_clock
     n_draw --&gt; n_colour_for
     n_draw --&gt; n_height_fraction
     n_draw --&gt; n_window_is_settled
-    click n_height_fraction href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L109&quot; &quot;open the source&quot;
-    click n_window_is_settled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L136&quot; &quot;open the source&quot;
-    click n_animation_clock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L174&quot; &quot;open the source&quot;
-    click n_badge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L202&quot; &quot;open the source&quot;
-    click n_draw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L234&quot; &quot;open the source&quot;
-    click n_colour_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L288&quot; &quot;open the source&quot;
+    click n_height_fraction href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L103&quot; &quot;open the source&quot;
+    click n_window_is_settled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L130&quot; &quot;open the source&quot;
+    click n_animation_clock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L168&quot; &quot;open the source&quot;
+    click n_badge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L196&quot; &quot;open the source&quot;
+    click n_draw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L228&quot; &quot;open the source&quot;
+    click n_colour_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L281&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_badge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -187,18 +187,17 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>PERIOD</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-period">78</a></td><td>Seconds for one full rise and fall.</td></tr>
-<tr><td><code>FRAMES_PER_SECOND</code> <sub>pub const</sub></td><td><a href="soundbar.src.html#fn-frames_per_second">86</a></td><td>How often the mark is redrawn while it is moving.</td></tr>
-<tr><td><code>SETTLE</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-settle">94</a></td><td>How long the window must hold still before the mark starts moving again.</td></tr>
-<tr><td><code>DELAYS</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-delays">99</a></td><td>Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html.</td></tr>
-<tr><td><code>MIN_FRACTION</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-min_fraction">104</a></td><td>Height as a fraction of the available box, matching 16% and 82%.</td></tr>
-<tr><td><code>MAX_FRACTION</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-max_fraction">105</a></td><td></td></tr>
-<tr><td><code>height_fraction</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-height_fraction">109</a></td><td>How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases.</td></tr>
-<tr><td><code>window_is_settled</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-window_is_settled">136</a></td><td>Whether the window is holding still enough for the mark to move.</td></tr>
-<tr><td><code>animation_clock</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-animation_clock">174</a></td><td>The clock the bars are drawn against, which is not always the real one.</td></tr>
-<tr><td><code>badge</code> <sub>pub fn</sub></td><td><a href="soundbar.src.html#fn-badge">202</a></td><td>Draw the mark at size, returning the response so it can carry a tooltip.</td></tr>
-<tr><td><code>draw</code> <sub>pub fn</sub></td><td><a href="soundbar.src.html#fn-draw">234</a></td><td>Draw the mark at size, returning the response so it can carry a tooltip.</td></tr>
-<tr><td><code>colour_for</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-colour_for">288</a></td><td>The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use.</td></tr>
+<tr><td><code>PERIOD</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-period">80</a></td><td>Seconds for one full rise and fall.</td></tr>
+<tr><td><code>SETTLE</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-settle">88</a></td><td>How long the window must hold still before the mark starts moving again.</td></tr>
+<tr><td><code>DELAYS</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-delays">93</a></td><td>Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html.</td></tr>
+<tr><td><code>MIN_FRACTION</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-min_fraction">98</a></td><td>Height as a fraction of the available box, matching 16% and 82%.</td></tr>
+<tr><td><code>MAX_FRACTION</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-max_fraction">99</a></td><td></td></tr>
+<tr><td><code>height_fraction</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-height_fraction">103</a></td><td>How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases.</td></tr>
+<tr><td><code>window_is_settled</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-window_is_settled">130</a></td><td>Whether the window is holding still enough for the mark to move.</td></tr>
+<tr><td><code>animation_clock</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-animation_clock">168</a></td><td>The clock the bars are drawn against, which is not always the real one.</td></tr>
+<tr><td><code>badge</code> <sub>pub fn</sub></td><td><a href="soundbar.src.html#fn-badge">196</a></td><td>Draw the mark at size, returning the response so it can carry a tooltip.</td></tr>
+<tr><td><code>draw</code> <sub>pub fn</sub></td><td><a href="soundbar.src.html#fn-draw">228</a></td><td>Draw the mark at size, returning the response so it can carry a tooltip.</td></tr>
+<tr><td><code>colour_for</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-colour_for">281</a></td><td>The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use.</td></tr>
 </tbody></table>
 </section>
 </div></div>

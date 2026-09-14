@@ -89,6 +89,7 @@ pub mod integrity;
 pub mod layout;
 pub mod monitor;
 pub mod notify;
+pub mod pace;
 pub mod palettes;
 pub mod paths;
 pub mod policy;
@@ -112,3 +113,24 @@ pub use app::VeilVoiceApp;
 
 /// Crate version string, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Draw one frame with no window, and discard what a real backend would have
+/// uploaded.
+///
+/// Every test in this crate that renders headlessly goes through here.
+/// `egui` 0.36 asserts that a frame's texture deltas were handled: dropping a
+/// `FullOutput` that still carries one panics, which is exactly right for a
+/// backend that forgot to upload a font atlas and exactly wrong for a test
+/// that only wants the shapes back. Clearing it in one place beats repeating
+/// the same two lines at fifteen call sites and forgetting it at the
+/// sixteenth.
+#[cfg(test)]
+pub(crate) fn headless_frame(
+    ctx: &egui::Context,
+    input: egui::RawInput,
+    add_contents: impl FnMut(&mut egui::Ui),
+) -> egui::FullOutput {
+    let mut output = ctx.run_ui(input, add_contents);
+    output.textures_delta.clear();
+    output
+}

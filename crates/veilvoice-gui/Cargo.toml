@@ -54,9 +54,9 @@ veilvoice-watch = { path = "../veilvoice-watch" }
 veilvoice-guard = { path = "../veilvoice-guard" }
 # The window itself: the event loop, the graphics context and the `App` this
 # crate implements.
-eframe = { version = "0.32", default-features = false, features = ["glow", "default_fonts", "wayland", "x11"] }
+eframe = { version = "0.36", default-features = false, features = ["glow", "default_fonts", "wayland", "x11"] }
 # The widgets. Every panel in this crate is drawn with it.
-egui = "0.32"
+egui = "0.36"
 # The platform's own file and folder panel, so choosing a file looks like
 # choosing a file on that machine rather than in this program.
 rfd = { version = "0.15", default-features = false, features = ["xdg-portal", "tokio"] }

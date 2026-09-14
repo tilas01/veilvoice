@@ -63,6 +63,34 @@ updates:
     # rather than an update: it can change behaviour, drop a platform, or raise
     # the minimum Rust version, and this project builds on the BSDs and on
     # 32-bit targets where that matters more than it usually does.
+    #
+    # Ten of those decisions are already made, and made together. The
+    # cryptographic line is held on the generation `pgp` 0.20 uses; the reason
+    # is written in full beside `argon2` in `crates/veilvoice-crypto/Cargo.toml`.
+    # Their majors are ignored so the same pull requests do not reopen every
+    # week; minors and patches still arrive. Remove these the day `pgp` moves
+    # or the signature check stops needing it (marker 149).
+    ignore:
+      - dependency-name: "sha2"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "hkdf"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "chacha20poly1305"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "argon2"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "x25519-dalek"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "ml-kem"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "rand_core"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "rand"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "rand_chacha"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "getrandom"
+        update-types: ["version-update:semver-major"]
     labels:
       - dependencies
       - rust

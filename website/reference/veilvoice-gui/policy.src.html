@@ -367,8 +367,8 @@
 <span class="ln" id="L294">        ];</span>
 <span class="ln" id="L295">        <span class="tok-kw">for</span> state <span class="tok-kw">in</span> states {</span>
 <span class="ln" id="L296">            <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L297">            <span class="tok-kw">let</span> _ = ctx.<span class="tok-fn">run</span>(Default::<span class="tok-fn">default</span>(), |ctx| {</span>
-<span class="ln" id="L298">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L297">            <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
+<span class="ln" id="L298">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| {</span>
 <span class="ln" id="L299">                    state.<span class="tok-fn">panel</span>(ui);</span>
 <span class="ln" id="L300">                    state.<span class="tok-fn">note</span>(ui, &amp;Requirement::AppLock);</span>
 <span class="ln" id="L301">                    state.<span class="tok-fn">note</span>(ui, &amp;Requirement::EncryptRecordings);</span>
