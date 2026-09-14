@@ -26,7 +26,7 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # cpal needs ALSA headers, and eframe needs the X11/Wayland stack.
       - name: Install Linux audio and windowing headers
@@ -148,7 +148,7 @@ jobs:
       CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_RUNNER: qemu-arm-static
       QEMU_LD_PREFIX: /usr/arm-linux-gnueabihf
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install the cross toolchain for ${{ matrix.target }}
         run: |
@@ -209,8 +209,8 @@ jobs:
       matrix:
         python: ['3.11', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       # Compares decoded pixels, not compressed bytes: zlib's output differs
@@ -226,7 +226,7 @@ jobs:
       #
       # `fetch-depth` matters here -- the generator walks `git ls-files`, so a
       # checkout missing files would produce a smaller index and "fail" for a
-      # reason that has nothing to do with the index. actions/checkout@v4 gives
+      # reason that has nothing to do with the index. actions/checkout@v7 gives
       # a complete working tree, which is what this needs.
       - name: Committed search index must match the repository
         run: python tools/search-index/generate.py --check
@@ -332,6 +332,23 @@ jobs:
       - name: The release step must tag the commit it built
         run: python tools/audit/publishing.py
 
+      # Four more of `tools/verify.py`'s checks that ran only when somebody ran
+      # them. Each needs nothing but the tree and an interpreter, so there was
+      # no reason for them to be here and every reason: the first is the guard
+      # for F-141 and F-142, a file written one place and read from another,
+      # which is the defect this project has shipped twice.
+      - name: No state file is written one place and read another
+        run: python tools/audit/state_paths.py
+
+      - name: The per-program guides must match the user guide
+        run: python tools/docs/guides.py --check
+
+      - name: The questions page must match docs/FAQ.md
+        run: python tools/site/faq.py --check
+
+      - name: The app-manifest generator must still verify what it writes
+        run: python tools/sign/selftest.py
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a
@@ -341,12 +358,18 @@ jobs:
     name: website tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       - name: Characters, structure, rendering, hostile input, scroll reveal
         run: node tools/site-tests/run.js
+      # The local host script, which is the site's fallback if GitHub Pages is
+      # not there. It starts the server, fetches every page and stops. It was
+      # in `tools/verify.py` and not here, so the fallback was checked only by
+      # the person who ran it.
+      - name: The local site must serve every page
+        run: python tools/site/serve.py --check
       # A longer randomised campaign than the per-commit default. Still not a
       # coverage-guided fuzzer, and `docs/AUDIT.md` does not pretend otherwise.
       - name: Extended hostile-markdown campaign
@@ -361,7 +384,7 @@ jobs:
     name: parser campaigns
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       # Debug, not release: the release profile disables overflow checks, and
@@ -379,10 +402,20 @@ jobs:
     name: dependency advisories
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: rustsec/audit-check@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      # The three questions cargo-audit does not ask: whether every licence in
+      # the graph can ship under GPL-3.0-or-later, whether every crate comes
+      # from crates.io, and whether one crate is compiled at two versions.
+      # `deny.toml` is the policy; its advisory exceptions are the same three
+      # as `.cargo/audit.toml`'s, and `tools/audit/dependencies.py` fails if
+      # the two files stop agreeing.
+      - name: Licences, sources and duplicate versions
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
 
   # A privacy tool that phones home is a broken privacy tool. This is a coarse
   # check, not a proof, but it catches an accidental HTTP client landing in the
@@ -391,7 +424,7 @@ jobs:
     name: no network dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       - name: Fail if a networking crate appears in the tree
@@ -495,7 +528,7 @@ jobs:
     name: the built program opens no network socket
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       - name: Install the windowing headers and the tracers
@@ -655,7 +688,7 @@ jobs:
     name: no RSA private-key operations
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Fail if any crate reaching pgp gains a private-key code path
         run: |
           set -euo pipefail

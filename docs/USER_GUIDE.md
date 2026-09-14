@@ -629,7 +629,7 @@ Where every choice the window remembers is made, and where they are kept.
 
 | Page | What is on it |
 |---|---|
-| **Interface** | The colour scheme, which is every palette the website has. Whether the mark in the header animates, and whether the window icon does. Whether the **install** tab is shown at all. |
+| **Interface** | The colour scheme, which is every palette the website has. Whether the mark in the header animates, and whether the window icon does. How often the window draws while something is moving, and whether the header carries a live frame-rate readout. Whether the **install** tab is shown at all. |
 | **Locking** | The app lock and the idle timer that turns it on. See §5 and §5.5. |
 | **At rest** | Whether a result is sealed with the app-lock password as well, and where a vault lives if you keep one. See §5.7. |
 | **Notifications** | How the window tells you a job has finished. |
@@ -712,6 +712,31 @@ adapter and on drivers whose OpenGL path is broken in a way that shows as a
 black window. Nothing in the program can detect that, because from inside it
 looks like success, so it is a switch rather than something measured. It takes
 effect at the next launch, because the choice is made before the window exists.
+
+#### How often it draws
+
+The window draws nothing at all while nothing is happening, which is what keeps
+it off a laptop battery. While something *is* moving, it draws at the display's
+own rate.
+
+Nothing asks the operating system what that rate is, because neither library
+this window is built on will say. It is measured instead: a window that waits
+for the display cannot draw faster than the display shows, so the interval
+between frames while something is animating *is* the display's rate, and the
+middle value of the last thirty-two of them is the figure the About tab
+reports. A single slow frame cannot move it.
+
+**Settings can lower it**, under animation: 30, 60, 90, 120, 144, 165 or 240 a
+second instead of matching the display. That is a choice to make for a battery
+rather than for smoothness, since the window waits for the screen either way.
+
+The About tab shows what it is aiming at, what it measured the display to be,
+how many frames it is drawing a second and how many arrived late. A frame that
+arrives more than half again later than it should have is counted late. If that
+keeps happening for two seconds together the window says so once, with what it
+is drawing with, because software rendering and a struggling GPU are different
+problems. Turning on the header readout puts the same two numbers where you can
+watch them.
 
 #### Where this copy keeps things
 

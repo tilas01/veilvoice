@@ -294,8 +294,8 @@ mod tests {
         ];
         for state in states {
             let ctx = egui::Context::default();
-            let _ = ctx.run(Default::default(), |ctx| {
-                egui::CentralPanel::default().show(ctx, |ui| {
+            let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
                     state.panel(ui);
                     state.note(ui, &Requirement::AppLock);
                     state.note(ui, &Requirement::EncryptRecordings);

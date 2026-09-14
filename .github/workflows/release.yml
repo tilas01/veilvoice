@@ -111,7 +111,7 @@ jobs:
             cross_gcc: musl-tools
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Only the GUI needs the windowing stack. A CLI-only target does not, and
       # on a cross target these packages would be for the wrong architecture.
@@ -316,7 +316,7 @@ jobs:
         shell: bash
         run: tar -C dist -czf "dist/$STAGE.tar.gz" "$STAGE"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.label }}
           path: |
@@ -340,7 +340,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The VM has no git, and a build whose timestamp comes from the clock
       # is a build that never reproduces. Written out here, where git
       # exists, and read inside the VM.
@@ -414,7 +414,7 @@ jobs:
           # The verdict the VM actually reached, not an assumption about it.
           echo "freebsd-x86_64: $(cat .repro-verdict 2>/dev/null || echo 'not-verified (the second build did not run)')" \
             > dist/repro-freebsd-x86_64.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: freebsd-x86_64
           path: |
@@ -431,7 +431,7 @@ jobs:
     # moved. When one fails the release simply ships without that archive.
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The VM has no git, and a build whose timestamp comes from the clock
       # is a build that never reproduces. Written out here, where git
       # exists, and read inside the VM.
@@ -509,7 +509,7 @@ jobs:
           # The verdict the VM actually reached, not an assumption about it.
           echo "openbsd-x86_64: $(cat .repro-verdict 2>/dev/null || echo 'not-verified (the second build did not run)')" \
             > dist/repro-openbsd-x86_64.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: openbsd-x86_64
           path: |
@@ -526,7 +526,7 @@ jobs:
     # moved. When one fails the release simply ships without that archive.
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The VM has no git, and a build whose timestamp comes from the clock
       # is a build that never reproduces. Written out here, where git
       # exists, and read inside the VM.
@@ -604,7 +604,7 @@ jobs:
           # The verdict the VM actually reached, not an assumption about it.
           echo "netbsd-x86_64: $(cat .repro-verdict 2>/dev/null || echo 'not-verified (the second build did not run)')" \
             > dist/repro-netbsd-x86_64.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: netbsd-x86_64
           path: |
@@ -625,9 +625,9 @@ jobs:
     env:
       HAS_SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: staging
           merge-multiple: true
@@ -654,7 +654,7 @@ jobs:
       # `crates/veilvoice-verify/tests/release_manifest.rs` builds a synthetic
       # release, runs this script, and reads the result back with the parser
       # that will read it for real.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: List what is inside each archive
@@ -870,7 +870,7 @@ jobs:
       # this source and compare; a tag pointing at different source means they
       # get a different answer and correctly conclude that the release does not
       # reproduce. The claim is the product here, so this line is the product.
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         if: steps.gate.outputs.publish == 'true'
         with:
           tag_name: ${{ env.VERSION_TAG }}

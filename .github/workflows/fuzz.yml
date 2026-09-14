@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The seven coverage-guided fuzz targets, run from the committed corpus.
+#
+# `ci.yml`'s fuzz job runs the deterministic campaigns inside `cargo test`,
+# which need only the stable toolchain and finish in minutes. These are the
+# libFuzzer targets in `fuzz/fuzz_targets/`, which need nightly and a long run
+# to be worth anything. Until this workflow existed they ran when somebody
+# remembered to run them, which is the shape of F-160: a check that exists and
+# is not in CI catches things eventually.
+#
+# Weekly rather than per push, because the useful campaign length is what
+# makes them useful, and dispatchable, for the run before a release.
+#
+# Two minutes per target here, against the ten to twenty minutes of a campaign
+# somebody sits through before a release. That is enough to fail on a
+# regression the corpus already reaches and is not a substitute for the long
+# run, which `docs/AUDIT.md` records with its duration each time it is done.
+
+name: fuzz
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  campaigns:
+    name: coverage-guided campaigns
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install nightly and cargo-fuzz
+        run: |
+          rustup toolchain install nightly --profile minimal
+          cargo +nightly install cargo-fuzz --locked
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fuzz
+
+      # The memory limit matches the campaigns recorded in docs/AUDIT.md. The
+      # container and lock targets reach Argon2 with parameters the file
+      # declares, and the attended ceiling is four gibibytes by design; a
+      # lower limit reports that ceiling as an out-of-memory, which it is not.
+      - name: Every target, two minutes each, from the committed corpus
+        working-directory: fuzz
+        run: |
+          set -euo pipefail
+          for target in $(ls fuzz_targets | sed 's/\.rs$//'); do
+            echo "== $target"
+            cargo +nightly fuzz run "$target" -- \
+              -max_total_time=120 -max_len=65536 -rss_limit_mb=6144 -timeout=25
+          done
+
+      - name: Keep anything that crashed
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-artifacts
+          path: fuzz/artifacts
+          if-no-files-found: ignore

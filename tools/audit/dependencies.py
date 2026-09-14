@@ -128,7 +128,51 @@ def counted(path):
     return total
 
 
+def advisory_ids(path):
+    """The RUSTSEC identifiers a policy file ignores, in the order written."""
+    found = []
+    with open(path, "r", encoding="utf-8") as handle:
+        for line in handle:
+            stripped = line.split("#", 1)[0].strip()
+            if stripped.startswith('"RUSTSEC-'):
+                found.append(stripped.strip('",'))
+    return found
+
+
+def policies_disagree():
+    """Where `.cargo/audit.toml` and `deny.toml` ignore different advisories.
+
+    cargo-audit and cargo-deny each read their own file and neither reads the
+    other's, so the same three exceptions are written twice. The arguments
+    live in `.cargo/audit.toml`; `deny.toml` carries the identifiers and a
+    pointer. Two lists that are meant to be one list drift the first time
+    somebody edits one of them, so this says which identifiers are on one side
+    only. Both are read as text rather than parsed, because the standard
+    library gained a TOML reader in 3.11 and this runs on 3.10 too.
+    """
+    audit = set(advisory_ids(os.path.join(ROOT, ".cargo", "audit.toml")))
+    deny = set(advisory_ids(os.path.join(ROOT, "deny.toml")))
+    problems = []
+    for ident in sorted(audit - deny):
+        problems.append("%s is ignored in .cargo/audit.toml and not in deny.toml" % ident)
+    for ident in sorted(deny - audit):
+        problems.append("%s is ignored in deny.toml and not in .cargo/audit.toml" % ident)
+    return problems
+
+
 def main():
+    disagreements = policies_disagree()
+    if disagreements:
+        print("the two advisory policies do not ignore the same advisories:")
+        for problem in disagreements:
+            print("  %s" % problem)
+        print()
+        print(
+            "The argument for an exception is written once, in .cargo/audit.toml; "
+            "deny.toml repeats the identifier and nothing else. Make the lists match."
+        )
+        return 1
+
     problems = []
     total = 0
     for path in manifests():
@@ -150,6 +194,8 @@ def main():
         return 1
 
     print("  %d dependencies, every one of them explained where it is declared" % total)
+    print("  %d advisory exceptions, the same in both policy files" % len(advisory_ids(
+        os.path.join(ROOT, "deny.toml"))))
     return 0
 
 

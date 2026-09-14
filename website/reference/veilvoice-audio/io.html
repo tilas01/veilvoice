@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/io.svg" alt="io.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/io.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 569 lines &middot; <a href="io.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 574 lines &middot; <a href="io.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#a-decoder-is-a-parser-and-this-one-reads-files-somebody-else-made">A decoder is a parser, and this one reads files somebody else made</a>
@@ -76,7 +76,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>569 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>574 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Audio</code> <span style="color:var(--muted)">line 151</span> &middot; Mono audio in memory.</li>
 </ul>
@@ -88,7 +88,7 @@
 <li><code>load</code> <span style="color:var(--muted)">line 179</span> &middot; Decode any supported audio file to mono f32.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>preflight</code>, <code>read_up_to</code></span>
 </li>
-<li><code>save_wav</code> <span style="color:var(--muted)">line 323</span> &middot; Write mono f32 audio to a 16-bit PCM WAV file.
+<li><code>save_wav</code> <span style="color:var(--muted)">line 328</span> &middot; Write mono f32 audio to a 16-bit PCM WAV file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>wav_bytes</code></span>
 </li>
 </ul>
@@ -132,17 +132,17 @@
 <a href="io.src.html#fn-read_up_to">
 <rect x="262.1" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_up_to</text>
-<text x="316.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
+<text x="316.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
 </a>
 <a href="io.src.html#fn-wav_bytes">
 <rect x="206.9" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="257.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav_bytes</text>
-<text x="257.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
+<text x="257.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
 </a>
 <a href="io.src.html#fn-save_wav">
 <rect x="333.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="379.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save_wav</text>
-<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 323</text>
+<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 328</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -165,9 +165,9 @@ flowchart TD
     n_duration_secs([&quot;Audio::duration_secs&lt;br/&gt;line 160&quot;])
     n_peak([&quot;Audio::peak&lt;br/&gt;line 168&quot;])
     n_load([&quot;load&lt;br/&gt;line 179&quot;])
-    n_read_up_to[&quot;read_up_to&lt;br/&gt;line 282&quot;]
-    n_wav_bytes[&quot;wav_bytes&lt;br/&gt;line 303&quot;]
-    n_save_wav([&quot;save_wav&lt;br/&gt;line 323&quot;])
+    n_read_up_to[&quot;read_up_to&lt;br/&gt;line 287&quot;]
+    n_wav_bytes[&quot;wav_bytes&lt;br/&gt;line 308&quot;]
+    n_save_wav([&quot;save_wav&lt;br/&gt;line 328&quot;])
     n_load --&gt; n_preflight
     n_load --&gt; n_read_up_to
     n_save_wav --&gt; n_wav_bytes
@@ -175,9 +175,9 @@ flowchart TD
     click n_duration_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L160&quot; &quot;open the source&quot;
     click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L168&quot; &quot;open the source&quot;
     click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L179&quot; &quot;open the source&quot;
-    click n_read_up_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L282&quot; &quot;open the source&quot;
-    click n_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L303&quot; &quot;open the source&quot;
-    click n_save_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L323&quot; &quot;open the source&quot;
+    click n_read_up_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L287&quot; &quot;open the source&quot;
+    click n_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L308&quot; &quot;open the source&quot;
+    click n_save_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L328&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration_secs,n_peak,n_load,n_save_wav entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -196,9 +196,9 @@ flowchart TD
 <tr><td><code>Audio::duration_secs</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-audio-duration_secs">160</a></td><td>Duration in seconds.</td></tr>
 <tr><td><code>Audio::peak</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-audio-peak">168</a></td><td>Peak absolute sample value.</td></tr>
 <tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-load">179</a></td><td>Decode any supported audio file to mono f32.</td></tr>
-<tr><td><code>read_up_to</code> <sub>fn</sub></td><td><a href="io.src.html#fn-read_up_to">282</a></td><td>Fill as much of buf as the file has, tolerating short reads.</td></tr>
-<tr><td><code>wav_bytes</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-wav_bytes">303</a></td><td>Encode mono f32 audio as a 16-bit PCM WAV, in memory.</td></tr>
-<tr><td><code>save_wav</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-save_wav">323</a></td><td>Write mono f32 audio to a 16-bit PCM WAV file.</td></tr>
+<tr><td><code>read_up_to</code> <sub>fn</sub></td><td><a href="io.src.html#fn-read_up_to">287</a></td><td>Fill as much of buf as the file has, tolerating short reads.</td></tr>
+<tr><td><code>wav_bytes</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-wav_bytes">308</a></td><td>Encode mono f32 audio as a 16-bit PCM WAV, in memory.</td></tr>
+<tr><td><code>save_wav</code> <sub>pub fn</sub></td><td><a href="io.src.html#fn-save_wav">328</a></td><td>Write mono f32 audio to a 16-bit PCM WAV file.</td></tr>
 </tbody></table>
 </section>
 </div></div>

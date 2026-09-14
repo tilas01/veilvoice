@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/hybrid.svg" alt="hybrid.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/hybrid.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 460 lines &middot; <a href="hybrid.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 475 lines &middot; <a href="hybrid.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-hybrid">Why hybrid</a>
@@ -64,7 +64,8 @@
 <p>ML-KEM (FIPS 203, formerly Kyber) is believed secure against a quantum adversary, but it is young, and lattice schemes have had implementation breaks. X25519 is battle-tested but falls to a cryptographically relevant quantum computer. Running both and mixing the two shared secrets means an attacker must break <em>both</em>: the construction is at least as strong as the stronger of the two, and it degrades gracefully if either one is broken. This is the same reasoning behind the hybrids now deployed in TLS.</p>
 <p>It matters here specifically because of <em>harvest-now-decrypt-later</em>: a recording captured today can be stored until quantum hardware exists. A tool whose whole purpose is protecting who is speaking has to assume the adversary is patient.</p>
 <h2 id="the-combiner">The combiner</h2>
-<p>The two shared secrets are mixed with HKDF-SHA256 rather than concatenated or XORed. Both secrets, both ciphertexts and both public keys go into the input, which binds the derived key to the exact transcript that produced it and prevents an attacker who can substitute one half from steering the result. Feeding the full transcript is what makes the combiner robust when one KEM&#x27;s ciphertexts are malleable.</p>
+<p>The two shared secrets are mixed with HKDF-SHA256 rather than concatenated or XORed. The input keying material is the X25519 shared secret followed by the ML-KEM one. The salt is the transcript of the exchange: the ephemeral X25519 public key, the ML-KEM ciphertext and the recipient&#x27;s X25519 public key. The info string names the construction and its version. Binding the transcript is what stops an attacker who can substitute one half of the exchange from steering the result, and is what keeps the combiner robust if one KEM&#x27;s ciphertexts turn out to be malleable.</p>
+<p>The recipient&#x27;s ML-KEM encapsulation key is not in the salt, and does not need to be. FIPS 203 derives the ML-KEM shared secret from the message and a hash of the encapsulation key, so that key is bound through the secret itself. X25519 makes no such promise, which is why its public key is bound here by hand. This is the shape of the X-Wing combiner, the ML-KEM secret, the X25519 secret, the X25519 ciphertext and public key under a label, with HKDF in place of one SHA3-256 call. Changing it now would change every key and every container already made, and would not change what an attacker can do.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>This is for encrypting a recording to somebody else&#x27;s key rather than to a passphrase, and it uses two different systems at once.</p>
 <p>One is the kind in use everywhere today. The other is designed to resist a quantum computer, which does not yet exist in a useful form but which somebody recording traffic now would be counting on later.</p>
@@ -72,34 +73,34 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>460 lines defining <strong>15 functions</strong> (10 public), <strong>4 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>475 lines defining <strong>15 functions</strong> (10 public), <strong>4 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct PublicKey</code> <span style="color:var(--muted)">line 76</span> &middot; A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</li>
-<li><code>struct SecretKey</code> <span style="color:var(--muted)">line 82</span> &middot; A recipient&#x27;s private key.</li>
-<li><code>struct Encapsulation</code> <span style="color:var(--muted)">line 90</span> &middot; The public values a sender transmits so the recipient can recover the shared secret.</li>
-<li><code>struct OsRng</code> <span style="color:var(--muted)">line 284</span> &middot; Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</li>
+<li><code>struct PublicKey</code> <span style="color:var(--muted)">line 88</span> &middot; A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</li>
+<li><code>struct SecretKey</code> <span style="color:var(--muted)">line 94</span> &middot; A recipient&#x27;s private key.</li>
+<li><code>struct Encapsulation</code> <span style="color:var(--muted)">line 102</span> &middot; The public values a sender transmits so the recipient can recover the shared secret.</li>
+<li><code>struct OsRng</code> <span style="color:var(--muted)">line 299</span> &middot; Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>PublicKey::to_bytes</code> <span style="color:var(--muted)">line 99</span> &middot; Serialise to PUBLIC_KEY_LEN bytes.
+<li><code>PublicKey::to_bytes</code> <span style="color:var(--muted)">line 111</span> &middot; Serialise to PUBLIC_KEY_LEN bytes.
 </li>
-<li><code>PublicKey::from_bytes</code> <span style="color:var(--muted)">line 107</span> &middot; Parse from exactly PUBLIC_KEY_LEN bytes.
+<li><code>PublicKey::from_bytes</code> <span style="color:var(--muted)">line 119</span> &middot; Parse from exactly PUBLIC_KEY_LEN bytes.
 </li>
-<li><code>Encapsulation::to_bytes</code> <span style="color:var(--muted)">line 124</span> &middot; Serialise to ENCAPSULATION_LEN bytes.
+<li><code>Encapsulation::to_bytes</code> <span style="color:var(--muted)">line 136</span> &middot; Serialise to ENCAPSULATION_LEN bytes.
 </li>
-<li><code>Encapsulation::from_bytes</code> <span style="color:var(--muted)">line 132</span> &middot; Parse from exactly ENCAPSULATION_LEN bytes.
+<li><code>Encapsulation::from_bytes</code> <span style="color:var(--muted)">line 144</span> &middot; Parse from exactly ENCAPSULATION_LEN bytes.
 </li>
-<li><code>SecretKey::generate</code> <span style="color:var(--muted)">line 149</span> &middot; Generate a fresh key pair from the OS CSPRNG.
+<li><code>SecretKey::generate</code> <span style="color:var(--muted)">line 161</span> &middot; Generate a fresh key pair from the OS CSPRNG.
 </li>
-<li><code>SecretKey::to_bytes</code> <span style="color:var(--muted)">line 170</span> &middot; Serialise to SECRET_KEY_LEN bytes.
+<li><code>SecretKey::to_bytes</code> <span style="color:var(--muted)">line 182</span> &middot; Serialise to SECRET_KEY_LEN bytes.
 </li>
-<li><code>SecretKey::from_bytes</code> <span style="color:var(--muted)">line 179</span> &middot; Parse from exactly SECRET_KEY_LEN bytes.
+<li><code>SecretKey::from_bytes</code> <span style="color:var(--muted)">line 191</span> &middot; Parse from exactly SECRET_KEY_LEN bytes.
 </li>
-<li><code>SecretKey::public_key</code> <span style="color:var(--muted)">line 194</span> &middot; The matching public key.
+<li><code>SecretKey::public_key</code> <span style="color:var(--muted)">line 206</span> &middot; The matching public key.
 </li>
-<li><code>SecretKey::decapsulate</code> <span style="color:var(--muted)">line 202</span> &middot; Recover the shared secret from a sender&#x27;s Encapsulation.
+<li><code>SecretKey::decapsulate</code> <span style="color:var(--muted)">line 214</span> &middot; Recover the shared secret from a sender&#x27;s Encapsulation.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>combine</code></span>
 </li>
-<li><code>PublicKey::encapsulate</code> <span style="color:var(--muted)">line 224</span> &middot; Produce a shared secret for this recipient, plus the public values they need in order to recover it.
+<li><code>PublicKey::encapsulate</code> <span style="color:var(--muted)">line 236</span> &middot; Produce a shared secret for this recipient, plus the public values they need in order to recover it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>combine</code></span>
 </li>
 </ul>
@@ -124,77 +125,77 @@
 <a href="hybrid.src.html#fn-publickey-to_bytes">
 <rect x="306.5" y="220.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="397.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PublicKey::to_bytes</text>
-<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
+<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
 <a href="hybrid.src.html#fn-publickey-from_bytes">
 <rect x="83.3" y="320.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="181.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PublicKey::from_bytes</text>
-<text x="181.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
+<text x="181.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 119</text>
 </a>
 <a href="hybrid.src.html#fn-encapsulation-to_bytes">
 <rect x="306.5" y="220.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="397.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encapsulation::to_bytes</text>
-<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
+<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
 </a>
 <a href="hybrid.src.html#fn-encapsulation-from_bytes">
 <rect x="83.3" y="320.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="181.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encapsulation::from_bytes</text>
-<text x="181.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
+<text x="181.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
 </a>
 <a href="hybrid.src.html#fn-secretkey-generate">
 <rect x="99.4" y="220.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="190.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::generate</text>
-<text x="190.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
+<text x="190.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
 </a>
 <a href="hybrid.src.html#fn-secretkey-to_bytes">
 <rect x="306.5" y="220.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="397.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::to_bytes</text>
-<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 182</text>
 </a>
 <a href="hybrid.src.html#fn-secretkey-from_bytes">
 <rect x="83.3" y="320.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="181.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::from_bytes</text>
-<text x="181.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
+<text x="181.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
 </a>
 <a href="hybrid.src.html#fn-secretkey-public_key">
 <rect x="306.5" y="320.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="405.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::public_key</text>
-<text x="405.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
+<text x="405.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 206</text>
 </a>
 <a href="hybrid.src.html#fn-secretkey-decapsulate">
 <rect x="75.2" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="177.9" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::decapsulate</text>
-<text x="177.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
+<text x="177.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
 </a>
 <a href="hybrid.src.html#fn-publickey-encapsulate">
 <rect x="306.5" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="409.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PublicKey::encapsulate</text>
-<text x="409.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
+<text x="409.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 236</text>
 </a>
 <a href="hybrid.src.html#fn-combine">
 <rect x="151.8" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="198.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">combine</text>
-<text x="198.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 251</text>
+<text x="198.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 266</text>
 </a>
 <a href="hybrid.src.html#fn-osrng-next_u32">
 <rect x="20.0" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::next_u32</text>
-<text x="94.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+<text x="94.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 302</text>
 </a>
 <a href="hybrid.src.html#fn-osrng-next_u64">
 <rect x="194.9" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="269.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::next_u64</text>
-<text x="269.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
+<text x="269.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 307</text>
 </a>
 <a href="hybrid.src.html#fn-osrng-fill_bytes">
 <rect x="270.3" y="620.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="352.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::fill_bytes</text>
-<text x="352.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<text x="352.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 324</text>
 </a>
 <a href="hybrid.src.html#fn-osrng-try_fill_bytes">
 <rect x="369.8" y="520.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="468.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::try_fill_bytes</text>
-<text x="468.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 312</text>
+<text x="468.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -211,40 +212,40 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_to_bytes([&quot;PublicKey::to_bytes&lt;br/&gt;line 99&quot;])
-    n_from_bytes([&quot;PublicKey::from_bytes&lt;br/&gt;line 107&quot;])
-    n_to_bytes([&quot;Encapsulation::to_bytes&lt;br/&gt;line 124&quot;])
-    n_from_bytes([&quot;Encapsulation::from_bytes&lt;br/&gt;line 132&quot;])
-    n_generate([&quot;SecretKey::generate&lt;br/&gt;line 149&quot;])
-    n_to_bytes([&quot;SecretKey::to_bytes&lt;br/&gt;line 170&quot;])
-    n_from_bytes([&quot;SecretKey::from_bytes&lt;br/&gt;line 179&quot;])
-    n_public_key([&quot;SecretKey::public_key&lt;br/&gt;line 194&quot;])
-    n_decapsulate([&quot;SecretKey::decapsulate&lt;br/&gt;line 202&quot;])
-    n_encapsulate([&quot;PublicKey::encapsulate&lt;br/&gt;line 224&quot;])
-    n_combine[&quot;combine&lt;br/&gt;line 251&quot;]
-    n_next_u32[&quot;OsRng::next_u32&lt;br/&gt;line 287&quot;]
-    n_next_u64[&quot;OsRng::next_u64&lt;br/&gt;line 292&quot;]
-    n_fill_bytes[&quot;OsRng::fill_bytes&lt;br/&gt;line 309&quot;]
-    n_try_fill_bytes[&quot;OsRng::try_fill_bytes&lt;br/&gt;line 312&quot;]
+    n_to_bytes([&quot;PublicKey::to_bytes&lt;br/&gt;line 111&quot;])
+    n_from_bytes([&quot;PublicKey::from_bytes&lt;br/&gt;line 119&quot;])
+    n_to_bytes([&quot;Encapsulation::to_bytes&lt;br/&gt;line 136&quot;])
+    n_from_bytes([&quot;Encapsulation::from_bytes&lt;br/&gt;line 144&quot;])
+    n_generate([&quot;SecretKey::generate&lt;br/&gt;line 161&quot;])
+    n_to_bytes([&quot;SecretKey::to_bytes&lt;br/&gt;line 182&quot;])
+    n_from_bytes([&quot;SecretKey::from_bytes&lt;br/&gt;line 191&quot;])
+    n_public_key([&quot;SecretKey::public_key&lt;br/&gt;line 206&quot;])
+    n_decapsulate([&quot;SecretKey::decapsulate&lt;br/&gt;line 214&quot;])
+    n_encapsulate([&quot;PublicKey::encapsulate&lt;br/&gt;line 236&quot;])
+    n_combine[&quot;combine&lt;br/&gt;line 266&quot;]
+    n_next_u32[&quot;OsRng::next_u32&lt;br/&gt;line 302&quot;]
+    n_next_u64[&quot;OsRng::next_u64&lt;br/&gt;line 307&quot;]
+    n_fill_bytes[&quot;OsRng::fill_bytes&lt;br/&gt;line 324&quot;]
+    n_try_fill_bytes[&quot;OsRng::try_fill_bytes&lt;br/&gt;line 327&quot;]
     n_decapsulate --&gt; n_combine
     n_encapsulate --&gt; n_combine
     n_next_u32 --&gt; n_fill_bytes
     n_next_u64 --&gt; n_fill_bytes
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L99&quot; &quot;open the source&quot;
-    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L107&quot; &quot;open the source&quot;
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L124&quot; &quot;open the source&quot;
-    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L132&quot; &quot;open the source&quot;
-    click n_generate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L149&quot; &quot;open the source&quot;
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L170&quot; &quot;open the source&quot;
-    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L179&quot; &quot;open the source&quot;
-    click n_public_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L194&quot; &quot;open the source&quot;
-    click n_decapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L202&quot; &quot;open the source&quot;
-    click n_encapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L224&quot; &quot;open the source&quot;
-    click n_combine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L251&quot; &quot;open the source&quot;
-    click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287&quot; &quot;open the source&quot;
-    click n_next_u64 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292&quot; &quot;open the source&quot;
-    click n_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L309&quot; &quot;open the source&quot;
-    click n_try_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L312&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L111&quot; &quot;open the source&quot;
+    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L119&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L136&quot; &quot;open the source&quot;
+    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L144&quot; &quot;open the source&quot;
+    click n_generate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L161&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L182&quot; &quot;open the source&quot;
+    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L191&quot; &quot;open the source&quot;
+    click n_public_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L206&quot; &quot;open the source&quot;
+    click n_decapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L214&quot; &quot;open the source&quot;
+    click n_encapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L236&quot; &quot;open the source&quot;
+    click n_combine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L266&quot; &quot;open the source&quot;
+    click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L302&quot; &quot;open the source&quot;
+    click n_next_u64 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L307&quot; &quot;open the source&quot;
+    click n_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L324&quot; &quot;open the source&quot;
+    click n_try_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L327&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_from_bytes,n_to_bytes,n_from_bytes,n_generate,n_to_bytes,n_from_bytes,n_public_key,n_decapsulate,n_encapsulate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -255,36 +256,36 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>HKDF_INFO</code> <sub>const</sub></td><td><a href="hybrid.src.html#fn-hkdf_info">51</a></td><td>Domain separation string, so keys derived here can never collide with keys derived by any other part of the system.</td></tr>
-<tr><td><code>X25519_PUB_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-x25519_pub_len">54</a></td><td>Encoded length of the X25519 public key.</td></tr>
-<tr><td><code>MLKEM_EK_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-mlkem_ek_len">56</a></td><td>Encoded length of the ML-KEM-768 encapsulation (public) key.</td></tr>
-<tr><td><code>MLKEM_CT_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-mlkem_ct_len">58</a></td><td>Encoded length of an ML-KEM-768 ciphertext.</td></tr>
-<tr><td><code>MLKEM_DK_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-mlkem_dk_len">60</a></td><td>Encoded length of the ML-KEM-768 decapsulation (private) key.</td></tr>
-<tr><td><code>X25519_SECRET_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-x25519_secret_len">62</a></td><td>Encoded length of the X25519 private scalar.</td></tr>
-<tr><td><code>SECRET_KEY_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-secret_key_len">64</a></td><td>Total encoded length of a SecretKey.</td></tr>
-<tr><td><code>PUBLIC_KEY_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-public_key_len">66</a></td><td>Total encoded length of a PublicKey.</td></tr>
-<tr><td><code>ENCAPSULATION_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-encapsulation_len">68</a></td><td>Total encoded length of an Encapsulation.</td></tr>
-<tr><td><code>MlKemDk</code> <sub>type</sub></td><td><a href="hybrid.src.html#fn-mlkemdk">70</a></td><td></td></tr>
-<tr><td><code>MlKemEk</code> <sub>type</sub></td><td><a href="hybrid.src.html#fn-mlkemek">71</a></td><td></td></tr>
-<tr><td><code>PublicKey</code> <sub>pub struct</sub></td><td><a href="hybrid.src.html#fn-publickey">76</a></td><td>A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</td></tr>
-<tr><td><code>SecretKey</code> <sub>pub struct</sub></td><td><a href="hybrid.src.html#fn-secretkey">82</a></td><td>A recipient&#x27;s private key.</td></tr>
-<tr><td><code>Encapsulation</code> <sub>pub struct</sub></td><td><a href="hybrid.src.html#fn-encapsulation">90</a></td><td>The public values a sender transmits so the recipient can recover the shared secret.</td></tr>
-<tr><td><code>PublicKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-publickey-to_bytes">99</a></td><td>Serialise to PUBLIC_KEY_LEN bytes.</td></tr>
-<tr><td><code>PublicKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-publickey-from_bytes">107</a></td><td>Parse from exactly PUBLIC_KEY_LEN bytes.</td></tr>
-<tr><td><code>Encapsulation::to_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-encapsulation-to_bytes">124</a></td><td>Serialise to ENCAPSULATION_LEN bytes.</td></tr>
-<tr><td><code>Encapsulation::from_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-encapsulation-from_bytes">132</a></td><td>Parse from exactly ENCAPSULATION_LEN bytes.</td></tr>
-<tr><td><code>SecretKey::generate</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-generate">149</a></td><td>Generate a fresh key pair from the OS CSPRNG.</td></tr>
-<tr><td><code>SecretKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-to_bytes">170</a></td><td>Serialise to SECRET_KEY_LEN bytes.</td></tr>
-<tr><td><code>SecretKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-from_bytes">179</a></td><td>Parse from exactly SECRET_KEY_LEN bytes.</td></tr>
-<tr><td><code>SecretKey::public_key</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-public_key">194</a></td><td>The matching public key.</td></tr>
-<tr><td><code>SecretKey::decapsulate</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-decapsulate">202</a></td><td>Recover the shared secret from a sender&#x27;s Encapsulation.</td></tr>
-<tr><td><code>PublicKey::encapsulate</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-publickey-encapsulate">224</a></td><td>Produce a shared secret for this recipient, plus the public values they need in order to recover it.</td></tr>
-<tr><td><code>combine</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-combine">251</a></td><td>Mix both shared secrets with the full transcript.</td></tr>
-<tr><td><code>OsRng</code> <sub>struct</sub></td><td><a href="hybrid.src.html#fn-osrng">284</a></td><td>Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</td></tr>
-<tr><td><code>OsRng::next_u32</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-next_u32">287</a></td><td></td></tr>
-<tr><td><code>OsRng::next_u64</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-next_u64">292</a></td><td></td></tr>
-<tr><td><code>OsRng::fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-fill_bytes">309</a></td><td>RngCore::fill_bytes has no error return: the trait&#x27;s contract is that it either fills the buffer or does not come back.</td></tr>
-<tr><td><code>OsRng::try_fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-try_fill_bytes">312</a></td><td></td></tr>
+<tr><td><code>HKDF_INFO</code> <sub>const</sub></td><td><a href="hybrid.src.html#fn-hkdf_info">63</a></td><td>Domain separation string, so keys derived here can never collide with keys derived by any other part of the system.</td></tr>
+<tr><td><code>X25519_PUB_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-x25519_pub_len">66</a></td><td>Encoded length of the X25519 public key.</td></tr>
+<tr><td><code>MLKEM_EK_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-mlkem_ek_len">68</a></td><td>Encoded length of the ML-KEM-768 encapsulation (public) key.</td></tr>
+<tr><td><code>MLKEM_CT_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-mlkem_ct_len">70</a></td><td>Encoded length of an ML-KEM-768 ciphertext.</td></tr>
+<tr><td><code>MLKEM_DK_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-mlkem_dk_len">72</a></td><td>Encoded length of the ML-KEM-768 decapsulation (private) key.</td></tr>
+<tr><td><code>X25519_SECRET_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-x25519_secret_len">74</a></td><td>Encoded length of the X25519 private scalar.</td></tr>
+<tr><td><code>SECRET_KEY_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-secret_key_len">76</a></td><td>Total encoded length of a SecretKey.</td></tr>
+<tr><td><code>PUBLIC_KEY_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-public_key_len">78</a></td><td>Total encoded length of a PublicKey.</td></tr>
+<tr><td><code>ENCAPSULATION_LEN</code> <sub>pub const</sub></td><td><a href="hybrid.src.html#fn-encapsulation_len">80</a></td><td>Total encoded length of an Encapsulation.</td></tr>
+<tr><td><code>MlKemDk</code> <sub>type</sub></td><td><a href="hybrid.src.html#fn-mlkemdk">82</a></td><td></td></tr>
+<tr><td><code>MlKemEk</code> <sub>type</sub></td><td><a href="hybrid.src.html#fn-mlkemek">83</a></td><td></td></tr>
+<tr><td><code>PublicKey</code> <sub>pub struct</sub></td><td><a href="hybrid.src.html#fn-publickey">88</a></td><td>A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</td></tr>
+<tr><td><code>SecretKey</code> <sub>pub struct</sub></td><td><a href="hybrid.src.html#fn-secretkey">94</a></td><td>A recipient&#x27;s private key.</td></tr>
+<tr><td><code>Encapsulation</code> <sub>pub struct</sub></td><td><a href="hybrid.src.html#fn-encapsulation">102</a></td><td>The public values a sender transmits so the recipient can recover the shared secret.</td></tr>
+<tr><td><code>PublicKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-publickey-to_bytes">111</a></td><td>Serialise to PUBLIC_KEY_LEN bytes.</td></tr>
+<tr><td><code>PublicKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-publickey-from_bytes">119</a></td><td>Parse from exactly PUBLIC_KEY_LEN bytes.</td></tr>
+<tr><td><code>Encapsulation::to_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-encapsulation-to_bytes">136</a></td><td>Serialise to ENCAPSULATION_LEN bytes.</td></tr>
+<tr><td><code>Encapsulation::from_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-encapsulation-from_bytes">144</a></td><td>Parse from exactly ENCAPSULATION_LEN bytes.</td></tr>
+<tr><td><code>SecretKey::generate</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-generate">161</a></td><td>Generate a fresh key pair from the OS CSPRNG.</td></tr>
+<tr><td><code>SecretKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-to_bytes">182</a></td><td>Serialise to SECRET_KEY_LEN bytes.</td></tr>
+<tr><td><code>SecretKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-from_bytes">191</a></td><td>Parse from exactly SECRET_KEY_LEN bytes.</td></tr>
+<tr><td><code>SecretKey::public_key</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-public_key">206</a></td><td>The matching public key.</td></tr>
+<tr><td><code>SecretKey::decapsulate</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-secretkey-decapsulate">214</a></td><td>Recover the shared secret from a sender&#x27;s Encapsulation.</td></tr>
+<tr><td><code>PublicKey::encapsulate</code> <sub>pub fn</sub></td><td><a href="hybrid.src.html#fn-publickey-encapsulate">236</a></td><td>Produce a shared secret for this recipient, plus the public values they need in order to recover it.</td></tr>
+<tr><td><code>combine</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-combine">266</a></td><td>Mix both shared secrets, with the exchange&#x27;s transcript as the salt.</td></tr>
+<tr><td><code>OsRng</code> <sub>struct</sub></td><td><a href="hybrid.src.html#fn-osrng">299</a></td><td>Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</td></tr>
+<tr><td><code>OsRng::next_u32</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-next_u32">302</a></td><td></td></tr>
+<tr><td><code>OsRng::next_u64</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-next_u64">307</a></td><td></td></tr>
+<tr><td><code>OsRng::fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-fill_bytes">324</a></td><td>RngCore::fill_bytes has no error return: the trait&#x27;s contract is that it either fills the buffer or does not come back.</td></tr>
+<tr><td><code>OsRng::try_fill_bytes</code> <sub>fn</sub></td><td><a href="hybrid.src.html#fn-osrng-try_fill_bytes">327</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -1596,8 +1596,8 @@ mod tests {
         };
         let mut field_x = 0.0f32;
         let mut button_x = 0.0f32;
-        let _ = ctx.run(input, |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| {
+        let _ = crate::headless_frame(&ctx, input, |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
                 let mut value = String::new();
                 field_x = password_row(ui, "current", &mut value).rect.left();
                 button_x = button_column(ui, |ui| ui.button("change password"))
@@ -1633,8 +1633,8 @@ mod tests {
         };
 
         let mut starts: Vec<(&str, f32)> = Vec::new();
-        let _ = ctx.run(input, |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| {
+        let _ = crate::headless_frame(&ctx, input, |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
                 for label in ["new", "password", "passphrase"] {
                     let mut value = String::new();
                     // Where the field actually landed, read back from the
@@ -2019,8 +2019,8 @@ mod tests {
             ..Default::default()
         };
         let mut text = String::new();
-        let output = ctx.run(input, |ctx| {
-            egui::CentralPanel::default().show(ctx, |ui| draw(security, ui));
+        let output = crate::headless_frame(&ctx, input, |ui| {
+            egui::CentralPanel::default().show(ui, |ui| draw(security, ui));
         });
         for shape in output.shapes {
             if let egui::epaint::Shape::Text(t) = shape.shape {

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/theme.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 796 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 802 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ next time.
 
 ## What this file contains
 
-796 lines defining **9 functions** (8 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+802 lines defining **9 functions** (8 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

@@ -22,6 +22,117 @@ than a summary written afterwards.
 - Checked by the website's own suite, which reads the script and the
   stylesheet and fails if either goes back.
 
+**The audit, round thirty-three: the whole tree read again**
+
+- The round after 0.1.21, run against the brief written before it began: every
+  class of defect the earlier rounds established and every check the
+  repository runs, asked of each file. What it found is written up in
+  `docs/AUDIT.md`; what changed because of it is below.
+- **Licences, sources and duplicate versions are checked now.** `cargo audit`
+  answers whether anything in the graph has an advisory against it and nothing
+  asked the other three questions: whether every licence can ship under
+  GPL-3.0-or-later, whether every crate comes from crates.io, and whether one
+  crate is compiled at two versions. `deny.toml` answers them, `cargo deny`
+  runs in CI beside the advisory check, and the two policy files are checked
+  against each other so their advisory exceptions cannot drift apart.
+- **Five checks that ran only when somebody ran them are in CI.** The guard for
+  a state file written one place and read from another, the per-program
+  guides, the questions page, the app-manifest self-test and the local site
+  host were all in `tools/verify.py` and none was in a workflow, so each
+  caught drift only when somebody remembered to look.
+- **The seven coverage-guided fuzz targets run weekly**, two minutes each from
+  the committed corpus, in a workflow of their own that can also be dispatched
+  before a release. They had only ever run by hand.
+- The hybrid key exchange's documentation said both public keys went into the
+  combiner. The recipient's X25519 key does; the recipient's ML-KEM key does
+  not, and does not need to, because FIPS 203 binds it through the shared
+  secret itself. The doc comment now says exactly what is bound, why the
+  omission is not a weakness, and why the transcript is not changed: every key
+  and container already made would change with it, for no gain.
+- The command line's offline claim was proved again on the built binary, four
+  ways, and each guard was shown to fail when given something to catch.
+
+**Dependencies, reviewed one by one**
+
+- **egui and eframe 0.36**, and this one is a security change as much as an
+  upgrade: 0.36 rasterises text without `ttf-parser`, so that crate has left
+  the dependency graph and its advisory leaves the exception list with it. Two
+  accepted advisories remain where there were three. The port was real work:
+  the application now draws into a root panel rather than taking the context,
+  the OpenGL choices moved to where the OpenGL backend is configured, panels
+  and styles are set differently, a dropped file reports its path through a
+  trait, and every headless test had to learn that a frame's texture uploads
+  must be accounted for. 1611 tests pass on it.
+- **`symphonia` 0.6**, the decoder for everything that is not a WAV. The 0.6
+  API changed how a stream is probed, how a decoder is made and how decoded
+  audio is read; the port keeps one interleaved buffer across packets rather
+  than one per packet, and every audio test passes on it.
+- **The GitHub Actions the workflows use**, nine of them, to their current
+  majors.
+- **The cryptographic line is held, on purpose, and the reason is written where
+  it will be read.** `sha2`, `hkdf`, `chacha20poly1305`, `argon2`,
+  `x25519-dalek`, `ml-kem`, `rand`, `rand_core`, `rand_chacha` and `getrandom`
+  all have a newer major. `pgp`, which verifies release signatures, pins the
+  generation this project uses, and taking the newer one would compile two
+  copies of every primitive into both binaries. None of the newer versions
+  fixes a vulnerability. The line moves together the day `pgp` moves, or the
+  day the signature check stops needing it, which is marker 149 on the
+  roadmap: a reader for exactly what a detached signature over a text file is,
+  with nothing else in it. Dependabot is told not to reopen the same ten pull
+  requests every week.
+- Every compatible update in the lock file taken.
+
+**The window draws at the display's rate**
+
+- The animations ran at twenty frames a second, by design: a constant in the
+  mark, a fifty-millisecond cadence for anything busy, and sixteen for veiling.
+  On a display faster than sixty that is judder, and the sixteen was wrong even
+  at sixty, because a display at sixty shows a frame every 16.67 ms and a
+  request for one "within sixteen" misses the frame it wanted and lands on the
+  next. Thirty a second, asked for as sixty.
+- **The fix is not a bigger number.** While anything is moving, the window asks
+  for the next frame now and lets the screen space it: a window that waits for
+  the display cannot draw faster than the display shows, so this is one frame
+  per refresh and no more, at whatever rate the screen runs.
+- That is also what makes the display measurable. Nothing in the libraries this
+  window is built on will say what the refresh rate is, so it is measured:
+  frames paced that way are the display's own, and the middle value of the last
+  thirty-two is a figure a single slow frame cannot move.
+- **Settings can lower it**, to 30, 60, 90, 120, 144, 165 or 240, which is a
+  choice to make for a battery rather than for smoothness.
+- **A live readout in the header** when you turn it on, and the About tab now
+  carries what the window is aiming at, what the display measured, the rate as
+  drawn and how many frames arrived late.
+- **It says when it is struggling.** A frame more than half again later than it
+  should have been is counted late; two seconds of that shows a notice once,
+  naming the rate, the target and what the window is drawing with, because
+  software rendering and a slow GPU are different problems. One bad second is
+  not enough, since every launch costs one.
+- Idle is unchanged: a window with nothing moving asks for no frames and draws
+  none.
+
+**The lock button and the theme picker agree on a height**
+
+- The manual lock button in the header did not line up with the picker beside
+  it. Measured properly, in a frame laid out the way the header lays it out:
+  the two share a centre exactly and the picker is one pixel taller, because
+  each control worked its own height out from padding and nothing said the two
+  should match.
+- The button now takes its height from the picker's own rectangle rather than
+  from a number written down twice, so they cannot drift apart at a font size
+  or on a platform nobody here has tried. Two tests hold it, one of which
+  proves the other can fail.
+- No screenshot can show this: the captures photograph a window with no app
+  lock set, and the button is only drawn when there is one.
+
+**Two markers on the roadmap**
+
+- Marker 148, the window drawing at the display's rate and saying so: the
+  animations ran at twenty frames a second by design, and what to build
+  instead is specified in full.
+- Marker 149, the signature check that needs only a signature check, which is
+  what unblocks the cryptographic line above.
+
 **The site can be claimed in Search Console**
 
 - The ownership tag Google asks for sits in the head of every page, so the site

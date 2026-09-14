@@ -100,7 +100,7 @@ flowchart TD
     n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>535 lines"]
     n_hoard["hoard.rs<br/>1037 lines"]
-    n_hybrid["hybrid.rs<br/>460 lines"]
+    n_hybrid["hybrid.rs<br/>475 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
     n_lock["lock.rs<br/>1958 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
@@ -146,7 +146,7 @@ flowchart TD
 | [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] | 327 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [[`container.rs`|File-veilvoice-crypto-container]] | 535 | The .veil encrypted container format. |
 | [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 1037 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
-| [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 460 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
+| [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 475 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 525 | Password-based key derivation with Argon2id. |
 | [[`lib.rs`|File-veilvoice-crypto-lib]] | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [[`lock.rs`|File-veilvoice-crypto-lock]] | 1958 | The application lock: an Argon2id password verifier with a rate limit. |

@@ -234,7 +234,7 @@ fn unix_level() -> Level {
 
 /// Whether a background service is installed.
 ///
-/// Always `false` for now, and the function exists so that a front end asking
+/// Always `false`, and the function exists so that a front end asking
 /// the question gets an answer rather than a missing feature: **VeilVoice does
 /// not install a service.** [`NO_SERVICE`] is why.
 pub fn service_installed() -> bool {
