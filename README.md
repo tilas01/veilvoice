@@ -688,7 +688,7 @@ writes with no extra work.
 - **Offline by construction.** Zero servers, enforced in CI.
 - **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
   including the page-locking path.
-- **61079 functional lines of Rust**, across 28 crates. A *functional line* is
+- **61082 functional lines of Rust**, across 28 crates. A *functional line* is
   a line holding code: blank lines and lines holding only a comment are not
   counted, and a line with code and a trailing comment counts once. Each
   crate's own README states its share of that total under **The files**.
