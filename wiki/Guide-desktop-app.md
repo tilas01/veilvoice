@@ -399,6 +399,16 @@ setting up an interview on another tab and are not sure the microphone is still
 working. Settings, under *the live monitor*, moves it to a floating card in the
 corner or switches it off; the Studio keeps its full meters either way.
 
+**On a call, or streaming, put it above everything.** The strip and the card
+are both inside the VeilVoice window, and on a call the call is in front of
+that window, so the only picture of what your microphone is doing is behind the
+thing you are talking into. Settings offers **a small window kept above
+everything**: its own window, above other windows, off the task bar, which you
+can drag wherever it suits and resize. Closing it puts the strip back rather
+than turning the meters off, because pressing a close button means "not here"
+and not "never show me my microphone again". On a platform that will not give a
+second window, it falls back to the floating card.
+
 **What the meters can and cannot tell you.** They say sound is arriving and
 sound is leaving, which is the thing that usually goes wrong: a muted
 microphone, the wrong device, a cable nothing is listening to. They cannot tell
