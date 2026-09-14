@@ -71,11 +71,13 @@ than a summary written afterwards.
   claims success without writing a byte, passed every test this project had. A
   key drawn from a buffer left untouched is a key somebody else already knows.
   It is now asked, in both forms, whether bytes actually arrive.
-- One of the fifteen cannot be killed and the reason is now written where it
-  lives: a ceiling on parallelism that the memory ceiling always reaches
-  first. It stays, because a guard that is only redundant today is not a guard
-  to delete, and the next person who changes it and sees nothing happen will
-  find the answer in the comment rather than concluding the line is dead.
+- **Run again afterwards**, which is what makes it a result: 104 objected to,
+  21 that do not compile, and two left, both of them the same line.
+- That line cannot be killed and the reason is now written where it lives: a
+  ceiling on parallelism that the memory ceiling always reaches first. It
+  stays, because a guard that is only redundant today is not a guard to
+  delete, and the next person who changes it and sees nothing happen will find
+  the answer in the comment rather than concluding the line is dead.
 
 **The command it prints and the command it runs cannot drift apart**
 

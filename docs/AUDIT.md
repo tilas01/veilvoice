@@ -319,21 +319,27 @@ is not this crate's to assess; it is the question of whether bytes arrive at
 all. They are asked for now, in both forms, and two draws are required to
 differ.
 
-**One of the fifteen cannot be killed, and saying why is the useful part.**
-`p_cost > MAX_P_COST` can never be the only test that fires: Argon2 wants
-eight KiB per lane, `checked` enforces that in widened arithmetic, and the
-memory ceiling is four gibibytes, so nothing above `MAX_M_COST / 8` reaches
-that line whatever it says. The guard stays, because it is the bound Argon2
-documents and because the argument it belongs to is about the order these
-checks run in: a later change that moved the lane relation would leave this as
-the only thing between a header and an overflow. What changes is the doc
-comment, which now says all of that, so that the next reader who mutates it
-and sees nothing happen finds the answer where they are standing rather than
-concluding the line is dead.
+**Two of the fifteen are one line, and that line cannot be killed.** Both are
+mutations of `p_cost > MAX_P_COST`, which can never be the only test that
+fires: Argon2 wants eight KiB per lane, `checked` enforces that in widened
+arithmetic, and the memory ceiling is four gibibytes, so nothing above
+`MAX_M_COST / 8` reaches that line whatever it says. The guard stays, because
+it is the bound Argon2 documents and because the argument it belongs to is
+about the order these checks run in: a later change that moved the lane
+relation would leave this as the only thing between a header and an overflow.
+What changes is the doc comment, which now says all of that, so the next
+reader who mutates it and sees nothing happen finds the answer where they are
+standing rather than concluding the line is dead.
 
-The campaign is not yet part of any build. It takes half an hour over four
-files and there are twenty-seven crates; making it a check is the work, and
-the brief for the next round carries it.
+**The campaign was run again against the new tests**, which is the part that
+makes this a result rather than an intention: 127 mutants, 104 caught, 21
+unviable, **2 missed**, and both of those are the two mutations of that one
+unkillable line. Thirteen of the fifteen are dead; the other two are
+documented where they live.
+
+The campaign is not yet part of any build. It takes twenty-three minutes over
+four files and there are twenty-seven crates; making it a check is the work,
+and marker 151 carries it.
 
 ## The thirty-second round: the guard that failed and the two behind it
 
