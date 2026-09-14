@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-conversation/src/edit.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 657 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 649 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ correct.
 
 ## What this file contains
 
-657 lines defining **12 functions** (11 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+649 lines defining **11 functions** (10 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -93,7 +93,6 @@ correct.
 - `Conversation::move_edges` (line 254) -- Move a span's edges, keeping its speaker and its text.
 - `Conversation::set_name` (line 281) -- Rename one speaker.
 - `Conversation::set_colour` (line 309) -- Give a speaker a colour, or take it away again.
-- `speaker_with_colour` (line 346) -- A speaker with a colour, for building one in a front end.
 
 ## What calls what
 
@@ -126,7 +125,6 @@ flowchart TD
     n_set_name(["Conversation::set_name<br/>line 281"])
     n_set_colour(["Conversation::set_colour<br/>line 309"])
     n_nearest_hint["Conversation::nearest_hint<br/>line 327"]
-    n_speaker_with_colour(["speaker_with_colour<br/>line 346"])
     n_merge --> n_turn_at
     n_reassign_at --> n_nearest_hint
     n_reassign_at --> n_reassign
@@ -144,9 +142,8 @@ flowchart TD
     click n_set_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L281" "open the source"
     click n_set_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L309" "open the source"
     click n_nearest_hint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L327" "open the source"
-    click n_speaker_with_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L346" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_check_colour,n_turns_at,n_reassign_at,n_split_at,n_merge,n_move_edges,n_set_name,n_set_colour,n_speaker_with_colour entry
+    class n_check_colour,n_turns_at,n_reassign_at,n_split_at,n_merge,n_move_edges,n_set_name,n_set_colour entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_turn_at,n_reassign api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -170,7 +167,6 @@ flowchart TD
 | `Conversation::set_name` <sub>pub fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L281) | Rename one speaker. |
 | `Conversation::set_colour` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L309) | Give a speaker a colour, or take it away again. |
 | `Conversation::nearest_hint` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L327) | Where to look, for a timestamp that landed in no span. |
-| `speaker_with_colour` <sub>pub fn</sub> | [346](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs#L346) | A speaker with a colour, for building one in a front end. |
 
 ---
 

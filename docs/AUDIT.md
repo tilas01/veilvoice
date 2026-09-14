@@ -233,6 +233,58 @@ thing you read it for, and the guard that catches this class today reads audio
 callbacks rather than the window's draw path. Extending it is marker 151's
 neighbour and is not done here.
 
+### F-182: five public items that nothing reached, and the reason no compiler said so
+
+A sweep of every `pub` declaration in the twenty-seven crates against every
+mention of its name anywhere in the tree. Of 1631 public items, twenty-six are
+named only by their own tests, which is normal and was left alone: a reader kept
+beside a writer, a constructor whose front end is not written yet. Five were
+named by nothing at all.
+
+| Item | What it did | Why nothing called it |
+|---|---|---|
+| `AppLock::needs_upgrade` | true for a record older than the authentication tag | `LockStore::unlock` re-tags on every success, so the upgrade happens without anybody asking the question |
+| `edit::speaker_with_colour` | a validating constructor for a speaker with a colour | `Speaker::named` plus `set_colour` is the path both front ends take, and it validates through the same function |
+| `Studio::is_a_room` | whether the running session is a room | the reading already arrives as `Reading::Room`, which is the same answer carrying the data with it |
+| `WatchFeed::has_unseen` | whether an alert is queued | `unseen` drains the queue and the caller tests what it got |
+| `VaultStore::last_audit` | what the last vault audit found | `unlocked` returns the audit, and the one caller uses the returned value |
+
+None of the five was wrong. That is the point of the finding and the reason it
+is one: each was compiled into every binary on every platform, documented,
+published into the generated reference and into the wiki, and answerable to
+nobody, because there was no caller whose behaviour would change if it were.
+
+**The last one cost something measurable.** `last_audit` read a private `audit`
+field, and that field was filled by `self.audit = Some(audit.clone())` on every
+vault open. So the accessor nobody called was keeping alive a field nobody read
+and a clone of the audit result performed every time the vault was opened. The
+field and the clone are gone with it.
+
+**Why `dead_code` is structurally unable to report any of this.** The lint stops
+at the crate boundary, because a public item in a library might be called by a
+consumer the compiler cannot see. In a workspace whose libraries have exactly
+two consumers, both inside the workspace, that leaves the whole class
+unwatched. It is worse than silence: a public accessor *reads* its private
+field, so the field is live as far as the lint is concerned, and the pair
+survives together. Nothing in a build was looking at this, which is why the
+sweep was done by hand and why it is now a check.
+
+**The guard.** `tools/audit/reachable.py`, in `tools/verify.py` and in CI beside
+`dependencies.py`, which asks the same question of the code this project
+imports. It asks the narrowest version deliberately: is this name written down
+anywhere but on the line declaring it. An item reached only by a test passes,
+because that is a real and often correct state; an item reached by nothing does
+not. The exemption list is empty and is meant to stay that way, since an entry
+in it is an argument to be written out rather than a line that makes a build go
+green. It was proved able to fail before it was trusted, by planting a public
+function nothing called and watching it name the file and line.
+
+**What the plan expected, and what was actually there.** The brief named
+`ffmpeg::command` as the first suspect. It is called, from
+`veilvoice-cli/src/conversation.rs`. A suspicion about which item is dead is
+worth exactly nothing next to the sweep that answers it for all 1631 at once,
+and the sweep is the part that is now repeatable.
+
 ### The checks this round ran, and where each one lives now
 
 The inventory is not a finding. It is here because the next round's reader
@@ -252,6 +304,7 @@ having looked.
 | the seven coverage-guided fuzz targets | by hand | **now, weekly** | ten minutes each, no crash, no hang, no out-of-memory |
 | the deterministic parser campaigns | yes | yes | clean |
 | **mutation testing** | no | not yet (marker 151) | **fifteen survivors; F-180** |
+| **a public item reached by nothing** | no | **now** | **five; F-182** |
 | a state file written one place and read another | by hand | **now** | nothing |
 | the per-program guides against the user guide | by hand | **now** | nothing |
 | the questions page against `docs/FAQ.md` | by hand | **now** | nothing |
@@ -332,17 +385,26 @@ the candidate on the list, on the ground that its only caller prints it.
 Printing it *is* the feature: the command line's whole posture there is to hand
 somebody a command and not run it. Reached, argued, and staying.
 
-**Four hand-typed numbers, checked but not written.** The functional line
-count and the test count appear in the README, on the front page and in one
-row of this document, and the website suite compares all four against the
-tree. The comparison is right. The typing is not: every change to any Rust
-file moves the line count, so a commit that touches code and forgets those
-four places fails a check that has nothing to do with what the commit was
-about. That happened four times in this round alone, which is a measurement
-rather than an impression. `docs/MEASURED.md` is already generated from the
-same counters; writing the other four from them is marker 152, and the suite's
-comparison stays where it is, as the guard rather than as the thing that
-catches a person every time.
+**Ten hand-typed numbers, checked but not written, now written.** The
+functional line count, the test count, the crate count and the suite count are
+stated in the README, on the front page and in one row of this document: ten
+claims in all, and the website suite already compared every one of them against
+the tree. The comparison was right and it is untouched. The typing was the
+problem. Every change to any Rust file moves the line count, so a commit that
+touched code and not those ten places failed a check that had nothing to do
+with what the commit was about, four times in this round alone. That is a
+measurement rather than an impression, which is why it was worth acting on
+rather than noting.
+
+`tools/measured/generate.py` already took all four numbers to write
+`docs/MEASURED.md`. It now writes the ten sentences from them as well, using
+the same regular expressions the suite checks with, so the tool that writes a
+claim and the suite that checks it cannot disagree about where the claim is. A
+pattern that stops matching fails the tool rather than letting it write nine of
+ten and report success. The one row it touches in this document is the "Test
+suite" row of the state-of-the-tree table, which describes now rather than
+recording the past, and the pattern is anchored to that row so no older number
+further up the page is within its reach. Marker 152, done.
 
 **The private-file helper.** Creates owner-only with `create_new`, so a
 symlink planted at the path is refused rather than followed, and replaces by
@@ -5278,7 +5340,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1620 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1620 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6925,7 +6987,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-one defects found and fixed (F-1 to F-181), across
+**One hundred and eighty-two defects found and fixed (F-1 to F-182), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

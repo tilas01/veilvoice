@@ -459,11 +459,6 @@ impl Studio {
         self.running.is_some()
     }
 
-    /// Whether what is running is a room rather than one microphone.
-    pub fn is_a_room(&self) -> bool {
-        matches!(self.running, Some(Running::Room(_)))
-    }
-
     /// Whether the form is set to a room. **Marker 147.**
     pub fn wants_a_room(&self) -> bool {
         self.room_wanted
