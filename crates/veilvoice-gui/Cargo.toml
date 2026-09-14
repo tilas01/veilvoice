@@ -59,7 +59,7 @@ eframe = { version = "0.36", default-features = false, features = ["glow", "defa
 egui = "0.36"
 # The platform's own file and folder panel, so choosing a file looks like
 # choosing a file on that machine rather than in this program.
-rfd = { version = "0.15", default-features = false, features = ["xdg-portal", "tokio"] }
+rfd = { version = "0.16", default-features = false, features = ["xdg-portal", "tokio"] }
 # Wipes typed passphrases out of the text fields that necessarily hold them in
 # the clear; see the `security` module for what that does and does not buy.
 zeroize.workspace = true
