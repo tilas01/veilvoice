@@ -528,6 +528,92 @@ mod tests {
         assert_eq!(argv[at + 1], "20");
     }
 
+    /// The three command builders agree about how to encode.
+    ///
+    /// They differ in how the picture gets in, and only in that: a numbered
+    /// sequence, a concat list, or a synthesised black source. Everything
+    /// after the inputs is the same decision made three times, in three
+    /// functions, with nothing until now comparing them.
+    ///
+    /// That matters because of which one is which. `concat_command` is what
+    /// the window runs. `command` is what `veilvoice conversation` **prints
+    /// for somebody to run by hand**, under a line saying VeilVoice never runs
+    /// it for you. If those two drift, the instruction this program gives is
+    /// not the thing this program does, and nobody would find out from a
+    /// passing build.
+    #[test]
+    fn every_way_into_a_video_encodes_it_the_same_way() {
+        let encoding = Encoding {
+            plan: size::Plan::new(
+                size::Preset::Uhd2160.size(),
+                size::FrameRate::new(60).unwrap(),
+            ),
+            ..Encoding::default()
+        };
+        let frames = command(
+            Path::new("/frames"),
+            "frame-%05d.png",
+            Path::new("/audio.wav"),
+            Path::new("/out.mp4"),
+            encoding.clone(),
+        );
+        let concat = concat_command(
+            Path::new("/list.txt"),
+            Path::new("/audio.wav"),
+            Path::new("/out.mp4"),
+            encoding.clone(),
+        );
+        let black = black_command(Path::new("/audio.wav"), Path::new("/out.mp4"), encoding);
+
+        /// The value after a switch, or nothing if the switch is absent.
+        fn after<'a>(argv: &'a [String], switch: &str) -> Option<&'a str> {
+            let at = argv.iter().position(|part| part == switch)?;
+            argv.get(at + 1).map(String::as_str)
+        }
+
+        // The printed command and the one the window runs take the same
+        // pictures in by two different routes, so every setting must match,
+        // the scale filter included.
+        for switch in ["-c:v", "-crf", "-vf", "-pix_fmt", "-c:a", "-b:a"] {
+            let printed = after(&frames, switch);
+            let run = after(&concat, switch);
+            assert_eq!(
+                printed, run,
+                "the printed command and the one the window runs disagree \
+                 about {switch}: {printed:?} against {run:?}"
+            );
+        }
+
+        // The black-frame command has no scale filter and should not: there
+        // are no pictures to scale, because ffmpeg synthesises the source at
+        // the size asked for. Everything downstream of the picture is still
+        // the same decision.
+        assert_eq!(after(&black, "-vf"), None, "there is nothing to scale");
+        for switch in ["-c:v", "-crf", "-pix_fmt", "-c:a", "-b:a"] {
+            let run = after(&concat, switch);
+            let plain = after(&black, switch);
+            assert_eq!(
+                run, plain,
+                "the video commands disagree about {switch}: {run:?} against {plain:?}"
+            );
+        }
+
+        // And the three switches every one of them must carry, so that a
+        // settings comparison cannot pass by all three having lost the same
+        // switch at once.
+        for argv in [&frames, &concat, &black] {
+            assert!(
+                argv.contains(&"-n".to_string()),
+                "overwrites without asking"
+            );
+            assert!(
+                argv.contains(&"-shortest".to_string()),
+                "runs past the shorter stream"
+            );
+            assert_eq!(after(argv, "-pix_fmt"), Some("yuv420p"));
+        }
+    }
+
     /// The chosen size reaches both commands.
     ///
     /// `black_command` had `1280x720` written into it, so a person who asked

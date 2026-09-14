@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/ffmpeg.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 631 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 717 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs)
 
 ## Contents
 
@@ -55,7 +55,7 @@ you.
 
 ## What this file contains
 
-631 lines defining **9 functions** (8 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+717 lines defining **9 functions** (8 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

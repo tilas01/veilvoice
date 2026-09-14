@@ -52,6 +52,19 @@ than a summary written afterwards.
 - The command line's offline claim was proved again on the built binary, four
   ways, and each guard was shown to fail when given something to catch.
 
+**The command it prints and the command it runs cannot drift apart**
+
+- `veilvoice conversation` prints an `ffmpeg` command for you to run yourself,
+  under a line saying VeilVoice never runs it for you. The window runs a
+  different one, because it feeds the pictures in by a list rather than by a
+  numbered pattern. Everything after the inputs was the same decision made
+  separately in three places, with only the frame size compared across two of
+  them.
+- They agreed, and now they have to: a test compares the codec, the quality,
+  the scale filter, the pixel format and the audio settings across all three,
+  so an instruction this program gives cannot quietly stop being the thing this
+  program does.
+
 **Dependencies, reviewed one by one**
 
 - **egui and eframe 0.36**, and this one is a security change as much as an
