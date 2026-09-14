@@ -184,6 +184,11 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>The hybrid key exchange&#x27;s documentation said both public keys went into the combiner. The recipient&#x27;s X25519 key does; the recipient&#x27;s ML-KEM key does not, and does not need to, because FIPS 203 binds it through the shared secret itself. The doc comment now says exactly what is bound, why the omission is not a weakness, and why the transcript is not changed: every key and container already made would change with it, for no gain.</li>
 <li>The command line&#x27;s offline claim was proved again on the built binary, four ways, and each guard was shown to fail when given something to catch.</li>
 </ul>
+<p><strong>Undefined-behaviour checking, run here for the first time</strong></p>
+<ul>
+<li>The whole workspace forbids unsafe code, so anything an interpreter found would belong to a dependency rather than to VeilVoice. It found nothing, in the two crates it got through: the release-signature and contents readers, and the WAV and metadata crate.</li>
+<li>Said precisely, because the alternative is a claim that sounds larger than it is: four tests in the metadata crate could not run, because they write tags to a real file and the interpreter&#x27;s filesystem stands in the way. No undefined behaviour and no unsupported operation was reported for them, and they pass in seconds outside it, so the tag writer is uncovered rather than broken. A third crate did not finish at all.</li>
+</ul>
 <p><strong>A promise about allocation, kept</strong></p>
 <ul>
 <li>The frame-pacing code carried a note saying it allocates nothing once a frame, and then took its median with a sort that takes a scratch buffer for a slice that long. Nothing looked wrong and nothing was slow; what was wrong is that a sentence in this repository was not true about the code fourteen lines beneath it.</li>
