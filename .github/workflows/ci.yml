@@ -315,6 +315,15 @@ jobs:
       - name: Every dependency must say what it is for
         run: python tools/audit/dependencies.py
 
+      # The same question asked of this project's own code. `dead_code` stops
+      # at the crate boundary, because a public item might have a consumer the
+      # compiler cannot see, so nothing here was checking that any of them did.
+      # Five had no caller and no test. One was an accessor keeping a private
+      # field alive, and a clone of an audit result on every vault open with it,
+      # which is the shape the compiler is structurally unable to report.
+      - name: Every public item must be reached by something
+        run: python tools/audit/reachable.py
+
       # And the other half of the question. Saying what a dependency is for
       # does not make anything watch it: a crate outside the workspace, or a
       # second workflow directory, falls outside every Dependabot entry and

@@ -47,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/studio.svg" alt="studio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/studio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2411 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2406 lines &middot; <a href="studio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-tabs-one-vault">Two tabs, one vault</a>
@@ -88,7 +88,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>2411 lines defining <strong>65 functions</strong> (37 public), <strong>12 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2406 lines defining <strong>64 functions</strong> (36 public), <strong>12 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Phase</code> <span style="color:var(--muted)">line 126</span> &middot; What the Studio is doing.</li>
 <li><code>enum Who</code> <span style="color:var(--muted)">line 141</span> &middot; Who is speaking into a session.</li>
@@ -99,9 +99,9 @@
 <li><code>struct GuestTake</code> <span style="color:var(--muted)">line 297</span> &middot; What is being kept for one guest while a room take runs.</li>
 <li><code>enum Reading</code> <span style="color:var(--muted)">line 319</span> &middot; What a running session last reported about itself.</li>
 <li><code>struct Studio</code> <span style="color:var(--muted)">line 333</span> &middot; The Studio and the Browser.</li>
-<li><code>enum Keep</code> <span style="color:var(--muted)">line 2119</span> &middot; Which side of the engine a take keeps.</li>
-<li><code>enum Render</code> <span style="color:var(--muted)">line 2187</span> &middot; What a take is to be turned into.</li>
-<li><code>enum Act</code> <span style="color:var(--muted)">line 2255</span> &middot; Something a browser row asked for.</li>
+<li><code>enum Keep</code> <span style="color:var(--muted)">line 2114</span> &middot; Which side of the engine a take keeps.</li>
+<li><code>enum Render</code> <span style="color:var(--muted)">line 2182</span> &middot; What a take is to be turned into.</li>
+<li><code>enum Act</code> <span style="color:var(--muted)">line 2250</span> &middot; Something a browser row asked for.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>RoomGuest::called</code> <span style="color:var(--muted)">line 206</span> &middot; What to call this guest in slot slot, filling in a blank name.
@@ -110,55 +110,53 @@
 </li>
 <li><code>Studio::is_veiling</code> <span style="color:var(--muted)">line 458</span> &middot; Whether the veiled voice is going out.
 </li>
-<li><code>Studio::is_a_room</code> <span style="color:var(--muted)">line 463</span> &middot; Whether what is running is a room rather than one microphone.
+<li><code>Studio::wants_a_room</code> <span style="color:var(--muted)">line 463</span> &middot; Whether the form is set to a room.
 </li>
-<li><code>Studio::wants_a_room</code> <span style="color:var(--muted)">line 468</span> &middot; Whether the form is set to a room.
+<li><code>Studio::want_a_room</code> <span style="color:var(--muted)">line 473</span> &middot; Switch the form between one microphone and a room.
 </li>
-<li><code>Studio::want_a_room</code> <span style="color:var(--muted)">line 478</span> &middot; Switch the form between one microphone and a room.
+<li><code>Studio::room_guests</code> <span style="color:var(--muted)">line 481</span> &middot; Who is in the room, in the order they were added.
 </li>
-<li><code>Studio::room_guests</code> <span style="color:var(--muted)">line 486</span> &middot; Who is in the room, in the order they were added.
+<li><code>Studio::room_guest_mut</code> <span style="color:var(--muted)">line 486</span> &middot; One guest, to be edited by the controls that draw them.
 </li>
-<li><code>Studio::room_guest_mut</code> <span style="color:var(--muted)">line 491</span> &middot; One guest, to be edited by the controls that draw them.
+<li><code>Studio::add_guest</code> <span style="color:var(--muted)">line 494</span> &middot; Add a guest, up to veilvoice_audio::MAX_GUESTS.
 </li>
-<li><code>Studio::add_guest</code> <span style="color:var(--muted)">line 499</span> &middot; Add a guest, up to veilvoice_audio::MAX_GUESTS.
+<li><code>Studio::remove_guest</code> <span style="color:var(--muted)">line 501</span> &middot; Take a guest out of the room.
 </li>
-<li><code>Studio::remove_guest</code> <span style="color:var(--muted)">line 506</span> &middot; Take a guest out of the room.
+<li><code>Studio::guest_levels</code> <span style="color:var(--muted)">line 511</span> &middot; The smoothed bars for the room, one pair per guest.
 </li>
-<li><code>Studio::guest_levels</code> <span style="color:var(--muted)">line 516</span> &middot; The smoothed bars for the room, one pair per guest.
+<li><code>Studio::levels</code> <span style="color:var(--muted)">line 522</span> &middot; The smoothed levels, for the monitor strip and for this tab.
 </li>
-<li><code>Studio::levels</code> <span style="color:var(--muted)">line 527</span> &middot; The smoothed levels, for the monitor strip and for this tab.
+<li><code>Studio::trouble</code> <span style="color:var(--muted)">line 532</span> &middot; What the audio path last reported about itself, and whether it is new.
 </li>
-<li><code>Studio::trouble</code> <span style="color:var(--muted)">line 537</span> &middot; What the audio path last reported about itself, and whether it is new.
+<li><code>Studio::intruders</code> <span style="color:var(--muted)">line 539</span> &middot; The programs that took the microphone while this take has been running.
 </li>
-<li><code>Studio::intruders</code> <span style="color:var(--muted)">line 544</span> &middot; The programs that took the microphone while this take has been running.
+<li><code>Studio::note_microphone_holders</code> <span style="color:var(--muted)">line 554</span> &middot; Record which programs are holding the microphone right now.
 </li>
-<li><code>Studio::note_microphone_holders</code> <span style="color:var(--muted)">line 559</span> &middot; Record which programs are holding the microphone right now.
-</li>
-<li><code>Studio::tick</code> <span style="color:var(--muted)">line 576</span> &middot; Read the session&#x27;s counters, once a frame, and move the levels on.
+<li><code>Studio::tick</code> <span style="color:var(--muted)">line 571</span> &middot; Read the session&#x27;s counters, once a frame, and move the levels on.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>catch_a_fault</code>, <code>is_recording</code>, <code>stop_veiling</code>, <code>finish_take</code>, <code>counted_interruptions</code>, <code>store_take</code>, <code>take_name</code>, <code>length</code></span>
 </li>
-<li><code>Studio::start_veiling</code> <span style="color:var(--muted)">line 717</span> &middot; Start veiling, keeping nothing.
+<li><code>Studio::start_veiling</code> <span style="color:var(--muted)">line 712</span> &middot; Start veiling, keeping nothing.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>start_session</code>, <code>sharing_a_microphone</code></span>
 </li>
-<li><code>Studio::start_room</code> <span style="color:var(--muted)">line 738</span> &middot; Marker 147.
+<li><code>Studio::start_room</code> <span style="color:var(--muted)">line 733</span> &middot; Marker 147.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>start_session</code>, <code>sharing_a_microphone</code></span>
 </li>
-<li><code>Studio::close</code> <span style="color:var(--muted)">line 767</span> &middot; Shut the vault and forget the key.
+<li><code>Studio::close</code> <span style="color:var(--muted)">line 762</span> &middot; Shut the vault and forget the key.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>stop_veiling</code>, <code>finish_take</code>, <code>is_recording</code>, <code>counted_interruptions</code>, <code>store_take</code>, <code>take_name</code>, <code>length</code></span>
 </li>
-<li><code>Studio::tab</code> <span style="color:var(--muted)">line 1527</span> &middot; The take half of the Recording Studio tab.
+<li><code>Studio::tab</code> <span style="color:var(--muted)">line 1522</span> &middot; The take half of the Recording Studio tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>is_previewing</code>, <code>keep_form</code>, <code>length</code>, <code>phase</code>, <code>say</code>, <code>shut_panel</code>, <code>start_take</code>, <code>stop_take</code>, <code>take_form</code>, <code>is_recording</code>, <code>unlock</code>, <code>start_session</code></span>
 </li>
-<li><code>Studio::browser</code> <span style="color:var(--muted)">line 1658</span> &middot; The Recording Browser tab.
+<li><code>Studio::browser</code> <span style="color:var(--muted)">line 1653</span> &middot; The Recording Browser tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>apply</code>, <code>counted</code>, <code>decoy_panel</code>, <code>export</code>, <code>length</code>, <code>made_on</code>, <code>say</code>, <code>shut_panel</code>, <code>size</code>, <code>play</code>, <code>refresh</code>, <code>make_decoys</code></span>
 </li>
-<li><code>Keep::wants_veiled</code> <span style="color:var(--muted)">line 2131</span> &middot; Whether the veiled voice is kept.
+<li><code>Keep::wants_veiled</code> <span style="color:var(--muted)">line 2126</span> &middot; Whether the veiled voice is kept.
 </li>
-<li><code>Keep::wants_plain</code> <span style="color:var(--muted)">line 2139</span> &middot; Whether the real voice is kept.
+<li><code>Keep::wants_plain</code> <span style="color:var(--muted)">line 2134</span> &middot; Whether the real voice is kept.
 </li>
-<li><code>Keep::label</code> <span style="color:var(--muted)">line 2144</span> &middot; What this is called where it is chosen.
+<li><code>Keep::label</code> <span style="color:var(--muted)">line 2139</span> &middot; What this is called where it is chosen.
 </li>
-<li><code>Keep::cost</code> <span style="color:var(--muted)">line 2158</span> &middot; What it costs, in the words the plaintext path uses.
+<li><code>Keep::cost</code> <span style="color:var(--muted)">line 2153</span> &middot; What it costs, in the words the plaintext path uses.
 </li>
 </ul>
 </section>
@@ -219,87 +217,87 @@
 <a href="studio.src.html#fn-studio-is_previewing">
 <rect x="380.7" y="120.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="479.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::is_previewing</text>
-<text x="479.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 522</text>
+<text x="479.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 517</text>
 </a>
 <a href="studio.src.html#fn-studio-tick">
 <rect x="55.1" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="117.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::tick</text>
-<text x="117.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 576</text>
+<text x="117.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 571</text>
 </a>
 <a href="studio.src.html#fn-studio-catch_a_fault">
 <rect x="20.0" y="620.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="118.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::catch_a_fault</text>
-<text x="118.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 668</text>
+<text x="118.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 663</text>
 </a>
 <a href="studio.src.html#fn-studio-phase">
 <rect x="205.8" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="272.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::phase</text>
-<text x="272.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 704</text>
+<text x="272.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 699</text>
 </a>
 <a href="studio.src.html#fn-studio-start_veiling">
 <rect x="364.6" y="220.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="463.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::start_veiling</text>
-<text x="463.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 717</text>
+<text x="463.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 712</text>
 </a>
 <a href="studio.src.html#fn-studio-start_room">
 <rect x="59.1" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="145.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::start_room</text>
-<text x="145.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 738</text>
+<text x="145.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 733</text>
 </a>
 <a href="studio.src.html#fn-studio-stop_veiling">
 <rect x="213.8" y="820.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="308.4" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::stop_veiling</text>
-<text x="308.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 749</text>
+<text x="308.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 744</text>
 </a>
 <a href="studio.src.html#fn-studio-close">
 <rect x="258.2" y="320.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="324.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::close</text>
-<text x="324.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 767</text>
+<text x="324.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 762</text>
 </a>
 <a href="studio.src.html#fn-studio-unlock">
 <rect x="417.0" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="487.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::unlock</text>
-<text x="487.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 796</text>
+<text x="487.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 791</text>
 </a>
 <a href="studio.src.html#fn-studio-tab">
 <rect x="51.0" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="109.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::tab</text>
-<text x="109.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1527</text>
+<text x="109.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1522</text>
 </a>
 <a href="studio.src.html#fn-studio-browser">
 <rect x="193.7" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="268.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Studio::browser</text>
-<text x="268.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1658</text>
+<text x="268.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1653</text>
 </a>
 <a href="studio.src.html#fn-counted_interruptions">
 <rect x="368.6" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="467.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">counted_interruptions</text>
-<text x="467.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2274</text>
+<text x="467.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2269</text>
 </a>
 <a href="studio.src.html#fn-counted_decoys">
 <rect x="238.0" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="308.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">counted_decoys</text>
-<text x="308.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2283</text>
+<text x="308.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2278</text>
 </a>
 <a href="studio.src.html#fn-counted">
 <rect x="243.3" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="293.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">counted</text>
-<text x="293.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2292</text>
+<text x="293.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2287</text>
 </a>
 <a href="studio.src.html#fn-made_on">
 <rect x="369.8" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="420.1" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">made_on</text>
-<text x="420.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2305</text>
+<text x="420.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2300</text>
 </a>
 <a href="studio.src.html#fn-length">
 <rect x="496.3" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="546.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">length</text>
-<text x="546.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2394</text>
+<text x="546.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2389</text>
 </a>
 <a href="studio.src.html#fn-size">
 <rect x="258.2" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="308.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">size</text>
-<text x="308.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2400</text>
+<text x="308.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2395</text>
 </a>
 <rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -311,11 +309,11 @@
 <text x="35.0" y="961.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="983.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
 <text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 65 functions are drawn; the diagram is</text>
+<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 64 functions are drawn; the diagram is</text>
 <text x="20.0" y="1028.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 65 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 64 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
@@ -324,23 +322,23 @@ flowchart TD
     n_sharing_a_microphone[&quot;sharing_a_microphone&lt;br/&gt;line 230&quot;]
     n_take_name[&quot;take_name&lt;br/&gt;line 276&quot;]
     n_is_recording[&quot;Studio::is_recording&lt;br/&gt;line 450&quot;]
-    n_is_previewing[&quot;Studio::is_previewing&lt;br/&gt;line 522&quot;]
-    n_tick([&quot;Studio::tick&lt;br/&gt;line 576&quot;])
-    n_catch_a_fault[&quot;Studio::catch_a_fault&lt;br/&gt;line 668&quot;]
-    n_phase[&quot;Studio::phase&lt;br/&gt;line 704&quot;]
-    n_start_veiling([&quot;Studio::start_veiling&lt;br/&gt;line 717&quot;])
-    n_start_room([&quot;Studio::start_room&lt;br/&gt;line 738&quot;])
-    n_stop_veiling[&quot;Studio::stop_veiling&lt;br/&gt;line 749&quot;]
-    n_close([&quot;Studio::close&lt;br/&gt;line 767&quot;])
-    n_unlock[&quot;Studio::unlock&lt;br/&gt;line 796&quot;]
-    n_tab([&quot;Studio::tab&lt;br/&gt;line 1527&quot;])
-    n_browser([&quot;Studio::browser&lt;br/&gt;line 1658&quot;])
-    n_counted_interruptions[&quot;counted_interruptions&lt;br/&gt;line 2274&quot;]
-    n_counted_decoys[&quot;counted_decoys&lt;br/&gt;line 2283&quot;]
-    n_counted[&quot;counted&lt;br/&gt;line 2292&quot;]
-    n_made_on[&quot;made_on&lt;br/&gt;line 2305&quot;]
-    n_length[&quot;length&lt;br/&gt;line 2394&quot;]
-    n_size[&quot;size&lt;br/&gt;line 2400&quot;]
+    n_is_previewing[&quot;Studio::is_previewing&lt;br/&gt;line 517&quot;]
+    n_tick([&quot;Studio::tick&lt;br/&gt;line 571&quot;])
+    n_catch_a_fault[&quot;Studio::catch_a_fault&lt;br/&gt;line 663&quot;]
+    n_phase[&quot;Studio::phase&lt;br/&gt;line 699&quot;]
+    n_start_veiling([&quot;Studio::start_veiling&lt;br/&gt;line 712&quot;])
+    n_start_room([&quot;Studio::start_room&lt;br/&gt;line 733&quot;])
+    n_stop_veiling[&quot;Studio::stop_veiling&lt;br/&gt;line 744&quot;]
+    n_close([&quot;Studio::close&lt;br/&gt;line 762&quot;])
+    n_unlock[&quot;Studio::unlock&lt;br/&gt;line 791&quot;]
+    n_tab([&quot;Studio::tab&lt;br/&gt;line 1522&quot;])
+    n_browser([&quot;Studio::browser&lt;br/&gt;line 1653&quot;])
+    n_counted_interruptions[&quot;counted_interruptions&lt;br/&gt;line 2269&quot;]
+    n_counted_decoys[&quot;counted_decoys&lt;br/&gt;line 2278&quot;]
+    n_counted[&quot;counted&lt;br/&gt;line 2287&quot;]
+    n_made_on[&quot;made_on&lt;br/&gt;line 2300&quot;]
+    n_length[&quot;length&lt;br/&gt;line 2389&quot;]
+    n_size[&quot;size&lt;br/&gt;line 2395&quot;]
     n_browser --&gt; n_counted
     n_browser --&gt; n_length
     n_browser --&gt; n_made_on
@@ -362,23 +360,23 @@ flowchart TD
     click n_sharing_a_microphone href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L230&quot; &quot;open the source&quot;
     click n_take_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L276&quot; &quot;open the source&quot;
     click n_is_recording href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L450&quot; &quot;open the source&quot;
-    click n_is_previewing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L522&quot; &quot;open the source&quot;
-    click n_tick href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L576&quot; &quot;open the source&quot;
-    click n_catch_a_fault href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L668&quot; &quot;open the source&quot;
-    click n_phase href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L704&quot; &quot;open the source&quot;
-    click n_start_veiling href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L717&quot; &quot;open the source&quot;
-    click n_start_room href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L738&quot; &quot;open the source&quot;
-    click n_stop_veiling href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L749&quot; &quot;open the source&quot;
-    click n_close href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L767&quot; &quot;open the source&quot;
-    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L796&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1527&quot; &quot;open the source&quot;
-    click n_browser href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1658&quot; &quot;open the source&quot;
-    click n_counted_interruptions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2274&quot; &quot;open the source&quot;
-    click n_counted_decoys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2283&quot; &quot;open the source&quot;
-    click n_counted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2292&quot; &quot;open the source&quot;
-    click n_made_on href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2305&quot; &quot;open the source&quot;
-    click n_length href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2394&quot; &quot;open the source&quot;
-    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2400&quot; &quot;open the source&quot;
+    click n_is_previewing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L517&quot; &quot;open the source&quot;
+    click n_tick href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L571&quot; &quot;open the source&quot;
+    click n_catch_a_fault href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L663&quot; &quot;open the source&quot;
+    click n_phase href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L699&quot; &quot;open the source&quot;
+    click n_start_veiling href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L712&quot; &quot;open the source&quot;
+    click n_start_room href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L733&quot; &quot;open the source&quot;
+    click n_stop_veiling href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L744&quot; &quot;open the source&quot;
+    click n_close href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L762&quot; &quot;open the source&quot;
+    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L791&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1522&quot; &quot;open the source&quot;
+    click n_browser href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1653&quot; &quot;open the source&quot;
+    click n_counted_interruptions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2269&quot; &quot;open the source&quot;
+    click n_counted_decoys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2278&quot; &quot;open the source&quot;
+    click n_counted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2287&quot; &quot;open the source&quot;
+    click n_made_on href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2300&quot; &quot;open the source&quot;
+    click n_length href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2389&quot; &quot;open the source&quot;
+    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2395&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_tick,n_start_veiling,n_start_room,n_close,n_tab,n_browser entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -408,66 +406,65 @@ flowchart TD
 <tr><td><code>Studio::is_open</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_open">438</a></td><td>Whether the vault is open.</td></tr>
 <tr><td><code>Studio::is_recording</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_recording">450</a></td><td>Whether a take is being kept.</td></tr>
 <tr><td><code>Studio::is_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_veiling">458</a></td><td>Whether the veiled voice is going out.</td></tr>
-<tr><td><code>Studio::is_a_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_a_room">463</a></td><td>Whether what is running is a room rather than one microphone.</td></tr>
-<tr><td><code>Studio::wants_a_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-wants_a_room">468</a></td><td>Whether the form is set to a room.</td></tr>
-<tr><td><code>Studio::want_a_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-want_a_room">478</a></td><td>Switch the form between one microphone and a room.</td></tr>
-<tr><td><code>Studio::room_guests</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-room_guests">486</a></td><td>Who is in the room, in the order they were added.</td></tr>
-<tr><td><code>Studio::room_guest_mut</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-room_guest_mut">491</a></td><td>One guest, to be edited by the controls that draw them.</td></tr>
-<tr><td><code>Studio::add_guest</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-add_guest">499</a></td><td>Add a guest, up to veilvoice_audio::MAX_GUESTS.</td></tr>
-<tr><td><code>Studio::remove_guest</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-remove_guest">506</a></td><td>Take a guest out of the room.</td></tr>
-<tr><td><code>Studio::guest_levels</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-guest_levels">516</a></td><td>The smoothed bars for the room, one pair per guest.</td></tr>
-<tr><td><code>Studio::is_previewing</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_previewing">522</a></td><td>Whether what is going out is a preview to this machine&#x27;s own output rather than to the chosen one.</td></tr>
-<tr><td><code>Studio::levels</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-levels">527</a></td><td>The smoothed levels, for the monitor strip and for this tab.</td></tr>
-<tr><td><code>Studio::trouble</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-trouble">537</a></td><td>What the audio path last reported about itself, and whether it is new.</td></tr>
-<tr><td><code>Studio::intruders</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-intruders">544</a></td><td>The programs that took the microphone while this take has been running.</td></tr>
-<tr><td><code>Studio::note_microphone_holders</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-note_microphone_holders">559</a></td><td>Record which programs are holding the microphone right now.</td></tr>
-<tr><td><code>Studio::tick</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tick">576</a></td><td>Read the session&#x27;s counters, once a frame, and move the levels on.</td></tr>
-<tr><td><code>Studio::catch_a_fault</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-catch_a_fault">668</a></td><td>Marker 145.</td></tr>
-<tr><td><code>Studio::phase</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-phase">704</a></td><td>What phase the take half of the tab is in.</td></tr>
-<tr><td><code>Studio::start_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_veiling">717</a></td><td>Start veiling, keeping nothing.</td></tr>
-<tr><td><code>Studio::start_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_room">738</a></td><td>Marker 147.</td></tr>
-<tr><td><code>Studio::stop_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-stop_veiling">749</a></td><td>Stop the audio.</td></tr>
-<tr><td><code>Studio::close</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-close">767</a></td><td>Shut the vault and forget the key.</td></tr>
-<tr><td><code>Studio::unlock</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unlock">796</a></td><td>Derive the key from both entries and open the vault.</td></tr>
-<tr><td><code>Studio::measure</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-measure">861</a></td><td>Read the folder the vaults are in: how much room is free, and how many vaults are already there.</td></tr>
-<tr><td><code>Studio::make_decoys</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-make_decoys">874</a></td><td>Make count decoys beside the open vault.</td></tr>
-<tr><td><code>Studio::start_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-start_take">918</a></td><td>Start recording into the vault&#x27;s holding area.</td></tr>
-<tr><td><code>Studio::start_session</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-start_session">944</a></td><td>Start, or restart, the live session setup describes.</td></tr>
-<tr><td><code>Studio::stop_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-stop_take">1108</a></td><td>Stop keeping, seal what was captured, and carry on veiling.</td></tr>
-<tr><td><code>Studio::finish_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-finish_take">1120</a></td><td>Stop recording and seal what was captured into the vault.</td></tr>
-<tr><td><code>Studio::store_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-store_take">1237</a></td><td>Seal one recorder&#x27;s audio into the vault under name.</td></tr>
-<tr><td><code>Studio::play</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-play">1306</a></td><td>Play a take, straight out of the vault and out of locked memory.</td></tr>
-<tr><td><code>Studio::export</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-export">1352</a></td><td>Turn a take into a page, a video, or both, in into.</td></tr>
-<tr><td><code>Studio::write_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-write_page">1462</a></td><td>The player page, its subtitles, and the drawing they sit in.</td></tr>
-<tr><td><code>Studio::refresh</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-refresh">1505</a></td><td>Re-read the listing from the vault.</td></tr>
-<tr><td><code>Studio::tab</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tab">1527</a></td><td>The take half of the Recording Studio tab.</td></tr>
-<tr><td><code>Studio::browser</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-browser">1658</a></td><td>The Recording Browser tab.</td></tr>
-<tr><td><code>Studio::decoy_panel</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-decoy_panel">1886</a></td><td>The decoy panel, under the listing.</td></tr>
-<tr><td><code>Studio::shut_panel</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-shut_panel">1905</a></td><td>The panel shown while the vault is shut, in both tabs.</td></tr>
-<tr><td><code>Studio::take_form</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-take_form">1965</a></td><td>The name field for the next take.</td></tr>
-<tr><td><code>Studio::keep_form</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-keep_form">1996</a></td><td>Which side of the engine to keep, asked before anything starts.</td></tr>
-<tr><td><code>Studio::say</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-say">2026</a></td><td>Show the last message, if there is one.</td></tr>
-<tr><td><code>Studio::apply</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-apply">2037</a></td><td>Carry out a row action.</td></tr>
-<tr><td><code>Keep</code> <sub>pub enum</sub></td><td><a href="studio.src.html#fn-keep">2119</a></td><td>Which side of the engine a take keeps.</td></tr>
-<tr><td><code>Keep::wants_veiled</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-wants_veiled">2131</a></td><td>Whether the veiled voice is kept.</td></tr>
-<tr><td><code>Keep::wants_plain</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-wants_plain">2139</a></td><td>Whether the real voice is kept.</td></tr>
-<tr><td><code>Keep::label</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-label">2144</a></td><td>What this is called where it is chosen.</td></tr>
-<tr><td><code>Keep::cost</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-cost">2158</a></td><td>What it costs, in the words the plaintext path uses.</td></tr>
-<tr><td><code>Render</code> <sub>pub enum</sub></td><td><a href="studio.src.html#fn-render">2187</a></td><td>What a take is to be turned into.</td></tr>
-<tr><td><code>Render::wants_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_page">2197</a></td><td></td></tr>
-<tr><td><code>Render::wants_video</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_video">2201</a></td><td></td></tr>
-<tr><td><code>wav_shape</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-wav_shape">2212</a></td><td>The sample rate and frame count a canonical WAV header states.</td></tr>
-<tr><td><code>plan_for</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-plan_for">2236</a></td><td>A one-speaker plan spanning a take.</td></tr>
-<tr><td><code>Act</code> <sub>enum</sub></td><td><a href="studio.src.html#fn-act">2255</a></td><td>Something a browser row asked for.</td></tr>
-<tr><td><code>counted_interruptions</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted_interruptions">2274</a></td><td>&quot;one interruption&quot; or &quot;three interruptions&quot;.</td></tr>
-<tr><td><code>counted_decoys</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted_decoys">2283</a></td><td>&quot;One decoy&quot; or &quot;four decoys&quot;, so the interface does not say &quot;1 decoys&quot;.</td></tr>
-<tr><td><code>counted</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted">2292</a></td><td>&quot;One recording&quot; or &quot;four recordings&quot;, so the interface does not say &quot;1 recordings&quot;.</td></tr>
-<tr><td><code>made_on</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-made_on">2305</a></td><td>A Unix time as a date somebody reads.</td></tr>
-<tr><td><code>pcm16</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-pcm16">2329</a></td><td>Sixteen-bit PCM from a WAV, as the waveform drawer wants it.</td></tr>
-<tr><td><code>safe_stem</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_stem">2344</a></td><td>A file name built from what somebody called a recording.</td></tr>
-<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-run_ffmpeg">2367</a></td><td>Run ffmpeg to put the audio in a video with a black picture.</td></tr>
-<tr><td><code>length</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-length">2394</a></td><td>A length in seconds, as m:ss, for somewhere a person reads.</td></tr>
-<tr><td><code>size</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-size">2400</a></td><td>A size in bytes, rounded to something a person can compare.</td></tr>
+<tr><td><code>Studio::wants_a_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-wants_a_room">463</a></td><td>Whether the form is set to a room.</td></tr>
+<tr><td><code>Studio::want_a_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-want_a_room">473</a></td><td>Switch the form between one microphone and a room.</td></tr>
+<tr><td><code>Studio::room_guests</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-room_guests">481</a></td><td>Who is in the room, in the order they were added.</td></tr>
+<tr><td><code>Studio::room_guest_mut</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-room_guest_mut">486</a></td><td>One guest, to be edited by the controls that draw them.</td></tr>
+<tr><td><code>Studio::add_guest</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-add_guest">494</a></td><td>Add a guest, up to veilvoice_audio::MAX_GUESTS.</td></tr>
+<tr><td><code>Studio::remove_guest</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-remove_guest">501</a></td><td>Take a guest out of the room.</td></tr>
+<tr><td><code>Studio::guest_levels</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-guest_levels">511</a></td><td>The smoothed bars for the room, one pair per guest.</td></tr>
+<tr><td><code>Studio::is_previewing</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-is_previewing">517</a></td><td>Whether what is going out is a preview to this machine&#x27;s own output rather than to the chosen one.</td></tr>
+<tr><td><code>Studio::levels</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-levels">522</a></td><td>The smoothed levels, for the monitor strip and for this tab.</td></tr>
+<tr><td><code>Studio::trouble</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-trouble">532</a></td><td>What the audio path last reported about itself, and whether it is new.</td></tr>
+<tr><td><code>Studio::intruders</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-intruders">539</a></td><td>The programs that took the microphone while this take has been running.</td></tr>
+<tr><td><code>Studio::note_microphone_holders</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-note_microphone_holders">554</a></td><td>Record which programs are holding the microphone right now.</td></tr>
+<tr><td><code>Studio::tick</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tick">571</a></td><td>Read the session&#x27;s counters, once a frame, and move the levels on.</td></tr>
+<tr><td><code>Studio::catch_a_fault</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-catch_a_fault">663</a></td><td>Marker 145.</td></tr>
+<tr><td><code>Studio::phase</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-phase">699</a></td><td>What phase the take half of the tab is in.</td></tr>
+<tr><td><code>Studio::start_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_veiling">712</a></td><td>Start veiling, keeping nothing.</td></tr>
+<tr><td><code>Studio::start_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_room">733</a></td><td>Marker 147.</td></tr>
+<tr><td><code>Studio::stop_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-stop_veiling">744</a></td><td>Stop the audio.</td></tr>
+<tr><td><code>Studio::close</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-close">762</a></td><td>Shut the vault and forget the key.</td></tr>
+<tr><td><code>Studio::unlock</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unlock">791</a></td><td>Derive the key from both entries and open the vault.</td></tr>
+<tr><td><code>Studio::measure</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-measure">856</a></td><td>Read the folder the vaults are in: how much room is free, and how many vaults are already there.</td></tr>
+<tr><td><code>Studio::make_decoys</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-make_decoys">869</a></td><td>Make count decoys beside the open vault.</td></tr>
+<tr><td><code>Studio::start_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-start_take">913</a></td><td>Start recording into the vault&#x27;s holding area.</td></tr>
+<tr><td><code>Studio::start_session</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-start_session">939</a></td><td>Start, or restart, the live session setup describes.</td></tr>
+<tr><td><code>Studio::stop_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-stop_take">1103</a></td><td>Stop keeping, seal what was captured, and carry on veiling.</td></tr>
+<tr><td><code>Studio::finish_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-finish_take">1115</a></td><td>Stop recording and seal what was captured into the vault.</td></tr>
+<tr><td><code>Studio::store_take</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-store_take">1232</a></td><td>Seal one recorder&#x27;s audio into the vault under name.</td></tr>
+<tr><td><code>Studio::play</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-play">1301</a></td><td>Play a take, straight out of the vault and out of locked memory.</td></tr>
+<tr><td><code>Studio::export</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-export">1347</a></td><td>Turn a take into a page, a video, or both, in into.</td></tr>
+<tr><td><code>Studio::write_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-write_page">1457</a></td><td>The player page, its subtitles, and the drawing they sit in.</td></tr>
+<tr><td><code>Studio::refresh</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-refresh">1500</a></td><td>Re-read the listing from the vault.</td></tr>
+<tr><td><code>Studio::tab</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tab">1522</a></td><td>The take half of the Recording Studio tab.</td></tr>
+<tr><td><code>Studio::browser</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-browser">1653</a></td><td>The Recording Browser tab.</td></tr>
+<tr><td><code>Studio::decoy_panel</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-decoy_panel">1881</a></td><td>The decoy panel, under the listing.</td></tr>
+<tr><td><code>Studio::shut_panel</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-shut_panel">1900</a></td><td>The panel shown while the vault is shut, in both tabs.</td></tr>
+<tr><td><code>Studio::take_form</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-take_form">1960</a></td><td>The name field for the next take.</td></tr>
+<tr><td><code>Studio::keep_form</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-keep_form">1991</a></td><td>Which side of the engine to keep, asked before anything starts.</td></tr>
+<tr><td><code>Studio::say</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-say">2021</a></td><td>Show the last message, if there is one.</td></tr>
+<tr><td><code>Studio::apply</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-apply">2032</a></td><td>Carry out a row action.</td></tr>
+<tr><td><code>Keep</code> <sub>pub enum</sub></td><td><a href="studio.src.html#fn-keep">2114</a></td><td>Which side of the engine a take keeps.</td></tr>
+<tr><td><code>Keep::wants_veiled</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-wants_veiled">2126</a></td><td>Whether the veiled voice is kept.</td></tr>
+<tr><td><code>Keep::wants_plain</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-wants_plain">2134</a></td><td>Whether the real voice is kept.</td></tr>
+<tr><td><code>Keep::label</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-label">2139</a></td><td>What this is called where it is chosen.</td></tr>
+<tr><td><code>Keep::cost</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-keep-cost">2153</a></td><td>What it costs, in the words the plaintext path uses.</td></tr>
+<tr><td><code>Render</code> <sub>pub enum</sub></td><td><a href="studio.src.html#fn-render">2182</a></td><td>What a take is to be turned into.</td></tr>
+<tr><td><code>Render::wants_page</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_page">2192</a></td><td></td></tr>
+<tr><td><code>Render::wants_video</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-render-wants_video">2196</a></td><td></td></tr>
+<tr><td><code>wav_shape</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-wav_shape">2207</a></td><td>The sample rate and frame count a canonical WAV header states.</td></tr>
+<tr><td><code>plan_for</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-plan_for">2231</a></td><td>A one-speaker plan spanning a take.</td></tr>
+<tr><td><code>Act</code> <sub>enum</sub></td><td><a href="studio.src.html#fn-act">2250</a></td><td>Something a browser row asked for.</td></tr>
+<tr><td><code>counted_interruptions</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted_interruptions">2269</a></td><td>&quot;one interruption&quot; or &quot;three interruptions&quot;.</td></tr>
+<tr><td><code>counted_decoys</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted_decoys">2278</a></td><td>&quot;One decoy&quot; or &quot;four decoys&quot;, so the interface does not say &quot;1 decoys&quot;.</td></tr>
+<tr><td><code>counted</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-counted">2287</a></td><td>&quot;One recording&quot; or &quot;four recordings&quot;, so the interface does not say &quot;1 recordings&quot;.</td></tr>
+<tr><td><code>made_on</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-made_on">2300</a></td><td>A Unix time as a date somebody reads.</td></tr>
+<tr><td><code>pcm16</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-pcm16">2324</a></td><td>Sixteen-bit PCM from a WAV, as the waveform drawer wants it.</td></tr>
+<tr><td><code>safe_stem</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-safe_stem">2339</a></td><td>A file name built from what somebody called a recording.</td></tr>
+<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-run_ffmpeg">2362</a></td><td>Run ffmpeg to put the audio in a video with a black picture.</td></tr>
+<tr><td><code>length</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-length">2389</a></td><td>A length in seconds, as m:ss, for somewhere a person reads.</td></tr>
+<tr><td><code>size</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-size">2395</a></td><td>A size in bytes, rounded to something a person can compare.</td></tr>
 </tbody></table>
 </section>
 </div></div>

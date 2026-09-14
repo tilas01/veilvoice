@@ -146,6 +146,13 @@ CHECKS = [
     # three that no line of code referred to.
     ("every dependency says what it is for",
      [sys.executable, "tools/audit/dependencies.py"]),
+    # The same question asked of this project's own code rather than of the
+    # code it imports. `dead_code` stops at the crate boundary, so nothing was
+    # watching whether a public item had a caller; five had none, and one of
+    # them was keeping a private field and a clone per vault open alive behind
+    # it, which is exactly the shape the compiler cannot report.
+    ("every public item is reached by something",
+     [sys.executable, "tools/audit/reachable.py"]),
     # Beside it, and answering the other question. `dependencies.py` asks
     # whether somebody said why each dependency is here; this asks whether
     # anything is watching it. A manifest outside every Dependabot entry is
