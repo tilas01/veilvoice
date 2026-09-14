@@ -399,6 +399,11 @@ setting up an interview on another tab and are not sure the microphone is still
 working. Settings, under *the live monitor*, moves it to a floating card in the
 corner or switches it off; the Studio keeps its full meters either way.
 
+**The Studio offers it where you start the session.** While the voice is being
+veiled there is a **keep the meters on top** button beside the live indicator,
+which is the moment you are about to put a call or a stream in front of this
+window. Settings has the same choice, under *the live monitor*.
+
 **On a call, or streaming, put it above everything.** The strip and the card
 are both inside the VeilVoice window, and on a call the call is in front of
 that window, so the only picture of what your microphone is doing is behind the
