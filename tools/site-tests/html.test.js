@@ -136,6 +136,33 @@ function run() {
     }
   }
 
+  // Search Console proves ownership of a site by fetching a page and looking
+  // for one meta tag. Nine of the fourteen pages carried it and five did not,
+  // which nothing noticed, because the only page anybody thought about was the
+  // home page. Which URL a crawler fetches is not this project's decision, and
+  // an ownership check that works on one page and not another fails for a
+  // reason nobody can see from the outside. So: every page, the same token.
+  const tokens = new Map();
+  for (const page of PAGES) {
+    const rel = path.relative(ROOT, page).replace(/\\/g, "/");
+    const html = fs.readFileSync(page, "utf8");
+    const found = /<meta name="google-site-verification" content="([^"]+)">/.exec(html);
+    if (!found) {
+      failures++;
+      console.log(`FAIL ${rel} carries no Search Console verification tag`);
+    } else {
+      tokens.set(rel, found[1]);
+    }
+  }
+  const distinct = new Set(tokens.values());
+  if (distinct.size > 1) {
+    failures++;
+    console.log(`FAIL the pages carry ${distinct.size} different verification ` +
+                `tokens; there is one property, so there is one token`);
+  } else if (distinct.size === 1) {
+    console.log(`  ${tokens.size} pages carry the same Search Console token`);
+  }
+
   // Every script the pages reference must exist and parse.
   for (const page of PAGES) {
     const dir = path.dirname(page);

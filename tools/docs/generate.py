@@ -2375,6 +2375,15 @@ def html_page(colours, depth, title, description, body, fingerprint):
     add('<meta name="viewport" content="width=device-width, initial-scale=1">')
     add('<title>%s</title>' % esc(title))
     add('<meta name="description" content="%s">' % esc(description))
+    # Search Console proves ownership by fetching a page and looking for this.
+    # Every page carries it rather than only the home page: which URL a crawler
+    # fetches is not this project's decision, and an ownership check that works
+    # on one page and not another fails for a reason nobody outside can see.
+    # Five pages were missing it and nothing noticed, so
+    # `tools/site-tests/html.test.js` now checks all of them and checks that
+    # the token is the same everywhere.
+    add('<meta name="google-site-verification" '
+        'content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">')
     add('<link rel="icon" href="%sassets/icon-32.png" type="image/png">' % up)
     add('<link rel="prefetch" href="%sindex.html">' % up)
     add('<link rel="prefetch" href="%swiki.html">' % up)

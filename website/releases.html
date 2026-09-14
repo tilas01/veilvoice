@@ -182,6 +182,12 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>The generator that already takes those numbers now writes the sentences from them too, using the same patterns the suite checks with, so the tool that writes a claim and the check that reads it cannot disagree about where the claim is. The check is unchanged and still runs.</li>
 <li>Nothing a reader sees is different, and that is the point: the numbers were right before and are right now without anybody having to remember them.</li>
 </ul>
+<p><strong>The site proves it is ours on every page, not most of them</strong></p>
+<ul>
+<li>Search Console confirms who owns a site by fetching a page and looking for one tag. The tag was on nine pages and missing from five, and missing from every page of the generated reference: the error pages, the search page, the wiki page and both halves of the script-free site had none.</li>
+<li>Which page a crawler fetches is not something this project chooses, so all 397 pages carry it now, written by the generators rather than by hand.</li>
+<li>A check fails the build if any page loses it, or if two pages ever name different tokens.</li>
+</ul>
 <p><strong>The undefined-behaviour checker can now look at the cryptography</strong></p>
 <ul>
 <li>VeilVoice keeps every key and passphrase in a type that locks its pages out of swap, so the operating system cannot write them to disk. That lock is made with a system call the interpreter used to check for undefined behaviour cannot make, so the first key any test created stopped the check dead, and the part of the program that does the encrypting was the one part that could not be checked this way at all.</li>
