@@ -56,14 +56,15 @@ than a summary written afterwards.
 
 - The whole workspace forbids unsafe code, so anything an interpreter found
   would belong to a dependency rather than to VeilVoice. It found nothing, in
-  the two crates it got through: the release-signature and contents readers,
-  and the WAV and metadata crate.
+  the three crates it got through: the release-signature and contents readers,
+  the WAV and metadata crate, and the speaker plan and its edits.
 - Said precisely, because the alternative is a claim that sounds larger than
   it is: four tests in the metadata crate could not run, because they write
   tags to a real file and the interpreter's filesystem stands in the way. No
   undefined behaviour and no unsupported operation was reported for them, and
   they pass in seconds outside it, so the tag writer is uncovered rather than
-  broken. A third crate did not finish at all.
+  broken. The engine and the cryptography were not reached at all, and that is
+  said rather than left to be assumed.
 
 **A promise about allocation, kept**
 

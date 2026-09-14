@@ -258,7 +258,7 @@ having looked.
 | the app-manifest generator's self-test | by hand | **now** | nothing |
 | the local site serves every page | by hand | **now** | nothing |
 | the offline claim, on the built command line | yes | yes | no import, no syscall, works in an empty network namespace; each guard proved able to fail |
-| Miri | no | no | **run, first time**: `veilvoice-check` clean, `veilvoice-meta` clean but for four tests Miri's filesystem shim will not let write; `veilvoice-conversation` did not finish |
+| Miri | no | no | **run, first time**: `veilvoice-check` and `veilvoice-conversation` clean, `veilvoice-meta` clean but for four tests Miri's filesystem shim will not let write; the engine and the cryptography not reached |
 | a reproducible-build rebuild | yes, per release | yes, per release | not re-run here |
 
 Two checks stay out of a workflow on purpose and the reason is worth writing
@@ -292,15 +292,23 @@ than a defect, and it is recorded as a limit on the coverage rather than as a
 result: **the tag writer is the one part of this crate Miri did not get to
 examine.**
 
-`veilvoice-conversation` did not finish. Its render tests process audio, which
-under an interpreter is slow enough that one of them held the run for a
-quarter of an hour, and the container's clock ran out. Not a finding, and not
-a pass either: it is simply not done, and saying so is the rule this document
-is held to.
+`veilvoice-conversation`, which holds the speaker plan and the edit
+operations: **78 tests, no failures, no undefined behaviour**, in 31 seconds,
+with its 24 render tests skipped.
 
-The honest summary is that Miri has now been run here for the first time, it
-found nothing, and it covered two crates of the five the brief names. The
-brief carries the rest.
+Those render tests are why the first attempt produced nothing for this crate.
+They process audio, which under an interpreter is slow enough that one of them
+held a combined run for a quarter of an hour while the two crates behind it
+waited. **Passing several crates to one Miri run lets the slowest test in the
+first of them decide what the rest get**, which is an arrangement mistake
+rather than a result: run per crate, and a crate that takes thirty seconds
+takes thirty seconds. Written down here because the next person to reach for
+this tool will otherwise arrange it the same way.
+
+The honest summary is that Miri has been run here for the first time, it found
+nothing, and it covered three crates. The render path of the conversation
+crate, the engine and the cryptography are not done, and the brief carries
+them with the arrangement note above.
 
 ### What was read and found correct
 
