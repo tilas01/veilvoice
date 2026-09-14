@@ -110,7 +110,7 @@ flowchart TD
     n_layout["layout.rs<br/>280 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
     n_notify["notify.rs<br/>460 lines"]
-    n_pace["pace.rs<br/>480 lines"]
+    n_pace["pace.rs<br/>489 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
     n_paths["paths.rs<br/>234 lines"]
     n_policy["policy.rs<br/>320 lines"]
@@ -279,7 +279,7 @@ flowchart TD
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 231 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
-| [`pace.rs`](../../docs/files/veilvoice-gui/pace.md) | 480 | How often the window draws while something in it is moving, and what that actually came to. |
+| [`pace.rs`](../../docs/files/veilvoice-gui/pace.md) | 489 | How often the window draws while something in it is moving, and what that actually came to. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | 234 | Exactly where this copy of VeilVoice is keeping things. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
@@ -299,7 +299,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 417 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**18,431 functional lines of Rust** in this crate. A functional line is a line
+**18,433 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
