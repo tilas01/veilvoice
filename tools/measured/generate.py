@@ -143,10 +143,23 @@ def measured_tests() -> int:
     stating is the one a reader gets when they run `cargo test` themselves.
     """
     environment = dict(os.environ)
-    environment.setdefault(
-        "CARGO_TARGET_DIR",
-        str(Path(os.environ.get("LOCALAPPDATA", ROOT)) / "veilvoice" / "target"),
-    )
+    # On Windows the build goes under %LOCALAPPDATA%, away from a repository
+    # that may sit in a synced folder or deep enough to meet the path limit.
+    #
+    # Everywhere else it goes where it always goes, which is the `target/` at
+    # the root of this repository, and the way to ask for that is to say
+    # nothing. The line this replaces named `ROOT` as the fallback and so built
+    # into `<repo>/veilvoice/target` on every machine that is not Windows: a
+    # second complete copy of the workspace build, inside the repository,
+    # invisible to `git status` because `.gitignore` matches `target/` at any
+    # depth, and never cleaned because nobody knew it was there. It was
+    # fifteen gigabytes when it was found, and finding it took a mutation
+    # campaign dying for want of disk. F-185.
+    if os.name == "nt" and "LOCALAPPDATA" in os.environ:
+        environment.setdefault(
+            "CARGO_TARGET_DIR",
+            str(Path(os.environ["LOCALAPPDATA"]) / "veilvoice" / "target"),
+        )
     finished = subprocess.run(
         ["cargo", "test", "--workspace"],
         cwd=ROOT,

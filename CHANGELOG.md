@@ -40,6 +40,23 @@ measures them**
 - Nothing a reader sees is different, and that is the point: the numbers were
   right before and are right now without anybody having to remember them.
 
+**Fifteen gigabytes of build output that was living inside the repository**
+
+- The tool that counts how many tests this project has does it by running
+  them. It sent that build to a folder under the user's profile on Windows,
+  which is right, and through a fallback nobody had thought about it sent it
+  to a folder **inside the repository** on every other system.
+- So every machine that is not Windows had a second complete copy of the build
+  sitting in the source tree, rebuilt from scratch each time the numbers were
+  regenerated. Nothing reported it: the rule that hides build output from
+  version control hides it at any depth, which is correct and also means this
+  never appeared in any status, any diff, or any clean.
+- It was found because something else broke. A long test run ran out of disk,
+  several steps removed from the cause.
+- The build now goes where builds go, and a check fails if build output ever
+  appears anywhere in the repository except the one place at the root. It
+  names the folder and how large it has grown.
+
 **The site proves it is ours on every page, not most of them**
 
 - Search Console confirms who owns a site by fetching a page and looking for
