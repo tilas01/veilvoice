@@ -207,6 +207,100 @@ mod tests {
         bytes.windows(needle.len()).any(|w| w == needle)
     }
 
+    /// The bland metadata this writes is itself a well-formed RIFF list.
+    ///
+    /// Stripping metadata is a signal. This tool substitutes plausible bland
+    /// tags instead, which only works if what it writes looks like what any
+    /// other tool would write: INFO sub-chunks are word aligned, and a reader
+    /// that walks them by declared length has to land exactly on the end.
+    ///
+    /// Three mutants lived in the one line that does that alignment, turning
+    /// the padding off, inverting it, or applying it to two lengths out of
+    /// every however many. Nothing objected, because nothing had ever read
+    /// back what this function writes.
+    #[test]
+    fn the_bland_metadata_written_in_is_word_aligned_and_walkable() {
+        let whole = info_chunk();
+        assert_eq!(&whole[..4], b"LIST", "the tags are carried in a LIST chunk");
+        let declared = u32::from_le_bytes(whole[4..8].try_into().unwrap()) as usize;
+        assert_eq!(
+            declared,
+            whole.len() - 8,
+            "the LIST header must describe exactly what follows it"
+        );
+        let info = &whole[8..];
+        assert_eq!(&info[..4], b"INFO", "a LIST body starts by naming its type");
+
+        let mut pos = 4;
+        let mut seen = 0;
+        while pos < info.len() {
+            assert!(
+                pos + 8 <= info.len(),
+                "an INFO entry needs eight bytes of header and only {} remain",
+                info.len() - pos
+            );
+            let size = u32::from_le_bytes(info[pos + 4..pos + 8].try_into().unwrap()) as usize;
+            assert_eq!(
+                size % 2,
+                0,
+                "entry {} declares {size} bytes, which is not word aligned",
+                show(&info[pos..pos + 4].try_into().unwrap())
+            );
+            let text = &info[pos + 8..pos + 8 + size];
+            assert!(
+                text.contains(&0),
+                "an INFO string is NUL terminated: {text:?}"
+            );
+            pos += 8 + size;
+            seen += 1;
+        }
+        assert_eq!(pos, info.len(), "the entries must consume the whole chunk");
+        assert_eq!(
+            seen,
+            REALISTIC_INFO.len(),
+            "every tag in the table has to come out the other side"
+        );
+    }
+
+    /// A kept chunk with an odd length and nothing after it.
+    ///
+    /// The walker copies the pad byte that follows an odd-sized chunk, and
+    /// checks there is one before reaching for it. Mutation testing moved that
+    /// `<` to a `<=`, which reaches one byte past the end of the region the
+    /// walker is allowed to read. Every existing test built its chunks with
+    /// the helper above, which always pads, so no odd-sized chunk ever ended
+    /// the file and the guard was never the thing that stopped anything.
+    #[test]
+    fn an_odd_chunk_at_the_very_end_is_not_read_past() {
+        // `data` with three bytes and no pad byte after it: technically
+        // malformed, and exactly what a truncated recording looks like.
+        let mut body = Vec::from(*b"fmt ");
+        body.extend_from_slice(&16u32.to_le_bytes());
+        body.extend_from_slice(&[1, 0, 1, 0, 128, 187, 0, 0, 0, 119, 1, 0, 2, 0, 16, 0]);
+        body.extend_from_slice(b"data");
+        body.extend_from_slice(&3u32.to_le_bytes());
+        body.extend_from_slice(&[9, 9, 9]);
+
+        let mut wav = Vec::from(*b"RIFF");
+        wav.extend_from_slice(&((body.len() + 4) as u32).to_le_bytes());
+        wav.extend_from_slice(b"WAVE");
+        wav.extend_from_slice(&body);
+
+        let (cleaned, _) = clean_wav_bytes(&wav, Policy::Strip)
+            .expect("a last chunk without its pad byte is still readable");
+
+        // The three bytes come through, and nothing that was never in the file
+        // comes with them.
+        assert!(find(&cleaned, &[9, 9, 9]), "the samples survive");
+        assert_eq!(
+            cleaned.len(),
+            wav.len(),
+            "and nothing was invented to pad them: {} in, {} out",
+            wav.len(),
+            cleaned.len()
+        );
+    }
+
     #[test]
     fn recognises_wav() {
         assert!(is_wav(&dirty_wav()));

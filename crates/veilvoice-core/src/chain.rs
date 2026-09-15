@@ -455,12 +455,7 @@ impl DeidConfig {
         }
         let a = u16::from_le_bytes([bytes[0], bytes[1]]) as f32 / u16::MAX as f32;
         let b = u16::from_le_bytes([bytes[2], bytes[3]]) as f32 / u16::MAX as f32;
-        let frame = self.frame_ms().max(MIN_RESEED_MS);
-        // One frame at the fast end, two seconds at the slow end, and the two
-        // draws sorted so the range is never reversed.
-        let span = (2000.0f32 - frame).max(frame);
-        let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
-        self.reseed_range_ms = Some((frame + lo * span, frame + hi * span));
+        self.reseed_range_ms = Some(reseed_range_from(a, b, self.frame_ms()));
         self
     }
 
@@ -867,6 +862,56 @@ impl Deidentifier {
         self.process(input, &mut out);
         out
     }
+}
+
+/// Turn two ratios in `0.0..=1.0` into a reseed range in milliseconds.
+///
+/// One frame at the fast end, about two seconds at the slow end, the two draws
+/// sorted so the range is never reversed, and **never narrower than one
+/// frame**.
+///
+/// # Why the minimum width is not a nicety
+///
+/// Each draw is sixteen bits, so one launch in 65,536 draws the same number
+/// twice and the range comes out with no width at all. `checked` accepts that,
+/// because it only refuses a range that is backwards, and a front end showing
+/// it would show two identical numbers. What it means is a **fixed** reseed
+/// interval, which is precisely the fixed ratchet period this function exists
+/// to avoid: the whole argument for drawing the range is that the period is a
+/// property of the session rather than of the program.
+///
+/// So a collision is widened by one frame, from whichever end has room. One
+/// frame because that is the resolution the engine actually has:
+/// `reseed_range_is_finer_than_a_frame` exists to report a range that collapses
+/// onto a single interval, and a drawn range should never be one.
+///
+/// Found by `a_drawn_range_is_always_valid` failing once, in a verification run
+/// that had already passed eleven times. The test was right and the code was
+/// wrong; sixty-four draws a run against a one in 65,536 event is a coin that
+/// comes up about once in a thousand runs. F-188.
+fn reseed_range_from(a: f32, b: f32, frame_ms: f32) -> (f32, f32) {
+    let frame = frame_ms.max(MIN_RESEED_MS);
+    let span = (2000.0f32 - frame).max(frame);
+    let (mut lo, mut hi) = if a <= b { (a, b) } else { (b, a) };
+
+    // One frame expressed in the same units as the draws, and never more than
+    // the whole of them: where the frame is longer than the span, which happens
+    // once the frame passes a second, the widest honest answer is everything.
+    let least = (frame / span).min(1.0);
+    if hi - lo < least {
+        // Widened around the draw rather than from one end, so a collision near
+        // the slow end stays near the slow end instead of being thrown to the
+        // fast one. The second clamp catches the case where the first ran into
+        // the top.
+        let middle = (lo + hi) * 0.5;
+        lo = (middle - least * 0.5).max(0.0);
+        hi = (lo + least).min(1.0);
+        if hi - lo < least {
+            lo = (hi - least).max(0.0);
+        }
+    }
+
+    (frame + lo * span, frame + hi * span)
 }
 
 #[cfg(test)]
@@ -1511,6 +1556,66 @@ mod reseed_range_tests {
             seen.insert(format!("{:.3},{:.3}", range.0, range.1));
         }
         assert!(seen.len() > 1, "eight draws produced one range: {seen:?}");
+    }
+
+    /// Two equal draws must not give a range of no width.
+    ///
+    /// This is the case `a_drawn_range_is_always_valid` found by accident. Each
+    /// draw is sixteen bits, so a collision is one launch in 65,536, and
+    /// sixty-four draws a run makes it about one run in a thousand: it failed
+    /// once in a verification run after eleven clean ones, and two hundred
+    /// repeats of the test afterwards did not reproduce it.
+    ///
+    /// Waiting for a one in 65,536 event is not a test. The arithmetic is now
+    /// a function of the two draws, so the collision can simply be handed to
+    /// it, at every value it can take.
+    #[test]
+    fn two_equal_draws_still_give_a_range_with_width_in_it() {
+        for frame_ms in [0.05f32, 1.0, 10.0, 21.3, 100.0, 2000.0, 5000.0] {
+            for step in 0..=64u32 {
+                let draw = step as f32 / 64.0;
+                let (lo, hi) = reseed_range_from(draw, draw, frame_ms);
+                assert!(
+                    lo < hi,
+                    "two draws of {draw} at a {frame_ms} ms frame gave {lo} to {hi}"
+                );
+                assert!(lo >= MIN_RESEED_MS, "{lo} is below the floor");
+                assert!(hi <= MAX_RESEED_MS, "{hi} is above the ceiling");
+
+                // And the width is a frame or more, which is the resolution the
+                // engine has: anything finer collapses onto one interval and is
+                // a fixed period wearing a range's clothes.
+                // A frame, or the whole of the available room where the
+                // frame is longer than that: past a one second frame the span
+                // is the frame, and everything is the widest honest answer.
+                let frame = frame_ms.max(MIN_RESEED_MS);
+                let span = (2000.0f32 - frame).max(frame);
+                let want = frame.min(span);
+                assert!(
+                    hi - lo >= want * 0.99,
+                    "{lo} to {hi} is narrower than {want} ms"
+                );
+            }
+        }
+    }
+
+    /// The same invariant over every pair of draws, not only equal ones.
+    #[test]
+    fn any_two_draws_give_a_usable_range() {
+        for i in 0..=16u32 {
+            for j in 0..=16u32 {
+                let (a, b) = (i as f32 / 16.0, j as f32 / 16.0);
+                let (lo, hi) = reseed_range_from(a, b, 21.3);
+                assert!(lo < hi, "draws {a} and {b} gave {lo} to {hi}");
+                assert!(lo >= MIN_RESEED_MS && hi <= MAX_RESEED_MS, "{lo} {hi}");
+
+                let config = DeidConfig {
+                    reseed_range_ms: Some((lo, hi)),
+                    ..DeidConfig::default()
+                };
+                assert!(config.checked().is_ok(), "{lo} {hi} was refused");
+            }
+        }
     }
 
     /// A drawn range is usable: the right way round, inside the bounds, and

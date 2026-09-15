@@ -48,7 +48,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/chain.svg" alt="chain.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/chain.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1621 lines &middot; <a href="chain.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1726 lines &middot; <a href="chain.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-signal-path">The signal path</a>
@@ -105,12 +105,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1621 lines defining <strong>23 functions</strong> (17 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1726 lines defining <strong>24 functions</strong> (17 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct DeidConfig</code> <span style="color:var(--muted)">line 142</span> &middot; User-facing configuration for the de-identifier.</li>
 <li><code>enum RangeError</code> <span style="color:var(--muted)">line 256</span> &middot; Why a ratchet range typed by a person was not accepted.</li>
-<li><code>struct ProcessStats</code> <span style="color:var(--muted)">line 611</span> &middot; Rolling performance statistics, surfaced live to the UI.</li>
-<li><code>struct Deidentifier</code> <span style="color:var(--muted)">line 672</span> &middot; The complete, irreversible voice de-identification chain.</li>
+<li><code>struct ProcessStats</code> <span style="color:var(--muted)">line 606</span> &middot; Rolling performance statistics, surfaced live to the UI.</li>
+<li><code>struct Deidentifier</code> <span style="color:var(--muted)">line 667</span> &middot; The complete, irreversible voice de-identification chain.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>parse_reseed_range</code> <span style="color:var(--muted)">line 333</span> &middot; Read a low,high ratchet range in milliseconds, or say why not.
@@ -122,29 +122,29 @@
 <br><span style="color:var(--muted);font-size:12px">reaches <code>frames_for_ms</code>, <code>frame_ms</code>, <code>hop</code></span>
 </li>
 <li><code>DeidConfig::with_random_reseed_range</code> <span style="color:var(--muted)">line 451</span> &middot; This configuration with a roll range drawn from the OS CSPRNG.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>frame_ms</code>, <code>hop</code></span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>frame_ms</code>, <code>reseed_range_from</code>, <code>hop</code></span>
 </li>
-<li><code>DeidConfig::checked</code> <span style="color:var(--muted)">line 507</span> &middot; Validate and normalise; returns an error string on impossible values.
+<li><code>DeidConfig::checked</code> <span style="color:var(--muted)">line 502</span> &middot; Validate and normalise; returns an error string on impossible values.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>clamp_ratio_bounds</code></span>
 </li>
-<li><code>ProcessStats::last_block_ms</code> <span style="color:var(--muted)">line 643</span> &middot; Most recent block processing time in milliseconds.
+<li><code>ProcessStats::last_block_ms</code> <span style="color:var(--muted)">line 638</span> &middot; Most recent block processing time in milliseconds.
 </li>
-<li><code>ProcessStats::worst_block_ms</code> <span style="color:var(--muted)">line 647</span> &middot; Worst block processing time in milliseconds.
+<li><code>ProcessStats::worst_block_ms</code> <span style="color:var(--muted)">line 642</span> &middot; Worst block processing time in milliseconds.
 </li>
-<li><code>ProcessStats::ema_block_ms</code> <span style="color:var(--muted)">line 651</span> &middot; Smoothed block processing time in milliseconds.
+<li><code>ProcessStats::ema_block_ms</code> <span style="color:var(--muted)">line 646</span> &middot; Smoothed block processing time in milliseconds.
 </li>
-<li><code>ProcessStats::last_realtime_factor</code> <span style="color:var(--muted)">line 656</span> &middot; Processing time divided by the block&#x27;s real-time duration.
+<li><code>ProcessStats::last_realtime_factor</code> <span style="color:var(--muted)">line 651</span> &middot; Processing time divided by the block&#x27;s real-time duration.
 </li>
-<li><code>Deidentifier::new</code> <span style="color:var(--muted)">line 702</span> &middot; Build with a fresh, unpredictable seed from the OS CSPRNG.
+<li><code>Deidentifier::new</code> <span style="color:var(--muted)">line 697</span> &middot; Build with a fresh, unpredictable seed from the OS CSPRNG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>from_seed</code></span>
 </li>
-<li><code>Deidentifier::latency_samples</code> <span style="color:var(--muted)">line 777</span> &middot; Fixed algorithmic latency in samples.
+<li><code>Deidentifier::latency_samples</code> <span style="color:var(--muted)">line 772</span> &middot; Fixed algorithmic latency in samples.
 </li>
-<li><code>Deidentifier::stats</code> <span style="color:var(--muted)">line 782</span> &middot; Live performance statistics (copy).
+<li><code>Deidentifier::stats</code> <span style="color:var(--muted)">line 777</span> &middot; Live performance statistics (copy).
 </li>
-<li><code>Deidentifier::accent_stats</code> <span style="color:var(--muted)">line 787</span> &middot; Live accent-neutralisation read-out (detected f0, applied ratios).
+<li><code>Deidentifier::accent_stats</code> <span style="color:var(--muted)">line 782</span> &middot; Live accent-neutralisation read-out (detected f0, applied ratios).
 </li>
-<li><code>Deidentifier::process_vec</code> <span style="color:var(--muted)">line 865</span> &middot; Convenience: process a whole buffer and return a new Vec.
+<li><code>Deidentifier::process_vec</code> <span style="color:var(--muted)">line 860</span> &middot; Convenience: process a whole buffer and return a new Vec.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>process</code></span>
 </li>
 </ul>
@@ -152,7 +152,7 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 605 1297" width="605" height="1297" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 614 1297" width="614" height="1297" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -161,129 +161,130 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="605" height="1297" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M166.9 508.0 C 166.9 528.0, 183.0 1051.0, 183.0 1068.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M545.2 255.5 C 567.2 255.5, 567.2 147.0, 487.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M545.2 255.5 C 567.2 255.5, 567.2 255.5, 292.7 255.5" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M484.8 147.0 C 506.8 147.0, 506.8 147.0, 272.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M289.7 255.5 C 506.8 255.5, 506.8 147.0, 487.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M410.3 716.5 C 410.3 736.5, 402.3 1051.0, 402.3 1068.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M417.5 998.0 C 555.1 998.0, 555.1 898.0, 536.1 898.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M330.0 372.5 C 352.0 372.5, 352.0 255.5, 292.7 255.5" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M577.5 372.5 C 599.5 372.5, 599.5 147.0, 487.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<rect x="0" y="0" width="614" height="1297" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M430.5 399.5 C 430.5 419.5, 187.1 951.0, 187.1 968.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M257.5 255.5 C 295.6 255.5, 295.6 147.0, 276.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M257.5 255.5 C 551.1 255.5, 551.1 147.0, 532.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M273.6 147.0 C 606.3 147.0, 606.3 47.0, 587.3 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M529.1 147.0 C 551.1 147.0, 551.1 147.0, 276.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M162.9 725.0 C 162.9 745.0, 406.3 951.0, 406.3 968.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M533.1 898.0 C 555.1 898.0, 555.1 898.0, 280.6 898.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M585.5 255.5 C 607.5 255.5, 607.5 147.0, 532.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M313.9 372.5 C 335.9 372.5, 335.9 147.0, 276.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M203.2 408.0 C 203.2 428.0, 306.8 1051.0, 306.8 1068.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="chain.src.html#fn-deidconfig-default">
-<rect x="25.2" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="115.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::default</text>
-<text x="115.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
-</a>
-<a href="chain.src.html#fn-rangeerror-fmt">
-<rect x="232.3" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="306.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">RangeError::fmt</text>
-<text x="306.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+<rect x="29.2" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="119.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::default</text>
+<text x="119.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
 </a>
 <a href="chain.src.html#fn-parse_reseed_range">
-<rect x="407.2" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="493.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_reseed_range</text>
-<text x="493.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
+<rect x="236.3" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="322.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_reseed_range</text>
+<text x="322.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-hop">
-<rect x="120.7" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="195.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::hop</text>
-<text x="195.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 382</text>
+<rect x="435.4" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="509.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::hop</text>
+<text x="509.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 382</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-frame_ms">
-<rect x="295.6" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="390.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frame_ms</text>
-<text x="390.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
+<rect x="84.4" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="179.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frame_ms</text>
+<text x="179.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-frames_for_ms">
-<rect x="60.2" y="228.5" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="175.0" y="251.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frames_for_ms</text>
-<text x="175.0" y="268.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 399</text>
+<rect x="299.6" y="120.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="414.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frames_for_ms</text>
+<text x="414.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 399</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-effective_reseed_range_ms">
-<rect x="315.7" y="220.0" width="229.5" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="430.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::</text>
-<text x="430.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">effective_reseed_range_ms</text>
-<text x="430.5" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 416</text>
+<rect x="28.0" y="220.0" width="229.5" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="142.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::</text>
+<text x="142.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">effective_reseed_range_ms</text>
+<text x="142.8" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 416</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-reseed_range_is_finer_than_a_frame">
-<rect x="28.0" y="337.0" width="302.0" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="179.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::</text>
-<text x="179.0" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">reseed_range_is_finer_than_a_frame</text>
-<text x="179.0" y="393.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 430</text>
+<rect x="283.5" y="220.0" width="302.0" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="434.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::</text>
+<text x="434.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">reseed_range_is_finer_than_a_frame</text>
+<text x="434.5" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 430</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-with_random_reseed_range">
-<rect x="356.0" y="337.0" width="221.4" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="466.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::</text>
-<text x="466.8" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">with_random_reseed_range</text>
-<text x="466.8" y="393.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
+<rect x="92.5" y="337.0" width="221.4" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="203.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::</text>
+<text x="203.2" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">with_random_reseed_range</text>
+<text x="203.2" y="393.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
 </a>
 <a href="chain.src.html#fn-deidconfig-checked">
-<rect x="76.4" y="454.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="166.9" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::checked</text>
-<text x="166.9" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 507</text>
+<rect x="339.9" y="345.5" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="430.5" y="368.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::checked</text>
+<text x="430.5" y="385.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 502</text>
 </a>
 <a href="chain.src.html#fn-clamp_ratio_bounds">
-<rect x="96.5" y="1071.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="183.0" y="1093.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clamp_ratio_bounds</text>
-<text x="183.0" y="1110.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 597</text>
+<rect x="100.5" y="971.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="187.1" y="993.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clamp_ratio_bounds</text>
+<text x="187.1" y="1010.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 592</text>
 </a>
 <a href="chain.src.html#fn-processstats-last_block_ms">
-<rect x="283.5" y="454.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="406.3" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::last_block_ms</text>
-<text x="406.3" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 643</text>
+<rect x="44.1" y="454.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="166.9" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::last_block_ms</text>
+<text x="166.9" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 638</text>
 </a>
 <a href="chain.src.html#fn-processstats-worst_block_ms">
-<rect x="44.1" y="554.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="171.0" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::worst_block_ms</text>
-<text x="171.0" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 647</text>
+<rect x="315.7" y="454.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="442.6" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::worst_block_ms</text>
+<text x="442.6" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 642</text>
 </a>
 <a href="chain.src.html#fn-processstats-ema_block_ms">
-<rect x="323.8" y="554.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="442.6" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::ema_block_ms</text>
-<text x="442.6" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 651</text>
+<rect x="80.4" y="562.5" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="199.2" y="585.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::ema_block_ms</text>
+<text x="199.2" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 646</text>
 </a>
 <a href="chain.src.html#fn-processstats-last_realtime_factor">
-<rect x="112.6" y="654.0" width="189.2" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="207.2" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::</text>
-<text x="207.2" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">last_realtime_factor</text>
-<text x="207.2" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 656</text>
+<rect x="343.9" y="554.0" width="189.2" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="438.6" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::</text>
+<text x="438.6" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">last_realtime_factor</text>
+<text x="438.6" y="610.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 651</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-new">
-<rect x="327.8" y="662.5" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="410.3" y="685.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::new</text>
-<text x="410.3" y="702.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 702</text>
+<rect x="80.4" y="671.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="162.9" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::new</text>
+<text x="162.9" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 697</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-from_seed">
-<rect x="295.6" y="1071.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="402.3" y="1093.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::from_seed</text>
-<text x="402.3" y="1110.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 709</text>
+<rect x="299.6" y="971.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="406.3" y="993.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::from_seed</text>
+<text x="406.3" y="1010.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 704</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-latency_samples">
-<rect x="68.3" y="771.0" width="261.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="199.2" y="793.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::latency_samples</text>
-<text x="199.2" y="810.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 777</text>
+<rect x="271.4" y="671.0" width="261.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="402.3" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::latency_samples</text>
+<text x="402.3" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 772</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-stats">
-<rect x="356.0" y="771.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="446.6" y="793.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::stats</text>
-<text x="446.6" y="810.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 782</text>
+<rect x="84.4" y="771.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="175.0" y="793.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::stats</text>
+<text x="175.0" y="810.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 777</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-accent_stats">
-<rect x="72.3" y="871.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="191.1" y="893.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::accent_stats</text>
-<text x="191.1" y="910.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 787</text>
+<rect x="291.6" y="771.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="410.3" y="793.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::accent_stats</text>
+<text x="410.3" y="810.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 782</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-process">
-<rect x="335.9" y="871.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="434.5" y="893.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process</text>
-<text x="434.5" y="910.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 793</text>
+<rect x="80.4" y="871.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="179.0" y="893.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process</text>
+<text x="179.0" y="910.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 788</text>
 </a>
 <a href="chain.src.html#fn-deidentifier-process_vec">
-<rect x="188.0" y="971.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="302.7" y="993.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process_vec</text>
-<text x="302.7" y="1010.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 865</text>
+<rect x="303.6" y="871.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="418.4" y="893.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process_vec</text>
+<text x="418.4" y="910.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 860</text>
+</a>
+<a href="chain.src.html#fn-reseed_range_from">
+<rect x="224.3" y="1071.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="306.8" y="1093.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
+<text x="306.8" y="1110.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 892</text>
 </a>
 <rect x="20.0" y="1155.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1164.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -295,16 +296,15 @@
 <text x="35.0" y="1212.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1234.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
 <text x="20.0" y="1249.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="1264.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 23 functions are drawn; the diagram is</text>
+<text x="20.0" y="1264.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 24 functions are drawn; the diagram is</text>
 <text x="20.0" y="1279.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 23 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 24 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_default[&quot;DeidConfig::default&lt;br/&gt;line 212&quot;]
-    n_fmt[&quot;RangeError::fmt&lt;br/&gt;line 287&quot;]
     n_parse_reseed_range([&quot;parse_reseed_range&lt;br/&gt;line 333&quot;])
     n_hop[&quot;DeidConfig::hop&lt;br/&gt;line 382&quot;]
     n_frame_ms[&quot;DeidConfig::frame_ms&lt;br/&gt;line 390&quot;]
@@ -312,19 +312,20 @@ flowchart TD
     n_effective_reseed_range_ms([&quot;DeidConfig::&lt;br/&gt;effective_reseed_range_ms&lt;br/&gt;line 416&quot;])
     n_reseed_range_is_finer_than_a_frame([&quot;DeidConfig::&lt;br/&gt;reseed_range_is_finer_than_a_frame&lt;br/&gt;line 430&quot;])
     n_with_random_reseed_range([&quot;DeidConfig::&lt;br/&gt;with_random_reseed_range&lt;br/&gt;line 451&quot;])
-    n_checked([&quot;DeidConfig::checked&lt;br/&gt;line 507&quot;])
-    n_clamp_ratio_bounds[&quot;clamp_ratio_bounds&lt;br/&gt;line 597&quot;]
-    n_last_block_ms([&quot;ProcessStats::last_block_ms&lt;br/&gt;line 643&quot;])
-    n_worst_block_ms([&quot;ProcessStats::worst_block_ms&lt;br/&gt;line 647&quot;])
-    n_ema_block_ms([&quot;ProcessStats::ema_block_ms&lt;br/&gt;line 651&quot;])
-    n_last_realtime_factor([&quot;ProcessStats::&lt;br/&gt;last_realtime_factor&lt;br/&gt;line 656&quot;])
-    n_new([&quot;Deidentifier::new&lt;br/&gt;line 702&quot;])
-    n_from_seed[&quot;Deidentifier::from_seed&lt;br/&gt;line 709&quot;]
-    n_latency_samples([&quot;Deidentifier::latency_samples&lt;br/&gt;line 777&quot;])
-    n_stats([&quot;Deidentifier::stats&lt;br/&gt;line 782&quot;])
-    n_accent_stats([&quot;Deidentifier::accent_stats&lt;br/&gt;line 787&quot;])
-    n_process[&quot;Deidentifier::process&lt;br/&gt;line 793&quot;]
-    n_process_vec([&quot;Deidentifier::process_vec&lt;br/&gt;line 865&quot;])
+    n_checked([&quot;DeidConfig::checked&lt;br/&gt;line 502&quot;])
+    n_clamp_ratio_bounds[&quot;clamp_ratio_bounds&lt;br/&gt;line 592&quot;]
+    n_last_block_ms([&quot;ProcessStats::last_block_ms&lt;br/&gt;line 638&quot;])
+    n_worst_block_ms([&quot;ProcessStats::worst_block_ms&lt;br/&gt;line 642&quot;])
+    n_ema_block_ms([&quot;ProcessStats::ema_block_ms&lt;br/&gt;line 646&quot;])
+    n_last_realtime_factor([&quot;ProcessStats::&lt;br/&gt;last_realtime_factor&lt;br/&gt;line 651&quot;])
+    n_new([&quot;Deidentifier::new&lt;br/&gt;line 697&quot;])
+    n_from_seed[&quot;Deidentifier::from_seed&lt;br/&gt;line 704&quot;]
+    n_latency_samples([&quot;Deidentifier::latency_samples&lt;br/&gt;line 772&quot;])
+    n_stats([&quot;Deidentifier::stats&lt;br/&gt;line 777&quot;])
+    n_accent_stats([&quot;Deidentifier::accent_stats&lt;br/&gt;line 782&quot;])
+    n_process[&quot;Deidentifier::process&lt;br/&gt;line 788&quot;]
+    n_process_vec([&quot;Deidentifier::process_vec&lt;br/&gt;line 860&quot;])
+    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 892&quot;]
     n_checked --&gt; n_clamp_ratio_bounds
     n_effective_reseed_range_ms --&gt; n_frame_ms
     n_effective_reseed_range_ms --&gt; n_frames_for_ms
@@ -334,8 +335,8 @@ flowchart TD
     n_process_vec --&gt; n_process
     n_reseed_range_is_finer_than_a_frame --&gt; n_frames_for_ms
     n_with_random_reseed_range --&gt; n_frame_ms
+    n_with_random_reseed_range --&gt; n_reseed_range_from
     click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L212&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L287&quot; &quot;open the source&quot;
     click n_parse_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L333&quot; &quot;open the source&quot;
     click n_hop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L382&quot; &quot;open the source&quot;
     click n_frame_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L390&quot; &quot;open the source&quot;
@@ -343,25 +344,26 @@ flowchart TD
     click n_effective_reseed_range_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L416&quot; &quot;open the source&quot;
     click n_reseed_range_is_finer_than_a_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L430&quot; &quot;open the source&quot;
     click n_with_random_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L451&quot; &quot;open the source&quot;
-    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L507&quot; &quot;open the source&quot;
-    click n_clamp_ratio_bounds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L597&quot; &quot;open the source&quot;
-    click n_last_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L643&quot; &quot;open the source&quot;
-    click n_worst_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L647&quot; &quot;open the source&quot;
-    click n_ema_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L651&quot; &quot;open the source&quot;
-    click n_last_realtime_factor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L656&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L702&quot; &quot;open the source&quot;
-    click n_from_seed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L709&quot; &quot;open the source&quot;
-    click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L777&quot; &quot;open the source&quot;
-    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L782&quot; &quot;open the source&quot;
-    click n_accent_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L787&quot; &quot;open the source&quot;
-    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L793&quot; &quot;open the source&quot;
-    click n_process_vec href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L865&quot; &quot;open the source&quot;
+    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L502&quot; &quot;open the source&quot;
+    click n_clamp_ratio_bounds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L592&quot; &quot;open the source&quot;
+    click n_last_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L638&quot; &quot;open the source&quot;
+    click n_worst_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L642&quot; &quot;open the source&quot;
+    click n_ema_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L646&quot; &quot;open the source&quot;
+    click n_last_realtime_factor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L651&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L697&quot; &quot;open the source&quot;
+    click n_from_seed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L704&quot; &quot;open the source&quot;
+    click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L772&quot; &quot;open the source&quot;
+    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L777&quot; &quot;open the source&quot;
+    click n_accent_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L782&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L788&quot; &quot;open the source&quot;
+    click n_process_vec href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L860&quot; &quot;open the source&quot;
+    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L892&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_parse_reseed_range,n_effective_reseed_range_ms,n_reseed_range_is_finer_than_a_frame,n_with_random_reseed_range,n_checked,n_last_block_ms,n_worst_block_ms,n_ema_block_ms,n_last_realtime_factor,n_new,n_latency_samples,n_stats,n_accent_stats,n_process_vec entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_frame_ms,n_from_seed,n_process api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_fmt,n_hop,n_frames_for_ms,n_clamp_ratio_bounds helper</code></pre>
+    class n_default,n_hop,n_frames_for_ms,n_clamp_ratio_bounds,n_reseed_range_from helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -381,25 +383,26 @@ flowchart TD
 <tr><td><code>DeidConfig::effective_reseed_range_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidconfig-effective_reseed_range_ms">416</a></td><td>What DeidConfig::reseed_range_ms actually comes to on this configuration, after quantising to whole frames.</td></tr>
 <tr><td><code>DeidConfig::reseed_range_is_finer_than_a_frame</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidconfig-reseed_range_is_finer_than_a_frame">430</a></td><td>Whether the requested range is finer than one frame, so the whole of it collapses onto a single interval.</td></tr>
 <tr><td><code>DeidConfig::with_random_reseed_range</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidconfig-with_random_reseed_range">451</a></td><td>This configuration with a roll range drawn from the OS CSPRNG.</td></tr>
-<tr><td><code>DeidConfig::scaled</code> <sub>fn</sub></td><td><a href="chain.src.html#fn-deidconfig-scaled">468</a></td><td>Scale a (lo, hi) ratio range toward 1.0 by intensity.</td></tr>
-<tr><td><code>DeidConfig::MAX_SAMPLE_RATE</code> <sub>pub const</sub></td><td><a href="chain.src.html#fn-deidconfig-max_sample_rate">488</a></td><td>The largest sample rate this engine will build for, in Hz.</td></tr>
-<tr><td><code>DeidConfig::MAX_FRAME_SIZE</code> <sub>pub const</sub></td><td><a href="chain.src.html#fn-deidconfig-max_frame_size">496</a></td><td>The largest FFT size this engine will build for.</td></tr>
-<tr><td><code>DeidConfig::checked</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidconfig-checked">507</a></td><td>Validate and normalise; returns an error string on impossible values.</td></tr>
-<tr><td><code>clamp_ratio_bounds</code> <sub>fn</sub></td><td><a href="chain.src.html#fn-clamp_ratio_bounds">597</a></td><td>Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order.</td></tr>
-<tr><td><code>ProcessStats</code> <sub>pub struct</sub></td><td><a href="chain.src.html#fn-processstats">611</a></td><td>Rolling performance statistics, surfaced live to the UI.</td></tr>
-<tr><td><code>ProcessStats::last_block_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-last_block_ms">643</a></td><td>Most recent block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::worst_block_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-worst_block_ms">647</a></td><td>Worst block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::ema_block_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-ema_block_ms">651</a></td><td>Smoothed block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::last_realtime_factor</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-last_realtime_factor">656</a></td><td>Processing time divided by the block&#x27;s real-time duration.</td></tr>
-<tr><td><code>Deidentifier</code> <sub>pub struct</sub></td><td><a href="chain.src.html#fn-deidentifier">672</a></td><td>The complete, irreversible voice de-identification chain.</td></tr>
-<tr><td><code>Deidentifier::new</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-new">702</a></td><td>Build with a fresh, unpredictable seed from the OS CSPRNG.</td></tr>
-<tr><td><code>Deidentifier::from_seed</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-from_seed">709</a></td><td>Build with an explicit seed (deterministic; for tests or seed-from-key).</td></tr>
-<tr><td><code>Deidentifier::latency_samples</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-latency_samples">777</a></td><td>Fixed algorithmic latency in samples.</td></tr>
-<tr><td><code>Deidentifier::stats</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-stats">782</a></td><td>Live performance statistics (copy).</td></tr>
-<tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-accent_stats">787</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
-<tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-process">793</a></td><td>Process input into output (equal length).</td></tr>
-<tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-process_vec">865</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
-<tr><td><code>reseed_range_tests</code> <sub>mod</sub></td><td><a href="chain.src.html#fn-reseed_range_tests">1458</a></td><td></td></tr>
+<tr><td><code>DeidConfig::scaled</code> <sub>fn</sub></td><td><a href="chain.src.html#fn-deidconfig-scaled">463</a></td><td>Scale a (lo, hi) ratio range toward 1.0 by intensity.</td></tr>
+<tr><td><code>DeidConfig::MAX_SAMPLE_RATE</code> <sub>pub const</sub></td><td><a href="chain.src.html#fn-deidconfig-max_sample_rate">483</a></td><td>The largest sample rate this engine will build for, in Hz.</td></tr>
+<tr><td><code>DeidConfig::MAX_FRAME_SIZE</code> <sub>pub const</sub></td><td><a href="chain.src.html#fn-deidconfig-max_frame_size">491</a></td><td>The largest FFT size this engine will build for.</td></tr>
+<tr><td><code>DeidConfig::checked</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidconfig-checked">502</a></td><td>Validate and normalise; returns an error string on impossible values.</td></tr>
+<tr><td><code>clamp_ratio_bounds</code> <sub>fn</sub></td><td><a href="chain.src.html#fn-clamp_ratio_bounds">592</a></td><td>Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order.</td></tr>
+<tr><td><code>ProcessStats</code> <sub>pub struct</sub></td><td><a href="chain.src.html#fn-processstats">606</a></td><td>Rolling performance statistics, surfaced live to the UI.</td></tr>
+<tr><td><code>ProcessStats::last_block_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-last_block_ms">638</a></td><td>Most recent block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::worst_block_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-worst_block_ms">642</a></td><td>Worst block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::ema_block_ms</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-ema_block_ms">646</a></td><td>Smoothed block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::last_realtime_factor</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-processstats-last_realtime_factor">651</a></td><td>Processing time divided by the block&#x27;s real-time duration.</td></tr>
+<tr><td><code>Deidentifier</code> <sub>pub struct</sub></td><td><a href="chain.src.html#fn-deidentifier">667</a></td><td>The complete, irreversible voice de-identification chain.</td></tr>
+<tr><td><code>Deidentifier::new</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-new">697</a></td><td>Build with a fresh, unpredictable seed from the OS CSPRNG.</td></tr>
+<tr><td><code>Deidentifier::from_seed</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-from_seed">704</a></td><td>Build with an explicit seed (deterministic; for tests or seed-from-key).</td></tr>
+<tr><td><code>Deidentifier::latency_samples</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-latency_samples">772</a></td><td>Fixed algorithmic latency in samples.</td></tr>
+<tr><td><code>Deidentifier::stats</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-stats">777</a></td><td>Live performance statistics (copy).</td></tr>
+<tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-accent_stats">782</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
+<tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-process">788</a></td><td>Process input into output (equal length).</td></tr>
+<tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-process_vec">860</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
+<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="chain.src.html#fn-reseed_range_from">892</a></td><td>Turn two ratios in 0.0..=1.0 into a reseed range in milliseconds.</td></tr>
+<tr><td><code>reseed_range_tests</code> <sub>mod</sub></td><td><a href="chain.src.html#fn-reseed_range_tests">1503</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

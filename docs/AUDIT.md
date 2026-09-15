@@ -498,6 +498,72 @@ only through a self-contradiction: telling the vault's index guard apart from
 one that accepts any failure needs a read of a path that fails and a write to
 that same path that then succeeds.
 
+### F-188: one launch in 65,536 drew a reseed range with no width in it
+
+The de-identifier re-draws its scrambling seed on an interval, and that
+interval is itself drawn at launch from a range the program also draws. The
+reason is written in the function: a fixed ratchet period is a fixed thing to
+observe, and every copy of VeilVoice having the same one makes the period a
+property of the *program* rather than of the session.
+
+The range came from two sixteen-bit draws, sorted. Two equal draws give a range
+of no width, which is a **fixed** interval: exactly the thing the drawing exists
+to prevent. `checked` accepts it, because it only refuses a range that is
+backwards. A front end showing it would show two identical numbers and nothing
+would look wrong.
+
+**How it surfaced, and why that is the interesting part.** A verification run
+failed on `a_drawn_range_is_always_valid`, a test that had passed eleven times
+that day. Sixty-four draws a run against a one in 65,536 event is about one run
+in a thousand. Two hundred repeats of the test afterwards did not reproduce it,
+which is what a one in a thousand event looks like when you go looking for it.
+
+The test was right and the code was wrong. That is worth saying plainly: the
+assertion encoded an invariant the function did not actually provide, and it had
+been sitting there being true by luck.
+
+**The fix, and why it is a separate function now.** Waiting for a one in 65,536
+event is not a test. The arithmetic that turns two draws into a range is now
+`reseed_range_from`, which takes the draws as arguments, so the collision can be
+handed to it directly at every value it can take rather than waited for. A
+collision is widened to one frame, centred on the draw so that a collision near
+the slow end stays near the slow end, and clamped to the available room. One
+frame because that is the resolution the engine has:
+`reseed_range_is_finer_than_a_frame` already exists to report a range that
+collapses onto a single interval, and a drawn range should never be one.
+
+Removing the widening again makes the new test fail with `draws 0 and 0 gave
+21.3 to 21.3`, which is the check that it checks anything.
+
+### F-187: a walker that reads past the end, and bland metadata that is not quite bland
+
+The same tool over the two readers that parse somebody else's file.
+`veilvoice-meta`'s WAV chunk walker and image stripper: 58 mutants, 53 caught,
+one that does not compile, and four the suite accepted. All four were in the
+walker, and they divide in a way worth naming.
+
+One was a guard against reading past the end. An odd-sized chunk is followed by
+a pad byte, and the walker copies it after checking there is one; moving that
+`<` to a `<=` reaches one byte beyond the region it is allowed to read. Every
+existing test built its chunks with a helper that always pads, so no odd-sized
+chunk ever ended a file and the guard was never the thing that stopped anything.
+A truncated recording is exactly that shape.
+
+The other three were in the bland metadata this crate writes **in place of**
+what it strips, and that is the part worth explaining. Stripping metadata is
+itself a signal: a file with no tags at all says something about how it was
+made. So a plausible, bland `LIST`/`INFO` chunk goes in instead, which only
+works if what goes in looks like what any other tool would write. One line
+word-aligns those entries, and three mutations of it turned the alignment off,
+inverted it, or applied it to two lengths in every however many. Nothing
+objected, because nothing had ever read back what that function writes. A
+generator whose output is never parsed is the encodings' gap in a second place.
+
+All four are fixed and the re-run is **58 mutants, 57 caught, one unviable,
+nothing surviving**. Each of the four was planted by hand afterwards to confirm
+the new tests fail on it. The weekly workflow covers this crate alongside the
+cryptography now.
+
 **The guard, which is marker 151.** `.github/workflows/mutants.yml` runs the
 campaign weekly over all eight cryptography files and can be dispatched before a
 release. Its verdict is not a number. `tools/mutants/check.py` compares the run
@@ -5677,7 +5743,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1646 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1650 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -7324,7 +7390,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-six defects found and fixed (F-1 to F-186), across
+**One hundred and eighty-eight defects found and fixed (F-1 to F-188), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

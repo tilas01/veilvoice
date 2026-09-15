@@ -70,6 +70,25 @@ jobs:
             --file crates/veilvoice-crypto/src/tape.rs \
             --timeout 300 \
             || true
+          mv mutants.out/missed.txt missed-crypto.txt
+
+      # The two readers that parse a file somebody else produced. They are a
+      # different crate, so a separate invocation, and its output is added to
+      # the same comparison below. Both were campaigned to zero survivors when
+      # this was written: the walker's guard against reading past an odd-sized
+      # last chunk, and the alignment of the bland metadata written in place of
+      # what was stripped, which is what makes a cleaned file look like any
+      # other file rather than like one this tool has been over.
+      - name: Change the metadata readers a line at a time
+        run: |
+          set -euo pipefail
+          cargo mutants -p veilvoice-meta \
+            --file crates/veilvoice-meta/src/wav.rs \
+            --file crates/veilvoice-meta/src/image.rs \
+            --timeout 300 \
+            || true
+          cat missed-crypto.txt mutants.out/missed.txt > mutants.out/missed.txt.all
+          mv mutants.out/missed.txt.all mutants.out/missed.txt
 
       # Compared rather than counted. `|| true` above is deliberate: the
       # campaign exits non-zero when anything survives, and something is
