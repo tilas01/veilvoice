@@ -385,29 +385,61 @@ mod tests {
             .expect("and removing it twice is still not one");
     }
 
-    /// A store into a directory that does not exist yet creates it.
+    /// A store survives its own directory being removed underneath it.
     ///
     /// `write_one` creates the parent when the parent is not empty, and
-    /// deleting that `!` inverts it into creating the parent only when there
-    /// is none to create. Every existing test handed it a `tempdir` that
-    /// already existed, so the creation never had to happen and its absence
-    /// never showed.
+    /// deleting that `!` inverts it into creating the parent only when there is
+    /// none to create. The first attempt at this test handed `Vault::at` a path
+    /// that did not exist and expected the creation to happen there, and the
+    /// mutant survived it: `Vault::at` calls `create_dir_all` itself when it
+    /// writes a new index, so by the time `write_one` runs the directory is
+    /// always already there. The creation in `write_one` only matters when the
+    /// directory goes away between the two, which is what somebody deleting the
+    /// folder looks like, so that is what this does.
     #[test]
-    fn storing_into_a_directory_that_does_not_exist_yet_creates_it() {
+    fn a_store_recreates_its_directory_if_it_is_removed_underneath() {
         let dir = tempfile::tempdir().unwrap();
-        let nested = dir.path().join("not").join("made").join("yet");
-        assert!(
-            !nested.exists(),
-            "the point of the test is that it is absent"
-        );
-
-        let vault = Vault::at(&nested, None).unwrap();
+        let base = dir.path().join("vault");
+        let vault = Vault::at(&base, None).unwrap();
         let lock = crate::lock::AppLock::create(b"pw", weak()).unwrap();
         vault.store(&lock).unwrap();
 
+        std::fs::remove_dir_all(&base).unwrap();
+        assert!(
+            !base.exists(),
+            "the directory is gone before the second store"
+        );
+
+        vault
+            .store(&lock)
+            .expect("a store must put the directory back");
         let (back, _) = vault.load().unwrap();
-        let back = back.expect("what was stored reads back");
+        let back = back.expect("and what it wrote must read back");
         assert!(back.same_secret_as(&lock));
+    }
+
+    /// An index that cannot be read is an error, not a reason to make a new one.
+    ///
+    /// The site index names both copies of the lock. If reading it fails for
+    /// any reason other than "it is not there", drawing a fresh one writes the
+    /// lock under a name nothing can compute again and orphans the real one.
+    /// The guard says exactly `NotFound`; mutation testing replaced it with
+    /// `true`, so every failure meant "make a new index", and nothing objected
+    /// because the only index the suite ever failed to read was an absent one.
+    #[test]
+    fn an_index_that_cannot_be_read_is_refused_rather_than_replaced() {
+        let dir = tempfile::tempdir().unwrap();
+        let base = dir.path().join("vault");
+        std::fs::create_dir_all(&base).unwrap();
+
+        // A directory where the index file should be: present, and unreadable
+        // as a file, on every platform this ships to.
+        std::fs::create_dir(base.join(INDEX_NAME)).unwrap();
+
+        assert!(
+            Vault::at(&base, None).is_err(),
+            "an unreadable index must not be quietly replaced"
+        );
     }
 
     #[test]
