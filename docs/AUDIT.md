@@ -387,22 +387,24 @@ fifteen survivors. This is the same tool over the four it had not reached: the
 app lock, the studio vault, the chunked tape and the reversible encodings.
 
 **674 mutants, 544 caught, 42 that do not compile, 5 timeouts, and 81 the suite
-accepted.** Four rounds of writing tests and re-measuring brought that to
-fifteen, and every one of the fifteen carries a written argument for why it
+accepted.** Five rounds of writing tests and re-measuring brought that to
+eighteen, and every one of the eighteen carries a written argument for why it
 cannot be killed.
 
-**What that "fifteen" is measured over, stated exactly.** The app lock, the
-vault and the tape were each campaigned end to end in the final run: 137, 28 and
-39 mutants, complete. The encodings file has 463 and no single run of it has
-finished here, because `cargo mutants` dies on `pthread_create` partway through
-even at `--jobs 1`, with fourteen gigabytes free and the thread limit at 64,318.
-The cause is not established and is written down rather than guessed at.
+**What that is measured over, stated exactly.** All four files were campaigned
+end to end: the app lock 137 mutants, the vault 28, the tape 39, the encodings
+463. A single run of the encodings does not finish here: `cargo mutants` dies on
+`pthread_create` partway through even at `--jobs 1`, with fourteen gigabytes
+free and the thread limit at 64,318. The cause is not established, and is
+written down that way rather than guessed at. `--shard k/6`, six separate
+processes of 78 mutants each, gets past whatever the limit is.
 
-So the fifteen are measured over 332 of that file's 463 mutants, and over all of
-the other three. Running it as `--shard k/6`, six separate processes, gets past
-whatever the limit is: the first shard is 78 mutants with nothing surviving.
-Until all six have run, the list is the best measurement taken and not a
-complete one, and saying which it is costs a sentence.
+**Running it whole was worth insisting on.** The partial runs reached 332 of the
+encodings' 463 and reported four survivors there. The six shards found twelve.
+The eight the partial runs never reached were all in the base conversions, which
+sit near the end of the file, and five of the eight were real gaps rather than
+equivalences. A campaign that stops early does not report that it stopped early:
+it reports a number, and the number looks like an answer.
 
 **Forty-four of the eighty-one were one gap.** The encodings had exactly one
 structural test: encode, decode, compare against the input. That tests the pair
@@ -466,9 +468,27 @@ nothing about whether it is testing anything. Only changing the code underneath
 and watching the test fail does. Every one of these three looked correct on the
 page, was reviewed while being written, and was wrong.
 
+**The five the shards found, and what it took to kill them.** Base-91 decides
+between packing thirteen bits and fourteen by comparing a thirteen-bit window
+against 88, in the encoder and again in the decoder. Moving either comparison by
+one changes the encoded form only when that window is exactly 88, and no sample,
+no length from nothing to sixty-four bytes, and neither a counter nor an
+all-ones run ever lands on it. Two searches found inputs that do: one of
+twenty-two bytes that reaches the boundary on the way in, and one of five that
+reaches it on the way out, because the decoder rebuilds a fourteen-bit value and
+tests the low thirteen of it, which is not the number the encoder tested. Both
+are named in the test with the reason each was needed.
+
+The decoder also needed pinning on its own. The digest test calls `apply` and
+never `undo`, and the round trip is blind to any change the pair still agrees
+on. That is not enough to call a decoder mutant equivalent, because `undo` is
+not only fed `apply`'s output: it is fed bytes read back from disk, which
+whoever can write that file chooses. So it is pinned on input built from its own
+alphabet.
+
 **What cannot be killed, and why that is written down rather than rounded off.**
-Fifteen survivors remain, in `tools/mutants/survivors.txt`, each with its
-argument. Four are equivalent by arithmetic: three where the operands have
+Eighteen survivors remain, in `tools/mutants/survivors.txt`, each with its
+argument. Seven are equivalent by arithmetic: six where the operands occupy
 disjoint bits so `|` and `^` compute the same value, and one where a cast to a
 byte already reduces modulo 256. Ten are properties of the machine rather than
 of the code: whether the operating system granted a page lock, whether a
@@ -5657,7 +5677,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1644 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1646 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |

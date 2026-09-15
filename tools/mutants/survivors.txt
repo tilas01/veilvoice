@@ -26,13 +26,16 @@
 # Format: one cargo-mutants line per entry, exactly as `missed.txt` writes it,
 # with the argument above it.
 #
-# **How completely this has been measured.** The app lock, the vault and the
-# tape were each campaigned end to end. `weave.rs` has 463 mutants and no single
-# run of it completes here: `cargo mutants` dies on `pthread_create` partway
-# through even at `--jobs 1`. Its entries below come from a run that reached 332
-# of the 463. `--shard k/6` gets past the limit, and the weekly workflow runs
-# the whole thing on a machine that does not have it, which is where this list
-# gets confirmed or corrected.
+# **How completely this has been measured.** All four files have now been
+# campaigned end to end: the app lock 137 mutants, the vault 28, the tape 39,
+# and the encodings 463 as six shards of 78. A single run of the encodings does
+# not finish here, because `cargo mutants` dies on `pthread_create` partway
+# through even at `--jobs 1`; `--shard k/6` gets past whatever that limit is.
+#
+# The shards found eight survivors in the encodings that the earlier partial run
+# never reached, all in the base conversions, and five of those eight are now
+# killed rather than listed. Finding them took two searched inputs, named in the
+# test beside the reason each was needed.
 
 
 # --- 1. Equivalent by arithmetic ---------------------------------------------
@@ -52,6 +55,18 @@ crates/veilvoice-crypto/src/weave.rs:631:63: replace | with ^ in Weave::undo
 # truncating cast changes nothing. Kept in the source because it states the
 # intent; unkillable because the cast does the work either way.
 crates/veilvoice-crypto/src/weave.rs:770:43: replace % with +
+
+# The six-bit encoders pack three bytes into one number, each into its own eight
+# bits of a twenty-four bit window. No two of the three share a bit, so `|` and
+# `^` produce the same number.
+crates/veilvoice-crypto/src/weave.rs:994:41: replace | with ^ in sixbit_encode
+crates/veilvoice-crypto/src/weave.rs:994:66: replace | with ^ in sixbit_encode
+
+# The base-91 decoder shifts each new value above whatever is still in the
+# queue, and the queue never holds more than `bits` significant bits: it starts
+# empty, and the loop below shifts eight out at a time until fewer than eight
+# remain. So the two operands are disjoint here as well.
+crates/veilvoice-crypto/src/weave.rs:984:26: replace | with ^ in base91_decode
 
 
 # --- 2. A property of the machine --------------------------------------------
