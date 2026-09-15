@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-meta/src/wav.rs`
 
-[`veilvoice-meta`](../../../crates/veilvoice-meta/README.md) &middot; 438 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs)
+[`veilvoice-meta`](../../../crates/veilvoice-meta/README.md) &middot; 425 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs)
 
 ## Contents
 
@@ -59,7 +59,7 @@ handing VeilVoice's own output to a general-purpose parser.
 
 ## What this file contains
 
-438 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+425 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 

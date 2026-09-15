@@ -97,18 +97,18 @@ your machine and the key is made from your password each time.
 flowchart TD
     n_lib(["lib.rs<br/>240 lines"])
     n_aead["aead.rs<br/>276 lines"]
-    n_amnesia["amnesia.rs<br/>440 lines"]
+    n_amnesia["amnesia.rs<br/>428 lines"]
     n_container["container.rs<br/>612 lines"]
     n_hoard["hoard.rs<br/>1037 lines"]
     n_hybrid["hybrid.rs<br/>524 lines"]
     n_kdf["kdf.rs<br/>633 lines"]
-    n_lock["lock.rs<br/>2302 lines"]
+    n_lock["lock.rs<br/>2250 lines"]
     n_privatefile["privatefile.rs<br/>308 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_studio["studio.rs<br/>1494 lines"]
-    n_tape["tape.rs<br/>403 lines"]
-    n_vault["vault.rs<br/>697 lines"]
-    n_weave["weave.rs<br/>1761 lines"]
+    n_tape["tape.rs<br/>391 lines"]
+    n_vault["vault.rs<br/>680 lines"]
+    n_weave["weave.rs<br/>1699 lines"]
     n_hoard --> n_amnesia
     n_hoard --> n_privatefile
     n_hoard --> n_weave
@@ -144,19 +144,19 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`aead.rs`|File-veilvoice-crypto-aead]] | 276 | Authenticated encryption with XChaCha20-Poly1305. |
-| [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] | 440 | Amnesic secret storage: page-locked, zeroized, and never printed. |
+| [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] | 428 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [[`container.rs`|File-veilvoice-crypto-container]] | 612 | The .veil encrypted container format. |
 | [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 1037 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 524 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 633 | Password-based key derivation with Argon2id. |
 | [[`lib.rs`|File-veilvoice-crypto-lib]] | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [[`lock.rs`|File-veilvoice-crypto-lock]] | 2302 | The application lock: an Argon2id password verifier with a rate limit. |
+| [[`lock.rs`|File-veilvoice-crypto-lock]] | 2250 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 308 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure, the self-destruct. |
 | [[`studio.rs`|File-veilvoice-crypto-studio]] | 1494 | The studio vault: a key that exists only when both locks have been opened. |
-| [[`tape.rs`|File-veilvoice-crypto-tape]] | 403 | A recording held in locked, zeroizing memory while it is still being made. |
-| [[`vault.rs`|File-veilvoice-crypto-vault]] | 697 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
-| [[`weave.rs`|File-veilvoice-crypto-weave]] | 1761 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
+| [[`tape.rs`|File-veilvoice-crypto-tape]] | 391 | A recording held in locked, zeroizing memory while it is still being made. |
+| [[`vault.rs`|File-veilvoice-crypto-vault]] | 680 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [[`weave.rs`|File-veilvoice-crypto-weave]] | 1699 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [[`seal_and_open.rs`|File-veilvoice-crypto-examples-seal_and_open]] | 80 | _no module documentation yet_ |
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |

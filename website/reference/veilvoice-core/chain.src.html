@@ -7,7 +7,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-core/src/chain.rs source &#183; VeilVoice reference</title>
 <meta name="description" content="The source of crates/veilvoice-core/src/chain.rs, on this site.">
-<meta name="google-site-verification" content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -47,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-core/src/chain.rs</code></h1>
-<p style="color:var(--muted)"><a href="chain.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1726 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="chain.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1717 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1675,172 +1674,163 @@
 <span class="ln" id="L1558">        assert!(seen.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>, <span class="tok-str">&quot;eight draws produced one range: {seen:?}&quot;</span>);</span>
 <span class="ln" id="L1559">    }</span>
 <span class="ln" id="L1560"></span>
-<span class="ln" id="L1561">    <span class="tok-com">/// Two equal draws must not give a range of no width.</span></span>
-<span class="ln" id="L1562">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1563">    <span class="tok-com">/// This is the case `a_drawn_range_is_always_valid` found by accident. Each</span></span>
-<span class="ln" id="L1564">    <span class="tok-com">/// draw is sixteen bits, so a collision is one launch in 65,536, and</span></span>
-<span class="ln" id="L1565">    <span class="tok-com">/// sixty-four draws a run makes it about one run in a thousand: it failed</span></span>
-<span class="ln" id="L1566">    <span class="tok-com">/// once in a verification run after eleven clean ones, and two hundred</span></span>
-<span class="ln" id="L1567">    <span class="tok-com">/// repeats of the test afterwards did not reproduce it.</span></span>
-<span class="ln" id="L1568">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1569">    <span class="tok-com">/// Waiting for a one in 65,536 event is not a test. The arithmetic is now</span></span>
-<span class="ln" id="L1570">    <span class="tok-com">/// a function of the two draws, so the collision can simply be handed to</span></span>
-<span class="ln" id="L1571">    <span class="tok-com">/// it, at every value it can take.</span></span>
-<span class="ln" id="L1572">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1573">    <span class="tok-kw">fn</span> <span class="tok-fn">two_equal_draws_still_give_a_range_with_width_in_it</span>() {</span>
-<span class="ln" id="L1574">        <span class="tok-kw">for</span> frame_ms <span class="tok-kw">in</span> [<span class="tok-num">0</span>.05f32, <span class="tok-num">1.0</span>, <span class="tok-num">10.0</span>, <span class="tok-num">21.3</span>, <span class="tok-num">100.0</span>, <span class="tok-num">2000.0</span>, <span class="tok-num">5000.0</span>] {</span>
-<span class="ln" id="L1575">            <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..=64u32 {</span>
-<span class="ln" id="L1576">                <span class="tok-kw">let</span> draw = step <span class="tok-kw">as</span> f32 / <span class="tok-num">64.0</span>;</span>
-<span class="ln" id="L1577">                <span class="tok-kw">let</span> (lo, hi) = <span class="tok-fn">reseed_range_from</span>(draw, draw, frame_ms);</span>
-<span class="ln" id="L1578">                assert!(</span>
-<span class="ln" id="L1579">                    lo &lt; hi,</span>
-<span class="ln" id="L1580">                    <span class="tok-str">&quot;two draws of {draw} at a {frame_ms} ms frame gave {lo} to {hi}&quot;</span></span>
-<span class="ln" id="L1581">                );</span>
-<span class="ln" id="L1582">                assert!(lo &gt;= MIN_RESEED_MS, <span class="tok-str">&quot;{lo} is below the floor&quot;</span>);</span>
-<span class="ln" id="L1583">                assert!(hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{hi} is above the ceiling&quot;</span>);</span>
-<span class="ln" id="L1584"></span>
-<span class="ln" id="L1585">                <span class="tok-com">// And the width is a frame or more, which is the resolution the</span></span>
-<span class="ln" id="L1586">                <span class="tok-com">// engine has: anything finer collapses onto one interval and is</span></span>
-<span class="ln" id="L1587">                <span class="tok-com">// a fixed period wearing a range&#x27;s clothes.</span></span>
-<span class="ln" id="L1588">                <span class="tok-com">// A frame, or the whole of the available room where the</span></span>
-<span class="ln" id="L1589">                <span class="tok-com">// frame is longer than that: past a one second frame the span</span></span>
-<span class="ln" id="L1590">                <span class="tok-com">// is the frame, and everything is the widest honest answer.</span></span>
-<span class="ln" id="L1591">                <span class="tok-kw">let</span> frame = frame_ms.<span class="tok-fn">max</span>(MIN_RESEED_MS);</span>
-<span class="ln" id="L1592">                <span class="tok-kw">let</span> span = (<span class="tok-num">2000</span>.0f32 - frame).<span class="tok-fn">max</span>(frame);</span>
-<span class="ln" id="L1593">                <span class="tok-kw">let</span> want = frame.<span class="tok-fn">min</span>(span);</span>
-<span class="ln" id="L1594">                assert!(</span>
-<span class="ln" id="L1595">                    hi - lo &gt;= want * <span class="tok-num">0.99</span>,</span>
-<span class="ln" id="L1596">                    <span class="tok-str">&quot;{lo} to {hi} is narrower than {want} ms&quot;</span></span>
-<span class="ln" id="L1597">                );</span>
-<span class="ln" id="L1598">            }</span>
-<span class="ln" id="L1599">        }</span>
-<span class="ln" id="L1600">    }</span>
-<span class="ln" id="L1601"></span>
-<span class="ln" id="L1602">    <span class="tok-com">/// The same invariant over every pair of draws, not only equal ones.</span></span>
-<span class="ln" id="L1603">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1604">    <span class="tok-kw">fn</span> <span class="tok-fn">any_two_draws_give_a_usable_range</span>() {</span>
-<span class="ln" id="L1605">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..=16u32 {</span>
-<span class="ln" id="L1606">            <span class="tok-kw">for</span> j <span class="tok-kw">in</span> <span class="tok-num">0</span>..=16u32 {</span>
-<span class="ln" id="L1607">                <span class="tok-kw">let</span> (a, b) = (i <span class="tok-kw">as</span> f32 / <span class="tok-num">16.0</span>, j <span class="tok-kw">as</span> f32 / <span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L1608">                <span class="tok-kw">let</span> (lo, hi) = <span class="tok-fn">reseed_range_from</span>(a, b, <span class="tok-num">21.3</span>);</span>
-<span class="ln" id="L1609">                assert!(lo &lt; hi, <span class="tok-str">&quot;draws {a} and {b} gave {lo} to {hi}&quot;</span>);</span>
-<span class="ln" id="L1610">                assert!(lo &gt;= MIN_RESEED_MS &amp;&amp; hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1561">    <span class="tok-com">/// Two equal draws must not give a range of no width, which is a fixed</span></span>
+<span class="ln" id="L1562">    <span class="tok-com">/// interval wearing a range&#x27;s clothes.</span></span>
+<span class="ln" id="L1563">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1564">    <span class="tok-kw">fn</span> <span class="tok-fn">two_equal_draws_still_give_a_range_with_width_in_it</span>() {</span>
+<span class="ln" id="L1565">        <span class="tok-kw">for</span> frame_ms <span class="tok-kw">in</span> [<span class="tok-num">0</span>.05f32, <span class="tok-num">1.0</span>, <span class="tok-num">10.0</span>, <span class="tok-num">21.3</span>, <span class="tok-num">100.0</span>, <span class="tok-num">2000.0</span>, <span class="tok-num">5000.0</span>] {</span>
+<span class="ln" id="L1566">            <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..=64u32 {</span>
+<span class="ln" id="L1567">                <span class="tok-kw">let</span> draw = step <span class="tok-kw">as</span> f32 / <span class="tok-num">64.0</span>;</span>
+<span class="ln" id="L1568">                <span class="tok-kw">let</span> (lo, hi) = <span class="tok-fn">reseed_range_from</span>(draw, draw, frame_ms);</span>
+<span class="ln" id="L1569">                assert!(</span>
+<span class="ln" id="L1570">                    lo &lt; hi,</span>
+<span class="ln" id="L1571">                    <span class="tok-str">&quot;two draws of {draw} at a {frame_ms} ms frame gave {lo} to {hi}&quot;</span></span>
+<span class="ln" id="L1572">                );</span>
+<span class="ln" id="L1573">                assert!(lo &gt;= MIN_RESEED_MS, <span class="tok-str">&quot;{lo} is below the floor&quot;</span>);</span>
+<span class="ln" id="L1574">                assert!(hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{hi} is above the ceiling&quot;</span>);</span>
+<span class="ln" id="L1575"></span>
+<span class="ln" id="L1576">                <span class="tok-com">// And the width is a frame or more, which is the resolution the</span></span>
+<span class="ln" id="L1577">                <span class="tok-com">// engine has: anything finer collapses onto one interval and is</span></span>
+<span class="ln" id="L1578">                <span class="tok-com">// a fixed period wearing a range&#x27;s clothes.</span></span>
+<span class="ln" id="L1579">                <span class="tok-com">// A frame, or the whole of the available room where the</span></span>
+<span class="ln" id="L1580">                <span class="tok-com">// frame is longer than that: past a one second frame the span</span></span>
+<span class="ln" id="L1581">                <span class="tok-com">// is the frame, and everything is the widest honest answer.</span></span>
+<span class="ln" id="L1582">                <span class="tok-kw">let</span> frame = frame_ms.<span class="tok-fn">max</span>(MIN_RESEED_MS);</span>
+<span class="ln" id="L1583">                <span class="tok-kw">let</span> span = (<span class="tok-num">2000</span>.0f32 - frame).<span class="tok-fn">max</span>(frame);</span>
+<span class="ln" id="L1584">                <span class="tok-kw">let</span> want = frame.<span class="tok-fn">min</span>(span);</span>
+<span class="ln" id="L1585">                assert!(</span>
+<span class="ln" id="L1586">                    hi - lo &gt;= want * <span class="tok-num">0.99</span>,</span>
+<span class="ln" id="L1587">                    <span class="tok-str">&quot;{lo} to {hi} is narrower than {want} ms&quot;</span></span>
+<span class="ln" id="L1588">                );</span>
+<span class="ln" id="L1589">            }</span>
+<span class="ln" id="L1590">        }</span>
+<span class="ln" id="L1591">    }</span>
+<span class="ln" id="L1592"></span>
+<span class="ln" id="L1593">    <span class="tok-com">/// The same invariant over every pair of draws, not only equal ones.</span></span>
+<span class="ln" id="L1594">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1595">    <span class="tok-kw">fn</span> <span class="tok-fn">any_two_draws_give_a_usable_range</span>() {</span>
+<span class="ln" id="L1596">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..=16u32 {</span>
+<span class="ln" id="L1597">            <span class="tok-kw">for</span> j <span class="tok-kw">in</span> <span class="tok-num">0</span>..=16u32 {</span>
+<span class="ln" id="L1598">                <span class="tok-kw">let</span> (a, b) = (i <span class="tok-kw">as</span> f32 / <span class="tok-num">16.0</span>, j <span class="tok-kw">as</span> f32 / <span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L1599">                <span class="tok-kw">let</span> (lo, hi) = <span class="tok-fn">reseed_range_from</span>(a, b, <span class="tok-num">21.3</span>);</span>
+<span class="ln" id="L1600">                assert!(lo &lt; hi, <span class="tok-str">&quot;draws {a} and {b} gave {lo} to {hi}&quot;</span>);</span>
+<span class="ln" id="L1601">                assert!(lo &gt;= MIN_RESEED_MS &amp;&amp; hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1602"></span>
+<span class="ln" id="L1603">                <span class="tok-kw">let</span> config = DeidConfig {</span>
+<span class="ln" id="L1604">                    reseed_range_ms: <span class="tok-fn">Some</span>((lo, hi)),</span>
+<span class="ln" id="L1605">                    ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1606">                };</span>
+<span class="ln" id="L1607">                assert!(config.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{lo} {hi} was refused&quot;</span>);</span>
+<span class="ln" id="L1608">            }</span>
+<span class="ln" id="L1609">        }</span>
+<span class="ln" id="L1610">    }</span>
 <span class="ln" id="L1611"></span>
-<span class="ln" id="L1612">                <span class="tok-kw">let</span> config = DeidConfig {</span>
-<span class="ln" id="L1613">                    reseed_range_ms: <span class="tok-fn">Some</span>((lo, hi)),</span>
-<span class="ln" id="L1614">                    ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1615">                };</span>
-<span class="ln" id="L1616">                assert!(config.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{lo} {hi} was refused&quot;</span>);</span>
-<span class="ln" id="L1617">            }</span>
-<span class="ln" id="L1618">        }</span>
-<span class="ln" id="L1619">    }</span>
-<span class="ln" id="L1620"></span>
-<span class="ln" id="L1621">    <span class="tok-com">/// A drawn range is usable: the right way round, inside the bounds, and</span></span>
-<span class="ln" id="L1622">    <span class="tok-com">/// wide enough to survive quantisation.</span></span>
-<span class="ln" id="L1623">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1624">    <span class="tok-kw">fn</span> <span class="tok-fn">a_drawn_range_is_always_valid</span>() {</span>
-<span class="ln" id="L1625">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">64</span> {</span>
-<span class="ln" id="L1626">            <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>().<span class="tok-fn">with_random_reseed_range</span>();</span>
-<span class="ln" id="L1627">            <span class="tok-kw">let</span> (lo, hi) = config.reseed_range_ms.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
-<span class="ln" id="L1628">            assert!(lo &lt; hi, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
-<span class="ln" id="L1629">            assert!(lo &gt;= MIN_RESEED_MS, <span class="tok-str">&quot;{lo}&quot;</span>);</span>
-<span class="ln" id="L1630">            assert!(hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{hi}&quot;</span>);</span>
-<span class="ln" id="L1631">            assert!(config.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
-<span class="ln" id="L1632">        }</span>
-<span class="ln" id="L1633">    }</span>
-<span class="ln" id="L1634"></span>
-<span class="ln" id="L1635">    <span class="tok-com">/// Everything a person can type that is not a range is **refused**, and</span></span>
-<span class="ln" id="L1636">    <span class="tok-com">/// the refusal says which thing was wrong. Nothing is adjusted to fit:</span></span>
-<span class="ln" id="L1637">    <span class="tok-com">/// that is the whole of marker 28&#x27;s wording.</span></span>
-<span class="ln" id="L1638">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1639">    <span class="tok-kw">fn</span> <span class="tok-fn">bad_input_is_refused_with_a_reason_and_never_corrected</span>() {</span>
-<span class="ln" id="L1640">        <span class="tok-kw">use</span> RangeError::*;</span>
-<span class="ln" id="L1641">        <span class="tok-kw">for</span> (text, expected) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1642">            (<span class="tok-str">&quot;&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(String::<span class="tok-fn">new</span>())),</span>
-<span class="ln" id="L1643">            (<span class="tok-str">&quot;5&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(<span class="tok-str">&quot;5&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L1644">            (<span class="tok-str">&quot;abc,def&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;abc&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L1645">            (<span class="tok-str">&quot;100,zzz&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;zzz&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L1646">            (<span class="tok-str">&quot;0,100&quot;</span>, <span class="tok-fn">NotPositive</span>(<span class="tok-num">0.0</span>)),</span>
-<span class="ln" id="L1647">            (<span class="tok-str">&quot;-5,100&quot;</span>, <span class="tok-fn">NotPositive</span>(-<span class="tok-num">5.0</span>)),</span>
-<span class="ln" id="L1648">            (</span>
-<span class="ln" id="L1649">                <span class="tok-str">&quot;1800,250&quot;</span>,</span>
-<span class="ln" id="L1650">                Backwards {</span>
-<span class="ln" id="L1651">                    lo: <span class="tok-num">1800.0</span>,</span>
-<span class="ln" id="L1652">                    hi: <span class="tok-num">250.0</span>,</span>
-<span class="ln" id="L1653">                },</span>
-<span class="ln" id="L1654">            ),</span>
-<span class="ln" id="L1655">            (</span>
-<span class="ln" id="L1656">                <span class="tok-str">&quot;100,100&quot;</span>,</span>
-<span class="ln" id="L1657">                Backwards {</span>
-<span class="ln" id="L1658">                    lo: <span class="tok-num">100.0</span>,</span>
-<span class="ln" id="L1659">                    hi: <span class="tok-num">100.0</span>,</span>
-<span class="ln" id="L1660">                },</span>
-<span class="ln" id="L1661">            ),</span>
-<span class="ln" id="L1662">            (</span>
-<span class="ln" id="L1663">                <span class="tok-str">&quot;0.001,100&quot;</span>,</span>
-<span class="ln" id="L1664">                TooShort {</span>
-<span class="ln" id="L1665">                    lo: <span class="tok-num">0.001</span>,</span>
-<span class="ln" id="L1666">                    least: MIN_RESEED_MS,</span>
-<span class="ln" id="L1667">                },</span>
-<span class="ln" id="L1668">            ),</span>
-<span class="ln" id="L1669">            (</span>
-<span class="ln" id="L1670">                <span class="tok-str">&quot;100,900000&quot;</span>,</span>
-<span class="ln" id="L1671">                TooLong {</span>
-<span class="ln" id="L1672">                    hi: <span class="tok-num">900_000.0</span>,</span>
-<span class="ln" id="L1673">                    most: MAX_RESEED_MS,</span>
-<span class="ln" id="L1674">                },</span>
-<span class="ln" id="L1675">            ),</span>
-<span class="ln" id="L1676">        ] {</span>
-<span class="ln" id="L1677">            <span class="tok-kw">let</span> got =</span>
-<span class="ln" id="L1678">                <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a value that is not a range must be refused&quot;</span>);</span>
-<span class="ln" id="L1679">            assert_eq!(</span>
-<span class="ln" id="L1680">                std::mem::<span class="tok-fn">discriminant</span>(&amp;got),</span>
-<span class="ln" id="L1681">                std::mem::<span class="tok-fn">discriminant</span>(&amp;expected),</span>
-<span class="ln" id="L1682">                <span class="tok-str">&quot;{text:?} gave {got:?}&quot;</span></span>
-<span class="ln" id="L1683">            );</span>
-<span class="ln" id="L1684">            <span class="tok-com">// Every refusal has to be a sentence somebody can act on.</span></span>
-<span class="ln" id="L1685">            <span class="tok-kw">let</span> words = got.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1686">            assert!(words.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{text:?}: {words}&quot;</span>);</span>
-<span class="ln" id="L1687">        }</span>
-<span class="ln" id="L1688">    }</span>
-<span class="ln" id="L1689"></span>
-<span class="ln" id="L1690">    <span class="tok-com">/// The shapes people actually type are accepted, and accepted exactly --</span></span>
-<span class="ln" id="L1691">    <span class="tok-com">/// the numbers that come back are the numbers that went in.</span></span>
-<span class="ln" id="L1692">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1693">    <span class="tok-kw">fn</span> <span class="tok-fn">a_usable_range_survives_unchanged</span>() {</span>
-<span class="ln" id="L1694">        <span class="tok-kw">for</span> (text, want) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1695">            (<span class="tok-str">&quot;250,1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1696">            (<span class="tok-str">&quot; 250 , 1800 &quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1697">            (<span class="tok-str">&quot;250-1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1698">            (<span class="tok-str">&quot;0.5,2&quot;</span>, (<span class="tok-num">0.5</span>, <span class="tok-num">2.0</span>)),</span>
-<span class="ln" id="L1699">        ] {</span>
-<span class="ln" id="L1700">            <span class="tok-kw">let</span> got = <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{text:?}: {e}&quot;</span>));</span>
-<span class="ln" id="L1701">            assert_eq!(got, want, <span class="tok-str">&quot;{text:?}&quot;</span>);</span>
-<span class="ln" id="L1702">        }</span>
-<span class="ln" id="L1703">    }</span>
-<span class="ln" id="L1704"></span>
-<span class="ln" id="L1705">    <span class="tok-com">/// What an interface shows is what the engine will do, not what was asked</span></span>
-<span class="ln" id="L1706">    <span class="tok-com">/// for. The ratchet only fires on a frame boundary, so a range is</span></span>
-<span class="ln" id="L1707">    <span class="tok-com">/// quantised, and displaying the request would describe a spread that does</span></span>
-<span class="ln" id="L1708">    <span class="tok-com">/// not exist.</span></span>
-<span class="ln" id="L1709">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1710">    <span class="tok-kw">fn</span> <span class="tok-fn">the_effective_range_is_quantised_to_whole_frames</span>() {</span>
-<span class="ln" id="L1711">        <span class="tok-kw">let</span> config = DeidConfig {</span>
-<span class="ln" id="L1712">            reseed_range_ms: <span class="tok-fn">Some</span>((<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1713">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1714">        };</span>
-<span class="ln" id="L1715">        <span class="tok-kw">let</span> (lo, hi) = config.<span class="tok-fn">effective_reseed_range_ms</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
-<span class="ln" id="L1716">        <span class="tok-kw">let</span> frame = config.<span class="tok-fn">frame_ms</span>();</span>
-<span class="ln" id="L1717">        <span class="tok-kw">for</span> value <span class="tok-kw">in</span> [lo, hi] {</span>
-<span class="ln" id="L1718">            <span class="tok-kw">let</span> frames = value / frame;</span>
-<span class="ln" id="L1719">            assert!(</span>
-<span class="ln" id="L1720">                (frames - frames.<span class="tok-fn">round</span>()).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">3</span>,</span>
-<span class="ln" id="L1721">                <span class="tok-str">&quot;{value} ms is not a whole number of {frame} ms frames&quot;</span></span>
-<span class="ln" id="L1722">            );</span>
-<span class="ln" id="L1723">        }</span>
-<span class="ln" id="L1724">        assert!(lo &gt;= <span class="tok-num">250.0</span> - frame &amp;&amp; hi &gt;= <span class="tok-num">1800.0</span> - frame, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
-<span class="ln" id="L1725">    }</span>
-<span class="ln" id="L1726">}</span>
+<span class="ln" id="L1612">    <span class="tok-com">/// A drawn range is usable: the right way round, inside the bounds, and</span></span>
+<span class="ln" id="L1613">    <span class="tok-com">/// wide enough to survive quantisation.</span></span>
+<span class="ln" id="L1614">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1615">    <span class="tok-kw">fn</span> <span class="tok-fn">a_drawn_range_is_always_valid</span>() {</span>
+<span class="ln" id="L1616">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">64</span> {</span>
+<span class="ln" id="L1617">            <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>().<span class="tok-fn">with_random_reseed_range</span>();</span>
+<span class="ln" id="L1618">            <span class="tok-kw">let</span> (lo, hi) = config.reseed_range_ms.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
+<span class="ln" id="L1619">            assert!(lo &lt; hi, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1620">            assert!(lo &gt;= MIN_RESEED_MS, <span class="tok-str">&quot;{lo}&quot;</span>);</span>
+<span class="ln" id="L1621">            assert!(hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{hi}&quot;</span>);</span>
+<span class="ln" id="L1622">            assert!(config.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1623">        }</span>
+<span class="ln" id="L1624">    }</span>
+<span class="ln" id="L1625"></span>
+<span class="ln" id="L1626">    <span class="tok-com">/// Everything a person can type that is not a range is **refused**, and</span></span>
+<span class="ln" id="L1627">    <span class="tok-com">/// the refusal says which thing was wrong. Nothing is adjusted to fit:</span></span>
+<span class="ln" id="L1628">    <span class="tok-com">/// that is the whole of marker 28&#x27;s wording.</span></span>
+<span class="ln" id="L1629">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1630">    <span class="tok-kw">fn</span> <span class="tok-fn">bad_input_is_refused_with_a_reason_and_never_corrected</span>() {</span>
+<span class="ln" id="L1631">        <span class="tok-kw">use</span> RangeError::*;</span>
+<span class="ln" id="L1632">        <span class="tok-kw">for</span> (text, expected) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1633">            (<span class="tok-str">&quot;&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(String::<span class="tok-fn">new</span>())),</span>
+<span class="ln" id="L1634">            (<span class="tok-str">&quot;5&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(<span class="tok-str">&quot;5&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L1635">            (<span class="tok-str">&quot;abc,def&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;abc&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L1636">            (<span class="tok-str">&quot;100,zzz&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;zzz&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L1637">            (<span class="tok-str">&quot;0,100&quot;</span>, <span class="tok-fn">NotPositive</span>(<span class="tok-num">0.0</span>)),</span>
+<span class="ln" id="L1638">            (<span class="tok-str">&quot;-5,100&quot;</span>, <span class="tok-fn">NotPositive</span>(-<span class="tok-num">5.0</span>)),</span>
+<span class="ln" id="L1639">            (</span>
+<span class="ln" id="L1640">                <span class="tok-str">&quot;1800,250&quot;</span>,</span>
+<span class="ln" id="L1641">                Backwards {</span>
+<span class="ln" id="L1642">                    lo: <span class="tok-num">1800.0</span>,</span>
+<span class="ln" id="L1643">                    hi: <span class="tok-num">250.0</span>,</span>
+<span class="ln" id="L1644">                },</span>
+<span class="ln" id="L1645">            ),</span>
+<span class="ln" id="L1646">            (</span>
+<span class="ln" id="L1647">                <span class="tok-str">&quot;100,100&quot;</span>,</span>
+<span class="ln" id="L1648">                Backwards {</span>
+<span class="ln" id="L1649">                    lo: <span class="tok-num">100.0</span>,</span>
+<span class="ln" id="L1650">                    hi: <span class="tok-num">100.0</span>,</span>
+<span class="ln" id="L1651">                },</span>
+<span class="ln" id="L1652">            ),</span>
+<span class="ln" id="L1653">            (</span>
+<span class="ln" id="L1654">                <span class="tok-str">&quot;0.001,100&quot;</span>,</span>
+<span class="ln" id="L1655">                TooShort {</span>
+<span class="ln" id="L1656">                    lo: <span class="tok-num">0.001</span>,</span>
+<span class="ln" id="L1657">                    least: MIN_RESEED_MS,</span>
+<span class="ln" id="L1658">                },</span>
+<span class="ln" id="L1659">            ),</span>
+<span class="ln" id="L1660">            (</span>
+<span class="ln" id="L1661">                <span class="tok-str">&quot;100,900000&quot;</span>,</span>
+<span class="ln" id="L1662">                TooLong {</span>
+<span class="ln" id="L1663">                    hi: <span class="tok-num">900_000.0</span>,</span>
+<span class="ln" id="L1664">                    most: MAX_RESEED_MS,</span>
+<span class="ln" id="L1665">                },</span>
+<span class="ln" id="L1666">            ),</span>
+<span class="ln" id="L1667">        ] {</span>
+<span class="ln" id="L1668">            <span class="tok-kw">let</span> got =</span>
+<span class="ln" id="L1669">                <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a value that is not a range must be refused&quot;</span>);</span>
+<span class="ln" id="L1670">            assert_eq!(</span>
+<span class="ln" id="L1671">                std::mem::<span class="tok-fn">discriminant</span>(&amp;got),</span>
+<span class="ln" id="L1672">                std::mem::<span class="tok-fn">discriminant</span>(&amp;expected),</span>
+<span class="ln" id="L1673">                <span class="tok-str">&quot;{text:?} gave {got:?}&quot;</span></span>
+<span class="ln" id="L1674">            );</span>
+<span class="ln" id="L1675">            <span class="tok-com">// Every refusal has to be a sentence somebody can act on.</span></span>
+<span class="ln" id="L1676">            <span class="tok-kw">let</span> words = got.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1677">            assert!(words.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{text:?}: {words}&quot;</span>);</span>
+<span class="ln" id="L1678">        }</span>
+<span class="ln" id="L1679">    }</span>
+<span class="ln" id="L1680"></span>
+<span class="ln" id="L1681">    <span class="tok-com">/// The shapes people actually type are accepted, and accepted exactly --</span></span>
+<span class="ln" id="L1682">    <span class="tok-com">/// the numbers that come back are the numbers that went in.</span></span>
+<span class="ln" id="L1683">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1684">    <span class="tok-kw">fn</span> <span class="tok-fn">a_usable_range_survives_unchanged</span>() {</span>
+<span class="ln" id="L1685">        <span class="tok-kw">for</span> (text, want) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1686">            (<span class="tok-str">&quot;250,1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1687">            (<span class="tok-str">&quot; 250 , 1800 &quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1688">            (<span class="tok-str">&quot;250-1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1689">            (<span class="tok-str">&quot;0.5,2&quot;</span>, (<span class="tok-num">0.5</span>, <span class="tok-num">2.0</span>)),</span>
+<span class="ln" id="L1690">        ] {</span>
+<span class="ln" id="L1691">            <span class="tok-kw">let</span> got = <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{text:?}: {e}&quot;</span>));</span>
+<span class="ln" id="L1692">            assert_eq!(got, want, <span class="tok-str">&quot;{text:?}&quot;</span>);</span>
+<span class="ln" id="L1693">        }</span>
+<span class="ln" id="L1694">    }</span>
+<span class="ln" id="L1695"></span>
+<span class="ln" id="L1696">    <span class="tok-com">/// What an interface shows is what the engine will do, not what was asked</span></span>
+<span class="ln" id="L1697">    <span class="tok-com">/// for. The ratchet only fires on a frame boundary, so a range is</span></span>
+<span class="ln" id="L1698">    <span class="tok-com">/// quantised, and displaying the request would describe a spread that does</span></span>
+<span class="ln" id="L1699">    <span class="tok-com">/// not exist.</span></span>
+<span class="ln" id="L1700">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1701">    <span class="tok-kw">fn</span> <span class="tok-fn">the_effective_range_is_quantised_to_whole_frames</span>() {</span>
+<span class="ln" id="L1702">        <span class="tok-kw">let</span> config = DeidConfig {</span>
+<span class="ln" id="L1703">            reseed_range_ms: <span class="tok-fn">Some</span>((<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1704">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1705">        };</span>
+<span class="ln" id="L1706">        <span class="tok-kw">let</span> (lo, hi) = config.<span class="tok-fn">effective_reseed_range_ms</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
+<span class="ln" id="L1707">        <span class="tok-kw">let</span> frame = config.<span class="tok-fn">frame_ms</span>();</span>
+<span class="ln" id="L1708">        <span class="tok-kw">for</span> value <span class="tok-kw">in</span> [lo, hi] {</span>
+<span class="ln" id="L1709">            <span class="tok-kw">let</span> frames = value / frame;</span>
+<span class="ln" id="L1710">            assert!(</span>
+<span class="ln" id="L1711">                (frames - frames.<span class="tok-fn">round</span>()).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">3</span>,</span>
+<span class="ln" id="L1712">                <span class="tok-str">&quot;{value} ms is not a whole number of {frame} ms frames&quot;</span></span>
+<span class="ln" id="L1713">            );</span>
+<span class="ln" id="L1714">        }</span>
+<span class="ln" id="L1715">        assert!(lo &gt;= <span class="tok-num">250.0</span> - frame &amp;&amp; hi &gt;= <span class="tok-num">1800.0</span> - frame, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1716">    }</span>
+<span class="ln" id="L1717">}</span>
 </span>
 </code></pre>
 </main>

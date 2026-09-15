@@ -9,7 +9,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Releases &middot; VeilVoice</title>
 <meta name="description" content="Every version of VeilVoice, what changed in it, and where to get it.">
-<meta name="google-site-verification" content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
 <meta property="og:title" content="VeilVoice: irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
@@ -211,12 +210,6 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>So every machine that is not Windows had a second complete copy of the build sitting in the source tree, rebuilt from scratch each time the numbers were regenerated. Nothing reported it: the rule that hides build output from version control hides it at any depth, which is correct and also means this never appeared in any status, any diff, or any clean.</li>
 <li>It was found because something else broke. A long test run ran out of disk, several steps removed from the cause.</li>
 <li>The build now goes where builds go, and a check fails if build output ever appears anywhere in the repository except the one place at the root. It names the folder and how large it has grown.</li>
-</ul>
-<p><strong>The site proves it is ours on every page, not most of them</strong></p>
-<ul>
-<li>Search Console confirms who owns a site by fetching a page and looking for one tag. The tag was on nine pages and missing from five, and missing from every page of the generated reference: the error pages, the search page, the wiki page and both halves of the script-free site had none.</li>
-<li>Which page a crawler fetches is not something this project chooses, so all 397 pages carry it now, written by the generators rather than by hand.</li>
-<li>A check fails the build if any page loses it, or if two pages ever name different tokens.</li>
 </ul>
 <p><strong>The undefined-behaviour checker can now look at the cryptography</strong></p>
 <ul>

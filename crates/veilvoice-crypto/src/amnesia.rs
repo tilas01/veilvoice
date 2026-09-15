@@ -255,15 +255,8 @@ impl std::fmt::Debug for Secret {
 mod tests {
     use super::*;
 
-    /// The page lock is taken in one place, so the interpreter can be told
-    /// about it in one place.
-    ///
-    /// `lock_pages` and `unlock_pages` exist so that a Miri run does not stop
-    /// at the first `Secret` a test builds. That only holds while they are the
-    /// only callers: a second `region::lock` written straight into a
-    /// constructor would be invisible until somebody ran Miri again and found
-    /// the whole crate unexaminable for the second time. This reads the file
-    /// and fails naming the line, rather than leaving it to be rediscovered.
+    /// The page lock goes through `lock_pages`, so the interpreter can be told
+    /// about it once. A direct call elsewhere leaves this crate unexaminable.
     #[test]
     fn the_page_lock_is_taken_in_exactly_one_place() {
         let source = include_str!("amnesia.rs").replace("\r\n", "\n");
@@ -298,12 +291,7 @@ mod tests {
         }
     }
 
-    /// A secret is correct whether or not its pages were locked.
-    ///
-    /// Locking is best effort everywhere: a machine with no budget, a platform
-    /// without the call, an allocation that will not align, and now an
-    /// interpreter that cannot make the call all take the same path. None of
-    /// them may change what the type stores or hands back.
+    /// A secret holds and wipes the same bytes whether or not the pages locked.
     #[test]
     fn locking_or_not_changes_nothing_about_what_is_stored() {
         let mut bytes = [7u8; 64];
