@@ -1259,6 +1259,88 @@ mod tests {
         );
     }
 
+    /// A header too short to say what it is, at exactly the boundary.
+    ///
+    /// `parse` needs nine bytes before it can read the magic and the version,
+    /// and refuses `bytes.len() < 9`. Mutation testing made that `<= 9`, which
+    /// rejects a nine-byte buffer as truncated instead of reading its version.
+    /// The suite tested shorter and much longer and never nine.
+    #[test]
+    fn nine_bytes_is_enough_to_reach_the_version_and_eight_is_not() {
+        let mut nine = Vec::from(MAGIC);
+        nine.push(99); // a version this build does not know
+
+        assert!(
+            matches!(AppLock::parse(&nine), Err(Error::UnsupportedVersion(99))),
+            "nine bytes is enough to read the version and report it"
+        );
+        assert!(
+            matches!(AppLock::parse(&nine[..8]), Err(Error::Truncated)),
+            "eight is not"
+        );
+    }
+
+    /// A legacy lock file that cannot be read is an error, not an absent lock.
+    ///
+    /// `read_legacy` matches specifically on `NotFound`; mutation testing
+    /// replaced that guard with `true`, so any failure to read the old file
+    /// meant "there is no old lock here". Somebody upgrading from a version
+    /// that used it would be told they have no lock at all.
+    #[test]
+    fn a_legacy_lock_that_cannot_be_read_is_not_reported_as_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(LEGACY_NAME)).unwrap();
+        assert!(
+            open_in(dir.path()).is_err(),
+            "a directory where the old lock file should be is not an absent lock"
+        );
+    }
+
+    /// Where this platform would keep the lock if nothing portable were set up.
+    ///
+    /// `platform_dir` could answer `None` or the empty path and nothing
+    /// objected. It is not the same question as `default_dir`, which prefers a
+    /// portable folder when one exists, so a test of that one does not reach
+    /// this one.
+    #[test]
+    fn the_platform_directory_is_a_real_path() {
+        let dir = platform_dir().expect("this platform has a configuration directory");
+        assert!(!dir.as_os_str().is_empty(), "and it is not the empty path");
+        assert!(
+            dir.is_absolute(),
+            "a configuration directory is an absolute path: {dir:?}"
+        );
+    }
+
+    /// A save puts its directory back if it has been removed underneath.
+    ///
+    /// `save` creates the parent when the parent is not empty, and deleting
+    /// that `!` inverts it. Every test wrote into a directory that already
+    /// existed, so the creation never had to happen. The case that reaches it
+    /// is the folder being deleted between one write and the next, which is
+    /// what somebody tidying up looks like. The same mutant and the same
+    /// reasoning appear in `crate::vault::write_one`.
+    #[test]
+    fn a_save_recreates_its_directory_if_it_is_removed_underneath() {
+        let dir = tempfile::tempdir().unwrap();
+        let base = dir.path().join("state");
+        let path = base.join("lock");
+        let mut store = LockStore::create(&path, b"pw", weak()).unwrap();
+
+        std::fs::remove_dir_all(&base).unwrap();
+        assert!(
+            !base.exists(),
+            "the directory is gone before the next write"
+        );
+
+        // An unlock persists the attempt count, which is a save.
+        store.unlock(b"pw").unwrap();
+        assert!(path.exists(), "the save must put the file back");
+
+        let reopened = LockStore::open(&path).unwrap().expect("and it reads back");
+        assert!(reopened.tampered() == store.tampered());
+    }
+
     /// A lock path that cannot be read is an error, not an absent lock.
     ///
     /// Both readers match specifically on `NotFound` and treat everything else
