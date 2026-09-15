@@ -7,7 +7,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-meta/src/wav.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Chunk-level RIFF/WAVE metadata removal.">
-<meta name="google-site-verification" content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -48,7 +47,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/wav.svg" alt="wav.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/src/wav.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 438 lines &middot; <a href="wav.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 425 lines &middot; <a href="wav.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-wav-gets-its-own-path">Why WAV gets its own path</a>
@@ -73,7 +72,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>438 lines defining <strong>4 functions</strong> (2 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>425 lines defining <strong>4 functions</strong> (2 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>clean_wav_bytes</code> <span style="color:var(--muted)">line 59</span> &middot; Rewrite a WAV, keeping only the chunks needed to decode it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>info_chunk</code>, <code>is_wav</code>, <code>show</code></span>

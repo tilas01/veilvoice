@@ -207,17 +207,10 @@ mod tests {
         bytes.windows(needle.len()).any(|w| w == needle)
     }
 
-    /// The bland metadata this writes is itself a well-formed RIFF list.
+    /// The bland tags written in are themselves a well-formed RIFF list.
     ///
-    /// Stripping metadata is a signal. This tool substitutes plausible bland
-    /// tags instead, which only works if what it writes looks like what any
-    /// other tool would write: INFO sub-chunks are word aligned, and a reader
-    /// that walks them by declared length has to land exactly on the end.
-    ///
-    /// Three mutants lived in the one line that does that alignment, turning
-    /// the padding off, inverting it, or applying it to two lengths out of
-    /// every however many. Nothing objected, because nothing had ever read
-    /// back what this function writes.
+    /// Stripping metadata is a signal, so plausible tags go in instead; that
+    /// only works if a reader walking them by declared length lands on the end.
     #[test]
     fn the_bland_metadata_written_in_is_word_aligned_and_walkable() {
         let whole = info_chunk();
@@ -262,14 +255,8 @@ mod tests {
         );
     }
 
-    /// A kept chunk with an odd length and nothing after it.
-    ///
-    /// The walker copies the pad byte that follows an odd-sized chunk, and
-    /// checks there is one before reaching for it. Mutation testing moved that
-    /// `<` to a `<=`, which reaches one byte past the end of the region the
-    /// walker is allowed to read. Every existing test built its chunks with
-    /// the helper above, which always pads, so no odd-sized chunk ever ended
-    /// the file and the guard was never the thing that stopped anything.
+    /// An odd-sized last chunk with no pad byte after it, which is what a
+    /// truncated recording looks like.
     #[test]
     fn an_odd_chunk_at_the_very_end_is_not_read_past() {
         // `data` with three bytes and no pad byte after it: technically

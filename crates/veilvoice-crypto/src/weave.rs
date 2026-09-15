@@ -1077,35 +1077,8 @@ mod tests {
         cases
     }
 
-    /// The bytes each encoding actually produces, not merely that it can be
-    /// undone.
-    ///
-    /// **Why round-tripping was not enough.** `every_encoding_round_trips_every_input`
-    /// checks that `undo(apply(x)) == x`, and that was the only structural test
-    /// these encodings had. It cannot see a change to `apply` that `undo` still
-    /// reverses, and mutation testing found forty-four of those: run lengths
-    /// counted to a different limit, literal runs broken at a different place,
-    /// comparisons moved by one, and several `|` turned into `^` inside the
-    /// base conversions. Every one produced a different encoded form, every one
-    /// still decoded back to the input, and the suite accepted all of them.
-    ///
-    /// A round trip tests the pair. This tests the encoder, by naming what it
-    /// emits for one fixed input, so a change to the encoded form has to be
-    /// made deliberately and shows up as a diff of these lines.
-    ///
-    /// The vectors were taken from the code as it stood when this test was
-    /// written, which makes them a record of the format rather than a proof it
-    /// is the right format. That is what a golden vector is, and it is the
-    /// reason each is paired with the round trip above rather than trusted on
-    /// its own.
-    /// A chosen encoding is never a no-op.
-    ///
-    /// All three choosers force the rotation amount odd with `| 1`, because
-    /// `Rotate(0)` is the identity and an obfuscation layer that comes out as
-    /// the identity is not a layer. Mutation testing turned each of those into
-    /// `& 1` and `^ 1`, six changes in all, and nothing objected: every test
-    /// asked whether the result round trips, and the identity round trips
-    /// perfectly.
+    /// All three choosers force the rotation odd, because Rotate(0) is the
+    /// identity and a no-op is not an obfuscation layer.
     #[test]
     fn a_chosen_rotation_is_never_the_identity() {
         // `for_name` is deterministic in its seed, so every seed byte it can be
@@ -1169,11 +1142,11 @@ mod tests {
         );
     }
 
-    /// `preserves_length` answers no for an encoding that does not.
+    /// The claim each encoding makes about its length, against what it does.
     ///
-    /// It could be replaced with `true` and nothing objected: every caller in
-    /// the tests asked it about encodings that do preserve length, so the
-    /// false half of the answer was never read.
+    /// Asymmetric on purpose: preserving length is a promise about every input
+    /// and one counterexample refutes it, while not preserving it only means
+    /// some input changes.
     #[test]
     fn preserves_length_is_not_simply_true() {
         assert!(Weave::None.preserves_length());
@@ -1227,11 +1200,8 @@ mod tests {
 
     /// An escape with nothing after it is refused rather than read past.
     ///
-    /// The quoted-printable and percent decoders check `i + 1 >= input.len()`
-    /// before reading the two characters an escape needs. Mutation testing
-    /// turned that `+` into `*`, which makes the test `i >= input.len()` and
-    /// therefore always false inside a loop that runs while `i < len`: the
-    /// guard stops guarding and the read runs off the end of the escape.
+    /// Quoted-printable and percent take two hex digits after the marker; yEnc
+    /// takes one byte, so what is truncated for them is complete for it.
     #[test]
     fn a_truncated_escape_is_refused() {
         // The marker and the truncated cases are named per encoding rather
@@ -1264,43 +1234,11 @@ mod tests {
         }
     }
 
-    /// A digest over what each encoding emits for every length from nothing to
-    /// sixty-four bytes.
+    /// The decoder, on input built from its alphabet rather than from the encoder.
     ///
-    /// **Why one fixed input was not enough.** The vectors below this pin each
-    /// encoder against a single twenty-two byte sample, and that killed
-    /// twenty-seven of the forty-four survivors in this file. It could not kill
-    /// the rest, because base-91 and the six-bit encodings carry state across
-    /// bytes and change behaviour at bit boundaries the sample never reaches:
-    /// base-91 packs thirteen or fourteen bits depending on the value, so
-    /// whether its bit counter lands on exactly thirteen depends on how many
-    /// bytes have gone in. Moving a `>` to a `>=` there alters the encoded form
-    /// only at lengths the one sample does not have.
-    ///
-    /// Sixty-five lengths of a fixed pattern reach those boundaries. The
-    /// outputs are compared as one digest per encoding rather than as
-    /// sixty-five vectors each, because two thousand committed hex strings is
-    /// not a thing anybody reads; the failure names the encoding, and
-    /// `emit_length_digests` below prints fresh values when a change is
-    /// deliberate.
-    /// The decoder pinned on input the encoder would never produce.
-    ///
-    /// **Why the other two tests cannot reach this.** The digest test calls
-    /// `apply` and never `undo`, so it says nothing about a decoder. The round
-    /// trip calls both, and is blind to any change that the pair still agrees
-    /// on: base-91's decoder has its own copy of the thirteen-or-fourteen-bit
-    /// decision, and moving its `>` to a `>=` still round trips everything the
-    /// encoder can emit.
-    ///
-    /// That is not enough to call it equivalent, because `undo` is not only fed
-    /// `apply`'s output. It is fed bytes read back from disk, which somebody
-    /// who can write that file chooses. So the decoder is pinned here on input
-    /// built from its own alphabet rather than from the encoder.
-    ///
-    /// `}A` is digit 88 followed by digit 0, which is the value 88 exactly:
-    /// the one number on either side of that comparison. The expected bytes
-    /// were computed from the algorithm as written, the same way the vectors
-    /// above were.
+    /// A round trip is blind to any change the pair still agrees on, and `undo`
+    /// is fed bytes read back from disk, not only what `apply` wrote. `}A` is
+    /// digit 88 then 0, which is the value either side of its bit-width test.
     #[test]
     fn the_base91_decoder_is_pinned_on_input_of_its_own() {
         for (encoded, want) in [

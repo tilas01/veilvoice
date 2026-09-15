@@ -7,7 +7,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>veilvoice-meta &#183; VeilVoice reference</title>
 <meta name="description" content="Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.">
-<meta name="google-site-verification" content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">
 <link rel="icon" href="../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../index.html">
 <link rel="prefetch" href="../wiki.html">
@@ -108,7 +107,7 @@
 <a href="veilvoice-meta/wav.src.html">
 <rect x="146.5" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="196.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav.rs</text>
-<text x="196.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">438 lines</text>
+<text x="196.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">425 lines</text>
 </a>
 <text x="20.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">Every arrow is a crate:: or super:: path one module</text>
 <text x="20.0" y="228.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">actually uses, read out of the source rather than</text>
@@ -122,7 +121,7 @@ flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;121 lines&quot;])
     n_audio[&quot;audio.rs&lt;br/&gt;278 lines&quot;]
     n_image[&quot;image.rs&lt;br/&gt;210 lines&quot;]
-    n_wav[&quot;wav.rs&lt;br/&gt;438 lines&quot;]
+    n_wav[&quot;wav.rs&lt;br/&gt;425 lines&quot;]
     n_audio --&gt; n_wav
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs&quot; &quot;open the source&quot;
     click n_audio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs&quot; &quot;open the source&quot;
@@ -137,7 +136,7 @@ flowchart TD
 <tr><td><a href="veilvoice-meta/audio.html"><code>audio.rs</code></a></td><td>278</td><td>Audio tag removal and replacement.</td></tr>
 <tr><td><a href="veilvoice-meta/image.html"><code>image.rs</code></a></td><td>210</td><td>Image EXIF/GPS removal.</td></tr>
 <tr><td><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a></td><td>121</td><td>Strip or spoof the identifying metadata that rides along with media files.</td></tr>
-<tr><td><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a></td><td>438</td><td>Chunk-level RIFF/WAVE metadata removal.</td></tr>
+<tr><td><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a></td><td>425</td><td>Chunk-level RIFF/WAVE metadata removal.</td></tr>
 <tr><td><a href="veilvoice-meta/tests-wav_fuzz.html"><code>wav_fuzz.rs</code></a></td><td>299</td><td>Randomised robustness testing for the RIFF chunk walker.</td></tr>
 </tbody></table>
 </section>

@@ -1558,17 +1558,8 @@ mod reseed_range_tests {
         assert!(seen.len() > 1, "eight draws produced one range: {seen:?}");
     }
 
-    /// Two equal draws must not give a range of no width.
-    ///
-    /// This is the case `a_drawn_range_is_always_valid` found by accident. Each
-    /// draw is sixteen bits, so a collision is one launch in 65,536, and
-    /// sixty-four draws a run makes it about one run in a thousand: it failed
-    /// once in a verification run after eleven clean ones, and two hundred
-    /// repeats of the test afterwards did not reproduce it.
-    ///
-    /// Waiting for a one in 65,536 event is not a test. The arithmetic is now
-    /// a function of the two draws, so the collision can simply be handed to
-    /// it, at every value it can take.
+    /// Two equal draws must not give a range of no width, which is a fixed
+    /// interval wearing a range's clothes.
     #[test]
     fn two_equal_draws_still_give_a_range_with_width_in_it() {
         for frame_ms in [0.05f32, 1.0, 10.0, 21.3, 100.0, 2000.0, 5000.0] {

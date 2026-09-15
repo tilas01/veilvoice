@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/weave.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1761 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1699 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs)
 
 ## Contents
 
@@ -97,7 +97,7 @@ dump, a swap file -- what escapes does not read as anything.
 
 ## What this file contains
 
-1761 lines defining **21 functions** (10 public), **1 type** and **18 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1699 lines defining **21 functions** (10 public), **1 type** and **18 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

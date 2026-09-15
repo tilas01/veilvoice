@@ -7,7 +7,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-crypto/src/amnesia.rs source &#183; VeilVoice reference</title>
 <meta name="description" content="The source of crates/veilvoice-crypto/src/amnesia.rs, on this site.">
-<meta name="google-site-verification" content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -47,7 +46,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/amnesia.rs</code></h1>
-<p style="color:var(--muted)"><a href="amnesia.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 440 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="amnesia.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 428 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -339,189 +338,177 @@
 <span class="ln" id="L255"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L256">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L257"></span>
-<span class="ln" id="L258">    <span class="tok-com">/// The page lock is taken in one place, so the interpreter can be told</span></span>
-<span class="ln" id="L259">    <span class="tok-com">/// about it in one place.</span></span>
-<span class="ln" id="L260">    <span class="tok-com">///</span></span>
-<span class="ln" id="L261">    <span class="tok-com">/// `lock_pages` and `unlock_pages` exist so that a Miri run does not stop</span></span>
-<span class="ln" id="L262">    <span class="tok-com">/// at the first `Secret` a test builds. That only holds while they are the</span></span>
-<span class="ln" id="L263">    <span class="tok-com">/// only callers: a second `region::lock` written straight into a</span></span>
-<span class="ln" id="L264">    <span class="tok-com">/// constructor would be invisible until somebody ran Miri again and found</span></span>
-<span class="ln" id="L265">    <span class="tok-com">/// the whole crate unexaminable for the second time. This reads the file</span></span>
-<span class="ln" id="L266">    <span class="tok-com">/// and fails naming the line, rather than leaving it to be rediscovered.</span></span>
-<span class="ln" id="L267">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L268">    <span class="tok-kw">fn</span> <span class="tok-fn">the_page_lock_is_taken_in_exactly_one_place</span>() {</span>
-<span class="ln" id="L269">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;amnesia.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L270">        <span class="tok-com">// Assembled at run time from halves. Written out whole, the needles</span></span>
-<span class="ln" id="L271">        <span class="tok-com">// would occur in this test&#x27;s own body and it would report itself, which</span></span>
-<span class="ln" id="L272">        <span class="tok-com">// it did on the first run.</span></span>
-<span class="ln" id="L273">        <span class="tok-kw">let</span> taking = [<span class="tok-str">&quot;region&quot;</span>, <span class="tok-str">&quot;::lock(&quot;</span>].<span class="tok-fn">concat</span>();</span>
-<span class="ln" id="L274">        <span class="tok-kw">let</span> releasing = [<span class="tok-str">&quot;region&quot;</span>, <span class="tok-str">&quot;::unlock(&quot;</span>].<span class="tok-fn">concat</span>();</span>
-<span class="ln" id="L275">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> source.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L276">            <span class="tok-kw">let</span> code = line.<span class="tok-fn">split</span>(<span class="tok-str">&quot;//&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L277">            <span class="tok-kw">if</span> !code.<span class="tok-fn">contains</span>(&amp;taking) &amp;&amp; !code.<span class="tok-fn">contains</span>(&amp;releasing) {</span>
-<span class="ln" id="L278">                continue;</span>
-<span class="ln" id="L279">            }</span>
-<span class="ln" id="L280">            <span class="tok-kw">let</span> before = source</span>
-<span class="ln" id="L281">                .<span class="tok-fn">split</span>(<span class="tok-str">&#x27;\n&#x27;</span>)</span>
-<span class="ln" id="L282">                .<span class="tok-fn">take</span>(number)</span>
-<span class="ln" id="L283">                .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L284">                .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L285">            <span class="tok-kw">let</span> holder = before</span>
-<span class="ln" id="L286">                .<span class="tok-fn">rsplit</span>(<span class="tok-str">&quot;fn &quot;</span>)</span>
-<span class="ln" id="L287">                .<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L288">                .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L289">                .<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L290">            assert!(</span>
-<span class="ln" id="L291">                holder == <span class="tok-str">&quot;lock_pages&quot;</span> || holder == <span class="tok-str">&quot;unlock_pages&quot;</span>,</span>
-<span class="ln" id="L292">                <span class="tok-str">&quot;amnesia.rs:{}: region::lock or region::unlock is called from \</span></span>
-<span class="ln" id="L293"><span class="tok-str">                 `{holder}` rather than from lock_pages or unlock_pages. Route \</span></span>
-<span class="ln" id="L294"><span class="tok-str">                 it through those, or Miri stops at the first Secret built and \</span></span>
-<span class="ln" id="L295"><span class="tok-str">                 this crate cannot be checked for undefined behaviour at all.&quot;</span>,</span>
-<span class="ln" id="L296">                number + <span class="tok-num">1</span></span>
-<span class="ln" id="L297">            );</span>
-<span class="ln" id="L298">        }</span>
-<span class="ln" id="L299">    }</span>
-<span class="ln" id="L300"></span>
-<span class="ln" id="L301">    <span class="tok-com">/// A secret is correct whether or not its pages were locked.</span></span>
-<span class="ln" id="L302">    <span class="tok-com">///</span></span>
-<span class="ln" id="L303">    <span class="tok-com">/// Locking is best effort everywhere: a machine with no budget, a platform</span></span>
-<span class="ln" id="L304">    <span class="tok-com">/// without the call, an allocation that will not align, and now an</span></span>
-<span class="ln" id="L305">    <span class="tok-com">/// interpreter that cannot make the call all take the same path. None of</span></span>
-<span class="ln" id="L306">    <span class="tok-com">/// them may change what the type stores or hands back.</span></span>
-<span class="ln" id="L307">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L308">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_or_not_changes_nothing_about_what_is_stored</span>() {</span>
-<span class="ln" id="L309">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = [7u8; <span class="tok-num">64</span>];</span>
-<span class="ln" id="L310">        <span class="tok-kw">let</span> secret = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> bytes);</span>
-<span class="ln" id="L311">        assert_eq!(bytes, [0u8; <span class="tok-num">64</span>], <span class="tok-str">&quot;the caller&#x27;s copy was not wiped&quot;</span>);</span>
-<span class="ln" id="L312">        assert_eq!(secret.<span class="tok-fn">expose</span>(), &amp;[7u8; <span class="tok-num">64</span>]);</span>
-<span class="ln" id="L313">        assert_eq!(secret.<span class="tok-fn">expose</span>().<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
-<span class="ln" id="L314">        <span class="tok-com">// The one thing that legitimately differs, asserted as a fact about the</span></span>
-<span class="ln" id="L315">        <span class="tok-com">// build rather than about the machine, so that a locked run and an</span></span>
-<span class="ln" id="L316">        <span class="tok-com">// unlocked one both pass and neither claims the other&#x27;s answer.</span></span>
-<span class="ln" id="L317">        <span class="tok-kw">if</span> cfg!(miri) {</span>
-<span class="ln" id="L318">            assert!(</span>
-<span class="ln" id="L319">                !secret.<span class="tok-fn">is_locked</span>(),</span>
-<span class="ln" id="L320">                <span class="tok-str">&quot;Miri cannot lock and must not say it did&quot;</span></span>
-<span class="ln" id="L321">            );</span>
-<span class="ln" id="L322">        }</span>
-<span class="ln" id="L323">    }</span>
-<span class="ln" id="L324"></span>
-<span class="ln" id="L325">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L326">    <span class="tok-kw">fn</span> <span class="tok-fn">new_wipes_the_callers_copy</span>() {</span>
-<span class="ln" id="L327">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> input = [7u8; <span class="tok-num">32</span>];</span>
-<span class="ln" id="L328">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> input);</span>
-<span class="ln" id="L329">        assert_eq!(s.<span class="tok-fn">expose</span>(), &amp;[7u8; <span class="tok-num">32</span>]);</span>
-<span class="ln" id="L330">        assert_eq!(input, [0u8; <span class="tok-num">32</span>], <span class="tok-str">&quot;source buffer must be wiped&quot;</span>);</span>
-<span class="ln" id="L331">    }</span>
-<span class="ln" id="L332"></span>
-<span class="ln" id="L333">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L334">    <span class="tok-kw">fn</span> <span class="tok-fn">random_is_not_all_zeroes_and_differs_each_time</span>() {</span>
-<span class="ln" id="L335">        <span class="tok-kw">let</span> a = Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L336">        <span class="tok-kw">let</span> b = Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L337">        assert_ne!(a.<span class="tok-fn">expose</span>(), &amp;[0u8; <span class="tok-num">32</span>]);</span>
-<span class="ln" id="L338">        assert_ne!(a, b, <span class="tok-str">&quot;two draws should not collide&quot;</span>);</span>
-<span class="ln" id="L339">    }</span>
-<span class="ln" id="L340"></span>
-<span class="ln" id="L341">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L342">    <span class="tok-kw">fn</span> <span class="tok-fn">equality_is_value_based</span>() {</span>
-<span class="ln" id="L343">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> x = [1u8; <span class="tok-num">16</span>];</span>
-<span class="ln" id="L344">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> y = [1u8; <span class="tok-num">16</span>];</span>
-<span class="ln" id="L345">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> z = [2u8; <span class="tok-num">16</span>];</span>
-<span class="ln" id="L346">        assert_eq!(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> x), Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> y));</span>
-<span class="ln" id="L347">        assert_ne!(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> z), Secret::<span class="tok-fn">random</span>(<span class="tok-num">16</span>).<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L348">    }</span>
-<span class="ln" id="L349"></span>
-<span class="ln" id="L350">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">debug_never_reveals_contents</span>() {</span>
-<span class="ln" id="L352">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = [0xABu8; <span class="tok-num">8</span>];</span>
-<span class="ln" id="L353">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> bytes);</span>
-<span class="ln" id="L354">        <span class="tok-kw">let</span> shown = format!(<span class="tok-str">&quot;{s:?}&quot;</span>);</span>
-<span class="ln" id="L355">        assert!(shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>), <span class="tok-str">&quot;{shown}&quot;</span>);</span>
-<span class="ln" id="L356">        assert!(!shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ab&quot;</span>) &amp;&amp; !shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;AB&quot;</span>), <span class="tok-str">&quot;{shown}&quot;</span>);</span>
-<span class="ln" id="L357">    }</span>
-<span class="ln" id="L358"></span>
-<span class="ln" id="L359">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L360">    <span class="tok-kw">fn</span> <span class="tok-fn">wipe_clears_in_place</span>() {</span>
-<span class="ln" id="L361">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Secret::<span class="tok-fn">random</span>(<span class="tok-num">64</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L362">        s.<span class="tok-fn">wipe</span>();</span>
-<span class="ln" id="L363">        <span class="tok-com">// Length must survive the wipe, or the &quot;all zero&quot; check below would</span></span>
-<span class="ln" id="L364">        <span class="tok-com">// pass vacuously on an empty slice.</span></span>
-<span class="ln" id="L365">        assert_eq!(s.<span class="tok-fn">len</span>(), <span class="tok-num">64</span>, <span class="tok-str">&quot;wipe must not shrink the secret&quot;</span>);</span>
-<span class="ln" id="L366">        assert_eq!(s.<span class="tok-fn">expose</span>().<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
-<span class="ln" id="L367">        assert!(s.<span class="tok-fn">expose</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|&amp;b| b == <span class="tok-num">0</span>));</span>
-<span class="ln" id="L368">    }</span>
-<span class="ln" id="L369"></span>
-<span class="ln" id="L370">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L371">    <span class="tok-kw">fn</span> <span class="tok-fn">clone_is_independent</span>() {</span>
-<span class="ln" id="L372">        <span class="tok-kw">let</span> a = Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L373">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> b = a.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L374">        assert_eq!(a, b);</span>
-<span class="ln" id="L375">        b.<span class="tok-fn">wipe</span>();</span>
-<span class="ln" id="L376">        assert_ne!(a, b, <span class="tok-str">&quot;wiping the clone must not touch the original&quot;</span>);</span>
-<span class="ln" id="L377">    }</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379">    <span class="tok-com">/// Locking is best-effort, so this asserts only that it is reported and</span></span>
-<span class="ln" id="L380">    <span class="tok-com">/// never panics, not that it succeeded, which depends on privileges.</span></span>
-<span class="ln" id="L381">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L382">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_is_reported_and_never_panics</span>() {</span>
-<span class="ln" id="L383">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">zeroed</span>(<span class="tok-num">4096</span>);</span>
-<span class="ln" id="L384">        <span class="tok-kw">let</span> _ = s.<span class="tok-fn">is_locked</span>();</span>
-<span class="ln" id="L385">    }</span>
-<span class="ln" id="L386"></span>
-<span class="ln" id="L387">    <span class="tok-com">/// Regression: locking has page granularity, and `region`&#x27;s lock guard</span></span>
-<span class="ln" id="L388">    <span class="tok-com">/// panics if unlocking fails. Between them, sharing a page across secrets</span></span>
-<span class="ln" id="L389">    <span class="tok-com">/// could unlock a live secret&#x27;s memory or abort from inside a `Drop`.</span></span>
-<span class="ln" id="L390">    <span class="tok-com">/// Creating and dropping many small secrets out of order must be boring.</span></span>
-<span class="ln" id="L391">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L392">    <span class="tok-kw">fn</span> <span class="tok-fn">many_small_secrets_can_coexist_and_drop_in_any_order</span>() {</span>
-<span class="ln" id="L393">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> live: Vec&lt;Secret&gt; = (<span class="tok-num">0</span>..<span class="tok-num">64</span>).<span class="tok-fn">map</span>(|_| Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L394">        while live.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span> {</span>
-<span class="ln" id="L395">            <span class="tok-fn">drop</span>(live.<span class="tok-fn">remove</span>(live.<span class="tok-fn">len</span>() / <span class="tok-num">2</span>));</span>
-<span class="ln" id="L396">            assert!(live.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">len</span>() == <span class="tok-num">32</span>));</span>
-<span class="ln" id="L397">        }</span>
-<span class="ln" id="L398">    }</span>
-<span class="ln" id="L399"></span>
-<span class="ln" id="L400">    <span class="tok-com">/// The locked span must be page aligned and inside the secret&#x27;s own</span></span>
-<span class="ln" id="L401">    <span class="tok-com">/// allocation, so no other allocation can share a locked page with it.</span></span>
-<span class="ln" id="L402">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L403">    <span class="tok-kw">fn</span> <span class="tok-fn">locked_span_is_page_aligned</span>() {</span>
-<span class="ln" id="L404">        <span class="tok-kw">let</span> page = region::page::<span class="tok-fn">size</span>();</span>
-<span class="ln" id="L405">        <span class="tok-kw">for</span> len <span class="tok-kw">in</span> [1usize, <span class="tok-num">31</span>, <span class="tok-num">32</span>, page - <span class="tok-num">1</span>, page, page + <span class="tok-num">1</span>, <span class="tok-num">5</span> * page] {</span>
-<span class="ln" id="L406">            <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">zeroed</span>(len);</span>
-<span class="ln" id="L407">            <span class="tok-kw">if</span> !s.<span class="tok-fn">is_locked</span>() {</span>
-<span class="ln" id="L408">                continue; <span class="tok-com">// no memlock budget here; nothing to check</span></span>
-<span class="ln" id="L409">            }</span>
-<span class="ln" id="L410">            assert_eq!(</span>
-<span class="ln" id="L411">                s.<span class="tok-fn">expose</span>().<span class="tok-fn">as_ptr</span>() <span class="tok-kw">as</span> usize % page,</span>
-<span class="ln" id="L412">                <span class="tok-num">0</span>,</span>
-<span class="ln" id="L413">                <span class="tok-str">&quot;len={len}: secret is not page aligned&quot;</span></span>
-<span class="ln" id="L414">            );</span>
-<span class="ln" id="L415">            assert!(s.offset + s.locked_span &lt;= s.backing.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L416">        }</span>
-<span class="ln" id="L417">    }</span>
-<span class="ln" id="L418"></span>
-<span class="ln" id="L419">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">zero_length_is_handled</span>() {</span>
-<span class="ln" id="L421">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">zeroed</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L422">        assert!(s.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L423">        assert_eq!(s.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L424">        assert!(!s.<span class="tok-fn">is_locked</span>());</span>
-<span class="ln" id="L425">    }</span>
-<span class="ln" id="L426"></span>
-<span class="ln" id="L427">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L428">    <span class="tok-kw">fn</span> <span class="tok-fn">contents_survive_the_alignment_offset</span>() {</span>
-<span class="ln" id="L429">        <span class="tok-com">// Regression guard for the offset arithmetic: what goes in comes out.</span></span>
-<span class="ln" id="L430">        <span class="tok-kw">for</span> len <span class="tok-kw">in</span> [1usize, <span class="tok-num">33</span>, <span class="tok-num">4095</span>, <span class="tok-num">4096</span>, <span class="tok-num">4097</span>] {</span>
-<span class="ln" id="L431">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> src = vec![0u8; len];</span>
-<span class="ln" id="L432">            <span class="tok-kw">for</span> (i, b) <span class="tok-kw">in</span> src.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L433">                *b = (i % <span class="tok-num">251</span>) <span class="tok-kw">as</span> u8;</span>
-<span class="ln" id="L434">            }</span>
-<span class="ln" id="L435">            <span class="tok-kw">let</span> expected = src.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L436">            <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> src);</span>
-<span class="ln" id="L437">            assert_eq!(s.<span class="tok-fn">expose</span>(), &amp;expected[..], <span class="tok-str">&quot;len={len}&quot;</span>);</span>
-<span class="ln" id="L438">        }</span>
-<span class="ln" id="L439">    }</span>
-<span class="ln" id="L440">}</span>
+<span class="ln" id="L258">    <span class="tok-com">/// The page lock goes through `lock_pages`, so the interpreter can be told</span></span>
+<span class="ln" id="L259">    <span class="tok-com">/// about it once. A direct call elsewhere leaves this crate unexaminable.</span></span>
+<span class="ln" id="L260">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L261">    <span class="tok-kw">fn</span> <span class="tok-fn">the_page_lock_is_taken_in_exactly_one_place</span>() {</span>
+<span class="ln" id="L262">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;amnesia.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L263">        <span class="tok-com">// Assembled at run time from halves. Written out whole, the needles</span></span>
+<span class="ln" id="L264">        <span class="tok-com">// would occur in this test&#x27;s own body and it would report itself, which</span></span>
+<span class="ln" id="L265">        <span class="tok-com">// it did on the first run.</span></span>
+<span class="ln" id="L266">        <span class="tok-kw">let</span> taking = [<span class="tok-str">&quot;region&quot;</span>, <span class="tok-str">&quot;::lock(&quot;</span>].<span class="tok-fn">concat</span>();</span>
+<span class="ln" id="L267">        <span class="tok-kw">let</span> releasing = [<span class="tok-str">&quot;region&quot;</span>, <span class="tok-str">&quot;::unlock(&quot;</span>].<span class="tok-fn">concat</span>();</span>
+<span class="ln" id="L268">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> source.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L269">            <span class="tok-kw">let</span> code = line.<span class="tok-fn">split</span>(<span class="tok-str">&quot;//&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L270">            <span class="tok-kw">if</span> !code.<span class="tok-fn">contains</span>(&amp;taking) &amp;&amp; !code.<span class="tok-fn">contains</span>(&amp;releasing) {</span>
+<span class="ln" id="L271">                continue;</span>
+<span class="ln" id="L272">            }</span>
+<span class="ln" id="L273">            <span class="tok-kw">let</span> before = source</span>
+<span class="ln" id="L274">                .<span class="tok-fn">split</span>(<span class="tok-str">&#x27;\n&#x27;</span>)</span>
+<span class="ln" id="L275">                .<span class="tok-fn">take</span>(number)</span>
+<span class="ln" id="L276">                .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L277">                .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L278">            <span class="tok-kw">let</span> holder = before</span>
+<span class="ln" id="L279">                .<span class="tok-fn">rsplit</span>(<span class="tok-str">&quot;fn &quot;</span>)</span>
+<span class="ln" id="L280">                .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L281">                .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L282">                .<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L283">            assert!(</span>
+<span class="ln" id="L284">                holder == <span class="tok-str">&quot;lock_pages&quot;</span> || holder == <span class="tok-str">&quot;unlock_pages&quot;</span>,</span>
+<span class="ln" id="L285">                <span class="tok-str">&quot;amnesia.rs:{}: region::lock or region::unlock is called from \</span></span>
+<span class="ln" id="L286"><span class="tok-str">                 `{holder}` rather than from lock_pages or unlock_pages. Route \</span></span>
+<span class="ln" id="L287"><span class="tok-str">                 it through those, or Miri stops at the first Secret built and \</span></span>
+<span class="ln" id="L288"><span class="tok-str">                 this crate cannot be checked for undefined behaviour at all.&quot;</span>,</span>
+<span class="ln" id="L289">                number + <span class="tok-num">1</span></span>
+<span class="ln" id="L290">            );</span>
+<span class="ln" id="L291">        }</span>
+<span class="ln" id="L292">    }</span>
+<span class="ln" id="L293"></span>
+<span class="ln" id="L294">    <span class="tok-com">/// A secret holds and wipes the same bytes whether or not the pages locked.</span></span>
+<span class="ln" id="L295">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L296">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_or_not_changes_nothing_about_what_is_stored</span>() {</span>
+<span class="ln" id="L297">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = [7u8; <span class="tok-num">64</span>];</span>
+<span class="ln" id="L298">        <span class="tok-kw">let</span> secret = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> bytes);</span>
+<span class="ln" id="L299">        assert_eq!(bytes, [0u8; <span class="tok-num">64</span>], <span class="tok-str">&quot;the caller&#x27;s copy was not wiped&quot;</span>);</span>
+<span class="ln" id="L300">        assert_eq!(secret.<span class="tok-fn">expose</span>(), &amp;[7u8; <span class="tok-num">64</span>]);</span>
+<span class="ln" id="L301">        assert_eq!(secret.<span class="tok-fn">expose</span>().<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
+<span class="ln" id="L302">        <span class="tok-com">// The one thing that legitimately differs, asserted as a fact about the</span></span>
+<span class="ln" id="L303">        <span class="tok-com">// build rather than about the machine, so that a locked run and an</span></span>
+<span class="ln" id="L304">        <span class="tok-com">// unlocked one both pass and neither claims the other&#x27;s answer.</span></span>
+<span class="ln" id="L305">        <span class="tok-kw">if</span> cfg!(miri) {</span>
+<span class="ln" id="L306">            assert!(</span>
+<span class="ln" id="L307">                !secret.<span class="tok-fn">is_locked</span>(),</span>
+<span class="ln" id="L308">                <span class="tok-str">&quot;Miri cannot lock and must not say it did&quot;</span></span>
+<span class="ln" id="L309">            );</span>
+<span class="ln" id="L310">        }</span>
+<span class="ln" id="L311">    }</span>
+<span class="ln" id="L312"></span>
+<span class="ln" id="L313">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L314">    <span class="tok-kw">fn</span> <span class="tok-fn">new_wipes_the_callers_copy</span>() {</span>
+<span class="ln" id="L315">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> input = [7u8; <span class="tok-num">32</span>];</span>
+<span class="ln" id="L316">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> input);</span>
+<span class="ln" id="L317">        assert_eq!(s.<span class="tok-fn">expose</span>(), &amp;[7u8; <span class="tok-num">32</span>]);</span>
+<span class="ln" id="L318">        assert_eq!(input, [0u8; <span class="tok-num">32</span>], <span class="tok-str">&quot;source buffer must be wiped&quot;</span>);</span>
+<span class="ln" id="L319">    }</span>
+<span class="ln" id="L320"></span>
+<span class="ln" id="L321">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L322">    <span class="tok-kw">fn</span> <span class="tok-fn">random_is_not_all_zeroes_and_differs_each_time</span>() {</span>
+<span class="ln" id="L323">        <span class="tok-kw">let</span> a = Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L324">        <span class="tok-kw">let</span> b = Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L325">        assert_ne!(a.<span class="tok-fn">expose</span>(), &amp;[0u8; <span class="tok-num">32</span>]);</span>
+<span class="ln" id="L326">        assert_ne!(a, b, <span class="tok-str">&quot;two draws should not collide&quot;</span>);</span>
+<span class="ln" id="L327">    }</span>
+<span class="ln" id="L328"></span>
+<span class="ln" id="L329">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L330">    <span class="tok-kw">fn</span> <span class="tok-fn">equality_is_value_based</span>() {</span>
+<span class="ln" id="L331">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> x = [1u8; <span class="tok-num">16</span>];</span>
+<span class="ln" id="L332">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> y = [1u8; <span class="tok-num">16</span>];</span>
+<span class="ln" id="L333">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> z = [2u8; <span class="tok-num">16</span>];</span>
+<span class="ln" id="L334">        assert_eq!(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> x), Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> y));</span>
+<span class="ln" id="L335">        assert_ne!(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> z), Secret::<span class="tok-fn">random</span>(<span class="tok-num">16</span>).<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L336">    }</span>
+<span class="ln" id="L337"></span>
+<span class="ln" id="L338">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L339">    <span class="tok-kw">fn</span> <span class="tok-fn">debug_never_reveals_contents</span>() {</span>
+<span class="ln" id="L340">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = [0xABu8; <span class="tok-num">8</span>];</span>
+<span class="ln" id="L341">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> bytes);</span>
+<span class="ln" id="L342">        <span class="tok-kw">let</span> shown = format!(<span class="tok-str">&quot;{s:?}&quot;</span>);</span>
+<span class="ln" id="L343">        assert!(shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>), <span class="tok-str">&quot;{shown}&quot;</span>);</span>
+<span class="ln" id="L344">        assert!(!shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ab&quot;</span>) &amp;&amp; !shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;AB&quot;</span>), <span class="tok-str">&quot;{shown}&quot;</span>);</span>
+<span class="ln" id="L345">    }</span>
+<span class="ln" id="L346"></span>
+<span class="ln" id="L347">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L348">    <span class="tok-kw">fn</span> <span class="tok-fn">wipe_clears_in_place</span>() {</span>
+<span class="ln" id="L349">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = Secret::<span class="tok-fn">random</span>(<span class="tok-num">64</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L350">        s.<span class="tok-fn">wipe</span>();</span>
+<span class="ln" id="L351">        <span class="tok-com">// Length must survive the wipe, or the &quot;all zero&quot; check below would</span></span>
+<span class="ln" id="L352">        <span class="tok-com">// pass vacuously on an empty slice.</span></span>
+<span class="ln" id="L353">        assert_eq!(s.<span class="tok-fn">len</span>(), <span class="tok-num">64</span>, <span class="tok-str">&quot;wipe must not shrink the secret&quot;</span>);</span>
+<span class="ln" id="L354">        assert_eq!(s.<span class="tok-fn">expose</span>().<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
+<span class="ln" id="L355">        assert!(s.<span class="tok-fn">expose</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|&amp;b| b == <span class="tok-num">0</span>));</span>
+<span class="ln" id="L356">    }</span>
+<span class="ln" id="L357"></span>
+<span class="ln" id="L358">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L359">    <span class="tok-kw">fn</span> <span class="tok-fn">clone_is_independent</span>() {</span>
+<span class="ln" id="L360">        <span class="tok-kw">let</span> a = Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L361">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> b = a.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L362">        assert_eq!(a, b);</span>
+<span class="ln" id="L363">        b.<span class="tok-fn">wipe</span>();</span>
+<span class="ln" id="L364">        assert_ne!(a, b, <span class="tok-str">&quot;wiping the clone must not touch the original&quot;</span>);</span>
+<span class="ln" id="L365">    }</span>
+<span class="ln" id="L366"></span>
+<span class="ln" id="L367">    <span class="tok-com">/// Locking is best-effort, so this asserts only that it is reported and</span></span>
+<span class="ln" id="L368">    <span class="tok-com">/// never panics, not that it succeeded, which depends on privileges.</span></span>
+<span class="ln" id="L369">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L370">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_is_reported_and_never_panics</span>() {</span>
+<span class="ln" id="L371">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">zeroed</span>(<span class="tok-num">4096</span>);</span>
+<span class="ln" id="L372">        <span class="tok-kw">let</span> _ = s.<span class="tok-fn">is_locked</span>();</span>
+<span class="ln" id="L373">    }</span>
+<span class="ln" id="L374"></span>
+<span class="ln" id="L375">    <span class="tok-com">/// Regression: locking has page granularity, and `region`&#x27;s lock guard</span></span>
+<span class="ln" id="L376">    <span class="tok-com">/// panics if unlocking fails. Between them, sharing a page across secrets</span></span>
+<span class="ln" id="L377">    <span class="tok-com">/// could unlock a live secret&#x27;s memory or abort from inside a `Drop`.</span></span>
+<span class="ln" id="L378">    <span class="tok-com">/// Creating and dropping many small secrets out of order must be boring.</span></span>
+<span class="ln" id="L379">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L380">    <span class="tok-kw">fn</span> <span class="tok-fn">many_small_secrets_can_coexist_and_drop_in_any_order</span>() {</span>
+<span class="ln" id="L381">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> live: Vec&lt;Secret&gt; = (<span class="tok-num">0</span>..<span class="tok-num">64</span>).<span class="tok-fn">map</span>(|_| Secret::<span class="tok-fn">random</span>(<span class="tok-num">32</span>).<span class="tok-fn">unwrap</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L382">        while live.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span> {</span>
+<span class="ln" id="L383">            <span class="tok-fn">drop</span>(live.<span class="tok-fn">remove</span>(live.<span class="tok-fn">len</span>() / <span class="tok-num">2</span>));</span>
+<span class="ln" id="L384">            assert!(live.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">len</span>() == <span class="tok-num">32</span>));</span>
+<span class="ln" id="L385">        }</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">    <span class="tok-com">/// The locked span must be page aligned and inside the secret&#x27;s own</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// allocation, so no other allocation can share a locked page with it.</span></span>
+<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">locked_span_is_page_aligned</span>() {</span>
+<span class="ln" id="L392">        <span class="tok-kw">let</span> page = region::page::<span class="tok-fn">size</span>();</span>
+<span class="ln" id="L393">        <span class="tok-kw">for</span> len <span class="tok-kw">in</span> [1usize, <span class="tok-num">31</span>, <span class="tok-num">32</span>, page - <span class="tok-num">1</span>, page, page + <span class="tok-num">1</span>, <span class="tok-num">5</span> * page] {</span>
+<span class="ln" id="L394">            <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">zeroed</span>(len);</span>
+<span class="ln" id="L395">            <span class="tok-kw">if</span> !s.<span class="tok-fn">is_locked</span>() {</span>
+<span class="ln" id="L396">                continue; <span class="tok-com">// no memlock budget here; nothing to check</span></span>
+<span class="ln" id="L397">            }</span>
+<span class="ln" id="L398">            assert_eq!(</span>
+<span class="ln" id="L399">                s.<span class="tok-fn">expose</span>().<span class="tok-fn">as_ptr</span>() <span class="tok-kw">as</span> usize % page,</span>
+<span class="ln" id="L400">                <span class="tok-num">0</span>,</span>
+<span class="ln" id="L401">                <span class="tok-str">&quot;len={len}: secret is not page aligned&quot;</span></span>
+<span class="ln" id="L402">            );</span>
+<span class="ln" id="L403">            assert!(s.offset + s.locked_span &lt;= s.backing.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L404">        }</span>
+<span class="ln" id="L405">    }</span>
+<span class="ln" id="L406"></span>
+<span class="ln" id="L407">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L408">    <span class="tok-kw">fn</span> <span class="tok-fn">zero_length_is_handled</span>() {</span>
+<span class="ln" id="L409">        <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">zeroed</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L410">        assert!(s.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L411">        assert_eq!(s.<span class="tok-fn">expose</span>(), b<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L412">        assert!(!s.<span class="tok-fn">is_locked</span>());</span>
+<span class="ln" id="L413">    }</span>
+<span class="ln" id="L414"></span>
+<span class="ln" id="L415">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L416">    <span class="tok-kw">fn</span> <span class="tok-fn">contents_survive_the_alignment_offset</span>() {</span>
+<span class="ln" id="L417">        <span class="tok-com">// Regression guard for the offset arithmetic: what goes in comes out.</span></span>
+<span class="ln" id="L418">        <span class="tok-kw">for</span> len <span class="tok-kw">in</span> [1usize, <span class="tok-num">33</span>, <span class="tok-num">4095</span>, <span class="tok-num">4096</span>, <span class="tok-num">4097</span>] {</span>
+<span class="ln" id="L419">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> src = vec![0u8; len];</span>
+<span class="ln" id="L420">            <span class="tok-kw">for</span> (i, b) <span class="tok-kw">in</span> src.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L421">                *b = (i % <span class="tok-num">251</span>) <span class="tok-kw">as</span> u8;</span>
+<span class="ln" id="L422">            }</span>
+<span class="ln" id="L423">            <span class="tok-kw">let</span> expected = src.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L424">            <span class="tok-kw">let</span> s = Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> src);</span>
+<span class="ln" id="L425">            assert_eq!(s.<span class="tok-fn">expose</span>(), &amp;expected[..], <span class="tok-str">&quot;len={len}&quot;</span>);</span>
+<span class="ln" id="L426">        }</span>
+<span class="ln" id="L427">    }</span>
+<span class="ln" id="L428">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

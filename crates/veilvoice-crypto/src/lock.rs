@@ -1259,12 +1259,7 @@ mod tests {
         );
     }
 
-    /// A header too short to say what it is, at exactly the boundary.
-    ///
-    /// `parse` needs nine bytes before it can read the magic and the version,
-    /// and refuses `bytes.len() < 9`. Mutation testing made that `<= 9`, which
-    /// rejects a nine-byte buffer as truncated instead of reading its version.
-    /// The suite tested shorter and much longer and never nine.
+    /// The header boundary from both sides: nine bytes reaches the version.
     #[test]
     fn nine_bytes_is_enough_to_reach_the_version_and_eight_is_not() {
         let mut nine = Vec::from(MAGIC);
@@ -1282,10 +1277,8 @@ mod tests {
 
     /// A legacy lock file that cannot be read is an error, not an absent lock.
     ///
-    /// `read_legacy` matches specifically on `NotFound`; mutation testing
-    /// replaced that guard with `true`, so any failure to read the old file
-    /// meant "there is no old lock here". Somebody upgrading from a version
-    /// that used it would be told they have no lock at all.
+    /// Telling somebody upgrading that they have no lock is how a lock silently
+    /// becomes no lock.
     #[test]
     fn a_legacy_lock_that_cannot_be_read_is_not_reported_as_absent() {
         let dir = tempfile::tempdir().unwrap();
@@ -1296,12 +1289,8 @@ mod tests {
         );
     }
 
-    /// Where this platform would keep the lock if nothing portable were set up.
-    ///
-    /// `platform_dir` could answer `None` or the empty path and nothing
-    /// objected. It is not the same question as `default_dir`, which prefers a
-    /// portable folder when one exists, so a test of that one does not reach
-    /// this one.
+    /// Where the lock would live without a portable folder, which is a different
+    /// question from where it does live.
     #[test]
     fn the_platform_directory_is_a_real_path() {
         let dir = platform_dir().expect("this platform has a configuration directory");
@@ -1312,14 +1301,10 @@ mod tests {
         );
     }
 
-    /// A save puts its directory back if it has been removed underneath.
+    /// A save puts its directory back when somebody has deleted it.
     ///
-    /// `save` creates the parent when the parent is not empty, and deleting
-    /// that `!` inverts it. Every test wrote into a directory that already
-    /// existed, so the creation never had to happen. The case that reaches it
-    /// is the folder being deleted between one write and the next, which is
-    /// what somebody tidying up looks like. The same mutant and the same
-    /// reasoning appear in `crate::vault::write_one`.
+    /// Every other path has already created it, so this is the only case that
+    /// reaches the creation in `save`.
     #[test]
     fn a_save_recreates_its_directory_if_it_is_removed_underneath() {
         let dir = tempfile::tempdir().unwrap();
@@ -1341,14 +1326,8 @@ mod tests {
         assert!(reopened.tampered() == store.tampered());
     }
 
-    /// A lock path that cannot be read is an error, not an absent lock.
-    ///
-    /// Both readers match specifically on `NotFound` and treat everything else
-    /// as a failure, because silently reporting "no lock here" for a file that
-    /// exists but could not be read would turn a permissions problem into an
-    /// open door. Mutation testing replaced each guard with `true`, making
-    /// every error mean "no lock", and nothing objected: the only paths the
-    /// suite ever handed them were absent ones.
+    /// Only `NotFound` means there is no lock. Reporting a file that exists but
+    /// cannot be read as absent turns a permissions problem into an open door.
     #[test]
     fn a_path_that_is_not_a_readable_file_is_an_error_rather_than_no_lock() {
         let dir = tempfile::tempdir().unwrap();
@@ -1368,12 +1347,7 @@ mod tests {
         );
     }
 
-    /// The tamper report can be raised from outside, and the flag actually moves.
-    ///
-    /// `report_tamper` could be replaced with a function that does nothing.
-    /// The vault calls it when the two copies of a lock disagree, which is
-    /// evidence the lock module cannot see on its own, so a version that does
-    /// nothing loses exactly the report that came from somewhere else.
+    /// The vault can raise the tamper report, and unlocking does not clear it.
     #[test]
     fn a_report_raised_from_outside_is_visible_and_survives_an_unlock() {
         let dir = tempfile::tempdir().unwrap();
@@ -1393,11 +1367,7 @@ mod tests {
         assert!(!store.tampered(), "acknowledging does");
     }
 
-    /// The store reports its wait and whether the last write reached every copy.
-    ///
-    /// Four mutants lived in these two accessors, answering `None`, a default
-    /// `Duration`, `true` and `false`. Nothing read either in a state where the
-    /// answer was interesting.
+    /// The wait and the every-copy-current answer, in states where each matters.
     #[test]
     fn the_store_reports_its_wait_and_whether_every_copy_is_current() {
         let dir = tempfile::tempdir().unwrap();
@@ -1423,13 +1393,8 @@ mod tests {
         );
     }
 
-    /// Where the lock lives is a real path, not nothing and not the empty one.
-    ///
-    /// Every one of these could be replaced with `None`, and two of them with
-    /// `Some(PathBuf::new())`, without any test objecting. None of them can be
-    /// asserted to equal a particular path, because the answer is a property of
-    /// the machine; what can be asserted is that there is an answer and that it
-    /// names something.
+    /// The default path names a real file in a real directory. Which path it is
+    /// belongs to the machine, so only its shape is asserted.
     #[test]
     fn the_default_lock_path_is_an_actual_path() {
         let path = default_path().expect("this platform has somewhere to keep a lock");
@@ -1477,14 +1442,10 @@ mod tests {
         assert_eq!(delay_secs(20), 900);
     }
 
-    /// Two locks are the same lock only when **both** halves match.
+    /// Same lock means the salt **and** the verifier match.
     ///
-    /// `same_secret_as` compares the salt and the verifier and ands the two
-    /// answers. Mutation testing replaced that `&` with `|`, and nothing
-    /// objected: every case the suite had was two locks that agreed about
-    /// everything or about nothing, and either of those passes under both
-    /// operators. The case that separates them is one half matching, which is
-    /// exactly the case an attacker would construct.
+    /// One half matching is the case somebody would construct; two records
+    /// agreeing about everything or nothing cannot tell `&` from `|`.
     #[test]
     fn two_locks_agreeing_on_one_half_are_not_the_same_lock() {
         let a = AppLock::create(b"pw", weak()).unwrap();
@@ -1511,12 +1472,8 @@ mod tests {
         assert!(a.same_secret_as(&a.clone()), "a lock is itself");
     }
 
-    /// Clearing the tamper report costs the passphrase.
-    ///
-    /// Mutation testing replaced the whole of `acknowledge` with `Ok(())` and
-    /// the suite accepted it. A report that anybody can dismiss without the
-    /// passphrase is a report an attacker dismisses, which is the thing the
-    /// sticky flag exists to prevent.
+    /// Clearing the tamper report costs the passphrase. A report anybody can
+    /// dismiss is a report an attacker dismisses.
     #[test]
     fn a_tamper_report_is_not_cleared_by_the_wrong_passphrase() {
         let mut lock = AppLock::create(b"pw", weak()).unwrap();
@@ -1532,13 +1489,8 @@ mod tests {
         assert!(!lock.tampered(), "the right one clears it");
     }
 
-    /// The wait is reported, and it shrinks as the clock moves.
-    ///
-    /// Three mutants lived here: `cooldown` answering `None` always, and
-    /// `cooldown_at` adding the elapsed time instead of subtracting it. The
-    /// suite asserted that a rate-limited attempt is refused, which the lock
-    /// decides from `delay_secs` rather than from this, so none of the three
-    /// changed a visible outcome.
+    /// The remaining wait shrinks with the clock, and a clock that went backwards
+    /// is not credit against it.
     #[test]
     fn the_wait_is_reported_and_counts_down() {
         let mut lock = AppLock::create(b"pw", weak()).unwrap();
@@ -1582,12 +1534,8 @@ mod tests {
         assert!(against_the_real_clock.cooldown().is_some());
     }
 
-    /// The clock is the real one.
-    ///
-    /// `unix_now` could be replaced with `0`, `1` or `-1` and nothing
-    /// objected, because every test that cares about time passes its own. The
-    /// assertion that can be made without pinning the clock is that the answer
-    /// is a plausible present, which all three constants fail.
+    /// The clock is the real one. Every other test passes its own time, so
+    /// nothing else would notice a constant.
     #[test]
     fn the_clock_reads_the_present_rather_than_a_constant() {
         let now = unix_now();

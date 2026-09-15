@@ -116,17 +116,6 @@ measures them**
   appears anywhere in the repository except the one place at the root. It
   names the folder and how large it has grown.
 
-**The site proves it is ours on every page, not most of them**
-
-- Search Console confirms who owns a site by fetching a page and looking for
-  one tag. The tag was on nine pages and missing from five, and missing from
-  every page of the generated reference: the error pages, the search page, the
-  wiki page and both halves of the script-free site had none.
-- Which page a crawler fetches is not something this project chooses, so all
-  397 pages carry it now, written by the generators rather than by hand.
-- A check fails the build if any page loses it, or if two pages ever name
-  different tokens.
-
 **The undefined-behaviour checker can now look at the cryptography**
 
 - VeilVoice keeps every key and passphrase in a type that locks its pages out

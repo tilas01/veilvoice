@@ -360,13 +360,7 @@ mod tests {
         Vault::at(dir, None).unwrap()
     }
 
-    /// Clearing a vault that is not there is not a failure.
-    ///
-    /// Two mutants lived in the one closure that decides this: the comparison
-    /// against `NotFound` inverted, and the `!` in front of it deleted. Either
-    /// turns "nothing to remove" into an error. The suite only ever cleared a
-    /// vault it had just written, where nothing is missing and both mutants
-    /// behave exactly like the original.
+    /// Removing nothing is not a failure, and removing it twice is not either.
     #[test]
     fn clearing_a_vault_that_was_never_written_succeeds() {
         let dir = tempfile::tempdir().unwrap();
@@ -385,17 +379,10 @@ mod tests {
             .expect("and removing it twice is still not one");
     }
 
-    /// A store survives its own directory being removed underneath it.
+    /// A store puts its directory back when somebody has deleted it.
     ///
-    /// `write_one` creates the parent when the parent is not empty, and
-    /// deleting that `!` inverts it into creating the parent only when there is
-    /// none to create. The first attempt at this test handed `Vault::at` a path
-    /// that did not exist and expected the creation to happen there, and the
-    /// mutant survived it: `Vault::at` calls `create_dir_all` itself when it
-    /// writes a new index, so by the time `write_one` runs the directory is
-    /// always already there. The creation in `write_one` only matters when the
-    /// directory goes away between the two, which is what somebody deleting the
-    /// folder looks like, so that is what this does.
+    /// `Vault::at` creates it when it writes a new index, so the creation in
+    /// `write_one` only matters between one write and the next.
     #[test]
     fn a_store_recreates_its_directory_if_it_is_removed_underneath() {
         let dir = tempfile::tempdir().unwrap();
@@ -418,14 +405,10 @@ mod tests {
         assert!(back.same_secret_as(&lock));
     }
 
-    /// An index that cannot be read is an error, not a reason to make a new one.
+    /// An unreadable index is refused, not replaced.
     ///
-    /// The site index names both copies of the lock. If reading it fails for
-    /// any reason other than "it is not there", drawing a fresh one writes the
-    /// lock under a name nothing can compute again and orphans the real one.
-    /// The guard says exactly `NotFound`; mutation testing replaced it with
-    /// `true`, so every failure meant "make a new index", and nothing objected
-    /// because the only index the suite ever failed to read was an absent one.
+    /// The index names both copies of the lock: drawing a fresh one writes the
+    /// lock under a name nothing can compute again.
     #[test]
     fn an_index_that_cannot_be_read_is_refused_rather_than_replaced() {
         let dir = tempfile::tempdir().unwrap();

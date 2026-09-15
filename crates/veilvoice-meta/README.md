@@ -86,7 +86,7 @@ flowchart TD
     n_lib(["lib.rs<br/>121 lines"])
     n_audio["audio.rs<br/>278 lines"]
     n_image["image.rs<br/>210 lines"]
-    n_wav["wav.rs<br/>438 lines"]
+    n_wav["wav.rs<br/>425 lines"]
     n_audio --> n_wav
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs" "open the source"
     click n_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" "open the source"
@@ -103,7 +103,7 @@ flowchart TD
 | [`audio.rs`](../../docs/files/veilvoice-meta/audio.md) | 278 | Audio tag removal and replacement. |
 | [`image.rs`](../../docs/files/veilvoice-meta/image.md) | 210 | Image EXIF/GPS removal. |
 | [`lib.rs`](../../docs/files/veilvoice-meta/lib.md) | 121 | Strip or spoof the identifying metadata that rides along with media files. |
-| [`wav.rs`](../../docs/files/veilvoice-meta/wav.md) | 438 | Chunk-level RIFF/WAVE metadata removal. |
+| [`wav.rs`](../../docs/files/veilvoice-meta/wav.md) | 425 | Chunk-level RIFF/WAVE metadata removal. |
 | [`wav_fuzz.rs`](../../docs/files/veilvoice-meta/tests-wav_fuzz.md) | 299 | Randomised robustness testing for the RIFF chunk walker. |
 
 **696 functional lines of Rust** in this crate. A functional line is a line
