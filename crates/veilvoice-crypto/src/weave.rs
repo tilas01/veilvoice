@@ -1108,19 +1108,25 @@ mod tests {
     /// perfectly.
     #[test]
     fn a_chosen_rotation_is_never_the_identity() {
-        // `for_name` is deterministic in its seed, so every second byte it can
-        // be handed is checked rather than sampled.
-        for b in 0u8..=255 {
-            let chosen = Weave::for_name(&[7, b]);
-            if let Weave::Rotate(by) = chosen {
-                assert_eq!(
-                    by % 2,
-                    1,
-                    "for_name chose Rotate({by}) from second byte {b}"
-                );
-                assert_ne!(by, 0);
+        // `for_name` is deterministic in its seed, so every seed byte it can be
+        // handed is checked rather than sampled. Both bytes matter: the first
+        // picks the encoding, the second is the rotation amount. An earlier
+        // version of this test fixed the first at 7, which selects an encoding
+        // that is not a rotation, so the assertion never ran at all and the two
+        // mutants it was written for survived it untouched.
+        let mut ever_rotated = false;
+        for a in 0u8..=255 {
+            for b in 0u8..=255 {
+                if let Weave::Rotate(by) = Weave::for_name(&[a, b]) {
+                    ever_rotated = true;
+                    assert_eq!(by % 2, 1, "for_name chose Rotate({by}) from seed {a},{b}");
+                }
             }
         }
+        assert!(
+            ever_rotated,
+            "no seed produced a rotation, so nothing above was actually checked"
+        );
 
         // The two random choosers cannot be enumerated, so they are drawn from
         // enough times that a chooser producing an even amount would have to be
@@ -1212,12 +1218,31 @@ mod tests {
     /// guard stops guarding and the read runs off the end of the escape.
     #[test]
     fn a_truncated_escape_is_refused() {
-        for weave in [Weave::QuotedPrintable, Weave::Percent] {
-            let marker = weave.apply(b" ")[0];
-            for truncated in [vec![marker], vec![b'A', marker], vec![marker, b'4']] {
+        // The marker and the truncated cases are named per encoding rather
+        // than derived, and both halves of that cost an attempt.
+        //
+        // Deriving the marker by encoding a space works for the two that
+        // escape a space and gives a plain encoded byte for yEnc, which
+        // escapes only four particular values and leaves a space alone: the
+        // first version fed yEnc a byte that is not an escape and then
+        // reported yEnc for accepting it.
+        //
+        // And the escapes are not the same shape. Quoted-printable and
+        // percent take two hexadecimal digits after the marker, so `=4` is
+        // truncated; yEnc takes one byte, so `=4` is complete and only a
+        // trailing marker is truncated. The second attempt asserted the
+        // quoted-printable shape against yEnc and failed for that reason.
+        let cases: &[(Weave, &[&[u8]])] = &[
+            (Weave::QuotedPrintable, &[b"=", b"A=", b"=4"]),
+            (Weave::Percent, &[b"%", b"A%", b"%4"]),
+            (Weave::YEnc, &[b"=", b"A="]),
+        ];
+
+        for (weave, truncated) in cases {
+            for input in *truncated {
                 assert!(
-                    weave.undo(&truncated).is_err(),
-                    "{weave:?} accepted a truncated escape {truncated:?}"
+                    weave.undo(input).is_err(),
+                    "{weave:?} accepted a truncated escape {input:?}"
                 );
             }
         }
