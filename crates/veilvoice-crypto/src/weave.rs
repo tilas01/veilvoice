@@ -1264,6 +1264,194 @@ mod tests {
         }
     }
 
+    /// A digest over what each encoding emits for every length from nothing to
+    /// sixty-four bytes.
+    ///
+    /// **Why one fixed input was not enough.** The vectors below this pin each
+    /// encoder against a single twenty-two byte sample, and that killed
+    /// twenty-seven of the forty-four survivors in this file. It could not kill
+    /// the rest, because base-91 and the six-bit encodings carry state across
+    /// bytes and change behaviour at bit boundaries the sample never reaches:
+    /// base-91 packs thirteen or fourteen bits depending on the value, so
+    /// whether its bit counter lands on exactly thirteen depends on how many
+    /// bytes have gone in. Moving a `>` to a `>=` there alters the encoded form
+    /// only at lengths the one sample does not have.
+    ///
+    /// Sixty-five lengths of a fixed pattern reach those boundaries. The
+    /// outputs are compared as one digest per encoding rather than as
+    /// sixty-five vectors each, because two thousand committed hex strings is
+    /// not a thing anybody reads; the failure names the encoding, and
+    /// `emit_length_digests` below prints fresh values when a change is
+    /// deliberate.
+    /// The decoder pinned on input the encoder would never produce.
+    ///
+    /// **Why the other two tests cannot reach this.** The digest test calls
+    /// `apply` and never `undo`, so it says nothing about a decoder. The round
+    /// trip calls both, and is blind to any change that the pair still agrees
+    /// on: base-91's decoder has its own copy of the thirteen-or-fourteen-bit
+    /// decision, and moving its `>` to a `>=` still round trips everything the
+    /// encoder can emit.
+    ///
+    /// That is not enough to call it equivalent, because `undo` is not only fed
+    /// `apply`'s output. It is fed bytes read back from disk, which somebody
+    /// who can write that file chooses. So the decoder is pinned here on input
+    /// built from its own alphabet rather than from the encoder.
+    ///
+    /// `}A` is digit 88 followed by digit 0, which is the value 88 exactly:
+    /// the one number on either side of that comparison. The expected bytes
+    /// were computed from the algorithm as written, the same way the vectors
+    /// above were.
+    #[test]
+    fn the_base91_decoder_is_pinned_on_input_of_its_own() {
+        for (encoded, want) in [
+            (&b"}A"[..], &[88u8][..]),
+            (&b"}A}A"[..], &[88, 0, 22][..]),
+            (&b"}AFD}A"[..], &[88, 128, 69, 192, 2][..]),
+        ] {
+            let got = Weave::Base91.undo(encoded).expect("valid base-91 decodes");
+            assert_eq!(
+                got,
+                want,
+                "Base91 decoded {} differently",
+                String::from_utf8_lossy(encoded)
+            );
+        }
+
+        // A character outside the alphabet is refused rather than guessed at.
+        assert!(Weave::Base91.undo(b"}A ").is_err());
+    }
+
+    #[test]
+    fn every_encoding_emits_the_same_bytes_at_every_length() {
+        let golden: &[(Weave, u64)] = LENGTH_DIGESTS;
+        assert_eq!(
+            golden.len(),
+            ALL.len(),
+            "every encoding in ALL needs a digest here; one was added without one"
+        );
+        for (weave, want) in golden {
+            let got = length_digest(*weave);
+            assert_eq!(
+                got, *want,
+                "{weave:?} no longer emits the same bytes across every length. \
+                 Run the ignored test `emit_length_digests` to see the new values, \
+                 and only take them if the change to the encoded form was meant."
+            );
+        }
+    }
+
+    /// Inputs of every length from nothing to sixty-four bytes.
+    ///
+    /// A repeating pattern rather than random bytes, so the corpus is the same
+    /// on every machine and every run, and one that repeats at an odd period so
+    /// run-length and word-swap have something to do at most lengths.
+    fn lengths() -> Vec<Vec<u8>> {
+        let mut out = Vec::new();
+        for n in 0..=64usize {
+            out.push((0..n).map(|i| PATTERN[i % PATTERN.len()]).collect());
+            // A counter as well as the text pattern, and the reason is a
+            // measurement: with the text alone, base-91's decision between
+            // packing thirteen bits and fourteen never landed on the exact
+            // value it compares against, so moving that `>` to a `>=` changed
+            // nothing this test could see. A counter walks every byte value and
+            // reaches it. The all-ones run is here for the same kind of reason,
+            // since it drives the run-length and delta encoders to their
+            // extremes.
+            out.push((0..n).map(|i| i as u8).collect());
+            out.push(vec![0xff; n]);
+        }
+        // One input found by searching rather than chosen, and it is here
+        // because two mutants needed it. Base-91 decides between packing
+        // thirteen bits and fourteen by comparing its thirteen-bit window
+        // against 88, in the encoder and again in the decoder. Moving either
+        // `>` to a `>=` changes behaviour only when that window is exactly 88,
+        // and neither the text pattern, the counter nor the all-ones run ever
+        // lands on it across every length to sixty-four. Two hundred thousand
+        // random inputs turned up this one, which does.
+        out.push(vec![
+            159, 166, 58, 27, 128, 51, 200, 235, 237, 206, 234, 40, 75, 176, 0, 34, 182, 215, 44,
+            135, 131, 125,
+        ]);
+        // And a second, because the decoder has its own copy of that decision
+        // and its own arithmetic: it rebuilds a fourteen-bit value and tests
+        // the low thirteen of it, which is not the same number the encoder
+        // tested. The input above reaches the boundary on the way in and never
+        // on the way out. This one reaches it on the way out.
+        out.push(vec![88, 32, 112, 212, 94]);
+        out
+    }
+
+    const PATTERN: &[u8] = b"AAB\x00\xff hello\x01";
+
+    const LENGTH_DIGESTS: &[(Weave, u64)] = &[
+        (Weave::None, 0xa2b055b31d9158be),
+        (Weave::Rotate(137), 0x2a49aa3544c11ba9),
+        (Weave::XorCounter, 0x467805adb128bd92),
+        (Weave::BitReverse, 0x45c70a79d76570ac),
+        (Weave::NibbleSwap, 0x9b9be1265c425cfa),
+        (Weave::Gray, 0x2d8a61220ba68b31),
+        (Weave::Reverse, 0x2f41b8bce9707d90),
+        (Weave::Delta, 0x43faf123dd659a61),
+        (Weave::MoveToFront, 0x04661a9829114b50),
+        (Weave::Complement, 0x0de858993e8493f7),
+        (Weave::Riffle, 0xa5f49500a19d5a7c),
+        (Weave::Substitute, 0x78c3b9eb75f17c99),
+        (Weave::Hex, 0xe5c8b715e2d427be),
+        (Weave::Base32, 0x3db4c8b0d4412818),
+        (Weave::Base32Hex, 0x0cf9dc57d6e31217),
+        (Weave::ZBase32, 0x94b22731aecb32d0),
+        (Weave::Crockford32, 0x2b5a5ecc8f03e5c5),
+        (Weave::Base45, 0x5d8935d91733e6d8),
+        (Weave::Ascii85, 0x705dca60633c72cc),
+        (Weave::Z85, 0x507831857f9c79cd),
+        (Weave::Base91, 0x7f3f1a3505f096aa),
+        (Weave::Uu, 0x51f1b05fc70bccb2),
+        (Weave::Xx, 0xf4cfca253c2f24cb),
+        (Weave::QuotedPrintable, 0x36ed0cc258fddc8e),
+        (Weave::Percent, 0xea30412818096cde),
+        (Weave::YEnc, 0x138ce320863ca16f),
+        (Weave::RunLength, 0xcd7779664c2d9aa9),
+        (Weave::XorMask, 0x86609ac613fba378),
+        (Weave::BitRotate, 0xe7c2f5b37d964eeb),
+        (Weave::WordSwap, 0x1a5d44fe3c8c07be),
+        (Weave::Morse, 0x6c88354debe84a78),
+    ];
+
+    /// FNV-1a over every encoded output, in order.
+    ///
+    /// Not a cryptographic hash and not used as one: this detects a change,
+    /// and the thing it is detecting is this project's own encoder moving.
+    /// Written out rather than pulled in so the test has no dependency of its
+    /// own, and fixed rather than randomly seeded so the committed value means
+    /// something.
+    fn length_digest(weave: Weave) -> u64 {
+        let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+        for input in lengths() {
+            for byte in weave.apply(&input) {
+                hash ^= u64::from(byte);
+                hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+            }
+            // The length of each output is part of what is being pinned, so a
+            // separator goes in rather than letting two different splits of the
+            // same bytes hash alike.
+            hash ^= 0xff;
+            hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+        }
+        hash
+    }
+
+    #[test]
+    #[ignore = "prints the digests for every_encoding_emits_the_same_bytes_at_every_length"]
+    fn emit_length_digests() {
+        for weave in ALL {
+            let w = match weave {
+                Weave::Rotate(_) => Weave::Rotate(137),
+                other => *other,
+            };
+            println!("DIGEST (Weave::{w:?}, {:#018x}),", length_digest(w));
+        }
+    }
+
     #[test]
     fn every_encoding_emits_exactly_these_bytes() {
         // Chosen to exercise what these encodings disagree about: a run of
