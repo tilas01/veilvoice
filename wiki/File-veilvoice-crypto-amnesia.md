@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/amnesia.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 440 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 428 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs)
 
 ## Contents
 
@@ -77,7 +77,7 @@ is given away by how long an answer took.
 
 ## What this file contains
 
-440 lines defining **15 functions** (9 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+428 lines defining **15 functions** (9 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

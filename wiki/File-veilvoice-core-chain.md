@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/src/chain.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 1726 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 1717 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
 
 ## Contents
 
@@ -149,7 +149,7 @@ needs in order to tell you honestly if the computer is not keeping up.
 
 ## What this file contains
 
-1726 lines defining **24 functions** (17 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1717 lines defining **24 functions** (17 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

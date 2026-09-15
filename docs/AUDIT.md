@@ -302,12 +302,15 @@ simply is not there. The claim in the notes that it was on every page was also
 not true, and this document's standing rule is that no part of this repository
 may say something that is not.
 
-The two generators now emit it, the four remaining hand-written pages carry it,
-and `tools/site-tests/html.test.js` checks that **all 397 pages have it and
-that every one of them names the same token**. The second half matters as much
-as the first: one property has one token, and two different tokens across a
-site is the failure mode where verification works until the day somebody opens
-the wrong page.
+The two generators were changed to emit it, the four remaining hand-written
+pages given it, and a check added that all 397 pages carried the same token.
+
+**Withdrawn shortly afterwards, and this entry is kept as the record of it.**
+The verification was never completed at Search Console's end, and indexing the
+site is not something this project is pursuing for now, so the tag, the
+generators' half of it and the check were all taken back out. What the entry is
+still worth is the shape of the mistake: a claim that something was on every
+page, made without counting the pages. That part did not depend on the tag.
 
 ### F-183: the crate the whole program's security rests on could not be checked for undefined behaviour
 
@@ -648,7 +651,6 @@ having looked.
 | **mutation testing** | no | **now, weekly** | **fifteen survivors over four files (F-180), then eighty-one over four more (F-186)** |
 | **a public item reached by nothing** | no | **now** | **five; F-182** |
 | **build output outside the root `target/`** | no | **now** | **one, at fifteen gigabytes, rebuilt on every run; F-185** |
-| **every page proves the site's ownership** | no | **now** | **five pages and the whole generated reference had no tag; F-184** |
 | a state file written one place and read another | by hand | **now** | nothing |
 | the per-program guides against the user guide | by hand | **now** | nothing |
 | the questions page against `docs/FAQ.md` | by hand | **now** | nothing |

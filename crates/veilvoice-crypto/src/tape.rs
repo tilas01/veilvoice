@@ -202,13 +202,7 @@ impl Tape {
 mod tests {
     use super::*;
 
-    /// A push longer than one chunk fills the room that is actually left.
-    ///
-    /// `push` computes `CHUNK - self.filled` and mutation testing turned that
-    /// into `CHUNK + self.filled`. Nothing objected, because every existing
-    /// test pushed less than a chunk at a time: `take` is the smaller of the
-    /// room and what is left to write, so while the input is short the wrong
-    /// room is never the smaller of the two and never gets used.
+    /// A push longer than one chunk fills the room actually left in it.
     #[test]
     fn a_push_that_crosses_a_chunk_boundary_lands_where_it_should() {
         let mut tape = Tape::new();
@@ -229,14 +223,8 @@ mod tests {
         assert_eq!(&out[100..], &long[..]);
     }
 
-    /// `fully_locked` is the same question as "every chunk is locked".
-    ///
-    /// Stated as a relation between the two counts rather than as an expected
-    /// answer, because whether the operating system grants any lock at all is
-    /// a property of the machine: this container allows eight megabytes, a
-    /// hardened one may allow none, and a test that demanded either would be
-    /// testing the machine. See F-77 for the other place that distinction
-    /// mattered.
+    /// Stated as a relation between the counts, because whether the operating
+    /// system grants a lock is a property of the machine.
     #[test]
     fn fully_locked_agrees_with_the_chunk_counts() {
         let mut tape = Tape::new();

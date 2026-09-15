@@ -591,14 +591,6 @@ def render_static(index):
     add('<title>Search index &middot; VeilVoice (no JavaScript)</title>')
     add('<meta name="description" content="A complete static index of every '
         'file and section in VeilVoice. No JavaScript required.">')
-    # Search Console proves ownership by fetching a page and looking for this.
-    # It is on every page rather than only the home page, because which page a
-    # crawler happens to fetch is not this project's decision to make, and a
-    # verification that works on one URL and not another is a verification that
-    # fails for a reason nobody can see. `tools/site-tests/html.test.js` checks
-    # that every page carries it and that they all carry the same token.
-    add('<meta name="google-site-verification" '
-        'content="KBDoj1rHayPLyhXzrXaogDKhf-21ahoAKVN8j1txHvQ">')
     # Markup, not script, so it works in this edition exactly as in the other.
     add('<link rel="prefetch" href="index.html">')
     add('<link rel="prefetch" href="../index.html">')
