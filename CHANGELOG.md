@@ -40,6 +40,39 @@ measures them**
 - Nothing a reader sees is different, and that is the point: the numbers were
   right before and are right now without anybody having to remember them.
 
+**A one in 65,536 chance that the voice scrambler settled into a fixed rhythm**
+
+- VeilVoice re-draws the seed behind its voice scrambling at an interval, and
+  draws that interval's range fresh at every launch, so the rhythm is a
+  property of your session rather than of the program. Two numbers are drawn to
+  set the range.
+- About one launch in 65,536, the two came out identical, and the range had no
+  width. That means a fixed interval, which is precisely what drawing the
+  range is meant to avoid. Nothing looked wrong: the settings were valid and a
+  panel showing them would have shown two matching numbers.
+- A drawn range is now always at least one frame wide, widened around the
+  numbers that were drawn so a slow rhythm stays slow.
+- It turned up as a test failing once after passing eleven times the same day,
+  and two hundred repeats afterwards did not bring it back. The arithmetic is a
+  separate function now, so the case can be handed to it directly rather than
+  waited for.
+
+**The metadata cleaner, put through the same test**
+
+- The part that reads a sound file somebody else made, and the part that
+  replaces its metadata, were changed a line at a time the same way. Of 58
+  changes worth trying, four went unnoticed.
+- One let the reader look one byte past the end of a file whose last section
+  has an odd length and no padding, which is what a cut-off recording looks
+  like.
+- The other three were in the bland tags this writes in place of the ones it
+  removes. Removing metadata is itself a signal, so plausible ordinary tags go
+  in instead, and that only works if they are shaped like the ones any other
+  program writes. Nothing had ever read back what it writes, so three ways of
+  getting that shape wrong all passed.
+- All four are fixed and the whole thing was run again: nothing survives now.
+  These two files are covered by the weekly check from here on.
+
 **Eighty-one changes to the encryption code that every test accepted**
 
 - One way to find out whether tests are worth anything is to change the code a
