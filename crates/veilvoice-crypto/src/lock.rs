@@ -1247,6 +1247,140 @@ mod tests {
         assert_eq!(delay_secs(6), 20);
         assert_eq!(delay_secs(20), MAX_DELAY_SECS);
         assert_eq!(delay_secs(u32::MAX), MAX_DELAY_SECS, "must not overflow");
+
+        // The cap is asserted as a number, not as `MAX_DELAY_SECS`. Comparing
+        // it against the constant that defines it is a check that agrees with
+        // itself: mutation testing replaced `15 * 60` with `15 + 60` and every
+        // line above still passed, because every line above was reading the
+        // mutated value from both sides. That is F-71's shape in a third
+        // place, and the fix is the same one: state the number the
+        // documentation states.
+        assert_eq!(MAX_DELAY_SECS, 900, "the cap is a quarter of an hour");
+        assert_eq!(BASE_DELAY_SECS, 5);
+        assert_eq!(FREE_ATTEMPTS, 3);
+        assert_eq!(delay_secs(20), 900);
+    }
+
+    /// Two locks are the same lock only when **both** halves match.
+    ///
+    /// `same_secret_as` compares the salt and the verifier and ands the two
+    /// answers. Mutation testing replaced that `&` with `|`, and nothing
+    /// objected: every case the suite had was two locks that agreed about
+    /// everything or about nothing, and either of those passes under both
+    /// operators. The case that separates them is one half matching, which is
+    /// exactly the case an attacker would construct.
+    #[test]
+    fn two_locks_agreeing_on_one_half_are_not_the_same_lock() {
+        let a = AppLock::create(b"pw", weak()).unwrap();
+
+        // Same salt, different verifier: a record whose salt was copied from
+        // a real one to make it look like that lock.
+        let mut wearing_its_salt = AppLock::create(b"other", weak()).unwrap();
+        wearing_its_salt.salt = a.salt;
+        assert!(
+            !a.same_secret_as(&wearing_its_salt),
+            "a matching salt alone must not make it the same lock"
+        );
+
+        // Same verifier, different salt. Not reachable from a passphrase,
+        // since the salt feeds the derivation, but this is a comparison of two
+        // records and a record is whatever is on disk.
+        let mut wearing_its_verifier = AppLock::create(b"other", weak()).unwrap();
+        wearing_its_verifier.verifier = a.verifier.clone();
+        assert!(
+            !a.same_secret_as(&wearing_its_verifier),
+            "a matching verifier alone must not make it the same lock"
+        );
+
+        assert!(a.same_secret_as(&a.clone()), "a lock is itself");
+    }
+
+    /// Clearing the tamper report costs the passphrase.
+    ///
+    /// Mutation testing replaced the whole of `acknowledge` with `Ok(())` and
+    /// the suite accepted it. A report that anybody can dismiss without the
+    /// passphrase is a report an attacker dismisses, which is the thing the
+    /// sticky flag exists to prevent.
+    #[test]
+    fn a_tamper_report_is_not_cleared_by_the_wrong_passphrase() {
+        let mut lock = AppLock::create(b"pw", weak()).unwrap();
+        lock.tampered = true;
+
+        assert!(
+            lock.acknowledge(b"nope").is_err(),
+            "the wrong passphrase must not clear the report"
+        );
+        assert!(lock.tampered(), "and must leave it raised");
+
+        lock.acknowledge(b"pw").unwrap();
+        assert!(!lock.tampered(), "the right one clears it");
+    }
+
+    /// The wait is reported, and it shrinks as the clock moves.
+    ///
+    /// Three mutants lived here: `cooldown` answering `None` always, and
+    /// `cooldown_at` adding the elapsed time instead of subtracting it. The
+    /// suite asserted that a rate-limited attempt is refused, which the lock
+    /// decides from `delay_secs` rather than from this, so none of the three
+    /// changed a visible outcome.
+    #[test]
+    fn the_wait_is_reported_and_counts_down() {
+        let mut lock = AppLock::create(b"pw", weak()).unwrap();
+        for _ in 0..4 {
+            let _ = lock.verify_at(b"nope", 1_000);
+        }
+        let wait = delay_secs(lock.failures());
+        assert!(wait > 0, "four failures must earn a wait");
+
+        assert_eq!(
+            lock.cooldown_at(1_000),
+            Some(wait),
+            "no time has passed, so the whole wait remains"
+        );
+        assert_eq!(
+            lock.cooldown_at(1_001),
+            Some(wait - 1),
+            "a second later, a second less"
+        );
+        assert_eq!(
+            lock.cooldown_at(1_000 + wait as i64),
+            None,
+            "once the wait is served there is none left"
+        );
+        assert_eq!(
+            lock.cooldown_at(900),
+            Some(wait),
+            "a clock that went backwards is not credit against the wait"
+        );
+
+        // And the public form, which reads the real clock. It needs its own
+        // lock, failed against that same clock: the one above recorded its
+        // failures at second 1,000 of the epoch, so by the real clock its wait
+        // was served decades ago and `None` is the right answer. Asserting
+        // `is_some` here is what kills the mutant that made `cooldown` always
+        // answer `None`.
+        let mut against_the_real_clock = AppLock::create(b"pw", weak()).unwrap();
+        for _ in 0..4 {
+            let _ = against_the_real_clock.verify(b"nope");
+        }
+        assert!(against_the_real_clock.cooldown().is_some());
+    }
+
+    /// The clock is the real one.
+    ///
+    /// `unix_now` could be replaced with `0`, `1` or `-1` and nothing
+    /// objected, because every test that cares about time passes its own. The
+    /// assertion that can be made without pinning the clock is that the answer
+    /// is a plausible present, which all three constants fail.
+    #[test]
+    fn the_clock_reads_the_present_rather_than_a_constant() {
+        let now = unix_now();
+        // 2020-01-01 and 2100-01-01. Wide enough that no reasonable machine
+        // clock trips it, narrow enough that 0, 1 and -1 all fall outside.
+        assert!(
+            (1_577_836_800..4_102_444_800).contains(&now),
+            "unix_now answered {now}, which is not a plausible present"
+        );
     }
 
     #[test]

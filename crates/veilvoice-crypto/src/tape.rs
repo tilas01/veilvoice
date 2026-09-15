@@ -202,6 +202,59 @@ impl Tape {
 mod tests {
     use super::*;
 
+    /// A push longer than one chunk fills the room that is actually left.
+    ///
+    /// `push` computes `CHUNK - self.filled` and mutation testing turned that
+    /// into `CHUNK + self.filled`. Nothing objected, because every existing
+    /// test pushed less than a chunk at a time: `take` is the smaller of the
+    /// room and what is left to write, so while the input is short the wrong
+    /// room is never the smaller of the two and never gets used.
+    #[test]
+    fn a_push_that_crosses_a_chunk_boundary_lands_where_it_should() {
+        let mut tape = Tape::new();
+        // A short push first, so the boundary falls inside the second push
+        // rather than neatly at the start of a chunk.
+        tape.push(&[7u8; 100]);
+        let long: Vec<u8> = (0..CHUNK + 33).map(|i| (i % 251) as u8).collect();
+        tape.push(&long);
+
+        assert_eq!(tape.len(), 100 + CHUNK + 33);
+        assert!(!tape.is_empty(), "a tape with bytes in it is not empty");
+        // 65,669 bytes is one full chunk and 133 bytes of a second.
+        assert_eq!(tape.chunk_count(), 2);
+
+        let mut out = vec![0u8; tape.len()];
+        tape.copy_into(&mut out).unwrap();
+        assert_eq!(&out[..100], &[7u8; 100]);
+        assert_eq!(&out[100..], &long[..]);
+    }
+
+    /// `fully_locked` is the same question as "every chunk is locked".
+    ///
+    /// Stated as a relation between the two counts rather than as an expected
+    /// answer, because whether the operating system grants any lock at all is
+    /// a property of the machine: this container allows eight megabytes, a
+    /// hardened one may allow none, and a test that demanded either would be
+    /// testing the machine. See F-77 for the other place that distinction
+    /// mattered.
+    #[test]
+    fn fully_locked_agrees_with_the_chunk_counts() {
+        let mut tape = Tape::new();
+        assert!(
+            tape.fully_locked(),
+            "an empty tape has nothing unlocked in it"
+        );
+        assert_eq!(tape.locked_chunks(), tape.chunk_count());
+
+        tape.push(&[1u8; CHUNK * 2 + 5]);
+        assert_eq!(tape.chunk_count(), 3);
+        assert_eq!(
+            tape.fully_locked(),
+            tape.locked_chunks() == tape.chunk_count(),
+            "fully_locked must say exactly what the counts say"
+        );
+    }
+
     #[test]
     fn an_empty_tape_holds_nothing_and_allocates_nothing() {
         let tape = Tape::new();

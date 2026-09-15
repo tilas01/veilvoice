@@ -1067,6 +1067,89 @@ mod tests {
         cases
     }
 
+    /// The bytes each encoding actually produces, not merely that it can be
+    /// undone.
+    ///
+    /// **Why round-tripping was not enough.** `every_encoding_round_trips_every_input`
+    /// checks that `undo(apply(x)) == x`, and that was the only structural test
+    /// these encodings had. It cannot see a change to `apply` that `undo` still
+    /// reverses, and mutation testing found forty-four of those: run lengths
+    /// counted to a different limit, literal runs broken at a different place,
+    /// comparisons moved by one, and several `|` turned into `^` inside the
+    /// base conversions. Every one produced a different encoded form, every one
+    /// still decoded back to the input, and the suite accepted all of them.
+    ///
+    /// A round trip tests the pair. This tests the encoder, by naming what it
+    /// emits for one fixed input, so a change to the encoded form has to be
+    /// made deliberately and shows up as a diff of these lines.
+    ///
+    /// The vectors were taken from the code as it stood when this test was
+    /// written, which makes them a record of the format rather than a proof it
+    /// is the right format. That is what a golden vector is, and it is the
+    /// reason each is paired with the round trip above rather than trusted on
+    /// its own.
+    #[test]
+    fn every_encoding_emits_exactly_these_bytes() {
+        // Chosen to exercise what these encodings disagree about: a run of
+        // three, a zero, two high bytes, a repeated word with a space either
+        // side, and a tail of small values.
+        let input: &[u8] = b"AAAB\x00\xff\xfe hello hello\x01\x02\x03";
+
+        let golden: &[(Weave, &str)] = &[
+        (Weave::None, "4141414200fffe2068656c6c6f2068656c6c6f010203"),
+        (Weave::Rotate(137), "cacacacb898887a9f1eef5f5f8a9f1eef5f5f88a8b8c"),
+        (Weave::XorCounter, "46670426835d3fc0977b513014bad1bd9b7a5a557191"),
+        (Weave::BitReverse, "8282824200ff7f0416a63636f60416a63636f68040c0"),
+        (Weave::NibbleSwap, "1414142400ffef028656c6c6f6028656c6c6f6102030"),
+        (Weave::Gray, "61616163008081305c575a5a58305c575a5a58010302"),
+        (Weave::Reverse, "0302016f6c6c6568206f6c6c656820feff0042414141"),
+        (Weave::Delta, "41000001beffff2248fd070003b148fd070003920101"),
+        (Weave::MoveToFront, "4100004202ffff246a686e00710404040400040a0b0c"),
+        (Weave::Complement, "bebebebdff0001df979a939390df979a939390fefdfc"),
+        (Weave::Riffle, "416c416f412042680065ff6cfe6c206f680165026c03"),
+        (Weave::Substitute, "7474741b0d66bfede5f0818176ede5f0818176b45b02"),
+        (Weave::Hex, "3431343134313432303066666665323036383635366336633666323036383635366336633666303130323033"),
+        (Weave::Base32, "494641554351514137373743413244464e525747364944494d5657475933594241494251"),
+        (Weave::Base32Hex, "3835304b32474730565656323051333544484d3655383338434c4d364f524f3130383147"),
+        (Weave::ZBase32, "656679776e6f6f793939396e79346466707473673665646563697367613561627965626f"),
+        (Weave::Crockford32, "3835304d324747305a5a5a32305433354448503659383338434e50365256523130383147"),
+        (Weave::Base45, "4142384242385535305635572b38442056443832452b38442056444d31454b4230"),
+        (Weave::Ascii85, "35735b6527213c3c2440424f752172445d695f29436922226a215772"),
+        (Weave::Z85, "6b255721363072723376784b2330407a59262e38792631313c305340"),
+        (Weave::Base91, "774429795141537c5b43642c5b2a31546f3471784c6d4445232841"),
+        (Weave::Uu, "303425213040235f5f4221483936514c3b5221483936514c3b5024226050"),
+        (Weave::Xx, "4549332d4555317a7a572d634e4b6c67506d2d634e4b6c67506b32302b6b"),
+        (Weave::QuotedPrintable, "414141423d30303d46463d46453d323068656c6c6f3d323068656c6c6f3d30313d30323d3033"),
+        (Weave::Percent, "4141414225303025464625464525323068656c6c6f25323068656c6c6f253031253032253033"),
+        (Weave::YEnc, "6b6b6b6c2a29284a928f9696994a928f9696992b2c2d"),
+        (Weave::RunLength, "8341074200fffe206865826c046f206865826c046f010203"),
+        (Weave::XorMask, "1b1b1b185aa5a47a323f3636357a323f3636355b5859"),
+        (Weave::BitRotate, "0a0a0a1200fff701432b63637b01432b63637b081018"),
+        (Weave::WordSwap, "41414241ff0020fe65686c6c206f65686c6c016f0302"),
+        (Weave::Morse, "2e2d2e2e2e2e2e2d2e2d2e2e2e2e2e2d2e2d2e2e2e2e2e2d2e2d2e2e2e2e2d2e2e2e2e2e2e2e2e2e2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2e2e2e2d2e2e2e2e2e2e2d2d2e2d2e2e2e2e2d2d2e2e2d2e2d2e2d2d2e2d2d2e2e2e2d2d2e2d2d2e2e2e2d2d2e2d2d2d2d2e2e2d2e2e2e2e2e2e2d2d2e2d2e2e2e2e2d2d2e2e2d2e2d2e2d2d2e2d2d2e2e2e2d2d2e2d2d2e2e2e2d2d2e2d2d2d2d2e2e2e2e2e2e2e2d2e2e2e2e2e2e2d2e2e2e2e2e2e2e2d2d"),
+        ];
+
+        assert_eq!(
+            golden.len(),
+            ALL.len(),
+            "every encoding in ALL needs a vector here; one was added without one"
+        );
+
+        for (weave, want) in golden {
+            let got: String = weave
+                .apply(input)
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect();
+            assert_eq!(&got, want, "{weave:?} no longer emits what it emitted");
+
+            // And it still reads its own output, so a vector cannot be
+            // "corrected" to match a broken encoder without this failing too.
+            let decoded = weave.undo(&weave.apply(input)).unwrap();
+            assert_eq!(decoded, input, "{weave:?} cannot undo its own output");
+        }
+    }
+
     #[test]
     fn every_encoding_round_trips_every_input() {
         for weave in ALL {

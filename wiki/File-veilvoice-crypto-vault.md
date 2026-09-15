@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/vault.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 615 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 665 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
 
 ## Contents
 
@@ -69,7 +69,7 @@ cannot touch, and that part is not a speed bump.
 
 ## What this file contains
 
-615 lines defining **12 functions** (8 public), **2 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+665 lines defining **12 functions** (8 public), **2 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
