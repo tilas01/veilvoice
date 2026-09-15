@@ -488,20 +488,30 @@ impl Weave {
                         let start = i;
                         let mut lit = 0;
                         while i < input.len() && lit < 127 {
-                            let same = i + 1 < input.len() && input[i + 1] == input[i];
-                            if same && lit > 0 {
-                                break;
-                            }
-                            if same {
+                            // The next byte starting a run ends this literal,
+                            // so that the run is encoded as a run rather than
+                            // copied out one byte at a time.
+                            //
+                            // This was two conditions, `same && lit > 0` and
+                            // then `same`, the first of which can only break
+                            // where the second already does. Mutation testing
+                            // reported three changes to `lit > 0` that no test
+                            // objected to, which is what a condition nothing
+                            // depends on looks like from the outside.
+                            if i + 1 < input.len() && input[i + 1] == input[i] {
                                 break;
                             }
                             i += 1;
                             lit += 1;
                         }
-                        if lit == 0 {
-                            i = start + 1;
-                            lit = 1;
-                        }
+                        // `lit` cannot be zero here. Reaching this branch means
+                        // the run test above found fewer than two equal bytes
+                        // at `i`, so the first pass of the loop cannot see a
+                        // repeat and always takes one byte. A `lit == 0` arm
+                        // stood here and could be changed at will without any
+                        // test noticing, because it is unreachable; it is gone
+                        // rather than left as code that looks like it runs.
+                        debug_assert!(lit > 0, "a literal run is at least one byte");
                         out.push(lit as u8);
                         out.extend_from_slice(&input[start..start + lit]);
                     }
@@ -1088,6 +1098,131 @@ mod tests {
     /// is the right format. That is what a golden vector is, and it is the
     /// reason each is paired with the round trip above rather than trusted on
     /// its own.
+    /// A chosen encoding is never a no-op.
+    ///
+    /// All three choosers force the rotation amount odd with `| 1`, because
+    /// `Rotate(0)` is the identity and an obfuscation layer that comes out as
+    /// the identity is not a layer. Mutation testing turned each of those into
+    /// `& 1` and `^ 1`, six changes in all, and nothing objected: every test
+    /// asked whether the result round trips, and the identity round trips
+    /// perfectly.
+    #[test]
+    fn a_chosen_rotation_is_never_the_identity() {
+        // `for_name` is deterministic in its seed, so every second byte it can
+        // be handed is checked rather than sampled.
+        for b in 0u8..=255 {
+            let chosen = Weave::for_name(&[7, b]);
+            if let Weave::Rotate(by) = chosen {
+                assert_eq!(
+                    by % 2,
+                    1,
+                    "for_name chose Rotate({by}) from second byte {b}"
+                );
+                assert_ne!(by, 0);
+            }
+        }
+
+        // The two random choosers cannot be enumerated, so they are drawn from
+        // enough times that a chooser producing an even amount would have to be
+        // very lucky to hide. A hundred draws each.
+        for _ in 0..100 {
+            for chosen in [
+                Weave::random().unwrap(),
+                Weave::random_length_preserving().unwrap(),
+            ] {
+                if let Weave::Rotate(by) = chosen {
+                    assert_eq!(by % 2, 1, "a random chooser produced Rotate({by})");
+                }
+                // And whatever was chosen actually changes something, which is
+                // the property the odd amount exists to guarantee.
+                let sample = b"the quick brown fox";
+                if !matches!(chosen, Weave::None) {
+                    assert_ne!(
+                        chosen.apply(sample),
+                        sample.to_vec(),
+                        "{chosen:?} left its input untouched"
+                    );
+                }
+            }
+        }
+    }
+
+    /// `preserves_length` answers no for an encoding that does not.
+    ///
+    /// It could be replaced with `true` and nothing objected: every caller in
+    /// the tests asked it about encodings that do preserve length, so the
+    /// false half of the answer was never read.
+    #[test]
+    fn preserves_length_is_not_simply_true() {
+        assert!(Weave::None.preserves_length());
+        assert!(Weave::Rotate(3).preserves_length());
+        assert!(Weave::XorMask.preserves_length());
+
+        // Hex doubles the input, Base32 pads it, Morse is far longer again.
+        for expanding in [Weave::Hex, Weave::Base32, Weave::Morse, Weave::RunLength] {
+            assert!(
+                !expanding.preserves_length(),
+                "{expanding:?} does not preserve length and must not claim to"
+            );
+        }
+
+        // And the claim is checked against what each encoding actually does.
+        //
+        // The two halves are not symmetric, and the first attempt at this test
+        // got that wrong. "Preserves length" is a claim about *every* input, so
+        // it is refuted by one input that changes the length and proved by
+        // none. "Does not preserve length" only promises that some input
+        // changes: yEnc escapes four particular byte values and leaves
+        // everything else alone, so it keeps the length of most samples while
+        // still being an encoding that can expand. A single sample judged both
+        // halves the same way and called yEnc a liar.
+        for weave in ALL {
+            let w = match weave {
+                Weave::Rotate(_) => Weave::Rotate(137),
+                other => *other,
+            };
+            let mut ever_changed = false;
+            for input in corpus() {
+                let out = w.apply(&input);
+                if out.len() != input.len() {
+                    ever_changed = true;
+                    assert!(
+                        !w.preserves_length(),
+                        "{w:?} claims to preserve length and changed {} bytes into {}",
+                        input.len(),
+                        out.len()
+                    );
+                }
+            }
+            if !w.preserves_length() {
+                assert!(
+                    ever_changed,
+                    "{w:?} says it does not preserve length, and never changed one"
+                );
+            }
+        }
+    }
+
+    /// An escape with nothing after it is refused rather than read past.
+    ///
+    /// The quoted-printable and percent decoders check `i + 1 >= input.len()`
+    /// before reading the two characters an escape needs. Mutation testing
+    /// turned that `+` into `*`, which makes the test `i >= input.len()` and
+    /// therefore always false inside a loop that runs while `i < len`: the
+    /// guard stops guarding and the read runs off the end of the escape.
+    #[test]
+    fn a_truncated_escape_is_refused() {
+        for weave in [Weave::QuotedPrintable, Weave::Percent] {
+            let marker = weave.apply(b" ")[0];
+            for truncated in [vec![marker], vec![b'A', marker], vec![marker, b'4']] {
+                assert!(
+                    weave.undo(&truncated).is_err(),
+                    "{weave:?} accepted a truncated escape {truncated:?}"
+                );
+            }
+        }
+    }
+
     #[test]
     fn every_encoding_emits_exactly_these_bytes() {
         // Chosen to exercise what these encodings disagree about: a run of

@@ -1236,6 +1236,140 @@ mod tests {
         assert!(lock.cooldown().is_none());
     }
 
+    /// A lock file of exactly the right length parses; one byte short does not.
+    ///
+    /// `parse` refuses `bytes.len() < want`, and mutation testing turned that
+    /// into `<=`, which rejects the exact length every real lock file has. The
+    /// suite never handed it a buffer of exactly `want`: it tested rubbish,
+    /// which is too short, and real files, which come through `to_bytes` and
+    /// so were never measured against the boundary from below.
+    #[test]
+    fn a_lock_file_is_accepted_at_exactly_its_length_and_not_one_byte_under() {
+        let lock = AppLock::create(b"pw", weak()).unwrap();
+        let bytes = lock.to_bytes();
+        assert_eq!(bytes.len(), LOCK_LEN, "a version 2 record is LOCK_LEN long");
+
+        AppLock::parse(&bytes).expect("exactly the right length must parse");
+        assert!(
+            matches!(
+                AppLock::parse(&bytes[..bytes.len() - 1]),
+                Err(Error::Truncated)
+            ),
+            "one byte short is truncated"
+        );
+    }
+
+    /// A lock path that cannot be read is an error, not an absent lock.
+    ///
+    /// Both readers match specifically on `NotFound` and treat everything else
+    /// as a failure, because silently reporting "no lock here" for a file that
+    /// exists but could not be read would turn a permissions problem into an
+    /// open door. Mutation testing replaced each guard with `true`, making
+    /// every error mean "no lock", and nothing objected: the only paths the
+    /// suite ever handed them were absent ones.
+    #[test]
+    fn a_path_that_is_not_a_readable_file_is_an_error_rather_than_no_lock() {
+        let dir = tempfile::tempdir().unwrap();
+
+        // Genuinely absent: the one case that really is `Ok(None)`.
+        assert!(LockStore::open(&dir.path().join("nothing-here"))
+            .unwrap()
+            .is_none());
+
+        // A directory where a file should be. Reading it fails with something
+        // that is not `NotFound` on every platform this ships to.
+        let in_the_way = dir.path().join("in-the-way");
+        std::fs::create_dir(&in_the_way).unwrap();
+        assert!(
+            LockStore::open(&in_the_way).is_err(),
+            "a directory in place of the lock file is not an absent lock"
+        );
+    }
+
+    /// The tamper report can be raised from outside, and the flag actually moves.
+    ///
+    /// `report_tamper` could be replaced with a function that does nothing.
+    /// The vault calls it when the two copies of a lock disagree, which is
+    /// evidence the lock module cannot see on its own, so a version that does
+    /// nothing loses exactly the report that came from somewhere else.
+    #[test]
+    fn a_report_raised_from_outside_is_visible_and_survives_an_unlock() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("lock");
+        let mut store = LockStore::create(&path, b"pw", weak()).unwrap();
+        assert!(!store.tampered());
+
+        store.report_tamper();
+        assert!(store.tampered(), "the report must be visible at once");
+
+        // And persisting it needs an unlock, after which it is still raised:
+        // an unlock is not an acknowledgement.
+        store.unlock(b"pw").unwrap();
+        assert!(store.tampered(), "unlocking does not clear a report");
+
+        store.acknowledge(b"pw").unwrap();
+        assert!(!store.tampered(), "acknowledging does");
+    }
+
+    /// The store reports its wait and whether the last write reached every copy.
+    ///
+    /// Four mutants lived in these two accessors, answering `None`, a default
+    /// `Duration`, `true` and `false`. Nothing read either in a state where the
+    /// answer was interesting.
+    #[test]
+    fn the_store_reports_its_wait_and_whether_every_copy_is_current() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("lock");
+        let mut store = LockStore::create(&path, b"pw", weak()).unwrap();
+
+        // A single file is either written or an error, so every copy is
+        // current by construction here. That is the `true` half.
+        assert!(store.every_copy_current());
+        assert!(store.cooldown().is_none(), "no failures, no wait");
+
+        for _ in 0..4 {
+            let _ = store.unlock(b"nope");
+        }
+        let waiting = store.cooldown().expect("four failures earn a wait");
+        assert!(
+            waiting.as_secs() > 0 && waiting.as_secs() <= MAX_DELAY_SECS,
+            "the wait is a real number of seconds, not a default Duration: {waiting:?}"
+        );
+        assert!(
+            store.every_copy_current(),
+            "still a single file, still current"
+        );
+    }
+
+    /// Where the lock lives is a real path, not nothing and not the empty one.
+    ///
+    /// Every one of these could be replaced with `None`, and two of them with
+    /// `Some(PathBuf::new())`, without any test objecting. None of them can be
+    /// asserted to equal a particular path, because the answer is a property of
+    /// the machine; what can be asserted is that there is an answer and that it
+    /// names something.
+    #[test]
+    fn the_default_lock_path_is_an_actual_path() {
+        let path = default_path().expect("this platform has somewhere to keep a lock");
+        assert!(
+            path.file_name().is_some(),
+            "the default path names a file: {path:?}"
+        );
+        assert!(
+            path.parent()
+                .map(|p| !p.as_os_str().is_empty())
+                .unwrap_or(false),
+            "and sits in a directory: {path:?}"
+        );
+
+        let dir = default_dir().expect("and that directory can be named on its own");
+        assert!(!dir.as_os_str().is_empty(), "which is not the empty path");
+        assert!(
+            path.starts_with(&dir),
+            "the file is inside the directory: {path:?} against {dir:?}"
+        );
+    }
+
     /// The rate limit is the whole defence against a script guessing all night,
     /// so its shape is asserted rather than assumed.
     #[test]

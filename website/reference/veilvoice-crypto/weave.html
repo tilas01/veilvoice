@@ -48,7 +48,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/weave.svg" alt="weave.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/weave.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1397 lines &middot; <a href="weave.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1532 lines &middot; <a href="weave.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-buys-and-it-is-not-what-it-looks-like">What this buys, and it is not what it looks like</a>
@@ -86,7 +86,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1397 lines defining <strong>21 functions</strong> (10 public), <strong>1 type</strong> and <strong>18 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1532 lines defining <strong>21 functions</strong> (10 public), <strong>1 type</strong> and <strong>18 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Weave</code> <span style="color:var(--muted)">line 90</span> &middot; Every encoding, by name.</li>
 </ul>
@@ -104,13 +104,13 @@
 <li><code>Weave::apply</code> <span style="color:var(--muted)">line 366</span> &middot; Encode.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base32_encode</code>, <code>base45_encode</code>, <code>base85_encode</code>, <code>base91_encode</code>, <code>sixbit_encode</code></span>
 </li>
-<li><code>Weave::undo</code> <span style="color:var(--muted)">line 535</span> &middot; Decode.
+<li><code>Weave::undo</code> <span style="color:var(--muted)">line 545</span> &middot; Decode.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base32_decode</code>, <code>base45_decode</code>, <code>base85_decode</code>, <code>base91_decode</code>, <code>nibble</code>, <code>sixbit_decode</code></span>
 </li>
-<li><code>encode</code> <span style="color:var(--muted)">line 718</span> &middot; Encode with a randomly chosen encoding, returning it so it can be undone.
+<li><code>encode</code> <span style="color:var(--muted)">line 728</span> &middot; Encode with a randomly chosen encoding, returning it so it can be undone.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>random</code></span>
 </li>
-<li><code>decode</code> <span style="color:var(--muted)">line 724</span> &middot; Undo encode.
+<li><code>decode</code> <span style="color:var(--muted)">line 734</span> &middot; Undo encode.
 </li>
 </ul>
 </section>
@@ -178,72 +178,72 @@
 <a href="weave.src.html#fn-weave-undo">
 <rect x="203.0" y="237.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="261.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Weave::undo</text>
-<text x="261.3" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 535</text>
+<text x="261.3" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 545</text>
 </a>
 <a href="weave.src.html#fn-encode">
 <rect x="345.6" y="237.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="391.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">encode</text>
-<text x="391.9" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 718</text>
+<text x="391.9" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 728</text>
 </a>
 <a href="weave.src.html#fn-decode">
 <rect x="464.1" y="237.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decode</text>
-<text x="510.3" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 724</text>
+<text x="510.3" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 734</text>
 </a>
 <a href="weave.src.html#fn-nibble">
 <rect x="20.0" y="337.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="66.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">nibble</text>
-<text x="66.2" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 728</text>
+<text x="66.2" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 738</text>
 </a>
 <a href="weave.src.html#fn-base32_encode">
 <rect x="138.5" y="337.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="204.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base32_encode</text>
-<text x="204.9" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 776</text>
+<text x="204.9" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 786</text>
 </a>
 <a href="weave.src.html#fn-base32_decode">
 <rect x="297.3" y="337.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="363.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base32_decode</text>
-<text x="363.6" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 796</text>
+<text x="363.6" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 806</text>
 </a>
 <a href="weave.src.html#fn-base45_encode">
 <rect x="456.0" y="337.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="522.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base45_encode</text>
-<text x="522.4" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 821</text>
+<text x="522.4" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 831</text>
 </a>
 <a href="weave.src.html#fn-base45_decode">
 <rect x="79.2" y="437.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="145.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base45_decode</text>
-<text x="145.6" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 838</text>
+<text x="145.6" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 848</text>
 </a>
 <a href="weave.src.html#fn-base85_encode">
 <rect x="238.0" y="437.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="304.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base85_encode</text>
-<text x="304.4" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 863</text>
+<text x="304.4" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 873</text>
 </a>
 <a href="weave.src.html#fn-base85_decode">
 <rect x="396.8" y="437.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="463.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base85_decode</text>
-<text x="463.2" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 884</text>
+<text x="463.2" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 894</text>
 </a>
 <a href="weave.src.html#fn-base91_encode">
 <rect x="79.2" y="537.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="145.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base91_encode</text>
-<text x="145.6" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 924</text>
+<text x="145.6" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 934</text>
 </a>
 <a href="weave.src.html#fn-base91_decode">
 <rect x="238.0" y="537.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="304.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base91_decode</text>
-<text x="304.4" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 953</text>
+<text x="304.4" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 963</text>
 </a>
 <a href="weave.src.html#fn-sixbit_encode">
 <rect x="396.8" y="537.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="463.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sixbit_encode</text>
-<text x="463.2" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 979</text>
+<text x="463.2" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 989</text>
 </a>
 <a href="weave.src.html#fn-sixbit_decode">
 <rect x="238.0" y="637.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="304.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sixbit_decode</text>
-<text x="304.4" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 999</text>
+<text x="304.4" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1009</text>
 </a>
 <rect x="20.0" y="721.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="730.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -269,20 +269,20 @@ flowchart TD
     n_random[&quot;Weave::random&lt;br/&gt;line 342&quot;]
     n_for_name([&quot;Weave::for_name&lt;br/&gt;line 356&quot;])
     n_apply([&quot;Weave::apply&lt;br/&gt;line 366&quot;])
-    n_undo([&quot;Weave::undo&lt;br/&gt;line 535&quot;])
-    n_encode([&quot;encode&lt;br/&gt;line 718&quot;])
-    n_decode([&quot;decode&lt;br/&gt;line 724&quot;])
-    n_nibble[&quot;nibble&lt;br/&gt;line 728&quot;]
-    n_base32_encode[&quot;base32_encode&lt;br/&gt;line 776&quot;]
-    n_base32_decode[&quot;base32_decode&lt;br/&gt;line 796&quot;]
-    n_base45_encode[&quot;base45_encode&lt;br/&gt;line 821&quot;]
-    n_base45_decode[&quot;base45_decode&lt;br/&gt;line 838&quot;]
-    n_base85_encode[&quot;base85_encode&lt;br/&gt;line 863&quot;]
-    n_base85_decode[&quot;base85_decode&lt;br/&gt;line 884&quot;]
-    n_base91_encode[&quot;base91_encode&lt;br/&gt;line 924&quot;]
-    n_base91_decode[&quot;base91_decode&lt;br/&gt;line 953&quot;]
-    n_sixbit_encode[&quot;sixbit_encode&lt;br/&gt;line 979&quot;]
-    n_sixbit_decode[&quot;sixbit_decode&lt;br/&gt;line 999&quot;]
+    n_undo([&quot;Weave::undo&lt;br/&gt;line 545&quot;])
+    n_encode([&quot;encode&lt;br/&gt;line 728&quot;])
+    n_decode([&quot;decode&lt;br/&gt;line 734&quot;])
+    n_nibble[&quot;nibble&lt;br/&gt;line 738&quot;]
+    n_base32_encode[&quot;base32_encode&lt;br/&gt;line 786&quot;]
+    n_base32_decode[&quot;base32_decode&lt;br/&gt;line 806&quot;]
+    n_base45_encode[&quot;base45_encode&lt;br/&gt;line 831&quot;]
+    n_base45_decode[&quot;base45_decode&lt;br/&gt;line 848&quot;]
+    n_base85_encode[&quot;base85_encode&lt;br/&gt;line 873&quot;]
+    n_base85_decode[&quot;base85_decode&lt;br/&gt;line 894&quot;]
+    n_base91_encode[&quot;base91_encode&lt;br/&gt;line 934&quot;]
+    n_base91_decode[&quot;base91_decode&lt;br/&gt;line 963&quot;]
+    n_sixbit_encode[&quot;sixbit_encode&lt;br/&gt;line 989&quot;]
+    n_sixbit_decode[&quot;sixbit_decode&lt;br/&gt;line 1009&quot;]
     n_apply --&gt; n_base32_encode
     n_apply --&gt; n_base45_encode
     n_apply --&gt; n_base85_encode
@@ -302,20 +302,20 @@ flowchart TD
     click n_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L342&quot; &quot;open the source&quot;
     click n_for_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L356&quot; &quot;open the source&quot;
     click n_apply href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L366&quot; &quot;open the source&quot;
-    click n_undo href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L535&quot; &quot;open the source&quot;
-    click n_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L718&quot; &quot;open the source&quot;
-    click n_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L724&quot; &quot;open the source&quot;
-    click n_nibble href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L728&quot; &quot;open the source&quot;
-    click n_base32_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L776&quot; &quot;open the source&quot;
-    click n_base32_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L796&quot; &quot;open the source&quot;
-    click n_base45_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L821&quot; &quot;open the source&quot;
-    click n_base45_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L838&quot; &quot;open the source&quot;
-    click n_base85_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L863&quot; &quot;open the source&quot;
-    click n_base85_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L884&quot; &quot;open the source&quot;
-    click n_base91_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L924&quot; &quot;open the source&quot;
-    click n_base91_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L953&quot; &quot;open the source&quot;
-    click n_sixbit_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L979&quot; &quot;open the source&quot;
-    click n_sixbit_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L999&quot; &quot;open the source&quot;
+    click n_undo href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L545&quot; &quot;open the source&quot;
+    click n_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L728&quot; &quot;open the source&quot;
+    click n_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L734&quot; &quot;open the source&quot;
+    click n_nibble href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L738&quot; &quot;open the source&quot;
+    click n_base32_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L786&quot; &quot;open the source&quot;
+    click n_base32_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L806&quot; &quot;open the source&quot;
+    click n_base45_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L831&quot; &quot;open the source&quot;
+    click n_base45_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L848&quot; &quot;open the source&quot;
+    click n_base85_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L873&quot; &quot;open the source&quot;
+    click n_base85_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L894&quot; &quot;open the source&quot;
+    click n_base91_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L934&quot; &quot;open the source&quot;
+    click n_base91_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L963&quot; &quot;open the source&quot;
+    click n_sixbit_encode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L989&quot; &quot;open the source&quot;
+    click n_sixbit_decode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1009&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_id,n_from_id,n_preserves_length,n_random_length_preserving,n_for_name,n_apply,n_undo,n_encode,n_decode entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -338,36 +338,36 @@ flowchart TD
 <tr><td><code>Weave::random</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-weave-random">342</a></td><td>Pick one at random, from ALL.</td></tr>
 <tr><td><code>Weave::for_name</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-weave-for_name">356</a></td><td>Pick one deterministically from key material, from LENGTH_PRESERVING.</td></tr>
 <tr><td><code>Weave::apply</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-weave-apply">366</a></td><td>Encode.</td></tr>
-<tr><td><code>Weave::undo</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-weave-undo">535</a></td><td>Decode.</td></tr>
-<tr><td><code>encode</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-encode">718</a></td><td>Encode with a randomly chosen encoding, returning it so it can be undone.</td></tr>
-<tr><td><code>decode</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-decode">724</a></td><td>Undo encode.</td></tr>
-<tr><td><code>nibble</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-nibble">728</a></td><td></td></tr>
-<tr><td><code>HEX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-hex">737</a></td><td></td></tr>
-<tr><td><code>HEX_UPPER</code> <sub>const</sub></td><td><a href="weave.src.html#fn-hex_upper">738</a></td><td></td></tr>
-<tr><td><code>B32</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b32">739</a></td><td></td></tr>
-<tr><td><code>B32HEX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b32hex">740</a></td><td></td></tr>
-<tr><td><code>ZB32</code> <sub>const</sub></td><td><a href="weave.src.html#fn-zb32">741</a></td><td></td></tr>
-<tr><td><code>CROCKFORD</code> <sub>const</sub></td><td><a href="weave.src.html#fn-crockford">742</a></td><td></td></tr>
-<tr><td><code>B45</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b45">743</a></td><td></td></tr>
-<tr><td><code>A85</code> <sub>const</sub></td><td><a href="weave.src.html#fn-a85">744</a></td><td></td></tr>
-<tr><td><code>Z85A</code> <sub>const</sub></td><td><a href="weave.src.html#fn-z85a">745</a></td><td></td></tr>
-<tr><td><code>UU</code> <sub>const</sub></td><td><a href="weave.src.html#fn-uu">746</a></td><td></td></tr>
-<tr><td><code>XX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-xx">747</a></td><td></td></tr>
-<tr><td><code>XX_ALPHABET</code> <sub>const</sub></td><td><a href="weave.src.html#fn-xx_alphabet">748</a></td><td></td></tr>
-<tr><td><code>Z85_ALPHABET</code> <sub>const</sub></td><td><a href="weave.src.html#fn-z85_alphabet">749</a></td><td></td></tr>
-<tr><td><code>SBOX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-sbox">756</a></td><td>A fixed permutation of every byte value, and its inverse.</td></tr>
-<tr><td><code>UNSBOX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-unsbox">766</a></td><td></td></tr>
-<tr><td><code>base32_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base32_encode">776</a></td><td></td></tr>
-<tr><td><code>base32_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base32_decode">796</a></td><td></td></tr>
-<tr><td><code>base45_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base45_encode">821</a></td><td></td></tr>
-<tr><td><code>base45_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base45_decode">838</a></td><td></td></tr>
-<tr><td><code>base85_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base85_encode">863</a></td><td></td></tr>
-<tr><td><code>base85_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base85_decode">884</a></td><td></td></tr>
-<tr><td><code>B91</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b91">921</a></td><td></td></tr>
-<tr><td><code>base91_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base91_encode">924</a></td><td></td></tr>
-<tr><td><code>base91_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base91_decode">953</a></td><td></td></tr>
-<tr><td><code>sixbit_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-sixbit_encode">979</a></td><td></td></tr>
-<tr><td><code>sixbit_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-sixbit_decode">999</a></td><td></td></tr>
+<tr><td><code>Weave::undo</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-weave-undo">545</a></td><td>Decode.</td></tr>
+<tr><td><code>encode</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-encode">728</a></td><td>Encode with a randomly chosen encoding, returning it so it can be undone.</td></tr>
+<tr><td><code>decode</code> <sub>pub fn</sub></td><td><a href="weave.src.html#fn-decode">734</a></td><td>Undo encode.</td></tr>
+<tr><td><code>nibble</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-nibble">738</a></td><td></td></tr>
+<tr><td><code>HEX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-hex">747</a></td><td></td></tr>
+<tr><td><code>HEX_UPPER</code> <sub>const</sub></td><td><a href="weave.src.html#fn-hex_upper">748</a></td><td></td></tr>
+<tr><td><code>B32</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b32">749</a></td><td></td></tr>
+<tr><td><code>B32HEX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b32hex">750</a></td><td></td></tr>
+<tr><td><code>ZB32</code> <sub>const</sub></td><td><a href="weave.src.html#fn-zb32">751</a></td><td></td></tr>
+<tr><td><code>CROCKFORD</code> <sub>const</sub></td><td><a href="weave.src.html#fn-crockford">752</a></td><td></td></tr>
+<tr><td><code>B45</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b45">753</a></td><td></td></tr>
+<tr><td><code>A85</code> <sub>const</sub></td><td><a href="weave.src.html#fn-a85">754</a></td><td></td></tr>
+<tr><td><code>Z85A</code> <sub>const</sub></td><td><a href="weave.src.html#fn-z85a">755</a></td><td></td></tr>
+<tr><td><code>UU</code> <sub>const</sub></td><td><a href="weave.src.html#fn-uu">756</a></td><td></td></tr>
+<tr><td><code>XX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-xx">757</a></td><td></td></tr>
+<tr><td><code>XX_ALPHABET</code> <sub>const</sub></td><td><a href="weave.src.html#fn-xx_alphabet">758</a></td><td></td></tr>
+<tr><td><code>Z85_ALPHABET</code> <sub>const</sub></td><td><a href="weave.src.html#fn-z85_alphabet">759</a></td><td></td></tr>
+<tr><td><code>SBOX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-sbox">766</a></td><td>A fixed permutation of every byte value, and its inverse.</td></tr>
+<tr><td><code>UNSBOX</code> <sub>const</sub></td><td><a href="weave.src.html#fn-unsbox">776</a></td><td></td></tr>
+<tr><td><code>base32_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base32_encode">786</a></td><td></td></tr>
+<tr><td><code>base32_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base32_decode">806</a></td><td></td></tr>
+<tr><td><code>base45_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base45_encode">831</a></td><td></td></tr>
+<tr><td><code>base45_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base45_decode">848</a></td><td></td></tr>
+<tr><td><code>base85_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base85_encode">873</a></td><td></td></tr>
+<tr><td><code>base85_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base85_decode">894</a></td><td></td></tr>
+<tr><td><code>B91</code> <sub>const</sub></td><td><a href="weave.src.html#fn-b91">931</a></td><td></td></tr>
+<tr><td><code>base91_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base91_encode">934</a></td><td></td></tr>
+<tr><td><code>base91_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-base91_decode">963</a></td><td></td></tr>
+<tr><td><code>sixbit_encode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-sixbit_encode">989</a></td><td></td></tr>
+<tr><td><code>sixbit_decode</code> <sub>fn</sub></td><td><a href="weave.src.html#fn-sixbit_decode">1009</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
