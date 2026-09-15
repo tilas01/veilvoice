@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/lock.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 2086 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 2220 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
 
 ## Contents
 
@@ -121,7 +121,7 @@ protects them; this protects the session.
 
 ## What this file contains
 
-2086 lines defining **49 functions** (34 public), **3 types** and **16 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2220 lines defining **49 functions** (34 public), **3 types** and **16 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

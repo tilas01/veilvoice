@@ -47,7 +47,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/vault.rs</code></h1>
-<p style="color:var(--muted)"><a href="vault.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 665 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="vault.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 697 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -477,284 +477,316 @@
 <span class="ln" id="L385">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;and removing it twice is still not one&quot;</span>);</span>
 <span class="ln" id="L386">    }</span>
 <span class="ln" id="L387"></span>
-<span class="ln" id="L388">    <span class="tok-com">/// A store into a directory that does not exist yet creates it.</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// A store survives its own directory being removed underneath it.</span></span>
 <span class="ln" id="L389">    <span class="tok-com">///</span></span>
 <span class="ln" id="L390">    <span class="tok-com">/// `write_one` creates the parent when the parent is not empty, and</span></span>
-<span class="ln" id="L391">    <span class="tok-com">/// deleting that `!` inverts it into creating the parent only when there</span></span>
-<span class="ln" id="L392">    <span class="tok-com">/// is none to create. Every existing test handed it a `tempdir` that</span></span>
-<span class="ln" id="L393">    <span class="tok-com">/// already existed, so the creation never had to happen and its absence</span></span>
-<span class="ln" id="L394">    <span class="tok-com">/// never showed.</span></span>
-<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">storing_into_a_directory_that_does_not_exist_yet_creates_it</span>() {</span>
-<span class="ln" id="L397">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L398">        <span class="tok-kw">let</span> nested = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;not&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;made&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;yet&quot;</span>);</span>
-<span class="ln" id="L399">        assert!(</span>
-<span class="ln" id="L400">            !nested.<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L401">            <span class="tok-str">&quot;the point of the test is that it is absent&quot;</span></span>
-<span class="ln" id="L402">        );</span>
-<span class="ln" id="L403"></span>
-<span class="ln" id="L404">        <span class="tok-kw">let</span> vault = Vault::<span class="tok-fn">at</span>(&amp;nested, None).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L405">        <span class="tok-kw">let</span> lock = <span class="tok-kw">crate</span>::lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L406">        vault.<span class="tok-fn">store</span>(&amp;lock).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L407"></span>
-<span class="ln" id="L408">        <span class="tok-kw">let</span> (back, _) = vault.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L409">        <span class="tok-kw">let</span> back = back.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;what was stored reads back&quot;</span>);</span>
-<span class="ln" id="L410">        assert!(back.<span class="tok-fn">same_secret_as</span>(&amp;lock));</span>
-<span class="ln" id="L411">    }</span>
+<span class="ln" id="L391">    <span class="tok-com">/// deleting that `!` inverts it into creating the parent only when there is</span></span>
+<span class="ln" id="L392">    <span class="tok-com">/// none to create. The first attempt at this test handed `Vault::at` a path</span></span>
+<span class="ln" id="L393">    <span class="tok-com">/// that did not exist and expected the creation to happen there, and the</span></span>
+<span class="ln" id="L394">    <span class="tok-com">/// mutant survived it: `Vault::at` calls `create_dir_all` itself when it</span></span>
+<span class="ln" id="L395">    <span class="tok-com">/// writes a new index, so by the time `write_one` runs the directory is</span></span>
+<span class="ln" id="L396">    <span class="tok-com">/// always already there. The creation in `write_one` only matters when the</span></span>
+<span class="ln" id="L397">    <span class="tok-com">/// directory goes away between the two, which is what somebody deleting the</span></span>
+<span class="ln" id="L398">    <span class="tok-com">/// folder looks like, so that is what this does.</span></span>
+<span class="ln" id="L399">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L400">    <span class="tok-kw">fn</span> <span class="tok-fn">a_store_recreates_its_directory_if_it_is_removed_underneath</span>() {</span>
+<span class="ln" id="L401">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L402">        <span class="tok-kw">let</span> base = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;vault&quot;</span>);</span>
+<span class="ln" id="L403">        <span class="tok-kw">let</span> vault = Vault::<span class="tok-fn">at</span>(&amp;base, None).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L404">        <span class="tok-kw">let</span> lock = <span class="tok-kw">crate</span>::lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;pw&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L405">        vault.<span class="tok-fn">store</span>(&amp;lock).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L406"></span>
+<span class="ln" id="L407">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;base).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L408">        assert!(</span>
+<span class="ln" id="L409">            !base.<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L410">            <span class="tok-str">&quot;the directory is gone before the second store&quot;</span></span>
+<span class="ln" id="L411">        );</span>
 <span class="ln" id="L412"></span>
-<span class="ln" id="L413">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L414">    <span class="tok-kw">fn</span> <span class="tok-fn">the_two_copies_are_not_the_same_file</span>() {</span>
-<span class="ln" id="L415">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L416">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L417">        assert_ne!(v.<span class="tok-fn">primary</span>(), v.<span class="tok-fn">shadow</span>());</span>
-<span class="ln" id="L418">        assert_ne!(v.<span class="tok-fn">primary</span>(), v.<span class="tok-fn">index</span>());</span>
+<span class="ln" id="L413">        vault</span>
+<span class="ln" id="L414">            .<span class="tok-fn">store</span>(&amp;lock)</span>
+<span class="ln" id="L415">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a store must put the directory back&quot;</span>);</span>
+<span class="ln" id="L416">        <span class="tok-kw">let</span> (back, _) = vault.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L417">        <span class="tok-kw">let</span> back = back.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;and what it wrote must read back&quot;</span>);</span>
+<span class="ln" id="L418">        assert!(back.<span class="tok-fn">same_secret_as</span>(&amp;lock));</span>
 <span class="ln" id="L419">    }</span>
 <span class="ln" id="L420"></span>
-<span class="ln" id="L421">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L422">    <span class="tok-kw">fn</span> <span class="tok-fn">the_names_are_stable_across_runs_and_differ_between_installs</span>() {</span>
-<span class="ln" id="L423">        <span class="tok-kw">let</span> one = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L424">        <span class="tok-kw">let</span> two = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L425"></span>
-<span class="ln" id="L426">        <span class="tok-kw">let</span> a = <span class="tok-fn">vault</span>(one.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L427">        <span class="tok-kw">let</span> again = <span class="tok-fn">vault</span>(one.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L428">        assert_eq!(a.<span class="tok-fn">primary</span>(), again.<span class="tok-fn">primary</span>(), <span class="tok-str">&quot;the index must be reused&quot;</span>);</span>
-<span class="ln" id="L429"></span>
-<span class="ln" id="L430">        <span class="tok-kw">let</span> b = <span class="tok-fn">vault</span>(two.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L431">        assert_ne!(</span>
-<span class="ln" id="L432">            a.<span class="tok-fn">primary</span>().<span class="tok-fn">file_name</span>(),</span>
-<span class="ln" id="L433">            b.<span class="tok-fn">primary</span>().<span class="tok-fn">file_name</span>(),</span>
-<span class="ln" id="L434">            <span class="tok-str">&quot;two installations must not share a name&quot;</span></span>
-<span class="ln" id="L435">        );</span>
-<span class="ln" id="L436">    }</span>
-<span class="ln" id="L437"></span>
-<span class="ln" id="L438">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L439">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_on_disk_says_it_is_a_lock_file</span>() {</span>
-<span class="ln" id="L440">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L441">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L442">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L443">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L444">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L445"></span>
-<span class="ln" id="L446">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [v.<span class="tok-fn">primary</span>(), v.<span class="tok-fn">shadow</span>()] {</span>
-<span class="ln" id="L447">            <span class="tok-kw">let</span> raw = std::fs::<span class="tok-fn">read</span>(path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L448">            assert!(</span>
-<span class="ln" id="L449">                !raw.<span class="tok-fn">windows</span>(<span class="tok-num">8</span>).<span class="tok-fn">any</span>(|w| w == lock::MAGIC),</span>
-<span class="ln" id="L450">                <span class="tok-str">&quot;{} still carries the magic in the clear&quot;</span>,</span>
-<span class="ln" id="L451">                path.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L452">            );</span>
-<span class="ln" id="L453">        }</span>
-<span class="ln" id="L454">    }</span>
-<span class="ln" id="L455"></span>
-<span class="ln" id="L456">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L457">    <span class="tok-kw">fn</span> <span class="tok-fn">a_masked_file_reads_back_as_what_was_written</span>() {</span>
-<span class="ln" id="L458">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L459">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L460">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L461">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L462">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L463"></span>
-<span class="ln" id="L464">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L465">        assert_eq!(found, Found::Intact);</span>
-<span class="ln" id="L466">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> loaded = loaded.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the lock should be there&quot;</span>);</span>
-<span class="ln" id="L467">        loaded.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L421">    <span class="tok-com">/// An index that cannot be read is an error, not a reason to make a new one.</span></span>
+<span class="ln" id="L422">    <span class="tok-com">///</span></span>
+<span class="ln" id="L423">    <span class="tok-com">/// The site index names both copies of the lock. If reading it fails for</span></span>
+<span class="ln" id="L424">    <span class="tok-com">/// any reason other than &quot;it is not there&quot;, drawing a fresh one writes the</span></span>
+<span class="ln" id="L425">    <span class="tok-com">/// lock under a name nothing can compute again and orphans the real one.</span></span>
+<span class="ln" id="L426">    <span class="tok-com">/// The guard says exactly `NotFound`; mutation testing replaced it with</span></span>
+<span class="ln" id="L427">    <span class="tok-com">/// `true`, so every failure meant &quot;make a new index&quot;, and nothing objected</span></span>
+<span class="ln" id="L428">    <span class="tok-com">/// because the only index the suite ever failed to read was an absent one.</span></span>
+<span class="ln" id="L429">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L430">    <span class="tok-kw">fn</span> <span class="tok-fn">an_index_that_cannot_be_read_is_refused_rather_than_replaced</span>() {</span>
+<span class="ln" id="L431">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L432">        <span class="tok-kw">let</span> base = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;vault&quot;</span>);</span>
+<span class="ln" id="L433">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;base).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L434"></span>
+<span class="ln" id="L435">        <span class="tok-com">// A directory where the index file should be: present, and unreadable</span></span>
+<span class="ln" id="L436">        <span class="tok-com">// as a file, on every platform this ships to.</span></span>
+<span class="ln" id="L437">        std::fs::<span class="tok-fn">create_dir</span>(base.<span class="tok-fn">join</span>(INDEX_NAME)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L438"></span>
+<span class="ln" id="L439">        assert!(</span>
+<span class="ln" id="L440">            Vault::<span class="tok-fn">at</span>(&amp;base, None).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L441">            <span class="tok-str">&quot;an unreadable index must not be quietly replaced&quot;</span></span>
+<span class="ln" id="L442">        );</span>
+<span class="ln" id="L443">    }</span>
+<span class="ln" id="L444"></span>
+<span class="ln" id="L445">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L446">    <span class="tok-kw">fn</span> <span class="tok-fn">the_two_copies_are_not_the_same_file</span>() {</span>
+<span class="ln" id="L447">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L448">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L449">        assert_ne!(v.<span class="tok-fn">primary</span>(), v.<span class="tok-fn">shadow</span>());</span>
+<span class="ln" id="L450">        assert_ne!(v.<span class="tok-fn">primary</span>(), v.<span class="tok-fn">index</span>());</span>
+<span class="ln" id="L451">    }</span>
+<span class="ln" id="L452"></span>
+<span class="ln" id="L453">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L454">    <span class="tok-kw">fn</span> <span class="tok-fn">the_names_are_stable_across_runs_and_differ_between_installs</span>() {</span>
+<span class="ln" id="L455">        <span class="tok-kw">let</span> one = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L456">        <span class="tok-kw">let</span> two = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L457"></span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> a = <span class="tok-fn">vault</span>(one.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L459">        <span class="tok-kw">let</span> again = <span class="tok-fn">vault</span>(one.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L460">        assert_eq!(a.<span class="tok-fn">primary</span>(), again.<span class="tok-fn">primary</span>(), <span class="tok-str">&quot;the index must be reused&quot;</span>);</span>
+<span class="ln" id="L461"></span>
+<span class="ln" id="L462">        <span class="tok-kw">let</span> b = <span class="tok-fn">vault</span>(two.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L463">        assert_ne!(</span>
+<span class="ln" id="L464">            a.<span class="tok-fn">primary</span>().<span class="tok-fn">file_name</span>(),</span>
+<span class="ln" id="L465">            b.<span class="tok-fn">primary</span>().<span class="tok-fn">file_name</span>(),</span>
+<span class="ln" id="L466">            <span class="tok-str">&quot;two installations must not share a name&quot;</span></span>
+<span class="ln" id="L467">        );</span>
 <span class="ln" id="L468">    }</span>
 <span class="ln" id="L469"></span>
 <span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">deleting_one_copy_does_not_remove_the_lock</span>() {</span>
+<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_on_disk_says_it_is_a_lock_file</span>() {</span>
 <span class="ln" id="L472">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L473">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
 <span class="ln" id="L474">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L475">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L476">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L477"></span>
-<span class="ln" id="L478">        std::fs::<span class="tok-fn">remove_file</span>(v.<span class="tok-fn">primary</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L479">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L480">        assert_eq!(found, Found::Restored, <span class="tok-str">&quot;the loss should be reported&quot;</span>);</span>
-<span class="ln" id="L481">        assert!(loaded.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the lock should have come back&quot;</span>);</span>
-<span class="ln" id="L482">        assert!(v.<span class="tok-fn">primary</span>().<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;and been written back to disk&quot;</span>);</span>
-<span class="ln" id="L483"></span>
-<span class="ln" id="L484">        <span class="tok-com">// The other direction too: the spare is rebuilt from the primary.</span></span>
-<span class="ln" id="L485">        std::fs::<span class="tok-fn">remove_file</span>(v.<span class="tok-fn">shadow</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L486">        <span class="tok-kw">let</span> (_, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L487">        assert_eq!(found, Found::Restored);</span>
-<span class="ln" id="L488">        assert!(v.<span class="tok-fn">shadow</span>().<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L489">    }</span>
-<span class="ln" id="L490"></span>
-<span class="ln" id="L491">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L492">    <span class="tok-kw">fn</span> <span class="tok-fn">a_shredded_copy_is_rebuilt_rather_than_believed</span>() {</span>
-<span class="ln" id="L493">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L494">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L495">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L496">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L497">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L498"></span>
-<span class="ln" id="L499">        std::fs::<span class="tok-fn">write</span>(v.<span class="tok-fn">primary</span>(), b<span class="tok-str">&quot;not a lock file at all&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L500">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L501">        assert_eq!(found, Found::Restored);</span>
-<span class="ln" id="L502">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> loaded = loaded.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the spare should have answered&quot;</span>);</span>
-<span class="ln" id="L503">        loaded.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L504">    }</span>
-<span class="ln" id="L505"></span>
-<span class="ln" id="L506">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L507">    <span class="tok-kw">fn</span> <span class="tok-fn">no_lock_reads_as_no_lock_rather_than_as_an_error</span>() {</span>
-<span class="ln" id="L508">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L509">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L510">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L511">        assert!(loaded.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L512">        assert_eq!(found, Found::Nothing);</span>
-<span class="ln" id="L513">    }</span>
-<span class="ln" id="L514"></span>
-<span class="ln" id="L515">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L516">    <span class="tok-kw">fn</span> <span class="tok-fn">clearing_leaves_nothing_behind</span>() {</span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L519">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L520">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L521">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L522">        v.<span class="tok-fn">clear</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L523"></span>
-<span class="ln" id="L524">        assert!(!v.<span class="tok-fn">primary</span>().<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L525">        assert!(!v.<span class="tok-fn">shadow</span>().<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L526">        assert!(!v.<span class="tok-fn">index</span>().<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L527">    }</span>
-<span class="ln" id="L528"></span>
-<span class="ln" id="L529">    <span class="tok-com">/// The mask is its own inverse, and the test says so directly rather than</span></span>
-<span class="ln" id="L530">    <span class="tok-com">/// only through a round trip, because a mask that quietly became a no-op</span></span>
-<span class="ln" id="L531">    <span class="tok-com">/// would still pass a round trip.</span></span>
-<span class="ln" id="L532">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L533">    <span class="tok-kw">fn</span> <span class="tok-fn">the_mask_changes_the_bytes_and_undoes_itself</span>() {</span>
-<span class="ln" id="L534">        <span class="tok-kw">let</span> site = [7u8; SITE_LEN];</span>
-<span class="ln" id="L535">        <span class="tok-kw">let</span> original = b<span class="tok-str">&quot;VEILLOK1 and then some more bytes to cover two blocks&quot;</span>.<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L536">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> worked = original.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L537">        <span class="tok-fn">mask</span>(&amp;site, &amp;<span class="tok-kw">mut</span> worked);</span>
-<span class="ln" id="L538">        assert_ne!(worked, original, <span class="tok-str">&quot;a mask that changes nothing is not one&quot;</span>);</span>
-<span class="ln" id="L539">        <span class="tok-fn">mask</span>(&amp;site, &amp;<span class="tok-kw">mut</span> worked);</span>
-<span class="ln" id="L540">        assert_eq!(worked, original);</span>
-<span class="ln" id="L541">    }</span>
-<span class="ln" id="L542"></span>
-<span class="ln" id="L543">    <span class="tok-com">/// F-85. A read that fails for any reason other than &quot;there is no index&quot;</span></span>
-<span class="ln" id="L544">    <span class="tok-com">/// must not be answered by writing a new one. The failure that mattered was</span></span>
-<span class="ln" id="L545">    <span class="tok-com">/// not corruption, it was permission: one refused read and the lock would</span></span>
-<span class="ln" id="L546">    <span class="tok-com">/// have been orphaned under a name nothing could compute again.</span></span>
+<span class="ln" id="L478">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [v.<span class="tok-fn">primary</span>(), v.<span class="tok-fn">shadow</span>()] {</span>
+<span class="ln" id="L479">            <span class="tok-kw">let</span> raw = std::fs::<span class="tok-fn">read</span>(path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L480">            assert!(</span>
+<span class="ln" id="L481">                !raw.<span class="tok-fn">windows</span>(<span class="tok-num">8</span>).<span class="tok-fn">any</span>(|w| w == lock::MAGIC),</span>
+<span class="ln" id="L482">                <span class="tok-str">&quot;{} still carries the magic in the clear&quot;</span>,</span>
+<span class="ln" id="L483">                path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L484">            );</span>
+<span class="ln" id="L485">        }</span>
+<span class="ln" id="L486">    }</span>
+<span class="ln" id="L487"></span>
+<span class="ln" id="L488">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L489">    <span class="tok-kw">fn</span> <span class="tok-fn">a_masked_file_reads_back_as_what_was_written</span>() {</span>
+<span class="ln" id="L490">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L491">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L493">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L494">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L495"></span>
+<span class="ln" id="L496">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L497">        assert_eq!(found, Found::Intact);</span>
+<span class="ln" id="L498">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> loaded = loaded.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the lock should be there&quot;</span>);</span>
+<span class="ln" id="L499">        loaded.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L500">    }</span>
+<span class="ln" id="L501"></span>
+<span class="ln" id="L502">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L503">    <span class="tok-kw">fn</span> <span class="tok-fn">deleting_one_copy_does_not_remove_the_lock</span>() {</span>
+<span class="ln" id="L504">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L505">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L506">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L507">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L508">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L509"></span>
+<span class="ln" id="L510">        std::fs::<span class="tok-fn">remove_file</span>(v.<span class="tok-fn">primary</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L511">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L512">        assert_eq!(found, Found::Restored, <span class="tok-str">&quot;the loss should be reported&quot;</span>);</span>
+<span class="ln" id="L513">        assert!(loaded.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;the lock should have come back&quot;</span>);</span>
+<span class="ln" id="L514">        assert!(v.<span class="tok-fn">primary</span>().<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;and been written back to disk&quot;</span>);</span>
+<span class="ln" id="L515"></span>
+<span class="ln" id="L516">        <span class="tok-com">// The other direction too: the spare is rebuilt from the primary.</span></span>
+<span class="ln" id="L517">        std::fs::<span class="tok-fn">remove_file</span>(v.<span class="tok-fn">shadow</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L518">        <span class="tok-kw">let</span> (_, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L519">        assert_eq!(found, Found::Restored);</span>
+<span class="ln" id="L520">        assert!(v.<span class="tok-fn">shadow</span>().<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L521">    }</span>
+<span class="ln" id="L522"></span>
+<span class="ln" id="L523">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L524">    <span class="tok-kw">fn</span> <span class="tok-fn">a_shredded_copy_is_rebuilt_rather_than_believed</span>() {</span>
+<span class="ln" id="L525">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L526">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L527">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L528">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L529">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L530"></span>
+<span class="ln" id="L531">        std::fs::<span class="tok-fn">write</span>(v.<span class="tok-fn">primary</span>(), b<span class="tok-str">&quot;not a lock file at all&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L532">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L533">        assert_eq!(found, Found::Restored);</span>
+<span class="ln" id="L534">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> loaded = loaded.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the spare should have answered&quot;</span>);</span>
+<span class="ln" id="L535">        loaded.<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L536">    }</span>
+<span class="ln" id="L537"></span>
+<span class="ln" id="L538">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L539">    <span class="tok-kw">fn</span> <span class="tok-fn">no_lock_reads_as_no_lock_rather_than_as_an_error</span>() {</span>
+<span class="ln" id="L540">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L541">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L542">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L543">        assert!(loaded.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L544">        assert_eq!(found, Found::Nothing);</span>
+<span class="ln" id="L545">    }</span>
+<span class="ln" id="L546"></span>
 <span class="ln" id="L547">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L548">    <span class="tok-kw">fn</span> <span class="tok-fn">a_damaged_index_refuses_rather_than_writing_a_new_one</span>() {</span>
+<span class="ln" id="L548">    <span class="tok-kw">fn</span> <span class="tok-fn">clearing_leaves_nothing_behind</span>() {</span>
 <span class="ln" id="L549">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L550">        <span class="tok-kw">let</span> first = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L551">        <span class="tok-kw">let</span> name = first.<span class="tok-fn">primary</span>().<span class="tok-fn">to_path_buf</span>();</span>
-<span class="ln" id="L552"></span>
-<span class="ln" id="L553">        <span class="tok-com">// Short by a byte, which is what a partial write leaves.</span></span>
-<span class="ln" id="L554">        std::fs::<span class="tok-fn">write</span>(first.<span class="tok-fn">index</span>(), [0u8; SITE_LEN - <span class="tok-num">1</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L555">        assert!(</span>
-<span class="ln" id="L556">            Vault::<span class="tok-fn">at</span>(dir.<span class="tok-fn">path</span>(), None).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L557">            <span class="tok-str">&quot;a damaged index was replaced, which orphans the lock behind it&quot;</span></span>
-<span class="ln" id="L558">        );</span>
-<span class="ln" id="L559"></span>
-<span class="ln" id="L560">        <span class="tok-com">// And the original name is still computable once the index is right,</span></span>
-<span class="ln" id="L561">        <span class="tok-com">// which is the whole point of refusing.</span></span>
-<span class="ln" id="L562">        std::fs::<span class="tok-fn">write</span>(first.<span class="tok-fn">index</span>(), std::fs::<span class="tok-fn">read</span>(first.<span class="tok-fn">index</span>()).<span class="tok-fn">unwrap</span>()).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L563">        <span class="tok-kw">let</span> restored = [0u8; SITE_LEN];</span>
-<span class="ln" id="L564">        std::fs::<span class="tok-fn">write</span>(first.<span class="tok-fn">index</span>(), restored).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L565">        <span class="tok-kw">let</span> second = Vault::<span class="tok-fn">at</span>(dir.<span class="tok-fn">path</span>(), None).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L566">        assert_ne!(second.<span class="tok-fn">primary</span>(), &amp;name, <span class="tok-str">&quot;different index, different name&quot;</span>);</span>
-<span class="ln" id="L567">    }</span>
-<span class="ln" id="L568"></span>
-<span class="ln" id="L569">    <span class="tok-com">/// F-87. A spare that could never be written is not a spare that was taken</span></span>
-<span class="ln" id="L570">    <span class="tok-com">/// away, and reporting it as one raises the same false alarm at every</span></span>
-<span class="ln" id="L571">    <span class="tok-com">/// launch until nobody reads any of them.</span></span>
-<span class="ln" id="L572">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L573">    <span class="tok-kw">fn</span> <span class="tok-fn">a_spare_that_cannot_be_written_is_not_reported_as_deleted</span>() {</span>
-<span class="ln" id="L574">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L575">        <span class="tok-com">// An admin directory that does not exist and cannot be created, which</span></span>
-<span class="ln" id="L576">        <span class="tok-com">// is what an unelevated run sees.</span></span>
-<span class="ln" id="L577">        <span class="tok-kw">let</span> unreachable = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;primary-is-a-file&quot;</span>);</span>
-<span class="ln" id="L578">        std::fs::<span class="tok-fn">write</span>(&amp;unreachable, b<span class="tok-str">&quot;not a directory&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L579">        <span class="tok-kw">let</span> v = Vault::<span class="tok-fn">at</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-fn">Some</span>(&amp;unreachable)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L580"></span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L582">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L583">        assert!(</span>
-<span class="ln" id="L584">            !v.<span class="tok-fn">shadow</span>().<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L585">            <span class="tok-str">&quot;the spare should not be writable here&quot;</span></span>
-<span class="ln" id="L586">        );</span>
-<span class="ln" id="L587"></span>
-<span class="ln" id="L588">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
-<span class="ln" id="L589">            <span class="tok-kw">let</span> (found_lock, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L590">            assert!(found_lock.<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L591">            assert_eq!(</span>
-<span class="ln" id="L592">                found,</span>
-<span class="ln" id="L593">                Found::Intact,</span>
-<span class="ln" id="L594">                <span class="tok-str">&quot;an unwritable spare was reported as a deleted one&quot;</span></span>
-<span class="ln" id="L595">            );</span>
-<span class="ln" id="L596">        }</span>
-<span class="ln" id="L597">    }</span>
-<span class="ln" id="L598"></span>
-<span class="ln" id="L599">    <span class="tok-com">/// F-86. Two copies that hold different passwords mean one of them is not</span></span>
-<span class="ln" id="L600">    <span class="tok-com">/// the lock that was set, and the older one is the way back in for whoever</span></span>
-<span class="ln" id="L601">    <span class="tok-com">/// knew the previous password.</span></span>
-<span class="ln" id="L602">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L603">    <span class="tok-kw">fn</span> <span class="tok-fn">two_copies_with_different_passwords_are_reported</span>() {</span>
-<span class="ln" id="L604">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L605">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L606">        <span class="tok-kw">let</span> current = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the new one&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L607">        v.<span class="tok-fn">store</span>(&amp;current).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L608"></span>
-<span class="ln" id="L609">        <span class="tok-com">// Put the previous lock back in the spare, as a stale spare would hold</span></span>
-<span class="ln" id="L610">        <span class="tok-com">// it after a password change that could not reach the spare.</span></span>
-<span class="ln" id="L611">        <span class="tok-kw">let</span> previous = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the old one&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L612">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = previous.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L613">        <span class="tok-fn">mask</span>(&amp;<span class="tok-fn">site_of</span>(&amp;v), &amp;<span class="tok-kw">mut</span> bytes);</span>
-<span class="ln" id="L614">        std::fs::<span class="tok-fn">write</span>(v.<span class="tok-fn">shadow</span>(), &amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L615"></span>
-<span class="ln" id="L616">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L617">        assert_eq!(found, Found::Disagreed);</span>
-<span class="ln" id="L618">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> loaded = loaded.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a lock should still be returned&quot;</span>);</span>
-<span class="ln" id="L619">        loaded</span>
-<span class="ln" id="L620">            .<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;the new one&quot;</span>)</span>
-<span class="ln" id="L621">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the copy the program writes must be the one that wins&quot;</span>);</span>
-<span class="ln" id="L622">    }</span>
-<span class="ln" id="L623"></span>
-<span class="ln" id="L624">    <span class="tok-com">/// F-86, the reporting half: `store` says whether the spare caught up, so</span></span>
-<span class="ln" id="L625">    <span class="tok-com">/// a caller can refuse to call a password change finished when it did not.</span></span>
-<span class="ln" id="L626">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L627">    <span class="tok-kw">fn</span> <span class="tok-fn">storing_says_whether_the_spare_was_written</span>() {</span>
-<span class="ln" id="L628">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L629">        <span class="tok-kw">let</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L550">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L551">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L552">        record.<span class="tok-fn">retag</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L553">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L554">        v.<span class="tok-fn">clear</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L555"></span>
+<span class="ln" id="L556">        assert!(!v.<span class="tok-fn">primary</span>().<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L557">        assert!(!v.<span class="tok-fn">shadow</span>().<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L558">        assert!(!v.<span class="tok-fn">index</span>().<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L559">    }</span>
+<span class="ln" id="L560"></span>
+<span class="ln" id="L561">    <span class="tok-com">/// The mask is its own inverse, and the test says so directly rather than</span></span>
+<span class="ln" id="L562">    <span class="tok-com">/// only through a round trip, because a mask that quietly became a no-op</span></span>
+<span class="ln" id="L563">    <span class="tok-com">/// would still pass a round trip.</span></span>
+<span class="ln" id="L564">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L565">    <span class="tok-kw">fn</span> <span class="tok-fn">the_mask_changes_the_bytes_and_undoes_itself</span>() {</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> site = [7u8; SITE_LEN];</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> original = b<span class="tok-str">&quot;VEILLOK1 and then some more bytes to cover two blocks&quot;</span>.<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> worked = original.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L569">        <span class="tok-fn">mask</span>(&amp;site, &amp;<span class="tok-kw">mut</span> worked);</span>
+<span class="ln" id="L570">        assert_ne!(worked, original, <span class="tok-str">&quot;a mask that changes nothing is not one&quot;</span>);</span>
+<span class="ln" id="L571">        <span class="tok-fn">mask</span>(&amp;site, &amp;<span class="tok-kw">mut</span> worked);</span>
+<span class="ln" id="L572">        assert_eq!(worked, original);</span>
+<span class="ln" id="L573">    }</span>
+<span class="ln" id="L574"></span>
+<span class="ln" id="L575">    <span class="tok-com">/// F-85. A read that fails for any reason other than &quot;there is no index&quot;</span></span>
+<span class="ln" id="L576">    <span class="tok-com">/// must not be answered by writing a new one. The failure that mattered was</span></span>
+<span class="ln" id="L577">    <span class="tok-com">/// not corruption, it was permission: one refused read and the lock would</span></span>
+<span class="ln" id="L578">    <span class="tok-com">/// have been orphaned under a name nothing could compute again.</span></span>
+<span class="ln" id="L579">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L580">    <span class="tok-kw">fn</span> <span class="tok-fn">a_damaged_index_refuses_rather_than_writing_a_new_one</span>() {</span>
+<span class="ln" id="L581">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> first = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L583">        <span class="tok-kw">let</span> name = first.<span class="tok-fn">primary</span>().<span class="tok-fn">to_path_buf</span>();</span>
+<span class="ln" id="L584"></span>
+<span class="ln" id="L585">        <span class="tok-com">// Short by a byte, which is what a partial write leaves.</span></span>
+<span class="ln" id="L586">        std::fs::<span class="tok-fn">write</span>(first.<span class="tok-fn">index</span>(), [0u8; SITE_LEN - <span class="tok-num">1</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L587">        assert!(</span>
+<span class="ln" id="L588">            Vault::<span class="tok-fn">at</span>(dir.<span class="tok-fn">path</span>(), None).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L589">            <span class="tok-str">&quot;a damaged index was replaced, which orphans the lock behind it&quot;</span></span>
+<span class="ln" id="L590">        );</span>
+<span class="ln" id="L591"></span>
+<span class="ln" id="L592">        <span class="tok-com">// And the original name is still computable once the index is right,</span></span>
+<span class="ln" id="L593">        <span class="tok-com">// which is the whole point of refusing.</span></span>
+<span class="ln" id="L594">        std::fs::<span class="tok-fn">write</span>(first.<span class="tok-fn">index</span>(), std::fs::<span class="tok-fn">read</span>(first.<span class="tok-fn">index</span>()).<span class="tok-fn">unwrap</span>()).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L595">        <span class="tok-kw">let</span> restored = [0u8; SITE_LEN];</span>
+<span class="ln" id="L596">        std::fs::<span class="tok-fn">write</span>(first.<span class="tok-fn">index</span>(), restored).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L597">        <span class="tok-kw">let</span> second = Vault::<span class="tok-fn">at</span>(dir.<span class="tok-fn">path</span>(), None).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L598">        assert_ne!(second.<span class="tok-fn">primary</span>(), &amp;name, <span class="tok-str">&quot;different index, different name&quot;</span>);</span>
+<span class="ln" id="L599">    }</span>
+<span class="ln" id="L600"></span>
+<span class="ln" id="L601">    <span class="tok-com">/// F-87. A spare that could never be written is not a spare that was taken</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// away, and reporting it as one raises the same false alarm at every</span></span>
+<span class="ln" id="L603">    <span class="tok-com">/// launch until nobody reads any of them.</span></span>
+<span class="ln" id="L604">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L605">    <span class="tok-kw">fn</span> <span class="tok-fn">a_spare_that_cannot_be_written_is_not_reported_as_deleted</span>() {</span>
+<span class="ln" id="L606">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L607">        <span class="tok-com">// An admin directory that does not exist and cannot be created, which</span></span>
+<span class="ln" id="L608">        <span class="tok-com">// is what an unelevated run sees.</span></span>
+<span class="ln" id="L609">        <span class="tok-kw">let</span> unreachable = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;primary-is-a-file&quot;</span>);</span>
+<span class="ln" id="L610">        std::fs::<span class="tok-fn">write</span>(&amp;unreachable, b<span class="tok-str">&quot;not a directory&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L611">        <span class="tok-kw">let</span> v = Vault::<span class="tok-fn">at</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-fn">Some</span>(&amp;unreachable)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L612"></span>
+<span class="ln" id="L613">        <span class="tok-kw">let</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L614">        v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L615">        assert!(</span>
+<span class="ln" id="L616">            !v.<span class="tok-fn">shadow</span>().<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L617">            <span class="tok-str">&quot;the spare should not be writable here&quot;</span></span>
+<span class="ln" id="L618">        );</span>
+<span class="ln" id="L619"></span>
+<span class="ln" id="L620">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
+<span class="ln" id="L621">            <span class="tok-kw">let</span> (found_lock, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L622">            assert!(found_lock.<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L623">            assert_eq!(</span>
+<span class="ln" id="L624">                found,</span>
+<span class="ln" id="L625">                Found::Intact,</span>
+<span class="ln" id="L626">                <span class="tok-str">&quot;an unwritable spare was reported as a deleted one&quot;</span></span>
+<span class="ln" id="L627">            );</span>
+<span class="ln" id="L628">        }</span>
+<span class="ln" id="L629">    }</span>
 <span class="ln" id="L630"></span>
-<span class="ln" id="L631">        <span class="tok-kw">let</span> reachable = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L632">        assert!(</span>
-<span class="ln" id="L633">            reachable.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L634">            <span class="tok-str">&quot;both copies were writable&quot;</span></span>
-<span class="ln" id="L635">        );</span>
-<span class="ln" id="L636"></span>
-<span class="ln" id="L637">        <span class="tok-kw">let</span> blocked = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;blocked&quot;</span>);</span>
-<span class="ln" id="L638">        std::fs::<span class="tok-fn">write</span>(&amp;blocked, b<span class="tok-str">&quot;a file, not a directory&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L639">        <span class="tok-kw">let</span> two = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L640">        <span class="tok-kw">let</span> v = Vault::<span class="tok-fn">at</span>(two.<span class="tok-fn">path</span>(), <span class="tok-fn">Some</span>(&amp;blocked)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L641">        assert!(!v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>(), <span class="tok-str">&quot;the spare could not be written&quot;</span>);</span>
-<span class="ln" id="L642">    }</span>
-<span class="ln" id="L643"></span>
-<span class="ln" id="L644">    <span class="tok-com">/// The site is private, and this test needs it to forge a spare. Reading it</span></span>
-<span class="ln" id="L645">    <span class="tok-com">/// back from the index is what any other process would have to do.</span></span>
-<span class="ln" id="L646">    <span class="tok-kw">fn</span> <span class="tok-fn">site_of</span>(v: &amp;Vault) -&gt; [u8; SITE_LEN] {</span>
-<span class="ln" id="L647">        <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(v.<span class="tok-fn">index</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L648">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = [0u8; SITE_LEN];</span>
-<span class="ln" id="L649">        s.<span class="tok-fn">copy_from_slice</span>(&amp;bytes);</span>
-<span class="ln" id="L650">        s</span>
-<span class="ln" id="L651">    }</span>
-<span class="ln" id="L652"></span>
-<span class="ln" id="L653">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L654">    <span class="tok-kw">fn</span> <span class="tok-fn">the_index_is_owner_only_from_the_moment_it_exists</span>() {</span>
-<span class="ln" id="L655">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L656">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L657">        assert!(v.<span class="tok-fn">index</span>().<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L658">        <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L659">        {</span>
-<span class="ln" id="L660">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L661">            <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(v.<span class="tok-fn">index</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>();</span>
-<span class="ln" id="L662">            assert_eq!(mode &amp; 0o077, <span class="tok-num">0</span>, <span class="tok-str">&quot;the index must not be readable by others&quot;</span>);</span>
-<span class="ln" id="L663">        }</span>
-<span class="ln" id="L664">    }</span>
-<span class="ln" id="L665">}</span>
+<span class="ln" id="L631">    <span class="tok-com">/// F-86. Two copies that hold different passwords mean one of them is not</span></span>
+<span class="ln" id="L632">    <span class="tok-com">/// the lock that was set, and the older one is the way back in for whoever</span></span>
+<span class="ln" id="L633">    <span class="tok-com">/// knew the previous password.</span></span>
+<span class="ln" id="L634">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L635">    <span class="tok-kw">fn</span> <span class="tok-fn">two_copies_with_different_passwords_are_reported</span>() {</span>
+<span class="ln" id="L636">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L637">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L638">        <span class="tok-kw">let</span> current = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the new one&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L639">        v.<span class="tok-fn">store</span>(&amp;current).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L640"></span>
+<span class="ln" id="L641">        <span class="tok-com">// Put the previous lock back in the spare, as a stale spare would hold</span></span>
+<span class="ln" id="L642">        <span class="tok-com">// it after a password change that could not reach the spare.</span></span>
+<span class="ln" id="L643">        <span class="tok-kw">let</span> previous = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;the old one&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L644">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = previous.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L645">        <span class="tok-fn">mask</span>(&amp;<span class="tok-fn">site_of</span>(&amp;v), &amp;<span class="tok-kw">mut</span> bytes);</span>
+<span class="ln" id="L646">        std::fs::<span class="tok-fn">write</span>(v.<span class="tok-fn">shadow</span>(), &amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L647"></span>
+<span class="ln" id="L648">        <span class="tok-kw">let</span> (loaded, found) = v.<span class="tok-fn">load</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L649">        assert_eq!(found, Found::Disagreed);</span>
+<span class="ln" id="L650">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> loaded = loaded.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a lock should still be returned&quot;</span>);</span>
+<span class="ln" id="L651">        loaded</span>
+<span class="ln" id="L652">            .<span class="tok-fn">verify</span>(b<span class="tok-str">&quot;the new one&quot;</span>)</span>
+<span class="ln" id="L653">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the copy the program writes must be the one that wins&quot;</span>);</span>
+<span class="ln" id="L654">    }</span>
+<span class="ln" id="L655"></span>
+<span class="ln" id="L656">    <span class="tok-com">/// F-86, the reporting half: `store` says whether the spare caught up, so</span></span>
+<span class="ln" id="L657">    <span class="tok-com">/// a caller can refuse to call a password change finished when it did not.</span></span>
+<span class="ln" id="L658">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L659">    <span class="tok-kw">fn</span> <span class="tok-fn">storing_says_whether_the_spare_was_written</span>() {</span>
+<span class="ln" id="L660">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L661">        <span class="tok-kw">let</span> record = lock::AppLock::<span class="tok-fn">create</span>(b<span class="tok-str">&quot;a passphrase&quot;</span>, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L662"></span>
+<span class="ln" id="L663">        <span class="tok-kw">let</span> reachable = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L664">        assert!(</span>
+<span class="ln" id="L665">            reachable.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L666">            <span class="tok-str">&quot;both copies were writable&quot;</span></span>
+<span class="ln" id="L667">        );</span>
+<span class="ln" id="L668"></span>
+<span class="ln" id="L669">        <span class="tok-kw">let</span> blocked = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;blocked&quot;</span>);</span>
+<span class="ln" id="L670">        std::fs::<span class="tok-fn">write</span>(&amp;blocked, b<span class="tok-str">&quot;a file, not a directory&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L671">        <span class="tok-kw">let</span> two = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L672">        <span class="tok-kw">let</span> v = Vault::<span class="tok-fn">at</span>(two.<span class="tok-fn">path</span>(), <span class="tok-fn">Some</span>(&amp;blocked)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L673">        assert!(!v.<span class="tok-fn">store</span>(&amp;record).<span class="tok-fn">unwrap</span>(), <span class="tok-str">&quot;the spare could not be written&quot;</span>);</span>
+<span class="ln" id="L674">    }</span>
+<span class="ln" id="L675"></span>
+<span class="ln" id="L676">    <span class="tok-com">/// The site is private, and this test needs it to forge a spare. Reading it</span></span>
+<span class="ln" id="L677">    <span class="tok-com">/// back from the index is what any other process would have to do.</span></span>
+<span class="ln" id="L678">    <span class="tok-kw">fn</span> <span class="tok-fn">site_of</span>(v: &amp;Vault) -&gt; [u8; SITE_LEN] {</span>
+<span class="ln" id="L679">        <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(v.<span class="tok-fn">index</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L680">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> s = [0u8; SITE_LEN];</span>
+<span class="ln" id="L681">        s.<span class="tok-fn">copy_from_slice</span>(&amp;bytes);</span>
+<span class="ln" id="L682">        s</span>
+<span class="ln" id="L683">    }</span>
+<span class="ln" id="L684"></span>
+<span class="ln" id="L685">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L686">    <span class="tok-kw">fn</span> <span class="tok-fn">the_index_is_owner_only_from_the_moment_it_exists</span>() {</span>
+<span class="ln" id="L687">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L688">        <span class="tok-kw">let</span> v = <span class="tok-fn">vault</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L689">        assert!(v.<span class="tok-fn">index</span>().<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L690">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L691">        {</span>
+<span class="ln" id="L692">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L693">            <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(v.<span class="tok-fn">index</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>();</span>
+<span class="ln" id="L694">            assert_eq!(mode &amp; 0o077, <span class="tok-num">0</span>, <span class="tok-str">&quot;the index must not be readable by others&quot;</span>);</span>
+<span class="ln" id="L695">        }</span>
+<span class="ln" id="L696">    }</span>
+<span class="ln" id="L697">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
