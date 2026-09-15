@@ -379,6 +379,119 @@ unfinishable. That half of the crate stays outside Miri's reach and the reason
 is arithmetic rather than arrangement, so it is recorded as a limit rather than
 carried as work.
 
+### F-186: eighty-one changes to the cryptography that the whole suite accepted
+
+Mutation testing changes the code a line at a time and asks whether any test
+objects. F-180 ran it over four files of the cryptography crate and found
+fifteen survivors. This is the same tool over the four it had not reached: the
+app lock, the studio vault, the chunked tape and the reversible encodings.
+
+**674 mutants, 544 caught, 42 that do not compile, 5 timeouts, and 81 the suite
+accepted.** Four rounds of writing tests and re-measuring brought that to
+fifteen, and every one of the fifteen carries a written argument for why it
+cannot be killed.
+
+**What that "fifteen" is measured over, stated exactly.** The app lock, the
+vault and the tape were each campaigned end to end in the final run: 137, 28 and
+39 mutants, complete. The encodings file has 463 and no single run of it has
+finished here, because `cargo mutants` dies on `pthread_create` partway through
+even at `--jobs 1`, with fourteen gigabytes free and the thread limit at 64,318.
+The cause is not established and is written down rather than guessed at.
+
+So the fifteen are measured over 332 of that file's 463 mutants, and over all of
+the other three. Running it as `--shard k/6`, six separate processes, gets past
+whatever the limit is: the first shard is 78 mutants with nothing surviving.
+Until all six have run, the list is the best measurement taken and not a
+complete one, and saying which it is costs a sentence.
+
+**Forty-four of the eighty-one were one gap.** The encodings had exactly one
+structural test: encode, decode, compare against the input. That tests the pair
+and not the encoder. Any change to the encoder that the decoder still reverses
+passes it, and forty-four such changes exist: run lengths counted to a different
+limit, literal runs broken at a different place, comparisons moved by one,
+several `|` turned into `^` inside the base conversions. Every one produced
+different encoded bytes and every one still decoded correctly. There are now
+golden vectors naming exactly what each of the thirty-one encodings emits for
+one fixed input, each paired with a decode of that same output so a vector
+cannot be quietly corrected to match a broken encoder.
+
+**Three were the app lock, and none was cosmetic.**
+
+| What survived | What it would mean |
+|---|---|
+| `same_secret_as` accepting `\|` in place of `&` | two locks sharing a salt but not a verifier would compare as the same lock |
+| `acknowledge` replaced with `Ok(())` | a tamper report anybody could dismiss without the passphrase, which is the thing a sticky flag exists to prevent |
+| the rate-limit cap asserted against the constant defining it | `15 * 60` became `15 + 60`, and every assertion passed because every assertion read the mutated value from both sides |
+
+That last one is F-71's shape in a third place: a check that compares a claim
+against a copy of itself. The cap is now asserted as 900, which is the number
+the sentence beside it states.
+
+**Two were not missing tests at all.** In the run-length encoder, one condition
+could only break where the very next line already breaks, and one branch
+handling a zero-length literal cannot be reached: entering that code path means
+the run test found fewer than two equal bytes, so the first pass always takes
+one. Three mutants lived in the first and two in the second. Both are gone. A
+condition nothing depends on is invisible from the outside until something
+changes it and no test complains, which is the only way either could have
+surfaced.
+
+**Three of the tests written to kill these did not test what they said, and the
+campaign is what found each.**
+
+The never-identity rotation test fixed the first seed byte at a value selecting
+an encoding that is not a rotation, so the assertion inside never executed and
+the two mutants walked through it. A later version drew a hundred random
+encodings, which reaches a rotation about ninety-six times in a hundred runs:
+the campaign duly reported one of that pair surviving while killing the other,
+which is what a test that only usually tests something looks like from outside.
+It now enumerates all 65,536 seed pairs, draws four thousand times, and fails if
+it never saw a rotation at all.
+
+The truncated-escape test derived its escape marker by encoding a space, which
+works for the two encodings that escape a space and hands yEnc an ordinary
+encoded byte, because yEnc escapes four particular values and leaves a space
+alone. It was feeding yEnc something that is not an escape and then reporting
+yEnc for accepting it. Corrected again after that, because yEnc takes one byte
+after its marker where the other two take two hexadecimal digits, so an input
+truncated for them is complete for it.
+
+A vault test meant to prove that storing into a missing directory creates it
+never reached the code, because the vault creates that directory a step earlier.
+The case that reaches it is the folder being deleted between opening the vault
+and writing to it.
+
+**The lesson, and it is the same one each time.** A test that passes proves
+nothing about whether it is testing anything. Only changing the code underneath
+and watching the test fail does. Every one of these three looked correct on the
+page, was reviewed while being written, and was wrong.
+
+**What cannot be killed, and why that is written down rather than rounded off.**
+Fifteen survivors remain, in `tools/mutants/survivors.txt`, each with its
+argument. Four are equivalent by arithmetic: three where the operands have
+disjoint bits so `|` and `^` compute the same value, and one where a cast to a
+byte already reduces modulo 256. Ten are properties of the machine rather than
+of the code: whether the operating system granted a page lock, whether a
+portable marker sits beside the executable, whether a directory under `/etc` can
+be made, what the account's own configuration directory holds. One is reachable
+only through a self-contradiction: telling the vault's index guard apart from
+one that accepts any failure needs a read of a path that fails and a write to
+that same path that then succeeds.
+
+**The guard, which is marker 151.** `.github/workflows/mutants.yml` runs the
+campaign weekly over all eight cryptography files and can be dispatched before a
+release. Its verdict is not a number. `tools/mutants/check.py` compares the run
+against the committed list: a survivor that is not argued for fails the build
+and is named, as a diff somebody reads, and a survivor that has been killed
+fails it too, because the argument above that line would then be claiming
+something untrue about the code. A list that over-claims is how a real survivor
+hides in it.
+
+Half an hour over eight files does not fit a per-push job, so what runs on every
+push is the half that does not need a campaign: `--lint` checks that every entry
+still points at a real file and a real line, since those move whenever the code
+above them moves. Both halves were proved able to fail before they were trusted.
+
 ### F-185: fifteen gigabytes of build output inside the repository, that no tool could see
 
 `tools/measured/generate.py` runs the test suite to count the tests, because a
@@ -446,7 +559,7 @@ having looked.
 | `warn(missing_docs)` in every crate | yes | yes | present in every library; the two `main.rs` files do not carry it, which is right |
 | the seven coverage-guided fuzz targets | by hand | **now, weekly** | ten minutes each, no crash, no hang, no out-of-memory |
 | the deterministic parser campaigns | yes | yes | clean |
-| **mutation testing** | no | not yet (marker 151) | **fifteen survivors; F-180** |
+| **mutation testing** | no | **now, weekly** | **fifteen survivors over four files (F-180), then eighty-one over four more (F-186)** |
 | **a public item reached by nothing** | no | **now** | **five; F-182** |
 | **build output outside the root `target/`** | no | **now** | **one, at fifteen gigabytes, rebuilt on every run; F-185** |
 | **every page proves the site's ownership** | no | **now** | **five pages and the whole generated reference had no tag; F-184** |
@@ -7191,7 +7304,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-five defects found and fixed (F-1 to F-185), across
+**One hundred and eighty-six defects found and fixed (F-1 to F-186), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

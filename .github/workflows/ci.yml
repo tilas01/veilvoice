@@ -332,6 +332,14 @@ jobs:
       - name: No build output may live outside the one directory at the root
         run: python tools/audit/build_output.py
 
+      # Marker 151. The campaign that produces this list runs weekly in
+      # mutants.yml, because half an hour over eight files does not fit here.
+      # This is the part that does: the line numbers in the committed list of
+      # survivors move whenever the code above them moves, and a list pointing
+      # at the wrong lines is worse than no list.
+      - name: Every argued-for surviving mutant must still point at real code
+        run: python tools/mutants/check.py --lint
+
       # And the other half of the question. Saying what a dependency is for
       # does not make anything watch it: a crate outside the workspace, or a
       # second workflow directory, falls outside every Dependabot entry and

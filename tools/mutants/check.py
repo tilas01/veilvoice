@@ -71,9 +71,78 @@ def reported(path):
     return out
 
 
+def lint():
+    """Check the list itself, without needing a campaign.
+
+    Every entry names a file and a line. Both go stale as soon as code moves
+    above them, and nothing would notice until the next weekly run, which is a
+    month of a list quietly pointing at the wrong lines. This is the half of the
+    check that a per-push build can afford, so `tools/verify.py` runs it.
+
+    It does not try to judge whether the named line is still the right one. That
+    needs the campaign. What it establishes is that the entry still points
+    somewhere real, which is what fails first when a file is edited.
+    """
+    known = listed(SURVIVORS)
+    if known is None:
+        print(
+            "tools/mutants/survivors.txt is missing, so there is nothing to "
+            "compare a campaign against.",
+            file=sys.stderr,
+        )
+        return 1
+
+    problems = []
+    for entry in known:
+        head = entry.split(": ", 1)[0]
+        parts = head.split(":")
+        if len(parts) < 3:
+            problems.append("%s: not in cargo-mutants' file:line:column form" % entry)
+            continue
+        relative, line = parts[0], parts[1]
+        path = os.path.join(ROOT, relative.replace("/", os.sep))
+        if not os.path.isfile(path):
+            problems.append("%s: no such file" % relative)
+            continue
+        try:
+            number = int(line)
+        except ValueError:
+            problems.append("%s: %s is not a line number" % (relative, line))
+            continue
+        with open(path, "r", encoding="utf-8", errors="replace") as handle:
+            total = sum(1 for _ in handle)
+        if number < 1 or number > total:
+            problems.append(
+                "%s:%d: the file has %d lines, so this entry points past its end"
+                % (relative, number, total)
+            )
+
+    if problems:
+        print("these entries in tools/mutants/survivors.txt no longer point anywhere:")
+        for problem in problems:
+            print("  %s" % problem)
+        print()
+        print(
+            "Line numbers move when the code above them moves. Re-run the "
+            "campaign (.github/workflows/mutants.yml, or cargo mutants locally) "
+            "and rewrite the entries from its missed.txt, keeping the argument "
+            "above each."
+        )
+        return 1
+
+    print("  %d argued-for survivors, every one still pointing at real code" % len(known))
+    return 0
+
+
 def main(argv):
+    if len(argv) == 2 and argv[1] == "--lint":
+        return lint()
     if len(argv) != 2:
-        print("usage: check.py <path to mutants.out/missed.txt>", file=sys.stderr)
+        print(
+            "usage: check.py <path to mutants.out/missed.txt>\n"
+            "       check.py --lint",
+            file=sys.stderr,
+        )
         return 2
 
     known = listed(SURVIVORS)

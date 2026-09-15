@@ -1129,14 +1129,25 @@ mod tests {
         );
 
         // The two random choosers cannot be enumerated, so they are drawn from
-        // enough times that a chooser producing an even amount would have to be
-        // very lucky to hide. A hundred draws each.
-        for _ in 0..100 {
+        // instead. A hundred draws was the first attempt and it was not enough:
+        // one encoding of the thirty-one is a rotation, so a hundred draws
+        // reaches the assertion about ninety-six times in a hundred runs, and
+        // the campaign duly reported one of these two mutants surviving while
+        // killing the other. A test that only usually tests something is a test
+        // that will eventually pass over a real defect.
+        //
+        // Two thousand draws puts the chance of never reaching a rotation below
+        // one in a very large number, and the counter below turns "never
+        // reached it" from a silent pass into a failure, which is the part that
+        // does not depend on arithmetic about luck.
+        let mut rotations_seen = 0usize;
+        for _ in 0..2_000 {
             for chosen in [
                 Weave::random().unwrap(),
                 Weave::random_length_preserving().unwrap(),
             ] {
                 if let Weave::Rotate(by) = chosen {
+                    rotations_seen += 1;
                     assert_eq!(by % 2, 1, "a random chooser produced Rotate({by})");
                 }
                 // And whatever was chosen actually changes something, which is
@@ -1151,6 +1162,11 @@ mod tests {
                 }
             }
         }
+        assert!(
+            rotations_seen > 0,
+            "four thousand draws produced no rotation, so the assertion above \
+             never ran and this test proved nothing"
+        );
     }
 
     /// `preserves_length` answers no for an encoding that does not.

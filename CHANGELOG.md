@@ -40,6 +40,32 @@ measures them**
 - Nothing a reader sees is different, and that is the point: the numbers were
   right before and are right now without anybody having to remember them.
 
+**Eighty-one changes to the encryption code that every test accepted**
+
+- One way to find out whether tests are worth anything is to change the code a
+  line at a time and see whether any of them complains. Run over the app lock,
+  the vault, the chunked store and the reversible encodings, that found 674
+  changes worth trying and 81 that the whole suite let through.
+- Forty-four were the same gap. The encodings were only ever checked by
+  encoding something and decoding it back, which tests the pair rather than the
+  encoder: any change the decoder still reverses passes. Each of the
+  thirty-one encodings now has its exact output written down for one fixed
+  input, so a change to what they emit has to be deliberate.
+- Three were in the app lock and none of them harmless. Two locks sharing half
+  their identity could have compared as the same lock. A tamper warning could
+  have been cleared without the passphrase. The limit on how long the lock
+  makes somebody wait was checked against the setting that defines it, so
+  changing fifteen minutes to seventy-five seconds passed every check.
+- Two were not missing tests but dead code: a condition that could only act
+  where the next line already acts, and a branch that cannot be reached at all.
+  Both are gone.
+- Four rounds of writing tests and re-measuring took 81 down to 15, and each of
+  those 15 is now recorded with the reason no test could ever catch it: some
+  compute exactly the same answer as the original, and some depend on the
+  machine rather than on the code.
+- This runs every week from now on, and compares itself against that recorded
+  list. Anything new fails the build and is named.
+
 **Fifteen gigabytes of build output that was living inside the repository**
 
 - The tool that counts how many tests this project has does it by running
