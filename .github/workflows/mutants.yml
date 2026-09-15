@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Mutation testing over the cryptography, weekly.
+#
+# Every other check in this repository asks whether an input was explored.
+# `cargo fuzz` generates inputs by coverage feedback, the deterministic
+# campaigns generate them by construction, and clippy and Miri read the code.
+# None of them asks the other question: **is there an assertion for what came
+# back**. Changing the code a line at a time and seeing whether any test
+# objects is the only thing here that does.
+#
+# The first run of it found fifteen changes the whole suite accepted, in four
+# files that had already been fuzzed, already audited twice, and already had
+# long arguments written about them. One replaced the randomness adapter with
+# something that returns a constant, and everything passed. That is F-180, and
+# it is why this is a workflow rather than an afternoon somebody spends.
+#
+# Weekly rather than per push, because a campaign takes half an hour over four
+# files and a per-push job cannot afford that. Dispatchable, for the run before
+# a release.
+#
+# **The committed baseline is the point of the design.** A campaign that prints
+# a number tells you the number changed; a campaign compared against a
+# committed list of known survivors tells you *which* mutant is new, as a diff
+# somebody reads in a pull request. `tools/mutants/survivors.txt` is that list,
+# and every line in it carries the argument for why that mutant cannot be
+# killed. A new survivor fails this job.
+
+name: mutants
+
+on:
+  schedule:
+    # Tuesdays, so it does not land on the same morning as the fuzz workflow.
+    - cron: '41 4 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  campaign:
+    name: mutation testing, the cryptography
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the pinned toolchain
+        run: rustup show
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-mutants
+        run: cargo install cargo-mutants --locked
+
+      # `--timeout 300` because the crypto tests run Argon2id, which is
+      # expensive by design: the default timeout reports a mutant as timing out
+      # when the suite simply took as long as it always takes, and a timeout
+      # reads as neither caught nor missed.
+      - name: Change the cryptography a line at a time
+        run: |
+          set -euo pipefail
+          cargo mutants -p veilvoice-crypto \
+            --file crates/veilvoice-crypto/src/aead.rs \
+            --file crates/veilvoice-crypto/src/kdf.rs \
+            --file crates/veilvoice-crypto/src/container.rs \
+            --file crates/veilvoice-crypto/src/hybrid.rs \
+            --file crates/veilvoice-crypto/src/lock.rs \
+            --file crates/veilvoice-crypto/src/vault.rs \
+            --file crates/veilvoice-crypto/src/weave.rs \
+            --file crates/veilvoice-crypto/src/tape.rs \
+            --timeout 300 \
+            || true
+
+      # Compared rather than counted. `|| true` above is deliberate: the
+      # campaign exits non-zero when anything survives, and something is
+      # expected to survive, so the verdict belongs to this step and to the
+      # committed list rather than to the exit code.
+      - name: No mutant may survive that is not already argued for
+        run: python tools/mutants/check.py mutants.out/missed.txt
+
+      - name: Keep the full result
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mutants-out
+          path: mutants.out
+          if-no-files-found: ignore

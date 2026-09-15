@@ -379,6 +379,55 @@ unfinishable. That half of the crate stays outside Miri's reach and the reason
 is arithmetic rather than arrangement, so it is recorded as a limit rather than
 carried as work.
 
+### F-185: fifteen gigabytes of build output inside the repository, that no tool could see
+
+`tools/measured/generate.py` runs the test suite to count the tests, because a
+count of `#[test]` is a different number from the one a reader gets. It ran it
+with the build redirected:
+
+```python
+environment.setdefault(
+    "CARGO_TARGET_DIR",
+    str(Path(os.environ.get("LOCALAPPDATA", ROOT)) / "veilvoice" / "target"),
+)
+```
+
+On Windows that is deliberate and correct: the build goes under
+`%LOCALAPPDATA%`, away from a repository that may sit in a synced folder or
+deep enough to meet the path limit. On every other machine `LOCALAPPDATA` does
+not exist, the fallback is the repository root, and the build goes to
+**`<repo>/veilvoice/target`**: a second complete copy of the workspace build,
+inside the repository, rebuilt from nothing every time the measured numbers
+were regenerated.
+
+**Nothing could report it, and the reason is a rule that is correct.**
+`.gitignore` carries a bare `target/`, which git matches at any depth. That is
+the right rule, since a build directory is certainly not source. It also means
+this one never appeared in `git status`, never appeared in a diff, was never
+cleaned, and could only be found by walking the tree with `du`.
+
+**What found it was several steps removed from it.** A mutation-testing
+campaign died copying the tree, reporting no space on the device. The disk was
+not the finding; the campaign was not the finding; the fifteen gigabytes were.
+A defect whose only symptom is an unrelated tool failing for an unrelated
+reason is the kind this document exists to write down, because the next person
+to meet the symptom will debug the symptom.
+
+**And it came back.** The directory was deleted mid-round, and the next
+regeneration recreated it, at 7.2 GB, because deleting output without fixing
+the line that writes it is not a fix. That is the whole argument for the guard
+rather than the sweep.
+
+**The fix and the guard.** The redirect is now conditional on actually being
+on Windows; everywhere else the tool says nothing and cargo uses the `target/`
+at the root, which is where every ignore rule and every other tool already
+expects it. `tools/audit/build_output.py` walks the tree for Cargo's own
+`CACHEDIR.TAG` signature, rather than for directories named `target`, and fails
+naming the path and its size if one turns up anywhere but the root and
+`fuzz/`. It is in `tools/verify.py` and in CI, and it was proved able to fail
+by planting a tagged directory under a crate and watching it report the path
+and the size.
+
 ### The checks this round ran, and where each one lives now
 
 The inventory is not a finding. It is here because the next round's reader
@@ -399,6 +448,7 @@ having looked.
 | the deterministic parser campaigns | yes | yes | clean |
 | **mutation testing** | no | not yet (marker 151) | **fifteen survivors; F-180** |
 | **a public item reached by nothing** | no | **now** | **five; F-182** |
+| **build output outside the root `target/`** | no | **now** | **one, at fifteen gigabytes, rebuilt on every run; F-185** |
 | **every page proves the site's ownership** | no | **now** | **five pages and the whole generated reference had no tag; F-184** |
 | a state file written one place and read another | by hand | **now** | nothing |
 | the per-program guides against the user guide | by hand | **now** | nothing |
@@ -7141,7 +7191,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-four defects found and fixed (F-1 to F-184), across
+**One hundred and eighty-five defects found and fixed (F-1 to F-185), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

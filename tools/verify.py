@@ -153,6 +153,12 @@ CHECKS = [
     # it, which is exactly the shape the compiler cannot report.
     ("every public item is reached by something",
      [sys.executable, "tools/audit/reachable.py"]),
+    # F-185. A build directory inside the repository is invisible to git,
+    # because `.gitignore` matches `target/` at any depth, so it is never
+    # reported and never cleaned. One had been rebuilt by this very tool on
+    # every non-Windows machine and had reached fifteen gigabytes.
+    ("no build output lives outside the one directory at the root",
+     [sys.executable, "tools/audit/build_output.py"]),
     # Beside it, and answering the other question. `dependencies.py` asks
     # whether somebody said why each dependency is here; this asks whether
     # anything is watching it. A manifest outside every Dependabot entry is
