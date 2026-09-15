@@ -159,6 +159,13 @@ CHECKS = [
     # every non-Windows machine and had reached fifteen gigabytes.
     ("no build output lives outside the one directory at the root",
      [sys.executable, "tools/audit/build_output.py"]),
+    # Marker 151. The mutation campaign itself is weekly, because half an hour
+    # does not fit a per-push job. What fits here is the half that does not need
+    # a campaign: every argued-for survivor still points at a real file and a
+    # real line. Those move whenever code above them moves, and without this the
+    # list would quietly point at the wrong lines until the next weekly run.
+    ("every argued-for surviving mutant still points at real code",
+     [sys.executable, "tools/mutants/check.py", "--lint"]),
     # Beside it, and answering the other question. `dependencies.py` asks
     # whether somebody said why each dependency is here; this asks whether
     # anything is watching it. A manifest outside every Dependabot entry is

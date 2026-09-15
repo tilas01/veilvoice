@@ -182,6 +182,15 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li>The generator that already takes those numbers now writes the sentences from them too, using the same patterns the suite checks with, so the tool that writes a claim and the check that reads it cannot disagree about where the claim is. The check is unchanged and still runs.</li>
 <li>Nothing a reader sees is different, and that is the point: the numbers were right before and are right now without anybody having to remember them.</li>
 </ul>
+<p><strong>Eighty-one changes to the encryption code that every test accepted</strong></p>
+<ul>
+<li>One way to find out whether tests are worth anything is to change the code a line at a time and see whether any of them complains. Run over the app lock, the vault, the chunked store and the reversible encodings, that found 674 changes worth trying and 81 that the whole suite let through.</li>
+<li>Forty-four were the same gap. The encodings were only ever checked by encoding something and decoding it back, which tests the pair rather than the encoder: any change the decoder still reverses passes. Each of the thirty-one encodings now has its exact output written down for one fixed input, so a change to what they emit has to be deliberate.</li>
+<li>Three were in the app lock and none of them harmless. Two locks sharing half their identity could have compared as the same lock. A tamper warning could have been cleared without the passphrase. The limit on how long the lock makes somebody wait was checked against the setting that defines it, so changing fifteen minutes to seventy-five seconds passed every check.</li>
+<li>Two were not missing tests but dead code: a condition that could only act where the next line already acts, and a branch that cannot be reached at all. Both are gone.</li>
+<li>Four rounds of writing tests and re-measuring took 81 down to 15, and each of those 15 is now recorded with the reason no test could ever catch it: some compute exactly the same answer as the original, and some depend on the machine rather than on the code.</li>
+<li>This runs every week from now on, and compares itself against that recorded list. Anything new fails the build and is named.</li>
+</ul>
 <p><strong>Fifteen gigabytes of build output that was living inside the repository</strong></p>
 <ul>
 <li>The tool that counts how many tests this project has does it by running them. It sent that build to a folder under the user&#x27;s profile on Windows, which is right, and through a fallback nobody had thought about it sent it to a folder <strong>inside the repository</strong> on every other system.</li>
