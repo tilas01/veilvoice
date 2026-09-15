@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Mutants that survive the test suite and cannot be killed.
+#
+# `tools/mutants/check.py` compares a campaign against this file: a survivor
+# that is not here fails the build and is named, and a line here that no longer
+# survives fails it too, because the argument below such a line would then be
+# claiming something untrue about the code.
+#
+# **Only a mutant that no test could kill belongs here.** Not one that has no
+# test yet: that is a missing test, and the campaign that produced this list
+# turned eighty-one survivors into sixteen by writing them. What is left falls
+# into three kinds, and each entry says which.
+#
+#   1. Equivalent by arithmetic. The mutated expression computes the same value
+#      as the original for every input the program can reach, so no observation
+#      distinguishes them.
+#   2. A property of the machine rather than of the code. The answer depends on
+#      whether the operating system granted something, or on what is on disk
+#      beside the executable, so a test that demanded either answer would be
+#      testing the computer it ran on. F-77 is this project's earlier record of
+#      that distinction mattering.
+#   3. Reachable only through a self-contradiction. Distinguishing the mutant
+#      needs two things at once that a filesystem will not do together.
+#
+# Format: one cargo-mutants line per entry, exactly as `missed.txt` writes it,
+# with the argument above it.
+#
+# **How completely this has been measured.** The app lock, the vault and the
+# tape were each campaigned end to end. `weave.rs` has 463 mutants and no single
+# run of it completes here: `cargo mutants` dies on `pthread_create` partway
+# through even at `--jobs 1`. Its entries below come from a run that reached 332
+# of the 463. `--shard k/6` gets past the limit, and the weekly workflow runs
+# the whole thing on a machine that does not have it, which is where this list
+# gets confirmed or corrected.
+
+
+# --- 1. Equivalent by arithmetic ---------------------------------------------
+
+# The run-length prefix sets the high bit of a length that is at most 127, so
+# the operands have no bit in common and `|` and `^` are the same operation.
+crates/veilvoice-crypto/src/weave.rs:484:39: replace | with ^ in Weave::apply
+
+# Both hexadecimal decoders rebuild a byte from two nibbles: the first is
+# shifted into the high four bits, the second occupies the low four, and the
+# two never overlap. `|` and `^` agree on disjoint bits.
+crates/veilvoice-crypto/src/weave.rs:608:54: replace | with ^ in Weave::undo
+crates/veilvoice-crypto/src/weave.rs:631:63: replace | with ^ in Weave::undo
+
+# The substitution table is built as `((i * 167 + 13) % 256) as u8`. The cast to
+# `u8` already reduces modulo 256, so the `%` is redundant and `+ 256` before a
+# truncating cast changes nothing. Kept in the source because it states the
+# intent; unkillable because the cast does the work either way.
+crates/veilvoice-crypto/src/weave.rs:770:43: replace % with +
+
+
+# --- 2. A property of the machine --------------------------------------------
+
+# `unix_now` negates the duration in the pre-epoch arm, which a machine whose
+# clock reads before 1970 would reach. Deleting the `-` is only observable on
+# such a machine, and a test cannot set the system clock.
+crates/veilvoice-crypto/src/lock.rs:182:19: delete - in unix_now
+
+# `every_copy_current` answers false only when a vault's administrator-owned
+# spare could not be written, which needs a vault whose spare lives somewhere
+# this process cannot write. Creating that state means either running the test
+# as two users or writing under /etc, and neither belongs in a unit test.
+crates/veilvoice-crypto/src/lock.rs:857:9: replace LockStore::every_copy_current -> bool with true
+
+# `open_default` reads the real per-user lock location. Distinguishing these
+# means writing a lock into the account's own configuration directory, which is
+# a test with a side effect on the machine that runs it.
+crates/veilvoice-crypto/src/lock.rs:874:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, true))
+crates/veilvoice-crypto/src/lock.rs:874:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, false))
+
+# `portable_dir` and `is_portable` answer from a folder beside the running
+# executable. Under `cargo test` that is the test binary in the build
+# directory, so making these answer anything but the default means planting a
+# folder inside `target/`, which a later build removes and which F-185 has just
+# finished arguing should never be written into by hand.
+crates/veilvoice-crypto/src/lock.rs:1058:5: replace portable_dir -> Option<PathBuf> with None
+crates/veilvoice-crypto/src/lock.rs:1113:5: replace is_portable -> bool with true
+crates/veilvoice-crypto/src/lock.rs:1113:5: replace is_portable -> bool with false
+
+# `admin_dir` tries to create /etc/veilvoice and answers None when it cannot.
+# On a machine where it can, calling it from a test changes that machine; on
+# one where it cannot, the mutant answering None is what the original already
+# does. Either way there is nothing to observe that is worth the side effect.
+crates/veilvoice-crypto/src/vault.rs:329:5: replace admin_dir -> Option<PathBuf> with None
+crates/veilvoice-crypto/src/vault.rs:329:5: replace admin_dir -> Option<PathBuf> with Some(Default::default())
+
+# `fully_locked` asks whether every chunk was locked out of swap. Where the
+# operating system grants every lock, as it does on the machines this runs on,
+# the honest answer is already true and the mutant is indistinguishable. The
+# test beside it asserts the relation between the two chunk counts instead,
+# which holds on a machine that grants none.
+crates/veilvoice-crypto/src/tape.rs:157:9: replace Tape::fully_locked -> bool with true
+
+
+# --- 3. Reachable only through a self-contradiction ---------------------------
+
+# The site index is re-drawn only when reading it failed with "not there".
+# Telling that guard apart from one that accepts any failure needs a read of the
+# index that fails and a write to that same path that then succeeds. A
+# filesystem that refuses the read refuses the write, so both the original and
+# the mutant return the same error and nothing observes the difference. The
+# guard stays because the reasoning it encodes is right, and because a
+# filesystem that did behave that way is exactly what it protects against.
+crates/veilvoice-crypto/src/vault.rs:139:23: replace match guard e.kind() == std::io::ErrorKind::NotFound with true in Vault::at
