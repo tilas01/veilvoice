@@ -324,6 +324,14 @@ jobs:
       - name: Every public item must be reached by something
         run: python tools/audit/reachable.py
 
+      # F-185. `.gitignore` matches `target/` at any depth, which is right and
+      # also means a build directory inside the repository never appears in
+      # `git status`, never appears in a diff and is never cleaned. One was
+      # being rebuilt by the measured-numbers tool on every machine that is not
+      # Windows, and reached fifteen gigabytes before anything noticed.
+      - name: No build output may live outside the one directory at the root
+        run: python tools/audit/build_output.py
+
       # And the other half of the question. Saying what a dependency is for
       # does not make anything watch it: a crate outside the workspace, or a
       # second workflow directory, falls outside every Dependabot entry and
