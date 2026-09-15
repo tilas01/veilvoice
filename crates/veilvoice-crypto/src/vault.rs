@@ -360,6 +360,56 @@ mod tests {
         Vault::at(dir, None).unwrap()
     }
 
+    /// Clearing a vault that is not there is not a failure.
+    ///
+    /// Two mutants lived in the one closure that decides this: the comparison
+    /// against `NotFound` inverted, and the `!` in front of it deleted. Either
+    /// turns "nothing to remove" into an error. The suite only ever cleared a
+    /// vault it had just written, where nothing is missing and both mutants
+    /// behave exactly like the original.
+    #[test]
+    fn clearing_a_vault_that_was_never_written_succeeds() {
+        let dir = tempfile::tempdir().unwrap();
+        let vault = vault(dir.path());
+        vault.clear().expect("removing nothing is not a failure");
+
+        // And again after a real write, so both halves of the closure are
+        // exercised in one test: this time the files exist and are removed.
+        let lock = crate::lock::AppLock::create(b"pw", weak()).unwrap();
+        vault.store(&lock).unwrap();
+        vault
+            .clear()
+            .expect("removing something is not a failure either");
+        vault
+            .clear()
+            .expect("and removing it twice is still not one");
+    }
+
+    /// A store into a directory that does not exist yet creates it.
+    ///
+    /// `write_one` creates the parent when the parent is not empty, and
+    /// deleting that `!` inverts it into creating the parent only when there
+    /// is none to create. Every existing test handed it a `tempdir` that
+    /// already existed, so the creation never had to happen and its absence
+    /// never showed.
+    #[test]
+    fn storing_into_a_directory_that_does_not_exist_yet_creates_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let nested = dir.path().join("not").join("made").join("yet");
+        assert!(
+            !nested.exists(),
+            "the point of the test is that it is absent"
+        );
+
+        let vault = Vault::at(&nested, None).unwrap();
+        let lock = crate::lock::AppLock::create(b"pw", weak()).unwrap();
+        vault.store(&lock).unwrap();
+
+        let (back, _) = vault.load().unwrap();
+        let back = back.expect("what was stored reads back");
+        assert!(back.same_secret_as(&lock));
+    }
+
     #[test]
     fn the_two_copies_are_not_the_same_file() {
         let dir = tempfile::tempdir().unwrap();
