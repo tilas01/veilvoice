@@ -628,7 +628,7 @@ impl Studio {
 
     /// **Roadmap item 145.** The Studio's own failsafe, and what it is for.
     ///
-    /// Separate from [`veilvoice_failsafe`], which is the application's and is
+    /// Separate from [`veilvoice_guard::failsafe`], which is the application's and is
     /// about *other programs* taking the microphone. This one is about this
     /// tab: a fault in the Studio stops the Studio rather than the recording.
     ///

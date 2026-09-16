@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/sentry.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 384 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 386 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs)
 
 ## Contents
 
@@ -16,7 +16,7 @@
 
 `veilvoice sentry` -- canaries, baselines, and what changed since.
 
-The command-line front end to `veilvoice_sentry`. All of the logic is in
+The command-line front end to `veilvoice_guard::sentry`. All of the logic is in
 that crate; this file decides where the state lives, prints it, and chooses
 an exit code.
 
@@ -46,7 +46,7 @@ command somebody removes from the scheduled task.
 
 # This detects, and stops nothing
 
-`veilvoice_sentry::SCOPE` is printed by `status` rather than paraphrased
+`veilvoice_guard::sentry::SCOPE` is printed by `status` rather than paraphrased
 here, so there is one wording and the tests guard it.
 
 # In plain words
@@ -59,19 +59,19 @@ out quickly.
 
 ## What this file contains
 
-384 lines defining **11 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+386 lines defining **11 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `status` (line 128) -- What is planted, what is watched, and what this is worth.
+- `status` (line 130) -- What is planted, what is watched, and what this is worth.
   - reaches: `baselines`, `load_nest`, `wrap`, `state_dir`, `nest_path`
-- `plant` (line 170) -- Put a canary in dir.
+- `plant` (line 172) -- Put a canary in dir.
   - reaches: `load_nest`, `save_nest`, `nest_path`, `state_dir`
-- `pull_up` (line 194) -- Stop watching a canary, and delete it.
+- `pull_up` (line 196) -- Stop watching a canary, and delete it.
   - reaches: `load_nest`, `save_nest`, `nest_path`, `state_dir`
-- `baseline` (line 205) -- Record what dir holds now, as the thing to compare against later.
+- `baseline` (line 207) -- Record what dir holds now, as the thing to compare against later.
   - reaches: `state_dir`
-- `check` (line 241) -- Look at every canary and every baseline.
+- `check` (line 243) -- Look at every canary and every baseline.
   - reaches: `baselines`, `load_nest`, `state_dir`, `nest_path`
 
 ## What calls what
@@ -91,14 +91,14 @@ flowchart TD
     n_state_dir["state_dir<br/>line 54"]
     n_nest_path["nest_path<br/>line 58"]
     n_load_nest["load_nest<br/>line 74"]
-    n_save_nest["save_nest<br/>line 85"]
-    n_baselines["baselines<br/>line 92"]
-    n_status(["status<br/>line 128"])
-    n_plant(["plant<br/>line 170"])
-    n_pull_up(["pull_up<br/>line 194"])
-    n_baseline(["baseline<br/>line 205"])
-    n_check(["check<br/>line 241"])
-    n_wrap["wrap<br/>line 319"]
+    n_save_nest["save_nest<br/>line 87"]
+    n_baselines["baselines<br/>line 94"]
+    n_status(["status<br/>line 130"])
+    n_plant(["plant<br/>line 172"])
+    n_pull_up(["pull_up<br/>line 196"])
+    n_baseline(["baseline<br/>line 207"])
+    n_check(["check<br/>line 243"])
+    n_wrap["wrap<br/>line 321"]
     n_baseline --> n_state_dir
     n_baselines --> n_state_dir
     n_check --> n_baselines
@@ -116,14 +116,14 @@ flowchart TD
     click n_state_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L54" "open the source"
     click n_nest_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L58" "open the source"
     click n_load_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L74" "open the source"
-    click n_save_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L85" "open the source"
-    click n_baselines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L92" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L128" "open the source"
-    click n_plant href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L170" "open the source"
-    click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L194" "open the source"
-    click n_baseline href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L205" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L241" "open the source"
-    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L319" "open the source"
+    click n_save_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L87" "open the source"
+    click n_baselines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L94" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L130" "open the source"
+    click n_plant href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L172" "open the source"
+    click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L196" "open the source"
+    click n_baseline href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L207" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L243" "open the source"
+    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L321" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_plant,n_pull_up,n_baseline,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -141,11 +141,11 @@ flowchart TD
 | `state_dir` <sub>pub fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L54) | Where the canaries and baselines are kept. |
 | `nest_path` <sub>fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L58) |  |
 | `load_nest` <sub>fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L74) | Read the nest, treating "no file yet" as "nothing planted". |
-| `save_nest` <sub>fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L85) |  |
-| `baselines` <sub>fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L92) | Every saved baseline, with the path it came from. |
-| `status` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L128) | What is planted, what is watched, and what this is worth. |
-| `plant` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L170) | Put a canary in dir. |
-| `pull_up` <sub>pub fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L194) | Stop watching a canary, and delete it. |
-| `baseline` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L205) | Record what dir holds now, as the thing to compare against later. |
-| `check` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L241) | Look at every canary and every baseline. |
-| `wrap` <sub>pub fn</sub> | [319](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L319) | Wrap text to width columns on spaces, for the scope note. |
+| `save_nest` <sub>fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L87) |  |
+| `baselines` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L94) | Every saved baseline, with the path it came from. |
+| `status` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L130) | What is planted, what is watched, and what this is worth. |
+| `plant` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L172) | Put a canary in dir. |
+| `pull_up` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L196) | Stop watching a canary, and delete it. |
+| `baseline` <sub>pub fn</sub> | [207](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L207) | Record what dir holds now, as the thing to compare against later. |
+| `check` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L243) | Look at every canary and every baseline. |
+| `wrap` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L321) | Wrap text to width columns on spaces, for the scope note. |

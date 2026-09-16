@@ -103,16 +103,18 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>170 lines"])
+    n_lib(["lib.rs<br/>171 lines"])
     n_companions["companions.rs<br/>1088 lines"]
     n_install["install.rs<br/>574 lines"]
     n_space["space.rs<br/>171 lines"]
+    n_update["update.rs<br/>581 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
     n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
     click n_companions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" "open the source"
     click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" "open the source"
     click n_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" "open the source"
     click n_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" "open the source"
 ```
 
@@ -124,11 +126,12 @@ flowchart TD
 |---|---:|---|
 | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | 1088 | Optional third-party software, detected rather than assumed. |
 | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 574 | Put this program somewhere the system can find it. |
-| [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 170 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 171 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | 171 | How much room is actually free where VeilVoice keeps things. |
+| [`update.rs`](../../docs/files/veilvoice-setup/update.md) | 581 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**1,720 functional lines of Rust** in this crate. A functional line is a line
+**2,073 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -158,6 +161,18 @@ counts blank lines and comments too. Both are produced by
 | `fn free_bytes` | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | Free space at path, in bytes, or None if the platform would not say. |
 | `fn parse_df` | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | The available column of a df -Pk report. |
 | `fn parse_fsutil` | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | The free-bytes figure from fsutil volume diskfree. |
+| `const REPO` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | The repository asked about. |
+| `const LATEST_URL` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | The page fetched. |
+| `const RELEASES_URL` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Where releases are listed, for somebody doing this by hand. |
+| `const TIMEOUT` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | How long the transfer tool is given before it is given up on. |
+| `enum Verdict` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | How this build's version compares with the newest published one. |
+| `struct Report` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | What a check found. |
+| `enum Error` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Why a check could not be completed. |
+| `const VERSION` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | The version this build was compiled as. |
+| `fn check` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Ask whether anything newer than current has been published. |
+| `fn report` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Compare two version strings and build the report. |
+| `fn tag_in` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | The tag in whatever the transfer tool printed. |
+| `const SCOPE` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | What this crate does and does not do, in one paragraph, for a front end to show beside the button. |
 | `const DISK_ADVICE` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | What VeilVoice tells the user about the disk under the volume. |
 | `enum Tool` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | One of the two tools this module knows about. |
 | `enum Hidden` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | Whether a destination is, or might be, a VeraCrypt hidden volume. |

@@ -24,7 +24,7 @@
 
 The manual update check, as the window shows it.
 
-`veilvoice_update` does the asking and states what the answer is worth.
+`veilvoice_setup::update` does the asking and states what the answer is worth.
 This is the button, the spinner and the result, and the rule that the
 button is the only thing that ever starts it.
 
@@ -40,7 +40,7 @@ channel, and the window drains that channel once a frame and moves on.
 # Nothing here is automatic
 
 There is no timer, no check at startup, and no "check again" on a schedule.
-`Updates` holds no clock. The only path into `veilvoice_update::check` is
+`Updates` holds no clock. The only path into `veilvoice_setup::update::check` is
 a click, and a test asserts the state a freshly built panel is in.
 
 # In plain words

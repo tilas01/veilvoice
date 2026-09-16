@@ -81,11 +81,20 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>412 lines"])
+    n_lib(["lib.rs<br/>423 lines"])
+    n_appctl["appctl.rs<br/>798 lines"]
+    n_input["input.rs<br/>605 lines"]
     n_linux["linux.rs<br/>201 lines"]
+    n_privilege["privilege.rs<br/>404 lines"]
+    n_proc["proc.rs<br/>274 lines"]
     n_windows["windows.rs<br/>606 lines"]
+    n_input --> n_proc
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
+    click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/appctl.rs" "open the source"
+    click n_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/input.rs" "open the source"
     click n_linux href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" "open the source"
+    click n_privilege href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs" "open the source"
+    click n_proc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/proc.rs" "open the source"
     click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" "open the source"
 ```
 
@@ -95,12 +104,16 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | 412 | Find out which applications are using your microphone and camera, right now. |
+| [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | 798 | Learn what normally runs on this machine, then notice what does not. |
+| [`input.rs`](../../docs/files/veilvoice-watch/input.md) | 605 | What on this machine could be watching the keyboard and the mouse. |
+| [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | 423 | Find out which applications are using your microphone and camera, right now. |
 | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | 201 | Linux detection, via open file handles in /proc. |
+| [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
+| [`proc.rs`](../../docs/files/veilvoice-watch/proc.md) | 274 | Which processes are running, per platform, and what that cannot tell you. |
 | [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 606 | Windows detection, via the Capability Access Manager. |
 | [`scan_once.rs`](../../docs/files/veilvoice-watch/examples-scan_once.md) | 30 | Print what is using the microphone and camera right now. |
 
-**745 functional lines of Rust** in this crate. A functional line is a line
+**3,917 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -111,6 +124,22 @@ counts blank lines and comments too. Both are produced by
 
 | Item | Where | What |
 |---|---|---|
+| `enum Grant` | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | How long a grant lasts. |
+| `enum Verdict` | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | What a baseline says about one program. |
+| `struct Entry` | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | One line of the decision log. |
+| `struct Baseline` | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | What normally runs here, what has been allowed, and what has been decided. |
+| `enum Error` | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | Why something was refused. |
+| `const SCOPE` | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | What a reader must be told, in the words to tell them. |
+| `enum Reach` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | Why a program is in the table. |
+| `struct Watcher` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | One program able to observe keyboard or mouse input. |
+| `const ALL` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | Every program this build knows how to recognise. |
+| `fn by_key` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | The program with this identifier. |
+| `fn matching` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | The entry a process name belongs to, if any. |
+| `struct Finding` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | One program found running, and how to describe it. |
+| `struct Report` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | What was found, and everything that qualifies it. |
+| `fn look` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | Look, and report. |
+| `const LIMITS` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | What a reader must be told, in the words to tell them. |
+| `const WHY_NOT_HOOKING` | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | Why this crate does not watch input in order to detect input watching. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | Crate version string, surfaced in the About panel. |
 | `enum DeviceKind` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | The kind of device being used. |
 | `struct DeviceUse` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | One application holding one device. |
@@ -121,6 +150,14 @@ counts blank lines and comments too. Both are produced by
 | `enum Change` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | A change between two scans. |
 | `struct Monitor` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | Watches for changes between scans. |
 | `fn scan` | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) |  |
+| `enum Level` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What VeilVoice is running with. |
+| `fn level` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What VeilVoice is running with right now. |
+| `fn service_installed` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | Whether a background service is installed. |
+| `const NO_SERVICE` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | Why the opt-in service is not shipped, in the words to show. |
+| `const NO_KERNEL` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What kernel level would need, and why it is not here. |
+| `const NEVER_ELEVATES` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What this crate will not do, and why that is deliberate. |
+| `fn running` | [`proc.rs`](../../docs/files/veilvoice-watch/proc.md) | Every process name this build can see, lower-cased and without a path. |
+| `const SCOPE` | [`proc.rs`](../../docs/files/veilvoice-watch/proc.md) | What a reader has to be told, in the words to show them. |
 | `fn scan` | [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) |  |
 
 ## Reading it elsewhere

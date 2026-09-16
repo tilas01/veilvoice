@@ -105,10 +105,12 @@ macro_rules! note {
 }
 
 mod builder;
+pub mod check;
 mod deps;
 mod discover;
 mod extracted;
 mod fetch;
+pub mod gnupg;
 mod report;
 
 use report::{Loudness, Status};
@@ -119,7 +121,7 @@ use std::process::ExitCode;
 use pgp::composed::SignedPublicKey;
 
 // ---------------------------------------------------------------------------
-// The key, the hashing and the signature check live in `veilvoice-check`.
+// The key, the hashing and the signature check live in `crate::check`.
 //
 // They were here, in a binary crate, which by construction has no consumers.
 // The desktop application was asked for a verify tab, and the choice was to
@@ -132,11 +134,11 @@ use pgp::composed::SignedPublicKey;
 // a silent accept could come from is the one place there is only one of.
 // ---------------------------------------------------------------------------
 
-use veilvoice_check::{digest_from_sums, digests_match, fingerprint_of, FINGERPRINT};
+use crate::check::{digest_from_sums, digests_match, fingerprint_of, FINGERPRINT};
 
 /// The embedded key, with its fingerprint checked against [`FINGERPRINT`].
 fn embedded_key() -> Result<SignedPublicKey, String> {
-    veilvoice_check::key().map_err(|error| error.to_string())
+    crate::check::key().map_err(|error| error.to_string())
 }
 
 // The two fallible ones are wrapped rather than imported. The library reports a
@@ -147,12 +149,12 @@ fn embedded_key() -> Result<SignedPublicKey, String> {
 
 /// SHA-256 of a file, as this program's `Result<_, String>`.
 fn sha256_file(path: &Path) -> Result<String, String> {
-    veilvoice_check::sha256_file(path).map_err(|error| error.to_string())
+    crate::check::sha256_file(path).map_err(|error| error.to_string())
 }
 
 /// Verify a detached signature, as this program's `Result<_, String>`.
 fn verify_detached(key: &SignedPublicKey, signature: &str, data: &[u8]) -> Result<(), String> {
-    veilvoice_check::verify_detached(key, signature, data).map_err(|error| error.to_string())
+    crate::check::verify_detached(key, signature, data).map_err(|error| error.to_string())
 }
 
 /// The verifier's own help, with its verbosity and exit-status tables.
@@ -915,7 +917,7 @@ fn report_extracted(found: &discover::Found) -> usize {
             .into_owned();
         let section = published
             .as_ref()
-            .and_then(|all| veilvoice_check::contents::for_archive(all, &name));
+            .and_then(|all| crate::check::contents::for_archive(all, &name));
 
         match section {
             Some(section) => problems += report_against_manifest(&found.directory, section),
@@ -950,7 +952,7 @@ enum Manifest {
     /// One was, and it cannot be trusted or read.
     Unusable(String),
     /// One was, and it is genuine.
-    Ready(Vec<veilvoice_check::contents::ArchiveContents>),
+    Ready(Vec<crate::check::contents::ArchiveContents>),
 }
 
 /// Read `CONTENTS.sha256`, having first proved it is the published one.
@@ -975,14 +977,14 @@ fn manifest(found: &discover::Found) -> Manifest {
         Ok(text) => text,
         Err(why) => return Manifest::Unusable(why),
     };
-    match veilvoice_check::check_file(path, &sums, &signature) {
+    match crate::check::check_file(path, &sums, &signature) {
         Err(why) => Manifest::Unusable(format!("{why}")),
         Ok(checked) if !checked.matched => Manifest::Unusable(
             "it is not the list this release signed: the hashes do not agree".to_string(),
         ),
         Ok(_) => match read_text(path) {
             Err(why) => Manifest::Unusable(why),
-            Ok(text) => match veilvoice_check::contents::parse(&text) {
+            Ok(text) => match crate::check::contents::parse(&text) {
                 Ok(all) => Manifest::Ready(all),
                 Err(why) => Manifest::Unusable(format!("{why}")),
             },
@@ -993,12 +995,12 @@ fn manifest(found: &discover::Found) -> Manifest {
 /// Check one extracted folder against the section of the list that covers it.
 fn report_against_manifest(
     root: &Path,
-    section: &veilvoice_check::contents::ArchiveContents,
+    section: &crate::check::contents::ArchiveContents,
 ) -> usize {
-    use veilvoice_check::contents::Verdict;
+    use crate::check::contents::Verdict;
 
-    let outcomes = veilvoice_check::contents::check(root, section);
-    let sweep = veilvoice_check::contents::extras(root, section);
+    let outcomes = crate::check::contents::check(root, section);
+    let sweep = crate::check::contents::extras(root, section);
     let as_published = outcomes.iter().filter(|o| o.is_good()).count();
 
     for outcome in &outcomes {
@@ -1065,7 +1067,7 @@ fn report_against_manifest(
 }
 
 /// The published hash for one path, for a `--verbose` line.
-fn digest_for(section: &veilvoice_check::contents::ArchiveContents, path: &str) -> String {
+fn digest_for(section: &crate::check::contents::ArchiveContents, path: &str) -> String {
     section
         .members
         .iter()
@@ -1080,7 +1082,7 @@ fn digest_for(section: &veilvoice_check::contents::ArchiveContents, path: &str) 
 /// survives the manifest: a hash says a file is byte for byte correct, and an
 /// unpacking tool that dropped the execute bit leaves that correct file
 /// unrunnable.
-fn report_runnable(root: &Path, section: &veilvoice_check::contents::ArchiveContents) {
+fn report_runnable(root: &Path, section: &crate::check::contents::ArchiveContents) {
     let mut stuck = Vec::new();
     for directory in section.roots() {
         let here = extracted::look_in(&root.join(&directory));
@@ -1155,7 +1157,7 @@ fn report_gnupg(found: &discover::Found) -> usize {
 
     out!("Checking it again with your own GnuPG");
     let mut problems = 0usize;
-    match veilvoice_gnupg::Gnupg::found() {
+    match crate::gnupg::Gnupg::found() {
         Err(why) => {
             out!("  {why}. These are the commands if you install it.");
         }
@@ -1164,7 +1166,7 @@ fn report_gnupg(found: &discover::Found) -> usize {
             // The key first, because GnuPG cannot check a signature by a key it
             // has never seen, and asking somebody to import it by hand is the
             // step at which almost everybody stops.
-            match gpg.import(veilvoice_check::PUBLIC_KEY, FINGERPRINT) {
+            match gpg.import(crate::check::PUBLIC_KEY, FINGERPRINT) {
                 // Not counted against the release. GnuPG being unusable on this
                 // machine -- no keyring directory, a read-only home, an agent
                 // that will not start -- says nothing whatever about the file
@@ -1653,7 +1655,7 @@ fn asked_for(text: &str) {
 /// with the binary, and it is worth naming rather than quietly dropping.
 ///
 /// What replaces it is the desktop application's verify tab, which does the
-/// same check with the same code in `veilvoice-check`, and `veilvoice verify`
+/// same check with the same code in `crate::check`, and `veilvoice verify`
 /// with no arguments, which still runs `auto`. The waiting-for-Enter is not
 /// kept: a subcommand of a command-line tool is being run from a shell that
 /// is not about to close.

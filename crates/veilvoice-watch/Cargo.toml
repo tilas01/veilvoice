@@ -13,3 +13,8 @@ description = "Detect which applications are currently using the microphone and 
 # pulling in platform bindings, and a privacy monitor with no dependencies is
 # one less supply chain to trust.
 [dependencies]
+
+[dev-dependencies]
+# Tests that write a screen-recorder allowlist or a driver listing and read it
+# back, in a directory that goes away with them.
+tempfile = "3"

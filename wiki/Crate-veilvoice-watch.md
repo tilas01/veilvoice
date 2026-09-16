@@ -68,11 +68,20 @@ the place this reads.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>412 lines"])
+    n_lib(["lib.rs<br/>423 lines"])
+    n_appctl["appctl.rs<br/>798 lines"]
+    n_input["input.rs<br/>605 lines"]
     n_linux["linux.rs<br/>201 lines"]
+    n_privilege["privilege.rs<br/>404 lines"]
+    n_proc["proc.rs<br/>274 lines"]
     n_windows["windows.rs<br/>606 lines"]
+    n_input --> n_proc
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
+    click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/appctl.rs" "open the source"
+    click n_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/input.rs" "open the source"
     click n_linux href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" "open the source"
+    click n_privilege href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs" "open the source"
+    click n_proc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/proc.rs" "open the source"
     click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" "open the source"
 ```
 
@@ -82,12 +91,16 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-watch-lib]] | 412 | Find out which applications are using your microphone and camera, right now. |
+| [[`appctl.rs`|File-veilvoice-watch-appctl]] | 798 | Learn what normally runs on this machine, then notice what does not. |
+| [[`input.rs`|File-veilvoice-watch-input]] | 605 | What on this machine could be watching the keyboard and the mouse. |
+| [[`lib.rs`|File-veilvoice-watch-lib]] | 423 | Find out which applications are using your microphone and camera, right now. |
 | [[`linux.rs`|File-veilvoice-watch-linux]] | 201 | Linux detection, via open file handles in /proc. |
+| [[`privilege.rs`|File-veilvoice-watch-privilege]] | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
+| [[`proc.rs`|File-veilvoice-watch-proc]] | 274 | Which processes are running, per platform, and what that cannot tell you. |
 | [[`windows.rs`|File-veilvoice-watch-windows]] | 606 | Windows detection, via the Capability Access Manager. |
 | [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] | 30 | Print what is using the microphone and camera right now. |
 
-**745 functional lines of Rust** in this crate. A functional line is a line
+**3,917 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

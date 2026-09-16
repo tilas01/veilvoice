@@ -52,6 +52,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod accel;
 pub mod ffmpeg;
 /// The monospace face the video frames are lettered with.
 pub mod font;

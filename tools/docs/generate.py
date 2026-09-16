@@ -82,33 +82,19 @@ import textwrap
 # documenting whatever happens to be on disk.
 CRATES = (
     "fuzz",
-    "veilvoice-accel",
-    "veilvoice-appctl",
     "veilvoice-audio",
-    "veilvoice-capture",
-    "veilvoice-check",
     "veilvoice-cli",
     "veilvoice-conversation",
     "veilvoice-core",
     "veilvoice-crypto",
-    "veilvoice-decoy",
-    "veilvoice-drivers",
-    "veilvoice-failsafe",
     "veilvoice-guard",
-    "veilvoice-input",
-    "veilvoice-gnupg",
     "veilvoice-gui",
     "veilvoice-meta",
     "veilvoice-policy",
-    "veilvoice-priv",
-    "veilvoice-proc",
-    "veilvoice-sentry",
     "veilvoice-setup",
-    "veilvoice-update",
     "veilvoice-verify",
     "veilvoice-video",
     "veilvoice-watch",
-    "veilvoice-workspace",
 )
 
 # Every crate in the workspace, so this script can say what it is *not* yet
@@ -116,33 +102,19 @@ CRATES = (
 # partial pass is exactly the failure mode section 4.5 of the audit describes.
 ALL_CRATES = (
     "fuzz",
-    "veilvoice-accel",
-    "veilvoice-appctl",
     "veilvoice-audio",
-    "veilvoice-capture",
-    "veilvoice-check",
     "veilvoice-cli",
     "veilvoice-conversation",
     "veilvoice-core",
     "veilvoice-crypto",
-    "veilvoice-decoy",
-    "veilvoice-drivers",
-    "veilvoice-failsafe",
     "veilvoice-guard",
-    "veilvoice-input",
-    "veilvoice-gnupg",
     "veilvoice-gui",
     "veilvoice-meta",
     "veilvoice-policy",
-    "veilvoice-priv",
-    "veilvoice-proc",
-    "veilvoice-sentry",
     "veilvoice-setup",
-    "veilvoice-update",
     "veilvoice-verify",
     "veilvoice-video",
     "veilvoice-watch",
-    "veilvoice-workspace",
 )
 
 def workspace_crates(root):
@@ -153,7 +125,7 @@ def workspace_crates(root):
     [`ALL_CRATES`] is hand-written, and its whole job is to let this tool say
     what it is *not* covering rather than quietly covering less than the tree
     contains. A hand-written list of what exists has one failure mode, and it
-    happened: `veilvoice-check` and `veilvoice-update` were added to the
+    happened: two crates were added to the
     workspace and to neither list, so they had no page, no banner, no diagram
     and no entry under "not yet covered" -- invisible rather than uncovered,
     which is the exact failure the list was written to prevent.
@@ -1455,7 +1427,7 @@ def banner_svg(colours, title, subtitle, kind):
     # **The banner grows; the subtitle is never cut.**
     #
     # It used to keep two lines and end the second with an ellipsis. That reads
-    # as a summary and is a sentence that stopped: `veilvoice-failsafe`'s banner
+    # as a summary and is a sentence that stopped: the failsafe's banner
     # said what the crate notices and not what it does about it, which is the
     # half that matters. A banner is the first thing on a crate's page and is
     # what the README and the website show, so it is the one place a
@@ -3198,6 +3170,44 @@ def is_ours(path):
         return False
 
 
+# Paths under the directories below that belong to a different generator.
+#
+# `website/reference/source/` and `wiki/Source-` are `tools/docs/sources.py`,
+# which documents the website's own JavaScript and CSS; this tool reads Rust
+# doc comments and cannot see them. `wiki/Guide-` is `tools/docs/guides.py`.
+# Both have their own `--check` with their own sweep over exactly those paths.
+#
+# The wiki is one flat namespace, so the exclusion there is a prefix on a file
+# name rather than a directory. That is the price of the wiki's shape, and it
+# is why those pages are named `Source-` and `Guide-` and nothing else is.
+NOT_OURS = ("website/reference/source/", "wiki/Source-", "wiki/Guide-")
+
+OWNED = ("docs/files", "website/reference", "assets/banners",
+         "website/assets/banners", "wiki")
+
+
+def orphans(root, files):
+    """Files this generator owns and no longer produces.
+
+    A page for a crate that has been folded into another one would otherwise
+    sit in the tree for ever, describing something that is not there. The
+    reference had 1359 such files the day fourteen crates became modules.
+    """
+    out = []
+    for base in OWNED:
+        directory = os.path.join(root, base.replace("/", os.sep))
+        if not os.path.isdir(directory):
+            continue
+        for current, _, names in os.walk(directory):
+            for name in names:
+                rel = os.path.relpath(os.path.join(current, name), root)
+                rel = rel.replace(os.sep, "/")
+                if rel.startswith(NOT_OURS) or rel in files:
+                    continue
+                out.append(rel)
+    return sorted(out)
+
+
 def write(root, files):
     # Nothing is written until every destination has been checked, so a refusal
     # leaves the tree exactly as it was rather than half-regenerated.
@@ -3226,7 +3236,22 @@ def write(root, files):
             os.makedirs(directory)
         with io.open(path, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(text)
-    print("  wrote %d files for %d crate(s)" % (len(files), len(CRATES)))
+    # And take away what this tool used to write and no longer does, or the
+    # page for a crate that has become a module outlives the crate.
+    gone = orphans(root, files)
+    for rel in gone:
+        os.remove(os.path.join(root, rel.replace("/", os.sep)))
+    for base in OWNED:
+        directory = os.path.join(root, base.replace("/", os.sep))
+        for current, names, _ in os.walk(directory, topdown=False):
+            for name in names:
+                where = os.path.join(current, name)
+                if not os.listdir(where):
+                    os.rmdir(where)
+
+    print("  wrote %d files for %d crate(s)%s"
+          % (len(files), len(CRATES),
+             ", and removed %d that are no longer produced" % len(gone) if gone else ""))
     remaining = [c for c in ALL_CRATES if c not in CRATES]
     if remaining:
         print()
@@ -3268,20 +3293,8 @@ def check(root, files):
     # `wiki/Guide-` is `tools/docs/guides.py`: per-program views of the user
     # guide, which this tool cannot produce because it reads Rust doc
     # comments and those are Markdown. That tool has its own `--check`.
-    not_ours = ("website/reference/source/", "wiki/Source-", "wiki/Guide-")
-    for base in ("docs/files", "website/reference", "assets/banners",
-                 "website/assets/banners", "wiki"):
-        directory = os.path.join(root, base.replace("/", os.sep))
-        if not os.path.isdir(directory):
-            continue
-        for current, _, names in os.walk(directory):
-            for name in names:
-                rel = os.path.relpath(os.path.join(current, name), root)
-                rel = rel.replace(os.sep, "/")
-                if rel.startswith(not_ours):
-                    continue
-                if rel not in files:
-                    problems.append("%s: not produced by the generator any more" % rel)
+    for rel in orphans(root, files):
+        problems.append("%s: not produced by the generator any more" % rel)
 
     if problems:
         for line in problems[:40]:

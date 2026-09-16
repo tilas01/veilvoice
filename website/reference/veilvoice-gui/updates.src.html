@@ -69,7 +69,7 @@
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
 <span class="ln" id="L2"><span class="tok-com">//! The manual update check, as the window shows it.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
-<span class="ln" id="L4"><span class="tok-com">//! [`veilvoice_update`] does the asking and states what the answer is worth.</span></span>
+<span class="ln" id="L4"><span class="tok-com">//! [`veilvoice_setup::update`] does the asking and states what the answer is worth.</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! This is the button, the spinner and the result, and the rule that the</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! button is the only thing that ever starts it.</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
@@ -85,7 +85,7 @@
 <span class="ln" id="L17"><span class="tok-com">//! # Nothing here is automatic</span></span>
 <span class="ln" id="L18"><span class="tok-com">//!</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! There is no timer, no check at startup, and no &quot;check again&quot; on a schedule.</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! [`Updates`] holds no clock. The only path into `veilvoice_update::check` is</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! [`Updates`] holds no clock. The only path into `veilvoice_setup::update::check` is</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! a click, and a test asserts the state a freshly built panel is in.</span></span>
 <span class="ln" id="L22"><span class="tok-com">//!</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! # In plain words</span></span>
@@ -103,7 +103,7 @@
 <span class="ln" id="L35"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
 <span class="ln" id="L36"><span class="tok-kw">use</span> eframe::egui::{<span class="tok-kw">self</span>, RichText, Ui};</span>
 <span class="ln" id="L37"><span class="tok-kw">use</span> std::sync::mpsc;</span>
-<span class="ln" id="L38"><span class="tok-kw">use</span> veilvoice_update::{Error, Report, Verdict};</span>
+<span class="ln" id="L38"><span class="tok-kw">use</span> veilvoice_setup::update::{Error, Report, Verdict};</span>
 <span class="ln" id="L39"></span>
 <span class="src-item" id="fn-updates">
 <span class="ln" id="L40"><span class="tok-com">/// The panel&#x27;s state.</span></span>
@@ -160,7 +160,7 @@
 <span class="ln" id="L85">        <span class="tok-com">// a check whose answer arrives after the panel was closed is simply</span></span>
 <span class="ln" id="L86">        <span class="tok-com">// dropped by the channel.</span></span>
 <span class="ln" id="L87">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L88">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(veilvoice_update::<span class="tok-fn">check</span>(&amp;current));</span>
+<span class="ln" id="L88">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(veilvoice_setup::update::<span class="tok-fn">check</span>(&amp;current));</span>
 <span class="ln" id="L89">        });</span>
 <span class="ln" id="L90">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
 <span class="ln" id="L91">        <span class="tok-kw">self</span>.answer = None;</span>
@@ -205,13 +205,13 @@
 <span class="ln" id="L128"></span>
 <span class="ln" id="L129">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
 <span class="ln" id="L130">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L131">            RichText::<span class="tok-fn">new</span>(veilvoice_update::SCOPE)</span>
+<span class="ln" id="L131">            RichText::<span class="tok-fn">new</span>(veilvoice_setup::update::SCOPE)</span>
 <span class="ln" id="L132">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
 <span class="ln" id="L133">                .<span class="tok-fn">small</span>(),</span>
 <span class="ln" id="L134">        );</span>
 <span class="ln" id="L135">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
 <span class="ln" id="L136">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L137">            RichText::<span class="tok-fn">new</span>(veilvoice_update::RELEASES_URL)</span>
+<span class="ln" id="L137">            RichText::<span class="tok-fn">new</span>(veilvoice_setup::update::RELEASES_URL)</span>
 <span class="ln" id="L138">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
 <span class="ln" id="L139">                .<span class="tok-fn">small</span>(),</span>
 <span class="ln" id="L140">        );</span>
@@ -308,7 +308,7 @@
 <span class="ln" id="L228">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L229">    <span class="tok-kw">fn</span> <span class="tok-fn">an_answer_survives_being_drained_once</span>() {</span>
 <span class="ln" id="L230">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L231">        tx.<span class="tok-fn">send</span>(<span class="tok-fn">Ok</span>(veilvoice_update::<span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>)))</span>
+<span class="ln" id="L231">        tx.<span class="tok-fn">send</span>(<span class="tok-fn">Ok</span>(veilvoice_setup::update::<span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>)))</span>
 <span class="ln" id="L232">            .<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L233">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates {</span>
 <span class="ln" id="L234">            job: <span class="tok-fn">Some</span>(rx),</span>

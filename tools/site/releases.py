@@ -156,7 +156,7 @@ FIGURE_HTML = (
 # than typed again. This is the one value in the whole chain that a person has
 # to compare by eye, so a wrong copy of it here would be the worst possible
 # defect on a page about verification.
-FINGERPRINT_SOURCE = os.path.join("crates", "veilvoice-check", "src", "lib.rs")
+FINGERPRINT_SOURCE = os.path.join("crates", "veilvoice-verify", "src", "check", "mod.rs")
 
 
 def verifier_usage():
@@ -283,7 +283,7 @@ VERIFY_BUILD = [
 ]
 
 # Doing it entirely with tools that are not VeilVoice's. Taken from the same
-# list `veilvoice verify gnupg` prints, in `veilvoice-gnupg`, so the page and
+# list `veilvoice verify gnupg` prints, in `veilvoice_verify::gnupg`, so the page and
 # the program cannot come to say different things.
 BY_HAND = [
     "gpg --import veilvoice-signing-key.asc",

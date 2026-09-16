@@ -20,7 +20,7 @@
 //! be lifted **from this side**. It was lifted from the other one. A release
 //! now also publishes `CONTENTS.sha256`, listing every file inside every
 //! archive with its SHA-256, staged before `SHA256SUMS` is computed so that the
-//! signature covers it too. `veilvoice_check::contents` reads it and `lib.rs`
+//! signature covers it too. `crate::check::contents` reads it and `lib.rs`
 //! checks the extracted folder against it, file by file, and reports anything
 //! in that folder the release never published.
 //!
@@ -167,10 +167,10 @@ fn runnable(path: &Path) -> bool {
 ///
 /// Roadmap item 90 moved the body out of this binary so the desktop application's
 /// verify tab prints the same commands; roadmap item 97 moved it again, into
-/// `veilvoice-gnupg`, which also *runs* them. Re-exported here rather than
+/// `crate::gnupg`, which also *runs* them. Re-exported here rather than
 /// called through at every site, which keeps this module the one place the
 /// verifier looks for anything about extracted releases and GnuPG.
-pub use veilvoice_gnupg::commands as gnupg_commands;
+pub use crate::gnupg::commands as gnupg_commands;
 
 #[cfg(test)]
 mod tests {

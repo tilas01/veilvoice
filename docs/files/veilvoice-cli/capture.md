@@ -25,7 +25,7 @@
 `veilvoice capture` -- which screen recorders are running, and which of them
 you have said you meant to run.
 
-The command-line front end to `veilvoice_capture`. That crate holds the
+The command-line front end to `veilvoice_watch::capture`. That crate holds the
 table, the allowlist and the honest account of the three things it cannot
 do; this file decides where the allowlist lives and prints the result.
 

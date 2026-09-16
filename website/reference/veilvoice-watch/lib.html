@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-watch/lib.svg" alt="lib.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-watch/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 412 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 423 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-belongs-in-a-voice-privacy-tool">Why this belongs in a voice-privacy tool</a>
@@ -91,31 +91,31 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>412 lines defining <strong>13 functions</strong> (9 public), <strong>6 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>423 lines defining <strong>13 functions</strong> (9 public), <strong>6 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum DeviceKind</code> <span style="color:var(--muted)">line 60</span> &middot; The kind of device being used.</li>
-<li><code>struct DeviceUse</code> <span style="color:var(--muted)">line 78</span> &middot; One application holding one device.</li>
-<li><code>struct Support</code> <span style="color:var(--muted)">line 112</span> &middot; What detection is possible here.</li>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 160</span> &middot; Everything that can go wrong here.</li>
-<li><code>enum Change</code> <span style="color:var(--muted)">line 205</span> &middot; A change between two scans.</li>
-<li><code>struct Monitor</code> <span style="color:var(--muted)">line 237</span> &middot; Watches for changes between scans.</li>
+<li><code>enum DeviceKind</code> <span style="color:var(--muted)">line 71</span> &middot; The kind of device being used.</li>
+<li><code>struct DeviceUse</code> <span style="color:var(--muted)">line 89</span> &middot; One application holding one device.</li>
+<li><code>struct Support</code> <span style="color:var(--muted)">line 123</span> &middot; What detection is possible here.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 171</span> &middot; Everything that can go wrong here.</li>
+<li><code>enum Change</code> <span style="color:var(--muted)">line 216</span> &middot; A change between two scans.</li>
+<li><code>struct Monitor</code> <span style="color:var(--muted)">line 248</span> &middot; Watches for changes between scans.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>DeviceUse::key</code> <span style="color:var(--muted)">line 99</span> &middot; A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.
+<li><code>DeviceUse::key</code> <span style="color:var(--muted)">line 110</span> &middot; A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.
 </li>
-<li><code>DeviceUse::held_for</code> <span style="color:var(--muted)">line 104</span> &middot; How long this application has held the device.
+<li><code>DeviceUse::held_for</code> <span style="color:var(--muted)">line 115</span> &middot; How long this application has held the device.
 </li>
-<li><code>support</code> <span style="color:var(--muted)">line 126</span> &middot; Report what this platform can detect.
+<li><code>support</code> <span style="color:var(--muted)">line 137</span> &middot; Report what this platform can detect.
 </li>
-<li><code>Change::alert</code> <span style="color:var(--muted)">line 214</span> &middot; A one-line alert suitable for a notification or an overlay.
+<li><code>Change::alert</code> <span style="color:var(--muted)">line 225</span> &middot; A one-line alert suitable for a notification or an overlay.
 </li>
-<li><code>DeviceUse::describe</code> <span style="color:var(--muted)">line 224</span> &middot; name (pid 1234), or just the name when there is no PID.
+<li><code>DeviceUse::describe</code> <span style="color:var(--muted)">line 235</span> &middot; name (pid 1234), or just the name when there is no PID.
 </li>
-<li><code>Monitor::new</code> <span style="color:var(--muted)">line 243</span> &middot; A monitor that has not yet seen anything.
+<li><code>Monitor::new</code> <span style="color:var(--muted)">line 254</span> &middot; A monitor that has not yet seen anything.
 </li>
-<li><code>Monitor::current</code> <span style="color:var(--muted)">line 248</span> &middot; The most recent snapshot.
+<li><code>Monitor::current</code> <span style="color:var(--muted)">line 259</span> &middot; The most recent snapshot.
 </li>
-<li><code>Monitor::poll</code> <span style="color:var(--muted)">line 257</span> &middot; Scan, and report what changed since the previous call.
+<li><code>Monitor::poll</code> <span style="color:var(--muted)">line 268</span> &middot; Scan, and report what changed since the previous call.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>diff</code>, <code>scan</code></span>
 </li>
 </ul>
@@ -138,67 +138,67 @@
 <a href="lib.src.html#fn-devicekind-fmt">
 <rect x="289.1" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="343.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceKind::fmt</text>
-<text x="343.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 68</text>
+<text x="343.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 79</text>
 </a>
 <a href="lib.src.html#fn-deviceuse-key">
 <rect x="165.4" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="235.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceUse::key</text>
-<text x="235.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
+<text x="235.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
 </a>
 <a href="lib.src.html#fn-deviceuse-held_for">
 <rect x="332.3" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="422.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceUse::held_for</text>
-<text x="422.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 104</text>
+<text x="422.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
 </a>
 <a href="lib.src.html#fn-support-2">
 <rect x="28.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="74.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">support</text>
-<text x="74.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
+<text x="74.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
 </a>
 <a href="lib.src.html#fn-error-from">
 <rect x="146.5" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="204.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::from</text>
-<text x="204.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
+<text x="204.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
 <a href="lib.src.html#fn-error-fmt">
 <rect x="289.1" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="343.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="343.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 174</text>
+<text x="343.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
 </a>
 <a href="lib.src.html#fn-scan">
 <rect x="423.7" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="470.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
-<text x="470.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 188</text>
+<text x="470.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
 <a href="lib.src.html#fn-change-alert">
 <rect x="26.8" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="93.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Change::alert</text>
-<text x="93.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
+<text x="93.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 225</text>
 </a>
 <a href="lib.src.html#fn-deviceuse-describe">
 <rect x="185.6" y="220.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="276.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceUse::describe</text>
-<text x="276.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
+<text x="276.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
 </a>
 <a href="lib.src.html#fn-monitor-new">
 <rect x="392.7" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="455.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::new</text>
-<text x="455.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 243</text>
+<text x="455.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
 </a>
 <a href="lib.src.html#fn-monitor-current">
 <rect x="114.2" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="192.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::current</text>
-<text x="192.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
+<text x="192.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 259</text>
 </a>
 <a href="lib.src.html#fn-monitor-poll">
 <rect x="297.2" y="320.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="363.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::poll</text>
-<text x="363.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<text x="363.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
 </a>
 <a href="lib.src.html#fn-monitor-diff">
 <rect x="205.7" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="272.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::diff</text>
-<text x="272.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 262</text>
+<text x="272.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -217,34 +217,34 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_fmt[&quot;DeviceKind::fmt&lt;br/&gt;line 68&quot;]
-    n_key([&quot;DeviceUse::key&lt;br/&gt;line 99&quot;])
-    n_held_for([&quot;DeviceUse::held_for&lt;br/&gt;line 104&quot;])
-    n_support([&quot;support&lt;br/&gt;line 126&quot;])
-    n_from[&quot;Error::from&lt;br/&gt;line 168&quot;]
-    n_fmt[&quot;Error::fmt&lt;br/&gt;line 174&quot;]
-    n_scan[&quot;scan&lt;br/&gt;line 188&quot;]
-    n_alert([&quot;Change::alert&lt;br/&gt;line 214&quot;])
-    n_describe([&quot;DeviceUse::describe&lt;br/&gt;line 224&quot;])
-    n_new([&quot;Monitor::new&lt;br/&gt;line 243&quot;])
-    n_current([&quot;Monitor::current&lt;br/&gt;line 248&quot;])
-    n_poll([&quot;Monitor::poll&lt;br/&gt;line 257&quot;])
-    n_diff[&quot;Monitor::diff&lt;br/&gt;line 262&quot;]
+    n_fmt[&quot;DeviceKind::fmt&lt;br/&gt;line 79&quot;]
+    n_key([&quot;DeviceUse::key&lt;br/&gt;line 110&quot;])
+    n_held_for([&quot;DeviceUse::held_for&lt;br/&gt;line 115&quot;])
+    n_support([&quot;support&lt;br/&gt;line 137&quot;])
+    n_from[&quot;Error::from&lt;br/&gt;line 179&quot;]
+    n_fmt[&quot;Error::fmt&lt;br/&gt;line 185&quot;]
+    n_scan[&quot;scan&lt;br/&gt;line 199&quot;]
+    n_alert([&quot;Change::alert&lt;br/&gt;line 225&quot;])
+    n_describe([&quot;DeviceUse::describe&lt;br/&gt;line 235&quot;])
+    n_new([&quot;Monitor::new&lt;br/&gt;line 254&quot;])
+    n_current([&quot;Monitor::current&lt;br/&gt;line 259&quot;])
+    n_poll([&quot;Monitor::poll&lt;br/&gt;line 268&quot;])
+    n_diff[&quot;Monitor::diff&lt;br/&gt;line 273&quot;]
     n_poll --&gt; n_diff
     n_poll --&gt; n_scan
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L68&quot; &quot;open the source&quot;
-    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L99&quot; &quot;open the source&quot;
-    click n_held_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L104&quot; &quot;open the source&quot;
-    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L126&quot; &quot;open the source&quot;
-    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L168&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L174&quot; &quot;open the source&quot;
-    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L188&quot; &quot;open the source&quot;
-    click n_alert href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L214&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L224&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L243&quot; &quot;open the source&quot;
-    click n_current href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L248&quot; &quot;open the source&quot;
-    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L257&quot; &quot;open the source&quot;
-    click n_diff href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L262&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L79&quot; &quot;open the source&quot;
+    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L110&quot; &quot;open the source&quot;
+    click n_held_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L115&quot; &quot;open the source&quot;
+    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L137&quot; &quot;open the source&quot;
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L179&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L185&quot; &quot;open the source&quot;
+    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L199&quot; &quot;open the source&quot;
+    click n_alert href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L225&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L235&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L254&quot; &quot;open the source&quot;
+    click n_current href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L259&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L268&quot; &quot;open the source&quot;
+    click n_diff href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L273&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_held_for,n_support,n_alert,n_describe,n_new,n_current,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -257,26 +257,26 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-version">56</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
-<tr><td><code>DeviceKind</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-devicekind">60</a></td><td>The kind of device being used.</td></tr>
-<tr><td><code>DeviceKind::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-devicekind-fmt">68</a></td><td></td></tr>
-<tr><td><code>DeviceUse</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-deviceuse">78</a></td><td>One application holding one device.</td></tr>
-<tr><td><code>DeviceUse::key</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-deviceuse-key">99</a></td><td>A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.</td></tr>
-<tr><td><code>DeviceUse::held_for</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-deviceuse-held_for">104</a></td><td>How long this application has held the device.</td></tr>
-<tr><td><code>Support</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-support">112</a></td><td>What detection is possible here.</td></tr>
-<tr><td><code>support</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-support-2">126</a></td><td>Report what this platform can detect.</td></tr>
-<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-error">160</a></td><td>Everything that can go wrong here.</td></tr>
-<tr><td><code>Error::from</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-from">168</a></td><td></td></tr>
-<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-fmt">174</a></td><td></td></tr>
-<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-scan">188</a></td><td>Take one snapshot of what is currently using the microphone and camera.</td></tr>
-<tr><td><code>Change</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-change">205</a></td><td>A change between two scans.</td></tr>
-<tr><td><code>Change::alert</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-change-alert">214</a></td><td>A one-line alert suitable for a notification or an overlay.</td></tr>
-<tr><td><code>DeviceUse::describe</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-deviceuse-describe">224</a></td><td>name (pid 1234), or just the name when there is no PID.</td></tr>
-<tr><td><code>Monitor</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-monitor">237</a></td><td>Watches for changes between scans.</td></tr>
-<tr><td><code>Monitor::new</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-monitor-new">243</a></td><td>A monitor that has not yet seen anything.</td></tr>
-<tr><td><code>Monitor::current</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-monitor-current">248</a></td><td>The most recent snapshot.</td></tr>
-<tr><td><code>Monitor::poll</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-monitor-poll">257</a></td><td>Scan, and report what changed since the previous call.</td></tr>
-<tr><td><code>Monitor::diff</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-monitor-diff">262</a></td><td>The comparison, split out so it can be tested without a real system.</td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-version">67</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
+<tr><td><code>DeviceKind</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-devicekind">71</a></td><td>The kind of device being used.</td></tr>
+<tr><td><code>DeviceKind::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-devicekind-fmt">79</a></td><td></td></tr>
+<tr><td><code>DeviceUse</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-deviceuse">89</a></td><td>One application holding one device.</td></tr>
+<tr><td><code>DeviceUse::key</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-deviceuse-key">110</a></td><td>A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.</td></tr>
+<tr><td><code>DeviceUse::held_for</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-deviceuse-held_for">115</a></td><td>How long this application has held the device.</td></tr>
+<tr><td><code>Support</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-support">123</a></td><td>What detection is possible here.</td></tr>
+<tr><td><code>support</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-support-2">137</a></td><td>Report what this platform can detect.</td></tr>
+<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-error">171</a></td><td>Everything that can go wrong here.</td></tr>
+<tr><td><code>Error::from</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-from">179</a></td><td></td></tr>
+<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-error-fmt">185</a></td><td></td></tr>
+<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-scan">199</a></td><td>Take one snapshot of what is currently using the microphone and camera.</td></tr>
+<tr><td><code>Change</code> <sub>pub enum</sub></td><td><a href="lib.src.html#fn-change">216</a></td><td>A change between two scans.</td></tr>
+<tr><td><code>Change::alert</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-change-alert">225</a></td><td>A one-line alert suitable for a notification or an overlay.</td></tr>
+<tr><td><code>DeviceUse::describe</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-deviceuse-describe">235</a></td><td>name (pid 1234), or just the name when there is no PID.</td></tr>
+<tr><td><code>Monitor</code> <sub>pub struct</sub></td><td><a href="lib.src.html#fn-monitor">248</a></td><td>Watches for changes between scans.</td></tr>
+<tr><td><code>Monitor::new</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-monitor-new">254</a></td><td>A monitor that has not yet seen anything.</td></tr>
+<tr><td><code>Monitor::current</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-monitor-current">259</a></td><td>The most recent snapshot.</td></tr>
+<tr><td><code>Monitor::poll</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-monitor-poll">268</a></td><td>Scan, and report what changed since the previous call.</td></tr>
+<tr><td><code>Monitor::diff</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-monitor-diff">273</a></td><td>The comparison, split out so it can be tested without a real system.</td></tr>
 </tbody></table>
 </section>
 </div></div>

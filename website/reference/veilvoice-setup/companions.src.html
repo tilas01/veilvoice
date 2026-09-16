@@ -757,7 +757,7 @@
 <span class="ln" id="L636"><span class="tok-com">/// On Windows this is Gpg4win through winget, which is the packaging almost</span></span>
 <span class="ln" id="L637"><span class="tok-com">/// everybody means by &quot;GnuPG on Windows&quot;. The other route on Windows is a</span></span>
 <span class="ln" id="L638"><span class="tok-com">/// `gpg` inside WSL, which is not an install of anything on Windows itself</span></span>
-<span class="ln" id="L639"><span class="tok-com">/// and is offered separately by `veilvoice-gnupg`.</span></span>
+<span class="ln" id="L639"><span class="tok-com">/// and is offered separately by `veilvoice_verify::gnupg`.</span></span>
 <span class="ln" id="L640"><span class="tok-kw">fn</span> <span class="tok-fn">gnupg_offer</span>() -&gt; Offer {</span>
 <span class="ln" id="L641">    <span class="tok-kw">if</span> cfg!(windows) {</span>
 <span class="ln" id="L642">        <span class="tok-kw">return</span> <span class="tok-kw">if</span> <span class="tok-fn">on_path</span>(<span class="tok-str">&quot;winget&quot;</span>).<span class="tok-fn">is_some</span>() {</span>

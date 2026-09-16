@@ -13,7 +13,7 @@
 //! the two.
 
 use crate::theme::{colour, field, heading, paint, warn};
-use veilvoice_failsafe::{Finding, Guard, Holder, Posture};
+use veilvoice_guard::failsafe::{Finding, Guard, Holder, Posture};
 
 /// Show what Failsafe would make of this machine right now.
 pub fn show(veiling: Option<&str>) -> Result<(), String> {
@@ -71,8 +71,8 @@ pub fn show(veiling: Option<&str>) -> Result<(), String> {
     println!();
     println!("{}", paint(colour::YELLOW, "WHAT THIS CANNOT DO"));
     for note in [
-        veilvoice_failsafe::CANNOT_PREVENT,
-        veilvoice_failsafe::NEVER_CLOSES,
+        veilvoice_guard::failsafe::CANNOT_PREVENT,
+        veilvoice_guard::failsafe::NEVER_CLOSES,
     ] {
         for line in crate::sentry::wrap(note, 72) {
             println!("  {line}");

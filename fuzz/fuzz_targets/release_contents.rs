@@ -19,7 +19,7 @@
 #![no_main]
 
 use libfuzzer_sys::fuzz_target;
-use veilvoice_check::contents;
+use veilvoice_verify::check::contents;
 
 fuzz_target!(|data: &[u8]| {
     // The caller reads this file as text, so anything that is not UTF-8 never

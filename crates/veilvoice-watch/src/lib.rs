@@ -47,6 +47,17 @@
 use std::fmt;
 use std::time::SystemTime;
 
+// The other things this machine is doing that a person being veiled would want
+// to know about. Each was a crate of its own; each is a module here, because
+// nobody takes "the process list" on its own, and the answer to "what else is
+// running" is the whole set rather than any one of them.
+pub mod appctl;
+pub mod capture;
+pub mod drivers;
+pub mod input;
+pub mod privilege;
+pub mod proc;
+
 #[cfg(target_os = "linux")]
 mod linux;
 #[cfg(target_os = "windows")]

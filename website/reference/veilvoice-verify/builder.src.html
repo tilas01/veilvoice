@@ -607,7 +607,7 @@
 <span class="ln" id="L504">            absent.<span class="tok-fn">push</span>(<span class="tok-fn">with_platform_extension</span>(name));</span>
 <span class="ln" id="L505">            continue;</span>
 <span class="ln" id="L506">        }</span>
-<span class="ln" id="L507">        <span class="tok-kw">let</span> digest = veilvoice_check::<span class="tok-fn">sha256_file</span>(&amp;file)</span>
+<span class="ln" id="L507">        <span class="tok-kw">let</span> digest = <span class="tok-kw">crate</span>::check::<span class="tok-fn">sha256_file</span>(&amp;file)</span>
 <span class="ln" id="L508">            .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, file.<span class="tok-fn">display</span>()))?;</span>
 <span class="ln" id="L509">        files.<span class="tok-fn">push</span>((<span class="tok-fn">with_platform_extension</span>(name), digest));</span>
 <span class="ln" id="L510">    }</span>
@@ -674,8 +674,8 @@
 <span class="ln" id="L565"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">compare</span>(built: &amp;Built, sums: &amp;str) -&gt; Vec&lt;Compared&gt; {</span>
 <span class="ln" id="L566">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L567">    <span class="tok-kw">for</span> (name, digest) <span class="tok-kw">in</span> &amp;built.files {</span>
-<span class="ln" id="L568">        <span class="tok-kw">match</span> veilvoice_check::<span class="tok-fn">digest_from_sums</span>(sums, name) {</span>
-<span class="ln" id="L569">            <span class="tok-fn">Some</span>(published) <span class="tok-kw">if</span> veilvoice_check::<span class="tok-fn">digests_match</span>(&amp;published, digest) =&gt; {</span>
+<span class="ln" id="L568">        <span class="tok-kw">match</span> <span class="tok-kw">crate</span>::check::<span class="tok-fn">digest_from_sums</span>(sums, name) {</span>
+<span class="ln" id="L569">            <span class="tok-fn">Some</span>(published) <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::check::<span class="tok-fn">digests_match</span>(&amp;published, digest) =&gt; {</span>
 <span class="ln" id="L570">                out.<span class="tok-fn">push</span>(Compared::Same {</span>
 <span class="ln" id="L571">                    name: name.<span class="tok-fn">clone</span>(),</span>
 <span class="ln" id="L572">                    digest: digest.<span class="tok-fn">clone</span>(),</span>

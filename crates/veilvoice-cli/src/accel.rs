@@ -14,7 +14,7 @@ use crate::theme::{colour, field, heading, paint, warn};
 
 /// Show what this machine has.
 pub fn show() -> Result<(), String> {
-    let found = veilvoice_accel::look();
+    let found = veilvoice_video::accel::look();
 
     println!("{}", heading("Graphics hardware on this machine"));
     println!();
@@ -22,7 +22,7 @@ pub fn show() -> Result<(), String> {
         "{}",
         field(
             "threads available",
-            &veilvoice_accel::usable_threads().to_string()
+            &veilvoice_video::accel::usable_threads().to_string()
         )
     );
     println!();
@@ -78,8 +78,8 @@ pub fn show() -> Result<(), String> {
         paint(colour::YELLOW, "WHAT A GRAPHICS CARD DOES NOT DO HERE")
     );
     for note in [
-        veilvoice_accel::WHY_NOT_THE_ENGINE,
-        veilvoice_accel::WHAT_IT_CHANGES,
+        veilvoice_video::accel::WHY_NOT_THE_ENGINE,
+        veilvoice_video::accel::WHAT_IT_CHANGES,
     ] {
         for line in crate::sentry::wrap(note, 72) {
             println!("  {line}");

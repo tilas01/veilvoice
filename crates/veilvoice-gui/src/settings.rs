@@ -304,12 +304,12 @@ impl Settings {
     }
 
     /// The Failsafe posture in force.
-    pub fn failsafe(&self) -> veilvoice_failsafe::Posture {
-        veilvoice_failsafe::Posture::from_key(&self.prefs.failsafe)
+    pub fn failsafe(&self) -> veilvoice_guard::failsafe::Posture {
+        veilvoice_guard::failsafe::Posture::from_key(&self.prefs.failsafe)
     }
 
     /// Record the Failsafe posture.
-    pub fn set_failsafe(&mut self, posture: veilvoice_failsafe::Posture) {
+    pub fn set_failsafe(&mut self, posture: veilvoice_guard::failsafe::Posture) {
         if self.failsafe() == posture {
             return;
         }
@@ -374,7 +374,7 @@ impl Settings {
 
         let current = self.failsafe();
         ui.horizontal(|ui| {
-            for posture in veilvoice_failsafe::Posture::ALL {
+            for posture in veilvoice_guard::failsafe::Posture::ALL {
                 if ui
                     .selectable_label(current == *posture, posture.label())
                     .clicked()
@@ -397,8 +397,8 @@ impl Settings {
         );
         ui.add_space(4.0);
         for note in [
-            veilvoice_failsafe::CANNOT_PREVENT,
-            veilvoice_failsafe::NEVER_CLOSES,
+            veilvoice_guard::failsafe::CANNOT_PREVENT,
+            veilvoice_guard::failsafe::NEVER_CLOSES,
         ] {
             ui.label(RichText::new(format!("  {note}")).small().color(p::muted()));
         }

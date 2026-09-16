@@ -191,7 +191,9 @@ impl Default for Prefs {
             // are "is it hearing me" and "is anything coming out". Both are
             // answered by a strip that is already on screen.
             live_monitor: crate::monitor::Style::default().key().to_string(),
-            failsafe: veilvoice_failsafe::Posture::default().key().to_string(),
+            failsafe: veilvoice_guard::failsafe::Posture::default()
+                .key()
+                .to_string(),
             // The display's own rate. A number here would be a guess about
             // somebody else's monitor, and the whole point of `pace` is that
             // the window measures it instead.
@@ -296,7 +298,7 @@ impl Prefs {
                     // Through `from_key`, so an unrecognised value lands on the
                     // default rather than being stored and acted on. The
                     // default is on.
-                    prefs.failsafe = veilvoice_failsafe::Posture::from_key(value)
+                    prefs.failsafe = veilvoice_guard::failsafe::Posture::from_key(value)
                         .key()
                         .to_string();
                 }

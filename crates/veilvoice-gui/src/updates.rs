@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! The manual update check, as the window shows it.
 //!
-//! [`veilvoice_update`] does the asking and states what the answer is worth.
+//! [`veilvoice_setup::update`] does the asking and states what the answer is worth.
 //! This is the button, the spinner and the result, and the rule that the
 //! button is the only thing that ever starts it.
 //!
@@ -17,7 +17,7 @@
 //! # Nothing here is automatic
 //!
 //! There is no timer, no check at startup, and no "check again" on a schedule.
-//! [`Updates`] holds no clock. The only path into `veilvoice_update::check` is
+//! [`Updates`] holds no clock. The only path into `veilvoice_setup::update::check` is
 //! a click, and a test asserts the state a freshly built panel is in.
 //!
 //! # In plain words
@@ -35,7 +35,7 @@
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
 use std::sync::mpsc;
-use veilvoice_update::{Error, Report, Verdict};
+use veilvoice_setup::update::{Error, Report, Verdict};
 
 /// The panel's state.
 #[derive(Default)]
@@ -85,7 +85,7 @@ impl Updates {
         // a check whose answer arrives after the panel was closed is simply
         // dropped by the channel.
         std::thread::spawn(move || {
-            let _ = tx.send(veilvoice_update::check(&current));
+            let _ = tx.send(veilvoice_setup::update::check(&current));
         });
         self.job = Some(rx);
         self.answer = None;
@@ -128,13 +128,13 @@ impl Updates {
 
         ui.add_space(10.0);
         ui.label(
-            RichText::new(veilvoice_update::SCOPE)
+            RichText::new(veilvoice_setup::update::SCOPE)
                 .color(p::muted())
                 .small(),
         );
         ui.add_space(6.0);
         ui.label(
-            RichText::new(veilvoice_update::RELEASES_URL)
+            RichText::new(veilvoice_setup::update::RELEASES_URL)
                 .color(p::muted())
                 .small(),
         );
@@ -228,7 +228,7 @@ mod tests {
     #[test]
     fn an_answer_survives_being_drained_once() {
         let (tx, rx) = mpsc::channel();
-        tx.send(Ok(veilvoice_update::report("0.1.12", "0.2.0")))
+        tx.send(Ok(veilvoice_setup::update::report("0.1.12", "0.2.0")))
             .unwrap();
         let mut updates = Updates {
             job: Some(rx),

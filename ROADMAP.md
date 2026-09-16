@@ -128,8 +128,8 @@ it cannot do as plainly as what it can.
 |---:|---|---|---|
 | 33 | Screen-capture detection: which recorders are running, muted per program by an allowlist | **done** | - |
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | - |
-| 36 | `veilvoice-sentry`: ransomware canaries and mass-change rate detection | **done** | - |
-| 37 | `veilvoice-appctl`: learn what runs, then allowlist it, with time-limited grants and a log | **done** | - |
+| 36 | Ransomware canaries and mass-change rate detection, now `veilvoice_guard::sentry` | **done** | - |
+| 37 | Learn what runs, then allowlist it, with time-limited grants and a log, now `veilvoice_watch::appctl` | **done** | - |
 | 38 | `veilvoice-policy`: settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | - |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **done** | - |
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | - |
@@ -394,7 +394,7 @@ not claim to beat an adversary who already owns the machine.
 | 155 | **Companion software installed for you, wherever that can honestly be done**: today VeilVoice detects ffmpeg, Audacity, GnuPG and the audio routing drivers, and offers a package-manager line where the platform has one and its own page where it does not. That leaves the Windows reader, who has no package manager by default, doing the most work on the platform where the routing driver matters most. This finishes the job per operating system and per architecture: the release that matches the machine, fetched and checked against its published hash before anything is run, then installed. Where the software has an installer of its own, that installer is run and the install path is its question to ask, because a program that answers it on the installer's behalf is a program guessing at somebody else's layout. Where there is no installer, the default location for the platform is used unless the person names another, and where a package manager already governs the machine it stays in charge rather than being worked around. Nothing proprietary is ever installed silently: its licence is still accepted by the person it binds. The same routes from `veilvoice companions` and from the About tab, one list, one implementation, with progress, cancel and resume as the existing installs already have | **planned** | 25 |
 | 156 | **Every page says where it lives, and a crawler is told it may read the site**: `og:image` was `assets/banner.png` on every page, a relative address, and the crawlers that read that tag do not resolve one. Every link to this site posted anywhere had always shown no picture, and nothing about the page looked wrong. There was no canonical address either, so one page reachable two ways was two pages to an index, and two pages carried no preview tags at all. `tools/site/seo.py` builds all of it from what each page already says, every generator that writes a page calls it, and `robots.txt` and a sitemap covering all 398 pages exist where there were none. Checked twice on purpose: once that each page is what the generator would write, once that what the generator writes is correct. F-194 | **done** | - |
 | 157 | **The banner moves on the no-JavaScript page too**: that edition showed the still while the main site animated the same artwork, both drawn by `assets/generate.py` from the same source. It shows the animation now, with the still still served to anybody who has asked their system for less movement, chosen by markup rather than by a script because that page runs none | **done** | - |
-| 158 | **Fewer crates, chosen by what somebody would actually take**: twenty-seven crates for one application, seven of them under seven hundred lines and four used by exactly one caller. Full modularity is not free: every split is a published surface, a `Cargo.toml`, a README, a banner, a page of the reference and a row in every table that lists them, and a reader deciding what to depend on has to read twenty-seven descriptions to find the two they want. The line is drawn at what somebody would realistically take on its own: the engine, the container, the audio path, the conversation, the renderer, the verifier, the installer, the settings, the observers and the alarms. The observers become one crate and the alarms another, the verifier absorbs its two backends, the renderer absorbs the graphics probe that exists to answer one question for it, and the decoy passphrase joins the cryptography it is part of. Nothing is deleted and no behaviour changes: every module keeps its name, its tests and its page | **planned** | 6 |
+| 158 | **Fewer crates, chosen by what somebody would actually take**: twenty-seven crates for one application, seven of them under seven hundred lines and four used by exactly one caller. Full modularity is not free: every split is a published surface, a `Cargo.toml`, a README, a banner, a page of the reference and a row in every table that lists them, and a reader deciding what to depend on had to read twenty-seven descriptions to find the two they wanted. Thirteen now, drawn at what somebody would realistically take on its own. The six observers became `veilvoice-watch`, the two alarms and the safety catch became `veilvoice-guard`, the verifier absorbed both of its backends, the renderer absorbed the graphics probe that answers one question for it, the decoy passphrase joined the cryptography it is part of, the update check joined the installer, and the saved profiles joined the settings. Nothing was deleted and no behaviour changed: every module kept its name, its tests and its page, and the whole suite passed before and after | **done** | - |
 | 107 | **VeilVoice on a phone**: an Android package a person installs without developer tools, signed, published beside the desktop archives and verifiable the same way. Roadmap item 52 established that the code compiles for Android; what is missing is the NDK in the release build, a capture path that uses the platform's own audio rather than ALSA, a window that works at a phone's size, and a signing key that does not require a legal identity, all four set out in *VeilVoice on a phone* above along with why iOS is a separate question. It sits last because it is worth more once there is a Studio to put on the phone, and because none of the desktop work is waiting on it | **planned** | 10 |
 
 
@@ -808,7 +808,7 @@ this project checks signatures with a key compiled into itself, which is a
 convenience with an obvious circularity, and a window that shelled out to `gpg`
 and reported what it said would not have escaped it.
 
-The body of the recipe moved into `veilvoice-check`, which the portable verifier
+The body of the recipe moved into `veilvoice_verify::check`, which the portable verifier
 and the window already share for the checking itself, so the two cannot drift
 into printing different commands. A test holds that.
 
@@ -1173,7 +1173,7 @@ program that vanishes with nothing to explain it is indistinguishable from a
 crash.
 
 **Roadmap item 37 is a baseline, and it is named honestly everywhere but its own
-title.** `veilvoice-appctl` learns what normally runs here, then tells you when
+title.** `veilvoice_watch::appctl` learns what normally runs here, then tells you when
 something runs that was not in that picture. **It does not block anything and
 cannot.** Real enforcement needs a kernel driver or a signed system policy and
 an application identity to sign it with, and this project is published under a
@@ -1253,8 +1253,9 @@ the crate's own source and fails the build if any of those mechanisms appear
 in it.
 
 The process listing that both this and screen-capture detection need was
-extracted into `veilvoice-proc` rather than copied or borrowed. Depending on
-`veilvoice-capture` for it would have meant a keyboard feature pulling in a
+extracted into what is now `veilvoice_watch::proc` rather than copied or
+borrowed. Depending on the screen-recorder code for it would have meant a
+keyboard feature pulling in a
 table of screen recorders, which is what the note at the top of this section
 says these crates must not do.
 

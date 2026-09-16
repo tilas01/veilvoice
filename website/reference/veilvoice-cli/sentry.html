@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/sentry.svg" alt="sentry.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/sentry.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 384 lines &middot; <a href="sentry.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 386 lines &middot; <a href="sentry.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-state-lives">Where the state lives</a>
@@ -78,7 +78,7 @@
 <div>
 <section id="s-about">
 <p><code>veilvoice sentry</code> -- canaries, baselines, and what changed since.</p>
-<p>The command-line front end to <code>veilvoice_sentry</code>. All of the logic is in that crate; this file decides where the state lives, prints it, and chooses an exit code.</p>
+<p>The command-line front end to <code>veilvoice_guard::sentry</code>. All of the logic is in that crate; this file decides where the state lives, prints it, and chooses an exit code.</p>
 <h2 id="where-the-state-lives">Where the state lives</h2>
 <p>Beside the app lock, under the platform&#x27;s usual per-user configuration directory:</p>
 <pre><code>&lt;config&gt;/veilvoice/sentry/nest.txt      the planted canaries
@@ -87,28 +87,28 @@
 <h2 id="the-exit-code-answers-one-question-and-not-the-other">The exit code answers one question and not the other</h2>
 <p><code>veilvoice sentry check</code> exits non-zero when <strong>a canary tripped</strong>, because that is a fact: a file nothing uses was changed, moved or removed. It exits zero for churn at any level, however high, because churn is a question -- a backup restore produces the same numbers as anything else, and a command that fails a scheduled task every time somebody copies a folder is a command somebody removes from the scheduled task.</p>
 <h2 id="this-detects-and-stops-nothing">This detects, and stops nothing</h2>
-<p><code>veilvoice_sentry::SCOPE</code> is printed by <code>status</code> rather than paraphrased here, so there is one wording and the tests guard it.</p>
+<p><code>veilvoice_guard::sentry::SCOPE</code> is printed by <code>status</code> rather than paraphrased here, so there is one wording and the tests guard it.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>The command line for the tripwires: the decoy files that should never change, and how much of a folder has changed since you last looked.</p>
 <p>Both are early warnings and neither stops anything. What they buy is finding out quickly.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>384 lines defining <strong>11 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>386 lines defining <strong>11 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>status</code> <span style="color:var(--muted)">line 128</span> &middot; What is planted, what is watched, and what this is worth.
+<li><code>status</code> <span style="color:var(--muted)">line 130</span> &middot; What is planted, what is watched, and what this is worth.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baselines</code>, <code>load_nest</code>, <code>wrap</code>, <code>state_dir</code>, <code>nest_path</code></span>
 </li>
-<li><code>plant</code> <span style="color:var(--muted)">line 170</span> &middot; Put a canary in dir.
+<li><code>plant</code> <span style="color:var(--muted)">line 172</span> &middot; Put a canary in dir.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load_nest</code>, <code>save_nest</code>, <code>nest_path</code>, <code>state_dir</code></span>
 </li>
-<li><code>pull_up</code> <span style="color:var(--muted)">line 194</span> &middot; Stop watching a canary, and delete it.
+<li><code>pull_up</code> <span style="color:var(--muted)">line 196</span> &middot; Stop watching a canary, and delete it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load_nest</code>, <code>save_nest</code>, <code>nest_path</code>, <code>state_dir</code></span>
 </li>
-<li><code>baseline</code> <span style="color:var(--muted)">line 205</span> &middot; Record what dir holds now, as the thing to compare against later.
+<li><code>baseline</code> <span style="color:var(--muted)">line 207</span> &middot; Record what dir holds now, as the thing to compare against later.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>state_dir</code></span>
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 241</span> &middot; Look at every canary and every baseline.
+<li><code>check</code> <span style="color:var(--muted)">line 243</span> &middot; Look at every canary and every baseline.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baselines</code>, <code>load_nest</code>, <code>state_dir</code>, <code>nest_path</code></span>
 </li>
 </ul>
@@ -158,42 +158,42 @@
 <a href="sentry.src.html#fn-save_nest">
 <rect x="454.8" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="505.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save_nest</text>
-<text x="505.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
+<text x="505.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
 </a>
 <a href="sentry.src.html#fn-baselines">
 <rect x="28.0" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="78.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">baselines</text>
-<text x="78.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="78.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
 </a>
 <a href="sentry.src.html#fn-status">
 <rect x="154.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="200.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 128</text>
+<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
 </a>
 <a href="sentry.src.html#fn-plant">
 <rect x="273.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="319.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">plant</text>
-<text x="319.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="319.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
 </a>
 <a href="sentry.src.html#fn-pull_up">
 <rect x="391.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="437.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pull_up</text>
-<text x="437.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
+<text x="437.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 196</text>
 </a>
 <a href="sentry.src.html#fn-baseline">
 <rect x="510.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="556.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">baseline</text>
-<text x="556.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 205</text>
+<text x="556.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 207</text>
 </a>
 <a href="sentry.src.html#fn-check">
 <rect x="269.0" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="315.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="315.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
+<text x="315.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 243</text>
 </a>
 <a href="sentry.src.html#fn-wrap">
 <rect x="269.0" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="315.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wrap</text>
-<text x="315.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 319</text>
+<text x="315.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -215,14 +215,14 @@ flowchart TD
     n_state_dir[&quot;state_dir&lt;br/&gt;line 54&quot;]
     n_nest_path[&quot;nest_path&lt;br/&gt;line 58&quot;]
     n_load_nest[&quot;load_nest&lt;br/&gt;line 74&quot;]
-    n_save_nest[&quot;save_nest&lt;br/&gt;line 85&quot;]
-    n_baselines[&quot;baselines&lt;br/&gt;line 92&quot;]
-    n_status([&quot;status&lt;br/&gt;line 128&quot;])
-    n_plant([&quot;plant&lt;br/&gt;line 170&quot;])
-    n_pull_up([&quot;pull_up&lt;br/&gt;line 194&quot;])
-    n_baseline([&quot;baseline&lt;br/&gt;line 205&quot;])
-    n_check([&quot;check&lt;br/&gt;line 241&quot;])
-    n_wrap[&quot;wrap&lt;br/&gt;line 319&quot;]
+    n_save_nest[&quot;save_nest&lt;br/&gt;line 87&quot;]
+    n_baselines[&quot;baselines&lt;br/&gt;line 94&quot;]
+    n_status([&quot;status&lt;br/&gt;line 130&quot;])
+    n_plant([&quot;plant&lt;br/&gt;line 172&quot;])
+    n_pull_up([&quot;pull_up&lt;br/&gt;line 196&quot;])
+    n_baseline([&quot;baseline&lt;br/&gt;line 207&quot;])
+    n_check([&quot;check&lt;br/&gt;line 243&quot;])
+    n_wrap[&quot;wrap&lt;br/&gt;line 321&quot;]
     n_baseline --&gt; n_state_dir
     n_baselines --&gt; n_state_dir
     n_check --&gt; n_baselines
@@ -240,14 +240,14 @@ flowchart TD
     click n_state_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L54&quot; &quot;open the source&quot;
     click n_nest_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L58&quot; &quot;open the source&quot;
     click n_load_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L74&quot; &quot;open the source&quot;
-    click n_save_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L85&quot; &quot;open the source&quot;
-    click n_baselines href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L92&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L128&quot; &quot;open the source&quot;
-    click n_plant href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L170&quot; &quot;open the source&quot;
-    click n_pull_up href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L194&quot; &quot;open the source&quot;
-    click n_baseline href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L205&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L241&quot; &quot;open the source&quot;
-    click n_wrap href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L319&quot; &quot;open the source&quot;
+    click n_save_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L87&quot; &quot;open the source&quot;
+    click n_baselines href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L94&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L130&quot; &quot;open the source&quot;
+    click n_plant href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L172&quot; &quot;open the source&quot;
+    click n_pull_up href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L196&quot; &quot;open the source&quot;
+    click n_baseline href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L207&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L243&quot; &quot;open the source&quot;
+    click n_wrap href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L321&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_plant,n_pull_up,n_baseline,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -263,14 +263,14 @@ flowchart TD
 <tr><td><code>state_dir</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-state_dir">54</a></td><td>Where the canaries and baselines are kept.</td></tr>
 <tr><td><code>nest_path</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-nest_path">58</a></td><td></td></tr>
 <tr><td><code>load_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-load_nest">74</a></td><td>Read the nest, treating &quot;no file yet&quot; as &quot;nothing planted&quot;.</td></tr>
-<tr><td><code>save_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-save_nest">85</a></td><td></td></tr>
-<tr><td><code>baselines</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-baselines">92</a></td><td>Every saved baseline, with the path it came from.</td></tr>
-<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-status">128</a></td><td>What is planted, what is watched, and what this is worth.</td></tr>
-<tr><td><code>plant</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-plant">170</a></td><td>Put a canary in dir.</td></tr>
-<tr><td><code>pull_up</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-pull_up">194</a></td><td>Stop watching a canary, and delete it.</td></tr>
-<tr><td><code>baseline</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-baseline">205</a></td><td>Record what dir holds now, as the thing to compare against later.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-check">241</a></td><td>Look at every canary and every baseline.</td></tr>
-<tr><td><code>wrap</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-wrap">319</a></td><td>Wrap text to width columns on spaces, for the scope note.</td></tr>
+<tr><td><code>save_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-save_nest">87</a></td><td></td></tr>
+<tr><td><code>baselines</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-baselines">94</a></td><td>Every saved baseline, with the path it came from.</td></tr>
+<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-status">130</a></td><td>What is planted, what is watched, and what this is worth.</td></tr>
+<tr><td><code>plant</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-plant">172</a></td><td>Put a canary in dir.</td></tr>
+<tr><td><code>pull_up</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-pull_up">196</a></td><td>Stop watching a canary, and delete it.</td></tr>
+<tr><td><code>baseline</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-baseline">207</a></td><td>Record what dir holds now, as the thing to compare against later.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-check">243</a></td><td>Look at every canary and every baseline.</td></tr>
+<tr><td><code>wrap</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-wrap">321</a></td><td>Wrap text to width columns on spaces, for the scope note.</td></tr>
 </tbody></table>
 </section>
 </div></div>

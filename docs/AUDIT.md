@@ -501,6 +501,34 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-195: a generator that wrote what was current and never took away what was not
+
+Found by doing something that had not been done before: deleting a crate.
+
+`tools/docs/generate.py` writes the reference, the wiki, the per-file pages and
+the banners. Its `--check` had noticed for a long time that a file it no longer
+produces should not be in the tree, and said so. Its `write` did not act on
+that. So the page for a crate that stopped existing would be written once,
+never rewritten, and never removed: it would sit in `website/reference/`
+describing something that is not there, be linked from the index, be walked
+into the search index, and be found by a reader.
+
+Nothing had ever removed a crate, so nothing had ever exercised it. Folding
+fourteen of them into modules produced **218** such files in one run.
+
+The sweep `--check` already had is now a function both halves call, and `write`
+removes what it finds before reporting. The report says how many, so a run that
+takes something away says so rather than doing it quietly:
+
+    wrote 1142 files for 14 crate(s), and removed 218 that are no longer produced
+
+Empty directories go too, in the same pass, because a directory left behind is
+the same defect one level up.
+
+This is the shape F-185 had, and it is worth naming the pattern rather than
+just the instance: a tool that only ever adds is a tool whose output is
+correct about the present and permanent about the past.
+
 ### F-194: the picture every link to this site was supposed to show, as a relative URL
 
 Every page carried `<meta property="og:image" content="assets/banner.png">`.
@@ -5973,7 +6001,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1654 tests across 27 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1654 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -7621,7 +7649,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ninety-four defects found and fixed (F-1 to F-194), across
+**One hundred and ninety-five defects found and fixed (F-1 to F-195), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

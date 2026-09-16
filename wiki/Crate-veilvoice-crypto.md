@@ -95,10 +95,11 @@ your machine and the key is made from your password each time.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>240 lines"])
+    n_lib(["lib.rs<br/>241 lines"])
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>428 lines"]
     n_container["container.rs<br/>618 lines"]
+    n_decoy["decoy.rs<br/>464 lines"]
     n_hoard["hoard.rs<br/>1099 lines"]
     n_hybrid["hybrid.rs<br/>524 lines"]
     n_kdf["kdf.rs<br/>633 lines"]
@@ -125,6 +126,7 @@ flowchart TD
     click n_aead href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" "open the source"
     click n_amnesia href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" "open the source"
     click n_container href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs" "open the source"
+    click n_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" "open the source"
     click n_hoard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs" "open the source"
     click n_hybrid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" "open the source"
     click n_kdf href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" "open the source"
@@ -146,10 +148,11 @@ flowchart TD
 | [[`aead.rs`|File-veilvoice-crypto-aead]] | 280 | Authenticated encryption with XChaCha20-Poly1305. |
 | [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] | 428 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [[`container.rs`|File-veilvoice-crypto-container]] | 618 | The .veil encrypted container format. |
+| [[`decoy.rs`|File-veilvoice-crypto-decoy]] | 464 | A second passphrase that opens a different, empty VeilVoice. |
 | [[`hoard.rs`|File-veilvoice-crypto-hoard]] | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 524 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 633 | Password-based key derivation with Argon2id. |
-| [[`lib.rs`|File-veilvoice-crypto-lib]] | 240 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [[`lib.rs`|File-veilvoice-crypto-lib]] | 241 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [[`lock.rs`|File-veilvoice-crypto-lock]] | 2264 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 313 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 417 | Secure erasure, the self-destruct. |
@@ -161,7 +164,7 @@ flowchart TD
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |
 
-**6,928 functional lines of Rust** in this crate. A functional line is a line
+**7,226 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

@@ -195,6 +195,11 @@ HTML_ID = re.compile(r"""\bid\s*=\s*["']([^"']+)["']""", re.I)
 TAG = re.compile(r"<[^>]+>")
 
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "..", "site"))
+import seo  # noqa: E402  the addresses every page carries
+
+
 def repo_root():
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.abspath(os.path.join(here, "..", ".."))
@@ -725,6 +730,18 @@ def render_static(index):
     return "\n".join(out) + "\n"
 
 
+def finished(rel, text):
+    """A page with the addresses every page of this site carries.
+
+    The static index is a page like any other, so it gets the same canonical
+    address and preview tags. `tools/site/seo.py` owns them; this calls it
+    rather than holding a second copy.
+    """
+    if not rel.endswith(".html"):
+        return text
+    return seo.finish(rel[len("website/"):], text)
+
+
 # --- writing and checking ---------------------------------------------------
 
 OUTPUTS = [
@@ -742,7 +759,7 @@ def write(root):
         # or --check fails on Windows for a reason that has nothing to do with
         # the index.
         with open(path, "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(render(index))
+            handle.write(finished(rel, render(index)))
         print("  wrote %s" % rel)
     print("  %d files, %d sections" % (len(index["docs"]), len(index["secs"])))
     warn_about_untracked(root)
@@ -754,7 +771,7 @@ def check(root):
     problems = []
     for rel, render in OUTPUTS:
         path = os.path.join(root, rel.replace("/", os.sep))
-        want = render(index)
+        want = finished(rel, render(index))
         try:
             with open(path, "r", encoding="utf-8", newline="") as handle:
                 got = handle.read().replace("\r\n", "\n")
