@@ -72,7 +72,7 @@ impl Side {
 
 /// Something that happened to the audio path while it was running.
 ///
-/// **Marker 132.** The platform reports these on a callback of its own, and
+/// **Roadmap item 132.** The platform reports these on a callback of its own, and
 /// until now the only thing done with one was `eprintln!`: on Windows the
 /// desktop application is built with no console at all, so a microphone
 /// unplugged in the middle of a call was silent, and a recording carried on
@@ -115,7 +115,7 @@ pub struct LiveStats {
     pub starved: u64,
     /// How many times the platform has reported trouble on either stream.
     ///
-    /// **Marker 132.** A count rather than the reports themselves, so this
+    /// **Roadmap item 132.** A count rather than the reports themselves, so this
     /// stays `Copy` and cheap to read every frame. A caller that sees it move
     /// asks [`LiveSession::interference`] what happened.
     pub interfered: u64,
@@ -124,7 +124,7 @@ pub struct LiveStats {
 /// Which sides of the engine a session keeps.
 ///
 /// Both are named at construction rather than passed as a pair of positional
-/// flags, which is the property **marker 131** asked for and which two separate
+/// flags, which is the property **roadmap item 131** asked for and which two separate
 /// arguments used to give: no caller reaches a recording of somebody's real
 /// voice without writing the word `plain` next to it.
 ///
@@ -305,7 +305,7 @@ fn agree_on_a_rate(
     Ok((inputs.remove(0), out))
 }
 
-/// The same, for any number of microphones. **Marker 147.**
+/// The same, for any number of microphones. **Roadmap item 147.**
 ///
 /// One rate for the whole room. Several microphones each running at their own
 /// rate into one mix is the F-168 problem once per guest, and it is worse than
@@ -424,7 +424,7 @@ impl LiveSession {
     /// mean a second copy of the audio living somewhere unprotected, which is
     /// the thing [`record`](crate::record) is for avoiding.
     ///
-    /// **Marker 131.** [`Keeping::plain`] is the one thing in this crate that
+    /// **Roadmap item 131.** [`Keeping::plain`] is the one thing in this crate that
     /// records the real voice, and it is named at the call site for that
     /// reason: a caller cannot reach it without writing the word. It is false
     /// in every path that has not been asked for it, and the interface that
@@ -674,7 +674,7 @@ mod tests {
         }
     }
 
-    /// **Marker 132.** What the recorder is given is what the engine produced.
+    /// **Roadmap item 132.** What the recorder is given is what the engine produced.
     ///
     /// The row this comes from asked for the samples reaching the recorder to
     /// be *checked* against the engine's output. They cannot differ, and a
@@ -710,7 +710,7 @@ mod tests {
             source.contains("sink.write(&scratch_out[..frames]);"),
             "the veiled recorder is no longer fed from the engine's own output \
              buffer. Whatever it is fed from now is a second copy of the audio, \
-             and marker 132 is the claim that there is not one"
+             and roadmap item 132 is the claim that there is not one"
         );
 
         // The microphone side, the same way: from the downmix inside the input
@@ -780,7 +780,7 @@ mod tests {
             None
         );
 
-        // Several microphones, which is what marker 147 opens. One rate has to
+        // Several microphones, which is what roadmap item 147 opens. One rate has to
         // suit every one of them and the output.
         assert_eq!(
             rate_they_agree_on(
@@ -810,7 +810,7 @@ mod tests {
 
     /// A stream error becomes something a caller can show.
     ///
-    /// **Marker 132.** Before this, both error callbacks were `eprintln!` and
+    /// **Roadmap item 132.** Before this, both error callbacks were `eprintln!` and
     /// nothing else: on Windows the desktop application has no console, so a
     /// device unplugged mid-call was silent and the recording carried on.
     #[test]

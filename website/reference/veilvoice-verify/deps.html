@@ -73,7 +73,7 @@
 </ul>
 <p>Everything else -- the engine, the container format, the app lock, the website generators -- has no system dependency at all.</p>
 <h2 id="what-detected-means-and-what-it-does-not">What &quot;detected&quot; means, and what it does not</h2>
-<p><code>Need::detect</code> answers from what is on <code>PATH</code> and from <code>pkg-config</code>. That is a real answer for a linker or a compiler and a <em>good</em> answer for a library, but it is not a build. A machine can pass every probe here and still fail to compile, and this module says so rather than promising otherwise: the build in marker 55 is the only thing that actually knows.</p>
+<p><code>Need::detect</code> answers from what is on <code>PATH</code> and from <code>pkg-config</code>. That is a real answer for a linker or a compiler and a <em>good</em> answer for a library, but it is not a build. A machine can pass every probe here and still fail to compile, and this module says so rather than promising otherwise: the build in roadmap item 55 is the only thing that actually knows.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Before you can build this program yourself, your computer needs a few pieces: a Rust compiler, and -- on Linux and macOS -- one or two things from your operating system that VeilVoice&#x27;s sound handling is built on top of. This works out which of those you already have and which you do not, tells you exactly what each one is and who makes it, and offers to install the missing ones <strong>only if you say yes</strong>.</p>
 <p>It will never install anything on its own, and it does not download anything itself -- it asks the software installer your system already came with, so you can see exactly what is being run.</p>

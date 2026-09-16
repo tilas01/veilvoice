@@ -256,7 +256,7 @@ pub fn concat_command(list: &Path, audio: &Path, output: &Path, encoding: Encodi
 
 /// The command that turns a veiled recording into a video with a black frame.
 ///
-/// **Marker 87.** Somewhere that accepts only video is a common place to need
+/// **Roadmap item 87.** Somewhere that accepts only video is a common place to need
 /// to put a recording: a message that will not take an audio file, a platform
 /// that wants something to show. The picture is not the point and does not need
 /// to be, so this is a black frame for the length of the audio and nothing
@@ -314,7 +314,7 @@ pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<Str
 
 /// The command that takes the sound out of a recording made somewhere else.
 ///
-/// **Marker 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and
+/// **Roadmap item 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and
 /// VeilVoice reads none of them: they are containers holding a video stream and
 /// an audio stream, and demuxing one means a demuxer this project does not
 /// ship, for the same reason it ships no encoder.
@@ -400,7 +400,7 @@ pub fn describe() -> String {
 #[cfg(test)]
 mod tests {
 
-    /// Marker 87. A synthesised colour source never ends, so without
+    /// Roadmap item 87. A synthesised colour source never ends, so without
     /// `-shortest` ffmpeg encodes black for ever and the only thing that stops
     /// it is the disk filling up.
     #[test]
@@ -421,7 +421,7 @@ mod tests {
         );
     }
 
-    /// Marker 88. Taking the sound out has to discard every video stream, not
+    /// Roadmap item 88. Taking the sound out has to discard every video stream, not
     /// the first one: an OBS recording with a camera and a screen capture has
     /// two, and a stream selector written for one fails on the other.
     #[test]

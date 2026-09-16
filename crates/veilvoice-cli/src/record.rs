@@ -180,7 +180,7 @@ pub fn run(
         } else {
             String::new()
         };
-        // **Marker 132.** What the platform said about the streams, on the
+        // **Roadmap item 132.** What the platform said about the streams, on the
         // line already being watched. A recording made while the microphone
         // was taken away is a recording somebody has to know that about, and
         // the report is repeated when it is stored.
@@ -247,7 +247,7 @@ pub fn run(
 fn report(recorder: &record::Recorder, seconds: f32, bytes: usize, interfered: u64) {
     println!("{}", field("length", &format!("{seconds:.1} s")));
     println!("{}", field("size", &format!("{} KiB", bytes / 1024)));
-    // **Marker 132.** Said here as well as on the meter line, because the
+    // **Roadmap item 132.** Said here as well as on the meter line, because the
     // meter line is gone by the time this is read and this is the moment
     // somebody decides whether to keep what was recorded.
     if interfered > 0 {

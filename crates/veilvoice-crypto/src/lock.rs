@@ -25,7 +25,7 @@
 //! The lock stores `Argon2id(domain ‖ password, salt)`, split by HKDF into a
 //! verifier and a tag key, and compares the verifier in constant time. It
 //! derives no key that encrypts anything, and that is still true of this
-//! module after marker 86.
+//! module after roadmap item 86.
 //!
 //! What changed is one level up. The desktop application can now be told to
 //! seal every recording it writes *with the app-lock passphrase*, and it does

@@ -86,7 +86,7 @@ pub enum Sealing {
     /// Argon2id over the **app-lock** passphrase, so everything VeilVoice
     /// writes is sealed without anybody choosing a second secret.
     ///
-    /// **Marker 86.** This reverses a decision the crypto crate states in as
+    /// **Roadmap item 86.** This reverses a decision the crypto crate states in as
     /// many words, and the reversal is deliberate rather than accidental, so
     /// the cost is written here as well as in the documentation: one passphrase
     /// now opens the application *and* everything it has ever written.
@@ -446,7 +446,7 @@ impl Security {
         if let Some(mut carried) = self.just_unlocked.take() {
             carried.zeroize();
         }
-        // Marker 86's session copy of the app-lock passphrase goes with
+        // Roadmap item 86's session copy of the app-lock passphrase goes with
         // everything else. Locking the window has to put back the state a
         // fresh launch would be in, or "lock" is a picture of a lock.
         self.app_secret = None;
@@ -560,7 +560,7 @@ impl Security {
                 // responsible for wiping it; `take_unlock_passphrase` says so,
                 // and `wipe_secrets` catches the case where nobody does.
                 let opened = std::mem::take(&mut self.entry);
-                // Marker 86. Kept for the session only when the mode that
+                // Roadmap item 86. Kept for the session only when the mode that
                 // needs it is already chosen. A user who has not asked for
                 // this keeps the old behaviour exactly: the passphrase is
                 // wiped the moment it has been checked, and never sits in
@@ -695,7 +695,7 @@ impl Security {
         });
         ui.add_space(24.0);
 
-        // **Marker 74.** A locked window says it is locked and nothing else.
+        // **Roadmap item 74.** A locked window says it is locked and nothing else.
         //
         // It used to say a great deal: what the lock is and is not worth, where
         // the file lives, and that deleting that file starts over and is not a
@@ -778,7 +778,7 @@ impl Security {
 
     /// The standing report that the lock file was interfered with.
     ///
-    /// **Marker 76.** It is drawn here rather than on the lock screen, and the
+    /// **Roadmap item 76.** It is drawn here rather than on the lock screen, and the
     /// distinction matters. The lock screen is read by whoever is holding the
     /// machine, and telling them their edit was noticed tells them to try
     /// something else. This side of the lock is read only by somebody who has
@@ -1678,7 +1678,7 @@ mod tests {
         }
     }
 
-    /// **Marker 74.** The locked window explains nothing.
+    /// **Roadmap item 74.** The locked window explains nothing.
     ///
     /// It used to explain a great deal: what the lock is and is not worth,
     /// where its file lives, and that deleting that file starts over. All true,
@@ -1690,7 +1690,7 @@ mod tests {
     /// because what is being held is that certain sentences are not reachable
     /// from that function at all. A rendering test would only prove they were
     /// absent from one frame.
-    /// Marker 86. The passphrase is kept only for the mode that needs it.
+    /// Roadmap item 86. The passphrase is kept only for the mode that needs it.
     ///
     /// A user who has not asked for app-lock sealing must keep the old
     /// behaviour exactly: the passphrase is wiped the instant it has been
@@ -1748,7 +1748,7 @@ mod tests {
         }
     }
 
-    /// Marker 86. Locking the window must put the state back where a fresh
+    /// Roadmap item 86. Locking the window must put the state back where a fresh
     /// launch would leave it, or the lock is a picture of a lock.
     #[test]
     fn locking_the_window_drops_the_sealing_passphrase() {
@@ -1765,7 +1765,7 @@ mod tests {
         );
     }
 
-    /// Marker 86. The plan has to be a password plan, because that is what
+    /// Roadmap item 86. The plan has to be a password plan, because that is what
     /// keeps the recordings openable after the lock is gone.
     #[test]
     fn app_lock_sealing_produces_a_container_that_outlives_the_lock() {
@@ -1801,7 +1801,7 @@ mod tests {
         );
     }
 
-    /// Marker 76. The report has to be reachable from the tab and only from
+    /// Roadmap item 76. The report has to be reachable from the tab and only from
     /// the tab, and clearing it has to go through the passphrase rather than
     /// through a flag the drawing code can set.
     #[test]
@@ -1863,7 +1863,7 @@ mod tests {
             "path.display()",
             "Delete the lock file",
             "failed attempt",
-            // Marker 76. The interference report is the same mistake in a new
+            // Roadmap item 76. The interference report is the same mistake in a new
             // shape: telling whoever is holding the machine that their last
             // edit was noticed tells them to try a different one.
             "interference_banner",

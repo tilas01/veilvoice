@@ -52,7 +52,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists-here-rather-than-in-the-verifier">Why this exists here rather than in the verifier</a>
   <a href="#three-files-and-the-tab-says-so-before-it-is-given-any">Three files, and the tab says so before it is given any</a>
-  <a href="#marker-97-one-press-three-answers">Marker 97: one press, three answers</a>
+  <a href="#roadmap-item-97-one-press-three-answers">Roadmap item 97: one press, three answers</a>
   <a href="#nothing-here-downloads-anything">Nothing here downloads anything</a>
   <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
@@ -67,7 +67,7 @@
 <p>The portable verifier is the one program in this project whose <em>smallness</em> is a feature: it is what somebody downloads before they trust anything else here, and a 1.5 MB single file is part of why it is checkable at all. Putting a GUI toolkit in it would have cost that for a convenience the desktop application was already the right place for. So the arithmetic moved to <code>veilvoice-check</code> and this is a second caller, not a second implementation.</p>
 <h2 id="three-files-and-the-tab-says-so-before-it-is-given-any">Three files, and the tab says so before it is given any</h2>
 <p>Verifying needs the download, the <code>SHA256SUMS</code> and the <code>SHA256SUMS.asc</code>. Dropping one file on a window and getting a verdict would be a lie, and an interface that discovers the other two are missing <em>after</em> the drop teaches people that verification is fiddly rather than that it needs three things. All three slots are visible from the start, and a drop fills whichever one the file&#x27;s name says it is.</p>
-<h2 id="marker-97-one-press-three-answers">Marker 97: one press, three answers</h2>
+<h2 id="roadmap-item-97-one-press-three-answers">Roadmap item 97: one press, three answers</h2>
 <p>The tab used to answer one question, and it was not the question somebody actually has. &quot;Is this zip the published one&quot; is a step; &quot;is the program I am about to run the published one&quot; is the thing they want to know, and it was being left to the command line.</p>
 <p>So one press now checks the archive against the signed hash list, then every file extracted out of that archive against the signed contents list the release publishes beside it, and then runs the GnuPG on this machine over the same signature and shows what it said. Three answers, one button, and each one drawn separately so a pass on one is never mistaken for a pass on another.</p>
 <p>Two things are deliberately <strong>not</strong> failures. A release that published no contents list -- everything before v0.1.15 -- simply has no such row, rather than a warning about a file that was never meant to be there. And a GnuPG that cannot run on this machine is drawn in the quiet colour: it is a fact about the computer and says nothing whatever about the download.</p>
@@ -359,17 +359,17 @@ flowchart TD
 <tr><td><code>Verify::body</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-body">357</a></td><td></td></tr>
 <tr><td><code>Verify::drop_target</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-drop_target">500</a></td><td>The rectangle that lights up while files are over the window.</td></tr>
 <tr><td><code>Verify::slot_row</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-slot_row">536</a></td><td>One file slot: what it is, what is in it, and a way to change it.</td></tr>
-<tr><td><code>Verify::gnupg_section</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_section">599</a></td><td>Marker 90.</td></tr>
+<tr><td><code>Verify::gnupg_section</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_section">599</a></td><td>Roadmap item 90.</td></tr>
 <tr><td><code>Verify::checker_section</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-checker_section">710</a></td><td>Which implementation checks the signature, and the choice behind it.</td></tr>
 <tr><td><code>Verify::copyable_command</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-copyable_command">830</a></td><td>One command, shown as it would be typed, with a button that copies it and says it did.</td></tr>
 <tr><td><code>Verify::verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-verdict">842</a></td><td>The answer, in the colour it deserves.</td></tr>
-<tr><td><code>Verify::contents_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-contents_verdict">853</a></td><td>Marker 97.</td></tr>
-<tr><td><code>Verify::gnupg_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_verdict">900</a></td><td>Marker 97.</td></tr>
+<tr><td><code>Verify::contents_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-contents_verdict">853</a></td><td>Roadmap item 97.</td></tr>
+<tr><td><code>Verify::gnupg_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_verdict">900</a></td><td>Roadmap item 97.</td></tr>
 <tr><td><code>Verify::archive_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-archive_verdict">938</a></td><td>The archive against the signed hash list.</td></tr>
 <tr><td><code>Verify::start</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-start">997</a></td><td>Run the check on a thread of its own.</td></tr>
 <tr><td><code>examine</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine">1020</a></td><td>The whole check, off the drawing thread.</td></tr>
-<tr><td><code>examine_contents</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine_contents">1054</a></td><td>Marker 97.</td></tr>
-<tr><td><code>examine_gnupg</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine_gnupg">1151</a></td><td>Marker 97.</td></tr>
+<tr><td><code>examine_contents</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine_contents">1054</a></td><td>Roadmap item 97.</td></tr>
+<tr><td><code>examine_gnupg</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine_gnupg">1151</a></td><td>Roadmap item 97.</td></tr>
 </tbody></table>
 </section>
 </div></div>

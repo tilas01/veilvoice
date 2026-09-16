@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! What came out of the archive, and the GnuPG somebody already has.
 //!
-//! **Marker 91.** Two halves of the same request: check the extracted copy as
+//! **Roadmap item 91.** Two halves of the same request: check the extracted copy as
 //! well as the archive, and offer the check through GnuPG for anybody who would
 //! rather trust their own tools than this binary.
 //!
@@ -165,8 +165,8 @@ fn runnable(path: &Path) -> bool {
 
 /// The commands that check this release with somebody else's GnuPG.
 ///
-/// Marker 90 moved the body out of this binary so the desktop application's
-/// verify tab prints the same commands; marker 97 moved it again, into
+/// Roadmap item 90 moved the body out of this binary so the desktop application's
+/// verify tab prints the same commands; roadmap item 97 moved it again, into
 /// `veilvoice-gnupg`, which also *runs* them. Re-exported here rather than
 /// called through at every site, which keeps this module the one place the
 /// verifier looks for anything about extracted releases and GnuPG.
@@ -260,7 +260,7 @@ mod tests {
         assert!(short[0].starts_with("gpg --verify"));
     }
 
-    /// Marker 91. The extracted report must never run when the archive itself
+    /// Roadmap item 91. The extracted report must never run when the archive itself
     /// failed. "The archive is bad, and here are the programs in the folder
     /// beside it" reads as reassurance, and there is none to give: an archive
     /// that failed its signature says nothing good about anything unpacked
@@ -272,7 +272,7 @@ mod tests {
             .find("fn command_auto(")
             .expect("command_auto exists");
         let end = source[start..]
-            .find("\n/// Marker 91. What is in the folder")
+            .find("\n/// Roadmap item 91. What is in the folder")
             .map(|at| start + at)
             .unwrap_or(source.len());
         let body = &source[start..end];

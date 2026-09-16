@@ -53,7 +53,7 @@
 <span class="ln" id="L2"><span class="tok-com">//! Where veiled recordings are written, and the encrypted volume that may hold</span></span>
 <span class="ln" id="L3"><span class="tok-com">//! them.</span></span>
 <span class="ln" id="L4"><span class="tok-com">//!</span></span>
-<span class="ln" id="L5"><span class="tok-com">//! **Markers 82, 83 and 84.** [`veilvoice_setup::volumes`] finds what is</span></span>
+<span class="ln" id="L5"><span class="tok-com">//! **Roadmap items 82, 83 and 84.** [`veilvoice_setup::volumes`] finds what is</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! mounted; this decides what to do about it, remembers the answer, and refuses</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! to write anywhere the user has not confirmed.</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
@@ -80,7 +80,7 @@
 <span class="ln" id="L29"><span class="tok-com">//! believed it was in a vault, which is the exact failure this exists to</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! prevent.</span></span>
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
-<span class="ln" id="L32"><span class="tok-com">//! # Marker 84: detection will fail, and that is planned for</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! # Roadmap item 84: detection will fail, and that is planned for</span></span>
 <span class="ln" id="L33"><span class="tok-com">//!</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! Portable installs, custom mount points, a platform neither tool supports.</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! The answer is not a silent fallback: it is a directory the user picks by</span></span>
@@ -320,7 +320,7 @@
 </span>
 <span class="ln" id="L244"></span>
 <span class="src-item" id="fn-storage-found_nothing">
-<span class="ln" id="L245">    <span class="tok-com">/// Whether anything was found at all, which decides whether marker 84&#x27;s</span></span>
+<span class="ln" id="L245">    <span class="tok-com">/// Whether anything was found at all, which decides whether roadmap item 84&#x27;s</span></span>
 <span class="ln" id="L246">    <span class="tok-com">/// guided path is the main offer or the fallback.</span></span>
 <span class="ln" id="L247">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">found_nothing</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
 <span class="ln" id="L248">        <span class="tok-kw">self</span>.found.<span class="tok-fn">is_empty</span>()</span>
@@ -347,7 +347,7 @@
 </span>
 <span class="ln" id="L265"></span>
 <span class="src-item" id="fn-storage-pick_by_hand">
-<span class="ln" id="L266">    <span class="tok-com">/// Start the folder picker for marker 84&#x27;s guided path.</span></span>
+<span class="ln" id="L266">    <span class="tok-com">/// Start the folder picker for roadmap item 84&#x27;s guided path.</span></span>
 <span class="ln" id="L267">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">pick_by_hand</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, tool: Tool) {</span>
 <span class="ln" id="L268">        <span class="tok-kw">self</span>.hand_picked_tool = tool;</span>
 <span class="ln" id="L269">        <span class="tok-kw">self</span>.choosing.<span class="tok-fn">start</span>(<span class="tok-kw">crate</span>::dialog::Ask::Folder);</span>
@@ -455,7 +455,7 @@
 <span class="ln" id="L359">        }</span>
 <span class="ln" id="L360">    }</span>
 <span class="ln" id="L361"></span>
-<span class="ln" id="L362">    <span class="tok-com">// Marker 83. Asked for VeraCrypt and never for Cryptomator, and asked</span></span>
+<span class="ln" id="L362">    <span class="tok-com">// Roadmap item 83. Asked for VeraCrypt and never for Cryptomator, and asked</span></span>
 <span class="ln" id="L363">    <span class="tok-com">// before anything is written rather than after something goes wrong.</span></span>
 <span class="ln" id="L364">    <span class="tok-kw">let</span> needs_answer = storage</span>
 <span class="ln" id="L365">        .destination</span>
@@ -512,7 +512,7 @@
 <span class="ln" id="L416">        });</span>
 <span class="ln" id="L417">    }</span>
 <span class="ln" id="L418"></span>
-<span class="ln" id="L419">    <span class="tok-com">// Marker 84. The guided path, which is the main offer when nothing was</span></span>
+<span class="ln" id="L419">    <span class="tok-com">// Roadmap item 84. The guided path, which is the main offer when nothing was</span></span>
 <span class="ln" id="L420">    <span class="tok-com">// found rather than a footnote under a list of nothing.</span></span>
 <span class="ln" id="L421">    <span class="tok-kw">if</span> storage.<span class="tok-fn">found_nothing</span>() {</span>
 <span class="ln" id="L422">        ui.<span class="tok-fn">label</span>(</span>
@@ -651,7 +651,7 @@
 <span class="ln" id="L554">        );</span>
 <span class="ln" id="L555">    }</span>
 <span class="ln" id="L556"></span>
-<span class="ln" id="L557">    <span class="tok-com">/// Marker 83&#x27;s whole point, from the other side: a caller that forgets to</span></span>
+<span class="ln" id="L557">    <span class="tok-com">/// Roadmap item 83&#x27;s whole point, from the other side: a caller that forgets to</span></span>
 <span class="ln" id="L558">    <span class="tok-com">/// check `ready` must not be handed the vault path anyway.</span></span>
 <span class="ln" id="L559">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L560">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unanswered_destination_never_yields_a_vault_path</span>() {</span>

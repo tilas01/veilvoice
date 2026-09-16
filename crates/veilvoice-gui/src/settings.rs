@@ -207,7 +207,7 @@ impl Settings {
 
     /// Whether the window asks the platform for a hardware-drawn context.
     ///
-    /// **Marker 137.** Read once, before the window is made, because it decides
+    /// **Roadmap item 137.** Read once, before the window is made, because it decides
     /// how the window is made. Changing it therefore takes effect at the next
     /// launch, and the panel says so rather than appearing to do nothing.
     pub fn acceleration(&self) -> bool {
@@ -357,7 +357,7 @@ impl Settings {
     /// Remember, or stop remembering, that recordings are sealed with the
     /// app-lock passphrase.
     ///
-    /// Marker 86. Same pair-of-methods shape as `always_group` and for the same
+    /// Roadmap item 86. Same pair-of-methods shape as `always_group` and for the same
     /// reason: the security tab asks for a choice to be kept without knowing
     /// where preferences live or what happens when the platform will not say.
     pub fn set_seal_with_app_lock(&mut self, seal: bool) {
@@ -989,7 +989,7 @@ impl Settings {
         }
     }
 
-    /// Marker 92. The autolock, and the range it offers.
+    /// Roadmap item 92. The autolock, and the range it offers.
     fn security_page(&mut self, ui: &mut Ui) {
         use crate::autolock::{describe_secs, parse, Autolock, CHOICES};
 

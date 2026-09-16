@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! **Marker 147.** Several microphones at once: a guest each, veiled each,
+//! **Roadmap item 147.** Several microphones at once: a guest each, veiled each,
 //! mixed once.
 //!
 //! # What this is for
@@ -93,7 +93,7 @@ pub struct Guest<'a> {
     /// refuse that. `sample_rate` is overwritten with the rate the devices
     /// agreed on.
     pub config: DeidConfig,
-    /// What to keep of this guest, if anything. Marker 131's warning about the
+    /// What to keep of this guest, if anything. Roadmap item 131's warning about the
     /// unveiled side applies once per guest.
     pub keeping: Keeping,
 }
@@ -130,13 +130,13 @@ pub struct RoomStats {
     /// silence.
     pub starved: u64,
     /// How many times the platform has reported trouble on any of the streams.
-    /// **Marker 132**, the same counter the single-microphone path carries.
+    /// **Roadmap item 132**, the same counter the single-microphone path carries.
     pub interfered: u64,
     /// What every engine together costs against the deadline they share.
     ///
     /// The sum of each guest's realtime factor. Below 1.0 the machine keeps up;
     /// at 1.0 the engines have used the whole block, and past it the audio
-    /// breaks. This is the honest account marker 147 asked for.
+    /// breaks. This is the honest account roadmap item 147 asked for.
     pub load: f32,
 }
 
@@ -477,7 +477,7 @@ impl RoomSession {
 
     /// What the platform last reported about any of the streams.
     ///
-    /// **Marker 132**, the same report the single-microphone path gives. It
+    /// **Roadmap item 132**, the same report the single-microphone path gives. It
     /// says which side, not which guest: cpal's error callback is per stream
     /// and this keeps the most recent one, which is the one worth showing.
     pub fn interference(&self) -> Option<crate::live::Interference> {
@@ -524,7 +524,7 @@ mod tests {
         );
     }
 
-    /// **Marker 147.** The load is a sum, because the deadline is shared.
+    /// **Roadmap item 147.** The load is a sum, because the deadline is shared.
     ///
     /// One engine at 0.2 of realtime is comfortable. Four of them is 0.8, on
     /// the same block, and that is the number worth showing rather than the

@@ -68,7 +68,7 @@ pub enum Style {
     Overlay,
     /// A small window of its own, kept above other windows.
     ///
-    /// **Marker 150.** The other two are inside the VeilVoice window, which is
+    /// **Roadmap item 150.** The other two are inside the VeilVoice window, which is
     /// behind whatever you are talking into. Somebody on a call or streaming
     /// has the meeting or the streaming software in front, and the only
     /// picture of what their microphone is doing is covered by it exactly when
@@ -366,7 +366,7 @@ pub fn show(
                 });
         }
         Style::OnTop => {
-            // Marker 150. A window of its own, above the others.
+            // Roadmap item 150. A window of its own, above the others.
             //
             // Immediate rather than deferred, because a deferred viewport's
             // closure has to be `'static` and these levels are borrowed from
@@ -495,7 +495,7 @@ pub fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
 mod tests {
     use super::*;
 
-    /// **Marker 150.** The always-on-top window is offered and is not the
+    /// **Roadmap item 150.** The always-on-top window is offered and is not the
     /// default.
     ///
     /// Not the default because a window that puts itself above everything is

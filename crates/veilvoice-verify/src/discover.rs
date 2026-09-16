@@ -55,7 +55,7 @@ pub const SUMS: &str = "SHA256SUMS";
 pub const SUMS_SIG: &str = "SHA256SUMS.asc";
 /// The list of what is inside each archive, itself covered by [`SUMS`].
 ///
-/// **Marker 97.** Optional, and its absence is not a failure: releases before
+/// **Roadmap item 97.** Optional, and its absence is not a failure: releases before
 /// v0.1.15 do not carry one, and a verifier that refused them would be refusing
 /// files it can check perfectly well.
 pub const CONTENTS: &str = veilvoice_check::contents::CONTENTS;

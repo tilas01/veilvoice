@@ -126,7 +126,7 @@ function run() {
 
   // ---- one version per release, in order, with no gaps --------------------
   //
-  // Marker 95. The version claims above only check that everything agrees with
+  // Roadmap item 95. The version claims above only check that everything agrees with
   // the workspace. They say nothing about whether the workspace number is the
   // right *next* one, and a release that skips 0.1.15 or repeats 0.1.14 is a
   // release nobody can reason about afterwards: a user asking "have I got the

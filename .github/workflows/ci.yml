@@ -248,7 +248,7 @@ jobs:
         run: python tools/site/split.py --check
 
       # The roadmap page and its picture are generated from ROADMAP.md, so a
-      # marker whose status changes without regenerating leaves the published
+      # roadmap item whose status changes without regenerating leaves the published
       # roadmap disagreeing with the roadmap -- the F-41 shape a sixth time, and
       # the one place it is a claim about what is finished. `tools/verify.py`
       # has run this check since the page existed; CI did not, so a stale
@@ -307,7 +307,7 @@ jobs:
       - name: Packaging definitions must match what a release publishes
         run: python tools/release/packaging.py --check
 
-      # Marker 126. A dependency is code this project ships and does not
+      # Roadmap item 126. A dependency is code this project ships and does not
       # review, build time on every machine that compiles this, and one more
       # thing that has to work on the BSDs and the 32-bit targets. One sentence
       # where it is declared, or it does not go in. The day this was written it
@@ -332,7 +332,7 @@ jobs:
       - name: No build output may live outside the one directory at the root
         run: python tools/audit/build_output.py
 
-      # Marker 151. The campaign that produces this list runs weekly in
+      # Roadmap item 151. The campaign that produces this list runs weekly in
       # mutants.yml, because half an hour over eight files does not fit here.
       # This is the part that does: the line numbers in the committed list of
       # survivors move whenever the code above them moves, and a list pointing

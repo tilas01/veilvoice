@@ -61,7 +61,7 @@
 <div>
 <section id="s-about">
 <p>The signed list of what is inside each release archive.</p>
-<p><strong>Marker 97.</strong> <code>SHA256SUMS</code> covers the archives. That proves a download is the one that was published, and it says nothing at all about the folder somebody unzipped it into, which is the copy they actually run.</p>
+<p><strong>Roadmap item 97.</strong> <code>SHA256SUMS</code> covers the archives. That proves a download is the one that was published, and it says nothing at all about the folder somebody unzipped it into, which is the copy they actually run.</p>
 <h2 id="the-gap-this-closes">The gap this closes</h2>
 <p>Until this existed, a verifier could check the archive and could not check the extracted directory beside it, and the reason was not laziness: nothing on disk records which archive a directory came from, and no signed list covered the loose files. The honest report was therefore two separate answers and the advice to extract the checked archive again.</p>
 <p>That advice is still correct and it is a poor substitute for an answer. A release now publishes <code>CONTENTS.sha256</code>, which lists every file inside every archive with its SHA-256, and it is staged <strong>before</strong> <code>SHA256SUMS</code> is computed, so the hash list covers it and the signature therefore covers it too. The chain is complete and every link in it is checkable:</p>

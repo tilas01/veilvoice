@@ -275,7 +275,7 @@ measures them**
   generation this project uses, and taking the newer one would compile two
   copies of every primitive into both binaries. None of the newer versions
   fixes a vulnerability. The line moves together the day `pgp` moves, or the
-  day the signature check stops needing it, which is marker 149 on the
+  day the signature check stops needing it, which is roadmap item 149 on the
   roadmap: a reader for exactly what a detached signature over a text file is,
   with nothing else in it. Dependabot is told not to reopen the same ten pull
   requests every week.
@@ -347,12 +347,12 @@ measures them**
 - No screenshot can show this: the captures photograph a window with no app
   lock set, and the button is only drawn when there is one.
 
-**Two markers on the roadmap**
+**Two roadmap items on the roadmap**
 
-- Marker 148, the window drawing at the display's rate and saying so: the
+- Roadmap item 148, the window drawing at the display's rate and saying so: the
   animations ran at twenty frames a second by design, and what to build
   instead is specified in full.
-- Marker 149, the signature check that needs only a signature check, which is
+- Roadmap item 149, the signature check that needs only a signature check, which is
   what unblocks the cryptographic line above.
 
 **The site can be claimed in Search Console**
@@ -461,7 +461,7 @@ measures them**
   machine already has, so the claim that VeilVoice ships no network client is
   unchanged and still checked three ways on every commit.
 
-**The video has a picture in it** (marker 139, finished)
+**The video has a picture in it** (roadmap item 139, finished)
 
 - A render produced veiled audio over a black rectangle. It now produces the
   same picture the preview page shows: a circle per speaker in their colour,
@@ -518,7 +518,8 @@ measures them**
   the closest-pair measure answers 1.0 when there is nothing to compare and that
   is below the separation floor. One voice has nothing to be confused with.
 
-**A level under every speaker's name** (marker 139, the first of its two halves)
+**A level under every speaker's name** (roadmap item 139, the first of its two
+halves)
 
 - The preview page lit whoever had the turn and said nothing more. A lit circle
   cannot say whether that person is mid-sentence or mid-pause, and those look
@@ -656,7 +657,7 @@ measures them**
   operating system; this varies the features, and a guard covering one axis
   reads as covering the other.
 
-**Several microphones at once, veiled and metered each** (marker 147)
+**Several microphones at once, veiled and metered each** (roadmap item 147)
 
 - `veilvoice_audio::room` opens one input per guest, veils each with its own
   engine, seed and destination voice, and mixes the results into the one output
@@ -679,7 +680,7 @@ measures them**
   that guest's samples rather than everybody's, and a slow one starves and is
   padded. A rate *mismatch* is not absorbed: it is refused before anything
   opens, which is the fix in this same release.
-- A recorder per guest, veiled or unveiled, and one for the mix. Marker 131's
+- A recorder per guest, veiled or unveiled, and one for the mix. Roadmap item 131's
   warning about the unveiled side applies once per guest.
 - **The Studio drives it.** Ticking "several microphones, a guest each" in the
   Studio turns the input picker into a guest list: a name and a microphone per
@@ -730,8 +731,8 @@ measures them**
 
 **The Studio has a failsafe of its own, and a running take says what it keeps**
 
-- Both are clauses of marker 145 that nothing had built, found by reading that
-  row rather than treating it as a sum of the markers under it.
+- Both are clauses of roadmap item 145 that nothing had built, found by reading that
+  row rather than treating it as a sum of the roadmap items under it.
 - **A device that goes stops the Studio, not the recording.** Since the last
   change the Studio knows when the device a take is being recorded from has
   stopped existing; knowing was as far as it went, and the take carried on
@@ -750,9 +751,9 @@ measures them**
   form that disappears when recording starts, so a take of somebody's real
   voice looked exactly like one that is not for the whole of the recording. It
   is beside the clock, in yellow when the microphone is being kept.
-- Marker 145 is still planned, and its row now says what it is waiting for
-  rather than reading as a sum of the markers under it: group mode recording
-  every guest with the same guarantees, which is marker 147.
+- Roadmap item 145 is still planned, and its row now says what it is waiting for
+  rather than reading as a sum of the roadmap items under it: group mode recording
+  every guest with the same guarantees, which is roadmap item 147.
 
 **A BSD reader was told to run a command their system does not have**
 
@@ -803,8 +804,8 @@ measures them**
 - A progress made for fewer speakers than the plan holds drops what it cannot
   keep rather than failing the render. A bar with nowhere to go is not worth a
   refused render.
-- This is the half of marker 133 that could be built from what was here. The
-  other half, several guests on several microphones at once, is now marker 147:
+- This is the half of roadmap item 133 that could be built from what was here. The
+  other half, several guests on several microphones at once, is now roadmap item 147:
   the live path opens one input and everything downstream assumes one.
 
 **The audio path says when something interfered with it**
@@ -831,7 +832,7 @@ measures them**
 - The limit is stated beside the warning rather than after it: this is what
   VeilVoice's own path noticed, and it cannot vouch for a microphone that was
   already being intercepted before this opened it.
-- The marker asked for the samples reaching the recorder to be *checked*
+- The roadmap item asked for the samples reaching the recorder to be *checked*
   against the engine's output. They cannot differ, because the recorder is fed
   from inside the output callback from the same slice the engine has just
   written into, so the check would be a buffer compared with itself. That is a
@@ -850,9 +851,9 @@ measures them**
 
 **Two roadmap rows corrected rather than built around**
 
-- Marker 132's opening sentence described a check that would compare a buffer
+- Roadmap item 132's opening sentence described a check that would compare a buffer
   with itself, and the row now says what was actually missing.
-- Marker 133 asked for two **live** bars per speaker **in group mode**, and
+- Roadmap item 133 asked for two **live** bars per speaker **in group mode**, and
   neither word survives reading the code: group mode is a panel for a recording
   that already exists and never opens a device, and the live path opens one
   input, so there is no per-guest live signal in this tree to draw. The row now
@@ -862,7 +863,7 @@ measures them**
 
 **Optimisation stops being a pass and becomes how this is written**
 
-- The practices marker 125's reading established are now in `CLAUDE.md` as the
+- The practices roadmap item 125's reading established are now in `CLAUDE.md` as the
   standing way this project is written, and three of the four are enforced by a
   build rather than by somebody remembering.
 - **No audio callback allocates, blocks or prints.** A callback runs on the
@@ -925,7 +926,7 @@ measures them**
   builds the recorders itself, after the device has answered, and hands them
   back: it takes a `Keeping` saying which sides to keep and returns a `Kept`
   holding them. The caller has no rate to get wrong.
-- The property marker 131 asked for survives: `Keeping`'s fields are named at
+- The property roadmap item 131 asked for survives: `Keeping`'s fields are named at
   the call site, so no caller reaches a recording of somebody's real voice
   without writing the word `plain` next to it.
 - A test reads the workspace and fails if a recorder is built anywhere outside
@@ -1429,7 +1430,7 @@ written up in `docs/AUDIT.md`.
 
 **A roadmap page that is not fighting its own compositor (F-152)**
 
-- Every marker square in the roadmap picture held a GPU layer for as long as
+- Every roadmap item square in the roadmap picture held a GPU layer for as long as
   the page was open, because a reveal animation was set to fill forwards and a
   filling animation never finishes. 162 composited layers became 8, and the
   scrolling film beside them stopped sharing a compositor with 146 things that
@@ -1735,7 +1736,7 @@ written up in `docs/AUDIT.md`.
 **The roadmap**
 
 - Every item on the roadmap page is linkable on its own now: item 98 is at
-  `roadmap.html#m98`, and each heading has an anchor too, so one marker can be
+  `roadmap.html#m98`, and each heading has an anchor too, so one roadmap item can be
   sent to somebody without sending the hundred around it.
 - The finished list is grouped under the headings it is written under, with the
   paragraphs each group opens with. The page used to keep the rows and drop the
@@ -2474,7 +2475,7 @@ wiped the instant it has been checked.
 
 ### Getting the tree ready for a release audit
 
-The work that a roadmap marker does not cover, and that a deploy needs.
+The work that a roadmap roadmap item does not cover, and that a deploy needs.
 
 **Manual pages.** `lintian` reported `no-manual-page` for all three binaries,
 and it was right: `man veilvoice` produced nothing.
@@ -2510,7 +2511,7 @@ after 64,309 inputs, while a seeded run *starts* at 625.
 - `Manifest::open_sealed` and `Policy::open_sealed` used the
   four-gigabyte Argon2 ceiling meant for a container somebody was sent and
   chose to open. Neither is that. The manifest sits at a fixed path, and this
-  cycle's own marker 75 made the desktop application read it at every unlock,
+  cycle's own roadmap item 75 made the desktop application read it at every unlock,
   so anybody able to write that directory could make every unlock allocate four
   gigabytes, which on a modest machine is an abort. Both now use the unattended
   ceiling the app lock was given. Found by decoding a slow unit the
@@ -2521,7 +2522,7 @@ after 64,309 inputs, while a seeded run *starts* at 625.
 
 ### The app lock, hardened as far as it honestly goes
 
-Markers 74 to 79, and one round of audit on the result.
+Roadmap items 74 to 79, and one round of audit on the result.
 
 **The locked window says it is locked and nothing else.** It used to name the
 lock file, its directory, how many attempts had failed, and that deleting the
@@ -2566,7 +2567,7 @@ sealed under a key kept beside it would look like the sealed case and be worth
 nothing.
 
 **The nine palettes are in the header**, where the website keeps its own. They
-have been in the application since marker 26; nobody found them on a page
+have been in the application since roadmap item 26; nobody found them on a page
 inside Settings.
 
 **A live session repaints at 16 ms and everything else at 50.** Twenty frames a
@@ -2578,8 +2579,8 @@ problem is worth more than a change made blind.
 ### The eleventh audit round: seven defects in the code above
 
 New security code written after an audit is precisely the code an audit exists
-for, so markers 74 to 79 got their own round. Six defects, every one in code
-written this cycle, every one found by reading the diff.
+for, so roadmap items 74 to 79 got their own round. Six defects, every one in
+code written this cycle, every one found by reading the diff.
 
 Two of them were **worse than the thing they hardened**, which is the pattern
 worth naming.
@@ -2613,8 +2614,8 @@ worth naming.
 
 ### The tenth audit round: security, functionality, and what it costs to run
 
-Marker 73, run last on purpose, because an audit of code that is still moving
-is an audit of code that will not exist.
+Roadmap item 73, run last on purpose, because an audit of code that is still
+moving is an audit of code that will not exist.
 
 Every claim a machine can test, tested: no `unsafe` in any of the 26 crates, no
 HTTP client anywhere in the dependency graph, `veilvoice-priv` starting only
@@ -2668,10 +2669,10 @@ one is a document.
 
 ### The roadmap, as something you watch
 
-Marker 71. Everything that is finished, scrolling past in a little under half a
-minute, then four seconds with a ring filling in the corner before it starts
-again. The countdown is there because a loop with no warning restarts under the
-reader while they are still on the last line.
+Roadmap item 71. Everything that is finished, scrolling past in a little under
+half a minute, then four seconds with a ring filling in the corner before it
+starts again. The countdown is there because a loop with no warning restarts
+under the reader while they are still on the last line.
 
 **An animation rather than an encoded file, and that is a decision rather than
 a shortcut.** This project ships no codec and does not bundle `ffmpeg`, and the
@@ -2681,8 +2682,8 @@ be a committed binary whose bytes depend on which build of which encoder made
 it, so it could not be regenerated and compared the way every other picture in
 this repository is. What is there plays in any browser with no plugin and no
 download, weighs a few kilobytes, takes the reader's colour scheme, and is
-generated from `ROADMAP.md`, so it cannot show a marker as finished that is
-not. The `ffmpeg` command to turn it into a file is printed under it.
+generated from `ROADMAP.md`, so it cannot show a roadmap item as finished that
+is not. The `ffmpeg` command to turn it into a file is printed under it.
 
 Somebody who has asked their system for less movement gets the list at the top
 and no countdown, rather than a picture that never settles.
@@ -2736,12 +2737,12 @@ has, and a layout that assumes the narrowest overflows on the others.
 
 ### Every workflow chart now carries its own colour key and explanation
 
-Marker 69. There are 303 of these drawings, one per crate and one per file, and
-until now each of them needed the page around it to mean anything: the colour
-key was a line of Markdown beside the picture and the explanation was a
-paragraph under it. That is fine on the page and useless everywhere else the
-drawing goes, which is a README, the wiki, and an `<img>` where nothing around
-it travels with it.
+Roadmap item 69. There are 303 of these drawings, one per crate and one per
+file, and until now each of them needed the page around it to mean anything:
+the colour key was a line of Markdown beside the picture and the explanation
+was a paragraph under it. That is fine on the page and useless everywhere else
+the drawing goes, which is a README, the wiki, and an `<img>` where nothing
+around it travels with it.
 
 Both are inside the picture now, wrapped to the canvas. So is a fourth entry
 the key never had: what the dashed line means, which a reader previously had to
@@ -2749,11 +2750,11 @@ guess.
 
 **The arrows are coloured by where they come from**, so a reader can follow one
 call out of a box without tracing every line back to its start. That needs one
-arrowhead per colour rather than one in total, because an SVG marker does not
-inherit the stroke of the path it is on and `context-stroke` is not in every
-engine this site supports. A back edge stays one colour for all of them: what
-matters there is telling a cycle from a step, and colouring those by origin
-would bury it under five hues.
+arrowhead per colour rather than one in total, because an SVG roadmap item does
+not inherit the stroke of the path it is on and `context-stroke` is not in
+every engine this site supports. A back edge stays one colour for all of them:
+what matters there is telling a cycle from a step, and colouring those by
+origin would bury it under five hues.
 
 **And a long name wraps instead of being cut.** It used to become an ellipsis
 past thirty characters. No name in the tree was long enough to trigger it,
@@ -2776,12 +2777,12 @@ function now.
 
 ### Twenty questions, answered, including the ones where the answer is no
 
-Marker 68. `docs/FAQ.md` and the page it renders to. Answers to what actually
-gets asked, and roughly half of them are limits rather than features: it does
-not hide what you said, it cannot tell who is speaking, it cannot detect a
-keylogger and nothing can, the app lock does not protect your recordings, the
-decoy passphrase is not deniability, and it has been audited only by its
-author.
+Roadmap item 68. `docs/FAQ.md` and the page it renders to. Answers to what
+actually gets asked, and roughly half of them are limits rather than features:
+it does not hide what you said, it cannot tell who is speaking, it cannot
+detect a keylogger and nothing can, the app lock does not protect your
+recordings, the decoy passphrase is not deniability, and it has been audited
+only by its author.
 
 The answers live in a Markdown file because that file is readable on GitHub, in
 a checkout, and by somebody who cloned this and never opened the website, which
@@ -2798,12 +2799,12 @@ with the source pages, doing exactly what it was written for.
 
 ### A working model of the application, and of the command line, in the page
 
-Marker 67. Everything else on the site describes the program. The screenshots
-are photographs of it, which are honest and are still pictures: a reader could
-not find out what happens when they change a setting, or what the command line
-answers, without downloading and running something. For a tool whose argument
-is "check this yourself", asking somebody to install it before they can look at
-it is the wrong way round.
+Roadmap item 67. Everything else on the site describes the program. The
+screenshots are photographs of it, which are honest and are still pictures: a
+reader could not find out what happens when they change a setting, or what the
+command line answers, without downloading and running something. For a tool
+whose argument is "check this yourself", asking somebody to install it before
+they can look at it is the wrong way round.
 
 There is now an overlay, opened from four buttons under the front page
 animation, or from a link: `#try`, `#try-cli`, `#try-both`, `#try-verify`. It
@@ -2860,7 +2861,7 @@ not, because sideways text is not a label.
 lines in a repository, which is the wrong shape for the question people
 actually ask: is this finished, and if not, what is left.
 
-`website/roadmap.html` is that question answered. One square per marker,
+`website/roadmap.html` is that question answered. One square per roadmap item,
 grouped by the sections the roadmap already has, coloured by state, with the
 unfinished ones listed under it with their estimates and the blocked ones
 listed separately with what each is waiting for.
@@ -2872,19 +2873,19 @@ not publishing one, and this repository has recorded that exact failure four
 times under other names.
 
 Two things the picture deliberately does not say. **Area is not progress**:
-every square is the same size and a marker is not a day, so reading the
+every square is the same size and a roadmap item is not a day, so reading the
 coloured fraction as "how far along this is" would be wrong, and the page says
 so directly under the picture. And **blocked is its own colour rather than a
-shade of unfinished**, because five markers are waiting on a decision or on
-somebody else's rules, and drawing them as "not done yet" would promise work
+shade of unfinished**, because five roadmap items are waiting on a decision or
+on somebody else's rules, and drawing them as "not done yet" would promise work
 that no amount of effort delivers.
 
-Eight new markers, 66 to 73, are the work asked for after v0.1.14, in the order
-it is expected to be done, ending with a full security and functionality audit
-and an optimisation pass before the next deploy. That one is last deliberately:
-an audit run before the code stops moving is an audit of code that no longer
-exists, and its estimate is the widest on the page because the audit's estimate
-is the number that has historically been wrong.
+Eight new roadmap items, 66 to 73, are the work asked for after v0.1.14, in the
+order it is expected to be done, ending with a full security and functionality
+audit and an optimisation pass before the next deploy. That one is last
+deliberately: an audit run before the code stops moving is an audit of code
+that no longer exists, and its estimate is the widest on the page because the
+audit's estimate is the number that has historically been wrong.
 
 ### The pictures: no black margin, and no sentence cut off mid-word
 
@@ -3150,9 +3151,9 @@ That run is what found the packaging defect above. macOS is still unrun, and its
 
 ### Every box in a flowchart now opens the source, here, in your colours
 
-Marker 27. The reference pages have drawn a call graph per crate and per file
-since marker 18, and every box in every one of them was a link that left the
-site: a blob on GitHub, in a new tab, in somebody else's colours.
+Roadmap item 27. The reference pages have drawn a call graph per crate and per
+file since roadmap item 18, and every box in every one of them was a link that
+left the site: a blob on GitHub, in a new tab, in somebody else's colours.
 
 There is now a page per file on this site carrying the file itself, coloured
 with the same six classes the site already uses for code, so it follows
@@ -3285,8 +3286,8 @@ the permissions **as the file is created** rather than afterwards.
 
 ### Every file in the tree now explains itself twice
 
-Marker 52. Every crate already carried a technical note and a plain-words one.
-Now every **file** does: all 125 of them, including the build scripts, the
+Roadmap item 52. Every crate already carried a technical note and a plain-words
+one. Now every **file** does: all 125 of them, including the build scripts, the
 examples and the test files.
 
 Eighty-five were written for this. None of them is a template. A formulaic
@@ -3318,10 +3319,11 @@ every file's page now carries both halves.
 veilvoice decoy
 ```
 
-Marker 42, which this roadmap called the most dangerous thing on its list. It
-set three conditions before anything shipped: what happens when it is typed by
-mistake, what "securely erased" is really worth on flash storage, and what an
-attacker who learns the trigger can do. Working through those decided the shape.
+Roadmap item 42, which this roadmap called the most dangerous thing on its
+list. It set three conditions before anything shipped: what happens when it is
+typed by mistake, what "securely erased" is really worth on flash storage, and
+what an attacker who learns the trigger can do. Working through those decided
+the shape.
 
 **The decoy is shipped.** A second passphrase opens VeilVoice with nothing in
 it: a way to comply with somebody standing over you without handing over your
@@ -3594,10 +3596,10 @@ that opened it stays disabled with no way back.
 
 ### `veilvoice privilege`: what it is running with, and what that lets it see
 
-Marker 39. Most of VeilVoice needs no special permissions, because changing a
-voice is something any program can do with your own account. The parts that
-*watch* see further as an administrator, and this says which of those you are
-getting.
+Roadmap item 39. Most of VeilVoice needs no special permissions, because
+changing a voice is something any program can do with your own account. The
+parts that *watch* see further as an administrator, and this says which of
+those you are getting.
 
 **It never raises its own privileges, installs a service, or asks for a
 password.** It prints the command and you decide. A privacy tool that silently
@@ -3640,11 +3642,11 @@ veilvoice appctl learn --finish   # close the baseline
 veilvoice appctl check            # what is running that it does not know
 ```
 
-Marker 37. **It does not block anything and cannot.** It is a way of noticing,
-not a lock on the door: a program it calls unknown is still running. Real
-enforcement needs a kernel driver or a signed system policy and an application
-identity to sign it with, and this project is published under a pseudonym on
-purpose.
+Roadmap item 37. **It does not block anything and cannot.** It is a way of
+noticing, not a lock on the door: a program it calls unknown is still running.
+Real enforcement needs a kernel driver or a signed system policy and an
+application identity to sign it with, and this project is published under a
+pseudonym on purpose.
 
 That note is printed by **every** subcommand, not once at setup, not
 behind a flag, because a warning shown once is a warning forgotten by
@@ -3680,7 +3682,7 @@ need no machine to run on.
 
 ### Notifications: a card, an alert, or nothing: with the contrast measured
 
-Marker 41. Three ways for the application to tell you something, chosen in
+Roadmap item 41. Three ways for the application to tell you something, chosen in
 Settings under *interface*:
 
 - **a card in the corner**: rounded, translucent, fades on its own, will
@@ -3723,7 +3725,7 @@ pseudonym on purpose.
 veilvoice anonymise recording.wav --reseed-range 250,1800
 ```
 
-Markers 28 and 48. The modulation seed rolls forward on a ratchet; a fixed
+Roadmap items 28 and 48. The modulation seed rolls forward on a ratchet; a fixed
 interval is a fixed thing to observe. The interval is now drawn fresh before
 every roll, from a range that is itself **drawn from the operating system's
 random source at launch**, so it is a property of your run rather
@@ -3793,9 +3795,9 @@ veilvoice input
 veilvoice input known
 ```
 
-Marker 35. It names the programs running right now that are **able** to observe
-keyboard and mouse, such as remote-support tools, macro recorders, password
-managers, screen readers, and says what each one is and why it can
+Roadmap item 35. It names the programs running right now that are **able** to
+observe keyboard and mouse, such as remote-support tools, macro recorders,
+password managers, screen readers, and says what each one is and why it can
 reach input at all. Nearly all of it is software somebody installed on purpose,
 and the crate says that too.
 
@@ -3862,10 +3864,10 @@ veilvoice-verify deps
 veilvoice-verify reproduce. --sums SHA256SUMS --sig SHA256SUMS.asc
 ```
 
-Markers 55 to 59. `veilvoice-verify file` answers *is this download the one
-that was published*. This answers the harder one: **is the published build the
-one this source produces**. A signature says who made a file. Only a build says
-what it is made of.
+Roadmap items 55 to 59. `veilvoice-verify file` answers *is this download the
+one that was published*. This answers the harder one: **is the published build
+the one this source produces**. A signature says who made a file. Only a build
+says what it is made of.
 
 **The signature is verified before any hash from the list is read.** Not warned
 about, and refused, with nothing built and nothing compared. The comparison
@@ -4426,11 +4428,11 @@ software, and the answer changed the plan.
   phones home on a timer", and that has to be said in those words or not
   offered.
 
-So markers 43 and 64 are **blocked** on a question rather than on effort. Local
-speech-to-text means a Whisper-family program; diarisation means a third thing
-again; and whether starting any of them is acceptable, given what was measured,
-is the maintainer's call. The two honest paths, one microphone per person, or
-a turn list, remain, and remain the default.
+So roadmap items 43 and 64 are **blocked** on a question rather than on effort.
+Local speech-to-text means a Whisper-family program; diarisation means a third
+thing again; and whether starting any of them is acceptable, given what was
+measured, is the maintainer's call. The two honest paths, one microphone per
+person, or a turn list, remain, and remain the default.
 
 Nothing shipped for this. That is the point: the alternative was shipping a
 feature that could not work, and finding out from somebody who trusted it.
@@ -4615,7 +4617,7 @@ clipping        ████████████████████    
 
 Now: -60 dBFS to 0, the number printed beside the bar, eighth-block characters
 so twenty columns give a hundred and sixty steps rather than twenty, a
-**peak-hold marker** that decays after a second and a half, and a **sticky
+**peak-hold roadmap item** that decays after a second and a half, and a **sticky
 CLIP** warning -- clipping is destructive and over in a millisecond, and a
 warning that has gone before the person looks up was never given. Below -40 the
 bar is drawn muted, so a quiet room does not read as a working microphone.
@@ -5024,7 +5026,7 @@ Twelve pages at five viewport widths, with and without scripts, now report no
 horizontal scrolling at all.
 
 **What this does not claim.** Every measurement here was taken in Chromium.
-Firefox and WebKit have not rendered any of it, so the marker for "every
+Firefox and WebKit have not rendered any of it, so the roadmap item for "every
 engine" stays open rather than being ticked on one engine's word.
 
 ### Two tools for looking, rather than reasoning
@@ -5248,9 +5250,9 @@ the recording like any other window.
 That is a choice and also a limit. Excluding a window from capture means
 `SetWindowDisplayAffinity` on Windows and its equivalents elsewhere, which is
 FFI, and every crate in this workspace carries `#![forbid(unsafe_code)]` --
-which is a front-page claim. So the exclusion is **not built**, ROADMAP marker
-34 is now marked blocked rather than planned, and anybody who needs a window
-that cannot be recorded should know they do not have one here.
+which is a front-page claim. So the exclusion is **not built**, ROADMAP roadmap
+item 34 is now marked blocked rather than planned, and anybody who needs a
+window that cannot be recorded should know they do not have one here.
 
 ```
 veilvoice capture status         what is running, what is allowed
@@ -5479,7 +5481,7 @@ own upstream colour.
 - The site's search is presented as the *index* it is. The URL is unchanged.
 - `tools/render/shot.py` drives headless Edge over the DevTools protocol, with
   no dependency, so pages can be rendered and looked at before being believed.
-- `ROADMAP.md` is the public answer to "what is coming", with 45 markers and
+- `ROADMAP.md` is the public answer to "what is coming", with 45 roadmap items and
   what each depends on.
 
 ## v0.1.9

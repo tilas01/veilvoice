@@ -5,7 +5,7 @@
     python tools/site/releases.py           # write website/releases.html
     python tools/site/releases.py --check   # verify it is current
 
-# Marker 94, and the problem it solves
+# Roadmap item 94, and the problem it solves
 
 Until now the only way to see what changed in a release was `CHANGELOG.md`,
 which is thousands of lines and is written newest-first for somebody reading
@@ -90,7 +90,7 @@ PLATFORMS = {
 #: The workflow that decides what a release actually contains.
 WORKFLOW = os.path.join(".github", "workflows", "release.yml")
 
-#: The first release that publishes a contents list. See marker 97.
+#: The first release that publishes a contents list. See roadmap item 97.
 CONTENTS_FROM = (0, 1, 15)
 
 
@@ -620,7 +620,7 @@ def earlier(text):
     So the heading is read for what it says: every patch version of that series
     from zero up to and including the one named. This project has released
     0.1.0, 0.1.1 and so on with no gaps -- which is checked, by the version
-    ordering guard added as marker 95 -- so the enumeration is a fact about the
+    ordering guard added as roadmap item 95 -- so the enumeration is a fact about the
     file rather than a guess about the world.
 
     Their notes genuinely are on their release pages and this page says so

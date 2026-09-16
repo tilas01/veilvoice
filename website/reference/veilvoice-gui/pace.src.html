@@ -106,7 +106,7 @@
 <span class="ln" id="L55"><span class="tok-com">//! `frame` runs once per drawn frame on the thread that draws. It allocates</span></span>
 <span class="ln" id="L56"><span class="tok-com">//! nothing, locks nothing and prints nothing: the interval history is a fixed</span></span>
 <span class="ln" id="L57"><span class="tok-com">//! ring, the median is taken over a copy of it on the stack, and the target</span></span>
-<span class="ln" id="L58"><span class="tok-com">//! that other modules read is an atomic. The guard from marker 126 reads this</span></span>
+<span class="ln" id="L58"><span class="tok-com">//! that other modules read is an atomic. The guard from roadmap item 126 reads this</span></span>
 <span class="ln" id="L59"><span class="tok-com">//! file.</span></span>
 <span class="ln" id="L60"></span>
 <span class="ln" id="L61"><span class="tok-kw">use</span> std::sync::atomic::{AtomicBool, AtomicU32, Ordering};</span>

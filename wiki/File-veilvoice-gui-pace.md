@@ -71,7 +71,7 @@ somebody looks while it is happening.
 `frame` runs once per drawn frame on the thread that draws. It allocates
 nothing, locks nothing and prints nothing: the interval history is a fixed
 ring, the median is taken over a copy of it on the stack, and the target
-that other modules read is an atomic. The guard from marker 126 reads this
+that other modules read is an atomic. The guard from roadmap item 126 reads this
 file.
 
 ## What this file contains

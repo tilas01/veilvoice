@@ -15,7 +15,7 @@
 
 What came out of the archive, and the GnuPG somebody already has.
 
-**Marker 91.** Two halves of the same request: check the extracted copy as
+**Roadmap item 91.** Two halves of the same request: check the extracted copy as
 well as the archive, and offer the check through GnuPG for anybody who would
 rather trust their own tools than this binary.
 

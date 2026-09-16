@@ -217,7 +217,7 @@
 <span class="src-item" id="fn-progress">
 <span class="ln" id="L160"><span class="tok-com">/// What a render has done so far, readable while it is still running.</span></span>
 <span class="ln" id="L161"><span class="tok-com">///</span></span>
-<span class="ln" id="L162"><span class="tok-com">/// **Marker 133.** The row asked for two bars per speaker, what went in and</span></span>
+<span class="ln" id="L162"><span class="tok-com">/// **Roadmap item 133.** The row asked for two bars per speaker, what went in and</span></span>
 <span class="ln" id="L163"><span class="tok-com">/// what came out, so the difference is visible rather than asserted. It asked</span></span>
 <span class="ln" id="L164"><span class="tok-com">/// for them *live*, in group mode, and neither word survived reading the code:</span></span>
 <span class="ln" id="L165"><span class="tok-com">/// group mode works on a recording that already exists and never opens a</span></span>
@@ -356,7 +356,7 @@
 <span class="ln" id="L278"><span class="tok-com">/// The loudest sample in a span, as a peak in `[0, 1]`.</span></span>
 <span class="ln" id="L279"><span class="tok-com">///</span></span>
 <span class="ln" id="L280"><span class="tok-com">/// One pass over a slice the engine has just walked twice, so it is in cache</span></span>
-<span class="ln" id="L281"><span class="tok-com">/// and costs nothing measurable next to an FFT. Marker 126 asks for work that</span></span>
+<span class="ln" id="L281"><span class="tok-com">/// and costs nothing measurable next to an FFT. Roadmap item 126 asks for work that</span></span>
 <span class="ln" id="L282"><span class="tok-com">/// can be done once to be done once; this is new work rather than repeated</span></span>
 <span class="ln" id="L283"><span class="tok-com">/// work, and it is the feature.</span></span>
 <span class="ln" id="L284"><span class="tok-kw">fn</span> <span class="tok-fn">peak</span>(samples: &amp;[f32]) -&gt; f32 {</span>
@@ -420,7 +420,7 @@
 <span class="src-item" id="fn-render_watched">
 <span class="ln" id="L335"><span class="tok-com">/// [`render`], with somewhere to report what it is doing as it does it.</span></span>
 <span class="ln" id="L336"><span class="tok-com">///</span></span>
-<span class="ln" id="L337"><span class="tok-com">/// **Marker 133.** `progress` is written to from every speaker&#x27;s thread as</span></span>
+<span class="ln" id="L337"><span class="tok-com">/// **Roadmap item 133.** `progress` is written to from every speaker&#x27;s thread as</span></span>
 <span class="ln" id="L338"><span class="tok-com">/// each turn finishes, and may be read from another thread at the same time:</span></span>
 <span class="ln" id="L339"><span class="tok-com">/// see [`Progress`]. Pass one made by [`Progress::for_speakers`] with as many</span></span>
 <span class="ln" id="L340"><span class="tok-com">/// slots as the plan has, or a default one to be told nothing.</span></span>
@@ -511,7 +511,7 @@
 <span class="ln" id="L424">                    <span class="tok-com">// would give them a different voice at each end of the</span></span>
 <span class="ln" id="L425">                    <span class="tok-com">// recording.</span></span>
 <span class="ln" id="L426">                    <span class="tok-kw">let</span> veiled = <span class="tok-fn">process_span</span>(&amp;<span class="tok-kw">mut</span> engine, &amp;input[*start..*end]);</span>
-<span class="ln" id="L427">                    <span class="tok-com">// **Marker 133.** What went in and what came out, measured</span></span>
+<span class="ln" id="L427">                    <span class="tok-com">// **Roadmap item 133.** What went in and what came out, measured</span></span>
 <span class="ln" id="L428">                    <span class="tok-com">// before the ends are faded: the fade is this module&#x27;s</span></span>
 <span class="ln" id="L429">                    <span class="tok-com">// splice repair rather than anything the engine did, and a</span></span>
 <span class="ln" id="L430">                    <span class="tok-com">// bar showing the engine&#x27;s output should show the engine&#x27;s</span></span>
@@ -943,7 +943,7 @@
 <span class="ln" id="L850">        assert_ne!(a.samples, b.samples);</span>
 <span class="ln" id="L851">    }</span>
 <span class="ln" id="L852"></span>
-<span class="ln" id="L853">    <span class="tok-com">/// **Marker 133.** A watched render reports what it is doing per speaker.</span></span>
+<span class="ln" id="L853">    <span class="tok-com">/// **Roadmap item 133.** A watched render reports what it is doing per speaker.</span></span>
 <span class="ln" id="L854">    <span class="tok-com">///</span></span>
 <span class="ln" id="L855">    <span class="tok-com">/// Checked after it has finished rather than while it runs, which is a</span></span>
 <span class="ln" id="L856">    <span class="tok-com">/// choice about what can be asserted: a test that read the bars mid-render</span></span>

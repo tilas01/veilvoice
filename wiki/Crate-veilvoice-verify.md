@@ -116,7 +116,7 @@ flowchart TD
 | [[`lib.rs`|File-veilvoice-verify-lib]] | 1889 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 1373 | The verifier's own tests. |
-| [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] | 208 | Marker 97. |
+| [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] | 208 | Roadmap item 97. |
 
 **4,422 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

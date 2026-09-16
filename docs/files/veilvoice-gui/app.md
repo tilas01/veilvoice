@@ -54,7 +54,7 @@ drawn in and the order this table is in.
 | **install** | Whether this copy is portable or installed, and the optional companions. |
 | **about** | Versions, licence, and the honest scope. |
 
-**Marker 130** took one row out of this table rather than adding one. Live
+**Roadmap item 130** took one row out of this table rather than adding one. Live
 scramble was a tab, and everything it did the Studio also did, through the
 same session, with the devices the other tab happened to be set to. Two
 screens for one act, and two starters for one microphone.
@@ -280,7 +280,7 @@ flowchart TD
 | `preferred_output` <sub>fn</sub> | [398](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L398) | Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default. |
 | `preferred_input` <sub>fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L407) | Pick the input to start on: the system default, else whatever is first. |
 | `VeilVoiceApp::count_frames` <sub>fn</sub> | [431](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L431) | Frames per second, to stderr, when VEILVOICE_FRAME_LOG is set. |
-| `VeilVoiceApp::frame_readout` <sub>fn</sub> | [464](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L464) | Marker 148. |
+| `VeilVoiceApp::frame_readout` <sub>fn</sub> | [464](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L464) | Roadmap item 148. |
 | `VeilVoiceApp::frame_rate_detail` <sub>fn</sub> | [493](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L493) | The sentence behind the readout, and the one the About tab prints. |
 | `VeilVoiceApp::without_devices` <sub>fn</sub> | [513](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L513) | The application with no devices enumerated. |
 | `VeilVoiceApp::default` <sub>fn</sub> | [581](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L581) |  |

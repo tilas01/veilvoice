@@ -61,7 +61,7 @@ pub enum Step {
     /// What this machine actually reports, and the one decision that follows
     /// from it.
     ///
-    /// **Marker 135.** Last, because it is the card that reports rather than
+    /// **Roadmap item 135.** Last, because it is the card that reports rather than
     /// asks: somebody who skipped everything else has still been shown where
     /// their recordings will go and how much room there is for them, which are
     /// the two facts a setup screen usually asserts and never measures.
@@ -355,7 +355,7 @@ impl FirstRun {
 
     /// What this machine says about itself, and the one choice that follows.
     ///
-    /// **Marker 135.** Every number here is read from the machine at the moment
+    /// **Roadmap item 135.** Every number here is read from the machine at the moment
     /// the card is drawn. None of it is a default written into this program: a
     /// setup screen that asserts how much room there is, or that the graphics
     /// will be fine, is guessing on somebody else's hardware and sounding
@@ -625,7 +625,7 @@ mod tests {
         assert!(!run.should_skip(Step::Autolock, &security));
     }
 
-    /// **Marker 135's whole point.** The card has to read the machine rather
+    /// **Roadmap item 135's whole point.** The card has to read the machine rather
     /// than carry numbers written here. A constant would be a claim about
     /// somebody else's hardware, stated with the confidence of a measurement.
     #[test]

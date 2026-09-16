@@ -130,7 +130,7 @@
 <span class="src-item" id="fn-interference">
 <span class="ln" id="L73"><span class="tok-com">/// Something that happened to the audio path while it was running.</span></span>
 <span class="ln" id="L74"><span class="tok-com">///</span></span>
-<span class="ln" id="L75"><span class="tok-com">/// **Marker 132.** The platform reports these on a callback of its own, and</span></span>
+<span class="ln" id="L75"><span class="tok-com">/// **Roadmap item 132.** The platform reports these on a callback of its own, and</span></span>
 <span class="ln" id="L76"><span class="tok-com">/// until now the only thing done with one was `eprintln!`: on Windows the</span></span>
 <span class="ln" id="L77"><span class="tok-com">/// desktop application is built with no console at all, so a microphone</span></span>
 <span class="ln" id="L78"><span class="tok-com">/// unplugged in the middle of a call was silent, and a recording carried on</span></span>
@@ -175,7 +175,7 @@
 <span class="ln" id="L115">    <span class="tok-kw">pub</span> starved: u64,</span>
 <span class="ln" id="L116">    <span class="tok-com">/// How many times the platform has reported trouble on either stream.</span></span>
 <span class="ln" id="L117">    <span class="tok-com">///</span></span>
-<span class="ln" id="L118">    <span class="tok-com">/// **Marker 132.** A count rather than the reports themselves, so this</span></span>
+<span class="ln" id="L118">    <span class="tok-com">/// **Roadmap item 132.** A count rather than the reports themselves, so this</span></span>
 <span class="ln" id="L119">    <span class="tok-com">/// stays `Copy` and cheap to read every frame. A caller that sees it move</span></span>
 <span class="ln" id="L120">    <span class="tok-com">/// asks [`LiveSession::interference`] what happened.</span></span>
 <span class="ln" id="L121">    <span class="tok-kw">pub</span> interfered: u64,</span>
@@ -186,7 +186,7 @@
 <span class="ln" id="L124"><span class="tok-com">/// Which sides of the engine a session keeps.</span></span>
 <span class="ln" id="L125"><span class="tok-com">///</span></span>
 <span class="ln" id="L126"><span class="tok-com">/// Both are named at construction rather than passed as a pair of positional</span></span>
-<span class="ln" id="L127"><span class="tok-com">/// flags, which is the property **marker 131** asked for and which two separate</span></span>
+<span class="ln" id="L127"><span class="tok-com">/// flags, which is the property **roadmap item 131** asked for and which two separate</span></span>
 <span class="ln" id="L128"><span class="tok-com">/// arguments used to give: no caller reaches a recording of somebody&#x27;s real</span></span>
 <span class="ln" id="L129"><span class="tok-com">/// voice without writing the word `plain` next to it.</span></span>
 <span class="ln" id="L130"><span class="tok-com">///</span></span>
@@ -387,7 +387,7 @@
 </span>
 <span class="ln" id="L307"></span>
 <span class="src-item" id="fn-agree_on_a_rate_for">
-<span class="ln" id="L308"><span class="tok-com">/// The same, for any number of microphones. **Marker 147.**</span></span>
+<span class="ln" id="L308"><span class="tok-com">/// The same, for any number of microphones. **Roadmap item 147.**</span></span>
 <span class="ln" id="L309"><span class="tok-com">///</span></span>
 <span class="ln" id="L310"><span class="tok-com">/// One rate for the whole room. Several microphones each running at their own</span></span>
 <span class="ln" id="L311"><span class="tok-com">/// rate into one mix is the F-168 problem once per guest, and it is worse than</span></span>
@@ -510,7 +510,7 @@
 <span class="ln" id="L424">    <span class="tok-com">/// mean a second copy of the audio living somewhere unprotected, which is</span></span>
 <span class="ln" id="L425">    <span class="tok-com">/// the thing [`record`](crate::record) is for avoiding.</span></span>
 <span class="ln" id="L426">    <span class="tok-com">///</span></span>
-<span class="ln" id="L427">    <span class="tok-com">/// **Marker 131.** [`Keeping::plain`] is the one thing in this crate that</span></span>
+<span class="ln" id="L427">    <span class="tok-com">/// **Roadmap item 131.** [`Keeping::plain`] is the one thing in this crate that</span></span>
 <span class="ln" id="L428">    <span class="tok-com">/// records the real voice, and it is named at the call site for that</span></span>
 <span class="ln" id="L429">    <span class="tok-com">/// reason: a caller cannot reach it without writing the word. It is false</span></span>
 <span class="ln" id="L430">    <span class="tok-com">/// in every path that has not been asked for it, and the interface that</span></span>
@@ -765,7 +765,7 @@
 <span class="ln" id="L674">        }</span>
 <span class="ln" id="L675">    }</span>
 <span class="ln" id="L676"></span>
-<span class="ln" id="L677">    <span class="tok-com">/// **Marker 132.** What the recorder is given is what the engine produced.</span></span>
+<span class="ln" id="L677">    <span class="tok-com">/// **Roadmap item 132.** What the recorder is given is what the engine produced.</span></span>
 <span class="ln" id="L678">    <span class="tok-com">///</span></span>
 <span class="ln" id="L679">    <span class="tok-com">/// The row this comes from asked for the samples reaching the recorder to</span></span>
 <span class="ln" id="L680">    <span class="tok-com">/// be *checked* against the engine&#x27;s output. They cannot differ, and a</span></span>
@@ -801,7 +801,7 @@
 <span class="ln" id="L710">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sink.write(&amp;scratch_out[..frames]);&quot;</span>),</span>
 <span class="ln" id="L711">            <span class="tok-str">&quot;the veiled recorder is no longer fed from the engine&#x27;s own output \</span></span>
 <span class="ln" id="L712"><span class="tok-str">             buffer. Whatever it is fed from now is a second copy of the audio, \</span></span>
-<span class="ln" id="L713"><span class="tok-str">             and marker 132 is the claim that there is not one&quot;</span></span>
+<span class="ln" id="L713"><span class="tok-str">             and roadmap item 132 is the claim that there is not one&quot;</span></span>
 <span class="ln" id="L714">        );</span>
 <span class="ln" id="L715"></span>
 <span class="ln" id="L716">        <span class="tok-com">// The microphone side, the same way: from the downmix inside the input</span></span>
@@ -871,7 +871,7 @@
 <span class="ln" id="L780">            None</span>
 <span class="ln" id="L781">        );</span>
 <span class="ln" id="L782"></span>
-<span class="ln" id="L783">        <span class="tok-com">// Several microphones, which is what marker 147 opens. One rate has to</span></span>
+<span class="ln" id="L783">        <span class="tok-com">// Several microphones, which is what roadmap item 147 opens. One rate has to</span></span>
 <span class="ln" id="L784">        <span class="tok-com">// suit every one of them and the output.</span></span>
 <span class="ln" id="L785">        assert_eq!(</span>
 <span class="ln" id="L786">            <span class="tok-fn">rate_they_agree_on</span>(</span>
@@ -901,7 +901,7 @@
 <span class="ln" id="L810"></span>
 <span class="ln" id="L811">    <span class="tok-com">/// A stream error becomes something a caller can show.</span></span>
 <span class="ln" id="L812">    <span class="tok-com">///</span></span>
-<span class="ln" id="L813">    <span class="tok-com">/// **Marker 132.** Before this, both error callbacks were `eprintln!` and</span></span>
+<span class="ln" id="L813">    <span class="tok-com">/// **Roadmap item 132.** Before this, both error callbacks were `eprintln!` and</span></span>
 <span class="ln" id="L814">    <span class="tok-com">/// nothing else: on Windows the desktop application has no console, so a</span></span>
 <span class="ln" id="L815">    <span class="tok-com">/// device unplugged mid-call was silent and the recording carried on.</span></span>
 <span class="ln" id="L816">    <span class="tok-attr">#[test</span>]</span>

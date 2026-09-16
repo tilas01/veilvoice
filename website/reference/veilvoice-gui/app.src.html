@@ -77,7 +77,7 @@
 <span class="ln" id="L26"><span class="tok-com">//! | **install** | Whether this copy is portable or installed, and the optional companions. |</span></span>
 <span class="ln" id="L27"><span class="tok-com">//! | **about** | Versions, licence, and the honest scope. |</span></span>
 <span class="ln" id="L28"><span class="tok-com">//!</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! **Marker 130** took one row out of this table rather than adding one. Live</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! **Roadmap item 130** took one row out of this table rather than adding one. Live</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! scramble was a tab, and everything it did the Studio also did, through the</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! same session, with the devices the other tab happened to be set to. Two</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! screens for one act, and two starters for one microphone.</span></span>
@@ -196,7 +196,7 @@
 <span class="ln" id="L144">    <span class="tok-com">/// Several people in one recording, each with a name and a colour.</span></span>
 <span class="ln" id="L145">    Group,</span>
 <span class="ln" id="L146">    <span class="tok-com">/// Scramble a microphone in real time, and keep what was said if it was</span></span>
-<span class="ln" id="L147">    <span class="tok-com">/// asked for. **Marker 130**: live scramble used to be a tab of its own.</span></span>
+<span class="ln" id="L147">    <span class="tok-com">/// asked for. **Roadmap item 130**: live scramble used to be a tab of its own.</span></span>
 <span class="ln" id="L148">    Studio,</span>
 <span class="ln" id="L149">    <span class="tok-com">/// What is in the vault, without opening any of it.</span></span>
 <span class="ln" id="L150">    Browser,</span>
@@ -259,7 +259,7 @@
 <span class="ln" id="L201">    <span class="tok-com">/// The tab with this name, if it is one.</span></span>
 <span class="ln" id="L202">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">from_key</span>(key: &amp;str) -&gt; Option&lt;Tab&gt; {</span>
 <span class="ln" id="L203">        <span class="tok-kw">let</span> key = key.<span class="tok-fn">trim</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L204">        <span class="tok-com">// **Marker 130.** Live scramble is the Studio now. `--tab live` still</span></span>
+<span class="ln" id="L204">        <span class="tok-com">// **Roadmap item 130.** Live scramble is the Studio now. `--tab live` still</span></span>
 <span class="ln" id="L205">        <span class="tok-com">// opens something rather than failing, because it is written into</span></span>
 <span class="ln" id="L206">        <span class="tok-com">// shortcuts and scripts that were made before the tab moved, and the</span></span>
 <span class="ln" id="L207">        <span class="tok-com">// honest destination for it is the tab that does that job today.</span></span>
@@ -368,7 +368,7 @@
 <span class="ln" id="L306"></span>
 <span class="ln" id="L307">    <span class="tok-com">// The devices the Studio veils between. The lists are the window&#x27;s</span></span>
 <span class="ln" id="L308">    <span class="tok-com">// because the window is what enumerates them, once, at startup; the</span></span>
-<span class="ln" id="L309">    <span class="tok-com">// session that uses them is the Studio&#x27;s, because marker 130 made the</span></span>
+<span class="ln" id="L309">    <span class="tok-com">// session that uses them is the Studio&#x27;s, because roadmap item 130 made the</span></span>
 <span class="ln" id="L310">    <span class="tok-com">// Studio the one place a session is started.</span></span>
 <span class="ln" id="L311">    inputs: Vec&lt;devices::DeviceInfo&gt;,</span>
 <span class="ln" id="L312">    outputs: Vec&lt;devices::DeviceInfo&gt;,</span>
@@ -381,7 +381,7 @@
 <span class="ln" id="L319">    <span class="tok-com">/// running. Read once, in `update`, because `stats` resets the peaks as it</span></span>
 <span class="ln" id="L320">    <span class="tok-com">/// reads them and two readers would each see half the level.</span></span>
 <span class="ln" id="L321">    <span class="tok-com">///</span></span>
-<span class="ln" id="L322">    <span class="tok-com">/// **Marker 147.** One microphone and a room report different shapes, and</span></span>
+<span class="ln" id="L322">    <span class="tok-com">/// **Roadmap item 147.** One microphone and a room report different shapes, and</span></span>
 <span class="ln" id="L323">    <span class="tok-com">/// this holds whichever it was rather than a flattened pair of numbers:</span></span>
 <span class="ln" id="L324">    <span class="tok-com">/// flattening is what would lose the per-guest bars.</span></span>
 <span class="ln" id="L325">    reading: Option&lt;<span class="tok-kw">crate</span>::studio::Reading&gt;,</span>
@@ -410,7 +410,7 @@
 <span class="ln" id="L348">    storage: <span class="tok-kw">crate</span>::storage::Storage,</span>
 <span class="ln" id="L349">    <span class="tok-com">/// Seconds since the window was last touched, for the autolock.</span></span>
 <span class="ln" id="L350">    <span class="tok-com">///</span></span>
-<span class="ln" id="L351">    <span class="tok-com">/// Marker 92. Counted from egui&#x27;s own frame time rather than the system</span></span>
+<span class="ln" id="L351">    <span class="tok-com">/// Roadmap item 92. Counted from egui&#x27;s own frame time rather than the system</span></span>
 <span class="ln" id="L352">    <span class="tok-com">/// clock, so moving the machine&#x27;s clock neither brings the lock forward nor</span></span>
 <span class="ln" id="L353">    <span class="tok-com">/// pushes it back.</span></span>
 <span class="ln" id="L354">    idle_secs: f32,</span>
@@ -521,7 +521,7 @@
 </span>
 <span class="ln" id="L453"></span>
 <span class="src-item" id="fn-veilvoiceapp-frame_readout">
-<span class="ln" id="L454">    <span class="tok-com">/// Marker 148. The frame rate in the header, when it has been asked for.</span></span>
+<span class="ln" id="L454">    <span class="tok-com">/// Roadmap item 148. The frame rate in the header, when it has been asked for.</span></span>
 <span class="ln" id="L455">    <span class="tok-com">///</span></span>
 <span class="ln" id="L456">    <span class="tok-com">/// Two numbers and no more: the rate as drawn, and how many frames arrived</span></span>
 <span class="ln" id="L457">    <span class="tok-com">/// late in the last second. The second one turns yellow rather than</span></span>
@@ -688,7 +688,7 @@
 <span class="ln" id="L610">    <span class="tok-com">/// hidden one.</span></span>
 <span class="ln" id="L611">    <span class="tok-com">/// What the integrity record found, drawn under the lock controls.</span></span>
 <span class="ln" id="L612">    <span class="tok-com">///</span></span>
-<span class="ln" id="L613">    <span class="tok-com">/// **Marker 75.** An associated function rather than a method so it borrows</span></span>
+<span class="ln" id="L613">    <span class="tok-com">/// **Roadmap item 75.** An associated function rather than a method so it borrows</span></span>
 <span class="ln" id="L614">    <span class="tok-com">/// the state it reads and nothing else: `self.security.tab` already holds a</span></span>
 <span class="ln" id="L615">    <span class="tok-com">/// mutable borrow of the same struct on the line above.</span></span>
 <span class="ln" id="L616">    <span class="tok-com">///</span></span>
@@ -844,18 +844,18 @@
 <span class="ln" id="L762">            watch: WatchFeed::<span class="tok-fn">start</span>(cc.egui_ctx.<span class="tok-fn">clone</span>()),</span>
 <span class="ln" id="L763">            ..Default::<span class="tok-fn">default</span>()</span>
 <span class="ln" id="L764">        };</span>
-<span class="ln" id="L765">        <span class="tok-com">// Marker 148. The saved frame-rate target, before the first frame, so</span></span>
+<span class="ln" id="L765">        <span class="tok-com">// Roadmap item 148. The saved frame-rate target, before the first frame, so</span></span>
 <span class="ln" id="L766">        <span class="tok-com">// the first animation is paced by what was chosen rather than by the</span></span>
 <span class="ln" id="L767">        <span class="tok-com">// default for one frame.</span></span>
 <span class="ln" id="L768">        app.pace.<span class="tok-fn">set_target</span>(app.preferences.<span class="tok-fn">frame_target</span>());</span>
 <span class="ln" id="L769"></span>
-<span class="ln" id="L770">        <span class="tok-com">// Marker 86. Before the first frame, and so before anything can be</span></span>
+<span class="ln" id="L770">        <span class="tok-com">// Roadmap item 86. Before the first frame, and so before anything can be</span></span>
 <span class="ln" id="L771">        <span class="tok-com">// unlocked: `Security` captures the app-lock passphrase as the lock</span></span>
 <span class="ln" id="L772">        <span class="tok-com">// opens, and only when this mode is already the chosen one.</span></span>
 <span class="ln" id="L773">        <span class="tok-kw">let</span> seal_with_app_lock = app.preferences.<span class="tok-fn">seal_with_app_lock</span>();</span>
 <span class="ln" id="L774">        app.security.<span class="tok-fn">prefer_app_lock_sealing</span>(seal_with_app_lock);</span>
 <span class="ln" id="L775"></span>
-<span class="ln" id="L776">        <span class="tok-com">// Markers 82 to 84. The remembered destination, and one look at what is</span></span>
+<span class="ln" id="L776">        <span class="tok-com">// Roadmap items 82 to 84. The remembered destination, and one look at what is</span></span>
 <span class="ln" id="L777">        <span class="tok-com">// mounted. Both at startup rather than per frame: `refresh` reads the</span></span>
 <span class="ln" id="L778">        <span class="tok-com">// mount table, and the draw path reads no files.</span></span>
 <span class="ln" id="L779">        app.storage.destination = app.preferences.<span class="tok-fn">destination</span>();</span>
@@ -1040,7 +1040,7 @@
 <span class="ln" id="L944">        <span class="tok-kw">self</span>.<span class="tok-fn">fit_to_the_screen</span>(ctx);</span>
 <span class="ln" id="L945">        <span class="tok-kw">self</span>.<span class="tok-fn">count_frames</span>(ctx);</span>
 <span class="ln" id="L946"></span>
-<span class="ln" id="L947">        <span class="tok-com">// Marker 148. One reading per drawn frame, before anything is</span></span>
+<span class="ln" id="L947">        <span class="tok-com">// Roadmap item 148. One reading per drawn frame, before anything is</span></span>
 <span class="ln" id="L948">        <span class="tok-com">// painted, so the header and the About tab report the same frame.</span></span>
 <span class="ln" id="L949">        <span class="tok-com">// Whether this frame was one an animation asked for is read from the</span></span>
 <span class="ln" id="L950">        <span class="tok-com">// flag `pace::next_frame` set at the end of the frame before.</span></span>
@@ -1058,7 +1058,7 @@
 <span class="ln" id="L962">            };</span>
 <span class="ln" id="L963">        }</span>
 <span class="ln" id="L964"></span>
-<span class="ln" id="L965">        <span class="tok-com">// Marker 148. Frames have been arriving late for two seconds running.</span></span>
+<span class="ln" id="L965">        <span class="tok-com">// Roadmap item 148. Frames have been arriving late for two seconds running.</span></span>
 <span class="ln" id="L966">        <span class="tok-com">// Said once, and only where a notice is not already in the way: the</span></span>
 <span class="ln" id="L967">        <span class="tok-com">// first-run cards and a crash report are both more urgent than this.</span></span>
 <span class="ln" id="L968">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.pace.<span class="tok-fn">is_dropping</span>()</span>
@@ -1077,7 +1077,7 @@
 <span class="ln" id="L981">            )));</span>
 <span class="ln" id="L982">        }</span>
 <span class="ln" id="L983"></span>
-<span class="ln" id="L984">        <span class="tok-com">// Marker 92. Any input at all is use; the passage of a job is not.</span></span>
+<span class="ln" id="L984">        <span class="tok-com">// Roadmap item 92. Any input at all is use; the passage of a job is not.</span></span>
 <span class="ln" id="L985">        <span class="tok-com">// Somebody who starts a long render and walks away has walked away, and</span></span>
 <span class="ln" id="L986">        <span class="tok-com">// what they are producing is the thing worth locking away.</span></span>
 <span class="ln" id="L987">        <span class="tok-kw">let</span> (touched, dt) = ctx.<span class="tok-fn">input</span>(|i| {</span>
@@ -1140,7 +1140,7 @@
 <span class="ln" id="L1044">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.security.<span class="tok-fn">is_locked</span>() {</span>
 <span class="ln" id="L1045">            <span class="tok-kw">self</span>.files.<span class="tok-fn">locked</span>();</span>
 <span class="ln" id="L1046">        }</span>
-<span class="ln" id="L1047">        <span class="tok-com">// Marker 86, kept in step. `set_` is a no-op when nothing changed, so</span></span>
+<span class="ln" id="L1047">        <span class="tok-com">// Roadmap item 86, kept in step. `set_` is a no-op when nothing changed, so</span></span>
 <span class="ln" id="L1048">        <span class="tok-com">// this costs a comparison per frame and never a write.</span></span>
 <span class="ln" id="L1049">        <span class="tok-kw">self</span>.preferences</span>
 <span class="ln" id="L1050">            .<span class="tok-fn">set_seal_with_app_lock</span>(<span class="tok-kw">self</span>.security.<span class="tok-fn">seals_with_app_lock</span>());</span>
@@ -1240,10 +1240,10 @@
 <span class="ln" id="L1144">                    ui.<span class="tok-fn">with_layout</span>(egui::Layout::<span class="tok-fn">right_to_left</span>(egui::Align::Center), |ui| {</span>
 <span class="ln" id="L1145">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;offline&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()).<span class="tok-fn">small</span>());</span>
 <span class="ln" id="L1146">                        <span class="tok-kw">self</span>.<span class="tok-fn">frame_readout</span>(ui);</span>
-<span class="ln" id="L1147">                        <span class="tok-com">// **Marker 78.** The colour scheme, in the header.</span></span>
+<span class="ln" id="L1147">                        <span class="tok-com">// **Roadmap item 78.** The colour scheme, in the header.</span></span>
 <span class="ln" id="L1148">                        <span class="tok-com">//</span></span>
 <span class="ln" id="L1149">                        <span class="tok-com">// Every one of the website&#x27;s themes has been in this</span></span>
-<span class="ln" id="L1150">                        <span class="tok-com">// application since marker 26, and the picker was on a</span></span>
+<span class="ln" id="L1150">                        <span class="tok-com">// application since roadmap item 26, and the picker was on a</span></span>
 <span class="ln" id="L1151">                        <span class="tok-com">// page inside Settings, which is a place somebody looks</span></span>
 <span class="ln" id="L1152">                        <span class="tok-com">// only if they already believe there is something to</span></span>
 <span class="ln" id="L1153">                        <span class="tok-com">// find. The website puts its picker in the header on</span></span>
@@ -1342,10 +1342,10 @@
 <span class="ln" id="L1246">        <span class="tok-com">// so this is the only reader and everything else is shown what it got.</span></span>
 <span class="ln" id="L1247">        <span class="tok-kw">self</span>.reading = <span class="tok-kw">self</span>.studio.<span class="tok-fn">tick</span>();</span>
 <span class="ln" id="L1248"></span>
-<span class="ln" id="L1249">        <span class="tok-com">// **Marker 132.** Who else is holding the microphone, while a take is</span></span>
+<span class="ln" id="L1249">        <span class="tok-com">// **Roadmap item 132.** Who else is holding the microphone, while a take is</span></span>
 <span class="ln" id="L1250">        <span class="tok-com">// being made and only then. Outside one this is the Monitor tab&#x27;s</span></span>
 <span class="ln" id="L1251">        <span class="tok-com">// question and the safety catch&#x27;s, and building a list every frame for</span></span>
-<span class="ln" id="L1252">        <span class="tok-com">// a question nobody is asking is what marker 126 is about.</span></span>
+<span class="ln" id="L1252">        <span class="tok-com">// a question nobody is asking is what roadmap item 126 is about.</span></span>
 <span class="ln" id="L1253">        <span class="tok-com">//</span></span>
 <span class="ln" id="L1254">        <span class="tok-com">// Independent of the safety catch&#x27;s posture on purpose. That is a</span></span>
 <span class="ln" id="L1255">        <span class="tok-com">// setting about closing other programs; this is a fact about a</span></span>
@@ -1508,7 +1508,7 @@
 <span class="ln" id="L1412">                        Tab::Security =&gt; {</span>
 <span class="ln" id="L1413">                            <span class="tok-kw">self</span>.security.<span class="tok-fn">tab</span>(ui);</span>
 <span class="ln" id="L1414">                            Self::<span class="tok-fn">integrity_panel</span>(ui, <span class="tok-kw">self</span>.integrity.<span class="tok-fn">state</span>());</span>
-<span class="ln" id="L1415">                            <span class="tok-com">// Markers 82 to 84. Returns true when the choice</span></span>
+<span class="ln" id="L1415">                            <span class="tok-com">// Roadmap items 82 to 84. Returns true when the choice</span></span>
 <span class="ln" id="L1416">                            <span class="tok-com">// changed, which is when it is worth a write to</span></span>
 <span class="ln" id="L1417">                            <span class="tok-com">// the settings file rather than every frame.</span></span>
 <span class="ln" id="L1418">                            <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::storage::<span class="tok-fn">panel</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.storage, ui) {</span>
@@ -1529,7 +1529,7 @@
 <span class="ln" id="L1433">        <span class="tok-kw">self</span>.group.<span class="tok-fn">drain</span>();</span>
 <span class="ln" id="L1434">        <span class="tok-kw">self</span>.verify.<span class="tok-fn">drain</span>();</span>
 <span class="ln" id="L1435"></span>
-<span class="ln" id="L1436">        <span class="tok-com">// **Marker 79.** How often to come back, decided by what is moving.</span></span>
+<span class="ln" id="L1436">        <span class="tok-com">// **Roadmap item 79.** How often to come back, decided by what is moving.</span></span>
 <span class="ln" id="L1437">        <span class="tok-com">//</span></span>
 <span class="ln" id="L1438">        <span class="tok-com">// This was one number, 50 ms, for everything: a live session, a</span></span>
 <span class="ln" id="L1439">        <span class="tok-com">// download, a file being veiled. Twenty frames a second is fine for a</span></span>
@@ -1572,7 +1572,7 @@
 <span class="ln" id="L1476">            <span class="tok-com">// header animating at its own rate, which is what the judder was.</span></span>
 <span class="ln" id="L1477">            <span class="tok-kw">crate</span>::pace::<span class="tok-fn">next_frame</span>(ctx);</span>
 <span class="ln" id="L1478">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> autolock.enabled &amp;&amp; !<span class="tok-kw">self</span>.security.<span class="tok-fn">is_locked</span>() {</span>
-<span class="ln" id="L1479">            <span class="tok-com">// Marker 92. Once a second is enough to notice a delay measured in</span></span>
+<span class="ln" id="L1479">            <span class="tok-com">// Roadmap item 92. Once a second is enough to notice a delay measured in</span></span>
 <span class="ln" id="L1480">            <span class="tok-com">// minutes, and it is what makes the lock actually engage: an idle</span></span>
 <span class="ln" id="L1481">            <span class="tok-com">// window requests no repaint, so without this the countdown would</span></span>
 <span class="ln" id="L1482">            <span class="tok-com">// only advance while somebody was looking at it, which is the one</span></span>
@@ -1791,7 +1791,7 @@
 <span class="ln" id="L1689"></span>
 <span class="ln" id="L1690">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
 <span class="ln" id="L1691">        <span class="tok-kw">let</span> busy = <span class="tok-kw">self</span>.job.<span class="tok-fn">is_some</span>();</span>
-<span class="ln" id="L1692">        <span class="tok-com">// Marker 83. A destination whose hidden-volume question is unanswered</span></span>
+<span class="ln" id="L1692">        <span class="tok-com">// Roadmap item 83. A destination whose hidden-volume question is unanswered</span></span>
 <span class="ln" id="L1693">        <span class="tok-com">// blocks the job rather than quietly writing beside the source file.</span></span>
 <span class="ln" id="L1694">        <span class="tok-com">// The silent fallback is the failure this exists to prevent: a veiled</span></span>
 <span class="ln" id="L1695">        <span class="tok-com">// recording sitting outside a vault while its owner believes it is</span></span>
@@ -1859,7 +1859,7 @@
 <span class="ln" id="L1755">            o.<span class="tok-fn">set_extension</span>(<span class="tok-str">&quot;veiled.wav&quot;</span>);</span>
 <span class="ln" id="L1756">            o</span>
 <span class="ln" id="L1757">        });</span>
-<span class="ln" id="L1758">        <span class="tok-com">// Marker 82. The encrypted destination replaces the folder and keeps</span></span>
+<span class="ln" id="L1758">        <span class="tok-com">// Roadmap item 82. The encrypted destination replaces the folder and keeps</span></span>
 <span class="ln" id="L1759">        <span class="tok-com">// the name. `place` returns the original untouched when nothing is</span></span>
 <span class="ln" id="L1760">        <span class="tok-com">// chosen, and also when the destination is not cleared to be used, so</span></span>
 <span class="ln" id="L1761">        <span class="tok-com">// a job that got past the button somehow still cannot write into a</span></span>
@@ -1933,7 +1933,7 @@
 <span class="src-item" id="fn-veilvoiceapp-guest_list">
 <span class="ln" id="L1828">    <span class="tok-com">/// The Recording Studio: the voice first, then the take.</span></span>
 <span class="ln" id="L1829">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1830">    <span class="tok-com">/// # Marker 130: live scramble is not a separate tab any more</span></span>
+<span class="ln" id="L1830">    <span class="tok-com">/// # Roadmap item 130: live scramble is not a separate tab any more</span></span>
 <span class="ln" id="L1831">    <span class="tok-com">///</span></span>
 <span class="ln" id="L1832">    <span class="tok-com">/// It was, and the split was in the wrong place. The Studio has always</span></span>
 <span class="ln" id="L1833">    <span class="tok-com">/// recorded through the same `LiveSession` the live tab ran, with the same</span></span>
@@ -1959,7 +1959,7 @@
 <span class="ln" id="L1853">    <span class="tok-com">/// startup, and because the file tab shows the same engine settings.</span></span>
 <span class="ln" id="L1854">    <span class="tok-com">/// The room: a name and a microphone each, and what that costs.</span></span>
 <span class="ln" id="L1855">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1856">    <span class="tok-com">/// **Marker 147.** Drawn by the window rather than by the Studio for the</span></span>
+<span class="ln" id="L1856">    <span class="tok-com">/// **Roadmap item 147.** Drawn by the window rather than by the Studio for the</span></span>
 <span class="ln" id="L1857">    <span class="tok-com">/// reason the device pickers are: the device list belongs to the window.</span></span>
 <span class="ln" id="L1858">    <span class="tok-com">/// What the Studio owns is the list of guests, because the session it</span></span>
 <span class="ln" id="L1859">    <span class="tok-com">/// starts is built from it.</span></span>
@@ -2047,7 +2047,7 @@
 <span class="ln" id="L1939">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
 <span class="ln" id="L1940">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Devices&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
 <span class="ln" id="L1941">        ui.<span class="tok-fn">add_enabled_ui</span>(!veiling, |ui| {</span>
-<span class="ln" id="L1942">            <span class="tok-com">// **Marker 147.** One microphone, or one per person in the room.</span></span>
+<span class="ln" id="L1942">            <span class="tok-com">// **Roadmap item 147.** One microphone, or one per person in the room.</span></span>
 <span class="ln" id="L1943">            <span class="tok-com">//</span></span>
 <span class="ln" id="L1944">            <span class="tok-com">// A room is not a bigger version of one microphone. One microphone</span></span>
 <span class="ln" id="L1945">            <span class="tok-com">// carrying four people is one signal, so whatever it is turned into</span></span>
@@ -2163,7 +2163,7 @@
 <span class="ln" id="L2055">                        p::<span class="tok-fn">green</span>()</span>
 <span class="ln" id="L2056">                    }),</span>
 <span class="ln" id="L2057">                );</span>
-<span class="ln" id="L2058">                <span class="tok-com">// **Marker 150.** The way to the always-on-top meters, where</span></span>
+<span class="ln" id="L2058">                <span class="tok-com">// **Roadmap item 150.** The way to the always-on-top meters, where</span></span>
 <span class="ln" id="L2059">                <span class="tok-com">// the session is started rather than only in Settings.</span></span>
 <span class="ln" id="L2060">                <span class="tok-com">//</span></span>
 <span class="ln" id="L2061">                <span class="tok-com">// This is the moment somebody is about to put a call or a</span></span>
@@ -2187,7 +2187,7 @@
 <span class="ln" id="L2079">            }</span>
 <span class="ln" id="L2080">        });</span>
 <span class="ln" id="L2081"></span>
-<span class="ln" id="L2082">        <span class="tok-com">// **Marker 132.** What the platform said about the streams, where the</span></span>
+<span class="ln" id="L2082">        <span class="tok-com">// **Roadmap item 132.** What the platform said about the streams, where the</span></span>
 <span class="ln" id="L2083">        <span class="tok-com">// person is looking when they are veiling. This used to go to standard</span></span>
 <span class="ln" id="L2084">        <span class="tok-com">// error, which on Windows is a console the window does not have, so a</span></span>
 <span class="ln" id="L2085">        <span class="tok-com">// microphone unplugged mid-call said nothing at all.</span></span>
@@ -2298,7 +2298,7 @@
 <span class="ln" id="L2190">                    );</span>
 <span class="ln" id="L2191">                }</span>
 <span class="ln" id="L2192">            }</span>
-<span class="ln" id="L2193">            <span class="tok-com">// **Marker 147.** Two bars per guest, and the cost of running all</span></span>
+<span class="ln" id="L2193">            <span class="tok-com">// **Roadmap item 147.** Two bars per guest, and the cost of running all</span></span>
 <span class="ln" id="L2194">            <span class="tok-com">// of them, which is the honest account the row asked for.</span></span>
 <span class="ln" id="L2195">            <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::studio::Reading::<span class="tok-fn">Room</span>(stats)) =&gt; {</span>
 <span class="ln" id="L2196">                <span class="tok-kw">let</span> levels = <span class="tok-kw">self</span>.studio.<span class="tok-fn">guest_levels</span>();</span>
@@ -2705,7 +2705,7 @@
 <span class="ln" id="L2585">                <span class="tok-str">&quot;not measured yet&quot;</span>.<span class="tok-fn">to_string</span>()</span>
 <span class="ln" id="L2586">            },</span>
 <span class="ln" id="L2587">        );</span>
-<span class="ln" id="L2588">        <span class="tok-com">// Marker 148. What the window is aiming at, what it got, and how many</span></span>
+<span class="ln" id="L2588">        <span class="tok-com">// Roadmap item 148. What the window is aiming at, what it got, and how many</span></span>
 <span class="ln" id="L2589">        <span class="tok-com">// frames missed. The frame time above answers &quot;is drawing slow&quot;; these</span></span>
 <span class="ln" id="L2590">        <span class="tok-com">// answer &quot;is it drawing as often as the screen shows&quot;.</span></span>
 <span class="ln" id="L2591">        <span class="tok-fn">field</span>(</span>
@@ -3001,7 +3001,7 @@
 <span class="ln" id="L2872"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L2873">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L2874"></span>
-<span class="ln" id="L2875">    <span class="tok-com">/// **Marker 79.** Nothing that waits happens on the thread that draws.</span></span>
+<span class="ln" id="L2875">    <span class="tok-com">/// **Roadmap item 79.** Nothing that waits happens on the thread that draws.</span></span>
 <span class="ln" id="L2876">    <span class="tok-com">///</span></span>
 <span class="ln" id="L2877">    <span class="tok-com">/// A window stutters for one of two reasons: it is asked to draw too</span></span>
 <span class="ln" id="L2878">    <span class="tok-com">/// rarely, or it is doing something slow between frames. The second is the</span></span>
@@ -3047,7 +3047,7 @@
 <span class="ln" id="L2918">            <span class="tok-com">// One per frame at 60 Hz is sixty of them a second for an answer</span></span>
 <span class="ln" id="L2919">            <span class="tok-com">// that changed when a file was dropped, which is where the check</span></span>
 <span class="ln" id="L2920">            <span class="tok-com">// that needs them lives. Added after reading the draw path for</span></span>
-<span class="ln" id="L2921">            <span class="tok-com">// marker 79 and finding none, so this keeps it that way rather</span></span>
+<span class="ln" id="L2921">            <span class="tok-com">// roadmap item 79 and finding none, so this keeps it that way rather</span></span>
 <span class="ln" id="L2922">            <span class="tok-com">// than fixing something.</span></span>
 <span class="ln" id="L2923">            <span class="tok-str">&quot;.exists()&quot;</span>,</span>
 <span class="ln" id="L2924">            <span class="tok-str">&quot;.is_file()&quot;</span>,</span>
@@ -3164,7 +3164,7 @@
 <span class="ln" id="L3035">        <span class="tok-com">///</span></span>
 <span class="ln" id="L3036">        <span class="tok-com">/// This used to be a list of *wrong* counts to forbid, which is the</span></span>
 <span class="ln" id="L3037">        <span class="tok-com">/// same mistake one level up: the list had to be edited every time the</span></span>
-<span class="ln" id="L3038">        <span class="tok-com">/// number changed, and marker 130 took a tab away and made &quot;ten&quot; both</span></span>
+<span class="ln" id="L3038">        <span class="tok-com">/// number changed, and roadmap item 130 took a tab away and made &quot;ten&quot; both</span></span>
 <span class="ln" id="L3039">        <span class="tok-com">/// the truth and one of the forbidden words. Reading the number and</span></span>
 <span class="ln" id="L3040">        <span class="tok-com">/// comparing it needs no maintenance at all.</span></span>
 <span class="ln" id="L3041">        <span class="tok-kw">const</span> WORDS: &amp;[&amp;str] = &amp;[</span>
@@ -3222,7 +3222,7 @@
 <span class="ln" id="L3093">        }</span>
 <span class="ln" id="L3094">    }</span>
 <span class="ln" id="L3095"></span>
-<span class="ln" id="L3096">    <span class="tok-com">/// Marker 92. A job running is not the window being used.</span></span>
+<span class="ln" id="L3096">    <span class="tok-com">/// Roadmap item 92. A job running is not the window being used.</span></span>
 <span class="ln" id="L3097">    <span class="tok-com">///</span></span>
 <span class="ln" id="L3098">    <span class="tok-com">/// The tempting version of an idle timer treats &quot;something is happening&quot; as</span></span>
 <span class="ln" id="L3099">    <span class="tok-com">/// &quot;somebody is here&quot;, and it is exactly backwards for this program:</span></span>
@@ -3257,7 +3257,7 @@
 <span class="ln" id="L3128">        );</span>
 <span class="ln" id="L3129">    }</span>
 <span class="ln" id="L3130"></span>
-<span class="ln" id="L3131">    <span class="tok-com">/// Marker 83. An unanswered hidden-volume question must stop the job, not</span></span>
+<span class="ln" id="L3131">    <span class="tok-com">/// Roadmap item 83. An unanswered hidden-volume question must stop the job, not</span></span>
 <span class="ln" id="L3132">    <span class="tok-com">/// quietly redirect it back beside the source file. A user who believes</span></span>
 <span class="ln" id="L3133">    <span class="tok-com">/// their recording went into a vault and finds it next to the original is</span></span>
 <span class="ln" id="L3134">    <span class="tok-com">/// the failure the whole question exists to prevent.</span></span>
@@ -3274,7 +3274,7 @@
 <span class="ln" id="L3145">        );</span>
 <span class="ln" id="L3146">    }</span>
 <span class="ln" id="L3147"></span>
-<span class="ln" id="L3148">    <span class="tok-com">/// Marker 75. The record has to be taken without anybody knowing to ask,</span></span>
+<span class="ln" id="L3148">    <span class="tok-com">/// Roadmap item 75. The record has to be taken without anybody knowing to ask,</span></span>
 <span class="ln" id="L3149">    <span class="tok-com">/// and it has to wait for the passphrase when there is one to wait for.</span></span>
 <span class="ln" id="L3150">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L3151">    <span class="tok-kw">fn</span> <span class="tok-fn">the_integrity_record_runs_itself_at_launch_and_again_at_unlock</span>() {</span>
@@ -3331,7 +3331,7 @@
 <span class="ln" id="L3202">        }</span>
 <span class="ln" id="L3203">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nothing-like-this&quot;</span>), None);</span>
 <span class="ln" id="L3204">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;&quot;</span>), None);</span>
-<span class="ln" id="L3205">        <span class="tok-com">// **Marker 130.** `live` is not a tab any more and is still a name</span></span>
+<span class="ln" id="L3205">        <span class="tok-com">// **Roadmap item 130.** `live` is not a tab any more and is still a name</span></span>
 <span class="ln" id="L3206">        <span class="tok-com">// people have in shortcuts, in scripts and in the older manual page.</span></span>
 <span class="ln" id="L3207">        <span class="tok-com">// It opens the tab that does that job now rather than failing.</span></span>
 <span class="ln" id="L3208">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;live&quot;</span>), <span class="tok-fn">Some</span>(Tab::Studio));</span>

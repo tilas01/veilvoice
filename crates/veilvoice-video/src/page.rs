@@ -704,7 +704,7 @@ fn speaker_markup(
     let label_y = y + radius + (radius * 0.55).max(18.0);
     let font = (radius * 0.36).clamp(11.0, 34.0);
 
-    // **Marker 139.** A level beside the name, so the picture shows the shape
+    // **Roadmap item 139.** A level beside the name, so the picture shows the shape
     // of the conversation rather than only its cast. A lit circle says who has
     // the turn; it says nothing about whether they are mid-sentence or mid-
     // pause, and those look identical for as long as the turn lasts.
@@ -803,7 +803,7 @@ pub fn still(
         .map(|turn| turn.speaker)
         .collect();
 
-    // **Marker 139.** How loud it is at this moment, given to whoever the plan
+    // **Roadmap item 139.** How loud it is at this moment, given to whoever the plan
     // says has the turn. One mixed track exists, so this is the mix; see
     // `waveform::level_at` for what that does and does not claim when two turns
     // overlap.
@@ -894,7 +894,7 @@ pub fn player(
         .collect::<Vec<_>>()
         .join(",");
 
-    // **Marker 139.** The same envelope the waveform is drawn from, as the
+    // **Roadmap item 139.** The same envelope the waveform is drawn from, as the
     // numbers the bars are moved by. Embedded rather than recomputed, and to
     // two decimals: this is a bar a few tens of pixels wide, and full `f32`
     // precision would be three times the bytes for a difference no screen has.
@@ -1015,7 +1015,7 @@ mod tests {
         }
     }
 
-    /// **Marker 139.** The bar moves for whoever has the turn, and for nobody
+    /// **Roadmap item 139.** The bar moves for whoever has the turn, and for nobody
     /// else.
     ///
     /// A lit circle says who is speaking. It says nothing about whether they

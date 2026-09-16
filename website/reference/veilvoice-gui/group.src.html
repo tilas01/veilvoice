@@ -154,7 +154,7 @@
 <span class="ln" id="L98">    <span class="tok-kw">pub</span> subtitles: bool,</span>
 <span class="ln" id="L99">    <span class="tok-com">/// The self-contained page that plays all of it together.</span></span>
 <span class="ln" id="L100">    <span class="tok-kw">pub</span> page: bool,</span>
-<span class="ln" id="L101">    <span class="tok-com">/// **Marker 139.** The video file, with the picture drawn rather than black.</span></span>
+<span class="ln" id="L101">    <span class="tok-com">/// **Roadmap item 139.** The video file, with the picture drawn rather than black.</span></span>
 <span class="ln" id="L102">    <span class="tok-com">///</span></span>
 <span class="ln" id="L103">    <span class="tok-com">/// Off by default, and the only one of the four that is. The other three</span></span>
 <span class="ln" id="L104">    <span class="tok-com">/// are files this program writes on its own; this one needs `ffmpeg`, which</span></span>
@@ -299,7 +299,7 @@
 <span class="ln" id="L229"></span>
 <span class="ln" id="L230">    <span class="tok-com">/// The worker, while a render is running.</span></span>
 <span class="ln" id="L231">    job: Option&lt;mpsc::Receiver&lt;Result&lt;Vec&lt;PathBuf&gt;, String&gt;&gt;&gt;,</span>
-<span class="ln" id="L232">    <span class="tok-com">/// What that worker is doing, while it does it. **Marker 133.**</span></span>
+<span class="ln" id="L232">    <span class="tok-com">/// What that worker is doing, while it does it. **Roadmap item 133.**</span></span>
 <span class="ln" id="L233">    <span class="tok-com">///</span></span>
 <span class="ln" id="L234">    <span class="tok-com">/// Shared with the render threads, which write to it, and read here every</span></span>
 <span class="ln" id="L235">    <span class="tok-com">/// frame while the render is running. `None` when nothing is rendering.</span></span>
@@ -1010,7 +1010,7 @@
 <span class="ln" id="L898">            ui.<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.outputs.audio, <span class="tok-str">&quot;audio&quot;</span>);</span>
 <span class="ln" id="L899">            ui.<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.outputs.subtitles, <span class="tok-str">&quot;subtitles&quot;</span>);</span>
 <span class="ln" id="L900">            ui.<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.outputs.page, <span class="tok-str">&quot;page&quot;</span>);</span>
-<span class="ln" id="L901">            <span class="tok-com">// **Marker 139.** Off unless asked, because this is the one output</span></span>
+<span class="ln" id="L901">            <span class="tok-com">// **Roadmap item 139.** Off unless asked, because this is the one output</span></span>
 <span class="ln" id="L902">            <span class="tok-com">// that needs a tool VeilVoice does not ship.</span></span>
 <span class="ln" id="L903">            ui.<span class="tok-fn">checkbox</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.outputs.video, <span class="tok-str">&quot;video&quot;</span>);</span>
 <span class="ln" id="L904">        });</span>
@@ -1265,7 +1265,7 @@
 <span class="ln" id="L1141">            }</span>
 <span class="ln" id="L1142">        });</span>
 <span class="ln" id="L1143"></span>
-<span class="ln" id="L1144">        <span class="tok-com">// **Marker 133.** Two bars per speaker while the render walks the file:</span></span>
+<span class="ln" id="L1144">        <span class="tok-com">// **Roadmap item 133.** Two bars per speaker while the render walks the file:</span></span>
 <span class="ln" id="L1145">        <span class="tok-com">// what went in, and what the engine produced from it. One bar answers</span></span>
 <span class="ln" id="L1146">        <span class="tok-com">// &quot;is something being written&quot; and not &quot;is this person being veiled&quot;,</span></span>
 <span class="ln" id="L1147">        <span class="tok-com">// which is the question somebody rendering an interview is asking.</span></span>
@@ -1370,7 +1370,7 @@
 <span class="ln" id="L1244">            config,</span>
 <span class="ln" id="L1245">        };</span>
 <span class="ln" id="L1246"></span>
-<span class="ln" id="L1247">        <span class="tok-com">// **Marker 133.** One slot per person the panel is showing. The plan</span></span>
+<span class="ln" id="L1247">        <span class="tok-com">// **Roadmap item 133.** One slot per person the panel is showing. The plan</span></span>
 <span class="ln" id="L1248">        <span class="tok-com">// comes off disk and may name more; `render_watched` drops what this</span></span>
 <span class="ln" id="L1249">        <span class="tok-com">// cannot hold rather than refusing to render, because a bar with</span></span>
 <span class="ln" id="L1250">        <span class="tok-com">// nowhere to go is not worth a failed render.</span></span>
@@ -1535,7 +1535,7 @@
 </span>
 <span class="ln" id="L1403"></span>
 <span class="src-item" id="fn-render_video">
-<span class="ln" id="L1404"><span class="tok-com">/// **Marker 139.** Draw the frames, then have `ffmpeg` make the video of them.</span></span>
+<span class="ln" id="L1404"><span class="tok-com">/// **Roadmap item 139.** Draw the frames, then have `ffmpeg` make the video of them.</span></span>
 <span class="ln" id="L1405"><span class="tok-com">///</span></span>
 <span class="ln" id="L1406"><span class="tok-com">/// The pictures go into a directory beside the output and are **left there**</span></span>
 <span class="ln" id="L1407"><span class="tok-com">/// rather than cleaned up. Two reasons, and the second is the one that decided</span></span>
@@ -1809,7 +1809,7 @@
 <span class="ln" id="L1668">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;line break&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
 <span class="ln" id="L1669">    }</span>
 <span class="ln" id="L1670"></span>
-<span class="ln" id="L1671">    <span class="tok-com">/// **Marker 133.** Two bars per speaker, drawn while the render runs.</span></span>
+<span class="ln" id="L1671">    <span class="tok-com">/// **Roadmap item 133.** Two bars per speaker, drawn while the render runs.</span></span>
 <span class="ln" id="L1672">    <span class="tok-com">///</span></span>
 <span class="ln" id="L1673">    <span class="tok-com">/// Read out of the source rather than driven, for the reason every guard in</span></span>
 <span class="ln" id="L1674">    <span class="tok-com">/// this crate is: drawing a panel needs a window, and a test that opened one</span></span>

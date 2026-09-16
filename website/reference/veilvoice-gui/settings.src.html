@@ -283,7 +283,7 @@
 <span class="src-item" id="fn-settings-acceleration">
 <span class="ln" id="L208">    <span class="tok-com">/// Whether the window asks the platform for a hardware-drawn context.</span></span>
 <span class="ln" id="L209">    <span class="tok-com">///</span></span>
-<span class="ln" id="L210">    <span class="tok-com">/// **Marker 137.** Read once, before the window is made, because it decides</span></span>
+<span class="ln" id="L210">    <span class="tok-com">/// **Roadmap item 137.** Read once, before the window is made, because it decides</span></span>
 <span class="ln" id="L211">    <span class="tok-com">/// how the window is made. Changing it therefore takes effect at the next</span></span>
 <span class="ln" id="L212">    <span class="tok-com">/// launch, and the panel says so rather than appearing to do nothing.</span></span>
 <span class="ln" id="L213">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">acceleration</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
@@ -469,7 +469,7 @@
 <span class="ln" id="L357">    <span class="tok-com">/// Remember, or stop remembering, that recordings are sealed with the</span></span>
 <span class="ln" id="L358">    <span class="tok-com">/// app-lock passphrase.</span></span>
 <span class="ln" id="L359">    <span class="tok-com">///</span></span>
-<span class="ln" id="L360">    <span class="tok-com">/// Marker 86. Same pair-of-methods shape as `always_group` and for the same</span></span>
+<span class="ln" id="L360">    <span class="tok-com">/// Roadmap item 86. Same pair-of-methods shape as `always_group` and for the same</span></span>
 <span class="ln" id="L361">    <span class="tok-com">/// reason: the security tab asks for a choice to be kept without knowing</span></span>
 <span class="ln" id="L362">    <span class="tok-com">/// where preferences live or what happens when the platform will not say.</span></span>
 <span class="ln" id="L363">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">set_seal_with_app_lock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, seal: bool) {</span>
@@ -1125,7 +1125,7 @@
 </span>
 <span class="ln" id="L991"></span>
 <span class="src-item" id="fn-settings-security_page">
-<span class="ln" id="L992">    <span class="tok-com">/// Marker 92. The autolock, and the range it offers.</span></span>
+<span class="ln" id="L992">    <span class="tok-com">/// Roadmap item 92. The autolock, and the range it offers.</span></span>
 <span class="ln" id="L993">    <span class="tok-kw">fn</span> <span class="tok-fn">security_page</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
 <span class="ln" id="L994">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::autolock::{describe_secs, parse, Autolock, CHOICES};</span>
 <span class="ln" id="L995"></span>

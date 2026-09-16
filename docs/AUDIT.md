@@ -230,7 +230,7 @@ choice is not a micro-optimisation.
 drifted; it is code written in this round, by the reading that the same round
 was doing. A rule you have just read is easiest to break while writing the
 thing you read it for, and the guard that catches this class today reads audio
-callbacks rather than the window's draw path. Extending it is marker 151's
+callbacks rather than the window's draw path. Extending it is roadmap item 151's
 neighbour and is not done here.
 
 ### F-182: five public items that nothing reached, and the reason no compiler said so
@@ -453,13 +453,13 @@ which is what a test that only usually tests something looks like from outside.
 It now enumerates all 65,536 seed pairs, draws four thousand times, and fails if
 it never saw a rotation at all.
 
-The truncated-escape test derived its escape marker by encoding a space, which
-works for the two encodings that escape a space and hands yEnc an ordinary
-encoded byte, because yEnc escapes four particular values and leaves a space
-alone. It was feeding yEnc something that is not an escape and then reporting
-yEnc for accepting it. Corrected again after that, because yEnc takes one byte
-after its marker where the other two take two hexadecimal digits, so an input
-truncated for them is complete for it.
+The truncated-escape test derived its escape roadmap item by encoding a space,
+which works for the two encodings that escape a space and hands yEnc an
+ordinary encoded byte, because yEnc escapes four particular values and leaves a
+space alone. It was feeding yEnc something that is not an escape and then
+reporting yEnc for accepting it. Corrected again after that, because yEnc takes
+one byte after its roadmap item where the other two take two hexadecimal
+digits, so an input truncated for them is complete for it.
 
 A vault test meant to prove that storing into a missing directory creates it
 never reached the code, because the vault creates that directory a step earlier.
@@ -495,11 +495,11 @@ argument. Seven are equivalent by arithmetic: six where the operands occupy
 disjoint bits so `|` and `^` compute the same value, and one where a cast to a
 byte already reduces modulo 256. Ten are properties of the machine rather than
 of the code: whether the operating system granted a page lock, whether a
-portable marker sits beside the executable, whether a directory under `/etc` can
-be made, what the account's own configuration directory holds. One is reachable
-only through a self-contradiction: telling the vault's index guard apart from
-one that accepts any failure needs a read of a path that fails and a write to
-that same path that then succeeds.
+portable roadmap item sits beside the executable, whether a directory under
+`/etc` can be made, what the account's own configuration directory holds. One
+is reachable only through a self-contradiction: telling the vault's index guard
+apart from one that accepts any failure needs a read of a path that fails and a
+write to that same path that then succeeds.
 
 ### F-188: one launch in 65,536 drew a reseed range with no width in it
 
@@ -567,14 +567,14 @@ nothing surviving**. Each of the four was planted by hand afterwards to confirm
 the new tests fail on it. The weekly workflow covers this crate alongside the
 cryptography now.
 
-**The guard, which is marker 151.** `.github/workflows/mutants.yml` runs the
-campaign weekly over all eight cryptography files and can be dispatched before a
-release. Its verdict is not a number. `tools/mutants/check.py` compares the run
-against the committed list: a survivor that is not argued for fails the build
-and is named, as a diff somebody reads, and a survivor that has been killed
-fails it too, because the argument above that line would then be claiming
-something untrue about the code. A list that over-claims is how a real survivor
-hides in it.
+**The guard, which is roadmap item 151.** `.github/workflows/mutants.yml` runs
+the campaign weekly over all eight cryptography files and can be dispatched
+before a release. Its verdict is not a number. `tools/mutants/check.py`
+compares the run against the committed list: a survivor that is not argued for
+fails the build and is named, as a diff somebody reads, and a survivor that has
+been killed fails it too, because the argument above that line would then be
+claiming something untrue about the code. A list that over-claims is how a real
+survivor hides in it.
 
 Half an hour over eight files does not fit a per-push job, so what runs on every
 push is the half that does not need a campaign: `--lint` checks that every entry
@@ -780,7 +780,7 @@ pattern that stops matching fails the tool rather than letting it write nine of
 ten and report success. The one row it touches in this document is the "Test
 suite" row of the state-of-the-tree table, which describes now rather than
 recording the past, and the pattern is anchored to that row so no older number
-further up the page is within its reach. Marker 152, done.
+further up the page is within its reach. Roadmap item 152, done.
 
 **The reproducible-build machinery, read end to end.** `Cargo.lock` is
 committed, every `cargo build` in the release workflow passes `--locked`, the
@@ -925,7 +925,7 @@ documented where they live.
 
 The campaign is not yet part of any build. It takes twenty-three minutes over
 four files and there are twenty-seven crates; making it a check is the work,
-and marker 151 carries it.
+and roadmap item 151 carries it.
 
 ## The thirty-second round: the guard that failed and the two behind it
 
@@ -1048,7 +1048,8 @@ easy to get wrong and this nearly did.
 
 `veilvoice-crypto::studio` shipped `make_decoy` and `Shape::of` in 0.1.20:
 documented, tested, and reached by nothing. Wiring them to a button is what
-marker 134 asks for. Wiring only that would have produced decoys worth nothing.
+roadmap item 134 asks for. Wiring only that would have produced decoys worth
+nothing.
 
 The vault lived at a fixed name, `studio`, in the folder the decoys would have
 been made in. A decoy is indistinguishable from the real vault by size, by file
@@ -1101,10 +1102,10 @@ thing.
 The same shape as F-163, a day later, in a test written to check that the new
 setup card could not fail.
 
-Marker 135's card counts the recording and playback devices this machine has.
-The test asked for that count twice and asserted the two agreed, on the ground
-that a build machine with no sound card, a sandbox that refuses to enumerate
-and an ordinary desktop all have to reach the card without an error.
+Roadmap item 135's card counts the recording and playback devices this machine
+has. The test asked for that count twice and asserted the two agreed, on the
+ground that a build machine with no sound card, a sandbox that refuses to
+enumerate and an ordinary desktop all have to reach the card without an error.
 
 The desktop crate's test binary **already** enumerates real devices, once, on
 purpose, in `app::tests::building_the_app_with_real_device_enumeration_does_not_panic`.
@@ -1126,10 +1127,10 @@ is, so the next person to reach for a second one reads why there is not one.
 Found by re-reading the change that introduced it, before it was pushed, which
 is the only reason it is a paragraph rather than a bug report.
 
-Marker 131 gives the Studio two recorders: one for the veiled voice and one for
-the microphone. The panel that runs while a take is recording drained the
-first, every frame, because a recorder nobody drains fills its ring and starts
-dropping samples. It did not drain the second.
+Roadmap item 131 gives the Studio two recorders: one for the veiled voice and
+one for the microphone. The panel that runs while a take is recording drained
+the first, every frame, because a recorder nobody drains fills its ring and
+starts dropping samples. It did not drain the second.
 
 So keeping the microphone would have produced a take that was quietly short,
 which is the exact failure `dropped` exists to report, arrived at by not asking
@@ -1147,8 +1148,8 @@ reads the panel's source for that.
 
 ### F-166: the WAV header said 48 kHz because that is what was asked for
 
-Found while reading the recording path for marker 130, in code that has been in
-both front ends since the recorder existed.
+Found while reading the recording path for roadmap item 130, in code that has
+been in both front ends since the recorder existed.
 
 `veilvoice_audio::record::start` takes the rate to write into the WAV header,
 and its own documentation says what that rate has to be:
@@ -1174,20 +1175,20 @@ false a function call later.
 **So the caller no longer has a rate to get wrong.** `start_recording` takes a
 `Keeping`, which is two named booleans saying which sides of the engine to
 keep, and returns a `Kept`, which is the recorders for them, built after the
-device has answered. Marker 131's property survives the change and is the
+device has answered. Roadmap item 131's property survives the change and is the
 reason `Keeping` has named fields rather than being a pair of positional flags:
 no caller reaches a recording of somebody's real voice without writing the word
 `plain` next to it.
 
-This is the shape marker 126 asks for. A guard reading the two call sites would
-have worked and would have had to keep working; a signature with no rate in it
-cannot be got wrong by a third caller written next year.
+This is the shape roadmap item 126 asks for. A guard reading the two call sites
+would have worked and would have had to keep working; a signature with no rate
+in it cannot be got wrong by a third caller written next year.
 
 ### Three dependencies nothing referred to
 
-Marker 126 asks for a dependency to be justified where it is declared. Writing
-that sentence for each of the 122 entries in this tree's manifests is what
-found the three that had no sentence to write.
+Roadmap item 126 asks for a dependency to be justified where it is declared.
+Writing that sentence for each of the 122 entries in this tree's manifests is
+what found the three that had no sentence to write.
 
 `veilvoice-verify` declares `sha2` and never mentions it: it hashes through
 `veilvoice_check::sha256_file`, which is the right way round, and the direct
@@ -1246,7 +1247,7 @@ same mistake on a build machine with no audio at all.
 
 ### A stream error printed to a console the window does not have
 
-Found while building marker 132, in code as old as the live path.
+Found while building roadmap item 132, in code as old as the live path.
 
 `cpal` reports trouble on a stream through an error callback, and the three in
 this tree were each `move |e| eprintln!(...)` and nothing else. On the command
@@ -1276,9 +1277,9 @@ still printed, for the command line, where the console exists.
 
 ### The check that would have compared a buffer with itself
 
-Marker 132 opened by asking for the samples reaching the recorder to be checked
-against what the engine produced. Reading the path to build that showed there
-is nothing to check: the veiled sink is written from inside the output
+Roadmap item 132 opened by asking for the samples reaching the recorder to be
+checked against what the engine produced. Reading the path to build that showed
+there is nothing to check: the veiled sink is written from inside the output
 callback, from the same `scratch_out` slice `Deidentifier::process` has just
 written into, and the microphone sink from the `mono_scratch` the downmix has
 just filled. A comparison would be a slice compared with itself.
@@ -1289,8 +1290,8 @@ writes, each from the one place in this process where its samples exist, and a
 third write would be a third copy of somebody's voice.
 
 That is the third roadmap row this cycle whose opening sentence described
-something the code does not do, after marker 139's video and marker 133's live
-bars. All three were written before the code they describe.
+something the code does not do, after roadmap item 139's video and roadmap item
+133's live bars. All three were written before the code they describe.
 
 ### A check that failed once and would not say why
 
@@ -1370,9 +1371,9 @@ could be checked from here.
 
 ### F-168: a microphone and an output that never compared their rates
 
-Found while reading the live path to build marker 147, and it is the same shape
-as F-166 one layer out: two numbers that have to agree, in two places, never
-compared.
+Found while reading the live path to build roadmap item 147, and it is the same
+shape as F-166 one layer out: two numbers that have to agree, in two places,
+never compared.
 
 `LiveSession::start_recording` took `input.default_input_config()` and
 `output.default_output_config()`. It built the engine and the ring between the
@@ -1405,9 +1406,9 @@ expects, so moving it is the change more likely to surprise somebody.
 
 The choosing is arithmetic over what the platform reported, in a function of
 its own, so it is tested without a sound card: five cases, including two
-microphones that cannot be run together, which is what marker 147 will open. F-163
-and F-165 are why nothing here opens a device to answer a question that does
-not need one.
+microphones that cannot be run together, which is what roadmap item 147 will
+open. F-163 and F-165 are why nothing here opens a device to answer a question
+that does not need one.
 
 ### F-169: the feature nine release jobs turn off, that nothing built
 
@@ -1427,8 +1428,8 @@ matrix: all of them, on all three platforms, with `live` on. So the
 configuration that nine release jobs use was compiled by **nothing** between
 releases.
 
-The defect it hid is three lines long. Markers 122 and 123 added a `playback`
-module, gated, and inserted it above `record`:
+The defect it hid is three lines long. Roadmap items 122 and 123 added a
+`playback` module, gated, and inserted it above `record`:
 
 ```rust
  #[cfg(feature = "live")]
@@ -1600,10 +1601,10 @@ where the mistake actually happened rather than the whole tree.
 
 ### A state location that had to be opted into rather than detected
 
-Marker 136 asks for a copy on a memory stick to keep its settings on the stick.
-The obvious implementation is to write beside the program when that directory
-is writable, and it is wrong in a way that is worth recording because it is the
-shape of several defects already in this document.
+Roadmap item 136 asks for a copy on a memory stick to keep its settings on the
+stick. The obvious implementation is to write beside the program when that
+directory is writable, and it is wrong in a way that is worth recording because
+it is the shape of several defects already in this document.
 
 An ordinary installation unpacked somewhere writable would silently move its
 settings, its vaults and its app lock the next time it started. Everything
@@ -1825,12 +1826,12 @@ run by a machine that does not forget.
 
 ## The thirtieth round: the full sweep, and what a repository forgets
 
-The round the roadmap calls marker 127: no part of this repository is signed off
-until every part of it has been. Security, memory safety and the post-quantum
-surface; correctness and QA over every crate; reproducibility of the build and
-of every generated artefact; the documentation, the website, the packaging and
-the scripts; and the optimisation pass, because bloat that nobody measured is a
-claim nobody checked.
+The round the roadmap calls roadmap item 127: no part of this repository is
+signed off until every part of it has been. Security, memory safety and the
+post-quantum surface; correctness and QA over every crate; reproducibility of
+the build and of every generated artefact; the documentation, the website, the
+packaging and the scripts; and the optimisation pass, because bloat that nobody
+measured is a claim nobody checked.
 
 **Ten defects, and eight of them are the same defect.** One is a real
 weakening of the Studio's central guarantee. One is a renderer that has been
@@ -1952,13 +1953,13 @@ frames. It keeps that on a 390x844 viewport at three times the device pixel
 ratio with the main thread throttled to a sixth of speed: a screencast of what
 the reader actually sees shows a new frame every 16.7ms throughout.
 
-The page it sits on was the problem. Every marker square in the still picture
-beside it carries a transform-and-opacity reveal, and the reveal was declared
-`animation-fill-mode: both`. A filling animation never finishes as far as the
-compositor is concerned, and a transform animation earns its element a layer, so
-all 146 squares held one for as long as the page was open. Chromium's layer tree
-reported **162 composited layers**, and the film was sharing a compositor with
-every one of them.
+The page it sits on was the problem. Every roadmap item square in the still
+picture beside it carries a transform-and-opacity reveal, and the reveal was
+declared `animation-fill-mode: both`. A filling animation never finishes as far
+as the compositor is concerned, and a transform animation earns its element a
+layer, so all 146 squares held one for as long as the page was open. Chromium's
+layer tree reported **162 composited layers**, and the film was sharing a
+compositor with every one of them.
 
 `forwards` was never needed: the reveal ends at `opacity:1;transform:none`,
 which is the square's own state, so holding it changes nothing on screen and
@@ -3813,8 +3814,8 @@ synthesised voices at 110 Hz and 175 Hz, with a four-turn plan:
 
 Each speaker lands on their own canonical register, the same one in both of
 their turns, and the two are far apart. `--page` wrote the audio, a WebVTT
-track, an SRT file and the player page. That is markers 46 to 51 doing what
-they say, measured rather than asserted.
+track, an SRT file and the player page. That is roadmap items 46 to 51 doing
+what they say, measured rather than asserted.
 
 ### The campaign, at twenty minutes a target
 
@@ -4102,10 +4103,10 @@ regenerated from it so the existing check would pass, and the new one reported
 
 ## The sixteenth round: the manifest generator, an hour after writing it
 
-The same rule as the fourteenth round, applied to the other half of marker 97.
-The generator that writes `CONTENTS.sha256` is the writing end of the seam the
-verifier reads, and it had just been moved out of the release workflow into a
-script so that it could be tested at all.
+The same rule as the fourteenth round, applied to the other half of roadmap
+item 97. The generator that writes `CONTENTS.sha256` is the writing end of the
+seam the verifier reads, and it had just been moved out of the release workflow
+into a script so that it could be tested at all.
 
 **One defect found and fixed (F-102)**, by measuring what a line of path
 handling actually does rather than what it reads as.
@@ -4198,7 +4199,7 @@ it rather than a wall of links.
 
 ## The fourteenth round: reading the verifier written an hour earlier
 
-Marker 97 rewrote what `veilvoice-verify` and the desktop verify tab do: a
+Roadmap item 97 rewrote what `veilvoice-verify` and the desktop verify tab do: a
 signed list of every file inside every archive, checked file by file against
 the extracted folder, and the reader's own GnuPG run over the same signature.
 New code in the one program whose entire job is not to be fooled is exactly the
@@ -4499,11 +4500,11 @@ had worn off.
 ## The eleventh round: the code written after the tenth round
 
 The tenth round was run last on purpose, on the grounds that an audit of code
-that is still moving is an audit of code that will not exist. Then markers 74
-to 79 were built, and three of them are security code: an authentication tag on
-the app lock, a second copy of it in a vault, and the integrity record moved
-into the window. New security code written after the audit is precisely the
-code an audit exists for, so it got its own round.
+that is still moving is an audit of code that will not exist. Then roadmap
+items 74 to 79 were built, and three of them are security code: an
+authentication tag on the app lock, a second copy of it in a vault, and the
+integrity record moved into the window. New security code written after the
+audit is precisely the code an audit exists for, so it got its own round.
 
 **Eight defects found and fixed (F-85 to F-92), every one of them in code
 written in this cycle or reachable only because of it. Six were found by
@@ -4667,11 +4668,12 @@ nobody chooses to open a file the program reads by itself at launch. The
 argument is general and it was applied to exactly one file.
 
 Two others have the same shape. `Manifest::open_sealed` reads the integrity
-record, and this cycle's own marker 75 made that automatic: it used to run only
-when somebody typed `veilvoice guard check`, and now the desktop application
-reads it at every unlock. `Policy::open_sealed` reads the sealed policy at a
-fixed path beside the plain one. Both used the generous four-gigabyte ceiling
-meant for a `.veil` somebody was sent and decided to open.
+record, and this cycle's own roadmap item 75 made that automatic: it used to
+run only when somebody typed `veilvoice guard check`, and now the desktop
+application reads it at every unlock. `Policy::open_sealed` reads the sealed
+policy at a fixed path beside the plain one. Both used the generous
+four-gigabyte ceiling meant for a `.veil` somebody was sent and decided to
+open.
 
 So anybody who can write the configuration directory can leave a sealed
 manifest declaring four gigabytes of Argon2 memory, and every unlock from then
@@ -4831,7 +4833,7 @@ markup and copies of assets**. Every byte of it is downloaded by every reader
 who uses the search.
 
 It bought them nothing. All 536 SVGs in this repository are produced by a
-generator and carry a marker saying so; not one is hand-written prose. The
+generator and carry a roadmap item saying so; not one is hand-written prose. The
 words inside a drawing are the words of the document it was drawn from, which
 is indexed at that document, and a search result pointing at an SVG file is a
 result nobody can use.
@@ -5294,13 +5296,14 @@ none.
 A comment cannot be tested, so the fix tests the code the comment is about: a
 test reads both front ends' source and fails the build if the call is not there.
 
-Marker 28 was completed alongside it, since the engine half already existed:
-the interval is now user-configurable, and **anything that is not a usable range
-is refused with the reason rather than clamped**. Six distinct refusals -- not
-two numbers, not a number, not positive, backwards, too short, too long -- each
-naming which end was wrong and what the bound is. Clamping would leave somebody
-running on a setting they did not choose and cannot see, which for a control
-whose whole purpose is unpredictability is the worst available failure.
+Roadmap item 28 was completed alongside it, since the engine half already
+existed: the interval is now user-configurable, and **anything that is not a
+usable range is refused with the reason rather than clamped**. Six distinct
+refusals -- not two numbers, not a number, not positive, backwards, too short,
+too long -- each naming which end was wrong and what the bound is. Clamping
+would leave somebody running on a setting they did not choose and cannot see,
+which for a control whose whole purpose is unpredictability is the worst
+available failure.
 
 ### F-72 -- three tests passed on this machine and failed on the same platform
 
@@ -5745,7 +5748,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1650 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (marker 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1650 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -6155,7 +6158,7 @@ stack and threw a `RangeError`. Because `repo.js` reports any rejection from the
 README fetch as *"could not reach api.github.com"*, the reader was given a
 confident, wrong explanation for a page that had loaded fine and then broken
 while rendering. **Fixed** with a nesting limit of sixteen, past which the
-remaining markers are shown as the text they are.
+remaining roadmap items are shown as the text they are.
 
 **F-25 -- A code fence could reach `Object.prototype`.**
 
@@ -6557,10 +6560,10 @@ That is finding F-41 running in reverse: generated output silently replacing
 the thing it was meant to describe.
 
 **Fixed** by refusing to overwrite any file that does not carry the generator's
-own marker, naming every one, and writing nothing at all until every
+own roadmap item, naming every one, and writing nothing at all until every
 destination has been checked -- so a refusal leaves the tree as it was rather
-than half regenerated. Generated banners and wiki pages now carry the marker
-too, which they should have anyway.
+than half regenerated. Generated banners and wiki pages now carry the roadmap
+item too, which they should have anyway.
 
 **F-51 -- the theme drift test only ran in one direction.**
 
@@ -6624,7 +6627,8 @@ the class of hand-written-HTML mistake it exists for. **Fixed** by allocating
 every anchor on a page from one place, in document order, using GitHub's own
 suffix rule so the Markdown and HTML renderings agree about where a link goes.
 
-**F-55 -- the Mermaid theme directive was emitted with its markers halved.**
+**F-55 -- the Mermaid theme directive was emitted with its roadmap items
+halved.**
 
 The init directive `%%{init: ...}%%` is built with `%`-formatting, which turns
 `%%` into `%`. Every one of 366 diagrams shipped with `%{init: ...}%`, which

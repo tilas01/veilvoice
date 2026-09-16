@@ -4,7 +4,7 @@
 //
 // # What this is for
 //
-// Marker 27 asks for diagrams that open the relevant source, highlighted, in
+// Roadmap item 27 asks for diagrams that open the relevant source, highlighted, in
 // the site's palette. Every box in a flowchart on a reference page is now a
 // link to a page of this site rather than to a blob on GitHub, and every one
 // of those links carries a fragment naming the function it drew.

@@ -68,7 +68,7 @@ pub struct Prefs {
     pub toured_tabs: String,
     /// Whether the window asks the platform for a hardware-drawn context.
     ///
-    /// **Marker 137.** On, and the setting exists for the machines where on is
+    /// **Roadmap item 137.** On, and the setting exists for the machines where on is
     /// the wrong answer. Asking is already the safe direction: `Preferred`
     /// takes a software context when no GPU one is available, so a virtual
     /// machine, a remote desktop or a server with no card still opens.
@@ -99,7 +99,7 @@ pub struct Prefs {
     pub always_group: bool,
     /// Whether every recording is sealed with the app-lock passphrase.
     ///
-    /// **Marker 86.** Persisted, unlike group mode, and the difference is what
+    /// **Roadmap item 86.** Persisted, unlike group mode, and the difference is what
     /// happens when somebody forgets it is on. A forgotten group mode renders a
     /// single speaker against a plan that does not describe them, which is
     /// wrong output. A forgotten sealing mode encrypts a file that would
@@ -109,7 +109,7 @@ pub struct Prefs {
     pub seal_with_app_lock: bool,
     /// The encrypted folder veiled recordings are written into, or empty.
     ///
-    /// **Markers 82 to 84.** Three fields rather than one, because the hidden
+    /// **Roadmap items 82 to 84.** Three fields rather than one, because the hidden
     /// state has to survive a restart alongside the path: a destination whose
     /// answer was forgotten would ask again, and a user asked the same question
     /// every launch stops reading it.
@@ -121,7 +121,7 @@ pub struct Prefs {
     pub vault_hidden: String,
     /// Whether the window locks itself after a period of no use.
     ///
-    /// **Marker 92.** On at half an hour, and the reason it is no longer off is
+    /// **Roadmap item 92.** On at half an hour, and the reason it is no longer off is
     /// in [`crate::autolock`]: a default nobody is shown is an answer rather
     /// than a question, and the answer it used to give was no protection at
     /// all to everybody who never opened this tab.

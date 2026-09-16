@@ -304,7 +304,7 @@ mod tests {
         }
     }
 
-    /// **Marker 129.** The guide's per-system table is the program's answer.
+    /// **Roadmap item 129.** The guide's per-system table is the program's answer.
     ///
     /// The row this comes from asks for the verification to be written up per
     /// platform "rather than left as a Linux instruction somebody has to

@@ -50,7 +50,7 @@
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
-<span class="ln" id="L2"><span class="tok-com">//! **Marker 147.** Several microphones at once: a guest each, veiled each,</span></span>
+<span class="ln" id="L2"><span class="tok-com">//! **Roadmap item 147.** Several microphones at once: a guest each, veiled each,</span></span>
 <span class="ln" id="L3"><span class="tok-com">//! mixed once.</span></span>
 <span class="ln" id="L4"><span class="tok-com">//!</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! # What this is for</span></span>
@@ -147,7 +147,7 @@
 <span class="ln" id="L93">    <span class="tok-com">/// refuse that. `sample_rate` is overwritten with the rate the devices</span></span>
 <span class="ln" id="L94">    <span class="tok-com">/// agreed on.</span></span>
 <span class="ln" id="L95">    <span class="tok-kw">pub</span> config: DeidConfig,</span>
-<span class="ln" id="L96">    <span class="tok-com">/// What to keep of this guest, if anything. Marker 131&#x27;s warning about the</span></span>
+<span class="ln" id="L96">    <span class="tok-com">/// What to keep of this guest, if anything. Roadmap item 131&#x27;s warning about the</span></span>
 <span class="ln" id="L97">    <span class="tok-com">/// unveiled side applies once per guest.</span></span>
 <span class="ln" id="L98">    <span class="tok-kw">pub</span> keeping: Keeping,</span>
 <span class="ln" id="L99">}</span>
@@ -188,13 +188,13 @@
 <span class="ln" id="L130">    <span class="tok-com">/// silence.</span></span>
 <span class="ln" id="L131">    <span class="tok-kw">pub</span> starved: u64,</span>
 <span class="ln" id="L132">    <span class="tok-com">/// How many times the platform has reported trouble on any of the streams.</span></span>
-<span class="ln" id="L133">    <span class="tok-com">/// **Marker 132**, the same counter the single-microphone path carries.</span></span>
+<span class="ln" id="L133">    <span class="tok-com">/// **Roadmap item 132**, the same counter the single-microphone path carries.</span></span>
 <span class="ln" id="L134">    <span class="tok-kw">pub</span> interfered: u64,</span>
 <span class="ln" id="L135">    <span class="tok-com">/// What every engine together costs against the deadline they share.</span></span>
 <span class="ln" id="L136">    <span class="tok-com">///</span></span>
 <span class="ln" id="L137">    <span class="tok-com">/// The sum of each guest&#x27;s realtime factor. Below 1.0 the machine keeps up;</span></span>
 <span class="ln" id="L138">    <span class="tok-com">/// at 1.0 the engines have used the whole block, and past it the audio</span></span>
-<span class="ln" id="L139">    <span class="tok-com">/// breaks. This is the honest account marker 147 asked for.</span></span>
+<span class="ln" id="L139">    <span class="tok-com">/// breaks. This is the honest account roadmap item 147 asked for.</span></span>
 <span class="ln" id="L140">    <span class="tok-kw">pub</span> load: f32,</span>
 <span class="ln" id="L141">}</span>
 </span>
@@ -553,7 +553,7 @@
 <span class="src-item" id="fn-roomsession-interference">
 <span class="ln" id="L478">    <span class="tok-com">/// What the platform last reported about any of the streams.</span></span>
 <span class="ln" id="L479">    <span class="tok-com">///</span></span>
-<span class="ln" id="L480">    <span class="tok-com">/// **Marker 132**, the same report the single-microphone path gives. It</span></span>
+<span class="ln" id="L480">    <span class="tok-com">/// **Roadmap item 132**, the same report the single-microphone path gives. It</span></span>
 <span class="ln" id="L481">    <span class="tok-com">/// says which side, not which guest: cpal&#x27;s error callback is per stream</span></span>
 <span class="ln" id="L482">    <span class="tok-com">/// and this keeps the most recent one, which is the one worth showing.</span></span>
 <span class="ln" id="L483">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">interference</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;<span class="tok-kw">crate</span>::live::Interference&gt; {</span>
@@ -601,7 +601,7 @@
 <span class="ln" id="L524">        );</span>
 <span class="ln" id="L525">    }</span>
 <span class="ln" id="L526"></span>
-<span class="ln" id="L527">    <span class="tok-com">/// **Marker 147.** The load is a sum, because the deadline is shared.</span></span>
+<span class="ln" id="L527">    <span class="tok-com">/// **Roadmap item 147.** The load is a sum, because the deadline is shared.</span></span>
 <span class="ln" id="L528">    <span class="tok-com">///</span></span>
 <span class="ln" id="L529">    <span class="tok-com">/// One engine at 0.2 of realtime is comfortable. Four of them is 0.8, on</span></span>
 <span class="ln" id="L530">    <span class="tok-com">/// the same block, and that is the number worth showing rather than the</span></span>

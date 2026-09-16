@@ -40,7 +40,7 @@
 //! is a real answer for a linker or a compiler and a *good* answer for a
 //! library, but it is not a build. A machine can pass every probe here and
 //! still fail to compile, and this module says so rather than promising
-//! otherwise: the build in marker 55 is the only thing that actually knows.
+//! otherwise: the build in roadmap item 55 is the only thing that actually knows.
 //!
 //! # In plain words
 //!

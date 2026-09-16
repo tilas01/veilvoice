@@ -51,7 +51,7 @@
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-tabs-one-vault">Two tabs, one vault</a>
-  <a href="#marker-130-this-is-also-where-veiling-as-it-runs-happens">Marker 130: this is also where veiling as it runs happens</a>
+  <a href="#roadmap-item-130-this-is-also-where-veiling-as-it-runs-happens">Roadmap item 130: this is also where veiling as it runs happens</a>
   <a href="#the-vault-needs-both-passphrases-and-asks-for-both-here">The vault needs both passphrases, and asks for both here</a>
   <a href="#what-is-recorded-is-what-comes-out-unless-it-was-asked-to-be-otherwise">What is recorded is what comes out, unless it was asked to be otherwise</a>
   <a href="#in-plain-words">In plain words</a>
@@ -64,7 +64,7 @@
 <p>The Recording Studio and the Recording Browser.</p>
 <h2 id="two-tabs-one-vault">Two tabs, one vault</h2>
 <p>The Studio records; the Browser is what is in the vault afterwards. They are one module because they are one vault, and a vault opened in two places is two chances to get the unlocking wrong.</p>
-<h2 id="marker-130-this-is-also-where-veiling-as-it-runs-happens">Marker 130: this is also where veiling as it runs happens</h2>
+<h2 id="roadmap-item-130-this-is-also-where-veiling-as-it-runs-happens">Roadmap item 130: this is also where veiling as it runs happens</h2>
 <p>Live scramble was a tab of its own, and it did not need to be. The Studio has always recorded through the same <code>veilvoice_audio::LiveSession</code> that tab ran, with the same engine and the same routing, so the two screens were one act performed in two rooms: pick the devices over there, come here, press record.</p>
 <p>Two sessions was the part that was actually wrong. Veiling on one tab and recording on the other opened the same microphone twice, and on the platforms that allow that at all the second stream gets a copy of the input nobody asked for. <code>Studio::start_session</code> is the only starter now, and a test reads this crate&#x27;s source and fails if a second one appears.</p>
 <p>The voice half of the tab is drawn by the window rather than here, because the device lists and the engine settings belong to the window. What lives in this module is the session those controls drive, and everything about the vault.</p>
@@ -79,7 +79,7 @@
 <p>Neither passphrase is stored. Both typing buffers are wiped the moment the key is derived, and the derived key lives in page-locked memory for as long as the vault is open. Locking the window closes the vault.</p>
 <h2 id="what-is-recorded-is-what-comes-out-unless-it-was-asked-to-be-otherwise">What is recorded is what comes out, unless it was asked to be otherwise</h2>
 <p>The Studio records through <code>veilvoice_audio::LiveSession::start_recording</code>, which is the same path the command line uses, so the samples that reach the recorder are the <strong>veiled</strong> ones. That is the default and it is what <code>Keep::Veiled</code> means.</p>
-<p><strong>Marker 131</strong> adds the other two. The microphone can be kept as well, or instead, and the reasoning for allowing it at all is on <code>Keep</code>: refusing would not stop somebody who needs the real recording, it would move them to a phone on the table, which is a plaintext file on a device with none of this. What matters is that it is asked for rather than arrived at.</p>
+<p><strong>Roadmap item 131</strong> adds the other two. The microphone can be kept as well, or instead, and the reasoning for allowing it at all is on <code>Keep</code>: refusing would not stop somebody who needs the real recording, it would move them to a phone on the table, which is a plaintext file on a device with none of this. What matters is that it is asked for rather than arrived at.</p>
 <p>So it is a choice made <strong>before</strong> the button, never remembered between runs, reset when the window locks, and stated in the same words the plaintext path uses. The default is the safe one, and every path that has not been asked for the microphone passes <code>None</code> where it would go.</p>
 <p>Each recording is assembled inside a <code>veilvoice_crypto::Secret</code> and handed straight to the vault to be sealed. Neither is ever a plain file, not even briefly: an unveiled take is a recording of a real voice, and it is sealed exactly as strongly as a veiled one.</p>
 <h2 id="in-plain-words">In plain words</h2>
@@ -138,7 +138,7 @@
 <li><code>Studio::start_veiling</code> <span style="color:var(--muted)">line 712</span> &middot; Start veiling, keeping nothing.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>start_session</code>, <code>sharing_a_microphone</code></span>
 </li>
-<li><code>Studio::start_room</code> <span style="color:var(--muted)">line 733</span> &middot; Marker 147.
+<li><code>Studio::start_room</code> <span style="color:var(--muted)">line 733</span> &middot; Roadmap item 147.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>start_session</code>, <code>sharing_a_microphone</code></span>
 </li>
 <li><code>Studio::close</code> <span style="color:var(--muted)">line 762</span> &middot; Shut the vault and forget the key.
@@ -419,10 +419,10 @@ flowchart TD
 <tr><td><code>Studio::intruders</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-intruders">539</a></td><td>The programs that took the microphone while this take has been running.</td></tr>
 <tr><td><code>Studio::note_microphone_holders</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-note_microphone_holders">554</a></td><td>Record which programs are holding the microphone right now.</td></tr>
 <tr><td><code>Studio::tick</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-tick">571</a></td><td>Read the session&#x27;s counters, once a frame, and move the levels on.</td></tr>
-<tr><td><code>Studio::catch_a_fault</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-catch_a_fault">663</a></td><td>Marker 145.</td></tr>
+<tr><td><code>Studio::catch_a_fault</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-catch_a_fault">663</a></td><td>Roadmap item 145.</td></tr>
 <tr><td><code>Studio::phase</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-phase">699</a></td><td>What phase the take half of the tab is in.</td></tr>
 <tr><td><code>Studio::start_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_veiling">712</a></td><td>Start veiling, keeping nothing.</td></tr>
-<tr><td><code>Studio::start_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_room">733</a></td><td>Marker 147.</td></tr>
+<tr><td><code>Studio::start_room</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-start_room">733</a></td><td>Roadmap item 147.</td></tr>
 <tr><td><code>Studio::stop_veiling</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-stop_veiling">744</a></td><td>Stop the audio.</td></tr>
 <tr><td><code>Studio::close</code> <sub>pub fn</sub></td><td><a href="studio.src.html#fn-studio-close">762</a></td><td>Shut the vault and forget the key.</td></tr>
 <tr><td><code>Studio::unlock</code> <sub>fn</sub></td><td><a href="studio.src.html#fn-studio-unlock">791</a></td><td>Derive the key from both entries and open the vault.</td></tr>

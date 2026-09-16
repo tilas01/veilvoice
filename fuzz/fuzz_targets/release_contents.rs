@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! The release contents list parser, coverage-guided.
 //!
-//! **Marker 97.** `CONTENTS.sha256` lists every file inside every release
+//! **Roadmap item 97.** `CONTENTS.sha256` lists every file inside every release
 //! archive with its SHA-256, and a verifier reads it to decide which paths on
 //! disk to open and what to compare them against. It is covered by the signed
 //! `SHA256SUMS`, and every caller is told to check that before parsing.

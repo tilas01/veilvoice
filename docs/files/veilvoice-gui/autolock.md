@@ -24,7 +24,7 @@
 
 Locking the window again after a period of no use.
 
-**Marker 92.** On at half an hour, and the delay is the user's to choose:
+**Roadmap item 92.** On at half an hour, and the delay is the user's to choose:
 anything from five minutes to forty eight hours from a list, a number typed
 in if none of those fit, and the ends of that range movable by anybody who
 wants a shorter or longer one.

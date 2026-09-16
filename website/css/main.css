@@ -1682,13 +1682,13 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
  * The link is quiet until the row is hovered or the link itself is focused.
  * Permalinks that shout are a distraction on a list of a hundred, and ones
  * that only appear on hover are unreachable by keyboard, so both. */
-ul.markers { list-style: none; padding-left: 0; }
-ul.markers li {
+ul.items { list-style: none; padding-left: 0; }
+ul.items li {
   margin: 0 0 10px;
   padding-left: 44px;
   text-indent: -44px;
 }
-.marker-link {
+.item-link {
   display: inline-block;
   min-width: 34px;
   color: var(--muted);
@@ -1697,23 +1697,23 @@ ul.markers li {
   opacity: 0.55;
   transition: opacity 120ms ease, color 120ms ease;
 }
-ul.markers li:hover .marker-link,
-tr:hover > td .marker-link,
-.marker-link:hover,
-.marker-link:focus-visible {
+ul.items li:hover .item-link,
+tr:hover > td .item-link,
+.item-link:hover,
+.item-link:focus-visible {
   opacity: 1;
   color: var(--accent);
 }
 /* The explanation after the name, one step back so the name is scannable in
    a long list without the explanation being hidden from anybody who wants it. */
-.marker-detail { color: var(--muted); }
+.item-detail { color: var(--muted); }
 /* A row or item arrived at by its own link says so, otherwise following a
    permalink into a list of a hundred lands you nowhere in particular. */
-ul.markers li:target,
+ul.items li:target,
 tr:target > td {
   background: var(--bg-inset);
 }
-ul.markers li:target { box-shadow: -8px 0 0 var(--bg-inset), 8px 0 0 var(--bg-inset); }
+ul.items li:target { box-shadow: -8px 0 0 var(--bg-inset), 8px 0 0 var(--bg-inset); }
 h3:target { color: var(--accent); }
 
 /* Every box in a flowchart is a link, and on these pages it goes to the file's

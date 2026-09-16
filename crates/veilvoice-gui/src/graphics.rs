@@ -89,7 +89,7 @@ pub fn describe(gl: Option<&eframe::glow::Context>) -> String {
 
 /// What was asked of the platform, in the words the About tab uses.
 ///
-/// **Marker 137.** Two settings and no third: asking, and not asking. The
+/// **Roadmap item 137.** Two settings and no third: asking, and not asking. The
 /// middle option, `Required`, is the one that sounds strongest and is wrong
 /// here for the reason in the module note, so it is not offered anywhere and
 /// this cannot express it.
