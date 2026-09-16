@@ -182,6 +182,13 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>Twenty-seven crates became thirteen</strong></p>
+<ul>
+<li>VeilVoice was split into twenty-seven separate libraries. Seven of them were under seven hundred lines and four were used by exactly one thing. Every one of those splits is a published surface, a manifest, a README, a page of the reference and a row in every list of what this project is made of, and somebody deciding what to depend on had to read twenty-seven descriptions to find the two they wanted.</li>
+<li>The line is drawn at what a person would realistically take on its own. The six that watch what else the machine is doing are one library now. The two that raise an alarm and the safety catch that acts on one are another. The download verifier absorbed both of its halves, the video renderer absorbed the graphics probe that exists to answer one question for it, the decoy passphrase joined the cryptography it is part of, the update check joined the installer, and saved profiles joined the settings.</li>
+<li><strong>Nothing was deleted and nothing behaves differently.</strong> Every module kept its name, its documentation and its tests, and the whole suite passed before and after. If you were using one of these as a library, the code is in the same shape at a shorter path.</li>
+<li>Found while doing it: the documentation generator wrote pages for what exists and never removed pages for what does not, because nothing had ever been removed before. It would have left 218 pages describing crates that are no longer there. It takes them away now, and says how many.</li>
+</ul>
 <p><strong>A link to this site now shows a picture, and search engines are told they may read it</strong></p>
 <ul>
 <li>Every page told a link preview to use <code>assets/banner.png</code>. That tag is read by crawlers, not by browsers, and a crawler does not work out what a relative address means. So every link to this site, posted anywhere, had always shown no picture. Nothing looked wrong: the tag was there and the file exists.</li>

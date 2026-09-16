@@ -2,7 +2,7 @@
 //! `veilvoice capture` -- which screen recorders are running, and which of them
 //! you have said you meant to run.
 //!
-//! The command-line front end to [`veilvoice_capture`]. That crate holds the
+//! The command-line front end to [`veilvoice_watch::capture`]. That crate holds the
 //! table, the allowlist and the honest account of the three things it cannot
 //! do; this file decides where the allowlist lives and prints the result.
 //!
@@ -39,7 +39,7 @@
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::path::PathBuf;
-use veilvoice_capture::{programs, Allowlist, Report};
+use veilvoice_watch::capture::{programs, Allowlist, Report};
 
 /// Where the allowlist is kept.
 ///
@@ -109,7 +109,7 @@ pub fn status() -> Result<(), String> {
 
     println!();
     println!("{}", paint(colour::YELLOW, "WHAT THIS IS WORTH"));
-    for line in crate::sentry::wrap(veilvoice_capture::SCOPE, 72) {
+    for line in crate::sentry::wrap(veilvoice_watch::capture::SCOPE, 72) {
         println!("  {line}");
     }
     println!();
@@ -125,7 +125,7 @@ pub fn status() -> Result<(), String> {
 /// Prints the route, which program to change and where, and -- as plainly as
 /// the rest -- the two things it does not do.
 pub fn calls() -> Result<(), String> {
-    use veilvoice_capture::comms;
+    use veilvoice_watch::capture::comms;
 
     println!("{}", heading("Talking through VeilVoice"));
     println!();

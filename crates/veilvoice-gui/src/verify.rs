@@ -12,7 +12,7 @@
 //! else here, and a 1.5 MB single file is part of why it is checkable at all.
 //! Putting a GUI toolkit in it would have cost that for a convenience the
 //! desktop application was already the right place for. So the arithmetic
-//! moved to `veilvoice-check` and this is a second caller, not a second
+//! moved to `veilvoice_verify::check` and this is a second caller, not a second
 //! implementation.
 //!
 //! # Three files, and the tab says so before it is given any
@@ -71,8 +71,8 @@ use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
-use veilvoice_check::{Checked, Error};
-use veilvoice_gnupg::backend::{self, Choice as Checker, Survey};
+use veilvoice_verify::check::{Checked, Error};
+use veilvoice_verify::gnupg::backend::{self, Choice as Checker, Survey};
 
 /// Which of the three files a dropped path is.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -181,7 +181,7 @@ pub struct Verify {
     /// Which OpenPGP implementation the reader chose, if any.
     ///
     /// `None` is not "decide for me": it is the ordinary state, and it means
-    /// the check built into this binary. See [`veilvoice_gnupg::backend`].
+    /// the check built into this binary. See [`veilvoice_verify::gnupg::backend`].
     checker: Option<Checker>,
     /// What is installed, once somebody has asked. `None` means nobody has.
     ///
@@ -452,12 +452,15 @@ impl Verify {
                 .color(p::yellow())
                 .small(),
         );
-        ui.label(RichText::new(veilvoice_check::SCOPE).color(p::muted()));
+        ui.label(RichText::new(veilvoice_verify::check::SCOPE).color(p::muted()));
         ui.add_space(8.0);
         ui.label(
-            RichText::new(format!("key fingerprint  {}", veilvoice_check::FINGERPRINT))
-                .color(p::muted())
-                .small(),
+            RichText::new(format!(
+                "key fingerprint  {}",
+                veilvoice_verify::check::FINGERPRINT
+            ))
+            .color(p::muted())
+            .small(),
         );
         ui.label(
             RichText::new(
@@ -593,7 +596,7 @@ impl Verify {
     /// already asking "is this download genuine", and the honest answer to that
     /// question includes "and here is how to ask something other than me".
     ///
-    /// The commands come from [`veilvoice_gnupg::commands`], which the
+    /// The commands come from [`veilvoice_verify::gnupg::commands`], which the
     /// portable verifier also uses, so the window and the command line cannot
     /// drift into printing two different recipes.
     fn gnupg_section(&mut self, ui: &mut Ui) {
@@ -626,7 +629,7 @@ impl Verify {
             return;
         };
 
-        match veilvoice_gnupg::on_path() {
+        match veilvoice_verify::gnupg::on_path() {
             Some(gpg) => ui.label(
                 RichText::new(format!("GnuPG found at {}", gpg.display()))
                     .color(p::green())
@@ -644,7 +647,7 @@ impl Verify {
         // The signing key beside the hash list, when the release shipped one.
         let key = sums.with_file_name("veilvoice-signing-key.asc");
         let key = key.is_file().then_some(key);
-        let commands = veilvoice_gnupg::commands(&sums, &signature, key.as_deref());
+        let commands = veilvoice_verify::gnupg::commands(&sums, &signature, key.as_deref());
 
         ui.add_space(4.0);
         let backend = backend::resolve(
@@ -705,7 +708,7 @@ impl Verify {
     ///
     /// Three of them, and the difference is the whole point: the built-in
     /// check is made by a program that came out of the download it is
-    /// checking, and the others are not. See [`veilvoice_gnupg::backend`] for
+    /// checking, and the others are not. See [`veilvoice_verify::gnupg::backend`] for
     /// why an installed GnuPG is still not used until it is chosen.
     fn checker_section(&mut self, ui: &mut Ui) {
         ui.add_space(12.0);
@@ -1032,7 +1035,7 @@ fn examine(download: &Path, sums_path: &Path, signature_path: &Path) -> Report {
         }
     };
 
-    let file = veilvoice_check::check_file(download, &sums, &signature);
+    let file = veilvoice_verify::check::check_file(download, &sums, &signature);
     // The rest only when the archive itself is the published one. Reporting on
     // an extracted folder after the archive failed would be answering a
     // question nobody should still be asking.
@@ -1057,7 +1060,7 @@ fn examine_contents(
     sums: &str,
     signature: &str,
 ) -> Option<Contents> {
-    use veilvoice_check::contents;
+    use veilvoice_verify::check::contents;
 
     let list = sums_path.with_file_name(contents::CONTENTS);
     if !list.is_file() {
@@ -1079,7 +1082,7 @@ fn examine_contents(
         })
     };
 
-    match veilvoice_check::check_file(&list, sums, signature) {
+    match veilvoice_verify::check::check_file(&list, sums, signature) {
         Err(why) => return unusable(format!("{why}")),
         Ok(checked) if !checked.matched => {
             return unusable(
@@ -1149,7 +1152,7 @@ fn examine_contents(
 
 /// Roadmap item 97. The same signature, through the GnuPG this machine already has.
 fn examine_gnupg(sums: &Path, signature: &Path) -> Gnupg {
-    let gpg = match veilvoice_gnupg::Gnupg::found() {
+    let gpg = match veilvoice_verify::gnupg::Gnupg::found() {
         Err(why) => {
             return Gnupg {
                 found: format!("{why}. The commands below are what to run if you install it."),
@@ -1162,7 +1165,10 @@ fn examine_gnupg(sums: &Path, signature: &Path) -> Gnupg {
         found: format!("GnuPG found at {}", gpg.program().display()),
         ..Gnupg::default()
     };
-    match gpg.import(veilvoice_check::PUBLIC_KEY, veilvoice_check::FINGERPRINT) {
+    match gpg.import(
+        veilvoice_verify::check::PUBLIC_KEY,
+        veilvoice_verify::check::FINGERPRINT,
+    ) {
         // Not drawn as a failure. GnuPG being unusable on this machine says
         // nothing about the download.
         Err(why) => {
@@ -1171,7 +1177,7 @@ fn examine_gnupg(sums: &Path, signature: &Path) -> Gnupg {
         }
         Ok(import) => report.note = import.note(),
     }
-    match gpg.verify(signature, sums, veilvoice_check::FINGERPRINT) {
+    match gpg.verify(signature, sums, veilvoice_verify::check::FINGERPRINT) {
         Err(why) => report.verdict = format!("GnuPG could not be asked: {why}"),
         Ok(run) => {
             report.answered = true;
@@ -1349,7 +1355,7 @@ mod tests {
     /// The signing key this tab points at is a file that exists here.
     ///
     /// A link to a key is worth exactly as much as the key being at the other
-    /// end of it. The path is the one `veilvoice-check` compiles the key in
+    /// end of it. The path is the one `veilvoice_verify::check` compiles the key in
     /// from, so if the file moves, both this link and that include break
     /// together rather than the link rotting quietly.
     #[test]
@@ -1440,7 +1446,7 @@ mod tests {
     }
 
     /// Roadmap item 90. The window and the command line must print the same GnuPG
-    /// recipe, which is why the body of it lives in `veilvoice-check` and both
+    /// recipe, which is why the body of it lives in `veilvoice_verify::check` and both
     /// call it rather than each keeping a copy.
     #[test]
     fn the_window_prints_the_shared_gnupg_commands() {
@@ -1454,7 +1460,7 @@ mod tests {
             .unwrap_or(source.len());
         let body = &source[start..end];
         assert!(
-            body.contains("veilvoice_gnupg::commands"),
+            body.contains("veilvoice_verify::gnupg::commands"),
             "the window builds its own commands, which will drift from the \
              verifier's"
         );
@@ -1477,9 +1483,9 @@ mod tests {
         std::fs::write(&file, b"contents").unwrap();
         let sums = format!(
             "{}  release.zip\n",
-            veilvoice_check::sha256_bytes(b"contents")
+            veilvoice_verify::check::sha256_bytes(b"contents")
         );
-        let error = veilvoice_check::check_file(&file, &sums, "not a signature")
+        let error = veilvoice_verify::check::check_file(&file, &sums, "not a signature")
             .expect_err("a bad signature must stop the check");
         assert!(matches!(error, Error::Malformed(_)), "{error:?}");
     }

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-guard/src/lib.rs`
 
-[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 150 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs)
+[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 159 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs)
 
 ## Contents
 
@@ -78,11 +78,11 @@ change the list too. What it catches is a change nobody was hiding.
 
 ## What this file contains
 
-150 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+159 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 90) -- Everything that can go wrong in this crate.
+- `enum Error` (line 99) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -98,14 +98,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 100"]
-    n_from["Error::from<br/>line 106"]
-    n_fmt["Error::fmt<br/>line 112"]
-    n_source["Error::source<br/>line 122"]
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L100" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L106" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L112" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L122" "open the source"
+    n_from["Error::from<br/>line 109"]
+    n_from["Error::from<br/>line 115"]
+    n_fmt["Error::fmt<br/>line 121"]
+    n_source["Error::source<br/>line 131"]
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L109" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L115" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L121" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L131" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_from,n_fmt,n_source helper
 ```
@@ -116,10 +116,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L74) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L80) | What tamper detection is worth, in the words a front-end should show. |
-| `Error` <sub>pub enum</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L90) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L100) |  |
-| `Error::from` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L106) |  |
-| `Error::fmt` <sub>fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L112) |  |
-| `Error::source` <sub>fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L122) |  |
+| `VERSION` <sub>pub const</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L83) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [89](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L89) | What tamper detection is worth, in the words a front-end should show. |
+| `Error` <sub>pub enum</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L99) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L109) |  |
+| `Error::from` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L115) |  |
+| `Error::fmt` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L121) |  |
+| `Error::source` <sub>fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L131) |  |

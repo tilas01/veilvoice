@@ -81,7 +81,7 @@
 <span class="src-item" id="fn-show">
 <span class="ln" id="L13"><span class="tok-com">/// Report the privilege level and what it means.</span></span>
 <span class="ln" id="L14"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">show</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L15">    <span class="tok-kw">let</span> level = veilvoice_priv::<span class="tok-fn">level</span>();</span>
+<span class="ln" id="L15">    <span class="tok-kw">let</span> level = veilvoice_watch::privilege::<span class="tok-fn">level</span>();</span>
 <span class="ln" id="L16"></span>
 <span class="ln" id="L17">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;What VeilVoice is running with&quot;</span>));</span>
 <span class="ln" id="L18">    println!();</span>
@@ -102,9 +102,9 @@
 <span class="ln" id="L33">    println!();</span>
 <span class="ln" id="L34">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS DOES NOT DO&quot;</span>));</span>
 <span class="ln" id="L35">    <span class="tok-kw">for</span> note <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L36">        veilvoice_priv::NEVER_ELEVATES,</span>
-<span class="ln" id="L37">        veilvoice_priv::NO_SERVICE,</span>
-<span class="ln" id="L38">        veilvoice_priv::NO_KERNEL,</span>
+<span class="ln" id="L36">        veilvoice_watch::privilege::NEVER_ELEVATES,</span>
+<span class="ln" id="L37">        veilvoice_watch::privilege::NO_SERVICE,</span>
+<span class="ln" id="L38">        veilvoice_watch::privilege::NO_KERNEL,</span>
 <span class="ln" id="L39">    ] {</span>
 <span class="ln" id="L40">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(note, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L41">            println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>

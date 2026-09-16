@@ -12,7 +12,7 @@ use crate::theme::{colour, field, heading, paint};
 
 /// Report the privilege level and what it means.
 pub fn show() -> Result<(), String> {
-    let level = veilvoice_priv::level();
+    let level = veilvoice_watch::privilege::level();
 
     println!("{}", heading("What VeilVoice is running with"));
     println!();
@@ -33,9 +33,9 @@ pub fn show() -> Result<(), String> {
     println!();
     println!("{}", paint(colour::YELLOW, "WHAT THIS DOES NOT DO"));
     for note in [
-        veilvoice_priv::NEVER_ELEVATES,
-        veilvoice_priv::NO_SERVICE,
-        veilvoice_priv::NO_KERNEL,
+        veilvoice_watch::privilege::NEVER_ELEVATES,
+        veilvoice_watch::privilege::NO_SERVICE,
+        veilvoice_watch::privilege::NO_KERNEL,
     ] {
         for line in crate::sentry::wrap(note, 72) {
             println!("  {line}");

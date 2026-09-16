@@ -104,12 +104,14 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>167 lines"])
+    n_lib(["lib.rs<br/>168 lines"])
     n_mandate["mandate.rs<br/>511 lines"]
     n_policy["policy.rs<br/>984 lines"]
+    n_workspace["workspace.rs<br/>817 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs" "open the source"
     click n_mandate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" "open the source"
+    click n_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/workspace.rs" "open the source"
 ```
 
 </details>
@@ -118,11 +120,12 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-policy/lib.md) | 167 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
+| [`lib.rs`](../../docs/files/veilvoice-policy/lib.md) | 168 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
 | [`mandate.rs`](../../docs/files/veilvoice-policy/mandate.md) | 511 | The two things VeilVoice insists on unless you say otherwise. |
 | [`policy.rs`](../../docs/files/veilvoice-policy/policy.md) | 984 | The policy itself: what can be required, and what requiring it does. |
+| [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | 817 | Named profiles and saved projects. |
 
-**1,143 functional lines of Rust** in this crate. A functional line is a line
+**1,689 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -148,6 +151,16 @@ counts blank lines and comments too. Both are produced by
 | `struct Policy` | [`policy.rs`](../../docs/files/veilvoice-policy/policy.md) | A set of requirements, and an optional note from whoever wrote them. |
 | `enum Verification` | [`policy.rs`](../../docs/files/veilvoice-policy/policy.md) | What is known about the seal on a policy. |
 | `fn verify` | [`policy.rs`](../../docs/files/veilvoice-policy/policy.md) | Check the plain policy in dir against its sealed copy. |
+| `enum Error` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | Something that could not be read. |
+| `struct Profile` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | A named way of working. |
+| `const INDIVIDUAL` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | Anonymise one person, with everything this engine has turned on. |
+| `const GROUP_VOICES` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | A group, each person with their own disguised voice. |
+| `const GROUP_ONE_VOICE` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | A group where nobody can be picked out by sound at all. |
+| `const BUILT_IN` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | The profiles that ship, in the order a picker shows them. |
+| `fn profile` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | The profile with this identifier. |
+| `fn default_profile` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | The profile a fresh install starts in. |
+| `struct Member` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | One person in a saved project. |
+| `struct Workspace` | [`workspace.rs`](../../docs/files/veilvoice-policy/workspace.md) | One piece of work, saved. |
 
 ## Reading it elsewhere
 

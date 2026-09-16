@@ -39,12 +39,6 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/source/website-js-theme-js.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/source/website-js-verify-js.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/source/website-js-walkthrough-js.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-accel.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-accel/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-accel/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-appctl.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-appctl/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-appctl/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-audio.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-audio/devices.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-audio/devices.src.html</loc></url>
@@ -62,20 +56,6 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-audio/record.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-audio/room.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-audio/room.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture/comms.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture/comms.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture/programs.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-capture/programs.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check/contents.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check/contents.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check/reproduce.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-check/reproduce.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/accel.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/accel.src.html</loc></url>
@@ -162,6 +142,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/amnesia.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/container.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/container.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/decoy.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/decoy.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/examples-seal_and_open.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/examples-seal_and_open.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/hoard.html</loc></url>
@@ -190,30 +172,6 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/vault.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/weave.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/weave.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-decoy.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-decoy/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-decoy/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/linux.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/linux.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/macos.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/macos.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/windows.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-drivers/windows.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-failsafe.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-failsafe/act.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-failsafe/act.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-failsafe/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-failsafe/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg/backend.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg/backend.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg/script.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gnupg/script.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/blame.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/blame.src.html</loc></url>
@@ -292,9 +250,6 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/watchfeed.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/window.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/window.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-input.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-input/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-input/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-meta.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-meta/audio.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-meta/audio.src.html</loc></url>
@@ -313,19 +268,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-policy/mandate.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-policy/policy.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-policy/policy.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-priv.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-priv/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-priv/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-proc.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-proc/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-proc/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry/canary.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry/canary.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry/lib.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry/rate.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-sentry/rate.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-policy/workspace.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-policy/workspace.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/companions.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/companions.src.html</loc></url>
@@ -335,13 +279,10 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/space.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/space.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/update.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/update.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/volumes.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-setup/volumes.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-update.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-update/examples-ask.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-update/examples-ask.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-update/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-update/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/builder.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/builder.src.html</loc></url>
@@ -362,6 +303,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/tests.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/tests.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/accel.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/accel.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/ffmpeg.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/ffmpeg.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/font.html</loc></url>
@@ -381,17 +324,22 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/waveform.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/waveform.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/appctl.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/appctl.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/examples-scan_once.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/examples-scan_once.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/input.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/input.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/lib.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/linux.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/linux.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/privilege.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/privilege.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/proc.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/proc.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/windows.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-watch/windows.src.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-workspace.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-workspace/lib.html</loc></url>
-  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-workspace/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/releases.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/roadmap.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/search.html</loc></url>

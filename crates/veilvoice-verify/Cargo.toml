@@ -28,11 +28,10 @@ description = "Verify a VeilVoice release without GnuPG installed"
 # RSA PKCS#1 v1.5 verification, and a subtle mistake there would be a silent
 # accept in the one tool whose entire job is not to silently accept. A widely
 # used implementation that many people read is the better risk.
-# The checking itself lives in `veilvoice-check`, so the desktop
+# The checking itself lives in this crate's `check` module, so the desktop
 # application's verify tab and this binary share one implementation rather than
 # holding two. This crate keeps the command line, the reporting, and the
 # download shim; it no longer owns the arithmetic.
-veilvoice-check = { path = "../veilvoice-check" }
 # Where an installation goes on each platform, so the `install` command puts
 # files exactly where the application itself would. No dependencies of its own.
 veilvoice-setup = { path = "../veilvoice-setup" }
@@ -40,10 +39,12 @@ veilvoice-setup = { path = "../veilvoice-setup" }
 # checked by two independent implementations rather than only this one. No
 # dependencies of its own, which matters in the one binary here whose size is
 # a feature.
-veilvoice-gnupg = { path = "../veilvoice-gnupg" }
 # Reading the signed public key and checking a detached signature with no
 # GnuPG installed, which is the whole point of this verifier.
 pgp = { version = "0.20", default-features = false }
+# The SHA-256 in `check::sha256_file`, which is the hash every published
+# list is written in.
+sha2 = "0.10"
 
 [dev-dependencies]
 # Tests that build a release layout and verify it, in a directory that goes

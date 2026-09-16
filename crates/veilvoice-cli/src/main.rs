@@ -101,9 +101,9 @@ use veilvoice_audio::devices;
 use veilvoice_audio::io as audio_io;
 use veilvoice_core::{AccentConfig, DeidConfig};
 use veilvoice_crypto::{container, hybrid, kdf};
+use veilvoice_guard::sentry::rate::{Limits, Threshold};
 use veilvoice_meta::Policy;
 use veilvoice_policy::Requirement;
-use veilvoice_sentry::rate::{Limits, Threshold};
 use veilvoice_setup::{companions, install};
 
 #[derive(Parser)]
@@ -1222,9 +1222,11 @@ impl From<CleanPolicy> for Policy {
 /// catch-all, and both catch-alls sent the BSDs to the Linux script. Written
 /// once, exhaustively, so a system added to one enumeration and not the other
 /// is a compile error rather than a wrong instruction.
-fn flavour_for(system: veilvoice_check::reproduce::System) -> veilvoice_gnupg::script::Flavour {
-    use veilvoice_check::reproduce::System;
-    use veilvoice_gnupg::script::Flavour;
+fn flavour_for(
+    system: veilvoice_verify::check::reproduce::System,
+) -> veilvoice_verify::gnupg::script::Flavour {
+    use veilvoice_verify::check::reproduce::System;
+    use veilvoice_verify::gnupg::script::Flavour;
     match system {
         System::MacOs => Flavour::MacOs,
         System::Bsd => Flavour::Bsd,
@@ -1241,10 +1243,10 @@ fn flavour_for(system: veilvoice_check::reproduce::System) -> veilvoice_gnupg::s
 /// machine with no browser is exactly the person most likely to be checking a
 /// download by hand.
 fn explain_verification(
-    flavour: veilvoice_gnupg::script::Flavour,
-    system: veilvoice_check::reproduce::System,
+    flavour: veilvoice_verify::gnupg::script::Flavour,
+    system: veilvoice_verify::check::reproduce::System,
 ) {
-    let survey = veilvoice_gnupg::backend::look();
+    let survey = veilvoice_verify::gnupg::backend::look();
     println!("Checking a VeilVoice release");
     println!();
     println!("  Three files, all published together on the releases page:");
@@ -1259,7 +1261,7 @@ fn explain_verification(
     println!("  website/assets/veilvoice-signing-key.asc, so it can be fetched");
     println!("  from somewhere other than the release being checked.");
     println!();
-    println!("    fingerprint  {}", veilvoice_check::FINGERPRINT);
+    println!("    fingerprint  {}", veilvoice_verify::check::FINGERPRINT);
     println!();
     println!("  Compare that against the fingerprint on the website and in");
     println!("  README.md. It is the one step nothing can do for you.");
@@ -1820,19 +1822,19 @@ fn run(command: Command) -> Result<(), String> {
                 // this falling through to Linux for a BSD reader, who was then
                 // told to run a command their system does not have.
                 let flavour = match system.as_deref() {
-                    Some("macos") => veilvoice_gnupg::script::Flavour::MacOs,
-                    Some("bsd") => veilvoice_gnupg::script::Flavour::Bsd,
-                    _ if macos => veilvoice_gnupg::script::Flavour::MacOs,
-                    _ => flavour_for(veilvoice_check::reproduce::System::here()),
+                    Some("macos") => veilvoice_verify::gnupg::script::Flavour::MacOs,
+                    Some("bsd") => veilvoice_verify::gnupg::script::Flavour::Bsd,
+                    _ if macos => veilvoice_verify::gnupg::script::Flavour::MacOs,
+                    _ => flavour_for(veilvoice_verify::check::reproduce::System::here()),
                 };
-                explain_verification(flavour, veilvoice_check::reproduce::System::here());
+                explain_verification(flavour, veilvoice_verify::check::reproduce::System::here());
                 return Ok(());
             }
             let named = system.as_deref().map(|name| {
-                veilvoice_check::reproduce::System::from_key(name).ok_or_else(|| {
+                veilvoice_verify::check::reproduce::System::from_key(name).ok_or_else(|| {
                     format!(
                         "unknown system {name:?}. One of: {}",
-                        veilvoice_check::reproduce::System::ALL
+                        veilvoice_verify::check::reproduce::System::ALL
                             .iter()
                             .map(|s| s.key())
                             .collect::<Vec<_>>()
@@ -1843,16 +1845,16 @@ fn run(command: Command) -> Result<(), String> {
             let system = match named {
                 Some(Ok(system)) => system,
                 Some(Err(why)) => return Err(why),
-                None if macos => veilvoice_check::reproduce::System::MacOs,
-                None => veilvoice_check::reproduce::System::here(),
+                None if macos => veilvoice_verify::check::reproduce::System::MacOs,
+                None => veilvoice_verify::check::reproduce::System::here(),
             };
             if build_script {
-                print!("{}", veilvoice_check::reproduce::script(system));
+                print!("{}", veilvoice_verify::check::reproduce::script(system));
                 return Ok(());
             }
             let flavour = flavour_for(system);
             if script {
-                print!("{}", veilvoice_gnupg::script::shell(flavour));
+                print!("{}", veilvoice_verify::gnupg::script::shell(flavour));
                 return Ok(());
             }
             explain_verification(flavour, system);

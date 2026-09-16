@@ -19,11 +19,11 @@
 //! list look like good news.
 
 use crate::theme::{colour, field, heading, paint, warn};
-use veilvoice_input::Reach;
+use veilvoice_watch::input::Reach;
 
 /// Show what can see input on this machine.
 pub fn look() -> Result<(), String> {
-    let report = veilvoice_input::look();
+    let report = veilvoice_watch::input::look();
 
     println!("{}", heading("What could see your keyboard and mouse"));
     println!();
@@ -61,11 +61,11 @@ pub fn look() -> Result<(), String> {
     }
 
     println!("{}", paint(colour::YELLOW, "WHAT THIS CANNOT TELL YOU"));
-    for line in crate::sentry::wrap(veilvoice_input::LIMITS, 72) {
+    for line in crate::sentry::wrap(veilvoice_watch::input::LIMITS, 72) {
         println!("  {line}");
     }
     println!();
-    for line in crate::sentry::wrap(veilvoice_input::WHY_NOT_HOOKING, 72) {
+    for line in crate::sentry::wrap(veilvoice_watch::input::WHY_NOT_HOOKING, 72) {
         println!("  {line}");
     }
     println!();
@@ -103,14 +103,17 @@ pub fn known() -> Result<(), String> {
             Reach::Incidental => "These reach input to do their own job",
         };
         println!("{}", paint(colour::BLUE, &format!("  {heading_text}")));
-        for watcher in veilvoice_input::ALL.iter().filter(|w| w.reach == reach) {
+        for watcher in veilvoice_watch::input::ALL
+            .iter()
+            .filter(|w| w.reach == reach)
+        {
             println!("{}", field(&format!("    {}", watcher.name), watcher.what));
         }
         println!();
     }
 
     println!("{}", paint(colour::YELLOW, "WHAT THIS CANNOT TELL YOU"));
-    for line in crate::sentry::wrap(veilvoice_input::LIMITS, 72) {
+    for line in crate::sentry::wrap(veilvoice_watch::input::LIMITS, 72) {
         println!("  {line}");
     }
     Ok(())

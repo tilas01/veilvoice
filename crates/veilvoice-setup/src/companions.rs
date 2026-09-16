@@ -636,7 +636,7 @@ fn detect_gnupg() -> Presence {
 /// On Windows this is Gpg4win through winget, which is the packaging almost
 /// everybody means by "GnuPG on Windows". The other route on Windows is a
 /// `gpg` inside WSL, which is not an install of anything on Windows itself
-/// and is offered separately by `veilvoice-gnupg`.
+/// and is offered separately by `veilvoice_verify::gnupg`.
 fn gnupg_offer() -> Offer {
     if cfg!(windows) {
         return if on_path("winget").is_some() {

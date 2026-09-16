@@ -32,9 +32,9 @@ it beside the workspace members for the same reason.
 | What | Measured |
 |---|---:|
 | Tests, measured by running them | 1654 |
-| Crates in the workspace | 27 |
+| Crates in the workspace | 13 |
 | Website suites | 20 |
-| Functional lines of Rust | 62079 |
-| Findings written up in the audit | 194 |
-| Highest finding number used | 194 |
+| Functional lines of Rust | 62084 |
+| Findings written up in the audit | 195 |
+| Highest finding number used | 195 |
 | Measured on | `x86_64-unknown-linux-gnu` |

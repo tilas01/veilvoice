@@ -83,7 +83,7 @@
 <span class="src-item" id="fn-show">
 <span class="ln" id="L15"><span class="tok-com">/// Show what this machine has.</span></span>
 <span class="ln" id="L16"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">show</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L17">    <span class="tok-kw">let</span> found = veilvoice_accel::<span class="tok-fn">look</span>();</span>
+<span class="ln" id="L17">    <span class="tok-kw">let</span> found = veilvoice_video::accel::<span class="tok-fn">look</span>();</span>
 <span class="ln" id="L18"></span>
 <span class="ln" id="L19">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Graphics hardware on this machine&quot;</span>));</span>
 <span class="ln" id="L20">    println!();</span>
@@ -91,7 +91,7 @@
 <span class="ln" id="L22">        <span class="tok-str">&quot;{}&quot;</span>,</span>
 <span class="ln" id="L23">        <span class="tok-fn">field</span>(</span>
 <span class="ln" id="L24">            <span class="tok-str">&quot;threads available&quot;</span>,</span>
-<span class="ln" id="L25">            &amp;veilvoice_accel::<span class="tok-fn">usable_threads</span>().<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L25">            &amp;veilvoice_video::accel::<span class="tok-fn">usable_threads</span>().<span class="tok-fn">to_string</span>()</span>
 <span class="ln" id="L26">        )</span>
 <span class="ln" id="L27">    );</span>
 <span class="ln" id="L28">    println!();</span>
@@ -147,8 +147,8 @@
 <span class="ln" id="L78">        <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT A GRAPHICS CARD DOES NOT DO HERE&quot;</span>)</span>
 <span class="ln" id="L79">    );</span>
 <span class="ln" id="L80">    <span class="tok-kw">for</span> note <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L81">        veilvoice_accel::WHY_NOT_THE_ENGINE,</span>
-<span class="ln" id="L82">        veilvoice_accel::WHAT_IT_CHANGES,</span>
+<span class="ln" id="L81">        veilvoice_video::accel::WHY_NOT_THE_ENGINE,</span>
+<span class="ln" id="L82">        veilvoice_video::accel::WHAT_IT_CHANGES,</span>
 <span class="ln" id="L83">    ] {</span>
 <span class="ln" id="L84">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(note, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L85">            println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>

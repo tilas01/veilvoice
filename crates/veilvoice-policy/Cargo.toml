@@ -9,6 +9,10 @@ repository.workspace = true
 description = "Settings that can only be tightened, sealed with the project's own post-quantum cryptography."
 
 [dependencies]
+# The engine configuration a saved profile is (`workspace`).
+veilvoice-core = { path = "../veilvoice-core" }
+# Which voice mode a saved group recording was made with (`workspace`).
+veilvoice-conversation = { path = "../veilvoice-conversation" }
 # Sealing a policy so it cannot be quietly rewritten, and the owner-only write
 # that puts it on disk.
 veilvoice-crypto = { path = "../veilvoice-crypto" }

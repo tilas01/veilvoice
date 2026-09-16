@@ -13,18 +13,6 @@ Every crate and every source file, generated from the doc comments in the code b
 - [[`wav_chunks.rs`|File-fuzz-fuzz_targets-wav_chunks]] &middot; The RIFF chunk walker in veilvoice-meta, coverage-guided.
 - [[`wav_preflight.rs`|File-fuzz-fuzz_targets-wav_preflight]] &middot; The WAV pre-flight in veilvoice-audio, coverage-guided.
 
-## [[veilvoice-accel|Crate-veilvoice-accel]]
-
-What graphics hardware this machine has, which of it can encode video, and the measured reason the audio engine does not use any of it.
-
-- [[`lib.rs`|File-veilvoice-accel-lib]] &middot; What hardware this machine has, and the one place VeilVoice can use it.
-
-## [[veilvoice-appctl|Crate-veilvoice-appctl]]
-
-Learn what normally runs here, then notice what does not -- with time-limited grants and a log, and no claim to block anything.
-
-- [[`lib.rs`|File-veilvoice-appctl-lib]] &middot; Learn what normally runs on this machine, then notice what does not.
-
 ## [[veilvoice-audio|Crate-veilvoice-audio]]
 
 Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.
@@ -37,22 +25,6 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 - [[`playback.rs`|File-veilvoice-audio-playback]] &middot; Playing a recording that is only in memory, and never on disk.
 - [[`record.rs`|File-veilvoice-audio-record]] &middot; Recording the veiled voice without it ever reaching unprotected memory.
 - [[`room.rs`|File-veilvoice-audio-room]] &middot; Roadmap item 147.
-
-## [[veilvoice-capture|Crate-veilvoice-capture]]
-
-Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of what cannot be seen.
-
-- [[`comms.rs`|File-veilvoice-capture-comms]] &middot; Communication programs, and how to put VeilVoice between you and them.
-- [[`lib.rs`|File-veilvoice-capture-lib]] &middot; Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.
-- [[`programs.rs`|File-veilvoice-capture-programs]] &middot; The programs this build knows can capture a screen.
-
-## [[veilvoice-check|Crate-veilvoice-check]]
-
-Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUMS, and the detached signature over that list. No GnuPG, no network.
-
-- [[`contents.rs`|File-veilvoice-check-contents]] &middot; The signed list of what is inside each release archive.
-- [[`lib.rs`|File-veilvoice-check-lib]] &middot; Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.
-- [[`reproduce.rs`|File-veilvoice-check-reproduce]] &middot; A script that rebuilds a release and compares it with what was published.
 
 ## [[veilvoice-cli|Crate-veilvoice-cli]]
 
@@ -114,6 +86,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`aead.rs`|File-veilvoice-crypto-aead]] &middot; Authenticated encryption with XChaCha20-Poly1305.
 - [[`amnesia.rs`|File-veilvoice-crypto-amnesia]] &middot; Amnesic secret storage: page-locked, zeroized, and never printed.
 - [[`container.rs`|File-veilvoice-crypto-container]] &middot; The .veil encrypted container format.
+- [[`decoy.rs`|File-veilvoice-crypto-decoy]] &middot; A second passphrase that opens a different, empty VeilVoice.
 - [[`hoard.rs`|File-veilvoice-crypto-hoard]] &middot; The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing.
 - [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] &middot; Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.
 - [[`kdf.rs`|File-veilvoice-crypto-kdf]] &middot; Password-based key derivation with Argon2id.
@@ -129,28 +102,6 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] &middot; Randomised robustness testing for the two parsers that read untrusted input.
 - [[`timing.rs`|File-veilvoice-crypto-tests-timing]] &middot; Timing measurement of the password paths.
 
-## [[veilvoice-decoy|Crate-veilvoice-decoy]]
-
-A second passphrase that opens an empty VeilVoice, with the deniability it does not provide stated plainly, and no passphrase that destroys anything.
-
-- [[`lib.rs`|File-veilvoice-decoy-lib]] &middot; A second passphrase that opens a different, empty VeilVoice.
-
-## [[veilvoice-drivers|Crate-veilvoice-drivers]]
-
-Notice when a kernel driver or module appears, with a cross-view check and an honest account of what hiding defeats.
-
-- [[`lib.rs`|File-veilvoice-drivers-lib]] &middot; What is loaded into the kernel, recorded, and compared later.
-- [[`linux.rs`|File-veilvoice-drivers-linux]] &middot; Linux: /proc/modules, cross-checked against /sys/module.
-- [[`macos.rs`|File-veilvoice-drivers-macos]] &middot; macOS: kmutil showloaded, falling back to kextstat.
-- [[`windows.rs`|File-veilvoice-drivers-windows]] &middot; Windows: driverquery.exe, which the system already ships.
-
-## [[veilvoice-failsafe|Crate-veilvoice-failsafe]]
-
-The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it.
-
-- [[`act.rs`|File-veilvoice-failsafe-act]] &middot; Actually closing a program, kept apart from deciding to.
-- [[`lib.rs`|File-veilvoice-failsafe-lib]] &middot; Failsafe: nothing leaves this machine in your own voice by accident.
-
 ## [[veilvoice-guard|Crate-veilvoice-guard]]
 
 Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them.
@@ -158,20 +109,6 @@ Integrity manifest and tamper detection for VeilVoice's own files, with best-eff
 - [[`blame.rs`|File-veilvoice-guard-blame]] &middot; Best-effort attribution: which program changed a file.
 - [[`lib.rs`|File-veilvoice-guard-lib]] &middot; Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them".
 - [[`manifest.rs`|File-veilvoice-guard-manifest]] &middot; The integrity manifest: what the files were, and what they are now.
-
-## [[veilvoice-input|Crate-veilvoice-input]]
-
-Which running programs can see your keyboard and mouse, reported as the heuristic it is -- and why a clean result proves nothing.
-
-- [[`lib.rs`|File-veilvoice-input-lib]] &middot; What on this machine could be watching the keyboard and the mouse.
-
-## [[veilvoice-gnupg|Crate-veilvoice-gnupg]]
-
-Run the GnuPG already on this machine: import the VeilVoice signing key and check a detached signature, reading GnuPG's machine-readable status rather than its translated prose.
-
-- [[`backend.rs`|File-veilvoice-gnupg-backend]] &middot; Which program checks the signature, and who decides.
-- [[`lib.rs`|File-veilvoice-gnupg-lib]] &middot; Run the GnuPG that is already on this machine.
-- [[`script.rs`|File-veilvoice-gnupg-script]] &middot; A shell script that checks a release, for people who would rather read one.
 
 ## [[veilvoice-gui|Crate-veilvoice-gui]]
 
@@ -230,26 +167,7 @@ Settings that can only be tightened, sealed with the project's own post-quantum 
 - [[`lib.rs`|File-veilvoice-policy-lib]] &middot; Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having.
 - [[`mandate.rs`|File-veilvoice-policy-mandate]] &middot; The two things VeilVoice insists on unless you say otherwise.
 - [[`policy.rs`|File-veilvoice-policy-policy]] &middot; The policy itself: what can be required, and what requiring it does.
-
-## [[veilvoice-priv|Crate-veilvoice-priv]]
-
-What privilege VeilVoice is running with and what each level can see -- reported, never acquired.
-
-- [[`lib.rs`|File-veilvoice-priv-lib]] &middot; What privilege VeilVoice is running with, and what each level can actually see.
-
-## [[veilvoice-proc|Crate-veilvoice-proc]]
-
-Which processes are running, per platform, with the limits of that answer stated rather than implied.
-
-- [[`lib.rs`|File-veilvoice-proc-lib]] &middot; Which processes are running, per platform, and what that cannot tell you.
-
-## [[veilvoice-sentry|Crate-veilvoice-sentry]]
-
-Ransomware canaries and mass-change rate detection: an early warning that says plainly what it cannot do.
-
-- [[`canary.rs`|File-veilvoice-sentry-canary]] &middot; Decoy files that should never change, and a record of what they were.
-- [[`lib.rs`|File-veilvoice-sentry-lib]] &middot; An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing.
-- [[`rate.rs`|File-veilvoice-sentry-rate]] &middot; How much of a directory tree changed, and how fast.
+- [[`workspace.rs`|File-veilvoice-policy-workspace]] &middot; Named profiles and saved projects.
 
 ## [[veilvoice-setup|Crate-veilvoice-setup]]
 
@@ -259,14 +177,8 @@ Per-user installation and companion-software detection, shared by the command li
 - [[`install.rs`|File-veilvoice-setup-install]] &middot; Put this program somewhere the system can find it.
 - [[`lib.rs`|File-veilvoice-setup-lib]] &middot; Everything that puts VeilVoice on a machine, and everything that reports what is already on it.
 - [[`space.rs`|File-veilvoice-setup-space]] &middot; How much room is actually free where VeilVoice keeps things.
+- [[`update.rs`|File-veilvoice-setup-update]] &middot; Ask, only when told to, whether a newer VeilVoice release exists.
 - [[`volumes.rs`|File-veilvoice-setup-volumes]] &middot; Encrypted volumes this machine already has: Cryptomator and VeraCrypt.
-
-## [[veilvoice-update|Crate-veilvoice-update]]
-
-Ask, when told to, whether a newer VeilVoice release exists. No HTTP client, no automatic check, and nothing is downloaded or installed.
-
-- [[`lib.rs`|File-veilvoice-update-lib]] &middot; Ask, only when told to, whether a newer VeilVoice release exists.
-- [[`ask.rs`|File-veilvoice-update-examples-ask]] &middot; Run the real check once, by hand.
 
 ## [[veilvoice-verify|Crate-veilvoice-verify]]
 
@@ -286,6 +198,7 @@ Verify a VeilVoice release without GnuPG installed
 
 A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg.
 
+- [[`accel.rs`|File-veilvoice-video-accel]] &middot; What hardware this machine has, and the one place VeilVoice can use it.
 - [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] &middot; The video file, which needs a codec this project does not ship.
 - [[`font.rs`|File-veilvoice-video-font]] &middot; A monospace face, five pixels by seven, drawn here.
 - [[`frames.rs`|File-veilvoice-video-frames]] &middot; The video's pictures, and how many of them there really are.
@@ -300,13 +213,11 @@ A watchable version of a veiled conversation: a waveform, a circle per speaker, 
 
 Detect which applications are currently using the microphone and camera, with alerts on change.
 
+- [[`appctl.rs`|File-veilvoice-watch-appctl]] &middot; Learn what normally runs on this machine, then notice what does not.
+- [[`input.rs`|File-veilvoice-watch-input]] &middot; What on this machine could be watching the keyboard and the mouse.
 - [[`lib.rs`|File-veilvoice-watch-lib]] &middot; Find out which applications are using your microphone and camera, right now.
 - [[`linux.rs`|File-veilvoice-watch-linux]] &middot; Linux detection, via open file handles in /proc.
+- [[`privilege.rs`|File-veilvoice-watch-privilege]] &middot; What privilege VeilVoice is running with, and what each level can actually see.
+- [[`proc.rs`|File-veilvoice-watch-proc]] &middot; Which processes are running, per platform, and what that cannot tell you.
 - [[`windows.rs`|File-veilvoice-watch-windows]] &middot; Windows detection, via the Capability Access Manager.
 - [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] &middot; Print what is using the microphone and camera right now.
-
-## [[veilvoice-workspace|Crate-veilvoice-workspace]]
-
-Named profiles and saved projects: the settings a recording was made with, written down so the next one can be made the same way.
-
-- [[`lib.rs`|File-veilvoice-workspace-lib]] &middot; Named profiles and saved projects.

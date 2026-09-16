@@ -344,10 +344,10 @@
 <span class="ln" id="L265">    <span class="tok-com">/// The input-file picker, while it is open.</span></span>
 <span class="ln" id="L266">    choosing_input: <span class="tok-kw">crate</span>::dialog::Pending,</span>
 <span class="ln" id="L267"></span>
-<span class="ln" id="L268">    <span class="tok-com">/// The safety catch. On by default; see `veilvoice_failsafe`.</span></span>
-<span class="ln" id="L269">    failsafe: veilvoice_failsafe::Guard,</span>
+<span class="ln" id="L268">    <span class="tok-com">/// The safety catch. On by default; see `veilvoice_guard::failsafe`.</span></span>
+<span class="ln" id="L269">    failsafe: veilvoice_guard::failsafe::Guard,</span>
 <span class="ln" id="L270">    <span class="tok-com">/// What Failsafe last found, so the panel and the notice agree.</span></span>
-<span class="ln" id="L271">    failsafe_finding: Option&lt;veilvoice_failsafe::Finding&gt;,</span>
+<span class="ln" id="L271">    failsafe_finding: Option&lt;veilvoice_guard::failsafe::Finding&gt;,</span>
 <span class="ln" id="L272"></span>
 <span class="ln" id="L273">    <span class="tok-com">/// What is being shown to the reader right now, if anything.</span></span>
 <span class="ln" id="L274">    <span class="tok-com">///</span></span>
@@ -624,7 +624,7 @@
 <span class="ln" id="L533">            tour: <span class="tok-kw">crate</span>::tour::Tour::<span class="tok-fn">default</span>(),</span>
 <span class="ln" id="L534">            tour_considered: false,</span>
 <span class="ln" id="L535">            choosing_input: <span class="tok-kw">crate</span>::dialog::Pending::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L536">            failsafe: veilvoice_failsafe::Guard::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L536">            failsafe: veilvoice_guard::failsafe::Guard::<span class="tok-fn">new</span>(),</span>
 <span class="ln" id="L537">            failsafe_finding: None,</span>
 <span class="ln" id="L538">            input: None,</span>
 <span class="ln" id="L539">            output: None,</span>
@@ -2472,7 +2472,7 @@
 <span class="ln" id="L2343">    <span class="tok-com">///</span></span>
 <span class="ln" id="L2344">    <span class="tok-com">/// Called once a frame, straight after the watch feed is drained, because</span></span>
 <span class="ln" id="L2345">    <span class="tok-com">/// that is where the information arrives. The decision is arithmetic over a</span></span>
-<span class="ln" id="L2346">    <span class="tok-com">/// list -- see `veilvoice_failsafe` -- so doing it every frame costs</span></span>
+<span class="ln" id="L2346">    <span class="tok-com">/// list -- see `veilvoice_guard::failsafe` -- so doing it every frame costs</span></span>
 <span class="ln" id="L2347">    <span class="tok-com">/// nothing and means the answer is never a frame out of date.</span></span>
 <span class="ln" id="L2348">    <span class="tok-com">///</span></span>
 <span class="ln" id="L2349">    <span class="tok-com">/// **Closing a program is done here and nowhere else**, and only when the</span></span>
@@ -2489,12 +2489,12 @@
 <span class="ln" id="L2360">        <span class="tok-kw">self</span>.failsafe.live = <span class="tok-kw">self</span>.studio.<span class="tok-fn">is_veiling</span>();</span>
 <span class="ln" id="L2361">        <span class="tok-kw">self</span>.failsafe.veiling = <span class="tok-kw">self</span>.chosen_output.<span class="tok-fn">clone</span>();</span>
 <span class="ln" id="L2362"></span>
-<span class="ln" id="L2363">        <span class="tok-kw">let</span> holders: Vec&lt;veilvoice_failsafe::Holder&gt; = <span class="tok-kw">self</span></span>
+<span class="ln" id="L2363">        <span class="tok-kw">let</span> holders: Vec&lt;veilvoice_guard::failsafe::Holder&gt; = <span class="tok-kw">self</span></span>
 <span class="ln" id="L2364">            .watch</span>
 <span class="ln" id="L2365">            .<span class="tok-fn">active</span>()</span>
 <span class="ln" id="L2366">            .<span class="tok-fn">iter</span>()</span>
 <span class="ln" id="L2367">            .<span class="tok-fn">filter</span>(|use_| use_.kind == veilvoice_watch::DeviceKind::Microphone)</span>
-<span class="ln" id="L2368">            .<span class="tok-fn">map</span>(|use_| veilvoice_failsafe::Holder {</span>
+<span class="ln" id="L2368">            .<span class="tok-fn">map</span>(|use_| veilvoice_guard::failsafe::Holder {</span>
 <span class="ln" id="L2369">                app: use_.app.<span class="tok-fn">clone</span>(),</span>
 <span class="ln" id="L2370">                pid: use_.pid,</span>
 <span class="ln" id="L2371">                device: use_.device.<span class="tok-fn">clone</span>(),</span>
@@ -2513,7 +2513,7 @@
 <span class="ln" id="L2384">        <span class="tok-com">// sixty times a second for as long as it takes to die.</span></span>
 <span class="ln" id="L2385">        <span class="tok-kw">let</span> fresh = <span class="tok-kw">self</span>.failsafe_finding.<span class="tok-fn">as_ref</span>() != <span class="tok-fn">Some</span>(&amp;finding);</span>
 <span class="ln" id="L2386">        <span class="tok-kw">if</span> fresh {</span>
-<span class="ln" id="L2387">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> veilvoice_failsafe::Finding::Foreign {</span>
+<span class="ln" id="L2387">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> veilvoice_guard::failsafe::Finding::Foreign {</span>
 <span class="ln" id="L2388">                app,</span>
 <span class="ln" id="L2389">                pid,</span>
 <span class="ln" id="L2390">                closeable,</span>
@@ -2523,7 +2523,7 @@
 <span class="ln" id="L2394">                <span class="tok-kw">let</span> words = finding.<span class="tok-fn">phrasing</span>();</span>
 <span class="ln" id="L2395">                <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">warn</span>(words.<span class="tok-fn">clone</span>()));</span>
 <span class="ln" id="L2396">                <span class="tok-kw">if</span> *closeable {</span>
-<span class="ln" id="L2397">                    <span class="tok-kw">match</span> veilvoice_failsafe::act::<span class="tok-fn">close</span>(app, *pid) {</span>
+<span class="ln" id="L2397">                    <span class="tok-kw">match</span> veilvoice_guard::failsafe::act::<span class="tok-fn">close</span>(app, *pid) {</span>
 <span class="ln" id="L2398">                        <span class="tok-fn">Ok</span>(done) =&gt; {</span>
 <span class="ln" id="L2399">                            <span class="tok-kw">self</span>.failsafe</span>
 <span class="ln" id="L2400">                                .<span class="tok-fn">record</span>(std::time::SystemTime::<span class="tok-fn">now</span>(), app, true, &amp;done)</span>

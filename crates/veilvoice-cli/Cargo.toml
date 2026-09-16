@@ -23,12 +23,6 @@ live = ["veilvoice-audio/live"]
 # beside rather than by a second binary somebody has to find. It was a binary
 # of its own until 0.1.18; `src/lib.rs` there says what that cost.
 veilvoice-verify = { path = "../veilvoice-verify" }
-# `veilvoice verify` offering to run the reader's own GnuPG, and the
-# per-platform script that installs one.
-veilvoice-gnupg = { path = "../veilvoice-gnupg" }
-# The verifier: the signed hash lists, the contents manifest, and which
-# platforms reproduce.
-veilvoice-check = { path = "../veilvoice-check" }
 # The engine's version, its configuration, and the seed-roll range parser the
 # flags share with the window.
 veilvoice-core = { path = "../veilvoice-core" }
@@ -41,35 +35,12 @@ veilvoice-guard = { path = "../veilvoice-guard" }
 # Capture, playback, decoding and the live session `veilvoice live` and
 # `record` run.
 veilvoice-audio = { path = "../veilvoice-audio", default-features = false }
-# What a virtual cable is, and how the ones this machine has are described.
-veilvoice-capture = { path = "../veilvoice-capture" }
-# `veilvoice accel`: what hardware acceleration changes, and how many threads
-# are usable here.
-veilvoice-accel = { path = "../veilvoice-accel" }
-# `veilvoice decoy`: making vaults that are indistinguishable by size, and
-# saying what that does not do.
-veilvoice-decoy = { path = "../veilvoice-decoy" }
-# `veilvoice appctl`: what closing another program is allowed to mean.
-veilvoice-appctl = { path = "../veilvoice-appctl" }
-# The safety catch's own words about what it cannot prevent and what it never
-# closes.
-veilvoice-failsafe = { path = "../veilvoice-failsafe" }
-# `veilvoice input`: what can reach the keyboard and mouse, and why nothing
-# here hooks them.
-veilvoice-input = { path = "../veilvoice-input" }
-# `veilvoice priv`: the privilege this process is running at, and the three
-# things it never does.
-veilvoice-priv = { path = "../veilvoice-priv" }
-# Whether a named process is running, for `appctl`.
-veilvoice-proc = { path = "../veilvoice-proc" }
 # Group mode: the plan, the render and the subtitles.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 # Stripping tags, EXIF and GPS out of what is written.
 veilvoice-meta = { path = "../veilvoice-meta" }
 # Settings somebody else decided, and the mandate that seals them.
 veilvoice-policy = { path = "../veilvoice-policy" }
-# `veilvoice sentry`: the canary files and the rate limit behind the app lock.
-veilvoice-sentry = { path = "../veilvoice-sentry" }
 # Installing this copy, and finding the encrypted volumes it can write into.
 veilvoice-setup = { path = "../veilvoice-setup" }
 # The preview page, the palette every speaker is coloured from, and the render

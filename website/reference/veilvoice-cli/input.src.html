@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/input.rs</code></h1>
-<p style="color:var(--muted)"><a href="input.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 117 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/input.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="input.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 120 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/input.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -87,12 +87,12 @@
 <span class="ln" id="L19"><span class="tok-com">//! list look like good news.</span></span>
 <span class="ln" id="L20"></span>
 <span class="ln" id="L21"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, paint, warn};</span>
-<span class="ln" id="L22"><span class="tok-kw">use</span> veilvoice_input::Reach;</span>
+<span class="ln" id="L22"><span class="tok-kw">use</span> veilvoice_watch::input::Reach;</span>
 <span class="ln" id="L23"></span>
 <span class="src-item" id="fn-look">
 <span class="ln" id="L24"><span class="tok-com">/// Show what can see input on this machine.</span></span>
 <span class="ln" id="L25"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">look</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L26">    <span class="tok-kw">let</span> report = veilvoice_input::<span class="tok-fn">look</span>();</span>
+<span class="ln" id="L26">    <span class="tok-kw">let</span> report = veilvoice_watch::input::<span class="tok-fn">look</span>();</span>
 <span class="ln" id="L27"></span>
 <span class="ln" id="L28">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;What could see your keyboard and mouse&quot;</span>));</span>
 <span class="ln" id="L29">    println!();</span>
@@ -130,11 +130,11 @@
 <span class="ln" id="L61">    }</span>
 <span class="ln" id="L62"></span>
 <span class="ln" id="L63">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS CANNOT TELL YOU&quot;</span>));</span>
-<span class="ln" id="L64">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_input::LIMITS, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L64">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_watch::input::LIMITS, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L65">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
 <span class="ln" id="L66">    }</span>
 <span class="ln" id="L67">    println!();</span>
-<span class="ln" id="L68">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_input::WHY_NOT_HOOKING, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L68">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_watch::input::WHY_NOT_HOOKING, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L69">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
 <span class="ln" id="L70">    }</span>
 <span class="ln" id="L71">    println!();</span>
@@ -174,18 +174,21 @@
 <span class="ln" id="L103">            Reach::Incidental =&gt; <span class="tok-str">&quot;These reach input to do their own job&quot;</span>,</span>
 <span class="ln" id="L104">        };</span>
 <span class="ln" id="L105">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::BLUE, &amp;format!(<span class="tok-str">&quot;  {heading_text}&quot;</span>)));</span>
-<span class="ln" id="L106">        <span class="tok-kw">for</span> watcher <span class="tok-kw">in</span> veilvoice_input::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|w| w.reach == reach) {</span>
-<span class="ln" id="L107">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(&amp;format!(<span class="tok-str">&quot;    {}&quot;</span>, watcher.name), watcher.what));</span>
-<span class="ln" id="L108">        }</span>
-<span class="ln" id="L109">        println!();</span>
-<span class="ln" id="L110">    }</span>
-<span class="ln" id="L111"></span>
-<span class="ln" id="L112">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS CANNOT TELL YOU&quot;</span>));</span>
-<span class="ln" id="L113">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_input::LIMITS, <span class="tok-num">72</span>) {</span>
-<span class="ln" id="L114">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
-<span class="ln" id="L115">    }</span>
-<span class="ln" id="L116">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L117">}</span>
+<span class="ln" id="L106">        <span class="tok-kw">for</span> watcher <span class="tok-kw">in</span> veilvoice_watch::input::ALL</span>
+<span class="ln" id="L107">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L108">            .<span class="tok-fn">filter</span>(|w| w.reach == reach)</span>
+<span class="ln" id="L109">        {</span>
+<span class="ln" id="L110">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(&amp;format!(<span class="tok-str">&quot;    {}&quot;</span>, watcher.name), watcher.what));</span>
+<span class="ln" id="L111">        }</span>
+<span class="ln" id="L112">        println!();</span>
+<span class="ln" id="L113">    }</span>
+<span class="ln" id="L114"></span>
+<span class="ln" id="L115">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS CANNOT TELL YOU&quot;</span>));</span>
+<span class="ln" id="L116">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_watch::input::LIMITS, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L117">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
+<span class="ln" id="L118">    }</span>
+<span class="ln" id="L119">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L120">}</span>
 </span>
 </code></pre>
 </main>

@@ -26,27 +26,18 @@ veilvoice-crypto = { path = "../veilvoice-crypto" }
 veilvoice-meta = { path = "../veilvoice-meta" }
 # Settings somebody else decided, and which controls that leaves the person.
 veilvoice-policy = { path = "../veilvoice-policy" }
-# The Verify tab, which runs the same check as `veilvoice verify` with the
-# same code underneath.
-veilvoice-check = { path = "../veilvoice-check" }
-# The second opinion on the Verify tab: the reader's own GnuPG, and the
-# commands it is asked to run.
-veilvoice-gnupg = { path = "../veilvoice-gnupg" }
+# The Verify tab: the same signed hash lists, the same contents manifest
+# and the same offer to run the reader's own GnuPG as `veilvoice verify`,
+# from the same code rather than a second copy.
+veilvoice-verify = { path = "../veilvoice-verify" }
 # Group mode and the Studio's plan, the render, and the subtitles.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 # The Install tab, the encrypted volumes it can write into, and the free space
 # the first-run card measures.
 veilvoice-setup = { path = "../veilvoice-setup" }
-# The update check the person presses, and what it does and does not send.
-veilvoice-update = { path = "../veilvoice-update" }
 # The palettes speakers are coloured from, the preview page and the render
 # size.
 veilvoice-video = { path = "../veilvoice-video" }
-# The saved members of a group recording, and the profiles they are rendered
-# with.
-veilvoice-workspace = { path = "../veilvoice-workspace" }
-# The safety catch: what it found, what it may close, and what it never will.
-veilvoice-failsafe = { path = "../veilvoice-failsafe" }
 # The Monitor tab's feed of what is holding the microphone and the camera.
 veilvoice-watch = { path = "../veilvoice-watch" }
 # The integrity panel: the manifest of this installation and what changed in

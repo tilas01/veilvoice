@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/input.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 117 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/input.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 120 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/input.rs)
 
 ## Contents
 
@@ -32,7 +32,7 @@ list look like good news.
 
 ## What this file contains
 
-117 lines defining **2 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+120 lines defining **2 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 

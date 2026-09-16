@@ -88,7 +88,7 @@
 <span class="ln" id="L20"><span class="tok-com">//! be lifted **from this side**. It was lifted from the other one. A release</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! now also publishes `CONTENTS.sha256`, listing every file inside every</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! archive with its SHA-256, staged before `SHA256SUMS` is computed so that the</span></span>
-<span class="ln" id="L23"><span class="tok-com">//! signature covers it too. `veilvoice_check::contents` reads it and `lib.rs`</span></span>
+<span class="ln" id="L23"><span class="tok-com">//! signature covers it too. `crate::check::contents` reads it and `lib.rs`</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! checks the extracted folder against it, file by file, and reports anything</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! in that folder the release never published.</span></span>
 <span class="ln" id="L26"><span class="tok-com">//!</span></span>
@@ -251,10 +251,10 @@
 <span class="ln" id="L167"><span class="tok-com">///</span></span>
 <span class="ln" id="L168"><span class="tok-com">/// Roadmap item 90 moved the body out of this binary so the desktop application&#x27;s</span></span>
 <span class="ln" id="L169"><span class="tok-com">/// verify tab prints the same commands; roadmap item 97 moved it again, into</span></span>
-<span class="ln" id="L170"><span class="tok-com">/// `veilvoice-gnupg`, which also *runs* them. Re-exported here rather than</span></span>
+<span class="ln" id="L170"><span class="tok-com">/// `crate::gnupg`, which also *runs* them. Re-exported here rather than</span></span>
 <span class="ln" id="L171"><span class="tok-com">/// called through at every site, which keeps this module the one place the</span></span>
 <span class="ln" id="L172"><span class="tok-com">/// verifier looks for anything about extracted releases and GnuPG.</span></span>
-<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> veilvoice_gnupg::commands <span class="tok-kw">as</span> gnupg_commands;</span>
+<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::gnupg::commands <span class="tok-kw">as</span> gnupg_commands;</span>
 <span class="ln" id="L174"></span>
 <span class="ln" id="L175"><span class="tok-attr">#[cfg</span>(test)]</span>
 <span class="ln" id="L176"><span class="tok-kw">mod</span> tests {</span>

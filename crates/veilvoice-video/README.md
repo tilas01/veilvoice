@@ -90,8 +90,9 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>167 lines"])
-    n_ffmpeg["ffmpeg.rs<br/>717 lines"]
+    n_lib(["lib.rs<br/>168 lines"])
+    n_accel["accel.rs<br/>647 lines"]
+    n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>686 lines"]
     n_page["page.rs<br/>1610 lines"]
@@ -110,6 +111,7 @@ flowchart TD
     n_page --> n_waveform
     n_raster --> n_font
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" "open the source"
+    click n_accel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs" "open the source"
     click n_ffmpeg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" "open the source"
     click n_font href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/font.rs" "open the source"
     click n_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs" "open the source"
@@ -126,17 +128,18 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 717 | The video file, which needs a codec this project does not ship. |
+| [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | 647 | What hardware this machine has, and the one place VeilVoice can use it. |
+| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 718 | The video file, which needs a codec this project does not ship. |
 | [`font.rs`](../../docs/files/veilvoice-video/font.md) | 418 | A monospace face, five pixels by seven, drawn here. |
 | [`frames.rs`](../../docs/files/veilvoice-video/frames.md) | 686 | The video's pictures, and how many of them there really are. |
-| [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 167 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 168 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1610 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
 | [`raster.rs`](../../docs/files/veilvoice-video/raster.md) | 594 | Pixels, and a PNG to put them in. |
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**3,997 functional lines of Rust** in this crate. A functional line is a line
+**4,470 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -147,6 +150,13 @@ counts blank lines and comments too. Both are produced by
 
 | Item | Where | What |
 |---|---|---|
+| `enum Vendor` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | Who made a graphics device. |
+| `struct Adapter` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | One graphics device. |
+| `struct Found` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | Everything found, and anything that went wrong looking. |
+| `fn look` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | Look for graphics hardware. |
+| `fn usable_threads` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | How many threads this machine can usefully run at once. |
+| `const WHY_NOT_THE_ENGINE` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | Why the audio engine is not offered a graphics card, with the numbers. |
+| `const WHAT_IT_CHANGES` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | What hardware encoding is for, and what it does not change. |
 | `fn found` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | Where ffmpeg is, if this machine has one. |
 | `struct Encoding` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | How to render the file. |
 | `fn command` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | The command that turns a directory of numbered frames and a WAV into a video file. |

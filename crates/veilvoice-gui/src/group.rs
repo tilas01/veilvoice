@@ -63,8 +63,8 @@ use veilvoice_conversation::render;
 use veilvoice_conversation::{Conversation, Speaker};
 use veilvoice_core::voices::{self, MAX_VOICES};
 use veilvoice_core::DeidConfig;
+use veilvoice_policy::workspace::{Member, Workspace};
 use veilvoice_video::palette::Palette;
-use veilvoice_workspace::{Member, Workspace};
 
 /// One person, as the panel holds them.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -254,7 +254,9 @@ impl Default for Group {
             title: String::new(),
             theme: veilvoice_video::palette::default_palette(),
             voices: VoiceMode::default(),
-            profile: veilvoice_workspace::default_profile().id.to_string(),
+            profile: veilvoice_policy::workspace::default_profile()
+                .id
+                .to_string(),
             project: None,
             opening_project: crate::dialog::Pending::new(),
             saving_project: crate::dialog::Pending::new(),
@@ -375,7 +377,7 @@ impl Group {
     /// top of `update`.
     fn collect_dialogs(&mut self) {
         if let Some(path) = self.opening_project.taken() {
-            match veilvoice_workspace::Workspace::load(&path) {
+            match veilvoice_policy::workspace::Workspace::load(&path) {
                 Ok(work) => {
                     self.from_workspace(&work);
                     self.project = Some(path);
@@ -481,7 +483,7 @@ impl Group {
         ui.add_space(4.0);
 
         ui.horizontal_wrapped(|ui| {
-            for one in veilvoice_workspace::BUILT_IN {
+            for one in veilvoice_policy::workspace::BUILT_IN {
                 let chosen = self.profile == one.id;
                 if ui.selectable_label(chosen, one.name).clicked() && !chosen {
                     self.apply_profile(one);
@@ -489,7 +491,7 @@ impl Group {
             }
         });
 
-        if let Some(one) = veilvoice_workspace::profile(&self.profile) {
+        if let Some(one) = veilvoice_policy::workspace::profile(&self.profile) {
             ui.label(RichText::new(one.note).color(p::muted()).small());
         } else {
             ui.label(
@@ -543,7 +545,7 @@ impl Group {
     }
 
     /// Set the controls this profile names, and change nothing else.
-    fn apply_profile(&mut self, one: &veilvoice_workspace::Profile) {
+    fn apply_profile(&mut self, one: &veilvoice_policy::workspace::Profile) {
         self.profile = one.id.to_string();
         self.enabled = one.group;
         // A profile that asks for a voice each cannot be applied to more people
@@ -951,7 +953,7 @@ impl Group {
         self.input = work.input.clone();
         self.plan = work.plan.clone();
 
-        match veilvoice_workspace::profile(&work.profile) {
+        match veilvoice_policy::workspace::profile(&work.profile) {
             Some(found) => {
                 self.profile = found.id.to_string();
                 self.voices = found.voices;
@@ -1908,7 +1910,7 @@ mod tests {
             plan: Some(PathBuf::from("plan.txt")),
             theme: veilvoice_video::palette::by_id("gruvbox").unwrap(),
             voices: VoiceMode::Uniform,
-            profile: veilvoice_workspace::GROUP_ONE_VOICE.id.to_string(),
+            profile: veilvoice_policy::workspace::GROUP_ONE_VOICE.id.to_string(),
             outputs: Outputs {
                 audio: true,
                 subtitles: false,
@@ -1990,9 +1992,9 @@ mod tests {
     #[test]
     fn a_project_with_too_many_people_for_the_mode_is_reported_not_trimmed() {
         let mut work = Workspace::new();
-        work.profile = veilvoice_workspace::GROUP_VOICES.id.to_string();
+        work.profile = veilvoice_policy::workspace::GROUP_VOICES.id.to_string();
         work.members = (0..9)
-            .map(|n| veilvoice_workspace::Member {
+            .map(|n| veilvoice_policy::workspace::Member {
                 name: format!("P{n}"),
                 colour: None,
             })
@@ -2015,7 +2017,7 @@ mod tests {
         };
         group.people[0].name = "Alex".into();
 
-        group.apply_profile(&veilvoice_workspace::GROUP_ONE_VOICE);
+        group.apply_profile(&veilvoice_policy::workspace::GROUP_ONE_VOICE);
         assert_eq!(group.voices, VoiceMode::Uniform);
         assert!(group.enabled);
         assert_eq!(group.title, "kept", "a profile is not a reset");

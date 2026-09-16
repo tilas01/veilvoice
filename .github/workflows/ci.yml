@@ -181,14 +181,9 @@ jobs:
         run: |
           cargo test --locked --target ${{ matrix.target }} ${{ matrix.extra }} \
             -p veilvoice-core -p veilvoice-crypto -p veilvoice-meta \
-            -p veilvoice-conversation -p veilvoice-check -p veilvoice-workspace \
-            -p veilvoice-gnupg \
-            -p veilvoice-policy -p veilvoice-decoy -p veilvoice-guard \
-            -p veilvoice-verify -p veilvoice-proc -p veilvoice-sentry \
-            -p veilvoice-appctl -p veilvoice-update -p veilvoice-watch \
-            -p veilvoice-failsafe -p veilvoice-input -p veilvoice-priv \
-            -p veilvoice-drivers -p veilvoice-capture -p veilvoice-accel \
-            -p veilvoice-setup
+            -p veilvoice-conversation -p veilvoice-video -p veilvoice-policy \
+            -p veilvoice-setup -p veilvoice-verify \
+            -p veilvoice-guard -p veilvoice-watch
 
   # The generated artwork is committed, so it must match what the generator
   # produces. Otherwise the two drift and the "verifiable from source" claim
@@ -718,7 +713,7 @@ jobs:
   #
   # Both crates that reach `pgp` are checked, and the list is derived from the
   # manifests rather than written here: the signature arithmetic moved from
-  # `veilvoice-verify` into `veilvoice-check` so the desktop application could
+  # `veilvoice-verify` into its `check` module so the desktop application could
   # share it, and for a while afterwards this job still grepped only the crate
   # it had started in. A guard whose scope is narrower than the claim it
   # enforces is worse than no guard, because it is green.

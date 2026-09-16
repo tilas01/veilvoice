@@ -77,8 +77,9 @@ none -- so it prints the command that would do it with `ffmpeg`, if you have
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>167 lines"])
-    n_ffmpeg["ffmpeg.rs<br/>717 lines"]
+    n_lib(["lib.rs<br/>168 lines"])
+    n_accel["accel.rs<br/>647 lines"]
+    n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>686 lines"]
     n_page["page.rs<br/>1610 lines"]
@@ -97,6 +98,7 @@ flowchart TD
     n_page --> n_waveform
     n_raster --> n_font
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" "open the source"
+    click n_accel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs" "open the source"
     click n_ffmpeg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" "open the source"
     click n_font href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/font.rs" "open the source"
     click n_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs" "open the source"
@@ -113,17 +115,18 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 717 | The video file, which needs a codec this project does not ship. |
+| [[`accel.rs`|File-veilvoice-video-accel]] | 647 | What hardware this machine has, and the one place VeilVoice can use it. |
+| [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 718 | The video file, which needs a codec this project does not ship. |
 | [[`font.rs`|File-veilvoice-video-font]] | 418 | A monospace face, five pixels by seven, drawn here. |
 | [[`frames.rs`|File-veilvoice-video-frames]] | 686 | The video's pictures, and how many of them there really are. |
-| [[`lib.rs`|File-veilvoice-video-lib]] | 167 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [[`lib.rs`|File-veilvoice-video-lib]] | 168 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [[`page.rs`|File-veilvoice-video-page]] | 1610 | The picture: one still for a preview, and one page that plays. |
 | [[`palette.rs`|File-veilvoice-video-palette]] | 747 | Colours: the site's own tokens, and one per speaker. |
 | [[`raster.rs`|File-veilvoice-video-raster]] | 594 | Pixels, and a PNG to put them in. |
 | [[`size.rs`|File-veilvoice-video-size]] | 732 | The size and frame rate a video is rendered at. |
 | [[`waveform.rs`|File-veilvoice-video-waveform]] | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**3,997 functional lines of Rust** in this crate. A functional line is a line
+**4,470 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

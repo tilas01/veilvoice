@@ -34,7 +34,7 @@ veilvoice-meta = { path = "../crates/veilvoice-meta" }
 # have written.
 veilvoice-guard = { path = "../crates/veilvoice-guard" }
 # The contents manifest parser, which reads a published list.
-veilvoice-check = { path = "../crates/veilvoice-check" }
+veilvoice-verify = { path = "../crates/veilvoice-verify" }
 # `default-features = false` drops cpal: the fuzzers touch decoding and header
 # checking only, and there is no reason to link an audio backend into them.
 veilvoice-audio = { path = "../crates/veilvoice-audio", default-features = false }

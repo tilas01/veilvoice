@@ -58,7 +58,7 @@ pub const SUMS_SIG: &str = "SHA256SUMS.asc";
 /// **Roadmap item 97.** Optional, and its absence is not a failure: releases before
 /// v0.1.15 do not carry one, and a verifier that refused them would be refusing
 /// files it can check perfectly well.
-pub const CONTENTS: &str = veilvoice_check::contents::CONTENTS;
+pub const CONTENTS: &str = crate::check::contents::CONTENTS;
 
 /// What was found in one directory.
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! `veilvoice sentry` -- canaries, baselines, and what changed since.
 //!
-//! The command-line front end to [`veilvoice_sentry`]. All of the logic is in
+//! The command-line front end to [`veilvoice_guard::sentry`]. All of the logic is in
 //! that crate; this file decides where the state lives, prints it, and chooses
 //! an exit code.
 //!
@@ -31,7 +31,7 @@
 //!
 //! # This detects, and stops nothing
 //!
-//! [`veilvoice_sentry::SCOPE`] is printed by `status` rather than paraphrased
+//! [`veilvoice_guard::sentry::SCOPE`] is printed by `status` rather than paraphrased
 //! here, so there is one wording and the tests guard it.
 //!
 //! # In plain words
@@ -44,8 +44,8 @@
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::path::{Path, PathBuf};
-use veilvoice_sentry::canary::Nest;
-use veilvoice_sentry::rate::{self, Concern, Limits, Snapshot, Threshold};
+use veilvoice_guard::sentry::canary::Nest;
+use veilvoice_guard::sentry::rate::{self, Concern, Limits, Snapshot, Threshold};
 
 /// Where the canaries and baselines are kept.
 ///
@@ -75,7 +75,9 @@ fn load_nest() -> Result<Nest, String> {
     let path = nest_path()?;
     match Nest::load(&path) {
         Ok(nest) => Ok(nest),
-        Err(veilvoice_sentry::Error::Io(error)) if error.kind() == std::io::ErrorKind::NotFound => {
+        Err(veilvoice_guard::sentry::Error::Io(error))
+            if error.kind() == std::io::ErrorKind::NotFound =>
+        {
             Ok(Nest::new())
         }
         Err(error) => Err(format!("{}: {error}", path.display())),
@@ -160,7 +162,7 @@ pub fn status() -> Result<(), String> {
 
     println!();
     println!("{}", paint(colour::YELLOW, "WHAT THIS IS WORTH"));
-    for line in wrap(veilvoice_sentry::SCOPE, 72) {
+    for line in wrap(veilvoice_guard::sentry::SCOPE, 72) {
         println!("  {line}");
     }
     Ok(())
@@ -363,13 +365,13 @@ mod tests {
 
     #[test]
     fn wrapping_keeps_every_word_and_respects_the_width() {
-        let lines = wrap(veilvoice_sentry::SCOPE, 72);
+        let lines = wrap(veilvoice_guard::sentry::SCOPE, 72);
         assert!(lines.len() > 1, "the scope note is longer than one line");
         for line in &lines {
             assert!(line.len() <= 72, "too long: {line:?}");
         }
         let rejoined = lines.join(" ");
-        let original: Vec<&str> = veilvoice_sentry::SCOPE.split_whitespace().collect();
+        let original: Vec<&str> = veilvoice_guard::sentry::SCOPE.split_whitespace().collect();
         assert_eq!(rejoined.split_whitespace().collect::<Vec<_>>(), original);
     }
 

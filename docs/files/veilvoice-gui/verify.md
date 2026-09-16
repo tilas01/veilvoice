@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/verify.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1592 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1598 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs)
 
 ## Contents
 
@@ -37,7 +37,7 @@ is a feature: it is what somebody downloads before they trust anything
 else here, and a 1.5 MB single file is part of why it is checkable at all.
 Putting a GUI toolkit in it would have cost that for a convenience the
 desktop application was already the right place for. So the arithmetic
-moved to `veilvoice-check` and this is a second caller, not a second
+moved to `veilvoice_verify::check` and this is a second caller, not a second
 implementation.
 
 # Three files, and the tab says so before it is given any
@@ -93,7 +93,7 @@ asks your own GnuPG the same question and shows you its answer.
 
 ## What this file contains
 
-1592 lines defining **23 functions** (7 public), **5 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1598 lines defining **23 functions** (7 public), **5 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -144,19 +144,19 @@ flowchart TD
     n_take_dropped(["Verify::take_dropped<br/>line 333"])
     n_tab(["Verify::tab<br/>line 351"])
     n_body["Verify::body<br/>line 357"]
-    n_drop_target["Verify::drop_target<br/>line 500"]
-    n_slot_row["Verify::slot_row<br/>line 536"]
-    n_gnupg_section["Verify::gnupg_section<br/>line 599"]
-    n_checker_section["Verify::checker_section<br/>line 710"]
-    n_copyable_command["Verify::copyable_command<br/>line 830"]
-    n_verdict["Verify::verdict<br/>line 842"]
-    n_contents_verdict["Verify::contents_verdict<br/>line 853"]
-    n_gnupg_verdict["Verify::gnupg_verdict<br/>line 900"]
-    n_archive_verdict["Verify::archive_verdict<br/>line 938"]
-    n_start["Verify::start<br/>line 997"]
-    n_examine["examine<br/>line 1020"]
-    n_examine_contents["examine_contents<br/>line 1054"]
-    n_examine_gnupg["examine_gnupg<br/>line 1151"]
+    n_drop_target["Verify::drop_target<br/>line 503"]
+    n_slot_row["Verify::slot_row<br/>line 539"]
+    n_gnupg_section["Verify::gnupg_section<br/>line 602"]
+    n_checker_section["Verify::checker_section<br/>line 713"]
+    n_copyable_command["Verify::copyable_command<br/>line 833"]
+    n_verdict["Verify::verdict<br/>line 845"]
+    n_contents_verdict["Verify::contents_verdict<br/>line 856"]
+    n_gnupg_verdict["Verify::gnupg_verdict<br/>line 903"]
+    n_archive_verdict["Verify::archive_verdict<br/>line 941"]
+    n_start["Verify::start<br/>line 1000"]
+    n_examine["examine<br/>line 1023"]
+    n_examine_contents["examine_contents<br/>line 1057"]
+    n_examine_gnupg["examine_gnupg<br/>line 1154"]
     n_accept --> n_fill_from_beside
     n_accept --> n_slot_for
     n_body --> n_checker_section
@@ -185,19 +185,19 @@ flowchart TD
     click n_take_dropped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L333" "open the source"
     click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L351" "open the source"
     click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L357" "open the source"
-    click n_drop_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L500" "open the source"
-    click n_slot_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L536" "open the source"
-    click n_gnupg_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L599" "open the source"
-    click n_checker_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L710" "open the source"
-    click n_copyable_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L830" "open the source"
-    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L842" "open the source"
-    click n_contents_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L853" "open the source"
-    click n_gnupg_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L900" "open the source"
-    click n_archive_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L938" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L997" "open the source"
-    click n_examine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1020" "open the source"
-    click n_examine_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1054" "open the source"
-    click n_examine_gnupg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1151" "open the source"
+    click n_drop_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L503" "open the source"
+    click n_slot_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L539" "open the source"
+    click n_gnupg_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L602" "open the source"
+    click n_checker_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L713" "open the source"
+    click n_copyable_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L833" "open the source"
+    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L845" "open the source"
+    click n_contents_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L856" "open the source"
+    click n_gnupg_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L903" "open the source"
+    click n_archive_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L941" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1000" "open the source"
+    click n_examine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1023" "open the source"
+    click n_examine_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1057" "open the source"
+    click n_examine_gnupg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1154" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_wants_repaint,n_take_dropped,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -232,19 +232,19 @@ flowchart TD
 | `Verify::take_dropped` <sub>pub fn</sub> | [333](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L333) | Read what the window was given this frame. |
 | `Verify::tab` <sub>pub fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L351) | The whole tab. |
 | `Verify::body` <sub>fn</sub> | [357](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L357) |  |
-| `Verify::drop_target` <sub>fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L500) | The rectangle that lights up while files are over the window. |
-| `Verify::slot_row` <sub>fn</sub> | [536](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L536) | One file slot: what it is, what is in it, and a way to change it. |
-| `Verify::gnupg_section` <sub>fn</sub> | [599](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L599) | Roadmap item 90. |
-| `Verify::checker_section` <sub>fn</sub> | [710](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L710) | Which implementation checks the signature, and the choice behind it. |
-| `Verify::copyable_command` <sub>fn</sub> | [830](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L830) | One command, shown as it would be typed, with a button that copies it and says it did. |
-| `Verify::verdict` <sub>fn</sub> | [842](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L842) | The answer, in the colour it deserves. |
-| `Verify::contents_verdict` <sub>fn</sub> | [853](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L853) | Roadmap item 97. |
-| `Verify::gnupg_verdict` <sub>fn</sub> | [900](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L900) | Roadmap item 97. |
-| `Verify::archive_verdict` <sub>fn</sub> | [938](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L938) | The archive against the signed hash list. |
-| `Verify::start` <sub>fn</sub> | [997](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L997) | Run the check on a thread of its own. |
-| `examine` <sub>fn</sub> | [1020](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1020) | The whole check, off the drawing thread. |
-| `examine_contents` <sub>fn</sub> | [1054](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1054) | Roadmap item 97. |
-| `examine_gnupg` <sub>fn</sub> | [1151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1151) | Roadmap item 97. |
+| `Verify::drop_target` <sub>fn</sub> | [503](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L503) | The rectangle that lights up while files are over the window. |
+| `Verify::slot_row` <sub>fn</sub> | [539](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L539) | One file slot: what it is, what is in it, and a way to change it. |
+| `Verify::gnupg_section` <sub>fn</sub> | [602](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L602) | Roadmap item 90. |
+| `Verify::checker_section` <sub>fn</sub> | [713](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L713) | Which implementation checks the signature, and the choice behind it. |
+| `Verify::copyable_command` <sub>fn</sub> | [833](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L833) | One command, shown as it would be typed, with a button that copies it and says it did. |
+| `Verify::verdict` <sub>fn</sub> | [845](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L845) | The answer, in the colour it deserves. |
+| `Verify::contents_verdict` <sub>fn</sub> | [856](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L856) | Roadmap item 97. |
+| `Verify::gnupg_verdict` <sub>fn</sub> | [903](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L903) | Roadmap item 97. |
+| `Verify::archive_verdict` <sub>fn</sub> | [941](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L941) | The archive against the signed hash list. |
+| `Verify::start` <sub>fn</sub> | [1000](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1000) | Run the check on a thread of its own. |
+| `examine` <sub>fn</sub> | [1023](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1023) | The whole check, off the drawing thread. |
+| `examine_contents` <sub>fn</sub> | [1057](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1057) | Roadmap item 97. |
+| `examine_gnupg` <sub>fn</sub> | [1154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1154) | Roadmap item 97. |
 
 ---
 

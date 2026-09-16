@@ -70,7 +70,7 @@
 <span class="ln" id="L2"><span class="tok-com">//! `veilvoice capture` -- which screen recorders are running, and which of them</span></span>
 <span class="ln" id="L3"><span class="tok-com">//! you have said you meant to run.</span></span>
 <span class="ln" id="L4"><span class="tok-com">//!</span></span>
-<span class="ln" id="L5"><span class="tok-com">//! The command-line front end to [`veilvoice_capture`]. That crate holds the</span></span>
+<span class="ln" id="L5"><span class="tok-com">//! The command-line front end to [`veilvoice_watch::capture`]. That crate holds the</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! table, the allowlist and the honest account of the three things it cannot</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! do; this file decides where the allowlist lives and prints the result.</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
@@ -107,7 +107,7 @@
 <span class="ln" id="L39"></span>
 <span class="ln" id="L40"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, err, field, heading, ok, paint, warn};</span>
 <span class="ln" id="L41"><span class="tok-kw">use</span> std::path::PathBuf;</span>
-<span class="ln" id="L42"><span class="tok-kw">use</span> veilvoice_capture::{programs, Allowlist, Report};</span>
+<span class="ln" id="L42"><span class="tok-kw">use</span> veilvoice_watch::capture::{programs, Allowlist, Report};</span>
 <span class="ln" id="L43"></span>
 <span class="src-item" id="fn-capture_dir">
 <span class="ln" id="L44"><span class="tok-com">/// Where the allowlist is kept.</span></span>
@@ -186,7 +186,7 @@
 <span class="ln" id="L109"></span>
 <span class="ln" id="L110">    println!();</span>
 <span class="ln" id="L111">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS IS WORTH&quot;</span>));</span>
-<span class="ln" id="L112">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_capture::SCOPE, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L112">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_watch::capture::SCOPE, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L113">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
 <span class="ln" id="L114">    }</span>
 <span class="ln" id="L115">    println!();</span>
@@ -204,7 +204,7 @@
 <span class="ln" id="L125"><span class="tok-com">/// Prints the route, which program to change and where, and -- as plainly as</span></span>
 <span class="ln" id="L126"><span class="tok-com">/// the rest -- the two things it does not do.</span></span>
 <span class="ln" id="L127"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">calls</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L128">    <span class="tok-kw">use</span> veilvoice_capture::comms;</span>
+<span class="ln" id="L128">    <span class="tok-kw">use</span> veilvoice_watch::capture::comms;</span>
 <span class="ln" id="L129"></span>
 <span class="ln" id="L130">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Talking through VeilVoice&quot;</span>));</span>
 <span class="ln" id="L131">    println!();</span>
