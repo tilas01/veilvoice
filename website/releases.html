@@ -10,9 +10,6 @@
 <title>Releases &middot; VeilVoice</title>
 <meta name="description" content="Every version of VeilVoice, what changed in it, and where to get it.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
-<meta property="og:title" content="VeilVoice: irreversible voice de-identification">
-<meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
-<meta property="og:image" content="assets/banner.png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
      Same-origin only: a prefetch is a real request, and a privacy tool
      quietly reaching a third party to feel fast would undercut its own
@@ -27,6 +24,22 @@
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
 <script src="js/teleport.js" defer></script>
+<!-- Written by tools/site/seo.py. Edit that, not this. -->
+<link rel="canonical" href="https://tilas01.github.io/veilvoice/releases.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="VeilVoice">
+<meta property="og:url" content="https://tilas01.github.io/veilvoice/releases.html">
+<meta property="og:title" content="Releases · VeilVoice">
+<meta property="og:description" content="Every version of VeilVoice, what changed in it, and where to get it.">
+<meta property="og:image" content="https://tilas01.github.io/veilvoice/assets/banner.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="VeilVoice: irreversible voice de-identification">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Releases · VeilVoice">
+<meta name="twitter:description" content="Every version of VeilVoice, what changed in it, and where to get it.">
+<meta name="twitter:image" content="https://tilas01.github.io/veilvoice/assets/banner.png">
+<!-- end of the generated addresses -->
 </head>
 <body>
 <header class="top">
@@ -169,6 +182,18 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </details>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p><strong>A link to this site now shows a picture, and search engines are told they may read it</strong></p>
+<ul>
+<li>Every page told a link preview to use <code>assets/banner.png</code>. That tag is read by crawlers, not by browsers, and a crawler does not work out what a relative address means. So every link to this site, posted anywhere, had always shown no picture. Nothing looked wrong: the tag was there and the file exists.</li>
+<li>The address is absolute now, and every page also says which address is its own, which stops the same page being counted twice. Two pages had no preview tags at all and now have them, and the no-JavaScript page&#x27;s preview title no longer reads <code>VeilVoice &amp;amp;middot; no-JavaScript edition</code>.</li>
+<li>None of it is typed any more. It is built from what each page already says, by one piece of code every generator calls, so a new page cannot arrive without it.</li>
+<li>The site also had no <code>robots.txt</code> and no sitemap, so the only way in was a link from somewhere else. Both are there now, and the sitemap is produced by walking the site: all 398 pages, updated whenever one is added or removed.</li>
+</ul>
+<p><strong>The banner moves on the no-JavaScript page too</strong></p>
+<ul>
+<li>That edition showed the still picture while the main site animated the same banner. It shows the animation now, which is the same file the main site already serves to anyone with scripts off.</li>
+<li>Anyone who has asked their system for less movement still gets the still, and that choice is made by the markup rather than by a script, so it works on a page that runs none.</li>
+</ul>
 <p><strong>Links into a page land on the thing they name</strong></p>
 <ul>
 <li>The site&#x27;s header stays at the top of the screen as you scroll, so anything a link jumps to needs to be pushed down clear of it. The amount it was pushed down by was a single number, and the header is five different heights depending on the page and the width of the window. At the commonest desktop width the heading you had asked for ended up behind the bar, so the section looked as though it started halfway through a sentence.</li>

@@ -114,8 +114,15 @@ function run() {
         problems.push(`reference to an unexpected host: ${host}`);
       }
     }
-    for (const m of html.matchAll(/<(?:script|link|img)\b[^>]*\b(?:src|href)="(\/\/|https?:)/g)) {
-      problems.push(`asset loaded from a third party: ${m[1]}`);
+    // A `<link>` only fetches for some values of `rel`. `canonical` is one of
+    // the ones that does not: it tells an index which address to treat as this
+    // page's own, and an address has to be absolute to say that at all. The
+    // rule is about requests the reader's browser makes, so it is scoped to
+    // the rels that make one.
+    const FETCHING_REL = /\brel="(?:stylesheet|icon|shortcut icon|apple-touch-icon|preload|prefetch|preconnect|dns-prefetch|modulepreload|manifest)"/;
+    for (const m of html.matchAll(/<(script|link|img)\b([^>]*)\b(?:src|href)="(\/\/|https?:)/g)) {
+      if (m[1] === "link" && !FETCHING_REL.test(m[2])) { continue; }
+      problems.push(`asset loaded from a third party: ${m[3]}`);
     }
 
     // Inline handlers are the thing the renderer's escaping exists to prevent;

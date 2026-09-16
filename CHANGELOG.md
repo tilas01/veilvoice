@@ -8,6 +8,33 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**A link to this site now shows a picture, and search engines are told they
+may read it**
+
+- Every page told a link preview to use `assets/banner.png`. That tag is read
+  by crawlers, not by browsers, and a crawler does not work out what a relative
+  address means. So every link to this site, posted anywhere, had always shown
+  no picture. Nothing looked wrong: the tag was there and the file exists.
+- The address is absolute now, and every page also says which address is its
+  own, which stops the same page being counted twice. Two pages had no preview
+  tags at all and now have them, and the no-JavaScript page's preview title no
+  longer reads `VeilVoice &amp;middot; no-JavaScript edition`.
+- None of it is typed any more. It is built from what each page already says,
+  by one piece of code every generator calls, so a new page cannot arrive
+  without it.
+- The site also had no `robots.txt` and no sitemap, so the only way in was a
+  link from somewhere else. Both are there now, and the sitemap is produced by
+  walking the site: all 398 pages, updated whenever one is added or removed.
+
+**The banner moves on the no-JavaScript page too**
+
+- That edition showed the still picture while the main site animated the same
+  banner. It shows the animation now, which is the same file the main site
+  already serves to anyone with scripts off.
+- Anyone who has asked their system for less movement still gets the still, and
+  that choice is made by the markup rather than by a script, so it works on a
+  page that runs none.
+
 **Links into a page land on the thing they name**
 
 - The site's header stays at the top of the screen as you scroll, so anything a

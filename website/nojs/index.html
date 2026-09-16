@@ -86,6 +86,22 @@ footer{margin-top:40px;border-top:1px solid var(--border);padding-top:18px;color
 /* No "on" rule here at all: this edition is the off position by definition,
    and a rule that could switch it on would only ever fire by mistake. */
 </style>
+<!-- Written by tools/site/seo.py. Edit that, not this. -->
+<link rel="canonical" href="https://tilas01.github.io/veilvoice/nojs/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VeilVoice">
+<meta property="og:url" content="https://tilas01.github.io/veilvoice/nojs/">
+<meta property="og:title" content="VeilVoice · no-JavaScript edition">
+<meta property="og:description" content="VeilVoice without JavaScript: irreversible voice de-identification, fully offline. One file, no scripts, no third-party requests.">
+<meta property="og:image" content="https://tilas01.github.io/veilvoice/assets/banner.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="VeilVoice: irreversible voice de-identification">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VeilVoice · no-JavaScript edition">
+<meta name="twitter:description" content="VeilVoice without JavaScript: irreversible voice de-identification, fully offline. One file, no scripts, no third-party requests.">
+<meta name="twitter:image" content="https://tilas01.github.io/veilvoice/assets/banner.png">
+<!-- end of the generated addresses -->
 </head>
 <body>
 
@@ -122,7 +138,19 @@ footer{margin-top:40px;border-top:1px solid var(--border);padding-top:18px;color
   <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
 </nav>
 
-<img src="../assets/banner.png" alt="VeilVoice: irreversible voice de-identification" width="1280" height="640">
+<!-- The same banner the full site draws in CSS, as a picture, because this
+     edition runs nothing. Both files come from `assets/generate.py`, so they
+     cannot drift from the markup the other site animates.
+
+     The animation costs 566 KB against the still's 19 KB, which is a real
+     price on a page whose whole argument is that it is small. It is paid only
+     by readers who have not asked their system for less movement: the first
+     <source> hands those readers the still, and that selection is markup, not
+     script, so it works here. -->
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="../assets/banner.png">
+  <img src="../assets/banner.gif" alt="VeilVoice: irreversible voice de-identification" width="1280" height="640">
+</picture>
 
 <h1>VeilVoice</h1>
 <p><strong>Irreversible voice de-identification, fully offline.</strong></p>

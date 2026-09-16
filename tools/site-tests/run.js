@@ -25,6 +25,7 @@ const SUITES = [
   require("./links.test.js"),
   require("./nav.test.js"),
   require("./anchors.test.js"),
+  require("./addresses.test.js"),
   require("./diagrams.test.js"),
   require("./source.test.js"),
   require("./packaging.test.js"),

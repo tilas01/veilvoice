@@ -189,6 +189,13 @@ def crates_missing_from_the_lists(root):
     return sorted(actual - listed), sorted(listed - actual)
 
 
+# The canonical address, preview picture and sitemap entry every page of the
+# website carries. One implementation, called by every generator that writes
+# a page, so a page cannot be produced without them.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "..", "site"))
+import seo  # noqa: E402
+
 REPO = "tilas01/veilvoice"
 REF = "main"
 
@@ -3291,7 +3298,7 @@ def check(root, files):
 
 def main():
     root = repo_root()
-    files = outputs(root)
+    files = seo.finished(outputs(root))
     if "--check" in sys.argv:
         return check(root, files)
     return write(root, files)
