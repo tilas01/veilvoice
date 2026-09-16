@@ -151,6 +151,11 @@ impl StftEngine {
         }
     }
 
+    /// Window, transform, hand the spectrum to `transform`, and overlap-add
+    /// the result back into the output queue.
+    ///
+    /// Every buffer this touches was sized when the chain was built. It is called
+    /// from the audio callback, so it allocates nothing and locks nothing.
     fn process_frame<F: FnMut(&mut [Complex<f32>], &[f32])>(&mut self, transform: &mut F) {
         // analysis window
         for k in 0..self.n {

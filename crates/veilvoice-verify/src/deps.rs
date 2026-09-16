@@ -325,16 +325,18 @@ fn linux_package(debian: &'static str, fedora: &'static str, arch: &'static str)
 /// differ per platform (`PATHEXT` on Windows, for one) and reimplementing them
 /// is how a probe reports something as missing that is sitting right there.
 fn which(program: &str) -> Option<String> {
-    let (finder, args) = if cfg!(windows) {
-        ("where", vec![program])
-    } else {
-        ("command", vec!["-v", program])
-    };
-    // `command -v` is a shell builtin, so it needs a shell.
+    // The finder itself is named absolutely. Asking `PATH` where something on
+    // `PATH` lives, by way of a program found on `PATH`, is a circle with an
+    // obvious way in.
     let output = if cfg!(windows) {
-        Command::new(finder).args(&args).output().ok()?
+        let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
+        Command::new(format!(r"{root}\System32\where.exe"))
+            .arg(program)
+            .output()
+            .ok()?
     } else {
-        Command::new("sh")
+        // `command -v` is a shell builtin, so it needs a shell.
+        Command::new("/bin/sh")
             .args(["-c", &format!("command -v {program}")])
             .output()
             .ok()?

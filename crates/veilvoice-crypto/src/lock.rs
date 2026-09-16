@@ -266,6 +266,11 @@ impl AppLock {
         self.verify_at(password, unix_now())
     }
 
+    /// Check a passphrase against this lock as of `now`.
+    ///
+    /// Taking the time as an argument rather than reading the clock is what lets
+    /// the cooldown be tested at all: a test that had to wait out the delay would
+    /// not be run.
     fn verify_at(&mut self, password: &[u8], now: i64) -> Result<(), Error> {
         if let Some(wait) = self.cooldown_at(now) {
             return Err(Error::AppLockCooldown(wait));
@@ -330,6 +335,10 @@ impl AppLock {
         Ok(())
     }
 
+    /// Whether the file's tamper tag is the one this key computes.
+    ///
+    /// Compared in constant time, and a tag that cannot be computed is treated as
+    /// matching: see the note in the body for why that is the safe direction.
     fn tag_matches(&self, tag_key: &Secret) -> bool {
         let Ok(want) = self.tag(tag_key) else {
             // A failure to compute the tag is a broken build or an exhausted
@@ -362,6 +371,9 @@ impl AppLock {
         self.cooldown_at(unix_now()).map(Duration::from_secs)
     }
 
+    /// How long is left of the delay after the last failed attempt, if any.
+    ///
+    /// `None` means try now.
     fn cooldown_at(&self, now: i64) -> Option<u64> {
         let wait = delay_secs(self.failures);
         if wait == 0 {
@@ -664,6 +676,8 @@ enum Backing {
 }
 
 impl Backing {
+    /// The path this lock is really kept at, whether it is a plain file or
+    /// the real one among a vault's decoys.
     fn primary(&self) -> &Path {
         match self {
             Self::File(p) => p,

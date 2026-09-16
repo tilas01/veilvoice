@@ -140,6 +140,11 @@ pub fn tighten(path: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Create or replace a file that only its owner can read.
+///
+/// `exclusive` refuses to replace an existing file. The Unix mode is set in the
+/// open itself rather than afterwards, so there is no window in which the file
+/// exists and is readable by anybody else.
 fn write_inner(path: &Path, bytes: &[u8], exclusive: bool) -> std::io::Result<()> {
     let mut options = std::fs::OpenOptions::new();
     options.write(true);

@@ -38,6 +38,10 @@ pub fn random_nonce() -> Result<[u8; NONCE_LEN], Error> {
     Ok(n)
 }
 
+/// The cipher for this key, refusing a key that is not 32 bytes.
+///
+/// The length is checked here rather than at each call site, so there is one
+/// place a wrong-sized key can reach the construction and it says no.
 fn cipher(key: &Secret) -> Result<XChaCha20Poly1305, Error> {
     if key.len() != 32 {
         return Err(Error::KeyLength);

@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -46,7 +47,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/deps.rs</code></h1>
-<p style="color:var(--muted)"><a href="deps.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 650 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="deps.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 652 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -399,338 +400,340 @@
 <span class="ln" id="L325"><span class="tok-com">/// differ per platform (`PATHEXT` on Windows, for one) and reimplementing them</span></span>
 <span class="ln" id="L326"><span class="tok-com">/// is how a probe reports something as missing that is sitting right there.</span></span>
 <span class="ln" id="L327"><span class="tok-kw">fn</span> <span class="tok-fn">which</span>(program: &amp;str) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L328">    <span class="tok-kw">let</span> (finder, args) = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L329">        (<span class="tok-str">&quot;where&quot;</span>, vec![program])</span>
-<span class="ln" id="L330">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L331">        (<span class="tok-str">&quot;command&quot;</span>, vec![<span class="tok-str">&quot;-v&quot;</span>, program])</span>
-<span class="ln" id="L332">    };</span>
-<span class="ln" id="L333">    <span class="tok-com">// `command -v` is a shell builtin, so it needs a shell.</span></span>
-<span class="ln" id="L334">    <span class="tok-kw">let</span> output = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L335">        Command::<span class="tok-fn">new</span>(finder).<span class="tok-fn">args</span>(&amp;args).<span class="tok-fn">output</span>().<span class="tok-fn">ok</span>()?</span>
-<span class="ln" id="L336">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L337">        Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;sh&quot;</span>)</span>
-<span class="ln" id="L338">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-c&quot;</span>, &amp;format!(<span class="tok-str">&quot;command -v {program}&quot;</span>)])</span>
-<span class="ln" id="L339">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L340">            .<span class="tok-fn">ok</span>()?</span>
-<span class="ln" id="L341">    };</span>
-<span class="ln" id="L342">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L343">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L344">    }</span>
-<span class="ln" id="L345">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
-<span class="ln" id="L346">    text.<span class="tok-fn">lines</span>().<span class="tok-fn">next</span>().<span class="tok-fn">map</span>(|line| line.<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L347">}</span>
+<span class="ln" id="L328">    <span class="tok-com">// The finder itself is named absolutely. Asking `PATH` where something on</span></span>
+<span class="ln" id="L329">    <span class="tok-com">// `PATH` lives, by way of a program found on `PATH`, is a circle with an</span></span>
+<span class="ln" id="L330">    <span class="tok-com">// obvious way in.</span></span>
+<span class="ln" id="L331">    <span class="tok-kw">let</span> output = <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L332">        <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L333">        Command::<span class="tok-fn">new</span>(format!(<span class="tok-str">r&quot;{root}\System32\where.exe&quot;</span>))</span>
+<span class="ln" id="L334">            .<span class="tok-fn">arg</span>(program)</span>
+<span class="ln" id="L335">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L336">            .<span class="tok-fn">ok</span>()?</span>
+<span class="ln" id="L337">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L338">        <span class="tok-com">// `command -v` is a shell builtin, so it needs a shell.</span></span>
+<span class="ln" id="L339">        Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sh&quot;</span>)</span>
+<span class="ln" id="L340">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-c&quot;</span>, &amp;format!(<span class="tok-str">&quot;command -v {program}&quot;</span>)])</span>
+<span class="ln" id="L341">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L342">            .<span class="tok-fn">ok</span>()?</span>
+<span class="ln" id="L343">    };</span>
+<span class="ln" id="L344">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L345">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L346">    }</span>
+<span class="ln" id="L347">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
+<span class="ln" id="L348">    text.<span class="tok-fn">lines</span>().<span class="tok-fn">next</span>().<span class="tok-fn">map</span>(|line| line.<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L349">}</span>
 </span>
-<span class="ln" id="L348"></span>
+<span class="ln" id="L350"></span>
 <span class="src-item" id="fn-program_version">
-<span class="ln" id="L349"><span class="tok-com">/// The first line a program prints when asked its version.</span></span>
-<span class="ln" id="L350"><span class="tok-kw">fn</span> <span class="tok-fn">program_version</span>(program: &amp;str, args: &amp;[&amp;str]) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L351">    <span class="tok-kw">let</span> output = Command::<span class="tok-fn">new</span>(program).<span class="tok-fn">args</span>(args).<span class="tok-fn">output</span>().<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L352">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L353">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L354">    }</span>
-<span class="ln" id="L355">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
-<span class="ln" id="L356">    <span class="tok-kw">let</span> line = text.<span class="tok-fn">lines</span>().<span class="tok-fn">next</span>()?.<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L357">    <span class="tok-fn">Some</span>(line)</span>
-<span class="ln" id="L358">}</span>
+<span class="ln" id="L351"><span class="tok-com">/// The first line a program prints when asked its version.</span></span>
+<span class="ln" id="L352"><span class="tok-kw">fn</span> <span class="tok-fn">program_version</span>(program: &amp;str, args: &amp;[&amp;str]) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L353">    <span class="tok-kw">let</span> output = Command::<span class="tok-fn">new</span>(program).<span class="tok-fn">args</span>(args).<span class="tok-fn">output</span>().<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L354">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L355">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L356">    }</span>
+<span class="ln" id="L357">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
+<span class="ln" id="L358">    <span class="tok-kw">let</span> line = text.<span class="tok-fn">lines</span>().<span class="tok-fn">next</span>()?.<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L359">    <span class="tok-fn">Some</span>(line)</span>
+<span class="ln" id="L360">}</span>
 </span>
-<span class="ln" id="L359"></span>
+<span class="ln" id="L361"></span>
 <span class="src-item" id="fn-detect_linker">
-<span class="ln" id="L360"><span class="tok-com">/// A linker, by whichever name this platform calls it.</span></span>
-<span class="ln" id="L361"><span class="tok-kw">fn</span> <span class="tok-fn">detect_linker</span>() -&gt; Presence {</span>
-<span class="ln" id="L362">    <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L363">        <span class="tok-com">// F-68. This looked for `link` on PATH and reported whatever it found.</span></span>
-<span class="ln" id="L364">        <span class="tok-com">// On the machine it was first run on that was Git for Windows&#x27;</span></span>
-<span class="ln" id="L365">        <span class="tok-com">// `usr/bin/link.exe` -- GNU coreutils&#x27; hardlink utility, which shares a</span></span>
-<span class="ln" id="L366">        <span class="tok-com">// name with Microsoft&#x27;s linker and has nothing whatever to do with</span></span>
-<span class="ln" id="L367">        <span class="tok-com">// building Rust. The report said the linker was present. A build on</span></span>
-<span class="ln" id="L368">        <span class="tok-com">// that machine would have stopped with a linker error.</span></span>
-<span class="ln" id="L369">        <span class="tok-com">//</span></span>
-<span class="ln" id="L370">        <span class="tok-com">// There is no honest probe here. `link.exe` is only on PATH inside a</span></span>
-<span class="ln" id="L371">        <span class="tok-com">// Developer Command Prompt, cargo finds MSVC through the registry</span></span>
-<span class="ln" id="L372">        <span class="tok-com">// instead, and any `link` that *is* on PATH is more likely to be</span></span>
-<span class="ln" id="L373">        <span class="tok-com">// something else. So this says it cannot tell, which is true, and the</span></span>
-<span class="ln" id="L374">        <span class="tok-com">// build says the rest.</span></span>
-<span class="ln" id="L375">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(</span>
-<span class="ln" id="L376">            <span class="tok-str">&quot;Rust finds Microsoft&#x27;s linker through the registry rather than PATH, \</span></span>
-<span class="ln" id="L377"><span class="tok-str">             so there is nothing here to look at. A `link.exe` on PATH is usually \</span></span>
-<span class="ln" id="L378"><span class="tok-str">             something else -- Git for Windows ships one. Only a build can say.&quot;</span></span>
-<span class="ln" id="L379">                .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L380">        );</span>
-<span class="ln" id="L381">    }</span>
-<span class="ln" id="L382">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;cc&quot;</span>, <span class="tok-str">&quot;clang&quot;</span>, <span class="tok-str">&quot;gcc&quot;</span>] {</span>
-<span class="ln" id="L383">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">which</span>(name) {</span>
-<span class="ln" id="L384">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(path);</span>
-<span class="ln" id="L385">        }</span>
-<span class="ln" id="L386">    }</span>
-<span class="ln" id="L387">    Presence::Missing</span>
-<span class="ln" id="L388">}</span>
+<span class="ln" id="L362"><span class="tok-com">/// A linker, by whichever name this platform calls it.</span></span>
+<span class="ln" id="L363"><span class="tok-kw">fn</span> <span class="tok-fn">detect_linker</span>() -&gt; Presence {</span>
+<span class="ln" id="L364">    <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L365">        <span class="tok-com">// F-68. This looked for `link` on PATH and reported whatever it found.</span></span>
+<span class="ln" id="L366">        <span class="tok-com">// On the machine it was first run on that was Git for Windows&#x27;</span></span>
+<span class="ln" id="L367">        <span class="tok-com">// `usr/bin/link.exe` -- GNU coreutils&#x27; hardlink utility, which shares a</span></span>
+<span class="ln" id="L368">        <span class="tok-com">// name with Microsoft&#x27;s linker and has nothing whatever to do with</span></span>
+<span class="ln" id="L369">        <span class="tok-com">// building Rust. The report said the linker was present. A build on</span></span>
+<span class="ln" id="L370">        <span class="tok-com">// that machine would have stopped with a linker error.</span></span>
+<span class="ln" id="L371">        <span class="tok-com">//</span></span>
+<span class="ln" id="L372">        <span class="tok-com">// There is no honest probe here. `link.exe` is only on PATH inside a</span></span>
+<span class="ln" id="L373">        <span class="tok-com">// Developer Command Prompt, cargo finds MSVC through the registry</span></span>
+<span class="ln" id="L374">        <span class="tok-com">// instead, and any `link` that *is* on PATH is more likely to be</span></span>
+<span class="ln" id="L375">        <span class="tok-com">// something else. So this says it cannot tell, which is true, and the</span></span>
+<span class="ln" id="L376">        <span class="tok-com">// build says the rest.</span></span>
+<span class="ln" id="L377">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(</span>
+<span class="ln" id="L378">            <span class="tok-str">&quot;Rust finds Microsoft&#x27;s linker through the registry rather than PATH, \</span></span>
+<span class="ln" id="L379"><span class="tok-str">             so there is nothing here to look at. A `link.exe` on PATH is usually \</span></span>
+<span class="ln" id="L380"><span class="tok-str">             something else -- Git for Windows ships one. Only a build can say.&quot;</span></span>
+<span class="ln" id="L381">                .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L382">        );</span>
+<span class="ln" id="L383">    }</span>
+<span class="ln" id="L384">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;cc&quot;</span>, <span class="tok-str">&quot;clang&quot;</span>, <span class="tok-str">&quot;gcc&quot;</span>] {</span>
+<span class="ln" id="L385">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-fn">which</span>(name) {</span>
+<span class="ln" id="L386">            <span class="tok-kw">return</span> Presence::<span class="tok-fn">Present</span>(path);</span>
+<span class="ln" id="L387">        }</span>
+<span class="ln" id="L388">    }</span>
+<span class="ln" id="L389">    Presence::Missing</span>
+<span class="ln" id="L390">}</span>
 </span>
-<span class="ln" id="L389"></span>
+<span class="ln" id="L391"></span>
 <span class="src-item" id="fn-detect_alsa">
-<span class="ln" id="L390"><span class="tok-com">/// ALSA&#x27;s headers, through the tool the build script itself uses.</span></span>
-<span class="ln" id="L391"><span class="tok-kw">fn</span> <span class="tok-fn">detect_alsa</span>() -&gt; Presence {</span>
-<span class="ln" id="L392">    <span class="tok-kw">if</span> !cfg!(target_os = <span class="tok-str">&quot;linux&quot;</span>) {</span>
-<span class="ln" id="L393">        <span class="tok-kw">return</span> Presence::NotOnThisPlatform;</span>
-<span class="ln" id="L394">    }</span>
-<span class="ln" id="L395">    <span class="tok-kw">if</span> <span class="tok-fn">which</span>(<span class="tok-str">&quot;pkg-config&quot;</span>).<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L396">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(</span>
-<span class="ln" id="L397">            <span class="tok-str">&quot;pkg-config is not installed, so there is no way to ask where ALSA is&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L398">        );</span>
-<span class="ln" id="L399">    }</span>
-<span class="ln" id="L400">    <span class="tok-com">// Exactly what `alsa-sys`&#x27;s build script asks, so the answer here and the</span></span>
-<span class="ln" id="L401">    <span class="tok-com">// answer during a build come from the same source.</span></span>
-<span class="ln" id="L402">    <span class="tok-kw">match</span> Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;pkg-config&quot;</span>)</span>
-<span class="ln" id="L403">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;--modversion&quot;</span>, <span class="tok-str">&quot;alsa&quot;</span>])</span>
-<span class="ln" id="L404">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L405">    {</span>
-<span class="ln" id="L406">        <span class="tok-fn">Ok</span>(output) <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() =&gt; {</span>
-<span class="ln" id="L407">            <span class="tok-kw">let</span> version = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L408">            Presence::<span class="tok-fn">Present</span>(format!(<span class="tok-str">&quot;ALSA {version}&quot;</span>))</span>
-<span class="ln" id="L409">        }</span>
-<span class="ln" id="L410">        <span class="tok-fn">Ok</span>(_) =&gt; Presence::Missing,</span>
-<span class="ln" id="L411">        <span class="tok-fn">Err</span>(error) =&gt; Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;pkg-config would not run: {error}&quot;</span>)),</span>
-<span class="ln" id="L412">    }</span>
-<span class="ln" id="L413">}</span>
+<span class="ln" id="L392"><span class="tok-com">/// ALSA&#x27;s headers, through the tool the build script itself uses.</span></span>
+<span class="ln" id="L393"><span class="tok-kw">fn</span> <span class="tok-fn">detect_alsa</span>() -&gt; Presence {</span>
+<span class="ln" id="L394">    <span class="tok-kw">if</span> !cfg!(target_os = <span class="tok-str">&quot;linux&quot;</span>) {</span>
+<span class="ln" id="L395">        <span class="tok-kw">return</span> Presence::NotOnThisPlatform;</span>
+<span class="ln" id="L396">    }</span>
+<span class="ln" id="L397">    <span class="tok-kw">if</span> <span class="tok-fn">which</span>(<span class="tok-str">&quot;pkg-config&quot;</span>).<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L398">        <span class="tok-kw">return</span> Presence::<span class="tok-fn">Unknown</span>(</span>
+<span class="ln" id="L399">            <span class="tok-str">&quot;pkg-config is not installed, so there is no way to ask where ALSA is&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L400">        );</span>
+<span class="ln" id="L401">    }</span>
+<span class="ln" id="L402">    <span class="tok-com">// Exactly what `alsa-sys`&#x27;s build script asks, so the answer here and the</span></span>
+<span class="ln" id="L403">    <span class="tok-com">// answer during a build come from the same source.</span></span>
+<span class="ln" id="L404">    <span class="tok-kw">match</span> Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;pkg-config&quot;</span>)</span>
+<span class="ln" id="L405">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;--modversion&quot;</span>, <span class="tok-str">&quot;alsa&quot;</span>])</span>
+<span class="ln" id="L406">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L407">    {</span>
+<span class="ln" id="L408">        <span class="tok-fn">Ok</span>(output) <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() =&gt; {</span>
+<span class="ln" id="L409">            <span class="tok-kw">let</span> version = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L410">            Presence::<span class="tok-fn">Present</span>(format!(<span class="tok-str">&quot;ALSA {version}&quot;</span>))</span>
+<span class="ln" id="L411">        }</span>
+<span class="ln" id="L412">        <span class="tok-fn">Ok</span>(_) =&gt; Presence::Missing,</span>
+<span class="ln" id="L413">        <span class="tok-fn">Err</span>(error) =&gt; Presence::<span class="tok-fn">Unknown</span>(format!(<span class="tok-str">&quot;pkg-config would not run: {error}&quot;</span>)),</span>
+<span class="ln" id="L414">    }</span>
+<span class="ln" id="L415">}</span>
 </span>
-<span class="ln" id="L414"></span>
+<span class="ln" id="L416"></span>
 <span class="src-item" id="fn-missing">
-<span class="ln" id="L415"><span class="tok-com">/// What is missing, split by whether a build stops without it.</span></span>
-<span class="ln" id="L416"><span class="tok-com">///</span></span>
-<span class="ln" id="L417"><span class="tok-com">/// Returned rather than printed so the caller decides how loudly to say it --</span></span>
-<span class="ln" id="L418"><span class="tok-com">/// and so the two are never conflated. A missing optional dependency means a</span></span>
-<span class="ln" id="L419"><span class="tok-com">/// build that succeeds with less in it, and reporting that as a failure would</span></span>
-<span class="ln" id="L420"><span class="tok-com">/// send somebody installing things they do not need.</span></span>
-<span class="ln" id="L421"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">missing</span>() -&gt; (Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> Need&gt;, Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> Need&gt;) {</span>
-<span class="ln" id="L422">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> required = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L423">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> optional = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L424">    <span class="tok-kw">for</span> need <span class="tok-kw">in</span> <span class="tok-fn">for_this_platform</span>() {</span>
-<span class="ln" id="L425">        <span class="tok-com">// `Unknown` is not `Missing`. A probe that could not run is not</span></span>
-<span class="ln" id="L426">        <span class="tok-com">// evidence of absence, and offering to install over the top of</span></span>
-<span class="ln" id="L427">        <span class="tok-com">// something already there is the mistake that distinction prevents.</span></span>
-<span class="ln" id="L428">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::Missing = need.<span class="tok-fn">detect</span>() {</span>
-<span class="ln" id="L429">            <span class="tok-kw">if</span> need.required {</span>
-<span class="ln" id="L430">                required.<span class="tok-fn">push</span>(need);</span>
-<span class="ln" id="L431">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L432">                optional.<span class="tok-fn">push</span>(need);</span>
-<span class="ln" id="L433">            }</span>
-<span class="ln" id="L434">        }</span>
-<span class="ln" id="L435">    }</span>
-<span class="ln" id="L436">    (required, optional)</span>
-<span class="ln" id="L437">}</span>
+<span class="ln" id="L417"><span class="tok-com">/// What is missing, split by whether a build stops without it.</span></span>
+<span class="ln" id="L418"><span class="tok-com">///</span></span>
+<span class="ln" id="L419"><span class="tok-com">/// Returned rather than printed so the caller decides how loudly to say it --</span></span>
+<span class="ln" id="L420"><span class="tok-com">/// and so the two are never conflated. A missing optional dependency means a</span></span>
+<span class="ln" id="L421"><span class="tok-com">/// build that succeeds with less in it, and reporting that as a failure would</span></span>
+<span class="ln" id="L422"><span class="tok-com">/// send somebody installing things they do not need.</span></span>
+<span class="ln" id="L423"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">missing</span>() -&gt; (Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> Need&gt;, Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> Need&gt;) {</span>
+<span class="ln" id="L424">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> required = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L425">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> optional = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L426">    <span class="tok-kw">for</span> need <span class="tok-kw">in</span> <span class="tok-fn">for_this_platform</span>() {</span>
+<span class="ln" id="L427">        <span class="tok-com">// `Unknown` is not `Missing`. A probe that could not run is not</span></span>
+<span class="ln" id="L428">        <span class="tok-com">// evidence of absence, and offering to install over the top of</span></span>
+<span class="ln" id="L429">        <span class="tok-com">// something already there is the mistake that distinction prevents.</span></span>
+<span class="ln" id="L430">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::Missing = need.<span class="tok-fn">detect</span>() {</span>
+<span class="ln" id="L431">            <span class="tok-kw">if</span> need.required {</span>
+<span class="ln" id="L432">                required.<span class="tok-fn">push</span>(need);</span>
+<span class="ln" id="L433">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L434">                optional.<span class="tok-fn">push</span>(need);</span>
+<span class="ln" id="L435">            }</span>
+<span class="ln" id="L436">        }</span>
+<span class="ln" id="L437">    }</span>
+<span class="ln" id="L438">    (required, optional)</span>
+<span class="ln" id="L439">}</span>
 </span>
-<span class="ln" id="L438"></span>
-<span class="ln" id="L439"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L440"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L441">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L442"></span>
-<span class="ln" id="L443">    <span class="tok-com">/// The one with this identifier. Here rather than in the module above,</span></span>
-<span class="ln" id="L444">    <span class="tok-com">/// because the tests are the only thing that looks a need up by name --</span></span>
-<span class="ln" id="L445">    <span class="tok-com">/// everything else walks the whole list.</span></span>
-<span class="ln" id="L446">    <span class="tok-kw">fn</span> <span class="tok-fn">by_key</span>(key: &amp;str) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> Need&gt; {</span>
-<span class="ln" id="L447">        ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|need| need.key == key)</span>
-<span class="ln" id="L448">    }</span>
-<span class="ln" id="L449"></span>
-<span class="ln" id="L450">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L451">    <span class="tok-kw">fn</span> <span class="tok-fn">every_entry_is_complete_and_uniquely_keyed</span>() {</span>
-<span class="ln" id="L452">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|need| need.key).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L453">        <span class="tok-kw">let</span> count = keys.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L454">        keys.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L455">        keys.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L456">        assert_eq!(keys.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;two needs share a key&quot;</span>);</span>
-<span class="ln" id="L457"></span>
-<span class="ln" id="L458">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L459">            assert!(!need.name.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
-<span class="ln" id="L460">            assert!(!need.what.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
-<span class="ln" id="L461">            assert!(!need.why.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
-<span class="ln" id="L462">            assert_eq!(<span class="tok-fn">by_key</span>(need.key).<span class="tok-fn">map</span>(|n| n.key), <span class="tok-fn">Some</span>(need.key));</span>
-<span class="ln" id="L463">        }</span>
-<span class="ln" id="L464">        assert!(<span class="tok-fn">by_key</span>(<span class="tok-str">&quot;nothing-like-this&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L465">    }</span>
-<span class="ln" id="L466"></span>
-<span class="ln" id="L467">    <span class="tok-com">/// Every need says *why* VeilVoice wants it. A list of packages with no</span></span>
-<span class="ln" id="L468">    <span class="tok-com">/// reasons is a list somebody installs without reading, which is the exact</span></span>
-<span class="ln" id="L469">    <span class="tok-com">/// habit this table exists to avoid feeding.</span></span>
-<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">every_need_explains_itself_rather_than_just_naming_a_package</span>() {</span>
-<span class="ln" id="L472">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L473">            assert!(</span>
-<span class="ln" id="L474">                need.why.<span class="tok-fn">len</span>() &gt; <span class="tok-num">40</span>,</span>
-<span class="ln" id="L475">                <span class="tok-str">&quot;{}: the reason is too short to be a reason&quot;</span>,</span>
-<span class="ln" id="L476">                need.key</span>
-<span class="ln" id="L477">            );</span>
-<span class="ln" id="L478">            assert!(</span>
-<span class="ln" id="L479">                need.what.<span class="tok-fn">len</span>() &gt; <span class="tok-num">30</span>,</span>
-<span class="ln" id="L480">                <span class="tok-str">&quot;{}: say what it actually is&quot;</span>,</span>
-<span class="ln" id="L481">                need.key</span>
-<span class="ln" id="L482">            );</span>
-<span class="ln" id="L483">        }</span>
-<span class="ln" id="L484">    }</span>
-<span class="ln" id="L485"></span>
-<span class="ln" id="L486">    <span class="tok-com">/// Detection must not panic, hang, or change anything, on any machine.</span></span>
-<span class="ln" id="L487">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L488">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_is_safe_wherever_this_runs</span>() {</span>
-<span class="ln" id="L489">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L490">            <span class="tok-kw">let</span> presence = need.<span class="tok-fn">detect</span>();</span>
-<span class="ln" id="L491">            assert!(!presence.<span class="tok-fn">describe</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
-<span class="ln" id="L492">            <span class="tok-kw">let</span> route = need.<span class="tok-fn">route</span>();</span>
-<span class="ln" id="L493">            <span class="tok-kw">match</span> &amp;route {</span>
-<span class="ln" id="L494">                Route::Run { program, args, .. } =&gt; {</span>
-<span class="ln" id="L495">                    assert!(!program.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L496">                    assert!(!args.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L497">                    assert!(route.<span class="tok-fn">command_line</span>().<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L498">                }</span>
-<span class="ln" id="L499">                Route::<span class="tok-fn">Yourself</span>(words) =&gt; assert!(words.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{}&quot;</span>, need.key),</span>
-<span class="ln" id="L500">                Route::NotOnThisPlatform | Route::<span class="tok-fn">Unknown</span>(_) =&gt; {}</span>
-<span class="ln" id="L501">            }</span>
-<span class="ln" id="L502">        }</span>
-<span class="ln" id="L503">    }</span>
-<span class="ln" id="L504"></span>
-<span class="ln" id="L505">    <span class="tok-com">/// A compiler is certainly here: this test is being compiled by one.</span></span>
-<span class="ln" id="L506">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L507">    <span class="tok-kw">fn</span> <span class="tok-fn">the_toolchain_is_found_because_it_is_running_this_test</span>() {</span>
-<span class="ln" id="L508">        <span class="tok-kw">let</span> rust = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;rust&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L509">        <span class="tok-kw">match</span> rust.<span class="tok-fn">detect</span>() {</span>
-<span class="ln" id="L510">            Presence::<span class="tok-fn">Present</span>(line) =&gt; assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cargo&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>),</span>
-<span class="ln" id="L511">            <span class="tok-com">// `cargo test` can be invoked where `cargo` itself is not on PATH.</span></span>
-<span class="ln" id="L512">            <span class="tok-com">// That is a real answer and not a reason to fail somebody&#x27;s build.</span></span>
-<span class="ln" id="L513">            other =&gt; panic!(<span class="tok-str">&quot;cargo should be findable from a cargo test: {other:?}&quot;</span>),</span>
-<span class="ln" id="L514">        }</span>
-<span class="ln" id="L515">    }</span>
-<span class="ln" id="L516"></span>
-<span class="ln" id="L517">    <span class="tok-com">/// F-68. A probe must not answer from a program that merely shares a name</span></span>
-<span class="ln" id="L518">    <span class="tok-com">/// with the one it is looking for.</span></span>
-<span class="ln" id="L519">    <span class="tok-com">///</span></span>
-<span class="ln" id="L520">    <span class="tok-com">/// This reported &quot;found&quot; on a Windows machine because Git for Windows ships</span></span>
-<span class="ln" id="L521">    <span class="tok-com">/// `usr/bin/link.exe`, GNU coreutils&#x27; hardlink tool. A build on that machine</span></span>
-<span class="ln" id="L522">    <span class="tok-com">/// would have stopped with a linker error after the dependency check had</span></span>
-<span class="ln" id="L523">    <span class="tok-com">/// said everything was fine.</span></span>
-<span class="ln" id="L524">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L525">    <span class="tok-kw">fn</span> <span class="tok-fn">the_windows_linker_is_not_looked_for_by_name_on_path</span>() {</span>
-<span class="ln" id="L526">        <span class="tok-com">// A source-reading test, so the line endings have to be settled first.</span></span>
-<span class="ln" id="L527">        <span class="tok-com">// F-72: these searched for &quot;\n}\n&quot; and passed on every machine</span></span>
-<span class="ln" id="L528">        <span class="tok-com">// whose checkout uses LF. GitHub&#x27;s Windows runners default to</span></span>
-<span class="ln" id="L529">        <span class="tok-com">// core.autocrlf=true, so the file arrives with CRLF, the pattern</span></span>
-<span class="ln" id="L530">        <span class="tok-com">// matches nothing, and three tests failed there and nowhere else --</span></span>
-<span class="ln" id="L531">        <span class="tok-com">// including on the developer machine that had just run them.</span></span>
-<span class="ln" id="L532">        <span class="tok-com">// Normalised here as well as pinned in .gitattributes: a test that</span></span>
-<span class="ln" id="L533">        <span class="tok-com">// depends on a git setting is a test somebody will trip over.</span></span>
-<span class="ln" id="L534">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;deps.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L535">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn detect_linker()&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function&quot;</span>);</span>
-<span class="ln" id="L536">        <span class="tok-kw">let</span> end = source[start..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n}\n&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its end&quot;</span>) + start;</span>
-<span class="ln" id="L537">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L538">        assert!(</span>
-<span class="ln" id="L539">            !body.<span class="tok-fn">contains</span>(concat!(<span class="tok-str">&quot;which(&quot;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&quot;link&quot;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&quot;)&quot;</span>)),</span>
-<span class="ln" id="L540">            <span class="tok-str">&quot;a `link` on PATH is usually not Microsoft&#x27;s linker&quot;</span></span>
-<span class="ln" id="L541">        );</span>
-<span class="ln" id="L542"></span>
-<span class="ln" id="L543">        <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L544">            <span class="tok-kw">let</span> presence = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;cc&quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">detect</span>();</span>
-<span class="ln" id="L545">            assert!(</span>
-<span class="ln" id="L546">                matches!(presence, Presence::<span class="tok-fn">Unknown</span>(_)),</span>
-<span class="ln" id="L547">                <span class="tok-str">&quot;on Windows only a build can decide: {presence:?}&quot;</span></span>
-<span class="ln" id="L548">            );</span>
-<span class="ln" id="L549">            assert!(</span>
-<span class="ln" id="L550">                presence.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Only a build can say&quot;</span>),</span>
-<span class="ln" id="L551">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L552">                presence.<span class="tok-fn">describe</span>()</span>
-<span class="ln" id="L553">            );</span>
-<span class="ln" id="L554">        }</span>
-<span class="ln" id="L555">    }</span>
-<span class="ln" id="L556"></span>
-<span class="ln" id="L557">    <span class="tok-com">/// Nothing in this module runs a package manager. The routes are values;</span></span>
-<span class="ln" id="L558">    <span class="tok-com">/// something else has to decide to run one, after asking.</span></span>
-<span class="ln" id="L559">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L560">    <span class="tok-kw">fn</span> <span class="tok-fn">no_route_is_ever_taken_by_this_module</span>() {</span>
-<span class="ln" id="L561">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;deps.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L562">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L563">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;.status()&quot;</span>, <span class="tok-str">&quot;.spawn()&quot;</span>] {</span>
-<span class="ln" id="L564">            assert!(</span>
-<span class="ln" id="L565">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L566">                <span class="tok-str">&quot;this module only looks; {forbidden} runs something&quot;</span></span>
-<span class="ln" id="L567">            );</span>
-<span class="ln" id="L568">        }</span>
-<span class="ln" id="L569">        <span class="tok-com">// `.output()` is used, and only to ask a program its version. Every</span></span>
-<span class="ln" id="L570">        <span class="tok-com">// use is named here so a new one has to be argued for.</span></span>
-<span class="ln" id="L571">        assert_eq!(</span>
-<span class="ln" id="L572">            body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;.output()&quot;</span>).<span class="tok-fn">count</span>(),</span>
-<span class="ln" id="L573">            <span class="tok-num">4</span>,</span>
-<span class="ln" id="L574">            <span class="tok-str">&quot;a new subprocess appeared in a module whose job is to look&quot;</span></span>
-<span class="ln" id="L575">        );</span>
-<span class="ln" id="L576">    }</span>
-<span class="ln" id="L577"></span>
-<span class="ln" id="L578">    <span class="tok-com">/// An unanswerable probe must never be reported as an absence.</span></span>
-<span class="ln" id="L579">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L580">    <span class="tok-kw">fn</span> <span class="tok-fn">could_not_tell_is_not_the_same_as_not_there</span>() {</span>
-<span class="ln" id="L581">        assert!(!Presence::Missing.<span class="tok-fn">is_satisfied</span>());</span>
-<span class="ln" id="L582">        assert!(!Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;no probe&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">is_satisfied</span>());</span>
-<span class="ln" id="L583">        assert!(Presence::NotOnThisPlatform.<span class="tok-fn">is_satisfied</span>());</span>
-<span class="ln" id="L584">        assert!(Presence::<span class="tok-fn">Present</span>(String::<span class="tok-fn">new</span>()).<span class="tok-fn">is_satisfied</span>());</span>
-<span class="ln" id="L585"></span>
-<span class="ln" id="L586">        assert!(Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L587">            .<span class="tok-fn">describe</span>()</span>
-<span class="ln" id="L588">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not tell&quot;</span>));</span>
-<span class="ln" id="L589">        assert_eq!(Presence::Missing.<span class="tok-fn">describe</span>(), <span class="tok-str">&quot;MISSING&quot;</span>);</span>
-<span class="ln" id="L590"></span>
-<span class="ln" id="L591">        <span class="tok-com">// And the split that acts on it: only a definite Missing counts.</span></span>
-<span class="ln" id="L592">        <span class="tok-kw">let</span> (required, optional) = <span class="tok-fn">missing</span>();</span>
-<span class="ln" id="L593">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> required.<span class="tok-fn">iter</span>().<span class="tok-fn">chain</span>(optional.<span class="tok-fn">iter</span>()) {</span>
-<span class="ln" id="L594">            assert_eq!(need.<span class="tok-fn">detect</span>(), Presence::Missing, <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
-<span class="ln" id="L595">        }</span>
-<span class="ln" id="L596">    }</span>
-<span class="ln" id="L597"></span>
-<span class="ln" id="L598">    <span class="tok-com">/// Optional and required are kept apart, or somebody installs ALSA headers</span></span>
-<span class="ln" id="L599">    <span class="tok-com">/// on a machine that will never run live mode.</span></span>
-<span class="ln" id="L600">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L601">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_optional_dependency_is_not_a_failed_build</span>() {</span>
-<span class="ln" id="L602">        <span class="tok-kw">let</span> alsa = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;alsa&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L603">        assert!(!alsa.required, <span class="tok-str">&quot;everything but live mode builds without it&quot;</span>);</span>
-<span class="ln" id="L604">        assert!(alsa.why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not live mode&quot;</span>), <span class="tok-str">&quot;{}&quot;</span>, alsa.why);</span>
-<span class="ln" id="L605"></span>
-<span class="ln" id="L606">        <span class="tok-kw">for</span> key <span class="tok-kw">in</span> [<span class="tok-str">&quot;rust&quot;</span>, <span class="tok-str">&quot;cc&quot;</span>] {</span>
-<span class="ln" id="L607">            assert!(<span class="tok-fn">by_key</span>(key).<span class="tok-fn">unwrap</span>().required, <span class="tok-str">&quot;{key}&quot;</span>);</span>
-<span class="ln" id="L608">        }</span>
-<span class="ln" id="L609">    }</span>
-<span class="ln" id="L610"></span>
-<span class="ln" id="L611">    <span class="tok-com">/// The Linux package name is given for all three families whatever happens,</span></span>
-<span class="ln" id="L612">    <span class="tok-com">/// so a reader on a fourth can translate.</span></span>
-<span class="ln" id="L613">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L614">    <span class="tok-kw">fn</span> <span class="tok-fn">a_machine_with_no_known_package_manager_still_gets_the_names</span>() {</span>
-<span class="ln" id="L615">        <span class="tok-com">// Exercised directly rather than through `route`, which depends on what</span></span>
-<span class="ln" id="L616">        <span class="tok-com">// is installed on the machine running the test.</span></span>
-<span class="ln" id="L617">        <span class="tok-kw">let</span> route = <span class="tok-fn">linux_package</span>(<span class="tok-str">&quot;libasound2-dev&quot;</span>, <span class="tok-str">&quot;alsa-lib-devel&quot;</span>, <span class="tok-str">&quot;alsa-lib&quot;</span>);</span>
-<span class="ln" id="L618">        <span class="tok-kw">match</span> route {</span>
-<span class="ln" id="L619">            Route::Run {</span>
-<span class="ln" id="L620">                program,</span>
-<span class="ln" id="L621">                args,</span>
-<span class="ln" id="L622">                vendor,</span>
-<span class="ln" id="L623">            } =&gt; {</span>
-<span class="ln" id="L624">                <span class="tok-com">// A manager was found. It must be run through `sudo` and name</span></span>
-<span class="ln" id="L625">                <span class="tok-com">// the package, and it must say whose packaging it is.</span></span>
-<span class="ln" id="L626">                assert_eq!(program, <span class="tok-str">&quot;sudo&quot;</span>);</span>
-<span class="ln" id="L627">                assert!(args.<span class="tok-fn">len</span>() &gt;= <span class="tok-num">2</span>, <span class="tok-str">&quot;{args:?}&quot;</span>);</span>
-<span class="ln" id="L628">                assert!(!vendor.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L629">            }</span>
-<span class="ln" id="L630">            Route::<span class="tok-fn">Yourself</span>(words) =&gt; {</span>
-<span class="ln" id="L631">                <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;libasound2-dev&quot;</span>, <span class="tok-str">&quot;alsa-lib-devel&quot;</span>, <span class="tok-str">&quot;alsa-lib&quot;</span>] {</span>
-<span class="ln" id="L632">                    assert!(words.<span class="tok-fn">contains</span>(name), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L633">                }</span>
-<span class="ln" id="L634">            }</span>
-<span class="ln" id="L635">            other =&gt; panic!(<span class="tok-str">&quot;a Linux package should not be {other:?}&quot;</span>),</span>
-<span class="ln" id="L636">        }</span>
-<span class="ln" id="L637">    }</span>
-<span class="ln" id="L638"></span>
-<span class="ln" id="L639">    <span class="tok-com">/// Nothing here downloads anything itself.</span></span>
-<span class="ln" id="L640">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L641">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_in_this_module_speaks_http</span>() {</span>
-<span class="ln" id="L642">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;deps.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L643">        <span class="tok-kw">for</span> word <span class="tok-kw">in</span> [<span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;https://reqwest&quot;</span>, <span class="tok-str">&quot;TcpStream&quot;</span>] {</span>
-<span class="ln" id="L644">            assert!(</span>
-<span class="ln" id="L645">                !source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;//!&quot;</span>).<span class="tok-fn">last</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">contains</span>(word),</span>
-<span class="ln" id="L646">                <span class="tok-str">&quot;{word} in a module that is supposed to shell out&quot;</span></span>
-<span class="ln" id="L647">            );</span>
-<span class="ln" id="L648">        }</span>
-<span class="ln" id="L649">    }</span>
-<span class="ln" id="L650">}</span>
+<span class="ln" id="L440"></span>
+<span class="ln" id="L441"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L442"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L443">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L444"></span>
+<span class="ln" id="L445">    <span class="tok-com">/// The one with this identifier. Here rather than in the module above,</span></span>
+<span class="ln" id="L446">    <span class="tok-com">/// because the tests are the only thing that looks a need up by name --</span></span>
+<span class="ln" id="L447">    <span class="tok-com">/// everything else walks the whole list.</span></span>
+<span class="ln" id="L448">    <span class="tok-kw">fn</span> <span class="tok-fn">by_key</span>(key: &amp;str) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> Need&gt; {</span>
+<span class="ln" id="L449">        ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|need| need.key == key)</span>
+<span class="ln" id="L450">    }</span>
+<span class="ln" id="L451"></span>
+<span class="ln" id="L452">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L453">    <span class="tok-kw">fn</span> <span class="tok-fn">every_entry_is_complete_and_uniquely_keyed</span>() {</span>
+<span class="ln" id="L454">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|need| need.key).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L455">        <span class="tok-kw">let</span> count = keys.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L456">        keys.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L457">        keys.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L458">        assert_eq!(keys.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;two needs share a key&quot;</span>);</span>
+<span class="ln" id="L459"></span>
+<span class="ln" id="L460">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L461">            assert!(!need.name.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
+<span class="ln" id="L462">            assert!(!need.what.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
+<span class="ln" id="L463">            assert!(!need.why.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
+<span class="ln" id="L464">            assert_eq!(<span class="tok-fn">by_key</span>(need.key).<span class="tok-fn">map</span>(|n| n.key), <span class="tok-fn">Some</span>(need.key));</span>
+<span class="ln" id="L465">        }</span>
+<span class="ln" id="L466">        assert!(<span class="tok-fn">by_key</span>(<span class="tok-str">&quot;nothing-like-this&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468"></span>
+<span class="ln" id="L469">    <span class="tok-com">/// Every need says *why* VeilVoice wants it. A list of packages with no</span></span>
+<span class="ln" id="L470">    <span class="tok-com">/// reasons is a list somebody installs without reading, which is the exact</span></span>
+<span class="ln" id="L471">    <span class="tok-com">/// habit this table exists to avoid feeding.</span></span>
+<span class="ln" id="L472">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L473">    <span class="tok-kw">fn</span> <span class="tok-fn">every_need_explains_itself_rather_than_just_naming_a_package</span>() {</span>
+<span class="ln" id="L474">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L475">            assert!(</span>
+<span class="ln" id="L476">                need.why.<span class="tok-fn">len</span>() &gt; <span class="tok-num">40</span>,</span>
+<span class="ln" id="L477">                <span class="tok-str">&quot;{}: the reason is too short to be a reason&quot;</span>,</span>
+<span class="ln" id="L478">                need.key</span>
+<span class="ln" id="L479">            );</span>
+<span class="ln" id="L480">            assert!(</span>
+<span class="ln" id="L481">                need.what.<span class="tok-fn">len</span>() &gt; <span class="tok-num">30</span>,</span>
+<span class="ln" id="L482">                <span class="tok-str">&quot;{}: say what it actually is&quot;</span>,</span>
+<span class="ln" id="L483">                need.key</span>
+<span class="ln" id="L484">            );</span>
+<span class="ln" id="L485">        }</span>
+<span class="ln" id="L486">    }</span>
+<span class="ln" id="L487"></span>
+<span class="ln" id="L488">    <span class="tok-com">/// Detection must not panic, hang, or change anything, on any machine.</span></span>
+<span class="ln" id="L489">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L490">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_is_safe_wherever_this_runs</span>() {</span>
+<span class="ln" id="L491">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L492">            <span class="tok-kw">let</span> presence = need.<span class="tok-fn">detect</span>();</span>
+<span class="ln" id="L493">            assert!(!presence.<span class="tok-fn">describe</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
+<span class="ln" id="L494">            <span class="tok-kw">let</span> route = need.<span class="tok-fn">route</span>();</span>
+<span class="ln" id="L495">            <span class="tok-kw">match</span> &amp;route {</span>
+<span class="ln" id="L496">                Route::Run { program, args, .. } =&gt; {</span>
+<span class="ln" id="L497">                    assert!(!program.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L498">                    assert!(!args.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L499">                    assert!(route.<span class="tok-fn">command_line</span>().<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L500">                }</span>
+<span class="ln" id="L501">                Route::<span class="tok-fn">Yourself</span>(words) =&gt; assert!(words.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{}&quot;</span>, need.key),</span>
+<span class="ln" id="L502">                Route::NotOnThisPlatform | Route::<span class="tok-fn">Unknown</span>(_) =&gt; {}</span>
+<span class="ln" id="L503">            }</span>
+<span class="ln" id="L504">        }</span>
+<span class="ln" id="L505">    }</span>
+<span class="ln" id="L506"></span>
+<span class="ln" id="L507">    <span class="tok-com">/// A compiler is certainly here: this test is being compiled by one.</span></span>
+<span class="ln" id="L508">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L509">    <span class="tok-kw">fn</span> <span class="tok-fn">the_toolchain_is_found_because_it_is_running_this_test</span>() {</span>
+<span class="ln" id="L510">        <span class="tok-kw">let</span> rust = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;rust&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L511">        <span class="tok-kw">match</span> rust.<span class="tok-fn">detect</span>() {</span>
+<span class="ln" id="L512">            Presence::<span class="tok-fn">Present</span>(line) =&gt; assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cargo&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>),</span>
+<span class="ln" id="L513">            <span class="tok-com">// `cargo test` can be invoked where `cargo` itself is not on PATH.</span></span>
+<span class="ln" id="L514">            <span class="tok-com">// That is a real answer and not a reason to fail somebody&#x27;s build.</span></span>
+<span class="ln" id="L515">            other =&gt; panic!(<span class="tok-str">&quot;cargo should be findable from a cargo test: {other:?}&quot;</span>),</span>
+<span class="ln" id="L516">        }</span>
+<span class="ln" id="L517">    }</span>
+<span class="ln" id="L518"></span>
+<span class="ln" id="L519">    <span class="tok-com">/// F-68. A probe must not answer from a program that merely shares a name</span></span>
+<span class="ln" id="L520">    <span class="tok-com">/// with the one it is looking for.</span></span>
+<span class="ln" id="L521">    <span class="tok-com">///</span></span>
+<span class="ln" id="L522">    <span class="tok-com">/// This reported &quot;found&quot; on a Windows machine because Git for Windows ships</span></span>
+<span class="ln" id="L523">    <span class="tok-com">/// `usr/bin/link.exe`, GNU coreutils&#x27; hardlink tool. A build on that machine</span></span>
+<span class="ln" id="L524">    <span class="tok-com">/// would have stopped with a linker error after the dependency check had</span></span>
+<span class="ln" id="L525">    <span class="tok-com">/// said everything was fine.</span></span>
+<span class="ln" id="L526">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L527">    <span class="tok-kw">fn</span> <span class="tok-fn">the_windows_linker_is_not_looked_for_by_name_on_path</span>() {</span>
+<span class="ln" id="L528">        <span class="tok-com">// A source-reading test, so the line endings have to be settled first.</span></span>
+<span class="ln" id="L529">        <span class="tok-com">// F-72: these searched for &quot;\n}\n&quot; and passed on every machine</span></span>
+<span class="ln" id="L530">        <span class="tok-com">// whose checkout uses LF. GitHub&#x27;s Windows runners default to</span></span>
+<span class="ln" id="L531">        <span class="tok-com">// core.autocrlf=true, so the file arrives with CRLF, the pattern</span></span>
+<span class="ln" id="L532">        <span class="tok-com">// matches nothing, and three tests failed there and nowhere else --</span></span>
+<span class="ln" id="L533">        <span class="tok-com">// including on the developer machine that had just run them.</span></span>
+<span class="ln" id="L534">        <span class="tok-com">// Normalised here as well as pinned in .gitattributes: a test that</span></span>
+<span class="ln" id="L535">        <span class="tok-com">// depends on a git setting is a test somebody will trip over.</span></span>
+<span class="ln" id="L536">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;deps.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L537">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn detect_linker()&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function&quot;</span>);</span>
+<span class="ln" id="L538">        <span class="tok-kw">let</span> end = source[start..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n}\n&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its end&quot;</span>) + start;</span>
+<span class="ln" id="L539">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L540">        assert!(</span>
+<span class="ln" id="L541">            !body.<span class="tok-fn">contains</span>(concat!(<span class="tok-str">&quot;which(&quot;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&quot;link&quot;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&quot;)&quot;</span>)),</span>
+<span class="ln" id="L542">            <span class="tok-str">&quot;a `link` on PATH is usually not Microsoft&#x27;s linker&quot;</span></span>
+<span class="ln" id="L543">        );</span>
+<span class="ln" id="L544"></span>
+<span class="ln" id="L545">        <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L546">            <span class="tok-kw">let</span> presence = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;cc&quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">detect</span>();</span>
+<span class="ln" id="L547">            assert!(</span>
+<span class="ln" id="L548">                matches!(presence, Presence::<span class="tok-fn">Unknown</span>(_)),</span>
+<span class="ln" id="L549">                <span class="tok-str">&quot;on Windows only a build can decide: {presence:?}&quot;</span></span>
+<span class="ln" id="L550">            );</span>
+<span class="ln" id="L551">            assert!(</span>
+<span class="ln" id="L552">                presence.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Only a build can say&quot;</span>),</span>
+<span class="ln" id="L553">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L554">                presence.<span class="tok-fn">describe</span>()</span>
+<span class="ln" id="L555">            );</span>
+<span class="ln" id="L556">        }</span>
+<span class="ln" id="L557">    }</span>
+<span class="ln" id="L558"></span>
+<span class="ln" id="L559">    <span class="tok-com">/// Nothing in this module runs a package manager. The routes are values;</span></span>
+<span class="ln" id="L560">    <span class="tok-com">/// something else has to decide to run one, after asking.</span></span>
+<span class="ln" id="L561">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L562">    <span class="tok-kw">fn</span> <span class="tok-fn">no_route_is_ever_taken_by_this_module</span>() {</span>
+<span class="ln" id="L563">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;deps.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L564">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L565">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;.status()&quot;</span>, <span class="tok-str">&quot;.spawn()&quot;</span>] {</span>
+<span class="ln" id="L566">            assert!(</span>
+<span class="ln" id="L567">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L568">                <span class="tok-str">&quot;this module only looks; {forbidden} runs something&quot;</span></span>
+<span class="ln" id="L569">            );</span>
+<span class="ln" id="L570">        }</span>
+<span class="ln" id="L571">        <span class="tok-com">// `.output()` is used, and only to ask a program its version. Every</span></span>
+<span class="ln" id="L572">        <span class="tok-com">// use is named here so a new one has to be argued for.</span></span>
+<span class="ln" id="L573">        assert_eq!(</span>
+<span class="ln" id="L574">            body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;.output()&quot;</span>).<span class="tok-fn">count</span>(),</span>
+<span class="ln" id="L575">            <span class="tok-num">4</span>,</span>
+<span class="ln" id="L576">            <span class="tok-str">&quot;a new subprocess appeared in a module whose job is to look&quot;</span></span>
+<span class="ln" id="L577">        );</span>
+<span class="ln" id="L578">    }</span>
+<span class="ln" id="L579"></span>
+<span class="ln" id="L580">    <span class="tok-com">/// An unanswerable probe must never be reported as an absence.</span></span>
+<span class="ln" id="L581">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L582">    <span class="tok-kw">fn</span> <span class="tok-fn">could_not_tell_is_not_the_same_as_not_there</span>() {</span>
+<span class="ln" id="L583">        assert!(!Presence::Missing.<span class="tok-fn">is_satisfied</span>());</span>
+<span class="ln" id="L584">        assert!(!Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;no probe&quot;</span>.<span class="tok-fn">into</span>()).<span class="tok-fn">is_satisfied</span>());</span>
+<span class="ln" id="L585">        assert!(Presence::NotOnThisPlatform.<span class="tok-fn">is_satisfied</span>());</span>
+<span class="ln" id="L586">        assert!(Presence::<span class="tok-fn">Present</span>(String::<span class="tok-fn">new</span>()).<span class="tok-fn">is_satisfied</span>());</span>
+<span class="ln" id="L587"></span>
+<span class="ln" id="L588">        assert!(Presence::<span class="tok-fn">Unknown</span>(<span class="tok-str">&quot;x&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L589">            .<span class="tok-fn">describe</span>()</span>
+<span class="ln" id="L590">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;could not tell&quot;</span>));</span>
+<span class="ln" id="L591">        assert_eq!(Presence::Missing.<span class="tok-fn">describe</span>(), <span class="tok-str">&quot;MISSING&quot;</span>);</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">        <span class="tok-com">// And the split that acts on it: only a definite Missing counts.</span></span>
+<span class="ln" id="L594">        <span class="tok-kw">let</span> (required, optional) = <span class="tok-fn">missing</span>();</span>
+<span class="ln" id="L595">        <span class="tok-kw">for</span> need <span class="tok-kw">in</span> required.<span class="tok-fn">iter</span>().<span class="tok-fn">chain</span>(optional.<span class="tok-fn">iter</span>()) {</span>
+<span class="ln" id="L596">            assert_eq!(need.<span class="tok-fn">detect</span>(), Presence::Missing, <span class="tok-str">&quot;{}&quot;</span>, need.key);</span>
+<span class="ln" id="L597">        }</span>
+<span class="ln" id="L598">    }</span>
+<span class="ln" id="L599"></span>
+<span class="ln" id="L600">    <span class="tok-com">/// Optional and required are kept apart, or somebody installs ALSA headers</span></span>
+<span class="ln" id="L601">    <span class="tok-com">/// on a machine that will never run live mode.</span></span>
+<span class="ln" id="L602">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L603">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_optional_dependency_is_not_a_failed_build</span>() {</span>
+<span class="ln" id="L604">        <span class="tok-kw">let</span> alsa = <span class="tok-fn">by_key</span>(<span class="tok-str">&quot;alsa&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L605">        assert!(!alsa.required, <span class="tok-str">&quot;everything but live mode builds without it&quot;</span>);</span>
+<span class="ln" id="L606">        assert!(alsa.why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not live mode&quot;</span>), <span class="tok-str">&quot;{}&quot;</span>, alsa.why);</span>
+<span class="ln" id="L607"></span>
+<span class="ln" id="L608">        <span class="tok-kw">for</span> key <span class="tok-kw">in</span> [<span class="tok-str">&quot;rust&quot;</span>, <span class="tok-str">&quot;cc&quot;</span>] {</span>
+<span class="ln" id="L609">            assert!(<span class="tok-fn">by_key</span>(key).<span class="tok-fn">unwrap</span>().required, <span class="tok-str">&quot;{key}&quot;</span>);</span>
+<span class="ln" id="L610">        }</span>
+<span class="ln" id="L611">    }</span>
+<span class="ln" id="L612"></span>
+<span class="ln" id="L613">    <span class="tok-com">/// The Linux package name is given for all three families whatever happens,</span></span>
+<span class="ln" id="L614">    <span class="tok-com">/// so a reader on a fourth can translate.</span></span>
+<span class="ln" id="L615">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L616">    <span class="tok-kw">fn</span> <span class="tok-fn">a_machine_with_no_known_package_manager_still_gets_the_names</span>() {</span>
+<span class="ln" id="L617">        <span class="tok-com">// Exercised directly rather than through `route`, which depends on what</span></span>
+<span class="ln" id="L618">        <span class="tok-com">// is installed on the machine running the test.</span></span>
+<span class="ln" id="L619">        <span class="tok-kw">let</span> route = <span class="tok-fn">linux_package</span>(<span class="tok-str">&quot;libasound2-dev&quot;</span>, <span class="tok-str">&quot;alsa-lib-devel&quot;</span>, <span class="tok-str">&quot;alsa-lib&quot;</span>);</span>
+<span class="ln" id="L620">        <span class="tok-kw">match</span> route {</span>
+<span class="ln" id="L621">            Route::Run {</span>
+<span class="ln" id="L622">                program,</span>
+<span class="ln" id="L623">                args,</span>
+<span class="ln" id="L624">                vendor,</span>
+<span class="ln" id="L625">            } =&gt; {</span>
+<span class="ln" id="L626">                <span class="tok-com">// A manager was found. It must be run through `sudo` and name</span></span>
+<span class="ln" id="L627">                <span class="tok-com">// the package, and it must say whose packaging it is.</span></span>
+<span class="ln" id="L628">                assert_eq!(program, <span class="tok-str">&quot;sudo&quot;</span>);</span>
+<span class="ln" id="L629">                assert!(args.<span class="tok-fn">len</span>() &gt;= <span class="tok-num">2</span>, <span class="tok-str">&quot;{args:?}&quot;</span>);</span>
+<span class="ln" id="L630">                assert!(!vendor.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L631">            }</span>
+<span class="ln" id="L632">            Route::<span class="tok-fn">Yourself</span>(words) =&gt; {</span>
+<span class="ln" id="L633">                <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;libasound2-dev&quot;</span>, <span class="tok-str">&quot;alsa-lib-devel&quot;</span>, <span class="tok-str">&quot;alsa-lib&quot;</span>] {</span>
+<span class="ln" id="L634">                    assert!(words.<span class="tok-fn">contains</span>(name), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L635">                }</span>
+<span class="ln" id="L636">            }</span>
+<span class="ln" id="L637">            other =&gt; panic!(<span class="tok-str">&quot;a Linux package should not be {other:?}&quot;</span>),</span>
+<span class="ln" id="L638">        }</span>
+<span class="ln" id="L639">    }</span>
+<span class="ln" id="L640"></span>
+<span class="ln" id="L641">    <span class="tok-com">/// Nothing here downloads anything itself.</span></span>
+<span class="ln" id="L642">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L643">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_in_this_module_speaks_http</span>() {</span>
+<span class="ln" id="L644">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;deps.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L645">        <span class="tok-kw">for</span> word <span class="tok-kw">in</span> [<span class="tok-str">&quot;http://&quot;</span>, <span class="tok-str">&quot;https://reqwest&quot;</span>, <span class="tok-str">&quot;TcpStream&quot;</span>] {</span>
+<span class="ln" id="L646">            assert!(</span>
+<span class="ln" id="L647">                !source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;//!&quot;</span>).<span class="tok-fn">last</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">contains</span>(word),</span>
+<span class="ln" id="L648">                <span class="tok-str">&quot;{word} in a module that is supposed to shell out&quot;</span></span>
+<span class="ln" id="L649">            );</span>
+<span class="ln" id="L650">        }</span>
+<span class="ln" id="L651">    }</span>
+<span class="ln" id="L652">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

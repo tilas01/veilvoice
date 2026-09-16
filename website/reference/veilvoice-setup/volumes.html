@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,7 +46,7 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-setup/volumes.svg" alt="volumes.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-setup/volumes.svg" alt="volumes.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-setup/src/volumes.rs</code></h1>
 <p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 580 lines &middot; <a href="volumes.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
@@ -63,7 +64,7 @@
 <p>Encrypted volumes this machine already has: Cryptomator and VeraCrypt.</p>
 <h2 id="what-this-does-and-the-two-things-it-deliberately-does-not">What this does, and the two things it deliberately does not</h2>
 <p>It <strong>reads</strong>. It finds whether either program is installed, and which of their volumes are mounted right now, so VeilVoice can offer to write veiled recordings into one instead of into a Downloads folder somebody meant to clear out.</p>
-<p>It does <strong>not drive either program</strong>. No launching, no mounting, no unlocking, and it never sees a volume passphrase. Mounting somebody&#x27;s encrypted volume is their act, taken in the tool they chose, and a voice de-identifier is not the program to be doing it for them. This is marker 39&#x27;s rule about privilege in a second place: use what is already there, ask for nothing.</p>
+<p>It does <strong>not drive either program</strong>. No launching, no mounting, no unlocking, and it never sees a volume passphrase. Mounting somebody&#x27;s encrypted volume is their act, taken in the tool they chose, and a voice de-identifier is not the program to be doing it for them. This is roadmap item 39&#x27;s rule about privilege in a second place: use what is already there, ask for nothing.</p>
 <p>It does <strong>not decide whether a volume is hidden</strong>. VeraCrypt&#x27;s hidden volumes exist so that somebody under compulsion can hand over one passphrase and reveal an outer volume, and the two are indistinguishable from outside <em>by design</em>. No amount of looking will tell them apart, so <code>Hidden</code> has an <code>Unknown</code> state and it is the caller&#x27;s job to ask rather than to guess. See <code>Hidden</code> for why guessing wrong destroys data.</p>
 <h2 id="by-the-time-veilvoice-sees-one-it-is-a-directory">By the time VeilVoice sees one, it is a directory</h2>
 <p>That is what makes this honest and small. A mounted Cryptomator vault and a mounted VeraCrypt volume are both ordinary directories to anything that writes a file. The encryption is entirely the other tool&#x27;s, VeilVoice adds none of its own here, and calling any of this &quot;VeilVoice encryption&quot; would be the overclaim this project refuses.</p>

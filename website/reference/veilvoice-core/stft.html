@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,9 +46,9 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-core/stft.svg" alt="stft.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-core/stft.svg" alt="stft.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/stft.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 259 lines &middot; <a href="stft.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 264 lines &middot; <a href="stft.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -67,7 +68,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>259 lines defining <strong>4 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>264 lines defining <strong>4 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct StftEngine</code> <span style="color:var(--muted)">line 36</span> &middot; Reusable streaming STFT engine (single channel).</li>
 </ul>
@@ -113,7 +114,7 @@
 <a href="stft.src.html#fn-stftengine-process_frame">
 <rect x="115.5" y="220.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="230.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StftEngine::process_frame</text>
-<text x="230.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+<text x="230.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -134,12 +135,12 @@ flowchart TD
     n_new([&quot;StftEngine::new&lt;br/&gt;line 60&quot;])
     n_latency_samples([&quot;StftEngine::latency_samples&lt;br/&gt;line 98&quot;])
     n_process([&quot;StftEngine::process&lt;br/&gt;line 105&quot;])
-    n_process_frame[&quot;StftEngine::process_frame&lt;br/&gt;line 154&quot;]
+    n_process_frame[&quot;StftEngine::process_frame&lt;br/&gt;line 159&quot;]
     n_process --&gt; n_process_frame
     click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60&quot; &quot;open the source&quot;
     click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98&quot; &quot;open the source&quot;
     click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105&quot; &quot;open the source&quot;
-    click n_process_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154&quot; &quot;open the source&quot;
+    click n_process_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L159&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_latency_samples,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -154,7 +155,7 @@ flowchart TD
 <tr><td><code>StftEngine::new</code> <sub>pub fn</sub></td><td><a href="stft.src.html#fn-stftengine-new">60</a></td><td>n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).</td></tr>
 <tr><td><code>StftEngine::latency_samples</code> <sub>pub fn</sub></td><td><a href="stft.src.html#fn-stftengine-latency_samples">98</a></td><td>End-to-end algorithmic latency (group delay) in samples.</td></tr>
 <tr><td><code>StftEngine::process</code> <sub>pub fn</sub></td><td><a href="stft.src.html#fn-stftengine-process">105</a></td><td>Process input into output (equal length).</td></tr>
-<tr><td><code>StftEngine::process_frame</code> <sub>fn</sub></td><td><a href="stft.src.html#fn-stftengine-process_frame">154</a></td><td></td></tr>
+<tr><td><code>StftEngine::process_frame</code> <sub>fn</sub></td><td><a href="stft.src.html#fn-stftengine-process_frame">159</a></td><td>Window, transform, hand the spectrum to transform, and overlap-add the result back into the output queue.</td></tr>
 </tbody></table>
 </section>
 </div></div>

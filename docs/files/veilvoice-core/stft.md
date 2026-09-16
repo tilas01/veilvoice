@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-core/src/stft.rs`
 
-[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 259 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs)
+[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 264 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs)
 
 ## Contents
 
@@ -50,7 +50,7 @@ is the door between the two ways of looking at the same thing.
 
 ## What this file contains
 
-259 lines defining **4 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+264 lines defining **4 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -86,12 +86,12 @@ flowchart TD
     n_new(["StftEngine::new<br/>line 60"])
     n_latency_samples(["StftEngine::latency_samples<br/>line 98"])
     n_process(["StftEngine::process<br/>line 105"])
-    n_process_frame["StftEngine::process_frame<br/>line 154"]
+    n_process_frame["StftEngine::process_frame<br/>line 159"]
     n_process --> n_process_frame
     click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60" "open the source"
     click n_latency_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98" "open the source"
     click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105" "open the source"
-    click n_process_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154" "open the source"
+    click n_process_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L159" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_latency_samples,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -108,7 +108,7 @@ flowchart TD
 | `StftEngine::new` <sub>pub fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60) | n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4). |
 | `StftEngine::latency_samples` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98) | End-to-end algorithmic latency (group delay) in samples. |
 | `StftEngine::process` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105) | Process input into output (equal length). |
-| `StftEngine::process_frame` <sub>fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154) |  |
+| `StftEngine::process_frame` <sub>fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L159) | Window, transform, hand the spectrum to transform, and overlap-add the result back into the output queue. |
 
 ---
 

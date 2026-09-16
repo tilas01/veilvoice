@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -46,7 +47,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-failsafe/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-failsafe.html">veilvoice-failsafe</a> &middot; 682 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-failsafe.html">veilvoice-failsafe</a> &middot; 744 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -776,7 +777,69 @@
 <span class="ln" id="L679">        assert!(guard.<span class="tok-fn">log</span>()[<span class="tok-num">0</span>].closed);</span>
 <span class="ln" id="L680">        assert!(guard.<span class="tok-fn">log</span>()[<span class="tok-num">0</span>].detail.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Headset Microphone&quot;</span>));</span>
 <span class="ln" id="L681">    }</span>
-<span class="ln" id="L682">}</span>
+<span class="ln" id="L682"></span>
+<span class="ln" id="L683">    <span class="tok-com">/// Failsafe knows no program by name except the ones it refuses to close.</span></span>
+<span class="ln" id="L684">    <span class="tok-com">///</span></span>
+<span class="ln" id="L685">    <span class="tok-com">/// The tests above use real application names as fixtures, because a test</span></span>
+<span class="ln" id="L686">    <span class="tok-com">/// reads better with one, and reading this file it is easy to come away</span></span>
+<span class="ln" id="L687">    <span class="tok-com">/// thinking a particular chat program is wired in. It is not, and this is</span></span>
+<span class="ln" id="L688">    <span class="tok-com">/// what keeps it that way: the decision is made about whatever holder the</span></span>
+<span class="ln" id="L689">    <span class="tok-com">/// caller found, and the only names written down anywhere in the working</span></span>
+<span class="ln" id="L690">    <span class="tok-com">/// half of this file are the operating system&#x27;s own.</span></span>
+<span class="ln" id="L691">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L692">    <span class="tok-kw">fn</span> <span class="tok-fn">no_program_is_known_here_by_name_except_the_protected_ones</span>() {</span>
+<span class="ln" id="L693">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L694">        <span class="tok-kw">let</span> working = source</span>
+<span class="ln" id="L695">            .<span class="tok-fn">split_once</span>(<span class="tok-str">&quot;\nmod tests {&quot;</span>)</span>
+<span class="ln" id="L696">            .<span class="tok-fn">map</span>(|(before, _)| before)</span>
+<span class="ln" id="L697">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the test module marks the end of the working half&quot;</span>);</span>
+<span class="ln" id="L698"></span>
+<span class="ln" id="L699">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> named = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L700">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> working.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L701">            <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> line.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">skip</span>(<span class="tok-num">1</span>).<span class="tok-fn">step_by</span>(<span class="tok-num">2</span>) {</span>
+<span class="ln" id="L702">                <span class="tok-kw">let</span> name = candidate.<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L703">                <span class="tok-kw">let</span> executable = name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.exe&quot;</span>);</span>
+<span class="ln" id="L704">                <span class="tok-kw">if</span> executable &amp;&amp; !PROTECTED.<span class="tok-fn">contains</span>(&amp;name.<span class="tok-fn">as_str</span>()) {</span>
+<span class="ln" id="L705">                    named.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;line {}: {candidate}&quot;</span>, number + <span class="tok-num">1</span>));</span>
+<span class="ln" id="L706">                }</span>
+<span class="ln" id="L707">            }</span>
+<span class="ln" id="L708">        }</span>
+<span class="ln" id="L709">        assert!(</span>
+<span class="ln" id="L710">            named.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L711">            <span class="tok-str">&quot;these name a program Failsafe has no business knowing about. It \</span></span>
+<span class="ln" id="L712"><span class="tok-str">             acts on what the caller found, on every platform, and a list of \</span></span>
+<span class="ln" id="L713"><span class="tok-str">             applications is a list that is wrong on the next machine:\n{}&quot;</span>,</span>
+<span class="ln" id="L714">            named.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L715">        );</span>
+<span class="ln" id="L716">    }</span>
+<span class="ln" id="L717"></span>
+<span class="ln" id="L718">    <span class="tok-com">/// A program nobody has ever heard of is handled like any other.</span></span>
+<span class="ln" id="L719">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L720">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unheard_of_program_is_treated_like_any_other</span>() {</span>
+<span class="ln" id="L721">        <span class="tok-kw">let</span> guard = <span class="tok-fn">veiling_guard</span>();</span>
+<span class="ln" id="L722">        <span class="tok-kw">for</span> app <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L723">            <span class="tok-str">&quot;Discord.exe&quot;</span>,</span>
+<span class="ln" id="L724">            <span class="tok-str">&quot;zoom.us&quot;</span>,</span>
+<span class="ln" id="L725">            <span class="tok-str">&quot;some-recorder-written-tomorrow&quot;</span>,</span>
+<span class="ln" id="L726">            <span class="tok-str">&quot;/opt/whatever/bin/Talk&quot;</span>,</span>
+<span class="ln" id="L727">            <span class="tok-str">&quot;C:\\Program Files\\Nobody\\Nobody.exe&quot;</span>,</span>
+<span class="ln" id="L728">            <span class="tok-str">&quot;obs&quot;</span>,</span>
+<span class="ln" id="L729">        ] {</span>
+<span class="ln" id="L730">            <span class="tok-kw">let</span> found = guard.<span class="tok-fn">look</span>(&amp;[<span class="tok-fn">holder</span>(app, <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Headset Microphone&quot;</span>))], &amp;[]);</span>
+<span class="ln" id="L731">            <span class="tok-kw">match</span> &amp;found {</span>
+<span class="ln" id="L732">                Finding::Foreign {</span>
+<span class="ln" id="L733">                    app: seen,</span>
+<span class="ln" id="L734">                    closeable,</span>
+<span class="ln" id="L735">                    ..</span>
+<span class="ln" id="L736">                } =&gt; {</span>
+<span class="ln" id="L737">                    assert_eq!(seen, app);</span>
+<span class="ln" id="L738">                    assert!(closeable, <span class="tok-str">&quot;{app} is not protected, so it is closeable&quot;</span>);</span>
+<span class="ln" id="L739">                }</span>
+<span class="ln" id="L740">                other =&gt; panic!(<span class="tok-str">&quot;{app} should have been the alarm, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L741">            }</span>
+<span class="ln" id="L742">        }</span>
+<span class="ln" id="L743">    }</span>
+<span class="ln" id="L744">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

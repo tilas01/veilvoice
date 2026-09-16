@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,9 +46,9 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-crypto/aead.svg" alt="aead.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-crypto/aead.svg" alt="aead.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/aead.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 276 lines &middot; <a href="aead.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 280 lines &middot; <a href="aead.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -66,17 +67,17 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>276 lines defining <strong>5 functions</strong> (4 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>280 lines defining <strong>5 functions</strong> (4 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>random_nonce</code> <span style="color:var(--muted)">line 35</span> &middot; Draw a fresh random nonce from the OS CSPRNG.
 </li>
-<li><code>seal</code> <span style="color:var(--muted)">line 51</span> &middot; Encrypt plaintext, authenticating aad alongside it.
+<li><code>seal</code> <span style="color:var(--muted)">line 55</span> &middot; Encrypt plaintext, authenticating aad alongside it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cipher</code></span>
 </li>
-<li><code>open</code> <span style="color:var(--muted)">line 70</span> &middot; Decrypt and verify.
+<li><code>open</code> <span style="color:var(--muted)">line 74</span> &middot; Decrypt and verify.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cipher</code></span>
 </li>
-<li><code>open_secret</code> <span style="color:var(--muted)">line 117</span> &middot; Decrypt and verify into protected memory, never into an ordinary Vec.
+<li><code>open_secret</code> <span style="color:var(--muted)">line 121</span> &middot; Decrypt and verify into protected memory, never into an ordinary Vec.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cipher</code></span>
 </li>
 </ul>
@@ -105,22 +106,22 @@
 <a href="aead.src.html#fn-cipher">
 <rect x="178.7" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="220.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cipher</text>
-<text x="220.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 41</text>
+<text x="220.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 45</text>
 </a>
 <a href="aead.src.html#fn-seal">
 <rect x="289.1" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="331.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal</text>
-<text x="331.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 51</text>
+<text x="331.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 55</text>
 </a>
 <a href="aead.src.html#fn-open">
 <rect x="399.6" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="441.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open</text>
-<text x="441.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 70</text>
+<text x="441.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
 </a>
 <a href="aead.src.html#fn-open_secret">
 <rect x="510.0" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="568.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_secret</text>
-<text x="568.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+<text x="568.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -138,18 +139,18 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_random_nonce([&quot;random_nonce&lt;br/&gt;line 35&quot;])
-    n_cipher[&quot;cipher&lt;br/&gt;line 41&quot;]
-    n_seal([&quot;seal&lt;br/&gt;line 51&quot;])
-    n_open([&quot;open&lt;br/&gt;line 70&quot;])
-    n_open_secret([&quot;open_secret&lt;br/&gt;line 117&quot;])
+    n_cipher[&quot;cipher&lt;br/&gt;line 45&quot;]
+    n_seal([&quot;seal&lt;br/&gt;line 55&quot;])
+    n_open([&quot;open&lt;br/&gt;line 74&quot;])
+    n_open_secret([&quot;open_secret&lt;br/&gt;line 121&quot;])
     n_open --&gt; n_cipher
     n_open_secret --&gt; n_cipher
     n_seal --&gt; n_cipher
     click n_random_nonce href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L35&quot; &quot;open the source&quot;
-    click n_cipher href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41&quot; &quot;open the source&quot;
-    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51&quot; &quot;open the source&quot;
-    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70&quot; &quot;open the source&quot;
-    click n_open_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L117&quot; &quot;open the source&quot;
+    click n_cipher href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L45&quot; &quot;open the source&quot;
+    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L55&quot; &quot;open the source&quot;
+    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L74&quot; &quot;open the source&quot;
+    click n_open_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L121&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_random_nonce,n_seal,n_open,n_open_secret entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -163,10 +164,10 @@ flowchart TD
 <tr><td><code>NONCE_LEN</code> <sub>pub const</sub></td><td><a href="aead.src.html#fn-nonce_len">30</a></td><td>Nonce length for XChaCha20-Poly1305, in bytes.</td></tr>
 <tr><td><code>TAG_LEN</code> <sub>pub const</sub></td><td><a href="aead.src.html#fn-tag_len">32</a></td><td>Poly1305 authentication tag length, in bytes.</td></tr>
 <tr><td><code>random_nonce</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-random_nonce">35</a></td><td>Draw a fresh random nonce from the OS CSPRNG.</td></tr>
-<tr><td><code>cipher</code> <sub>fn</sub></td><td><a href="aead.src.html#fn-cipher">41</a></td><td></td></tr>
-<tr><td><code>seal</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-seal">51</a></td><td>Encrypt plaintext, authenticating aad alongside it.</td></tr>
-<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-open">70</a></td><td>Decrypt and verify.</td></tr>
-<tr><td><code>open_secret</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-open_secret">117</a></td><td>Decrypt and verify into protected memory, never into an ordinary Vec.</td></tr>
+<tr><td><code>cipher</code> <sub>fn</sub></td><td><a href="aead.src.html#fn-cipher">45</a></td><td>The cipher for this key, refusing a key that is not 32 bytes.</td></tr>
+<tr><td><code>seal</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-seal">55</a></td><td>Encrypt plaintext, authenticating aad alongside it.</td></tr>
+<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-open">74</a></td><td>Decrypt and verify.</td></tr>
+<tr><td><code>open_secret</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-open_secret">121</a></td><td>Decrypt and verify into protected memory, never into an ordinary Vec.</td></tr>
 </tbody></table>
 </section>
 </div></div>

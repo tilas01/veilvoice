@@ -501,6 +501,179 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-193: seventeen images with no size, and everything under them moving
+
+Following on from F-191, and found by the same measurement: a landing that was
+correct the moment it was made was wrong a second later, and the offset was not
+what had changed.
+
+Seventeen `<img>` elements on this site declared no `width` and `height`. Six
+of them are the drawings of the command-line help screens, high on the front
+page, and one is the screen photograph in the demonstration. An image with no
+declared size occupies nothing until it arrives, so everything below it moves
+down when it does, and the reader who followed a link to one of those sections
+arrives, reads a line, and finds the line somewhere else. The brand icon in the
+header was another, on every page of the site including the twelve hundred
+generated ones.
+
+All seventeen now carry their size, taken from the file rather than typed:
+the help drawings and the banners from their own `viewBox`, the screen
+photograph from the size `tools/site/demo.py` already enforces for every
+capture, the icons and the banner image from the files themselves. The
+generators that write the reference and source pages read the banner they have
+just written rather than carrying a number, because a banner whose subtitle
+runs to a third line is taller than the rest.
+
+`anchors.test.js` fails on an `<img>` without both, so the next one to be added
+without them fails a build rather than moving a paragraph under somebody.
+
+### F-192: three tables listing the crates, none of them listing the crates
+
+The website's front page renders the README. The README lists the crates
+twice, in a Layout table and a table for somebody using them as libraries, and
+`docs/USING_THE_CRATES.md` lists them a third time. The three carried thirteen,
+twelve and thirteen rows. The workspace has twenty-seven crates.
+
+So the public description of what this project is made of was short by fifteen
+crates, and had been for as long as those fifteen had existed. Among the
+missing were the verifier's two backends, the failsafe, the video renderer and
+the workspace store: not internal plumbing, but things the rest of the
+documentation talks about at length.
+
+Nothing careless produced this. A crate is added in `crates/`, and the tables
+are in two other files. That is the shape this project already has a rule
+about, and the rule is that a fact in more than one place is derived or
+checked. Descriptions cannot be derived, because a sentence assembled from a
+crate name is padding. So the membership is checked:
+`tools/audit/crate_tables.py` reads the workspace and every table, and fails
+naming each crate a table has missed and each row that names a crate that is
+not there. The library tables are held to the crates with a `src/lib.rs`, the
+Layout table to every workspace member.
+
+The check was written first, run against the tree to produce the list of
+fifteen, and the rows were then written by hand.
+
+### F-191: the offset that clears the sticky header was a number, and the number was wrong
+
+The website's header is `position: sticky`, so whatever a fragment jump puts at
+the top of the viewport is underneath it. `scroll-margin-top` exists for that,
+and the stylesheet set it to a flat `90px`.
+
+The header is not 90px tall at any width. Driven in a browser it measures 133px
+at desktop widths, 171px where the navigation wraps to three rows, 115px on a
+phone, 143px at 320px and 81px on the reference pages. At the commonest width
+that is 43px in the direction that hides the heading, so following `download`
+from the navigation arrived at a page that appeared to begin mid-sentence.
+
+The rule also named `section`, `h2` and `h3` and nothing else, so an `h4` or a
+list item with an id got no offset at all and landed a full header height under
+the bar. That is every entry on the releases page and every entry on the
+roadmap.
+
+Measured across both, 425 of 430 fragment links on the site landed wrong. The
+edition of the site that runs no scripts had none of this, because it has no
+sticky header, and it is the standard the rest of the site is now held to.
+
+The offset is measured rather than written down. `website/js/teleport.js` reads
+the header's height, publishes it as `--anchor-offset` and keeps it current
+with a `ResizeObserver`, so a header that grows a row, a font that loads late
+and a phone turned sideways all correct themselves. The stylesheet applies it
+to `[id]` rather than to a list of tag names. The landing is then held for a
+second afterwards, because a fragment jump happens once and the page is not
+finished at that moment, and the holding stops the instant the reader scrolls.
+Where the reader landed is outlined briefly, which under
+`prefers-reduced-motion` is an outline that simply sits there rather than
+fading.
+
+Navigation itself is left alone: no click is prevented and no history entry is
+written, because the full-size screenshot viewers open through `:target`, which
+follows a real fragment navigation and not a `pushState`.
+
+One more thing was in the way, and it was the site's own stylesheet.
+`scroll-behavior: smooth` is set on `html`, so a fragment jump is an animation
+rather than an event. Over the height of a screen or two that animation is the
+thing that tells a reader they have gone down the page rather than sideways.
+Over twenty thousand pixels, which is what the front page's later sections are
+from the top, it is a second and a half of the whole page rushing past, and
+measured it was a second and a half during which the reader had not arrived
+anywhere. A hop longer than two screens now goes straight there, and the
+outline says where "there" is; a shorter one still glides.
+
+`tools/site-tests/anchors.test.js` checks what can be read without a browser:
+that the offset comes from the variable rather than a constant, that it applies
+to every id, that the script measures the header, that every image declares its
+size, and that every page carrying the sticky header loads the script. The last
+of those found four more pages on its first run.
+
+Measured again afterwards, at 1280px and at 390px: of 436 fragment links, 411
+land with the heading exactly 14px below the header, within 50ms. The other 25
+cannot land anywhere else. Twenty open the full-size screenshot viewers, which
+are fixed overlays that cover the page rather than places in it, and five name
+something at the very bottom of a page, where the document has no more room to
+scroll. The edition that runs no scripts has the same five.
+
+### F-190: a record length multiplied by eight, on a target where that wraps
+
+Part 2.5 of the brief, which is integer width, and the reason this project
+builds i686 and armv7 in CI: everything in that section bites only on 32-bit.
+
+The obfuscated store pads every record to a bucket so that its size says as
+little as possible about its contents. The bucket is chosen from the record's
+length multiplied by the worst-case expansion any of the reversible encodings
+can produce, which is eight. A record over about 512 MiB wraps that
+multiplication on a 32-bit target, and `bucket_for` would then size the buffer
+from a number smaller than the data it has to hold.
+
+**What actually happened next is worth stating, because it is not a breach.**
+The line after it compares the encoded body against the padded length and
+refuses when the body is larger, so a wrapped size was caught and reported as
+an encryption failure rather than producing a short buffer. In a debug build
+the multiplication would have panicked first. So the outcome was a confusing
+error, not a corrupt record, and the check that saved it was written for a
+different reason: to catch a new encoding that expands further than the
+allowance.
+
+That is still the wrong shape. This project's stated pattern for a length that
+came from a caller is checked or saturating arithmetic, and F-79 was this same
+class on the recorder. The multiplication and the addition are checked now, and
+`bucket_for`'s own rounding saturates rather than wrapping to zero.
+
+The store holds settings and measurements, a few kilobytes each, so nothing
+reachable today goes near the boundary. The test does the arithmetic directly
+rather than allocating half a gigabyte to prove it.
+
+### F-189: a bare program name is a search, and two of them were left
+
+Part 2.1 of the round's brief: every place this workspace starts a process,
+checked against the rule the project already states, which is that a program is
+named by absolute path and never left to `PATH` to find.
+
+The rule is enforced by a test in `veilvoice-gui`'s reduced-motion probe, which
+reads its own source and fails on any spawn that does not go through the helper
+beside it. That test only reads one file in one crate, which is the gap: two
+other crates spawn processes and neither had anything watching them.
+
+`veilvoice-accel` lists the machine's graphics adapters. Windows names
+PowerShell under `%SystemRoot%`, macOS names `/usr/sbin/system_profiler`, and
+Linux said `lspci`. Anything earlier on `PATH` under that name is what would
+have run, in a process that is already the desktop application.
+
+`veilvoice-verify`'s `which` asks where a program lives, and asked by spawning
+`where` on Windows and `sh` elsewhere, both bare. Asking `PATH` where something
+on `PATH` lives, by way of a program found on `PATH`, is a circle with an
+obvious way into it. The command-line half of this project already names
+`where.exe` absolutely; the verifier did not.
+
+Both are named absolutely now, and `veilvoice-accel` has the same
+read-your-own-source test the interface crate has, proved by putting the bare
+name back and watching it fail.
+
+**Deliberately left alone.** The reproducible-build path spawns `rustc`,
+`cargo` and `git` by bare name, and that is correct: it is checking a build
+against the toolchain the person running it has, so resolving through their
+`PATH` is the whole point. Naming those absolutely would break the thing they
+are for.
+
 ### F-188: one launch in 65,536 drew a reseed range with no width in it
 
 The de-identifier re-draws its scrambling seed on an interval, and that
@@ -5748,7 +5921,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1650 tests across 27 crates, plus doctests and 18 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1654 tests across 27 crates, plus doctests and 19 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -7396,7 +7569,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and eighty-eight defects found and fixed (F-1 to F-188), across
+**One hundred and ninety-three defects found and fixed (F-1 to F-193), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

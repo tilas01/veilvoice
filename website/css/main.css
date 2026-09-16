@@ -228,11 +228,48 @@ nav.links a:hover { color: var(--accent); }
  * to y=0 -- which is *underneath* the header, so the reader lands on a section
  * whose title they cannot see. `scroll-margin-top` is the property that exists
  * for exactly this and needs no JavaScript.
+ *
+ * The offset is a variable rather than a number because the header is not one
+ * height. Measured in a browser it is 133px at desktop widths, 171px where the
+ * navigation wraps to three rows, 115px on a phone and 81px on the reference
+ * pages, and this rule used to say 90px for all of them. `js/teleport.js`
+ * measures the header and sets `--anchor-offset` from it; the value below is
+ * what applies for the frame before that runs, and on the pages that carry no
+ * scripts.
+ *
+ * Every id, not a list of element names. The old list was `section`, `h2` and
+ * `h3`, which left every `h4` on the releases page and every roadmap entry
+ * with no offset at all.
  */
-:target,
-section[id],
-h2[id],
-h3[id] { scroll-margin-top: 90px; }
+:root { --anchor-offset: 147px; }
+
+[id] { scroll-margin-top: var(--anchor-offset); }
+
+/*
+ * Where you landed, for a moment.
+ *
+ * A fragment jump moves the page without moving anything the eye can follow,
+ * so on a dense page it is not obvious which heading was asked for. This
+ * outlines it and lets the outline fade.
+ *
+ * The outline is a plain declaration and the fade is an animation, which is
+ * deliberate: under `prefers-reduced-motion` the rule at the top of this file
+ * collapses the animation and the outline is simply there for the two seconds
+ * the class is applied. Nobody loses the cue for having asked for less
+ * movement.
+ */
+.landed {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+  border-radius: 4px;
+  animation: landed-fade 2s ease-out 1 forwards;
+}
+
+@keyframes landed-fade {
+  0%   { outline-color: var(--accent); }
+  70%  { outline-color: var(--accent); }
+  100% { outline-color: transparent; }
+}
 
 .theme-pick {
   background: var(--bg-soft);

@@ -226,6 +226,12 @@ pub fn seal_to_public_key(
     finish(header, &key, plaintext)
 }
 
+/// Seal `plaintext` under `header` and return the whole file.
+///
+/// The header is authenticated as associated data and then written in front of
+/// the ciphertext, so the parameters a reader needs in order to open the file
+/// are the same bytes the tag was computed over. Editing any of them breaks the
+/// tag rather than changing how the file is opened.
 fn finish(header: Header, key: &Secret, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
     let aad = header.to_bytes();
     let ciphertext = aead::seal(key, &header.nonce, &aad, plaintext)?;

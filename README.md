@@ -626,14 +626,28 @@ veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }
 | `veilvoice-audio` | Device enumeration, file decode/encode, live capture→process→playback. |
 | `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, page-locked secrets, the app-lock verifier. |
 | `veilvoice-meta` | Metadata stripping for audio and images. |
-| `veilvoice-watch` | Microphone and camera use, by application. Zero dependencies. |
-| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files. |
-| `veilvoice-setup` | Per-user install and its exact reversal, and detection of the optional companion software. |
-| `veilvoice-sentry` | Ransomware canaries and directory churn measurement. Detects; stops nothing. |
-| `veilvoice-policy` | Settings that can only be tightened, sealed with the same post-quantum container. |
-| `veilvoice-drivers` | What is loaded in the kernel, compared against last time, with a cross-view check. |
-| `veilvoice-capture` | Which screen recorders are running, and an allowlist for the ones you meant. |
 | `veilvoice-conversation` | Several speakers in one recording: a voice each, names, and subtitles. |
+| `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles. |
+| `veilvoice-workspace` | Named profiles and saved projects: the settings a recording was made with, written down. |
+| `veilvoice-policy` | Settings that can only be tightened, sealed with the same post-quantum container. |
+| `veilvoice-decoy` | A second passphrase that opens an empty VeilVoice, and a plain account of what that is not. |
+| `veilvoice-setup` | Per-user install and its exact reversal, and detection of the optional companion software. |
+| `veilvoice-update` | Asks, when told to, whether a newer release exists. No HTTP client, nothing downloaded. |
+| `veilvoice-check` | A release verified without GnuPG: the SHA-256, its line in the signed list, and the signature over that list. |
+| `veilvoice-gnupg` | The same check through the GnuPG already on the machine, read from its status output rather than its prose. |
+| `veilvoice-verify` | The verifier behind `veilvoice verify`, which drives both of the two above. |
+| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files. |
+| `veilvoice-sentry` | Ransomware canaries and directory churn measurement. Detects; stops nothing. |
+| `veilvoice-watch` | Microphone and camera use, by application. Zero dependencies. |
+| `veilvoice-failsafe` | Notices another program taking a real microphone mid-session, and acts. Never claims to have prevented it. |
+| `veilvoice-capture` | Which screen recorders are running, and an allowlist for the ones you meant. |
+| `veilvoice-input` | Which running programs can see the keyboard and mouse, reported as the heuristic it is. |
+| `veilvoice-drivers` | What is loaded in the kernel, compared against last time, with a cross-view check. |
+| `veilvoice-proc` | The running processes, per platform, with the limits of that answer stated rather than implied. |
+| `veilvoice-appctl` | What normally runs on this machine and what does not, with time-limited grants and a log. |
+| `veilvoice-priv` | What privilege VeilVoice is running with, and what each level can see. Reported, never acquired. |
+| `veilvoice-accel` | What graphics hardware is here, which of it can encode video, and the measured reason the audio engine uses none of it. |
+| `veilvoice-gui` | The desktop application. A library so its own tests can reach it, rather than something to build on. |
 
 The engine itself is small enough to drop into an audio callback:
 
@@ -688,7 +702,7 @@ writes with no extra work.
 - **Offline by construction.** Zero servers, enforced in CI.
 - **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
   including the page-locking path.
-- **61958 functional lines of Rust**, across 28 crates. A *functional line* is
+- **62079 functional lines of Rust**, across 28 crates. A *functional line* is
   a line holding code: blank lines and lines holding only a comment are not
   counted, and a line with code and a trailing comment counts once. Each
   crate's own README states its share of that total under **The files**.
@@ -731,13 +745,27 @@ writes with no extra work.
 | `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, amnesic secrets. |
 | `veilvoice-audio`  | Capture/playback (cpal), virtual-cable routing, file import/export. |
 | `veilvoice-meta`   | Metadata strip/spoof for audio and image EXIF/GPS. |
-| `veilvoice-watch`  | Which applications are using the microphone and camera, and alerts on change. |
-| `veilvoice-capture` | Screen recorders that are running, muted per program. Does **not** hide VeilVoice's window. |
 | `veilvoice-conversation` | Who spoke when, one destination voice each, WebVTT and SubRip subtitles. |
-| `veilvoice-drivers` | Loaded kernel drivers and modules, recorded and compared. Detects carelessness, not rootkits. |
+| `veilvoice-video`  | The conversation drawn and played back: waveform, a circle per speaker, burnt-in subtitles. ffmpeg muxes it. |
+| `veilvoice-workspace` | Named profiles and saved projects, so the next recording can be made the same way as the last. |
 | `veilvoice-policy` | Settings fixed so the interface cannot turn them off. Every one of them tightens. |
-| `veilvoice-sentry` | Canaries and churn measurement over a directory, an early warning and never a preventer. |
+| `veilvoice-decoy`  | A second passphrase that opens an empty VeilVoice. Says what deniability it does not give you. |
 | `veilvoice-setup`  | Per-user install, PATH, removal, and companion detection, shared by both front ends. |
+| `veilvoice-update` | Whether a newer release exists, asked only when asked. Nothing is downloaded or installed. |
+| `veilvoice-check`  | Hash, signed list and detached signature, checked with no GnuPG on the machine. |
+| `veilvoice-gnupg`  | The same three checks run through the reader's own GnuPG, read from its status output. |
+| `veilvoice-verify` | The verifier behind `veilvoice verify` and the desktop Verify tab, over both of the above. |
+| `veilvoice-guard`  | Integrity manifest over VeilVoice's own files, with best-effort attribution of what changed them. |
+| `veilvoice-sentry` | Canaries and churn measurement over a directory, an early warning and never a preventer. |
+| `veilvoice-watch`  | Which applications are using the microphone and camera, and alerts on change. |
+| `veilvoice-failsafe` | The safety catch: another program takes a real microphone mid-session, and the session reacts. |
+| `veilvoice-capture` | Screen recorders that are running, muted per program. Does **not** hide VeilVoice's window. |
+| `veilvoice-input`  | Which programs can see the keyboard and mouse. A heuristic, and labelled as one. |
+| `veilvoice-drivers` | Loaded kernel drivers and modules, recorded and compared. Detects carelessness, not rootkits. |
+| `veilvoice-proc`   | The process list, per platform, and what that answer is worth on each. |
+| `veilvoice-appctl` | What normally runs here, what does not, and grants that expire. Claims to block nothing. |
+| `veilvoice-priv`   | The privilege level VeilVoice is running at, and what it can see there. Never raises it. |
+| `veilvoice-accel`  | The graphics hardware, what of it can encode video, and why the audio path uses none of it. |
 | `veilvoice-cli`    | The `veilvoice` command-line tool. |
 | `veilvoice-gui`    | The desktop app (egui, Tokyo Night). |
 
@@ -750,8 +778,8 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.21: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1650 tests across 27
-crates plus doctests, and 18 website suites, clippy clean, no `unsafe`), with
+destinations, CLI and GUI are implemented and tested (1654 tests across 27
+crates plus doctests, and 19 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
 targets, each one built twice from a copy of the source at a different path and
@@ -765,7 +793,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Thirty-three audit rounds have found and fixed **188 defects**.
+Thirty-three audit rounds have found and fixed **193 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a

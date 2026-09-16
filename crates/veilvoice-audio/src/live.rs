@@ -225,6 +225,7 @@ fn rate_they_agree_on(
     output_ranges: &[(u32, u32)],
     inputs: &[(u32, Vec<(u32, u32)>)],
 ) -> Option<u32> {
+    /// Whether a device that reports these ranges will take `rate`.
     fn covers(ranges: &[(u32, u32)], rate: u32) -> bool {
         ranges
             .iter()

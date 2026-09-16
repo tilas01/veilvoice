@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-failsafe/src/lib.rs`
 
-[[veilvoice-failsafe|Crate-veilvoice-failsafe]] &middot; 682 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/lib.rs)
+[[veilvoice-failsafe|Crate-veilvoice-failsafe]] &middot; 744 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/lib.rs)
 
 ## Contents
 
@@ -81,7 +81,7 @@ acts, within about a second.
 
 ## What this file contains
 
-682 lines defining **14 functions** (12 public), **5 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+744 lines defining **14 functions** (12 public), **5 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-core/src/voices.rs`
 
-[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 867 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs)
+[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 872 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs)
 
 ## Contents
 
@@ -149,7 +149,7 @@ and a measured limit on how many of them can genuinely be told apart by ear.
 
 ## What this file contains
 
-867 lines defining **11 functions** (11 public), **1 type** and **11 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+872 lines defining **11 functions** (11 public), **1 type** and **11 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -162,11 +162,11 @@ and a measured limit on how many of them can genuinely be told apart by ear.
 - `Voice::describe` (line 227) -- A short label for an interface: "low register, narrow tract".
   - reaches: `rendered_f0_hz`, `bin_hz`
 - `voice` (line 326) -- The destination voice for slot index.
-- `clear_voices` (line 407) -- How many voices can be handed out before two of them are too alike.
+- `clear_voices` (line 412) -- How many voices can be handed out before two of them are too alike.
   - reaches: `all`, `separation`
-- `closest_pair` (line 427) -- The closest pair among the first count voices, as a ratio.
+- `closest_pair` (line 432) -- The closest pair among the first count voices, as a ratio.
   - reaches: `all`, `separation`
-- `distinct_voices` (line 453) -- How many of the ten are still distinguishable under config.
+- `distinct_voices` (line 458) -- How many of the ten are still distinguishable under config.
   - reaches: `all`
 
 ## What calls what
@@ -197,9 +197,9 @@ flowchart TD
     n_voice(["voice<br/>line 326"])
     n_all["all<br/>line 337"]
     n_separation["separation<br/>line 363"]
-    n_clear_voices(["clear_voices<br/>line 407"])
-    n_closest_pair(["closest_pair<br/>line 427"])
-    n_distinct_voices(["distinct_voices<br/>line 453"])
+    n_clear_voices(["clear_voices<br/>line 412"])
+    n_closest_pair(["closest_pair<br/>line 432"])
+    n_distinct_voices(["distinct_voices<br/>line 458"])
     n_clear_voices --> n_all
     n_clear_voices --> n_separation
     n_closest_pair --> n_all
@@ -215,9 +215,9 @@ flowchart TD
     click n_voice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L326" "open the source"
     click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L337" "open the source"
     click n_separation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L363" "open the source"
-    click n_clear_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L407" "open the source"
-    click n_closest_pair href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L427" "open the source"
-    click n_distinct_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L453" "open the source"
+    click n_clear_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L412" "open the source"
+    click n_closest_pair href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L432" "open the source"
+    click n_distinct_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L458" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_checked,n_describe,n_voice,n_clear_voices,n_closest_pair,n_distinct_voices entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -249,10 +249,10 @@ flowchart TD
 | `voice` <sub>pub fn</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L326) | The destination voice for slot index. |
 | `all` <sub>pub fn</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L337) | Every destination voice, in the order they are handed out. |
 | `separation` <sub>pub fn</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L363) | How far apart two voices are, as the larger of their two separations. |
-| `CLEAR_SEPARATION` <sub>pub const</sub> | [395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L395) | The separation below which two voices should not be handed to two people. |
-| `clear_voices` <sub>pub fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L407) | How many voices can be handed out before two of them are too alike. |
-| `closest_pair` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L427) | The closest pair among the first count voices, as a ratio. |
-| `distinct_voices` <sub>pub fn</sub> | [453](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L453) | How many of the ten are still distinguishable under config. |
+| `CLEAR_SEPARATION` <sub>pub const</sub> | [400](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L400) | The separation below which two voices should not be handed to two people. |
+| `clear_voices` <sub>pub fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L412) | How many voices can be handed out before two of them are too alike. |
+| `closest_pair` <sub>pub fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L432) | The closest pair among the first count voices, as a ratio. |
+| `distinct_voices` <sub>pub fn</sub> | [458](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L458) | How many of the ten are still distinguishable under config. |
 
 ---
 

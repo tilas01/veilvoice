@@ -93,14 +93,14 @@ identify you, this has not touched that.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>89 lines"])
-    n_accent["accent.rs<br/>697 lines"]
-    n_chain["chain.rs<br/>1717 lines"]
-    n_effects["effects.rs<br/>226 lines"]
-    n_modulation["modulation.rs<br/>313 lines"]
+    n_accent["accent.rs<br/>701 lines"]
+    n_chain["chain.rs<br/>1721 lines"]
+    n_effects["effects.rs<br/>245 lines"]
+    n_modulation["modulation.rs<br/>323 lines"]
     n_pitch["pitch.rs<br/>286 lines"]
     n_spectral["spectral.rs<br/>442 lines"]
-    n_stft["stft.rs<br/>259 lines"]
-    n_voices["voices.rs<br/>867 lines"]
+    n_stft["stft.rs<br/>264 lines"]
+    n_voices["voices.rs<br/>872 lines"]
     n_window["window.rs<br/>101 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
@@ -131,15 +131,15 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`accent.rs`|File-veilvoice-core-accent]] | 697 | Accent and speaker-trait neutralisation. |
-| [[`chain.rs`|File-veilvoice-core-chain]] | 1717 | The assembled de-identification chain and its live performance statistics. |
-| [[`effects.rs`|File-veilvoice-core-effects]] | 226 | Light time-domain effects applied after resynthesis. |
+| [[`accent.rs`|File-veilvoice-core-accent]] | 701 | Accent and speaker-trait neutralisation. |
+| [[`chain.rs`|File-veilvoice-core-chain]] | 1721 | The assembled de-identification chain and its live performance statistics. |
+| [[`effects.rs`|File-veilvoice-core-effects]] | 245 | Light time-domain effects applied after resynthesis. |
 | [[`lib.rs`|File-veilvoice-core-lib]] | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
-| [[`modulation.rs`|File-veilvoice-core-modulation]] | 313 | Cryptographically-seeded modulation of the effect parameters. |
+| [[`modulation.rs`|File-veilvoice-core-modulation]] | 323 | Cryptographically-seeded modulation of the effect parameters. |
 | [[`pitch.rs`|File-veilvoice-core-pitch]] | 286 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [[`spectral.rs`|File-veilvoice-core-spectral]] | 442 | Frequency-domain de-identification transform. |
-| [[`stft.rs`|File-veilvoice-core-stft]] | 259 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [[`voices.rs`|File-veilvoice-core-voices]] | 867 | Destination voices: several canonical registers instead of one. |
+| [[`stft.rs`|File-veilvoice-core-stft]] | 264 | Streaming short-time Fourier transform with overlap-add resynthesis. |
+| [[`voices.rs`|File-veilvoice-core-voices]] | 872 | Destination voices: several canonical registers instead of one. |
 | [[`window.rs`|File-veilvoice-core-window]] | 101 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [[`spectrum_report.rs`|File-veilvoice-core-examples-spectrum_report]] | 107 | Where do the output partials actually land? |
 | [[`veil_a_buffer.rs`|File-veilvoice-core-examples-veil_a_buffer]] | 54 | _no module documentation yet_ |

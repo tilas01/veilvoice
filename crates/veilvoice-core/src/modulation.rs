@@ -42,6 +42,8 @@ struct Param {
 }
 
 impl Param {
+    /// Start in the middle of the range, so the first frames are not a slide
+    /// from an edge the caller never asked for.
     fn new(lo: f32, hi: f32, smooth: f32) -> Self {
         let mid = 0.5 * (lo + hi);
         Self {
@@ -52,9 +54,17 @@ impl Param {
             smooth,
         }
     }
+
+    /// Draw the next value to move towards. The draw is the only place the
+    /// keystream is consumed, which is what makes the modulation reproducible
+    /// from a seed and unpredictable without one.
     fn retarget(&mut self, rng: &mut ChaCha20Rng) {
         self.target = rng.gen_range(self.lo..=self.hi);
     }
+
+    /// Move one step of the way towards the target and report where that is.
+    /// A one-pole approach rather than a jump: a parameter that steps is a
+    /// parameter you can hear stepping.
     fn step(&mut self) -> f32 {
         self.current += (self.target - self.current) * self.smooth;
         self.current

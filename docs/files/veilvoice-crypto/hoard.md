@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/hoard.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1037 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1099 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs)
 
 ## Contents
 
@@ -154,28 +154,28 @@ you unlock.
 
 ## What this file contains
 
-1037 lines defining **19 functions** (11 public), **3 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1099 lines defining **19 functions** (11 public), **3 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct StoreKey` (line 193) -- The key that names and opens everything in the hoard.
-- `struct Audit` (line 246) -- What an audit found.
-- `struct Hoard` (line 268) -- An obfuscated store rooted at a directory.
+- `struct Audit` (line 249) -- What an audit found.
+- `struct Hoard` (line 271) -- An obfuscated store rooted at a directory.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `StoreKey::from_secret` (line 197) -- Wrap raw key material.
-- `Audit::is_clean` (line 262) -- Whether anything was found that a user should be told about.
-- `Hoard::open` (line 275) -- Open the hoard in dir.
-- `Hoard::write` (line 313) -- Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside.
-  - reaches: `roster`, `save_roster`, `write_raw`, `open_bytes`, `path_for`, `bucket_for`, `fill_random`, `name_for`, `base64url`
-- `Hoard::read` (line 408) -- Read a record back, or None if it was never written.
+- `Audit::is_clean` (line 265) -- Whether anything was found that a user should be told about.
+- `Hoard::open` (line 278) -- Open the hoard in dir.
+- `Hoard::write` (line 316) -- Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside.
+  - reaches: `roster`, `save_roster`, `write_raw`, `open_bytes`, `path_for`, `fill_random`, `name_for`, `base64url`
+- `Hoard::read` (line 425) -- Read a record back, or None if it was never written.
   - reaches: `open_bytes`, `path_for`, `name_for`, `base64url`
-- `Hoard::remove` (line 458) -- Remove a record and drop it from the roster.
-  - reaches: `path_for`, `roster`, `save_roster`, `name_for`, `open_bytes`, `write_raw`, `base64url`, `bucket_for`, `fill_random`
-- `Hoard::sow_decoys` (line 508) -- Write decoy files: names of the same shape, contents of the same character, holding nothing.
+- `Hoard::remove` (line 479) -- Remove a record and drop it from the roster.
+  - reaches: `path_for`, `roster`, `save_roster`, `name_for`, `open_bytes`, `write_raw`, `base64url`, `fill_random`
+- `Hoard::sow_decoys` (line 534) -- Write decoy files: names of the same shape, contents of the same character, holding nothing.
   - reaches: `base64url`, `fill_random`
-- `Hoard::audit` (line 539) -- Check every record the roster knows about, and count what else is here.
+- `Hoard::audit` (line 565) -- Check every record the roster knows about, and count what else is here.
   - reaches: `is_hoard_shaped`, `name_for`, `open_bytes`, `roster`, `base64url`, `path_for`
 
 ## What calls what
@@ -202,21 +202,21 @@ flowchart TD
     n_expand["StoreKey::expand<br/>line 202"]
     n_base64url["base64url<br/>line 214"]
     n_bucket_for["bucket_for<br/>line 235"]
-    n_is_clean(["Audit::is_clean<br/>line 262"])
-    n_open(["Hoard::open<br/>line 275"])
-    n_name_for["Hoard::name_for<br/>line 286"]
-    n_path_for["Hoard::path_for<br/>line 305"]
-    n_write(["Hoard::write<br/>line 313"])
-    n_write_raw["Hoard::write_raw<br/>line 324"]
-    n_read(["Hoard::read<br/>line 408"])
-    n_open_bytes["Hoard::open_bytes<br/>line 418"]
-    n_remove(["Hoard::remove<br/>line 458"])
-    n_roster["Hoard::roster<br/>line 473"]
-    n_save_roster["Hoard::save_roster<br/>line 489"]
-    n_sow_decoys(["Hoard::sow_decoys<br/>line 508"])
-    n_audit(["Hoard::audit<br/>line 539"])
-    n_is_hoard_shaped["is_hoard_shaped<br/>line 576"]
-    n_fill_random["fill_random<br/>line 583"]
+    n_is_clean(["Audit::is_clean<br/>line 265"])
+    n_open(["Hoard::open<br/>line 278"])
+    n_name_for["Hoard::name_for<br/>line 289"]
+    n_path_for["Hoard::path_for<br/>line 308"]
+    n_write(["Hoard::write<br/>line 316"])
+    n_write_raw["Hoard::write_raw<br/>line 332"]
+    n_read(["Hoard::read<br/>line 425"])
+    n_open_bytes["Hoard::open_bytes<br/>line 439"]
+    n_remove(["Hoard::remove<br/>line 479"])
+    n_roster["Hoard::roster<br/>line 494"]
+    n_save_roster["Hoard::save_roster<br/>line 515"]
+    n_sow_decoys(["Hoard::sow_decoys<br/>line 534"])
+    n_audit(["Hoard::audit<br/>line 565"])
+    n_is_hoard_shaped["is_hoard_shaped<br/>line 602"]
+    n_fill_random["fill_random<br/>line 614"]
     n_audit --> n_is_hoard_shaped
     n_audit --> n_name_for
     n_audit --> n_open_bytes
@@ -237,28 +237,27 @@ flowchart TD
     n_write --> n_roster
     n_write --> n_save_roster
     n_write --> n_write_raw
-    n_write_raw --> n_bucket_for
     n_write_raw --> n_fill_random
     n_write_raw --> n_name_for
     click n_from_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L197" "open the source"
     click n_expand href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L202" "open the source"
     click n_base64url href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L214" "open the source"
     click n_bucket_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L235" "open the source"
-    click n_is_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L262" "open the source"
-    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L275" "open the source"
-    click n_name_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L286" "open the source"
-    click n_path_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L305" "open the source"
-    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L313" "open the source"
-    click n_write_raw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L324" "open the source"
-    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L408" "open the source"
-    click n_open_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L418" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L458" "open the source"
-    click n_roster href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L473" "open the source"
-    click n_save_roster href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L489" "open the source"
-    click n_sow_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L508" "open the source"
-    click n_audit href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L539" "open the source"
-    click n_is_hoard_shaped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L576" "open the source"
-    click n_fill_random href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L583" "open the source"
+    click n_is_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L265" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L278" "open the source"
+    click n_name_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L289" "open the source"
+    click n_path_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L308" "open the source"
+    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L316" "open the source"
+    click n_write_raw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L332" "open the source"
+    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L425" "open the source"
+    click n_open_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L439" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L479" "open the source"
+    click n_roster href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L494" "open the source"
+    click n_save_roster href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L515" "open the source"
+    click n_sow_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L534" "open the source"
+    click n_audit href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L565" "open the source"
+    click n_is_hoard_shaped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L602" "open the source"
+    click n_fill_random href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L614" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_from_secret,n_is_clean,n_open,n_write,n_read,n_remove,n_sow_decoys,n_audit entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -287,23 +286,23 @@ flowchart TD
 | `StoreKey::expand` <sub>fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L202) | Derive a subkey under a label. |
 | `base64url` <sub>fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L214) | Base64url, no padding. |
 | `bucket_for` <sub>fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L235) | The bucket a payload of this length pads up to. |
-| `Audit` <sub>pub struct</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L246) | What an audit found. |
-| `Audit::is_clean` <sub>pub fn</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L262) | Whether anything was found that a user should be told about. |
-| `Hoard` <sub>pub struct</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L268) | An obfuscated store rooted at a directory. |
-| `Hoard::open` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L275) | Open the hoard in dir. |
-| `Hoard::name_for` <sub>pub fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L286) | The filename a logical record lives under. |
-| `Hoard::path_for` <sub>pub fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L305) | The full path of a logical record. |
-| `Hoard::write` <sub>pub fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L313) | Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside. |
-| `Hoard::write_raw` <sub>fn</sub> | [324](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L324) |  |
-| `Hoard::read` <sub>pub fn</sub> | [408](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L408) | Read a record back, or None if it was never written. |
-| `Hoard::open_bytes` <sub>fn</sub> | [418](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L418) |  |
-| `Hoard::remove` <sub>pub fn</sub> | [458](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L458) | Remove a record and drop it from the roster. |
-| `Hoard::roster` <sub>pub fn</sub> | [473](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L473) | The logical names the roster says should exist. |
-| `Hoard::save_roster` <sub>fn</sub> | [489](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L489) |  |
-| `Hoard::sow_decoys` <sub>pub fn</sub> | [508](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L508) | Write decoy files: names of the same shape, contents of the same character, holding nothing. |
-| `Hoard::audit` <sub>pub fn</sub> | [539](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L539) | Check every record the roster knows about, and count what else is here. |
-| `is_hoard_shaped` <sub>fn</sub> | [576](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L576) | Whether a filename has the shape this module writes. |
-| `fill_random` <sub>fn</sub> | [583](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L583) |  |
+| `Audit` <sub>pub struct</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L249) | What an audit found. |
+| `Audit::is_clean` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L265) | Whether anything was found that a user should be told about. |
+| `Hoard` <sub>pub struct</sub> | [271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L271) | An obfuscated store rooted at a directory. |
+| `Hoard::open` <sub>pub fn</sub> | [278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L278) | Open the hoard in dir. |
+| `Hoard::name_for` <sub>pub fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L289) | The filename a logical record lives under. |
+| `Hoard::path_for` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L308) | The full path of a logical record. |
+| `Hoard::write` <sub>pub fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L316) | Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside. |
+| `Hoard::write_raw` <sub>fn</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L332) | Encode, seal and write one record under its obfuscated name. |
+| `Hoard::read` <sub>pub fn</sub> | [425](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L425) | Read a record back, or None if it was never written. |
+| `Hoard::open_bytes` <sub>fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L439) | Undo Hoard::write_raw for bytes already read off the disk. |
+| `Hoard::remove` <sub>pub fn</sub> | [479](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L479) | Remove a record and drop it from the roster. |
+| `Hoard::roster` <sub>pub fn</sub> | [494](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L494) | The logical names the roster says should exist. |
+| `Hoard::save_roster` <sub>fn</sub> | [515](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L515) | Write the list of logical names, itself as an ordinary record. |
+| `Hoard::sow_decoys` <sub>pub fn</sub> | [534](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L534) | Write decoy files: names of the same shape, contents of the same character, holding nothing. |
+| `Hoard::audit` <sub>pub fn</sub> | [565](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L565) | Check every record the roster knows about, and count what else is here. |
+| `is_hoard_shaped` <sub>fn</sub> | [602](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L602) | Whether a filename has the shape this module writes. |
+| `fill_random` <sub>fn</sub> | [614](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L614) | Fill buf from the operating system, treating a refusal as an error rather than falling back to anything. |
 
 ---
 

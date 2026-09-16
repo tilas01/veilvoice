@@ -53,6 +53,7 @@
 //! is not proof it will work: that also depends on your drivers and on the
 //! copy of ffmpeg you have.
 
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 /// Who made a graphics device.
@@ -295,10 +296,33 @@ fn windows_adapters() -> Found {
     }
 }
 
+/// Resolve a tool to an absolute path, never through `PATH`.
+///
+/// A bare program name is a search, and anything earlier on the path that
+/// happens to share the name is what runs.
+#[cfg(target_os = "linux")]
+fn tool(name: &str) -> Option<PathBuf> {
+    for directory in ["/usr/bin", "/bin", "/usr/sbin", "/sbin", "/usr/local/bin"] {
+        let candidate = Path::new(directory).join(name);
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+    }
+    None
+}
+
 /// Ask Linux through `lspci`.
 #[cfg(target_os = "linux")]
 fn linux_adapters() -> Found {
-    match Command::new("lspci").output() {
+    let Some(lspci) = tool("lspci") else {
+        return Found {
+            adapters: Vec::new(),
+            problems: vec![
+                "lspci is not installed, so the graphics devices could not be listed".into(),
+            ],
+        };
+    };
+    match Command::new(lspci).output() {
         Ok(output) if output.status.success() => {
             let text = String::from_utf8_lossy(&output.stdout);
             let adapters = text
@@ -428,6 +452,42 @@ the software encoder produces the same video more slowly.";
 
 #[cfg(test)]
 mod tests {
+
+    /// Every spawn in this file names an absolute path.
+    ///
+    /// A bare name is resolved through `PATH`, so whatever is earliest on it
+    /// and shares the name is what runs. Windows and macOS were already doing
+    /// this; the Linux branch searched for `lspci`.
+    #[test]
+    fn no_spawn_here_searches_the_path() {
+        let source = include_str!("lib.rs").replace("\r\n", "\n");
+        let mut bare = Vec::new();
+        for (number, line) in source.lines().enumerate() {
+            let trimmed = line.trim_start();
+            if trimmed.starts_with("//") || trimmed.starts_with('*') {
+                continue;
+            }
+            // Assembled at run time, or this line matches itself.
+            let needle = ["Command", "::new("].concat();
+            let Some(rest) = trimmed.split_once(&needle) else {
+                continue;
+            };
+            let argument = rest.1.trim_start();
+            // An absolute path, or a variable holding one that this file built.
+            let named = argument.starts_with("\"/")
+                || argument.starts_with("&program")
+                || argument.starts_with("lspci")
+                || argument.starts_with("program");
+            if !named {
+                bare.push(format!("line {}: {}", number + 1, trimmed));
+            }
+        }
+        assert!(
+            bare.is_empty(),
+            "these spawns search PATH rather than naming a path:\n{}",
+            bare.join("\n")
+        );
+    }
     use super::*;
 
     #[test]

@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -46,7 +47,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-core/src/effects.rs</code></h1>
-<p style="color:var(--muted)"><a href="effects.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 226 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="effects.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 245 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -121,184 +122,203 @@
 <span class="ln" id="L68"></span>
 <span class="ln" id="L69"><span class="tok-kw">impl</span> SoftClip {</span>
 <span class="src-item" id="fn-softclip-new">
-<span class="ln" id="L70">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(drive: f32, mix: f32) -&gt; Self {</span>
-<span class="ln" id="L71">        <span class="tok-kw">let</span> drive = drive.<span class="tok-fn">max</span>(<span class="tok-num">0.01</span>);</span>
-<span class="ln" id="L72">        Self {</span>
-<span class="ln" id="L73">            drive,</span>
-<span class="ln" id="L74">            mix: mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>),</span>
-<span class="ln" id="L75">            norm: drive.<span class="tok-fn">tanh</span>(),</span>
-<span class="ln" id="L76">        }</span>
-<span class="ln" id="L77">    }</span>
+<span class="ln" id="L70">    <span class="tok-com">/// Build a shaper. `drive` is clamped away from zero so the normalisation</span></span>
+<span class="ln" id="L71">    <span class="tok-com">/// below cannot divide by it, and `mix` to the dry/wet range.</span></span>
+<span class="ln" id="L72">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(drive: f32, mix: f32) -&gt; Self {</span>
+<span class="ln" id="L73">        <span class="tok-kw">let</span> drive = drive.<span class="tok-fn">max</span>(<span class="tok-num">0.01</span>);</span>
+<span class="ln" id="L74">        Self {</span>
+<span class="ln" id="L75">            drive,</span>
+<span class="ln" id="L76">            mix: mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>),</span>
+<span class="ln" id="L77">            norm: drive.<span class="tok-fn">tanh</span>(),</span>
+<span class="ln" id="L78">        }</span>
+<span class="ln" id="L79">    }</span>
 </span>
 <span class="src-item" id="fn-softclip-process">
-<span class="ln" id="L78">    <span class="tok-attr">#[inline</span>]</span>
-<span class="ln" id="L79">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
-<span class="ln" id="L80">        <span class="tok-kw">let</span> wet = (<span class="tok-kw">self</span>.drive * x).<span class="tok-fn">tanh</span>() / <span class="tok-kw">self</span>.norm;</span>
-<span class="ln" id="L81">        x * (<span class="tok-num">1.0</span> - <span class="tok-kw">self</span>.mix) + wet * <span class="tok-kw">self</span>.mix</span>
-<span class="ln" id="L82">    }</span>
+<span class="ln" id="L80">    <span class="tok-com">/// Shape one sample. Dividing by `tanh(drive)` keeps the loudest output</span></span>
+<span class="ln" id="L81">    <span class="tok-com">/// at the same level whatever the drive is, so turning it up changes the</span></span>
+<span class="ln" id="L82">    <span class="tok-com">/// timbre without changing the volume.</span></span>
+<span class="ln" id="L83">    <span class="tok-attr">#[inline</span>]</span>
+<span class="ln" id="L84">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
+<span class="ln" id="L85">        <span class="tok-kw">let</span> wet = (<span class="tok-kw">self</span>.drive * x).<span class="tok-fn">tanh</span>() / <span class="tok-kw">self</span>.norm;</span>
+<span class="ln" id="L86">        x * (<span class="tok-num">1.0</span> - <span class="tok-kw">self</span>.mix) + wet * <span class="tok-kw">self</span>.mix</span>
+<span class="ln" id="L87">    }</span>
 </span>
-<span class="ln" id="L83">}</span>
-<span class="ln" id="L84"></span>
+<span class="ln" id="L88">}</span>
+<span class="ln" id="L89"></span>
 <span class="src-item" id="fn-delayvoice">
-<span class="ln" id="L85"><span class="tok-com">/// A single modulated delay line, summed into a small ensemble to create the</span></span>
-<span class="ln" id="L86"><span class="tok-com">/// impression of several slightly different voices.</span></span>
-<span class="ln" id="L87"><span class="tok-kw">struct</span> DelayVoice {</span>
-<span class="ln" id="L88">    buf: Vec&lt;f32&gt;,</span>
-<span class="ln" id="L89">    write: usize,</span>
-<span class="ln" id="L90">    base_delay: f32, <span class="tok-com">// samples</span></span>
-<span class="ln" id="L91">    depth: f32,      <span class="tok-com">// samples of LFO sweep</span></span>
-<span class="ln" id="L92">    lfo_phase: f32,</span>
-<span class="ln" id="L93">    lfo_inc: f32,</span>
-<span class="ln" id="L94">}</span>
+<span class="ln" id="L90"><span class="tok-com">/// A single modulated delay line, summed into a small ensemble to create the</span></span>
+<span class="ln" id="L91"><span class="tok-com">/// impression of several slightly different voices.</span></span>
+<span class="ln" id="L92"><span class="tok-kw">struct</span> DelayVoice {</span>
+<span class="ln" id="L93">    buf: Vec&lt;f32&gt;,</span>
+<span class="ln" id="L94">    write: usize,</span>
+<span class="ln" id="L95">    base_delay: f32, <span class="tok-com">// samples</span></span>
+<span class="ln" id="L96">    depth: f32,      <span class="tok-com">// samples of LFO sweep</span></span>
+<span class="ln" id="L97">    lfo_phase: f32,</span>
+<span class="ln" id="L98">    lfo_inc: f32,</span>
+<span class="ln" id="L99">}</span>
 </span>
-<span class="ln" id="L95"></span>
-<span class="ln" id="L96"><span class="tok-kw">impl</span> DelayVoice {</span>
+<span class="ln" id="L100"></span>
+<span class="ln" id="L101"><span class="tok-kw">impl</span> DelayVoice {</span>
 <span class="src-item" id="fn-delayvoice-new">
-<span class="ln" id="L97">    <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, base_ms: f32, depth_ms: f32, rate_hz: f32, phase: f32) -&gt; Self {</span>
-<span class="ln" id="L98">        <span class="tok-kw">let</span> base_delay = base_ms * <span class="tok-num">0.001</span> * sample_rate;</span>
-<span class="ln" id="L99">        <span class="tok-kw">let</span> depth = depth_ms * <span class="tok-num">0.001</span> * sample_rate;</span>
-<span class="ln" id="L100">        <span class="tok-kw">let</span> max = (base_delay + depth) <span class="tok-kw">as</span> usize + <span class="tok-num">4</span>;</span>
-<span class="ln" id="L101">        Self {</span>
-<span class="ln" id="L102">            buf: vec![<span class="tok-num">0.0</span>; max.<span class="tok-fn">next_power_of_two</span>()],</span>
-<span class="ln" id="L103">            write: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L104">            base_delay,</span>
-<span class="ln" id="L105">            depth,</span>
-<span class="ln" id="L106">            lfo_phase: phase,</span>
-<span class="ln" id="L107">            lfo_inc: TAU * rate_hz / sample_rate,</span>
-<span class="ln" id="L108">        }</span>
-<span class="ln" id="L109">    }</span>
+<span class="ln" id="L102">    <span class="tok-com">/// One delay line, sized once here for the deepest sweep it can be asked</span></span>
+<span class="ln" id="L103">    <span class="tok-com">/// for. The buffer is rounded up to a power of two so the read and write</span></span>
+<span class="ln" id="L104">    <span class="tok-com">/// positions wrap with a mask rather than a division.</span></span>
+<span class="ln" id="L105">    <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, base_ms: f32, depth_ms: f32, rate_hz: f32, phase: f32) -&gt; Self {</span>
+<span class="ln" id="L106">        <span class="tok-kw">let</span> base_delay = base_ms * <span class="tok-num">0.001</span> * sample_rate;</span>
+<span class="ln" id="L107">        <span class="tok-kw">let</span> depth = depth_ms * <span class="tok-num">0.001</span> * sample_rate;</span>
+<span class="ln" id="L108">        <span class="tok-kw">let</span> max = (base_delay + depth) <span class="tok-kw">as</span> usize + <span class="tok-num">4</span>;</span>
+<span class="ln" id="L109">        Self {</span>
+<span class="ln" id="L110">            buf: vec![<span class="tok-num">0.0</span>; max.<span class="tok-fn">next_power_of_two</span>()],</span>
+<span class="ln" id="L111">            write: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L112">            base_delay,</span>
+<span class="ln" id="L113">            depth,</span>
+<span class="ln" id="L114">            lfo_phase: phase,</span>
+<span class="ln" id="L115">            lfo_inc: TAU * rate_hz / sample_rate,</span>
+<span class="ln" id="L116">        }</span>
+<span class="ln" id="L117">    }</span>
 </span>
 <span class="src-item" id="fn-delayvoice-process">
-<span class="ln" id="L110">    <span class="tok-attr">#[inline</span>]</span>
-<span class="ln" id="L111">    <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
-<span class="ln" id="L112">        <span class="tok-kw">let</span> mask = <span class="tok-kw">self</span>.buf.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>;</span>
-<span class="ln" id="L113">        <span class="tok-kw">self</span>.buf[<span class="tok-kw">self</span>.write] = x;</span>
-<span class="ln" id="L114">        <span class="tok-kw">let</span> d = <span class="tok-kw">self</span>.base_delay + <span class="tok-kw">self</span>.depth * <span class="tok-kw">self</span>.lfo_phase.<span class="tok-fn">sin</span>();</span>
-<span class="ln" id="L115">        <span class="tok-kw">let</span> read = <span class="tok-kw">self</span>.write <span class="tok-kw">as</span> f32 - d;</span>
-<span class="ln" id="L116">        <span class="tok-kw">let</span> read = read.<span class="tok-fn">rem_euclid</span>(<span class="tok-kw">self</span>.buf.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32);</span>
-<span class="ln" id="L117">        <span class="tok-kw">let</span> i0 = read.<span class="tok-fn">floor</span>() <span class="tok-kw">as</span> usize &amp; mask;</span>
-<span class="ln" id="L118">        <span class="tok-kw">let</span> i1 = (i0 + <span class="tok-num">1</span>) &amp; mask;</span>
-<span class="ln" id="L119">        <span class="tok-kw">let</span> frac = read - read.<span class="tok-fn">floor</span>();</span>
-<span class="ln" id="L120">        <span class="tok-kw">let</span> out = <span class="tok-kw">self</span>.buf[i0] * (<span class="tok-num">1.0</span> - frac) + <span class="tok-kw">self</span>.buf[i1] * frac;</span>
-<span class="ln" id="L121">        <span class="tok-kw">self</span>.write = (<span class="tok-kw">self</span>.write + <span class="tok-num">1</span>) &amp; mask;</span>
-<span class="ln" id="L122">        <span class="tok-kw">self</span>.lfo_phase = (<span class="tok-kw">self</span>.lfo_phase + <span class="tok-kw">self</span>.lfo_inc) % TAU;</span>
-<span class="ln" id="L123">        out</span>
-<span class="ln" id="L124">    }</span>
+<span class="ln" id="L118">    <span class="tok-com">/// Write one sample and read one back from where the sweep currently</span></span>
+<span class="ln" id="L119">    <span class="tok-com">/// points, interpolating between the two neighbouring samples so the</span></span>
+<span class="ln" id="L120">    <span class="tok-com">/// moving read position does not step audibly.</span></span>
+<span class="ln" id="L121">    <span class="tok-attr">#[inline</span>]</span>
+<span class="ln" id="L122">    <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
+<span class="ln" id="L123">        <span class="tok-kw">let</span> mask = <span class="tok-kw">self</span>.buf.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>;</span>
+<span class="ln" id="L124">        <span class="tok-kw">self</span>.buf[<span class="tok-kw">self</span>.write] = x;</span>
+<span class="ln" id="L125">        <span class="tok-kw">let</span> d = <span class="tok-kw">self</span>.base_delay + <span class="tok-kw">self</span>.depth * <span class="tok-kw">self</span>.lfo_phase.<span class="tok-fn">sin</span>();</span>
+<span class="ln" id="L126">        <span class="tok-kw">let</span> read = <span class="tok-kw">self</span>.write <span class="tok-kw">as</span> f32 - d;</span>
+<span class="ln" id="L127">        <span class="tok-kw">let</span> read = read.<span class="tok-fn">rem_euclid</span>(<span class="tok-kw">self</span>.buf.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32);</span>
+<span class="ln" id="L128">        <span class="tok-kw">let</span> i0 = read.<span class="tok-fn">floor</span>() <span class="tok-kw">as</span> usize &amp; mask;</span>
+<span class="ln" id="L129">        <span class="tok-kw">let</span> i1 = (i0 + <span class="tok-num">1</span>) &amp; mask;</span>
+<span class="ln" id="L130">        <span class="tok-kw">let</span> frac = read - read.<span class="tok-fn">floor</span>();</span>
+<span class="ln" id="L131">        <span class="tok-kw">let</span> out = <span class="tok-kw">self</span>.buf[i0] * (<span class="tok-num">1.0</span> - frac) + <span class="tok-kw">self</span>.buf[i1] * frac;</span>
+<span class="ln" id="L132">        <span class="tok-kw">self</span>.write = (<span class="tok-kw">self</span>.write + <span class="tok-num">1</span>) &amp; mask;</span>
+<span class="ln" id="L133">        <span class="tok-kw">self</span>.lfo_phase = (<span class="tok-kw">self</span>.lfo_phase + <span class="tok-kw">self</span>.lfo_inc) % TAU;</span>
+<span class="ln" id="L134">        out</span>
+<span class="ln" id="L135">    }</span>
 </span>
-<span class="ln" id="L125">}</span>
-<span class="ln" id="L126"></span>
+<span class="ln" id="L136">}</span>
+<span class="ln" id="L137"></span>
 <span class="src-item" id="fn-chorus">
-<span class="ln" id="L127"><span class="tok-com">/// Detuned chorus ensemble.</span></span>
-<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Chorus {</span>
-<span class="ln" id="L129">    voices: Vec&lt;DelayVoice&gt;,</span>
-<span class="ln" id="L130">    mix: f32,</span>
-<span class="ln" id="L131">}</span>
+<span class="ln" id="L138"><span class="tok-com">/// Detuned chorus ensemble.</span></span>
+<span class="ln" id="L139"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Chorus {</span>
+<span class="ln" id="L140">    voices: Vec&lt;DelayVoice&gt;,</span>
+<span class="ln" id="L141">    mix: f32,</span>
+<span class="ln" id="L142">}</span>
 </span>
-<span class="ln" id="L132"></span>
-<span class="ln" id="L133"><span class="tok-kw">impl</span> Chorus {</span>
+<span class="ln" id="L143"></span>
+<span class="ln" id="L144"><span class="tok-kw">impl</span> Chorus {</span>
 <span class="src-item" id="fn-chorus-new">
-<span class="ln" id="L134">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, mix: f32) -&gt; Self {</span>
-<span class="ln" id="L135">        <span class="tok-com">// Three voices at different rates and phases: cheap but effective spread.</span></span>
-<span class="ln" id="L136">        <span class="tok-kw">let</span> voices = vec![</span>
-<span class="ln" id="L137">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">14.0</span>, <span class="tok-num">3.0</span>, <span class="tok-num">0.17</span>, <span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L138">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">21.0</span>, <span class="tok-num">4.0</span>, <span class="tok-num">0.23</span>, <span class="tok-num">2.1</span>),</span>
-<span class="ln" id="L139">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">9.0</span>, <span class="tok-num">2.0</span>, <span class="tok-num">0.31</span>, <span class="tok-num">4.0</span>),</span>
-<span class="ln" id="L140">        ];</span>
-<span class="ln" id="L141">        Self {</span>
-<span class="ln" id="L142">            voices,</span>
-<span class="ln" id="L143">            mix: mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>),</span>
-<span class="ln" id="L144">        }</span>
-<span class="ln" id="L145">    }</span>
+<span class="ln" id="L145">    <span class="tok-com">/// Build the ensemble. Every buffer it will ever use is allocated here,</span></span>
+<span class="ln" id="L146">    <span class="tok-com">/// because [`Chorus::process`] runs in the audio callback.</span></span>
+<span class="ln" id="L147">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, mix: f32) -&gt; Self {</span>
+<span class="ln" id="L148">        <span class="tok-com">// Three voices at different rates and phases: cheap but effective spread.</span></span>
+<span class="ln" id="L149">        <span class="tok-kw">let</span> voices = vec![</span>
+<span class="ln" id="L150">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">14.0</span>, <span class="tok-num">3.0</span>, <span class="tok-num">0.17</span>, <span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L151">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">21.0</span>, <span class="tok-num">4.0</span>, <span class="tok-num">0.23</span>, <span class="tok-num">2.1</span>),</span>
+<span class="ln" id="L152">            DelayVoice::<span class="tok-fn">new</span>(sample_rate, <span class="tok-num">9.0</span>, <span class="tok-num">2.0</span>, <span class="tok-num">0.31</span>, <span class="tok-num">4.0</span>),</span>
+<span class="ln" id="L153">        ];</span>
+<span class="ln" id="L154">        Self {</span>
+<span class="ln" id="L155">            voices,</span>
+<span class="ln" id="L156">            mix: mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>),</span>
+<span class="ln" id="L157">        }</span>
+<span class="ln" id="L158">    }</span>
 </span>
 <span class="src-item" id="fn-chorus-process">
-<span class="ln" id="L146">    <span class="tok-attr">#[inline</span>]</span>
-<span class="ln" id="L147">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
-<span class="ln" id="L148">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wet = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L149">        <span class="tok-kw">for</span> v <span class="tok-kw">in</span> &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.voices {</span>
-<span class="ln" id="L150">            wet += v.<span class="tok-fn">process</span>(x);</span>
-<span class="ln" id="L151">        }</span>
-<span class="ln" id="L152">        wet /= <span class="tok-kw">self</span>.voices.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L153">        x * (<span class="tok-num">1.0</span> - <span class="tok-kw">self</span>.mix) + wet * <span class="tok-kw">self</span>.mix</span>
-<span class="ln" id="L154">    }</span>
+<span class="ln" id="L159">    <span class="tok-com">/// Sum the voices, average them, and blend that against the dry sample.</span></span>
+<span class="ln" id="L160">    <span class="tok-attr">#[inline</span>]</span>
+<span class="ln" id="L161">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
+<span class="ln" id="L162">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wet = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L163">        <span class="tok-kw">for</span> v <span class="tok-kw">in</span> &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.voices {</span>
+<span class="ln" id="L164">            wet += v.<span class="tok-fn">process</span>(x);</span>
+<span class="ln" id="L165">        }</span>
+<span class="ln" id="L166">        wet /= <span class="tok-kw">self</span>.voices.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L167">        x * (<span class="tok-num">1.0</span> - <span class="tok-kw">self</span>.mix) + wet * <span class="tok-kw">self</span>.mix</span>
+<span class="ln" id="L168">    }</span>
 </span>
-<span class="ln" id="L155">}</span>
-<span class="ln" id="L156"></span>
+<span class="ln" id="L169">}</span>
+<span class="ln" id="L170"></span>
 <span class="src-item" id="fn-reverb">
-<span class="ln" id="L157"><span class="tok-com">/// Minimal Schroeder-style reverb: one feedback comb + one all-pass. Kept very</span></span>
-<span class="ln" id="L158"><span class="tok-com">/// light so speech stays dry enough to transcribe.</span></span>
-<span class="ln" id="L159"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Reverb {</span>
-<span class="ln" id="L160">    comb: Vec&lt;f32&gt;,</span>
-<span class="ln" id="L161">    comb_w: usize,</span>
-<span class="ln" id="L162">    comb_fb: f32,</span>
-<span class="ln" id="L163">    ap: Vec&lt;f32&gt;,</span>
-<span class="ln" id="L164">    ap_w: usize,</span>
-<span class="ln" id="L165">    ap_g: f32,</span>
-<span class="ln" id="L166">    mix: f32,</span>
-<span class="ln" id="L167">}</span>
+<span class="ln" id="L171"><span class="tok-com">/// Minimal Schroeder-style reverb: one feedback comb + one all-pass. Kept very</span></span>
+<span class="ln" id="L172"><span class="tok-com">/// light so speech stays dry enough to transcribe.</span></span>
+<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Reverb {</span>
+<span class="ln" id="L174">    comb: Vec&lt;f32&gt;,</span>
+<span class="ln" id="L175">    comb_w: usize,</span>
+<span class="ln" id="L176">    comb_fb: f32,</span>
+<span class="ln" id="L177">    ap: Vec&lt;f32&gt;,</span>
+<span class="ln" id="L178">    ap_w: usize,</span>
+<span class="ln" id="L179">    ap_g: f32,</span>
+<span class="ln" id="L180">    mix: f32,</span>
+<span class="ln" id="L181">}</span>
 </span>
-<span class="ln" id="L168"></span>
-<span class="ln" id="L169"><span class="tok-kw">impl</span> Reverb {</span>
+<span class="ln" id="L182"></span>
+<span class="ln" id="L183"><span class="tok-kw">impl</span> Reverb {</span>
 <span class="src-item" id="fn-reverb-new">
-<span class="ln" id="L170">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, mix: f32) -&gt; Self {</span>
-<span class="ln" id="L171">        <span class="tok-kw">let</span> comb_len = ((<span class="tok-num">0.0297</span> * sample_rate) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
-<span class="ln" id="L172">        <span class="tok-kw">let</span> ap_len = ((<span class="tok-num">0.0050</span> * sample_rate) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
-<span class="ln" id="L173">        Self {</span>
-<span class="ln" id="L174">            comb: vec![<span class="tok-num">0.0</span>; comb_len],</span>
-<span class="ln" id="L175">            comb_w: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L176">            comb_fb: <span class="tok-num">0.72</span>,</span>
-<span class="ln" id="L177">            ap: vec![<span class="tok-num">0.0</span>; ap_len],</span>
-<span class="ln" id="L178">            ap_w: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L179">            ap_g: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L180">            mix: mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>),</span>
-<span class="ln" id="L181">        }</span>
-<span class="ln" id="L182">    }</span>
+<span class="ln" id="L184">    <span class="tok-com">/// Size both delay lines for this sample rate, once. The lengths are the</span></span>
+<span class="ln" id="L185">    <span class="tok-com">/// classic Schroeder figures: 29.7ms for the comb, 5ms for the all-pass.</span></span>
+<span class="ln" id="L186">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(sample_rate: f32, mix: f32) -&gt; Self {</span>
+<span class="ln" id="L187">        <span class="tok-kw">let</span> comb_len = ((<span class="tok-num">0.0297</span> * sample_rate) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
+<span class="ln" id="L188">        <span class="tok-kw">let</span> ap_len = ((<span class="tok-num">0.0050</span> * sample_rate) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
+<span class="ln" id="L189">        Self {</span>
+<span class="ln" id="L190">            comb: vec![<span class="tok-num">0.0</span>; comb_len],</span>
+<span class="ln" id="L191">            comb_w: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L192">            comb_fb: <span class="tok-num">0.72</span>,</span>
+<span class="ln" id="L193">            ap: vec![<span class="tok-num">0.0</span>; ap_len],</span>
+<span class="ln" id="L194">            ap_w: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L195">            ap_g: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L196">            mix: mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>),</span>
+<span class="ln" id="L197">        }</span>
+<span class="ln" id="L198">    }</span>
 </span>
 <span class="src-item" id="fn-reverb-process">
-<span class="ln" id="L183">    <span class="tok-attr">#[inline</span>]</span>
-<span class="ln" id="L184">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
-<span class="ln" id="L185">        <span class="tok-com">// comb</span></span>
-<span class="ln" id="L186">        <span class="tok-kw">let</span> c = <span class="tok-kw">self</span>.comb[<span class="tok-kw">self</span>.comb_w];</span>
-<span class="ln" id="L187">        <span class="tok-kw">let</span> cw = x + c * <span class="tok-kw">self</span>.comb_fb;</span>
-<span class="ln" id="L188">        <span class="tok-kw">self</span>.comb[<span class="tok-kw">self</span>.comb_w] = cw;</span>
-<span class="ln" id="L189">        <span class="tok-kw">self</span>.comb_w = (<span class="tok-kw">self</span>.comb_w + <span class="tok-num">1</span>) % <span class="tok-kw">self</span>.comb.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L190">        <span class="tok-com">// all-pass</span></span>
-<span class="ln" id="L191">        <span class="tok-kw">let</span> a = <span class="tok-kw">self</span>.ap[<span class="tok-kw">self</span>.ap_w];</span>
-<span class="ln" id="L192">        <span class="tok-kw">let</span> aw = c + (-<span class="tok-kw">self</span>.ap_g) * a;</span>
-<span class="ln" id="L193">        <span class="tok-kw">let</span> out = a + <span class="tok-kw">self</span>.ap_g * aw;</span>
-<span class="ln" id="L194">        <span class="tok-kw">self</span>.ap[<span class="tok-kw">self</span>.ap_w] = aw;</span>
-<span class="ln" id="L195">        <span class="tok-kw">self</span>.ap_w = (<span class="tok-kw">self</span>.ap_w + <span class="tok-num">1</span>) % <span class="tok-kw">self</span>.ap.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L196">        x * (<span class="tok-num">1.0</span> - <span class="tok-kw">self</span>.mix) + out * <span class="tok-kw">self</span>.mix</span>
-<span class="ln" id="L197">    }</span>
+<span class="ln" id="L199">    <span class="tok-com">/// One sample through the comb and then the all-pass, blended against the</span></span>
+<span class="ln" id="L200">    <span class="tok-com">/// dry sample. Both delay lines are already the right size, so nothing</span></span>
+<span class="ln" id="L201">    <span class="tok-com">/// here allocates.</span></span>
+<span class="ln" id="L202">    <span class="tok-attr">#[inline</span>]</span>
+<span class="ln" id="L203">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">process</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, x: f32) -&gt; f32 {</span>
+<span class="ln" id="L204">        <span class="tok-com">// comb</span></span>
+<span class="ln" id="L205">        <span class="tok-kw">let</span> c = <span class="tok-kw">self</span>.comb[<span class="tok-kw">self</span>.comb_w];</span>
+<span class="ln" id="L206">        <span class="tok-kw">let</span> cw = x + c * <span class="tok-kw">self</span>.comb_fb;</span>
+<span class="ln" id="L207">        <span class="tok-kw">self</span>.comb[<span class="tok-kw">self</span>.comb_w] = cw;</span>
+<span class="ln" id="L208">        <span class="tok-kw">self</span>.comb_w = (<span class="tok-kw">self</span>.comb_w + <span class="tok-num">1</span>) % <span class="tok-kw">self</span>.comb.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L209">        <span class="tok-com">// all-pass</span></span>
+<span class="ln" id="L210">        <span class="tok-kw">let</span> a = <span class="tok-kw">self</span>.ap[<span class="tok-kw">self</span>.ap_w];</span>
+<span class="ln" id="L211">        <span class="tok-kw">let</span> aw = c + (-<span class="tok-kw">self</span>.ap_g) * a;</span>
+<span class="ln" id="L212">        <span class="tok-kw">let</span> out = a + <span class="tok-kw">self</span>.ap_g * aw;</span>
+<span class="ln" id="L213">        <span class="tok-kw">self</span>.ap[<span class="tok-kw">self</span>.ap_w] = aw;</span>
+<span class="ln" id="L214">        <span class="tok-kw">self</span>.ap_w = (<span class="tok-kw">self</span>.ap_w + <span class="tok-num">1</span>) % <span class="tok-kw">self</span>.ap.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L215">        x * (<span class="tok-num">1.0</span> - <span class="tok-kw">self</span>.mix) + out * <span class="tok-kw">self</span>.mix</span>
+<span class="ln" id="L216">    }</span>
 </span>
-<span class="ln" id="L198">}</span>
-<span class="ln" id="L199"></span>
-<span class="ln" id="L200"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L201"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L202">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L203"></span>
-<span class="ln" id="L204">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L205">    <span class="tok-kw">fn</span> <span class="tok-fn">softclip_is_bounded_and_finite</span>() {</span>
-<span class="ln" id="L206">        <span class="tok-kw">let</span> sc = SoftClip::<span class="tok-fn">new</span>(<span class="tok-num">2.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L207">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> -<span class="tok-num">1000</span>..<span class="tok-num">1000</span> {</span>
-<span class="ln" id="L208">            <span class="tok-kw">let</span> y = sc.<span class="tok-fn">process</span>(i <span class="tok-kw">as</span> f32 / <span class="tok-num">100.0</span>);</span>
-<span class="ln" id="L209">            assert!(y.<span class="tok-fn">is_finite</span>());</span>
-<span class="ln" id="L210">        }</span>
-<span class="ln" id="L211">    }</span>
-<span class="ln" id="L212"></span>
-<span class="ln" id="L213">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L214">    <span class="tok-kw">fn</span> <span class="tok-fn">chorus_and_reverb_finite</span>() {</span>
-<span class="ln" id="L215">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> ch = Chorus::<span class="tok-fn">new</span>(<span class="tok-num">48_000.0</span>, <span class="tok-num">0.3</span>);</span>
-<span class="ln" id="L216">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rv = Reverb::<span class="tok-fn">new</span>(<span class="tok-num">48_000.0</span>, <span class="tok-num">0.15</span>);</span>
-<span class="ln" id="L217">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> acc = <span class="tok-num">0</span>.0f32;</span>
-<span class="ln" id="L218">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">48_000</span> {</span>
-<span class="ln" id="L219">            <span class="tok-kw">let</span> x = (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.01</span>).<span class="tok-fn">sin</span>();</span>
-<span class="ln" id="L220">            <span class="tok-kw">let</span> y = rv.<span class="tok-fn">process</span>(ch.<span class="tok-fn">process</span>(x));</span>
-<span class="ln" id="L221">            assert!(y.<span class="tok-fn">is_finite</span>());</span>
-<span class="ln" id="L222">            acc += y.<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L223">        }</span>
-<span class="ln" id="L224">        assert!(acc &gt; <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L225">    }</span>
-<span class="ln" id="L226">}</span>
+<span class="ln" id="L217">}</span>
+<span class="ln" id="L218"></span>
+<span class="ln" id="L219"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L220"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L221">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L222"></span>
+<span class="ln" id="L223">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L224">    <span class="tok-kw">fn</span> <span class="tok-fn">softclip_is_bounded_and_finite</span>() {</span>
+<span class="ln" id="L225">        <span class="tok-kw">let</span> sc = SoftClip::<span class="tok-fn">new</span>(<span class="tok-num">2.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L226">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> -<span class="tok-num">1000</span>..<span class="tok-num">1000</span> {</span>
+<span class="ln" id="L227">            <span class="tok-kw">let</span> y = sc.<span class="tok-fn">process</span>(i <span class="tok-kw">as</span> f32 / <span class="tok-num">100.0</span>);</span>
+<span class="ln" id="L228">            assert!(y.<span class="tok-fn">is_finite</span>());</span>
+<span class="ln" id="L229">        }</span>
+<span class="ln" id="L230">    }</span>
+<span class="ln" id="L231"></span>
+<span class="ln" id="L232">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L233">    <span class="tok-kw">fn</span> <span class="tok-fn">chorus_and_reverb_finite</span>() {</span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> ch = Chorus::<span class="tok-fn">new</span>(<span class="tok-num">48_000.0</span>, <span class="tok-num">0.3</span>);</span>
+<span class="ln" id="L235">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rv = Reverb::<span class="tok-fn">new</span>(<span class="tok-num">48_000.0</span>, <span class="tok-num">0.15</span>);</span>
+<span class="ln" id="L236">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> acc = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L237">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">48_000</span> {</span>
+<span class="ln" id="L238">            <span class="tok-kw">let</span> x = (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.01</span>).<span class="tok-fn">sin</span>();</span>
+<span class="ln" id="L239">            <span class="tok-kw">let</span> y = rv.<span class="tok-fn">process</span>(ch.<span class="tok-fn">process</span>(x));</span>
+<span class="ln" id="L240">            assert!(y.<span class="tok-fn">is_finite</span>());</span>
+<span class="ln" id="L241">            acc += y.<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L242">        }</span>
+<span class="ln" id="L243">        assert!(acc &gt; <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L244">    }</span>
+<span class="ln" id="L245">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

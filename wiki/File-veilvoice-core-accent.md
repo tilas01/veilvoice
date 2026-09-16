@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/src/accent.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 697 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 701 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs)
 
 ## Contents
 
@@ -73,7 +73,7 @@ the sound. So VeilVoice says accent removal is **partial**, and means it.
 
 ## What this file contains
 
-697 lines defining **13 functions** (8 public), **3 types** and **10 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+701 lines defining **13 functions** (8 public), **3 types** and **10 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -119,8 +119,8 @@ flowchart TD
     n_shape(["AccentNeutralizer::shape<br/>line 309"])
     n_recompute_shape["AccentNeutralizer::<br/>recompute_shape<br/>line 352"]
     n_log_centroid["log_centroid<br/>line 404"]
-    n_gain_to_db["gain_to_db<br/>line 423"]
-    n_db_to_gain["db_to_gain<br/>line 427"]
+    n_gain_to_db["gain_to_db<br/>line 425"]
+    n_db_to_gain["db_to_gain<br/>line 431"]
     n_measure_envelope --> n_log_centroid
     n_shape --> n_db_to_gain
     n_shape --> n_gain_to_db
@@ -136,8 +136,8 @@ flowchart TD
     click n_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L309" "open the source"
     click n_recompute_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L352" "open the source"
     click n_log_centroid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L404" "open the source"
-    click n_gain_to_db href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L423" "open the source"
-    click n_db_to_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L427" "open the source"
+    click n_gain_to_db href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L425" "open the source"
+    click n_db_to_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L431" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -174,5 +174,5 @@ flowchart TD
 | `AccentNeutralizer::shape` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L309) | Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average. |
 | `AccentNeutralizer::recompute_shape` <sub>fn</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L352) | Rebuild the correction curve from the current long-term average. |
 | `log_centroid` <sub>fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L404) | Energy-weighted geometric-mean frequency of env over lo, hi bins. |
-| `gain_to_db` <sub>fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L423) |  |
-| `db_to_gain` <sub>fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L427) |  |
+| `gain_to_db` <sub>fn</sub> | [425](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L425) | A linear gain as decibels. |
+| `db_to_gain` <sub>fn</sub> | [431](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L431) | Decibels back to a linear gain. |

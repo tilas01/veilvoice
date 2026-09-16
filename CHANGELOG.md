@@ -8,6 +8,51 @@ than a summary written afterwards.
 
 ## Unreleased
 
+**Links into a page land on the thing they name**
+
+- The site's header stays at the top of the screen as you scroll, so anything a
+  link jumps to needs to be pushed down clear of it. The amount it was pushed
+  down by was a single number, and the header is five different heights
+  depending on the page and the width of the window. At the commonest desktop
+  width the heading you had asked for ended up behind the bar, so the section
+  looked as though it started halfway through a sentence.
+- Worse for two whole pages: the rule only covered sections and the larger
+  headings, so every entry on the releases page and every entry on the roadmap
+  got no push at all and landed a full header height underneath.
+- Driven in a browser, 425 of the 430 links into a page on this site landed in
+  the wrong place. The edition of the site that runs no scripts had none of
+  this, because it has no bar that follows you down, and it is the standard the
+  rest of the site is now held to.
+- The header is measured instead of guessed, and re-measured when the window
+  changes shape or a font arrives late. The landing is held for a second
+  afterwards, because pictures and fonts below the fold can still move the page
+  under you, and it lets go the moment you scroll. Where you landed is outlined
+  briefly so it is obvious which heading you asked for, and if you have asked
+  your system for less movement the outline simply sits there rather than
+  fading.
+- Jumping a long way down the page no longer takes a second and a half to get
+  there. The page glides when the distance is a screen or two, which is what
+  tells you that you went down rather than sideways, and goes straight there
+  when it is further, which is what a link into a page is for.
+- Seventeen images on the site did not say how big they were, so everything
+  below them moved down when they arrived. That is why a section you had just
+  landed on could be somewhere else a moment later. They all say now, and a
+  check refuses an image that does not.
+- The back button, the middle button and copying a link all behave exactly as
+  before: nothing about the navigation itself was taken over.
+
+**The list of crates on the front page was short by fifteen**
+
+- The website's front page shows the README, and the README lists what this
+  project is made of twice. Both lists, and a third in the library
+  documentation, had stopped being added to. They showed twelve and thirteen
+  crates; there are twenty-seven.
+- The missing ones are not plumbing: the two halves of the download verifier,
+  the failsafe, the video renderer and the workspace store are all things the
+  rest of the documentation describes at length.
+- All three lists are complete, and a check now reads the workspace and the
+  three lists on every build, so the next crate cannot be added without them.
+
 **The website no longer opens on a ticked-looking box**
 
 - The first thing the site shows is the notice a reader has to accept, and the
@@ -39,6 +84,32 @@ measures them**
   claim is. The check is unchanged and still runs.
 - Nothing a reader sees is different, and that is the point: the numbers were
   right before and are right now without anybody having to remember them.
+
+**A size calculation that could wrap on 32-bit machines**
+
+- Records in the encrypted store are padded to a fixed set of sizes so that how
+  big a file is says as little as possible about what is in it. Working out
+  that size multiplies the record's length by eight.
+- On the 32-bit builds, a record over about half a gigabyte would have wrapped
+  that sum around. Nothing was at risk: the next line caught it and reported a
+  failure, and the store only ever holds settings and measurements a few
+  kilobytes in size. But it was the wrong way to write it.
+- The arithmetic is checked now, and refuses cleanly instead of wrapping.
+
+**Two places that asked the system to find a program, rather than saying where
+it was**
+
+- Naming a program without its full path means the system searches for it, and
+  whatever it finds first is what runs. VeilVoice already says full paths
+  everywhere it starts something, and a test enforces that, but the test only
+  reads one file.
+- Listing your graphics hardware on Linux, and looking up where an installed
+  tool lives, were both still asking the system to search. Both now say exactly
+  where they expect to find what they are running, and the graphics code has
+  its own copy of the test that keeps it that way.
+- The reproducible-build check still searches for your Rust toolchain and git,
+  deliberately: it is checking a build against the tools you have, so finding
+  yours is the point.
 
 **A one in 65,536 chance that the voice scrambler settled into a fixed rhythm**
 

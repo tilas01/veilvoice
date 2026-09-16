@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,9 +46,9 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-core/accent.svg" alt="accent.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-core/accent.svg" alt="accent.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/accent.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 697 lines &middot; <a href="accent.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 701 lines &middot; <a href="accent.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-an-accent-is-made-of-and-what-a-signal-level-transform-can-remove">What an accent is made of, and what a signal-level transform can remove</a>
@@ -79,7 +80,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>697 lines defining <strong>13 functions</strong> (8 public), <strong>3 types</strong> and <strong>10 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>701 lines defining <strong>13 functions</strong> (8 public), <strong>3 types</strong> and <strong>10 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct AccentConfig</code> <span style="color:var(--muted)">line 95</span> &middot; How aggressively accent and speaker traits are normalised.</li>
 <li><code>struct AccentStats</code> <span style="color:var(--muted)">line 143</span> &middot; Live read-out of what the neutraliser is currently doing, for the UI.</li>
@@ -184,12 +185,12 @@
 <a href="accent.src.html#fn-gain_to_db">
 <rect x="387.1" y="562.5" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="441.4" y="585.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">gain_to_db</text>
-<text x="441.4" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
+<text x="441.4" y="602.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 425</text>
 </a>
 <a href="accent.src.html#fn-db_to_gain">
 <rect x="208.2" y="671.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="262.5" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">db_to_gain</text>
-<text x="262.5" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
+<text x="262.5" y="710.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 431</text>
 </a>
 <rect x="20.0" y="755.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="764.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -217,8 +218,8 @@ flowchart TD
     n_shape([&quot;AccentNeutralizer::shape&lt;br/&gt;line 309&quot;])
     n_recompute_shape[&quot;AccentNeutralizer::&lt;br/&gt;recompute_shape&lt;br/&gt;line 352&quot;]
     n_log_centroid[&quot;log_centroid&lt;br/&gt;line 404&quot;]
-    n_gain_to_db[&quot;gain_to_db&lt;br/&gt;line 423&quot;]
-    n_db_to_gain[&quot;db_to_gain&lt;br/&gt;line 427&quot;]
+    n_gain_to_db[&quot;gain_to_db&lt;br/&gt;line 425&quot;]
+    n_db_to_gain[&quot;db_to_gain&lt;br/&gt;line 431&quot;]
     n_measure_envelope --&gt; n_log_centroid
     n_shape --&gt; n_db_to_gain
     n_shape --&gt; n_gain_to_db
@@ -234,8 +235,8 @@ flowchart TD
     click n_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L309&quot; &quot;open the source&quot;
     click n_recompute_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L352&quot; &quot;open the source&quot;
     click n_log_centroid href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L404&quot; &quot;open the source&quot;
-    click n_gain_to_db href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L423&quot; &quot;open the source&quot;
-    click n_db_to_gain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L427&quot; &quot;open the source&quot;
+    click n_gain_to_db href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L425&quot; &quot;open the source&quot;
+    click n_db_to_gain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L431&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -270,8 +271,8 @@ flowchart TD
 <tr><td><code>AccentNeutralizer::shape</code> <sub>pub fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-shape">309</a></td><td>Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.</td></tr>
 <tr><td><code>AccentNeutralizer::recompute_shape</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-accentneutralizer-recompute_shape">352</a></td><td>Rebuild the correction curve from the current long-term average.</td></tr>
 <tr><td><code>log_centroid</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-log_centroid">404</a></td><td>Energy-weighted geometric-mean frequency of env over lo, hi bins.</td></tr>
-<tr><td><code>gain_to_db</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-gain_to_db">423</a></td><td></td></tr>
-<tr><td><code>db_to_gain</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-db_to_gain">427</a></td><td></td></tr>
+<tr><td><code>gain_to_db</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-gain_to_db">425</a></td><td>A linear gain as decibels.</td></tr>
+<tr><td><code>db_to_gain</code> <sub>fn</sub></td><td><a href="accent.src.html#fn-db_to_gain">431</a></td><td>Decibels back to a linear gain.</td></tr>
 </tbody></table>
 </section>
 </div></div>

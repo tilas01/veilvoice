@@ -98,6 +98,11 @@ const VIRTUAL_CABLE_HINTS: &[&str] = &[
     "virtual",      // generic catch-all, last resort
 ];
 
+/// Whether a device's name suggests it is a virtual cable rather than
+/// real hardware.
+///
+/// A guess from a name, and treated as one everywhere it is used: it decides
+/// what to suggest, never what to refuse.
 fn looks_virtual(name: &str) -> bool {
     let lower = name.to_lowercase();
     VIRTUAL_CABLE_HINTS.iter().any(|h| lower.contains(h))

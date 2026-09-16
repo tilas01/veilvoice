@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/shred.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 415 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 417 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs)
 
 ## Contents
 
@@ -66,16 +66,16 @@ unencrypted anywhere.
 
 ## What this file contains
 
-415 lines defining **3 functions** (1 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+417 lines defining **3 functions** (1 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Passes` (line 64) -- How thoroughly to overwrite before unlinking.
-- `struct ShredReport` (line 86) -- What actually happened, so the caller can tell the user the truth.
+- `struct ShredReport` (line 88) -- What actually happened, so the caller can tell the user the truth.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `shred_file` (line 105) -- Overwrite a file's contents, then delete it.
+- `shred_file` (line 107) -- Overwrite a file's contents, then delete it.
   - reaches: `caveats`
 
 ## What calls what
@@ -92,13 +92,13 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_count["Passes::count<br/>line 75"]
-    n_shred_file(["shred_file<br/>line 105"])
-    n_caveats["caveats<br/>line 190"]
+    n_count["Passes::count<br/>line 77"]
+    n_shred_file(["shred_file<br/>line 107"])
+    n_caveats["caveats<br/>line 192"]
     n_shred_file --> n_caveats
-    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L75" "open the source"
-    click n_shred_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L105" "open the source"
-    click n_caveats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L190" "open the source"
+    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L77" "open the source"
+    click n_shred_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L107" "open the source"
+    click n_caveats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L192" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_shred_file entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -113,7 +113,7 @@ flowchart TD
 |---|---:|---|
 | `CHUNK` <sub>const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L60) | Bytes written per chunk. |
 | `Passes` <sub>pub enum</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L64) | How thoroughly to overwrite before unlinking. |
-| `Passes::count` <sub>fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L75) |  |
-| `ShredReport` <sub>pub struct</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L86) | What actually happened, so the caller can tell the user the truth. |
-| `shred_file` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L105) | Overwrite a file's contents, then delete it. |
-| `caveats` <sub>fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L190) | The honest limits, phrased for a user rather than a security engineer. |
+| `Passes::count` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L77) | How many overwriting passes this setting means, with a custom count held between 1 and 32. |
+| `ShredReport` <sub>pub struct</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L88) | What actually happened, so the caller can tell the user the truth. |
+| `shred_file` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L107) | Overwrite a file's contents, then delete it. |
+| `caveats` <sub>fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L192) | The honest limits, phrased for a user rather than a security engineer. |

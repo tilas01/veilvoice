@@ -379,6 +379,10 @@ pub fn parse_reseed_range(text: &str) -> Result<(f32, f32), RangeError> {
 }
 
 impl DeidConfig {
+    /// How far the analysis window moves between frames, in samples.
+    ///
+    /// At least one, whatever the configuration says, because a hop of zero would
+    /// never advance through the input.
     fn hop(&self) -> usize {
         (self.frame_size / self.overlap.max(1)).max(1)
     }

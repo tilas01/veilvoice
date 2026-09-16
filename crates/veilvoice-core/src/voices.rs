@@ -361,6 +361,11 @@ pub fn all() -> Vec<Voice> {
 /// `1.0` means identical on both axes. `1.19` means the stronger axis differs
 /// by 19 %, which is three semitones of pitch.
 pub fn separation(a: &Voice, b: &Voice, config: &DeidConfig) -> f32 {
+    /// The larger of two numbers over the smaller, so the answer does not
+    /// depend on which way round they were given.
+    ///
+    /// Anything that is not a positive finite number answers 1.0, which reads as
+    /// "no difference" and keeps a bad input from being reported as a large one.
     fn ratio(x: f32, y: f32) -> f32 {
         if x <= 0.0 || y <= 0.0 || !x.is_finite() || !y.is_finite() {
             return 1.0;
