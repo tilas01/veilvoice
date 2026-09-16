@@ -34,7 +34,7 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use veilvoice_check::contents;
+use veilvoice_verify::check::contents;
 
 /// The repository root, from this test's own location.
 fn repository() -> PathBuf {

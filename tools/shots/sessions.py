@@ -354,13 +354,13 @@ def workspace_version():
 def signing_fingerprint():
     """The fingerprint of the key this project signs with.
 
-    Read from `FINGERPRINT` in `veilvoice-check`, which is the constant the
+    Read from `FINGERPRINT` in `veilvoice_verify::check`, which is the constant the
     verifier itself compares the embedded key against. That is the source
     rather than a copy of it: a transcript naming a different key fails
     against the same value the program uses, not against a second written
     down somewhere for humans.
     """
-    text = read(os.path.join(ROOT, "crates", "veilvoice-check", "src", "lib.rs"))
+    text = read(os.path.join(ROOT, "crates", "veilvoice-verify", "src", "check", "mod.rs"))
     found = re.search(r'pub const FINGERPRINT: &str = "([0-9A-F]{40})"', text)
     return found.group(1) if found else None
 

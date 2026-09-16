@@ -419,14 +419,14 @@
 <span class="ln" id="L305"></span>
 <span class="src-item" id="fn-settings-failsafe">
 <span class="ln" id="L306">    <span class="tok-com">/// The Failsafe posture in force.</span></span>
-<span class="ln" id="L307">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">failsafe</span>(&amp;<span class="tok-kw">self</span>) -&gt; veilvoice_failsafe::Posture {</span>
-<span class="ln" id="L308">        veilvoice_failsafe::Posture::<span class="tok-fn">from_key</span>(&amp;<span class="tok-kw">self</span>.prefs.failsafe)</span>
+<span class="ln" id="L307">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">failsafe</span>(&amp;<span class="tok-kw">self</span>) -&gt; veilvoice_guard::failsafe::Posture {</span>
+<span class="ln" id="L308">        veilvoice_guard::failsafe::Posture::<span class="tok-fn">from_key</span>(&amp;<span class="tok-kw">self</span>.prefs.failsafe)</span>
 <span class="ln" id="L309">    }</span>
 </span>
 <span class="ln" id="L310"></span>
 <span class="src-item" id="fn-settings-set_failsafe">
 <span class="ln" id="L311">    <span class="tok-com">/// Record the Failsafe posture.</span></span>
-<span class="ln" id="L312">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">set_failsafe</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, posture: veilvoice_failsafe::Posture) {</span>
+<span class="ln" id="L312">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">set_failsafe</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, posture: veilvoice_guard::failsafe::Posture) {</span>
 <span class="ln" id="L313">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-fn">failsafe</span>() == posture {</span>
 <span class="ln" id="L314">            <span class="tok-kw">return</span>;</span>
 <span class="ln" id="L315">        }</span>
@@ -505,7 +505,7 @@
 <span class="ln" id="L374"></span>
 <span class="ln" id="L375">        <span class="tok-kw">let</span> current = <span class="tok-kw">self</span>.<span class="tok-fn">failsafe</span>();</span>
 <span class="ln" id="L376">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L377">            <span class="tok-kw">for</span> posture <span class="tok-kw">in</span> veilvoice_failsafe::Posture::ALL {</span>
+<span class="ln" id="L377">            <span class="tok-kw">for</span> posture <span class="tok-kw">in</span> veilvoice_guard::failsafe::Posture::ALL {</span>
 <span class="ln" id="L378">                <span class="tok-kw">if</span> ui</span>
 <span class="ln" id="L379">                    .<span class="tok-fn">selectable_label</span>(current == *posture, posture.<span class="tok-fn">label</span>())</span>
 <span class="ln" id="L380">                    .<span class="tok-fn">clicked</span>()</span>
@@ -528,8 +528,8 @@
 <span class="ln" id="L397">        );</span>
 <span class="ln" id="L398">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
 <span class="ln" id="L399">        <span class="tok-kw">for</span> note <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L400">            veilvoice_failsafe::CANNOT_PREVENT,</span>
-<span class="ln" id="L401">            veilvoice_failsafe::NEVER_CLOSES,</span>
+<span class="ln" id="L400">            veilvoice_guard::failsafe::CANNOT_PREVENT,</span>
+<span class="ln" id="L401">            veilvoice_guard::failsafe::NEVER_CLOSES,</span>
 <span class="ln" id="L402">        ] {</span>
 <span class="ln" id="L403">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;  {note}&quot;</span>)).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
 <span class="ln" id="L404">        }</span>

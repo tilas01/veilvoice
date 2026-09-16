@@ -81,7 +81,7 @@
 <span class="ln" id="L13"><span class="tok-com">//! the two.</span></span>
 <span class="ln" id="L14"></span>
 <span class="ln" id="L15"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, paint, warn};</span>
-<span class="ln" id="L16"><span class="tok-kw">use</span> veilvoice_failsafe::{Finding, Guard, Holder, Posture};</span>
+<span class="ln" id="L16"><span class="tok-kw">use</span> veilvoice_guard::failsafe::{Finding, Guard, Holder, Posture};</span>
 <span class="ln" id="L17"></span>
 <span class="src-item" id="fn-show">
 <span class="ln" id="L18"><span class="tok-com">/// Show what Failsafe would make of this machine right now.</span></span>
@@ -140,8 +140,8 @@
 <span class="ln" id="L71">    println!();</span>
 <span class="ln" id="L72">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS CANNOT DO&quot;</span>));</span>
 <span class="ln" id="L73">    <span class="tok-kw">for</span> note <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L74">        veilvoice_failsafe::CANNOT_PREVENT,</span>
-<span class="ln" id="L75">        veilvoice_failsafe::NEVER_CLOSES,</span>
+<span class="ln" id="L74">        veilvoice_guard::failsafe::CANNOT_PREVENT,</span>
+<span class="ln" id="L75">        veilvoice_guard::failsafe::NEVER_CLOSES,</span>
 <span class="ln" id="L76">    ] {</span>
 <span class="ln" id="L77">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(note, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L78">            println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>

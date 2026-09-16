@@ -4810,14 +4810,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "veilvoice-accel"
-version = "0.1.21"
-
-[[package]]
-name = "veilvoice-appctl"
-version = "0.1.21"
-
-[[package]]
 name = "veilvoice-audio"
 version = "0.1.21"
 dependencies = [
@@ -4831,47 +4823,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "veilvoice-capture"
-version = "0.1.21"
-dependencies = [
- "tempfile",
- "veilvoice-proc",
-]
-
-[[package]]
-name = "veilvoice-check"
-version = "0.1.21"
-dependencies = [
- "pgp",
- "sha2",
- "tempfile",
-]
-
-[[package]]
 name = "veilvoice-cli"
 version = "0.1.21"
 dependencies = [
  "clap",
  "rpassword",
  "tempfile",
- "veilvoice-accel",
- "veilvoice-appctl",
  "veilvoice-audio",
- "veilvoice-capture",
- "veilvoice-check",
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
- "veilvoice-decoy",
- "veilvoice-failsafe",
- "veilvoice-gnupg",
  "veilvoice-guard",
- "veilvoice-input",
  "veilvoice-meta",
  "veilvoice-policy",
- "veilvoice-priv",
- "veilvoice-proc",
- "veilvoice-sentry",
  "veilvoice-setup",
  "veilvoice-verify",
  "veilvoice-video",
@@ -4919,31 +4883,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "veilvoice-decoy"
-version = "0.1.21"
-dependencies = [
- "veilvoice-crypto",
-]
-
-[[package]]
-name = "veilvoice-drivers"
-version = "0.1.21"
-dependencies = [
- "tempfile",
-]
-
-[[package]]
-name = "veilvoice-failsafe"
-version = "0.1.21"
-
-[[package]]
-name = "veilvoice-gnupg"
-version = "0.1.21"
-dependencies = [
- "veilvoice-check",
-]
-
-[[package]]
 name = "veilvoice-guard"
 version = "0.1.21"
 dependencies = [
@@ -4961,29 +4900,18 @@ dependencies = [
  "rfd",
  "tempfile",
  "veilvoice-audio",
- "veilvoice-check",
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
- "veilvoice-failsafe",
- "veilvoice-gnupg",
  "veilvoice-guard",
  "veilvoice-meta",
  "veilvoice-policy",
  "veilvoice-setup",
- "veilvoice-update",
+ "veilvoice-verify",
  "veilvoice-video",
  "veilvoice-watch",
- "veilvoice-workspace",
  "winresource",
  "zeroize",
-]
-
-[[package]]
-name = "veilvoice-input"
-version = "0.1.21"
-dependencies = [
- "veilvoice-proc",
 ]
 
 [[package]]
@@ -5001,23 +4929,9 @@ name = "veilvoice-policy"
 version = "0.1.21"
 dependencies = [
  "tempfile",
+ "veilvoice-conversation",
+ "veilvoice-core",
  "veilvoice-crypto",
-]
-
-[[package]]
-name = "veilvoice-priv"
-version = "0.1.21"
-
-[[package]]
-name = "veilvoice-proc"
-version = "0.1.21"
-
-[[package]]
-name = "veilvoice-sentry"
-version = "0.1.21"
-dependencies = [
- "sha2",
- "tempfile",
 ]
 
 [[package]]
@@ -5025,17 +4939,12 @@ name = "veilvoice-setup"
 version = "0.1.21"
 
 [[package]]
-name = "veilvoice-update"
-version = "0.1.21"
-
-[[package]]
 name = "veilvoice-verify"
 version = "0.1.21"
 dependencies = [
  "pgp",
+ "sha2",
  "tempfile",
- "veilvoice-check",
- "veilvoice-gnupg",
  "veilvoice-setup",
  "winresource",
 ]
@@ -5052,15 +4961,8 @@ dependencies = [
 [[package]]
 name = "veilvoice-watch"
 version = "0.1.21"
-
-[[package]]
-name = "veilvoice-workspace"
-version = "0.1.21"
 dependencies = [
  "tempfile",
- "veilvoice-conversation",
- "veilvoice-core",
- "veilvoice-crypto",
 ]
 
 [[package]]

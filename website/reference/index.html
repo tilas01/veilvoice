@@ -79,20 +79,6 @@
 <li><a href="fuzz/fuzz_targets-wav_preflight.html"><code>wav_preflight.rs</code></a> <span style="color:var(--muted)">The WAV pre-flight in veilvoice-audio, coverage-guided.</span></li>
 </ul>
 </section>
-<section id="veilvoice-accel">
-<h2><a href="veilvoice-accel.html">veilvoice-accel</a></h2>
-<p>What graphics hardware this machine has, which of it can encode video, and the measured reason the audio engine does not use any of it.</p>
-<ul>
-<li><a href="veilvoice-accel/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">What hardware this machine has, and the one place VeilVoice can use it.</span></li>
-</ul>
-</section>
-<section id="veilvoice-appctl">
-<h2><a href="veilvoice-appctl.html">veilvoice-appctl</a></h2>
-<p>Learn what normally runs here, then notice what does not -- with time-limited grants and a log, and no claim to block anything.</p>
-<ul>
-<li><a href="veilvoice-appctl/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Learn what normally runs on this machine, then notice what does not.</span></li>
-</ul>
-</section>
 <section id="veilvoice-audio">
 <h2><a href="veilvoice-audio.html">veilvoice-audio</a></h2>
 <p>Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.</p>
@@ -105,24 +91,6 @@
 <li><a href="veilvoice-audio/playback.html"><code>playback.rs</code></a> <span style="color:var(--muted)">Playing a recording that is only in memory, and never on disk.</span></li>
 <li><a href="veilvoice-audio/record.html"><code>record.rs</code></a> <span style="color:var(--muted)">Recording the veiled voice without it ever reaching unprotected memory.</span></li>
 <li><a href="veilvoice-audio/room.html"><code>room.rs</code></a> <span style="color:var(--muted)">Roadmap item 147.</span></li>
-</ul>
-</section>
-<section id="veilvoice-capture">
-<h2><a href="veilvoice-capture.html">veilvoice-capture</a></h2>
-<p>Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of what cannot be seen.</p>
-<ul>
-<li><a href="veilvoice-capture/comms.html"><code>comms.rs</code></a> <span style="color:var(--muted)">Communication programs, and how to put VeilVoice between you and them.</span></li>
-<li><a href="veilvoice-capture/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.</span></li>
-<li><a href="veilvoice-capture/programs.html"><code>programs.rs</code></a> <span style="color:var(--muted)">The programs this build knows can capture a screen.</span></li>
-</ul>
-</section>
-<section id="veilvoice-check">
-<h2><a href="veilvoice-check.html">veilvoice-check</a></h2>
-<p>Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUMS, and the detached signature over that list. No GnuPG, no network.</p>
-<ul>
-<li><a href="veilvoice-check/contents.html"><code>contents.rs</code></a> <span style="color:var(--muted)">The signed list of what is inside each release archive.</span></li>
-<li><a href="veilvoice-check/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Check a VeilVoice release: a file&#x27;s SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.</span></li>
-<li><a href="veilvoice-check/reproduce.html"><code>reproduce.rs</code></a> <span style="color:var(--muted)">A script that rebuilds a release and compares it with what was published.</span></li>
 </ul>
 </section>
 <section id="veilvoice-cli">
@@ -188,6 +156,7 @@
 <li><a href="veilvoice-crypto/aead.html"><code>aead.rs</code></a> <span style="color:var(--muted)">Authenticated encryption with XChaCha20-Poly1305.</span></li>
 <li><a href="veilvoice-crypto/amnesia.html"><code>amnesia.rs</code></a> <span style="color:var(--muted)">Amnesic secret storage: page-locked, zeroized, and never printed.</span></li>
 <li><a href="veilvoice-crypto/container.html"><code>container.rs</code></a> <span style="color:var(--muted)">The .veil encrypted container format.</span></li>
+<li><a href="veilvoice-crypto/decoy.html"><code>decoy.rs</code></a> <span style="color:var(--muted)">A second passphrase that opens a different, empty VeilVoice.</span></li>
 <li><a href="veilvoice-crypto/hoard.html"><code>hoard.rs</code></a> <span style="color:var(--muted)">The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing.</span></li>
 <li><a href="veilvoice-crypto/hybrid.html"><code>hybrid.rs</code></a> <span style="color:var(--muted)">Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.</span></li>
 <li><a href="veilvoice-crypto/kdf.html"><code>kdf.rs</code></a> <span style="color:var(--muted)">Password-based key derivation with Argon2id.</span></li>
@@ -204,31 +173,6 @@
 <li><a href="veilvoice-crypto/tests-timing.html"><code>timing.rs</code></a> <span style="color:var(--muted)">Timing measurement of the password paths.</span></li>
 </ul>
 </section>
-<section id="veilvoice-decoy">
-<h2><a href="veilvoice-decoy.html">veilvoice-decoy</a></h2>
-<p>A second passphrase that opens an empty VeilVoice, with the deniability it does not provide stated plainly, and no passphrase that destroys anything.</p>
-<ul>
-<li><a href="veilvoice-decoy/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">A second passphrase that opens a different, empty VeilVoice.</span></li>
-</ul>
-</section>
-<section id="veilvoice-drivers">
-<h2><a href="veilvoice-drivers.html">veilvoice-drivers</a></h2>
-<p>Notice when a kernel driver or module appears, with a cross-view check and an honest account of what hiding defeats.</p>
-<ul>
-<li><a href="veilvoice-drivers/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">What is loaded into the kernel, recorded, and compared later.</span></li>
-<li><a href="veilvoice-drivers/linux.html"><code>linux.rs</code></a> <span style="color:var(--muted)">Linux: /proc/modules, cross-checked against /sys/module.</span></li>
-<li><a href="veilvoice-drivers/macos.html"><code>macos.rs</code></a> <span style="color:var(--muted)">macOS: kmutil showloaded, falling back to kextstat.</span></li>
-<li><a href="veilvoice-drivers/windows.html"><code>windows.rs</code></a> <span style="color:var(--muted)">Windows: driverquery.exe, which the system already ships.</span></li>
-</ul>
-</section>
-<section id="veilvoice-failsafe">
-<h2><a href="veilvoice-failsafe.html">veilvoice-failsafe</a></h2>
-<p>The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it.</p>
-<ul>
-<li><a href="veilvoice-failsafe/act.html"><code>act.rs</code></a> <span style="color:var(--muted)">Actually closing a program, kept apart from deciding to.</span></li>
-<li><a href="veilvoice-failsafe/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Failsafe: nothing leaves this machine in your own voice by accident.</span></li>
-</ul>
-</section>
 <section id="veilvoice-guard">
 <h2><a href="veilvoice-guard.html">veilvoice-guard</a></h2>
 <p>Integrity manifest and tamper detection for VeilVoice&#x27;s own files, with best-effort attribution of what changed them.</p>
@@ -236,22 +180,6 @@
 <li><a href="veilvoice-guard/blame.html"><code>blame.rs</code></a> <span style="color:var(--muted)">Best-effort attribution: which program changed a file.</span></li>
 <li><a href="veilvoice-guard/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Tamper detection for VeilVoice&#x27;s own files: a manifest of what they should be, a check of what they are, and a best-effort answer to &quot;what changed them&quot;.</span></li>
 <li><a href="veilvoice-guard/manifest.html"><code>manifest.rs</code></a> <span style="color:var(--muted)">The integrity manifest: what the files were, and what they are now.</span></li>
-</ul>
-</section>
-<section id="veilvoice-input">
-<h2><a href="veilvoice-input.html">veilvoice-input</a></h2>
-<p>Which running programs can see your keyboard and mouse, reported as the heuristic it is -- and why a clean result proves nothing.</p>
-<ul>
-<li><a href="veilvoice-input/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">What on this machine could be watching the keyboard and the mouse.</span></li>
-</ul>
-</section>
-<section id="veilvoice-gnupg">
-<h2><a href="veilvoice-gnupg.html">veilvoice-gnupg</a></h2>
-<p>Run the GnuPG already on this machine: import the VeilVoice signing key and check a detached signature, reading GnuPG&#x27;s machine-readable status rather than its translated prose.</p>
-<ul>
-<li><a href="veilvoice-gnupg/backend.html"><code>backend.rs</code></a> <span style="color:var(--muted)">Which program checks the signature, and who decides.</span></li>
-<li><a href="veilvoice-gnupg/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Run the GnuPG that is already on this machine.</span></li>
-<li><a href="veilvoice-gnupg/script.html"><code>script.rs</code></a> <span style="color:var(--muted)">A shell script that checks a release, for people who would rather read one.</span></li>
 </ul>
 </section>
 <section id="veilvoice-gui">
@@ -313,29 +241,7 @@
 <li><a href="veilvoice-policy/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having.</span></li>
 <li><a href="veilvoice-policy/mandate.html"><code>mandate.rs</code></a> <span style="color:var(--muted)">The two things VeilVoice insists on unless you say otherwise.</span></li>
 <li><a href="veilvoice-policy/policy.html"><code>policy.rs</code></a> <span style="color:var(--muted)">The policy itself: what can be required, and what requiring it does.</span></li>
-</ul>
-</section>
-<section id="veilvoice-priv">
-<h2><a href="veilvoice-priv.html">veilvoice-priv</a></h2>
-<p>What privilege VeilVoice is running with and what each level can see -- reported, never acquired.</p>
-<ul>
-<li><a href="veilvoice-priv/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">What privilege VeilVoice is running with, and what each level can actually see.</span></li>
-</ul>
-</section>
-<section id="veilvoice-proc">
-<h2><a href="veilvoice-proc.html">veilvoice-proc</a></h2>
-<p>Which processes are running, per platform, with the limits of that answer stated rather than implied.</p>
-<ul>
-<li><a href="veilvoice-proc/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Which processes are running, per platform, and what that cannot tell you.</span></li>
-</ul>
-</section>
-<section id="veilvoice-sentry">
-<h2><a href="veilvoice-sentry.html">veilvoice-sentry</a></h2>
-<p>Ransomware canaries and mass-change rate detection: an early warning that says plainly what it cannot do.</p>
-<ul>
-<li><a href="veilvoice-sentry/canary.html"><code>canary.rs</code></a> <span style="color:var(--muted)">Decoy files that should never change, and a record of what they were.</span></li>
-<li><a href="veilvoice-sentry/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing.</span></li>
-<li><a href="veilvoice-sentry/rate.html"><code>rate.rs</code></a> <span style="color:var(--muted)">How much of a directory tree changed, and how fast.</span></li>
+<li><a href="veilvoice-policy/workspace.html"><code>workspace.rs</code></a> <span style="color:var(--muted)">Named profiles and saved projects.</span></li>
 </ul>
 </section>
 <section id="veilvoice-setup">
@@ -346,15 +252,8 @@
 <li><a href="veilvoice-setup/install.html"><code>install.rs</code></a> <span style="color:var(--muted)">Put this program somewhere the system can find it.</span></li>
 <li><a href="veilvoice-setup/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Everything that puts VeilVoice on a machine, and everything that reports what is already on it.</span></li>
 <li><a href="veilvoice-setup/space.html"><code>space.rs</code></a> <span style="color:var(--muted)">How much room is actually free where VeilVoice keeps things.</span></li>
+<li><a href="veilvoice-setup/update.html"><code>update.rs</code></a> <span style="color:var(--muted)">Ask, only when told to, whether a newer VeilVoice release exists.</span></li>
 <li><a href="veilvoice-setup/volumes.html"><code>volumes.rs</code></a> <span style="color:var(--muted)">Encrypted volumes this machine already has: Cryptomator and VeraCrypt.</span></li>
-</ul>
-</section>
-<section id="veilvoice-update">
-<h2><a href="veilvoice-update.html">veilvoice-update</a></h2>
-<p>Ask, when told to, whether a newer VeilVoice release exists. No HTTP client, no automatic check, and nothing is downloaded or installed.</p>
-<ul>
-<li><a href="veilvoice-update/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Ask, only when told to, whether a newer VeilVoice release exists.</span></li>
-<li><a href="veilvoice-update/examples-ask.html"><code>ask.rs</code></a> <span style="color:var(--muted)">Run the real check once, by hand.</span></li>
 </ul>
 </section>
 <section id="veilvoice-verify">
@@ -376,6 +275,7 @@
 <h2><a href="veilvoice-video.html">veilvoice-video</a></h2>
 <p>A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg.</p>
 <ul>
+<li><a href="veilvoice-video/accel.html"><code>accel.rs</code></a> <span style="color:var(--muted)">What hardware this machine has, and the one place VeilVoice can use it.</span></li>
 <li><a href="veilvoice-video/ffmpeg.html"><code>ffmpeg.rs</code></a> <span style="color:var(--muted)">The video file, which needs a codec this project does not ship.</span></li>
 <li><a href="veilvoice-video/font.html"><code>font.rs</code></a> <span style="color:var(--muted)">A monospace face, five pixels by seven, drawn here.</span></li>
 <li><a href="veilvoice-video/frames.html"><code>frames.rs</code></a> <span style="color:var(--muted)">The video&#x27;s pictures, and how many of them there really are.</span></li>
@@ -391,17 +291,14 @@
 <h2><a href="veilvoice-watch.html">veilvoice-watch</a></h2>
 <p>Detect which applications are currently using the microphone and camera, with alerts on change.</p>
 <ul>
+<li><a href="veilvoice-watch/appctl.html"><code>appctl.rs</code></a> <span style="color:var(--muted)">Learn what normally runs on this machine, then notice what does not.</span></li>
+<li><a href="veilvoice-watch/input.html"><code>input.rs</code></a> <span style="color:var(--muted)">What on this machine could be watching the keyboard and the mouse.</span></li>
 <li><a href="veilvoice-watch/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Find out which applications are using your microphone and camera, right now.</span></li>
 <li><a href="veilvoice-watch/linux.html"><code>linux.rs</code></a> <span style="color:var(--muted)">Linux detection, via open file handles in /proc.</span></li>
+<li><a href="veilvoice-watch/privilege.html"><code>privilege.rs</code></a> <span style="color:var(--muted)">What privilege VeilVoice is running with, and what each level can actually see.</span></li>
+<li><a href="veilvoice-watch/proc.html"><code>proc.rs</code></a> <span style="color:var(--muted)">Which processes are running, per platform, and what that cannot tell you.</span></li>
 <li><a href="veilvoice-watch/windows.html"><code>windows.rs</code></a> <span style="color:var(--muted)">Windows detection, via the Capability Access Manager.</span></li>
 <li><a href="veilvoice-watch/examples-scan_once.html"><code>scan_once.rs</code></a> <span style="color:var(--muted)">Print what is using the microphone and camera right now.</span></li>
-</ul>
-</section>
-<section id="veilvoice-workspace">
-<h2><a href="veilvoice-workspace.html">veilvoice-workspace</a></h2>
-<p>Named profiles and saved projects: the settings a recording was made with, written down so the next one can be made the same way.</p>
-<ul>
-<li><a href="veilvoice-workspace/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Named profiles and saved projects.</span></li>
 </ul>
 </section>
 </main>

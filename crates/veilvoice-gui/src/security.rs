@@ -1850,7 +1850,7 @@ mod tests {
             .unwrap_or(source.len());
         // Comments stripped first. The first version of this flagged its own
         // explanation of why the count is not shown, which is the same honest
-        // failure `veilvoice-priv`'s subprocess guard records: what matters is
+        // failure `veilvoice-watch`'s privilege probe records: what matters is
         // what the function *draws*, so that is what is searched.
         let body: String = source[start..end]
             .lines()

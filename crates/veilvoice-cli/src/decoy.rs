@@ -14,13 +14,13 @@ use crate::theme::{colour, field, heading, paint};
 pub fn explain() -> Result<(), String> {
     println!("{}", heading("A second passphrase"));
     println!();
-    for line in crate::sentry::wrap(veilvoice_decoy::SCOPE, 72) {
+    for line in crate::sentry::wrap(veilvoice_crypto::decoy::SCOPE, 72) {
         println!("  {line}");
     }
 
     println!();
     println!("{}", paint(colour::YELLOW, "WHAT NO PASSPHRASE DOES"));
-    for line in crate::sentry::wrap(veilvoice_decoy::WHY_NO_DESTRUCTION, 72) {
+    for line in crate::sentry::wrap(veilvoice_crypto::decoy::WHY_NO_DESTRUCTION, 72) {
         println!("  {line}");
     }
 
@@ -30,7 +30,7 @@ pub fn explain() -> Result<(), String> {
         "{}",
         field(
             "different in at least",
-            &format!("{} places", veilvoice_decoy::LEAST_DIFFERENCE)
+            &format!("{} places", veilvoice_crypto::decoy::LEAST_DIFFERENCE)
         )
     );
     println!(

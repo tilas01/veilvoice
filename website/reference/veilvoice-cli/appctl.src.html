@@ -85,7 +85,7 @@
 <span class="ln" id="L17"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, paint, warn};</span>
 <span class="ln" id="L18"><span class="tok-kw">use</span> std::path::{Path, PathBuf};</span>
 <span class="ln" id="L19"><span class="tok-kw">use</span> std::time::{Duration, SystemTime};</span>
-<span class="ln" id="L20"><span class="tok-kw">use</span> veilvoice_appctl::{Baseline, Grant, Verdict};</span>
+<span class="ln" id="L20"><span class="tok-kw">use</span> veilvoice_watch::appctl::{Baseline, Grant, Verdict};</span>
 <span class="ln" id="L21"></span>
 <span class="src-item" id="fn-baseline_path">
 <span class="ln" id="L22"><span class="tok-com">/// Where the baseline is kept.</span></span>
@@ -142,7 +142,7 @@
 <span class="ln" id="L67"><span class="tok-kw">fn</span> <span class="tok-fn">scope</span>() {</span>
 <span class="ln" id="L68">    println!();</span>
 <span class="ln" id="L69">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS DOES NOT DO&quot;</span>));</span>
-<span class="ln" id="L70">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_appctl::SCOPE, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L70">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_watch::appctl::SCOPE, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L71">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
 <span class="ln" id="L72">    }</span>
 <span class="ln" id="L73">}</span>
@@ -151,7 +151,7 @@
 <span class="src-item" id="fn-running">
 <span class="ln" id="L75"><span class="tok-com">/// What is running now, through the shared listing.</span></span>
 <span class="ln" id="L76"><span class="tok-kw">fn</span> <span class="tok-fn">running</span>() -&gt; (Vec&lt;String&gt;, Vec&lt;String&gt;) {</span>
-<span class="ln" id="L77">    veilvoice_proc::<span class="tok-fn">running</span>()</span>
+<span class="ln" id="L77">    veilvoice_watch::proc::<span class="tok-fn">running</span>()</span>
 <span class="ln" id="L78">}</span>
 </span>
 <span class="ln" id="L79"></span>

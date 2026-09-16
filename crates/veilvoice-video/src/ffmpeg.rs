@@ -12,7 +12,8 @@
 //!
 //! So the honest arrangement is the one the rest of the project already uses
 //! for exactly this kind of problem: the download in `veilvoice-verify`, the
-//! registry in `veilvoice-watch`, the driver list in `veilvoice-drivers`. Find
+//! registry in `veilvoice-watch`, the driver list in `veilvoice_watch::drivers`.
+//! Find
 //! the tool the machine already has, prepare the exact command, and let the
 //! person decide.
 //!
@@ -84,7 +85,7 @@ pub struct Encoding {
     ///
     /// `None` means `libx264`, which is the software encoder and is always
     /// there. A hardware encoder goes here by its `ffmpeg` name, such as
-    /// `h264_nvenc`; `veilvoice_accel` is what finds out which this machine
+    /// `h264_nvenc`; `veilvoice_video::accel` is what finds out which this machine
     /// has, and it is honest that finding a device is not proof it works.
     ///
     /// This changes **how long the video takes to write, and nothing else**.

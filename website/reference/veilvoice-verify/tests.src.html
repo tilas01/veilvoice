@@ -238,7 +238,7 @@
 <span class="ln" id="L145">    <span class="tok-com">// signature. Feeding it in must fail to parse rather than be accepted by</span></span>
 <span class="ln" id="L146">    <span class="tok-com">// something that only checked &quot;does this look armoured&quot;.</span></span>
 <span class="ln" id="L147">    <span class="tok-kw">let</span> key = <span class="tok-fn">embedded_key</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L148">    assert!(<span class="tok-fn">verify_detached</span>(&amp;key, veilvoice_check::PUBLIC_KEY, b<span class="tok-str">&quot;data&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L148">    assert!(<span class="tok-fn">verify_detached</span>(&amp;key, <span class="tok-kw">crate</span>::check::PUBLIC_KEY, b<span class="tok-str">&quot;data&quot;</span>).<span class="tok-fn">is_err</span>());</span>
 <span class="ln" id="L149">}</span>
 </span>
 <span class="ln" id="L150"></span>

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/ffmpeg.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 717 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 718 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs)
 
 ## Contents
 
@@ -27,7 +27,8 @@ a reader can check with `cargo tree` in ten seconds.
 
 So the honest arrangement is the one the rest of the project already uses
 for exactly this kind of problem: the download in `veilvoice-verify`, the
-registry in `veilvoice-watch`, the driver list in `veilvoice-drivers`. Find
+registry in `veilvoice-watch`, the driver list in `veilvoice_watch::drivers`.
+Find
 the tool the machine already has, prepare the exact command, and let the
 person decide.
 
@@ -55,21 +56,21 @@ you.
 
 ## What this file contains
 
-717 lines defining **9 functions** (8 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+718 lines defining **9 functions** (8 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Encoding` (line 69) -- How to render the file.
+- `struct Encoding` (line 70) -- How to render the file.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `command` (line 126) -- The command that turns a directory of numbered frames and a WAV into a video file.
-- `concat_command` (line 210) -- The command that turns a concat list of held pictures and a WAV into a video file.
-- `black_command` (line 274) -- The command that turns a veiled recording into a video with a black frame.
-- `extract_command` (line 329) -- The command that takes the sound out of a recording made somewhere else.
-- `is_container` (line 360) -- Whether a file looks like something extract_command should be offered for.
-- `command_line` (line 371) -- The command as one line, for printing.
-- `describe` (line 385) -- What to tell the user about their machine's ffmpeg.
+- `command` (line 127) -- The command that turns a directory of numbered frames and a WAV into a video file.
+- `concat_command` (line 211) -- The command that turns a concat list of held pictures and a WAV into a video file.
+- `black_command` (line 275) -- The command that turns a veiled recording into a video with a black frame.
+- `extract_command` (line 330) -- The command that takes the sound out of a recording made somewhere else.
+- `is_container` (line 361) -- Whether a file looks like something extract_command should be offered for.
+- `command_line` (line 372) -- The command as one line, for printing.
+- `describe` (line 386) -- What to tell the user about their machine's ffmpeg.
   - reaches: `found`
 
 ## What calls what
@@ -86,25 +87,25 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_found["found<br/>line 49"]
-    n_default["Encoding::default<br/>line 97"]
-    n_command(["command<br/>line 126"])
-    n_concat_command(["concat_command<br/>line 210"])
-    n_black_command(["black_command<br/>line 274"])
-    n_extract_command(["extract_command<br/>line 329"])
-    n_is_container(["is_container<br/>line 360"])
-    n_command_line(["command_line<br/>line 371"])
-    n_describe(["describe<br/>line 385"])
+    n_found["found<br/>line 50"]
+    n_default["Encoding::default<br/>line 98"]
+    n_command(["command<br/>line 127"])
+    n_concat_command(["concat_command<br/>line 211"])
+    n_black_command(["black_command<br/>line 275"])
+    n_extract_command(["extract_command<br/>line 330"])
+    n_is_container(["is_container<br/>line 361"])
+    n_command_line(["command_line<br/>line 372"])
+    n_describe(["describe<br/>line 386"])
     n_describe --> n_found
-    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L49" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L97" "open the source"
-    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L126" "open the source"
-    click n_concat_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L210" "open the source"
-    click n_black_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L274" "open the source"
-    click n_extract_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L329" "open the source"
-    click n_is_container href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L360" "open the source"
-    click n_command_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L371" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L385" "open the source"
+    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L50" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L98" "open the source"
+    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L127" "open the source"
+    click n_concat_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L211" "open the source"
+    click n_black_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L275" "open the source"
+    click n_extract_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L330" "open the source"
+    click n_is_container href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L361" "open the source"
+    click n_command_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L372" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L386" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_command,n_concat_command,n_black_command,n_extract_command,n_is_container,n_command_line,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -119,14 +120,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `found` <sub>pub fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L49) | Where ffmpeg is, if this machine has one. |
-| `Encoding` <sub>pub struct</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L69) | How to render the file. |
-| `Encoding::default` <sub>fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L97) |  |
-| `command` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L126) | The command that turns a directory of numbered frames and a WAV into a video file. |
-| `concat_command` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L210) | The command that turns a concat list of held pictures and a WAV into a video file. |
-| `black_command` <sub>pub fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L274) | The command that turns a veiled recording into a video with a black frame. |
-| `extract_command` <sub>pub fn</sub> | [329](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L329) | The command that takes the sound out of a recording made somewhere else. |
-| `OBS_CONTAINERS` <sub>pub const</sub> | [353](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L353) | Containers OBS writes, which extract_command can take the sound out of. |
-| `is_container` <sub>pub fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L360) | Whether a file looks like something extract_command should be offered for. |
-| `command_line` <sub>pub fn</sub> | [371](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L371) | The command as one line, for printing. |
-| `describe` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L385) | What to tell the user about their machine's ffmpeg. |
+| `found` <sub>pub fn</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L50) | Where ffmpeg is, if this machine has one. |
+| `Encoding` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L70) | How to render the file. |
+| `Encoding::default` <sub>fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L98) |  |
+| `command` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L127) | The command that turns a directory of numbered frames and a WAV into a video file. |
+| `concat_command` <sub>pub fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L211) | The command that turns a concat list of held pictures and a WAV into a video file. |
+| `black_command` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L275) | The command that turns a veiled recording into a video with a black frame. |
+| `extract_command` <sub>pub fn</sub> | [330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L330) | The command that takes the sound out of a recording made somewhere else. |
+| `OBS_CONTAINERS` <sub>pub const</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L354) | Containers OBS writes, which extract_command can take the sound out of. |
+| `is_container` <sub>pub fn</sub> | [361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L361) | Whether a file looks like something extract_command should be offered for. |
+| `command_line` <sub>pub fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L372) | The command as one line, for printing. |
+| `describe` <sub>pub fn</sub> | [386](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L386) | What to tell the user about their machine's ffmpeg. |

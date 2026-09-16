@@ -504,7 +504,7 @@ pub fn hash_what_was_built(dir: &Path) -> Result<Built, String> {
             absent.push(with_platform_extension(name));
             continue;
         }
-        let digest = veilvoice_check::sha256_file(&file)
+        let digest = crate::check::sha256_file(&file)
             .map_err(|error| format!("{}: {error}", file.display()))?;
         files.push((with_platform_extension(name), digest));
     }
@@ -565,8 +565,8 @@ pub enum Compared {
 pub fn compare(built: &Built, sums: &str) -> Vec<Compared> {
     let mut out = Vec::new();
     for (name, digest) in &built.files {
-        match veilvoice_check::digest_from_sums(sums, name) {
-            Some(published) if veilvoice_check::digests_match(&published, digest) => {
+        match crate::check::digest_from_sums(sums, name) {
+            Some(published) if crate::check::digests_match(&published, digest) => {
                 out.push(Compared::Same {
                     name: name.clone(),
                     digest: digest.clone(),

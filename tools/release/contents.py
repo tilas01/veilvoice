@@ -18,7 +18,7 @@ the signature therefore covers it too, and the chain runs all the way down:
 
     SHA256SUMS.asc -> SHA256SUMS -> CONTENTS.sha256 -> each file on disk
 
-`veilvoice-check`'s `contents` module is the reader. The format is deliberately
+`veilvoice_verify::check`'s `contents` module is the reader. The format is deliberately
 the shape of `sha256sum` output with a `# <archive>` line before each group, so
 that somebody with neither VeilVoice nor a parser can use it by eye.
 

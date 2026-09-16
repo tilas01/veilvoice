@@ -67,6 +67,15 @@
 mod blame;
 mod manifest;
 
+// The two things that watch for interference rather than describe it, and that
+// were crates of their own. `sentry` notices a directory being rewritten;
+// `failsafe` notices another program taking a real microphone mid-session and
+// is the one thing here that acts rather than reports. They sit beside the
+// integrity manifest because all three answer the same question: has something
+// touched what was supposed to be left alone.
+pub mod failsafe;
+pub mod sentry;
+
 pub use blame::{who_touched, who_touched as blame_path, Blame};
 pub use manifest::{files_in as manifest_files_in, Change, Entry, Manifest, Report};
 

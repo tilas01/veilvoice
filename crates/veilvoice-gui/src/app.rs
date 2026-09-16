@@ -265,10 +265,10 @@ pub struct VeilVoiceApp {
     /// The input-file picker, while it is open.
     choosing_input: crate::dialog::Pending,
 
-    /// The safety catch. On by default; see `veilvoice_failsafe`.
-    failsafe: veilvoice_failsafe::Guard,
+    /// The safety catch. On by default; see `veilvoice_guard::failsafe`.
+    failsafe: veilvoice_guard::failsafe::Guard,
     /// What Failsafe last found, so the panel and the notice agree.
-    failsafe_finding: Option<veilvoice_failsafe::Finding>,
+    failsafe_finding: Option<veilvoice_guard::failsafe::Finding>,
 
     /// What is being shown to the reader right now, if anything.
     ///
@@ -533,7 +533,7 @@ impl VeilVoiceApp {
             tour: crate::tour::Tour::default(),
             tour_considered: false,
             choosing_input: crate::dialog::Pending::new(),
-            failsafe: veilvoice_failsafe::Guard::new(),
+            failsafe: veilvoice_guard::failsafe::Guard::new(),
             failsafe_finding: None,
             input: None,
             output: None,
@@ -2343,7 +2343,7 @@ impl VeilVoiceApp {
     ///
     /// Called once a frame, straight after the watch feed is drained, because
     /// that is where the information arrives. The decision is arithmetic over a
-    /// list -- see `veilvoice_failsafe` -- so doing it every frame costs
+    /// list -- see `veilvoice_guard::failsafe` -- so doing it every frame costs
     /// nothing and means the answer is never a frame out of date.
     ///
     /// **Closing a program is done here and nowhere else**, and only when the
@@ -2360,12 +2360,12 @@ impl VeilVoiceApp {
         self.failsafe.live = self.studio.is_veiling();
         self.failsafe.veiling = self.chosen_output.clone();
 
-        let holders: Vec<veilvoice_failsafe::Holder> = self
+        let holders: Vec<veilvoice_guard::failsafe::Holder> = self
             .watch
             .active()
             .iter()
             .filter(|use_| use_.kind == veilvoice_watch::DeviceKind::Microphone)
-            .map(|use_| veilvoice_failsafe::Holder {
+            .map(|use_| veilvoice_guard::failsafe::Holder {
                 app: use_.app.clone(),
                 pid: use_.pid,
                 device: use_.device.clone(),
@@ -2384,7 +2384,7 @@ impl VeilVoiceApp {
         // sixty times a second for as long as it takes to die.
         let fresh = self.failsafe_finding.as_ref() != Some(&finding);
         if fresh {
-            if let veilvoice_failsafe::Finding::Foreign {
+            if let veilvoice_guard::failsafe::Finding::Foreign {
                 app,
                 pid,
                 closeable,
@@ -2394,7 +2394,7 @@ impl VeilVoiceApp {
                 let words = finding.phrasing();
                 self.notice = Some(crate::notify::Notice::warn(words.clone()));
                 if *closeable {
-                    match veilvoice_failsafe::act::close(app, *pid) {
+                    match veilvoice_guard::failsafe::act::close(app, *pid) {
                         Ok(done) => {
                             self.failsafe
                                 .record(std::time::SystemTime::now(), app, true, &done)

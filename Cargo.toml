@@ -10,33 +10,19 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/veilvoice-capture",
-    "crates/veilvoice-check",
     "crates/veilvoice-conversation",
     "crates/veilvoice-core",
     "crates/veilvoice-crypto",
-    "crates/veilvoice-accel",
-    "crates/veilvoice-appctl",
     "crates/veilvoice-audio",
     "crates/veilvoice-meta",
-    "crates/veilvoice-gnupg",
     "crates/veilvoice-gui",
     "crates/veilvoice-cli",
     "crates/veilvoice-video",
     "crates/veilvoice-watch",
-    "crates/veilvoice-decoy",
-    "crates/veilvoice-drivers",
-    "crates/veilvoice-failsafe",
     "crates/veilvoice-guard",
-    "crates/veilvoice-input",
     "crates/veilvoice-policy",
-    "crates/veilvoice-priv",
-    "crates/veilvoice-proc",
-    "crates/veilvoice-sentry",
     "crates/veilvoice-setup",
-    "crates/veilvoice-update",
     "crates/veilvoice-verify",
-    "crates/veilvoice-workspace",
 ]
 # `fuzz/` is a cargo-fuzz package and needs nightly plus libFuzzer. Excluding it
 # keeps the pinned stable toolchain sufficient for everything else, so a fresh

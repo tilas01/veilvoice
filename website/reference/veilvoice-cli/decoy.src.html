@@ -83,13 +83,13 @@
 <span class="ln" id="L14"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">explain</span>() -&gt; Result&lt;(), String&gt; {</span>
 <span class="ln" id="L15">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;A second passphrase&quot;</span>));</span>
 <span class="ln" id="L16">    println!();</span>
-<span class="ln" id="L17">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_decoy::SCOPE, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L17">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_crypto::decoy::SCOPE, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L18">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
 <span class="ln" id="L19">    }</span>
 <span class="ln" id="L20"></span>
 <span class="ln" id="L21">    println!();</span>
 <span class="ln" id="L22">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT NO PASSPHRASE DOES&quot;</span>));</span>
-<span class="ln" id="L23">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_decoy::WHY_NO_DESTRUCTION, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L23">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_crypto::decoy::WHY_NO_DESTRUCTION, <span class="tok-num">72</span>) {</span>
 <span class="ln" id="L24">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
 <span class="ln" id="L25">    }</span>
 <span class="ln" id="L26"></span>
@@ -99,7 +99,7 @@
 <span class="ln" id="L30">        <span class="tok-str">&quot;{}&quot;</span>,</span>
 <span class="ln" id="L31">        <span class="tok-fn">field</span>(</span>
 <span class="ln" id="L32">            <span class="tok-str">&quot;different in at least&quot;</span>,</span>
-<span class="ln" id="L33">            &amp;format!(<span class="tok-str">&quot;{} places&quot;</span>, veilvoice_decoy::LEAST_DIFFERENCE)</span>
+<span class="ln" id="L33">            &amp;format!(<span class="tok-str">&quot;{} places&quot;</span>, veilvoice_crypto::decoy::LEAST_DIFFERENCE)</span>
 <span class="ln" id="L34">        )</span>
 <span class="ln" id="L35">    );</span>
 <span class="ln" id="L36">    println!(</span>

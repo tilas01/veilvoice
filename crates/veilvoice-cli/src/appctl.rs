@@ -17,7 +17,7 @@
 use crate::theme::{colour, field, heading, paint, warn};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
-use veilvoice_appctl::{Baseline, Grant, Verdict};
+use veilvoice_watch::appctl::{Baseline, Grant, Verdict};
 
 /// Where the baseline is kept.
 pub fn baseline_path() -> Result<PathBuf, String> {
@@ -67,14 +67,14 @@ fn save(path: &Path, baseline: &Baseline) -> Result<(), String> {
 fn scope() {
     println!();
     println!("{}", paint(colour::YELLOW, "WHAT THIS DOES NOT DO"));
-    for line in crate::sentry::wrap(veilvoice_appctl::SCOPE, 72) {
+    for line in crate::sentry::wrap(veilvoice_watch::appctl::SCOPE, 72) {
         println!("  {line}");
     }
 }
 
 /// What is running now, through the shared listing.
 fn running() -> (Vec<String>, Vec<String>) {
-    veilvoice_proc::running()
+    veilvoice_watch::proc::running()
 }
 
 /// Record what is running as ordinary.
