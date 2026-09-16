@@ -114,14 +114,14 @@ flowchart TD
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>286 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
-    n_capture["capture.rs<br/>330 lines"]
+    n_capture["capture.rs<br/>336 lines"]
     n_conversation["conversation.rs<br/>1090 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
-    n_guard["guard.rs<br/>346 lines"]
+    n_guard["guard.rs<br/>347 lines"]
     n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>120 lines"]
-    n_lock["lock.rs<br/>329 lines"]
+    n_lock["lock.rs<br/>330 lines"]
     n_mandate["mandate.rs<br/>330 lines"]
     n_meter["meter.rs<br/>259 lines"]
     n_policy["policy.rs<br/>243 lines"]
@@ -195,14 +195,14 @@ flowchart TD
 | [`accel.rs`](../../docs/files/veilvoice-cli/accel.md) | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
 | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 286 | veilvoice appctl learns what normally runs, so it can notice what does not. |
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
-| [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 330 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
+| [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 336 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 1090 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | 112 | veilvoice failsafe is the safety catch. |
-| [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 346 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 347 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui opens the desktop application from the command line. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
-| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 329 | veilvoice lock manages the application lock from the command line. |
+| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 330 | veilvoice lock manages the application lock from the command line. |
 | [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 3439 | veilvoice, the command-line interface. |
 | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | 330 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 259 | Level meters for veilvoice live, on a scale that means something. |
@@ -239,7 +239,7 @@ counts blank lines and comments too. Both are produced by
 | `fn capture_dir` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Where the allowlist is kept. |
 | `fn status` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | What is running, what is allowed, and what this cannot see. |
 | `fn calls` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Every program in the table, whether it is running or not. |
-| `fn list` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) |  |
+| `fn list` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | veilvoice capture list: the screen recorders this build knows how to name. |
 | `fn allow` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Stop notifying about one program. |
 | `fn deny` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Start notifying about one program again. |
 | `fn check` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Look now, and let the exit code answer. |
@@ -253,7 +253,7 @@ counts blank lines and comments too. Both are produced by
 | `fn show` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | Show what Failsafe would make of this machine right now. |
 | `fn describe` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | A named finding, for the tests to reach without a machine. |
 | `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
-| `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
+| `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | Dispatch veilvoice guard to the subcommand that was asked for. |
 | `fn candidates` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | Everywhere this looks, in order, and whether each had it. |
 | `fn find` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | The desktop application, wherever it is. |
 | `fn open` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | Open the window. |
@@ -261,7 +261,7 @@ counts blank lines and comments too. Both are produced by
 | `fn known` | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | Everything this build knows how to recognise, whether running or not. |
 | `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
 | `fn wrap` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Greedy word wrap. |
-| `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
+| `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Dispatch veilvoice lock to the subcommand that was asked for. |
 | `fn status` | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | What is required now, and how it got that way. |
 | `fn history` | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | The log of every change, oldest first. |
 | `fn relax` | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | Stop insisting on one or both requirements. |
