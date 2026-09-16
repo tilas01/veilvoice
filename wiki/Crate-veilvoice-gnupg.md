@@ -18,7 +18,7 @@
 
 Run the GnuPG that is already on this machine.
 
-**Marker 97.** VeilVoice checks a release signature itself, with a key
+**Roadmap item 97.** VeilVoice checks a release signature itself, with a key
 compiled into the binary, so that somebody with no GnuPG installed is not
 stuck. That is a real convenience and it has an obvious circularity: the
 program telling you the download is genuine came out of that download.

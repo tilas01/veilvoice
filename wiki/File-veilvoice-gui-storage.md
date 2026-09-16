@@ -9,7 +9,7 @@
 
 - [A destination, not a mode](#a-destination-not-a-mode)
 - [Why a chosen destination can still be refused](#why-a-chosen-destination-can-still-be-refused)
-- [Marker 84: detection will fail, and that is planned for](#marker-84-detection-will-fail-and-that-is-planned-for)
+- [Roadmap item 84: detection will fail, and that is planned for](#roadmap-item-84-detection-will-fail-and-that-is-planned-for)
 - [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -17,7 +17,7 @@
 Where veiled recordings are written, and the encrypted volume that may hold
 them.
 
-**Markers 82, 83 and 84.** `veilvoice_setup::volumes` finds what is
+**Roadmap items 82, 83 and 84.** `veilvoice_setup::volumes` finds what is
 mounted; this decides what to do about it, remembers the answer, and refuses
 to write anywhere the user has not confirmed.
 
@@ -44,7 +44,7 @@ quietly would put a veiled recording somewhere unencrypted while its owner
 believed it was in a vault, which is the exact failure this exists to
 prevent.
 
-# Marker 84: detection will fail, and that is planned for
+# Roadmap item 84: detection will fail, and that is planned for
 
 Portable installs, custom mount points, a platform neither tool supports.
 The answer is not a silent fallback: it is a directory the user picks by
@@ -83,10 +83,10 @@ wrong half of one of those can destroy what is hidden inside.
   - reaches: `still_mounted`
 - `Storage::refresh` (line 228) -- Look again at what is installed and mounted.
 - `Storage::found` (line 241) -- What was found at the last refresh.
-- `Storage::found_nothing` (line 247) -- Whether anything was found at all, which decides whether marker 84's guided path is the main offer or the fallback.
+- `Storage::found_nothing` (line 247) -- Whether anything was found at all, which decides whether roadmap item 84's guided path is the main offer or the fallback.
 - `Storage::present` (line 252) -- Whether the chosen folder was there when this was last refreshed.
 - `Storage::take_hand_picked` (line 257) -- Take a folder the user picked by hand, if the picker has answered.
-- `Storage::pick_by_hand` (line 267) -- Start the folder picker for marker 84's guided path.
+- `Storage::pick_by_hand` (line 267) -- Start the folder picker for roadmap item 84's guided path.
 - `Storage::choose` (line 273) -- Choose one of the detected volumes.
 - `Storage::clear` (line 281) -- Go back to writing beside the source file.
 - `Storage::answer_hidden` (line 287) -- Answer the hidden-volume question for the chosen destination.
@@ -181,10 +181,10 @@ flowchart TD
 | `Storage::default` <sub>fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L210) |  |
 | `Storage::refresh` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L228) | Look again at what is installed and mounted. |
 | `Storage::found` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L241) | What was found at the last refresh. |
-| `Storage::found_nothing` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L247) | Whether anything was found at all, which decides whether marker 84's guided path is the main offer or the fallback. |
+| `Storage::found_nothing` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L247) | Whether anything was found at all, which decides whether roadmap item 84's guided path is the main offer or the fallback. |
 | `Storage::present` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L252) | Whether the chosen folder was there when this was last refreshed. |
 | `Storage::take_hand_picked` <sub>pub fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L257) | Take a folder the user picked by hand, if the picker has answered. |
-| `Storage::pick_by_hand` <sub>pub fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L267) | Start the folder picker for marker 84's guided path. |
+| `Storage::pick_by_hand` <sub>pub fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L267) | Start the folder picker for roadmap item 84's guided path. |
 | `Storage::choose` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L273) | Choose one of the detected volumes. |
 | `Storage::clear` <sub>pub fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L281) | Go back to writing beside the source file. |
 | `Storage::answer_hidden` <sub>pub fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L287) | Answer the hidden-volume question for the chosen destination. |

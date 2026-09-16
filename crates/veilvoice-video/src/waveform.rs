@@ -105,7 +105,7 @@ pub fn envelope(samples: &[f32], columns: usize) -> Envelope {
 
 /// How loud the recording is at `progress`, from 0.0 to 1.0.
 ///
-/// **Marker 139.** The bar beside each speaker's name is drawn from this. It
+/// **Roadmap item 139.** The bar beside each speaker's name is drawn from this. It
 /// reads the same envelope the waveform is drawn from rather than the samples,
 /// so the bar and the wave under it can never disagree: one array, two things
 /// drawn from it.

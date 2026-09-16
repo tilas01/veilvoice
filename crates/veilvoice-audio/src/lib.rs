@@ -60,7 +60,7 @@ pub mod playback;
 // nine release jobs.
 #[cfg(feature = "live")]
 pub mod record;
-/// Several microphones at once, a guest each. **Marker 147.**
+/// Several microphones at once, a guest each. **Roadmap item 147.**
 #[cfg(feature = "live")]
 pub mod room;
 // Not behind the `live` feature. The scale is arithmetic over a number, and a

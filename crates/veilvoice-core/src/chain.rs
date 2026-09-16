@@ -1625,7 +1625,7 @@ mod reseed_range_tests {
 
     /// Everything a person can type that is not a range is **refused**, and
     /// the refusal says which thing was wrong. Nothing is adjusted to fit:
-    /// that is the whole of marker 28's wording.
+    /// that is the whole of roadmap item 28's wording.
     #[test]
     fn bad_input_is_refused_with_a_reason_and_never_corrected() {
         use RangeError::*;

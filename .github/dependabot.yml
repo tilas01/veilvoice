@@ -69,7 +69,7 @@ updates:
     # is written in full beside `argon2` in `crates/veilvoice-crypto/Cargo.toml`.
     # Their majors are ignored so the same pull requests do not reopen every
     # week; minors and patches still arrive. Remove these the day `pgp` moves
-    # or the signature check stops needing it (marker 149).
+    # or the signature check stops needing it (roadmap item 149).
     ignore:
       - dependency-name: "sha2"
         update-types: ["version-update:semver-major"]

@@ -141,7 +141,7 @@ CHECKS = [
      [sys.executable, "tools/release/packaging.py"]),
     ("no state file is written one place and read another",
      [sys.executable, "tools/audit/state_paths.py"]),
-    # Marker 126. A dependency is a decision, and a decision with no sentence
+    # Roadmap item 126. A dependency is a decision, and a decision with no sentence
     # beside it is one nobody can revisit. The day this was added it found
     # three that no line of code referred to.
     ("every dependency says what it is for",
@@ -159,7 +159,7 @@ CHECKS = [
     # every non-Windows machine and had reached fifteen gigabytes.
     ("no build output lives outside the one directory at the root",
      [sys.executable, "tools/audit/build_output.py"]),
-    # Marker 151. The mutation campaign itself is weekly, because half an hour
+    # Roadmap item 151. The mutation campaign itself is weekly, because half an hour
     # does not fit a per-push job. What fits here is the half that does not need
     # a campaign: every argued-for survivor still points at a real file and a
     # real line. Those move whenever code above them moves, and without this the

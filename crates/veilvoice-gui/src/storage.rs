@@ -2,7 +2,7 @@
 //! Where veiled recordings are written, and the encrypted volume that may hold
 //! them.
 //!
-//! **Markers 82, 83 and 84.** [`veilvoice_setup::volumes`] finds what is
+//! **Roadmap items 82, 83 and 84.** [`veilvoice_setup::volumes`] finds what is
 //! mounted; this decides what to do about it, remembers the answer, and refuses
 //! to write anywhere the user has not confirmed.
 //!
@@ -29,7 +29,7 @@
 //! believed it was in a vault, which is the exact failure this exists to
 //! prevent.
 //!
-//! # Marker 84: detection will fail, and that is planned for
+//! # Roadmap item 84: detection will fail, and that is planned for
 //!
 //! Portable installs, custom mount points, a platform neither tool supports.
 //! The answer is not a silent fallback: it is a directory the user picks by
@@ -242,7 +242,7 @@ impl Storage {
         &self.found
     }
 
-    /// Whether anything was found at all, which decides whether marker 84's
+    /// Whether anything was found at all, which decides whether roadmap item 84's
     /// guided path is the main offer or the fallback.
     pub fn found_nothing(&self) -> bool {
         self.found.is_empty()
@@ -263,7 +263,7 @@ impl Storage {
         }
     }
 
-    /// Start the folder picker for marker 84's guided path.
+    /// Start the folder picker for roadmap item 84's guided path.
     pub fn pick_by_hand(&mut self, tool: Tool) {
         self.hand_picked_tool = tool;
         self.choosing.start(crate::dialog::Ask::Folder);
@@ -359,7 +359,7 @@ pub fn panel(storage: &mut Storage, ui: &mut egui::Ui) -> bool {
         }
     }
 
-    // Marker 83. Asked for VeraCrypt and never for Cryptomator, and asked
+    // Roadmap item 83. Asked for VeraCrypt and never for Cryptomator, and asked
     // before anything is written rather than after something goes wrong.
     let needs_answer = storage
         .destination
@@ -416,7 +416,7 @@ pub fn panel(storage: &mut Storage, ui: &mut egui::Ui) -> bool {
         });
     }
 
-    // Marker 84. The guided path, which is the main offer when nothing was
+    // Roadmap item 84. The guided path, which is the main offer when nothing was
     // found rather than a footnote under a list of nothing.
     if storage.found_nothing() {
         ui.label(
@@ -554,7 +554,7 @@ mod tests {
         );
     }
 
-    /// Marker 83's whole point, from the other side: a caller that forgets to
+    /// Roadmap item 83's whole point, from the other side: a caller that forgets to
     /// check `ready` must not be handed the vault path anyway.
     #[test]
     fn an_unanswered_destination_never_yields_a_vault_path() {

@@ -318,7 +318,7 @@
 <span class="src-item" id="fn-black_command">
 <span class="ln" id="L257"><span class="tok-com">/// The command that turns a veiled recording into a video with a black frame.</span></span>
 <span class="ln" id="L258"><span class="tok-com">///</span></span>
-<span class="ln" id="L259"><span class="tok-com">/// **Marker 87.** Somewhere that accepts only video is a common place to need</span></span>
+<span class="ln" id="L259"><span class="tok-com">/// **Roadmap item 87.** Somewhere that accepts only video is a common place to need</span></span>
 <span class="ln" id="L260"><span class="tok-com">/// to put a recording: a message that will not take an audio file, a platform</span></span>
 <span class="ln" id="L261"><span class="tok-com">/// that wants something to show. The picture is not the point and does not need</span></span>
 <span class="ln" id="L262"><span class="tok-com">/// to be, so this is a black frame for the length of the audio and nothing</span></span>
@@ -378,7 +378,7 @@
 <span class="src-item" id="fn-extract_command">
 <span class="ln" id="L315"><span class="tok-com">/// The command that takes the sound out of a recording made somewhere else.</span></span>
 <span class="ln" id="L316"><span class="tok-com">///</span></span>
-<span class="ln" id="L317"><span class="tok-com">/// **Marker 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and</span></span>
+<span class="ln" id="L317"><span class="tok-com">/// **Roadmap item 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and</span></span>
 <span class="ln" id="L318"><span class="tok-com">/// VeilVoice reads none of them: they are containers holding a video stream and</span></span>
 <span class="ln" id="L319"><span class="tok-com">/// an audio stream, and demuxing one means a demuxer this project does not</span></span>
 <span class="ln" id="L320"><span class="tok-com">/// ship, for the same reason it ships no encoder.</span></span>
@@ -473,7 +473,7 @@
 <span class="ln" id="L400"><span class="tok-attr">#[cfg</span>(test)]</span>
 <span class="ln" id="L401"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L402"></span>
-<span class="ln" id="L403">    <span class="tok-com">/// Marker 87. A synthesised colour source never ends, so without</span></span>
+<span class="ln" id="L403">    <span class="tok-com">/// Roadmap item 87. A synthesised colour source never ends, so without</span></span>
 <span class="ln" id="L404">    <span class="tok-com">/// `-shortest` ffmpeg encodes black for ever and the only thing that stops</span></span>
 <span class="ln" id="L405">    <span class="tok-com">/// it is the disk filling up.</span></span>
 <span class="ln" id="L406">    <span class="tok-attr">#[test</span>]</span>
@@ -494,7 +494,7 @@
 <span class="ln" id="L421">        );</span>
 <span class="ln" id="L422">    }</span>
 <span class="ln" id="L423"></span>
-<span class="ln" id="L424">    <span class="tok-com">/// Marker 88. Taking the sound out has to discard every video stream, not</span></span>
+<span class="ln" id="L424">    <span class="tok-com">/// Roadmap item 88. Taking the sound out has to discard every video stream, not</span></span>
 <span class="ln" id="L425">    <span class="tok-com">/// the first one: an OBS recording with a camera and a screen capture has</span></span>
 <span class="ln" id="L426">    <span class="tok-com">/// two, and a stream selector written for one fails on the other.</span></span>
 <span class="ln" id="L427">    <span class="tok-attr">#[test</span>]</span>

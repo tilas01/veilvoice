@@ -845,7 +845,7 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
         return worst;
     }
 
-    // Marker 97. Both of these now check rather than describe, so both can
+    // Roadmap item 97. Both of these now check rather than describe, so both can
     // fail the run. A verifier that prints "CHANGED veilvoice" and then exits
     // zero has told somebody nothing they will act on.
     let wrong = report_extracted(&found) + report_gnupg(&found);
@@ -856,7 +856,7 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
     worst
 }
 
-/// Marker 97. Every file in the extracted folder, against the signed list.
+/// Roadmap item 97. Every file in the extracted folder, against the signed list.
 ///
 /// # What changed, and why the old caveat is gone
 ///
@@ -1129,7 +1129,7 @@ fn report_presence_only(directory: &Path) {
     }
 }
 
-/// Marker 97. The same check, run through the GnuPG the reader already has.
+/// Roadmap item 97. The same check, run through the GnuPG the reader already has.
 ///
 /// Two implementations, both reported. This program checked the signature with
 /// a key compiled into itself, and it came out of the same download; GnuPG's
@@ -1225,7 +1225,7 @@ fn report_gnupg(found: &discover::Found) -> usize {
     problems
 }
 
-/// Marker 91. Print the commands that check this release with somebody else's
+/// Roadmap item 91. Print the commands that check this release with somebody else's
 /// GnuPG, and nothing else.
 ///
 /// A separate subcommand rather than only a footnote under `auto`, because the

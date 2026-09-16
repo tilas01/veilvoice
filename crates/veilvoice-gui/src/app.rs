@@ -26,7 +26,7 @@
 //! | **install** | Whether this copy is portable or installed, and the optional companions. |
 //! | **about** | Versions, licence, and the honest scope. |
 //!
-//! **Marker 130** took one row out of this table rather than adding one. Live
+//! **Roadmap item 130** took one row out of this table rather than adding one. Live
 //! scramble was a tab, and everything it did the Studio also did, through the
 //! same session, with the devices the other tab happened to be set to. Two
 //! screens for one act, and two starters for one microphone.
@@ -144,7 +144,7 @@ pub(crate) enum Tab {
     /// Several people in one recording, each with a name and a colour.
     Group,
     /// Scramble a microphone in real time, and keep what was said if it was
-    /// asked for. **Marker 130**: live scramble used to be a tab of its own.
+    /// asked for. **Roadmap item 130**: live scramble used to be a tab of its own.
     Studio,
     /// What is in the vault, without opening any of it.
     Browser,
@@ -201,7 +201,7 @@ impl Tab {
     /// The tab with this name, if it is one.
     pub fn from_key(key: &str) -> Option<Tab> {
         let key = key.trim().to_ascii_lowercase();
-        // **Marker 130.** Live scramble is the Studio now. `--tab live` still
+        // **Roadmap item 130.** Live scramble is the Studio now. `--tab live` still
         // opens something rather than failing, because it is written into
         // shortcuts and scripts that were made before the tab moved, and the
         // honest destination for it is the tab that does that job today.
@@ -306,7 +306,7 @@ pub struct VeilVoiceApp {
 
     // The devices the Studio veils between. The lists are the window's
     // because the window is what enumerates them, once, at startup; the
-    // session that uses them is the Studio's, because marker 130 made the
+    // session that uses them is the Studio's, because roadmap item 130 made the
     // Studio the one place a session is started.
     inputs: Vec<devices::DeviceInfo>,
     outputs: Vec<devices::DeviceInfo>,
@@ -319,7 +319,7 @@ pub struct VeilVoiceApp {
     /// running. Read once, in `update`, because `stats` resets the peaks as it
     /// reads them and two readers would each see half the level.
     ///
-    /// **Marker 147.** One microphone and a room report different shapes, and
+    /// **Roadmap item 147.** One microphone and a room report different shapes, and
     /// this holds whichever it was rather than a flattened pair of numbers:
     /// flattening is what would lose the per-guest bars.
     reading: Option<crate::studio::Reading>,
@@ -348,7 +348,7 @@ pub struct VeilVoiceApp {
     storage: crate::storage::Storage,
     /// Seconds since the window was last touched, for the autolock.
     ///
-    /// Marker 92. Counted from egui's own frame time rather than the system
+    /// Roadmap item 92. Counted from egui's own frame time rather than the system
     /// clock, so moving the machine's clock neither brings the lock forward nor
     /// pushes it back.
     idle_secs: f32,
@@ -451,7 +451,7 @@ impl VeilVoiceApp {
         }
     }
 
-    /// Marker 148. The frame rate in the header, when it has been asked for.
+    /// Roadmap item 148. The frame rate in the header, when it has been asked for.
     ///
     /// Two numbers and no more: the rate as drawn, and how many frames arrived
     /// late in the last second. The second one turns yellow rather than
@@ -610,7 +610,7 @@ impl VeilVoiceApp {
     /// hidden one.
     /// What the integrity record found, drawn under the lock controls.
     ///
-    /// **Marker 75.** An associated function rather than a method so it borrows
+    /// **Roadmap item 75.** An associated function rather than a method so it borrows
     /// the state it reads and nothing else: `self.security.tab` already holds a
     /// mutable borrow of the same struct on the line above.
     ///
@@ -762,18 +762,18 @@ impl VeilVoiceApp {
             watch: WatchFeed::start(cc.egui_ctx.clone()),
             ..Default::default()
         };
-        // Marker 148. The saved frame-rate target, before the first frame, so
+        // Roadmap item 148. The saved frame-rate target, before the first frame, so
         // the first animation is paced by what was chosen rather than by the
         // default for one frame.
         app.pace.set_target(app.preferences.frame_target());
 
-        // Marker 86. Before the first frame, and so before anything can be
+        // Roadmap item 86. Before the first frame, and so before anything can be
         // unlocked: `Security` captures the app-lock passphrase as the lock
         // opens, and only when this mode is already the chosen one.
         let seal_with_app_lock = app.preferences.seal_with_app_lock();
         app.security.prefer_app_lock_sealing(seal_with_app_lock);
 
-        // Markers 82 to 84. The remembered destination, and one look at what is
+        // Roadmap items 82 to 84. The remembered destination, and one look at what is
         // mounted. Both at startup rather than per frame: `refresh` reads the
         // mount table, and the draw path reads no files.
         app.storage.destination = app.preferences.destination();
@@ -944,7 +944,7 @@ impl eframe::App for VeilVoiceApp {
         self.fit_to_the_screen(ctx);
         self.count_frames(ctx);
 
-        // Marker 148. One reading per drawn frame, before anything is
+        // Roadmap item 148. One reading per drawn frame, before anything is
         // painted, so the header and the About tab report the same frame.
         // Whether this frame was one an animation asked for is read from the
         // flag `pace::next_frame` set at the end of the frame before.
@@ -962,7 +962,7 @@ impl eframe::App for VeilVoiceApp {
             };
         }
 
-        // Marker 148. Frames have been arriving late for two seconds running.
+        // Roadmap item 148. Frames have been arriving late for two seconds running.
         // Said once, and only where a notice is not already in the way: the
         // first-run cards and a crash report are both more urgent than this.
         if self.pace.is_dropping()
@@ -981,7 +981,7 @@ impl eframe::App for VeilVoiceApp {
             )));
         }
 
-        // Marker 92. Any input at all is use; the passage of a job is not.
+        // Roadmap item 92. Any input at all is use; the passage of a job is not.
         // Somebody who starts a long render and walks away has walked away, and
         // what they are producing is the thing worth locking away.
         let (touched, dt) = ctx.input(|i| {
@@ -1044,7 +1044,7 @@ impl eframe::App for VeilVoiceApp {
         if self.security.is_locked() {
             self.files.locked();
         }
-        // Marker 86, kept in step. `set_` is a no-op when nothing changed, so
+        // Roadmap item 86, kept in step. `set_` is a no-op when nothing changed, so
         // this costs a comparison per frame and never a write.
         self.preferences
             .set_seal_with_app_lock(self.security.seals_with_app_lock());
@@ -1144,10 +1144,10 @@ impl eframe::App for VeilVoiceApp {
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.label(RichText::new("offline").color(p::green()).small());
                         self.frame_readout(ui);
-                        // **Marker 78.** The colour scheme, in the header.
+                        // **Roadmap item 78.** The colour scheme, in the header.
                         //
                         // Every one of the website's themes has been in this
-                        // application since marker 26, and the picker was on a
+                        // application since roadmap item 26, and the picker was on a
                         // page inside Settings, which is a place somebody looks
                         // only if they already believe there is something to
                         // find. The website puts its picker in the header on
@@ -1246,10 +1246,10 @@ impl eframe::App for VeilVoiceApp {
         // so this is the only reader and everything else is shown what it got.
         self.reading = self.studio.tick();
 
-        // **Marker 132.** Who else is holding the microphone, while a take is
+        // **Roadmap item 132.** Who else is holding the microphone, while a take is
         // being made and only then. Outside one this is the Monitor tab's
         // question and the safety catch's, and building a list every frame for
-        // a question nobody is asking is what marker 126 is about.
+        // a question nobody is asking is what roadmap item 126 is about.
         //
         // Independent of the safety catch's posture on purpose. That is a
         // setting about closing other programs; this is a fact about a
@@ -1412,7 +1412,7 @@ impl eframe::App for VeilVoiceApp {
                         Tab::Security => {
                             self.security.tab(ui);
                             Self::integrity_panel(ui, self.integrity.state());
-                            // Markers 82 to 84. Returns true when the choice
+                            // Roadmap items 82 to 84. Returns true when the choice
                             // changed, which is when it is worth a write to
                             // the settings file rather than every frame.
                             if crate::storage::panel(&mut self.storage, ui) {
@@ -1433,7 +1433,7 @@ impl eframe::App for VeilVoiceApp {
         self.group.drain();
         self.verify.drain();
 
-        // **Marker 79.** How often to come back, decided by what is moving.
+        // **Roadmap item 79.** How often to come back, decided by what is moving.
         //
         // This was one number, 50 ms, for everything: a live session, a
         // download, a file being veiled. Twenty frames a second is fine for a
@@ -1476,7 +1476,7 @@ impl eframe::App for VeilVoiceApp {
             // header animating at its own rate, which is what the judder was.
             crate::pace::next_frame(ctx);
         } else if autolock.enabled && !self.security.is_locked() {
-            // Marker 92. Once a second is enough to notice a delay measured in
+            // Roadmap item 92. Once a second is enough to notice a delay measured in
             // minutes, and it is what makes the lock actually engage: an idle
             // window requests no repaint, so without this the countdown would
             // only advance while somebody was looking at it, which is the one
@@ -1689,7 +1689,7 @@ impl VeilVoiceApp {
 
         ui.add_space(12.0);
         let busy = self.job.is_some();
-        // Marker 83. A destination whose hidden-volume question is unanswered
+        // Roadmap item 83. A destination whose hidden-volume question is unanswered
         // blocks the job rather than quietly writing beside the source file.
         // The silent fallback is the failure this exists to prevent: a veiled
         // recording sitting outside a vault while its owner believes it is
@@ -1755,7 +1755,7 @@ impl VeilVoiceApp {
             o.set_extension("veiled.wav");
             o
         });
-        // Marker 82. The encrypted destination replaces the folder and keeps
+        // Roadmap item 82. The encrypted destination replaces the folder and keeps
         // the name. `place` returns the original untouched when nothing is
         // chosen, and also when the destination is not cleared to be used, so
         // a job that got past the button somehow still cannot write into a
@@ -1827,7 +1827,7 @@ impl VeilVoiceApp {
 
     /// The Recording Studio: the voice first, then the take.
     ///
-    /// # Marker 130: live scramble is not a separate tab any more
+    /// # Roadmap item 130: live scramble is not a separate tab any more
     ///
     /// It was, and the split was in the wrong place. The Studio has always
     /// recorded through the same `LiveSession` the live tab ran, with the same
@@ -1853,7 +1853,7 @@ impl VeilVoiceApp {
     /// startup, and because the file tab shows the same engine settings.
     /// The room: a name and a microphone each, and what that costs.
     ///
-    /// **Marker 147.** Drawn by the window rather than by the Studio for the
+    /// **Roadmap item 147.** Drawn by the window rather than by the Studio for the
     /// reason the device pickers are: the device list belongs to the window.
     /// What the Studio owns is the list of guests, because the session it
     /// starts is built from it.
@@ -1939,7 +1939,7 @@ impl VeilVoiceApp {
         ui.add_space(4.0);
         ui.label(RichText::new("Devices").color(p::blue()).small());
         ui.add_enabled_ui(!veiling, |ui| {
-            // **Marker 147.** One microphone, or one per person in the room.
+            // **Roadmap item 147.** One microphone, or one per person in the room.
             //
             // A room is not a bigger version of one microphone. One microphone
             // carrying four people is one signal, so whatever it is turned into
@@ -2055,7 +2055,7 @@ impl VeilVoiceApp {
                         p::green()
                     }),
                 );
-                // **Marker 150.** The way to the always-on-top meters, where
+                // **Roadmap item 150.** The way to the always-on-top meters, where
                 // the session is started rather than only in Settings.
                 //
                 // This is the moment somebody is about to put a call or a
@@ -2079,7 +2079,7 @@ impl VeilVoiceApp {
             }
         });
 
-        // **Marker 132.** What the platform said about the streams, where the
+        // **Roadmap item 132.** What the platform said about the streams, where the
         // person is looking when they are veiling. This used to go to standard
         // error, which on Windows is a console the window does not have, so a
         // microphone unplugged mid-call said nothing at all.
@@ -2190,7 +2190,7 @@ impl VeilVoiceApp {
                     );
                 }
             }
-            // **Marker 147.** Two bars per guest, and the cost of running all
+            // **Roadmap item 147.** Two bars per guest, and the cost of running all
             // of them, which is the honest account the row asked for.
             Some(crate::studio::Reading::Room(stats)) => {
                 let levels = self.studio.guest_levels();
@@ -2585,7 +2585,7 @@ impl VeilVoiceApp {
                 "not measured yet".to_string()
             },
         );
-        // Marker 148. What the window is aiming at, what it got, and how many
+        // Roadmap item 148. What the window is aiming at, what it got, and how many
         // frames missed. The frame time above answers "is drawing slow"; these
         // answer "is it drawing as often as the screen shows".
         field(
@@ -2872,7 +2872,7 @@ mod header_layout_tests {
 mod tests {
     use super::*;
 
-    /// **Marker 79.** Nothing that waits happens on the thread that draws.
+    /// **Roadmap item 79.** Nothing that waits happens on the thread that draws.
     ///
     /// A window stutters for one of two reasons: it is asked to draw too
     /// rarely, or it is doing something slow between frames. The second is the
@@ -2918,7 +2918,7 @@ mod tests {
             // One per frame at 60 Hz is sixty of them a second for an answer
             // that changed when a file was dropped, which is where the check
             // that needs them lives. Added after reading the draw path for
-            // marker 79 and finding none, so this keeps it that way rather
+            // roadmap item 79 and finding none, so this keeps it that way rather
             // than fixing something.
             ".exists()",
             ".is_file()",
@@ -3035,7 +3035,7 @@ mod tests {
         ///
         /// This used to be a list of *wrong* counts to forbid, which is the
         /// same mistake one level up: the list had to be edited every time the
-        /// number changed, and marker 130 took a tab away and made "ten" both
+        /// number changed, and roadmap item 130 took a tab away and made "ten" both
         /// the truth and one of the forbidden words. Reading the number and
         /// comparing it needs no maintenance at all.
         const WORDS: &[&str] = &[
@@ -3093,7 +3093,7 @@ mod tests {
         }
     }
 
-    /// Marker 92. A job running is not the window being used.
+    /// Roadmap item 92. A job running is not the window being used.
     ///
     /// The tempting version of an idle timer treats "something is happening" as
     /// "somebody is here", and it is exactly backwards for this program:
@@ -3128,7 +3128,7 @@ mod tests {
         );
     }
 
-    /// Marker 83. An unanswered hidden-volume question must stop the job, not
+    /// Roadmap item 83. An unanswered hidden-volume question must stop the job, not
     /// quietly redirect it back beside the source file. A user who believes
     /// their recording went into a vault and finds it next to the original is
     /// the failure the whole question exists to prevent.
@@ -3145,7 +3145,7 @@ mod tests {
         );
     }
 
-    /// Marker 75. The record has to be taken without anybody knowing to ask,
+    /// Roadmap item 75. The record has to be taken without anybody knowing to ask,
     /// and it has to wait for the passphrase when there is one to wait for.
     #[test]
     fn the_integrity_record_runs_itself_at_launch_and_again_at_unlock() {
@@ -3202,7 +3202,7 @@ mod tests {
         }
         assert_eq!(Tab::from_key("nothing-like-this"), None);
         assert_eq!(Tab::from_key(""), None);
-        // **Marker 130.** `live` is not a tab any more and is still a name
+        // **Roadmap item 130.** `live` is not a tab any more and is still a name
         // people have in shortcuts, in scripts and in the older manual page.
         // It opens the tab that does that job now rather than failing.
         assert_eq!(Tab::from_key("live"), Some(Tab::Studio));

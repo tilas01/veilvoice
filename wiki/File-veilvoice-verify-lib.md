@@ -215,15 +215,15 @@ flowchart TD
 | `take_value` <sub>fn</sub> | [653](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L653) |  |
 | `command_release` <sub>fn</sub> | [669](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L669) | Fetch a release and check it, in one step. |
 | `command_auto` <sub>fn</sub> | [750](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L750) | Find a release near the user and check it, with nothing else to type. |
-| `report_extracted` <sub>fn</sub> | [883](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L883) | Marker 97. |
+| `report_extracted` <sub>fn</sub> | [883](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L883) | Roadmap item 97. |
 | `Manifest` <sub>enum</sub> | [947](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L947) | What the release said is inside its archives, if anything usable. |
 | `manifest` <sub>fn</sub> | [963](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L963) | Read CONTENTS.sha256, having first proved it is the published one. |
 | `report_against_manifest` <sub>fn</sub> | [994](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L994) | Check one extracted folder against the section of the list that covers it. |
 | `digest_for` <sub>fn</sub> | [1068](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1068) | The published hash for one path, for a --verbose line. |
 | `report_runnable` <sub>fn</sub> | [1083](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1083) | Whether the operating system will run the programs that are there. |
 | `report_presence_only` <sub>fn</sub> | [1107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1107) | The old report, for a release that published no contents list. |
-| `report_gnupg` <sub>fn</sub> | [1150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1150) | Marker 97. |
-| `command_gnupg` <sub>fn</sub> | [1235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1235) | Marker 91. |
+| `report_gnupg` <sub>fn</sub> | [1150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1150) | Roadmap item 97. |
+| `command_gnupg` <sub>fn</sub> | [1235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1235) | Roadmap item 91. |
 | `command_deps` <sub>fn</sub> | [1280](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1280) | What this machine needs before it can build VeilVoice. |
 | `command_build` <sub>fn</sub> | [1352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1352) | Build the workspace from source and hash what came out. |
 | `do_build` <sub>fn</sub> | [1370](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1370) | Everything both build commands do before they differ. |

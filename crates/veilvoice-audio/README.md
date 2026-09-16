@@ -115,7 +115,7 @@ flowchart TD
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 212 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
-| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 614 | Marker 147. |
+| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 614 | Roadmap item 147. |
 
 **2,049 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

@@ -129,11 +129,11 @@ flowchart TD
 | `every_test_that_reads_source_normalises_its_line_endings` <sub>fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L285) | F-72. |
 | `searching_for_a_brace_on_its_own_line_fails_against_crlf` <sub>fn</sub> | [317](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L317) | The failure mode itself, so it is on record as reachable rather than theoretical. |
 | `the_repository_pins_its_line_endings` <sub>fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L336) | .gitattributes exists and pins text to LF. |
-| `the_contents_list_is_verified_before_it_is_parsed` <sub>fn</sub> | [369](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L369) | Marker 97. |
+| `the_contents_list_is_verified_before_it_is_parsed` <sub>fn</sub> | [369](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L369) | Roadmap item 97. |
 | `a_release_without_a_contents_list_is_not_a_failure` <sub>fn</sub> | [392](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L392) | A release that published no contents list is still checkable. |
 | `a_contents_list_with_nothing_to_check_it_against_is_unusable` <sub>fn</sub> | [406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L406) | A contents list with no signed hash list beside it cannot be used, and "cannot be used" is reported rather than quietly skipped. |
 | `matches_name` <sub>fn</sub> | [421](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L421) | A name for a Manifest, for a failing assertion to print. |
-| `a_gnupg_that_cannot_run_is_never_counted_against_the_release` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L436) | Marker 97. |
+| `a_gnupg_that_cannot_run_is_never_counted_against_the_release` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L436) | Roadmap item 97. |
 | `a_named_directory_that_is_not_there_is_refused_before_anything_is_searched` <sub>fn</sub> | [472](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L472) | F-108. |
 | `no_interface_string_has_a_gap_where_a_line_continuation_belongs` <sub>fn</sub> | [522](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L522) | No interface string carries a run of spaces left behind by its own source indentation. |
 | `every_command_line_drawing_is_shown_in_the_readme` <sub>fn</sub> | [636](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L636) | Nothing a reader is meant to type still names a veilvoice-verify program. |
@@ -142,5 +142,5 @@ flowchart TD
 | `no_page_tells_a_reader_to_run_a_program_that_no_longer_exists` <sub>fn</sub> | [789](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L789) |  |
 | `no_desktop_test_opens_a_device_a_dialog_or_a_window` <sub>fn</sub> | [929](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L929) | No test in the desktop crate may open a device, a dialog or a window. |
 | `only_the_session_builds_a_recorder` <sub>fn</sub> | [1053](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1053) | F-166. |
-| `the_desktop_starts_a_live_session_in_exactly_one_place` <sub>fn</sub> | [1127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1127) | Marker 130. |
-| `no_audio_callback_allocates_or_blocks` <sub>fn</sub> | [1235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1235) | Marker 126. |
+| `the_desktop_starts_a_live_session_in_exactly_one_place` <sub>fn</sub> | [1127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1127) | Roadmap item 130. |
+| `no_audio_callback_allocates_or_blocks` <sub>fn</sub> | [1235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1235) | Roadmap item 126. |

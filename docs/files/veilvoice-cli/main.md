@@ -233,7 +233,7 @@ flowchart TD
 | `explain_verification` <sub>fn</sub> | [1243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1243) | What checking a release actually involves, and who does which part. |
 | `main` <sub>fn</sub> | [1320](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1320) |  |
 | `run` <sub>fn</sub> | [1357](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1357) |  |
-| `run_ffmpeg` <sub>fn</sub> | [1925](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1925) | Markers 87 and 88. |
+| `run_ffmpeg` <sub>fn</sub> | [1925](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1925) | Roadmap items 87 and 88. |
 | `list_volumes` <sub>fn</sub> | [2000](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2000) | Report the encrypted volumes this machine is offering. |
 | `list_companions` <sub>fn</sub> | [2048](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2048) | Report every companion that means anything on this platform. |
 | `offer_line` <sub>fn</sub> | [2081](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2081) | One line describing what VeilVoice can do about a missing companion. |

@@ -159,7 +159,7 @@ impl Default for Settings {
 
 /// What a render has done so far, readable while it is still running.
 ///
-/// **Marker 133.** The row asked for two bars per speaker, what went in and
+/// **Roadmap item 133.** The row asked for two bars per speaker, what went in and
 /// what came out, so the difference is visible rather than asserted. It asked
 /// for them *live*, in group mode, and neither word survived reading the code:
 /// group mode works on a recording that already exists and never opens a
@@ -278,7 +278,7 @@ impl Progress {
 /// The loudest sample in a span, as a peak in `[0, 1]`.
 ///
 /// One pass over a slice the engine has just walked twice, so it is in cache
-/// and costs nothing measurable next to an FFT. Marker 126 asks for work that
+/// and costs nothing measurable next to an FFT. Roadmap item 126 asks for work that
 /// can be done once to be done once; this is new work rather than repeated
 /// work, and it is the feature.
 fn peak(samples: &[f32]) -> f32 {
@@ -334,7 +334,7 @@ pub fn render(
 
 /// [`render`], with somewhere to report what it is doing as it does it.
 ///
-/// **Marker 133.** `progress` is written to from every speaker's thread as
+/// **Roadmap item 133.** `progress` is written to from every speaker's thread as
 /// each turn finishes, and may be read from another thread at the same time:
 /// see [`Progress`]. Pass one made by [`Progress::for_speakers`] with as many
 /// slots as the plan has, or a default one to be told nothing.
@@ -424,7 +424,7 @@ pub fn render_watched(
                     // would give them a different voice at each end of the
                     // recording.
                     let veiled = process_span(&mut engine, &input[*start..*end]);
-                    // **Marker 133.** What went in and what came out, measured
+                    // **Roadmap item 133.** What went in and what came out, measured
                     // before the ends are faded: the fade is this module's
                     // splice repair rather than anything the engine did, and a
                     // bar showing the engine's output should show the engine's
@@ -850,7 +850,7 @@ mod tests {
         assert_ne!(a.samples, b.samples);
     }
 
-    /// **Marker 133.** A watched render reports what it is doing per speaker.
+    /// **Roadmap item 133.** A watched render reports what it is doing per speaker.
     ///
     /// Checked after it has finished rather than while it runs, which is a
     /// choice about what can be asserted: a test that read the bars mid-render

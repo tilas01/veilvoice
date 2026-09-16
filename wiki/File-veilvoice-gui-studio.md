@@ -8,7 +8,7 @@
 ## Contents
 
 - [Two tabs, one vault](#two-tabs-one-vault)
-- [Marker 130: this is also where veiling as it runs happens](#marker-130-this-is-also-where-veiling-as-it-runs-happens)
+- [Roadmap item 130: this is also where veiling as it runs happens](#roadmap-item-130-this-is-also-where-veiling-as-it-runs-happens)
 - [The vault needs both passphrases, and asks for both here](#the-vault-needs-both-passphrases-and-asks-for-both-here)
 - [What is recorded is what comes out, unless it was asked to be otherwise](#what-is-recorded-is-what-comes-out-unless-it-was-asked-to-be-otherwise)
 - [In plain words](#in-plain-words)
@@ -23,7 +23,7 @@ The Studio records; the Browser is what is in the vault afterwards. They are
 one module because they are one vault, and a vault opened in two places is
 two chances to get the unlocking wrong.
 
-# Marker 130: this is also where veiling as it runs happens
+# Roadmap item 130: this is also where veiling as it runs happens
 
 Live scramble was a tab of its own, and it did not need to be. The Studio
 has always recorded through the same `veilvoice_audio::LiveSession` that
@@ -78,7 +78,7 @@ which is the same path the command line uses, so the samples that reach the
 recorder are the **veiled** ones. That is the default and it is what
 `Keep::Veiled` means.
 
-**Marker 131** adds the other two. The microphone can be kept as well, or
+**Roadmap item 131** adds the other two. The microphone can be kept as well, or
 instead, and the reasoning for allowing it at all is on `Keep`: refusing
 would not stop somebody who needs the real recording, it would move them to
 a phone on the table, which is a plaintext file on a device with none of
@@ -143,7 +143,7 @@ anybody who can open the cupboard can then hear who was talking.
   - reaches: `catch_a_fault`, `is_recording`, `stop_veiling`, `finish_take`, `counted_interruptions`, `store_take`, `take_name`, `length`
 - `Studio::start_veiling` (line 712) -- Start veiling, keeping nothing.
   - reaches: `start_session`, `sharing_a_microphone`
-- `Studio::start_room` (line 733) -- Marker 147.
+- `Studio::start_room` (line 733) -- Roadmap item 147.
   - reaches: `start_session`, `sharing_a_microphone`
 - `Studio::close` (line 762) -- Shut the vault and forget the key.
   - reaches: `stop_veiling`, `finish_take`, `is_recording`, `counted_interruptions`, `store_take`, `take_name`, `length`
@@ -276,10 +276,10 @@ flowchart TD
 | `Studio::intruders` <sub>pub fn</sub> | [539](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L539) | The programs that took the microphone while this take has been running. |
 | `Studio::note_microphone_holders` <sub>pub fn</sub> | [554](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L554) | Record which programs are holding the microphone right now. |
 | `Studio::tick` <sub>pub fn</sub> | [571](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L571) | Read the session's counters, once a frame, and move the levels on. |
-| `Studio::catch_a_fault` <sub>fn</sub> | [663](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L663) | Marker 145. |
+| `Studio::catch_a_fault` <sub>fn</sub> | [663](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L663) | Roadmap item 145. |
 | `Studio::phase` <sub>fn</sub> | [699](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L699) | What phase the take half of the tab is in. |
 | `Studio::start_veiling` <sub>pub fn</sub> | [712](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L712) | Start veiling, keeping nothing. |
-| `Studio::start_room` <sub>pub fn</sub> | [733](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L733) | Marker 147. |
+| `Studio::start_room` <sub>pub fn</sub> | [733](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L733) | Roadmap item 147. |
 | `Studio::stop_veiling` <sub>pub fn</sub> | [744](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L744) | Stop the audio. |
 | `Studio::close` <sub>pub fn</sub> | [762](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L762) | Shut the vault and forget the key. |
 | `Studio::unlock` <sub>fn</sub> | [791](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L791) | Derive the key from both entries and open the vault. |

@@ -2,14 +2,15 @@
 
 # VeilVoice: roadmap
 
-**What is built, what is coming, and roughly when.** One marker is one feature:
-written, tested, documented and merged. A marker is not ticked because the code
-compiles. It is ticked when the thing works, has tests, has documentation, and
-survives the checks in CI.
+**What is built, what is coming, and roughly when.** One roadmap item is one
+feature: written, tested, documented and merged. A roadmap item is not ticked
+because the code compiles. It is ticked when the thing works, has tests, has
+documentation, and survives the checks in CI.
 
-Estimates are in working days and they are estimates. Where a marker depends on
-something outside this project, such as a platform's rules or a decision that
-has not been taken, that is written down rather than absorbed into a number.
+Estimates are in working days and they are estimates. Where a roadmap item
+depends on something outside this project, such as a platform's rules or a
+decision that has not been taken, that is written down rather than absorbed
+into a number.
 
 **Where we are now:** **v0.1.21 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
@@ -61,7 +62,7 @@ opens at a size you can read.
 **Every item on this page is linkable on its own.** The
 [roadmap page](https://tilas01.github.io/veilvoice/roadmap.html) gives each one
 an anchor: item 98 is at `roadmap.html#m98`, and each heading below has one
-too, so a single marker can be sent to somebody without sending the whole
+too, so a single roadmap item can be sent to somebody without sending the whole
 list.
 
 ---
@@ -79,7 +80,7 @@ list.
 
 ## Shipped
 
-| # | Marker | Status |
+| # | Item | Status |
 |---:|---|---|
 | 1 | DSP engine: phase discard, many-to-one normalisation, CSPRNG modulation | **done** |
 | 2 | Accent neutralisation, on by default | **done** |
@@ -101,7 +102,7 @@ list.
 
 ## In progress
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 18 | Documentation generator: a page, flowchart and banner for every crate and **every** `.rs` file, mirrored to the website and the GitHub wiki | **done** | - |
 | 20 | Repository panel no longer shows a README's own markup as text | **done** | - |
@@ -123,7 +124,7 @@ Each of these is a crate of its own, so that another project can depend on one
 without taking all of them. Every one is **opt-in**, and every one states what
 it cannot do as plainly as what it can.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 33 | Screen-capture detection: which recorders are running, muted per program by an allowlist | **done** | - |
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | - |
@@ -142,7 +143,7 @@ Asked for after v0.1.12. One recording, several speakers, each given a
 different voice and each voiceprint destroyed just as thoroughly; names and
 subtitles; and an optional video of the result.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 46 | **Conversation mode**: tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **done** | - |
 | 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **done** | - |
@@ -166,7 +167,7 @@ it set your machine up so you can find out.
 The program is renamed `veilvoice-setup-tools`, because checking a signature is
 then the smallest thing it does.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 55 | **Build the whole repository from source**, from the tool itself: find or install a toolchain, pin it to `rust-toolchain.toml`, and run the same build the release does | **done** | - |
 | 56 | **Reproducibility check**: build here, hash what came out, and compare it against the published `SHA256SUMS` entry for this platform, saying which files matched and which did not | **done** | - |
@@ -177,11 +178,11 @@ then the smallest thing it does.
 
 ## Group mode, where you can see it
 
-The engine has handled several speakers since marker 46. The desktop app has
-never shown it. These are about making the thing visible and usable rather than
-about the signal, which is already done.
+The engine has handled several speakers since roadmap item 46. The desktop app
+has never shown it. These are about making the thing visible and usable rather
+than about the signal, which is already done.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | - |
 | 62 | **A name and a colour per speaker in the app**: the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | - |
@@ -193,7 +194,7 @@ Asked for after v0.1.14. Everything here is about the same problem from two
 sides: somebody deciding whether to trust this, and somebody using it and not
 being sure it is working. Neither is answered by more features.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 66 | **The live monitor**: what is going in and what is coming out, on every tab, on by default, and a preview that lets you hear yourself veiled before anybody else does | **done** | - |
 | 67 | **An interactive demonstration on the website**: the inside of the application and of the command line, laid out in the site's own colours, that a reader can click through before downloading anything | **done** | - |
@@ -211,7 +212,7 @@ different sides: the app lock is the weakest control this project ships, it is
 described as such in several places, and the request is to make it as strong as
 it can honestly be made rather than to keep apologising for it.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 74 | **The lock screen tells an attacker nothing**: no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **done** | - |
 | 75 | **`veilvoice-guard` inside the desktop application**: the integrity record taken at the first launch and checked at every one after, sealed under the app-lock passphrase where there is one | **done** | - |
@@ -222,7 +223,7 @@ it can honestly be made rather than to keep apologising for it.
 
 ## Finally
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 44 | Fifth audit round: every vulnerability class across the tree, twelve findings written up individually (F-48 to F-59) | **done** | - |
 | 45 | **v0.1.10 released**: ten platforms, signed, and verified by hand after publication | **done** | - |
@@ -232,7 +233,7 @@ it can honestly be made rather than to keep apologising for it.
 
 ## Encrypted volumes: Cryptomator, VeraCrypt, and the disk underneath
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 81 | **Find the encrypted volumes this machine already has**: detect an installed Cryptomator or VeraCrypt, and the vaults and mounted volumes each is offering, without asking either to do anything | **done** | - |
 | 82 | **Write veiled output into a chosen volume**: a destination that is a Cryptomator vault or a mounted VeraCrypt volume, remembered, and used for every export | **done** | - |
@@ -245,7 +246,7 @@ it can honestly be made rather than to keep apologising for it.
 
 ## Asked for after the encrypted volumes
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 87 | **A video of a veiled recording**: a black frame and the audio, so a recording can be posted where only video is accepted | **done** | - |
 | 88 | **Import from every format OBS writes**: bring in a recording made elsewhere, video or audio, and take the sound out of it | **done** | - |
@@ -264,23 +265,23 @@ it can honestly be made rather than to keep apologising for it.
 ## The window, and the things that were marked done and were not
 
 Two rows above were marked **done** before they were, and this section exists
-partly to say so. Marker 79 declared a window that does not stutter, twice: once
-when the drawing thread was cleared, and again when a repaint timer was removed
-and the improvement measured. Both changes were real and neither reached the
-cause, which was the animated logo asking for another frame thirty times a
-second whether or not anybody could see it. Marker 95 declared one version per
-release enforced, and the enforcement covered the package definitions and not
-the twelve other places, the README's install block among them, that repeat the
-version by hand.
+partly to say so. Roadmap item 79 declared a window that does not stutter,
+twice: once when the drawing thread was cleared, and again when a repaint timer
+was removed and the improvement measured. Both changes were real and neither
+reached the cause, which was the animated logo asking for another frame thirty
+times a second whether or not anybody could see it. Roadmap item 95 declared
+one version per release enforced, and the enforcement covered the package
+definitions and not the twelve other places, the README's install block among
+them, that repeat the version by hand.
 
 Neither is being un-marked. What was done was done. The correction is that a
-marker means the work described happened, not that the symptom is gone, and
-this list is more useful if the difference is visible.
+roadmap item means the work described happened, not that the symptom is gone,
+and this list is more useful if the difference is visible.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 98 | **A window that is genuinely idle**: the cause of the frames found by asking the toolkit rather than by reasoning, the animation stopped when the window is unfocused or being dragged, and the result measured to nothing | **done** | - |
-| 99 | **The window toolkit brought forward**: `eframe` and `egui` from 0.29 to 0.32, which is what made the frames answerable, and the runtime dependency it added declared everywhere a package can declare it. Brought forward again to 0.36 with marker 148, which took `ttf-parser` out of the dependency graph and one advisory out of the exception list with it | **done** | - |
+| 99 | **The window toolkit brought forward**: `eframe` and `egui` from 0.29 to 0.32, which is what made the frames answerable, and the runtime dependency it added declared everywhere a package can declare it. Brought forward again to 0.36 with roadmap item 148, which took `ttf-parser` out of the dependency graph and one advisory out of the exception list with it | **done** | - |
 | 100 | **What drew the window, reported**: the graphics choices named in the source with their reasoning, and the driver actually obtained shown on the About tab, read from the driver | **done** | - |
 | 101 | **Crash reports about the failure they are about**: the closing note chosen from the panic rather than the same guess every time, and a missing system library named along with the package that carries it | **done** | - |
 | 102 | **One version, in one file**: every other copy derived from `Cargo.toml` or checked against it, with the files that keep a history added to rather than rewritten | **done** | - |
@@ -294,7 +295,7 @@ Everything here came from one message and they belong together: somebody
 arriving at this project for the first time, deciding whether to trust it,
 installing it, and finding their way around it without reading a manual.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 104 | **A demonstration that is the program**: five recorded sessions of the real binaries replayed on the website, re-run and compared on every build, sitting with the screenshots | **done** | - |
 | 105 | **A crash report offered rather than buried**: the report already written to disk surfaced above whatever tab you land on, with what it contains listed and readable in full before anything leaves your machine, and the filing left to the person | **done** | - |
@@ -335,10 +336,10 @@ kernel drivers. That will be answered before anything is promised.
 ## Asked for after v0.1.18
 
 The app lock already turns the app-lock passphrase into a key that seals
-everything VeilVoice writes (marker 86). This asks for the same protection one
-layer in: the secrets and the veiling state while they are in memory, so that a
-program which can read another process's RAM, a rootkit or a debugger, reads
-ciphertext rather than a passphrase or a voiceprint.
+everything VeilVoice writes (roadmap item 86). This asks for the same
+protection one layer in: the secrets and the veiling state while they are in
+memory, so that a program which can read another process's RAM, a rootkit or a
+debugger, reads ciphertext rather than a passphrase or a voiceprint.
 
 The honest limit is stated with the feature rather than after it. Data the CPU
 is actively working on has to be plaintext for the instant it is used, and an
@@ -346,16 +347,16 @@ attacker already running as the kernel can wait for that instant. This raises
 the cost of an external read and narrows the window to nearly nothing; it does
 not claim to beat an adversary who already owns the machine.
 
-| # | Marker | Status | Estimate |
+| # | Item | Status | Estimate |
 |---:|---|---|---|
 | 113 | **Memory that reads as ciphertext from outside the process**: the app-lock key holds the secrets and the veiling state encrypted in RAM with the same post-quantum sealing used at rest, each value decrypted only for the moment it is used and re-sealed straight after, so a scan of the process's memory finds no passphrase and no voiceprint | **planned** | 20 |
 | 114 | **A layout no two copies share**: the in-memory shape of that protected state varied per build and per run, so a scanner tuned to one copy of VeilVoice does not recognise the next, and no fixed offset survives from one binary to another. No junk and no decoy RAM: the footprint is unchanged, the protection is in the arrangement rather than in bulk | **planned** | 10 |
 | 115 | **Tamper noticed, and the source named**: an attempt to read or write VeilVoice's memory from another process detected where each operating system allows it, the app locked and the person told, and the reaching process identified as far as the platform permits, on Windows, macOS, Linux and the BSDs. Where a platform cannot say, it says that rather than guessing | **planned** | 20 |
 | 116 | **One author in the history, and every commit verified**: the commit history rewritten so the whole of it matches the attribution rule this project already states, with the assistance credit staying exactly where a reader looks for it (the README, and the footer of every page) rather than in a trailer that makes a second contributor of it, and every commit in the history signed rather than only the recent ones. Trees are unchanged by this, so reproducible builds still verify | **done** | - |
 | 117 | **A demonstration you navigate rather than watch**: the website's demo driven by the reader, a header per part of the program, and the screenshots for whichever they pick shown under it. Not an imitation of the interface: the real captures, the ones the build already regenerates and compares, so the demo cannot drift from the program. The command line gets the same treatment, a worked case per thing somebody actually wants to do, explained rather than listed, and the site's own Demo link lands on the section and opens it | **done** | - |
-| 118 | **Told when anything touches VeilVoice at all**: every attempt to open, read, write or attach to one of VeilVoice's processes surfaced to the person, not only the ones that succeed, with what reached in named as far as the platform will say. Built on markers 113 to 115 rather than beside them: the memory is already sealed, this is the part that says somebody tried | **planned** | 15 |
+| 118 | **Told when anything touches VeilVoice at all**: every attempt to open, read, write or attach to one of VeilVoice's processes surfaced to the person, not only the ones that succeed, with what reached in named as far as the platform will say. Built on roadmap items 113 to 115 rather than beside them: the memory is already sealed, this is the part that says somebody tried | **planned** | 15 |
 | 119 | **A verdict, and then a choice**: something reaching into VeilVoice is reported with what it did and what VeilVoice can prove about it, and the person decides: remove it, quarantine it, or mark it a false positive that is remembered. The decision is the person's, always, because a program that silently uninstalls another program on a heuristic is a worse problem than the one it set out to solve | **planned** | 12 |
-| 120 | **The allowlist that cannot be worn as a disguise**: a signed antivirus reading VeilVoice's memory is what antivirus does, and flagging Defender as a rootkit would train somebody to ignore the warnings. So known-good is recognised by a verified code signature checked at the moment of the access, never by a process name, a path or a hash somebody can copy. An allowlist entry permits the read and still records it, still shows it in the log, and never widens to the file storage or the app lock: nothing on it can turn into a way through the protection markers 113 to 115 provide. Stated limit, as everywhere: an attacker who already holds the kernel can forge what the kernel is asked, and this says so rather than promising otherwise | **planned** | 18 |
+| 120 | **The allowlist that cannot be worn as a disguise**: a signed antivirus reading VeilVoice's memory is what antivirus does, and flagging Defender as a rootkit would train somebody to ignore the warnings. So known-good is recognised by a verified code signature checked at the moment of the access, never by a process name, a path or a hash somebody can copy. An allowlist entry permits the read and still records it, still shows it in the log, and never widens to the file storage or the app lock: nothing on it can turn into a way through the protection roadmap items 113 to 115 provide. Stated limit, as everywhere: an attacker who already holds the kernel can forge what the kernel is asked, and this says so rather than promising otherwise | **planned** | 18 |
 | 121 | **A studio vault that needs both keys**: every recording the studio makes, and every preview it holds, sealed into one vault whose key exists only when the app lock *and* the at-rest passphrase have both been given. Neither alone derives it, so a stolen laptop with the app unlocked opens nothing and a known recording passphrase without the app opens nothing. The same post-quantum sealing used everywhere else, held in the same page-locked, zeroizing memory, with the same honest report of how much the operating system actually agreed to lock | **done** | - |
 | 122 | **Recording Studio**: the place recording happens, with the vault already open because both locks were answered on the way in. Capture, monitor, preview and re-take without a plaintext file existing at any point, and a session that locks itself back up when the app does rather than staying open behind a screensaver | **done** | - |
 | 123 | **Recording Browser**: everything in the vault, listed with what it is and when it was made, played back by decrypting into page-locked memory rather than writing a temporary file somebody would have to remember to shred, whole rather than in blocks because the container is sealed and authenticated as one piece. Export is a deliberate act with its own warning, because leaving the vault is the moment the protection ends | **done** | - |
@@ -367,7 +368,7 @@ not claim to beat an adversary who already owns the machine.
 | 130 | **The live scramble moved into the Studio**: veiling as it runs has stopped being a separate tab and is what the Studio does. It was already the same engine, the same ratchet and the same virtual-cable routing on both screens, which is what made two of them wrong rather than merely redundant: the Studio recorded with whichever devices the other tab happened to be set to, and each tab started a session of its own, so veiling on one and recording on the other opened the same microphone twice. There is one starter now. The tab is the voice above and the take below, the voice half works with the vault shut because veiling a call has never needed a vault, and ending a take leaves the veiling running | **done** | - |
 | 131 | **Both sides of the glass, kept or discarded**: the Studio asks which of the two to keep before the button rather than after it, because a recording of somebody's real voice is not a thing to discover having made. The veiled voice is selected, both is offered, and the microphone on its own is offered last. Anything that keeps the microphone says so in the same words the plaintext path uses: it is sealed in the vault as strongly as anything else, and it is still a recording anybody who opens the vault can hear who was speaking in. Never remembered between runs and reset when the window locks, for the reason group mode is not remembered. Both kept means two takes, the unveiled one named for it. The command line's `record` keeps the veiled voice only and is unchanged: this is a Studio decision, made where the vault that receives it is | **done** | - |
 | 132 | **Audio that says when it was interfered with**: a device swapped or unplugged mid-session, and another program taking the microphone while a take is running, are noticed and shown rather than recorded silently. This row used to open by asking for the samples reaching the recorder to be *checked* against what the engine produced. They cannot differ: the recorder is fed from inside the output callback, from the same slice the engine has just written into, so that check is a buffer compared with itself. It is a property to keep rather than one to measure, and a test reads the source for it. What was actually missing was the report: the platform announces a stream error on a callback of its own, and both of them were `eprintln!` and nothing else, so on Windows, where the window has no console, a microphone unplugged mid-call was silent. Stated limit up front, beside the report rather than after it: this notices interference with VeilVoice's own path and cannot vouch for a microphone that was already lying | **done** | - |
-| 133 | **Every guest, veiled and plain, side by side**: two bars per speaker in group mode, what went into each of their turns and what the engine produced from it, drawn as the render walks the file. One bar answers "is something being written" and not "is this person being veiled", which is the question somebody rendering an interview is asking; two that move differently are the only thing on screen showing the engine is between them. Under them, in the same words the live meters use, what they cannot show. The row asked for this **live**, and that half is marker 147: group mode works on a recording that already exists and never opens a device, the live path opens one input, and there is no per-guest live signal in this tree to draw. The one-microphone live case already has its two bars, in the Studio | **done** | - |
+| 133 | **Every guest, veiled and plain, side by side**: two bars per speaker in group mode, what went into each of their turns and what the engine produced from it, drawn as the render walks the file. One bar answers "is something being written" and not "is this person being veiled", which is the question somebody rendering an interview is asking; two that move differently are the only thing on screen showing the engine is between them. Under them, in the same words the live meters use, what they cannot show. The row asked for this **live**, and that half is roadmap item 147: group mode works on a recording that already exists and never opens a device, the live path opens one input, and there is no per-guest live signal in this tree to draw. The one-microphone live case already has its two bars, in the Studio | **done** | - |
 | 134 | **Decoy vaults, as many as you choose**: the Browser asks whether to make dummy vaults and how many, sizes them from the real one so they are indistinguishable by size, and fills them with encrypted nonsense under keys that are thrown away. Cracked, one yields bytes that will not parse as anything: a decoy is not a vault with weak contents, it is a vault whose contents never existed. Asked there rather than at first run, because a decoy is sized from the real vault and at first run there is not one yet. The real vault is found by trying each directory rather than by name, so a decoy is not told apart by reading the folder either. The count defaults from the free space actually detected rather than from a number picked here, and the honest limit is stated: this raises the cost of a search, it does not make the real vault unfindable to somebody who watches you open it | **done** | - |
 | 135 | **Setup inside the app, with defaults it worked out**: first run ends on a card that reads this machine rather than asserting anything about it. Where recordings will go and how much room is free there, read from the operating system and said as an hour of veiled audio rather than as a number of bytes. How many devices there are to record from and play to. What the window will ask the graphics driver for, with the tick that turns it off. Every one says what it costs, and where the machine will not answer the card says that instead of printing a figure nobody measured. Nothing on it has to be answered and nothing is a gate | **done** | - |
 | 136 | **Portable first, and it tells you where it is**: a folder called `veilvoice-data` beside the program makes the settings, the vaults and the lock live in it, so a copy on a stick stays a copy on a stick. Opted into rather than detected, because "beside the program if that is writable" would move an ordinary installation's state the day somebody unpacked it somewhere writable, and the symptom would be an empty vault. The About tab prints the exact paths it is using and says which of the two arrangements is in force, rather than leaving somebody to guess. Installing later can carry those settings over or leave them, and that is a question the install button waits for rather than a default, because the answer differs for a shared machine and a private one. Carried means copied, never moved, and nothing already at the destination is replaced | **done** | - |
@@ -375,12 +376,12 @@ not claim to beat an adversary who already owns the machine.
 | 139 | **A video of who said what, from the Studio**: **done.** The preview page and the video file are now two drawings of one recording rather than a picture and a black rectangle. A circle per speaker in their own colour, whoever is talking lit, a level under each name that moves with the sound, the waveform and a playhead. **The frames are drawn here**, as pixels: `raster` is a canvas with rectangles, antialiased circles and a PNG writer, and `font` is a five-by-seven monospace face of ninety-five glyphs written out in the file. Neither borrows anything, because the drawing is SVG and no ffmpeg can be assumed to read SVG, and pulling in a rasteriser to convert it would have undone the argument the ffmpeg module already makes about large C libraries. The one dependency is `miniz_oxide` for the deflate PNG needs, which was already in this tree under `flate2`. **A picture is written when the picture changes**, not thirty times a second: the playhead moves a pixel at a time rather than a frame at a time, so ten minutes at thirty writes hundreds of files rather than eighteen thousand, and the saving is reported rather than claimed. A short recording holds nothing and should not, because the playhead crosses the whole waveform however long the recording is. That is why the ffmpeg command is a concat list with a duration per picture rather than a numbered sequence, which would have played an hour of conversation in a few seconds. Names outside printable ASCII cannot be drawn by a face this size and come out as boxes; the render **names them** rather than letting somebody find out by watching. Single-person recordings take the same path as a group of eight | **done** | 6 |
 | 140 | **Resolutions somebody would actually pick**: 1080p as the default, with 1440p, 2160p and a custom size offered, rather than the 1280x720 the renderer starts at today. The size the display is actually running at is offered as a preset where the platform will say, and where it will not the list is simply the fixed ones: a guess about somebody's monitor is worse than a menu | **done** | - |
 | 141 | **How much code this actually is, counted one way and said once**: a functional line count in the README, and the same count per crate in each crate's own documentation, with the definition stated where it is used: a line holding code, not a blank line and not a comment. Deliberately a **new** number rather than a redefinition of an existing one. The per-file line counts already printed on the generated pages, in the artwork and in the reference links are a different measure, counted differently, and are left exactly as they are: changing what an existing number means, everywhere it appears, to match a new definition would silently alter every page and link that carries one | **done** | - |
-| 138 | **v0.1.19, the audited release**: the full audit of marker 127 run over the whole repository, everything it finds fixed, and the tag cut on what came out. Not the code alone: the documentation, the website, the packaging, the scripts and the reproducibility, and the optimisation pass, because a release audited in part is a release described inaccurately. The Studio is deliberately **not** in it. A release named after a feature that is still being written is the thing this roadmap exists to prevent, so 0.1.19 is the release that says the tree is sound and 0.1.20 is the one that says what was built on it | **done** | - |
+| 138 | **v0.1.19, the audited release**: the full audit of roadmap item 127 run over the whole repository, everything it finds fixed, and the tag cut on what came out. Not the code alone: the documentation, the website, the packaging, the scripts and the reproducibility, and the optimisation pass, because a release audited in part is a release described inaccurately. The Studio is deliberately **not** in it. A release named after a feature that is still being written is the thing this roadmap exists to prevent, so 0.1.19 is the release that says the tree is sound and 0.1.20 is the one that says what was built on it | **done** | - |
 | 127 | **The full final audit, and what counts as complete**: no part of this repository is signed off until every part of it has been. Security, memory safety and the post-quantum surface; correctness and QA over every crate; reproducibility of the build and of every generated artefact; the documentation, the website, the packaging and the scripts; **and the optimisation pass above**, because bloat that nobody measured is a claim nobody checked. A round that covers the code and skips the documentation, or covers both and skips whether the thing still builds byte for byte, is not a final audit and is not to be described as one | **done** | - |
 | 142 | **The demonstration on the page, and the drawing of it gone**: the recorded terminal sessions and the photographs of the window both on the front page in the order somebody meets them, neither behind a button. The hand-drawn CSS model of the application is removed rather than relabelled: it sat beside photographs of the same interface and asked a reader to work out which to believe, on a site whose argument is that they should not have to take anybody's word for anything | **done** | - |
 | 143 | **`veilvoice verify`, said that way everywhere**: nine places still described a `veilvoice-verify` executable that stopped being published at 0.1.18, three of them lists the program itself reads. The lists are now taken from the job that publishes the binaries, and a test reads the repository the way a reader does and fails on anything telling somebody to run a program that is not there | **done** | - |
-| 144 | **Staleness as an invariant rather than a habit**: `CLAUDE.md` now states that a change is not finished until everything describing it has changed with it, that a fact appearing twice is derived or checked rather than repeated, and that the only exception is a record of the past. Written down because the two markers above were the same failure found twice, in different files, months apart | **done** | - |
-| 145 | **The Recording Studio, in full**: everything markers 121 to 137 specify, built and working together rather than as parts. Recording in an environment that never lets a plaintext sample reach the disk, sealed post-quantum into a vault that needs both the app lock and the at-rest passphrase, held in page-locked zeroizing memory. It shows, at all times and both live and on replay, whether the voice being recorded is veiled or not: **done**, and the part that was missing was the running take, which said the clock and not which voice it was keeping, so a take of somebody's real voice looked exactly like one that was not for the whole of the recording. It has its own failsafe, separate from the application's, so a fault in the Studio stops the Studio rather than the recording: **done**. The device a take is being recorded from going away is the fault it catches, and it stores what was captured and stops, rather than discarding it, retrying, or moving the recording onto a microphone the person did not choose. Group mode records every guest with the same guarantees: **done**, and it is marker 147, because group mode never opens a device and the live path opened one input. A room in the Studio opens one per guest, veils each into a voice of their own, and stores a take per guest beside the mix, in the same vault, under the same lock and with the same choice of which side to keep. The output is rendered inside the vault, viewed and listened to inside the vault, and leaving it is an export: a deliberate act, warned about, because that is the moment the protection ends. Something like a recording studio somebody already knows how to use, that happens to be secure, rather than a security tool somebody has to learn to record with. No longer carries a version number: it was aimed at v0.1.20, that release shipped with the parts named in their own markers, and a target date a release has already passed is worse than none | **done** | - |
+| 144 | **Staleness as an invariant rather than a habit**: `CLAUDE.md` now states that a change is not finished until everything describing it has changed with it, that a fact appearing twice is derived or checked rather than repeated, and that the only exception is a record of the past. Written down because the two roadmap items above were the same failure found twice, in different files, months apart | **done** | - |
+| 145 | **The Recording Studio, in full**: everything roadmap items 121 to 137 specify, built and working together rather than as parts. Recording in an environment that never lets a plaintext sample reach the disk, sealed post-quantum into a vault that needs both the app lock and the at-rest passphrase, held in page-locked zeroizing memory. It shows, at all times and both live and on replay, whether the voice being recorded is veiled or not: **done**, and the part that was missing was the running take, which said the clock and not which voice it was keeping, so a take of somebody's real voice looked exactly like one that was not for the whole of the recording. It has its own failsafe, separate from the application's, so a fault in the Studio stops the Studio rather than the recording: **done**. The device a take is being recorded from going away is the fault it catches, and it stores what was captured and stops, rather than discarding it, retrying, or moving the recording onto a microphone the person did not choose. Group mode records every guest with the same guarantees: **done**, and it is roadmap item 147, because group mode never opens a device and the live path opened one input. A room in the Studio opens one per guest, veils each into a voice of their own, and stores a take per guest beside the mix, in the same vault, under the same lock and with the same choice of which side to keep. The output is rendered inside the vault, viewed and listened to inside the vault, and leaving it is an export: a deliberate act, warned about, because that is the moment the protection ends. Something like a recording studio somebody already knows how to use, that happens to be secure, rather than a security tool somebody has to learn to record with. No longer carries a version number: it was aimed at v0.1.20, that release shipped with the parts named in their own entries, and a target date a release has already passed is worse than none | **done** | - |
 | 146 | **The Studio release**: 145 with the Browser, the decoys, the setup and the BSD reproducibility, tagged after its own audit round rather than on the strength of an earlier one. An audit covers the tree it was run on and no other. v0.1.20 carried the vault, both tabs, the render settings, the corrections, the player and the BSD double build, and was audited in its own round; the decoys, the machine card, the portable arrangement, the acceleration switch and the choice of which side to keep landed after it. So this describes the release after 0.1.20, and says so rather than keeping a number that has gone | **planned** | 8 |
 | 147 | **Several microphones at once, veiled and metered each**: one input per guest, each veiled by its own engine with its own seed and destination voice, mixed into the one output a call or a recorder hears. The capture path is `veilvoice_audio::room`: a recorder per guest and one for the mix, one sample rate agreed across every device before anything opens, a ring per guest so one microphone's clock drifting is that guest's dropped samples rather than everybody's, and the honest account the row asked for as a number rather than a promise, since the output callback runs every engine before it returns and the load is the sum of their realtime factors against the deadline they share. The mix is summed and clipped and **never limited**, because a limiter is a dynamics processor and this program's whole claim is about what changes a voice. The Studio drives it: a guest list with a name and a microphone each, two bars per guest with the load and the clipping count beside them, and a take that stores the mix and every guest separately, veiled or unveiled on the same choice the single microphone has. The Studio holds one session or the other and never both, which is one field rather than two so it cannot be got wrong. Two guests on one microphone is refused by name before anything opens, the default device included, because one microphone carrying two people is one signal and veiling it gives both of them the same voice | **done** | - |
 | 148 | **The window draws at the display's rate, and says so**: the animations ran at twenty frames a second by design, from a constant in the mark and a fifty-millisecond cadence in the busy path, and a reader with a 144 Hz display saw that as judder. The sixteen-millisecond veiling path was worse than it looks: a display at sixty shows a frame every 16.67 ms, so asking for one "within sixteen" misses the frame it wanted and lands on the next, which is thirty asked for as sixty. **Done**, and not by choosing a bigger number: while anything is moving the window asks for the next frame now and vsync spaces it, so it draws once per refresh at whatever the display runs at. That is also what makes the display measurable, since neither `egui` nor `eframe` exposes a refresh rate: frames paced that way are the display's own, and the median of the last thirty-two is a figure one slow frame cannot move, clamped between 30 and 240. Settings offers 30, 60, 90, 120, 144, 165 and 240 for somebody who wants fewer frames on a battery, and a live readout in the header. The About tab carries what it is aiming at, what the display measured, the rate as drawn and how many frames arrived late; a frame more than half again late is late, and two seconds of that says so once, naming what the window is drawing with. Idle still draws nothing. Nothing in the measurement allocates, locks or prints per frame | **done** | - |
@@ -388,23 +389,23 @@ not claim to beat an adversary who already owns the machine.
 | 150 | **The meters above a call**: the live monitor had two places to sit and both were inside the VeilVoice window, which on a call or while streaming is behind the thing being talked into, so the one picture of what a microphone is doing was covered exactly when it mattered. A third choice now: a small window of its own, kept above other windows, off the task bar, draggable and resizable, drawing the same two levels and the same sentence about what a level cannot tell you. Not the default, because a window that puts itself above everything is a thing to ask for. Closing it brings the strip back rather than turning the meters off, since the close button belongs to the window manager and pressing it means "not in my way". Where a platform will not give a second window it falls back to the floating card, which is the same thing inside the window | **done** | - |
 | 151 | **Mutation testing, as a check rather than as an afternoon**: changing the code a line at a time and asking whether any test objects is the only thing this project runs that asks whether an assertion exists for what came back, as opposed to whether an input was explored. Its first run over four cryptographic files found fifteen changes the whole suite accepted, including one that replaced the randomness adapter with a constant. All three parts are in. `mutants.yml` runs the campaign weekly over the eight cryptography files and dispatches before a release, and its verdict is not a number: `tools/mutants/check.py` compares the run against `tools/mutants/survivors.txt`, a committed list where every entry carries the argument for why that mutant cannot be killed, so a new survivor is a diff somebody reads and a survivor that has been killed fails too, because the list would then claim something untrue. The campaign was extended to the app lock, the studio vault, the obfuscated store and the reversible encodings: 674 mutants, 81 survivors, and four rounds of writing tests and re-measuring brought that to fifteen, every one of them argued. And `tools/audit/build_output.py` fails the build on any build output outside the root `target/`, which is F-185, because the fifteen gigabytes the first attempt died on turned out to be written by this project's own tooling on every machine that is not Windows | **done** | - |
 | 152 | **The numbers the README states, written by the tool that measures them**: the functional line count and the test count appear in `README.md`, on the front page and in one row of `docs/AUDIT.md`, and all four are typed by hand and compared against the tree by the website suite. The comparison is right and the typing is the problem: every change to any Rust file moves the line count, so a commit that touches code and does not touch those four places fails a check that has nothing to do with what the commit was for. Four times in one round was the measurement. `tools/measured/generate.py` now writes all ten of them from the numbers it already takes, using the same anchors the suite checks, so the tool that writes a claim and the suite that checks it cannot disagree about where the claim is. The comparison stays exactly as it was: it is the guard, and it no longer doubles as the thing that catches a person on every push | **done** | - |
-| 107 | **VeilVoice on a phone**: an Android package a person installs without developer tools, signed, published beside the desktop archives and verifiable the same way. Marker 52 established that the code compiles for Android; what is missing is the NDK in the release build, a capture path that uses the platform's own audio rather than ALSA, a window that works at a phone's size, and a signing key that does not require a legal identity, all four set out in *VeilVoice on a phone* above along with why iOS is a separate question. It sits last because it is worth more once there is a Studio to put on the phone, and because none of the desktop work is waiting on it | **planned** | 10 |
+| 107 | **VeilVoice on a phone**: an Android package a person installs without developer tools, signed, published beside the desktop archives and verifiable the same way. Roadmap item 52 established that the code compiles for Android; what is missing is the NDK in the release build, a capture path that uses the platform's own audio rather than ALSA, a window that works at a phone's size, and a signing key that does not require a legal identity, all four set out in *VeilVoice on a phone* above along with why iOS is a separate question. It sits last because it is worth more once there is a Studio to put on the phone, and because none of the desktop work is waiting on it | **planned** | 10 |
 
 
 ---
 
 ## The things that are not just work
 
-Some of the markers above depend on something other than effort, and
+Some of the roadmap items above depend on something other than effort, and
 pretending otherwise would make this roadmap a wish list. They are named rather
 than numbered, because a number changes whenever a row above it does -- which is
 exactly what happened when the USB work was dropped from this list.
 
 **Transcription: the decision has now been taken, and it is a narrow one.**
-Marker 43 was blocked because VeilVoice talks to no servers at all and CI fails
-the build if a network client appears anywhere in the dependency graph, one of
-the few claims a reader can check in ten seconds, and a large part of why this
-project is worth trusting.
+Roadmap item 43 was blocked because VeilVoice talks to no servers at all and CI
+fails the build if a network client appears anywhere in the dependency graph,
+one of the few claims a reader can check in ten seconds, and a large part of
+why this project is worth trusting.
 
 The decision is: **transcription may happen, and anything that leaves this
 machine is the veiled audio, never the recording.** That is a smaller trade than
@@ -432,7 +433,7 @@ Not every provider accepts audio input, and that is not a small caveat: an API
 that takes text and images does not take a WAV, whatever else it can do. Which
 providers actually accept audio is a fact about somebody else's service that
 this machine cannot check offline, so it is checked *from a machine that can*
-before a line of it is written, the same rule that turned marker 64 from
+before a line of it is written, the same rule that turned roadmap item 64 from
 planned into blocked, one paragraph down, and saved a feature that would have
 shipped unable to work.
 
@@ -462,12 +463,12 @@ rather than discovered by a user", was kept.
   start a background service that phones home on a timer", and that has to be
   said in those words or not offered.
 
-So marker 64 is **blocked**, on a question rather than on effort: local
+So roadmap item 64 is **blocked**, on a question rather than on effort: local
 speech-to-text means a Whisper-family program such as `whisper.cpp` or
 `faster-whisper`, and speaker diarisation means a third thing again. Which of those to detect,
 and whether starting any of them is acceptable given what was measured above,
-is the maintainer's call. Marker 43 is blocked behind the same question for its
-local half.
+is the maintainer's call. Roadmap item 43 is blocked behind the same question
+for its local half.
 
 The two honest paths that exist today, one microphone per person or a turn
 list, remain, and remain the default. A machine with none of this installed
@@ -485,7 +486,7 @@ kernel-level enforcement is unavailable on those two platforms and why. Linux
 and OpenBSD have no such gate.
 
 **"Builds for every operating system" will mean "builds for the one it is
-running on".** Markers 55 to 58. A build needs that platform's headers and
+running on".** Roadmap items 55 to 58. A build needs that platform's headers and
 linker: `veilvoice-cli` cannot be compiled for Linux from this machine today
 because `alsa-sys` needs ALSA's headers, and a macOS build needs Apple's SDK,
 which Apple's licence does not allow to be redistributed or run elsewhere.
@@ -499,16 +500,16 @@ claim is normally checked, and it is a real answer rather than a pretended one.
 Where a cross-target check *is* possible the tool will offer it and will label
 it as what it is.
 
-**Reproducibility is a property of the release, not of the checker.** Marker 56
-can only report what it finds. If a build here and the published build differ,
-that is a finding to publish, not a bug in the tool to paper over -- and the
-first version will print both hashes and the differing file names rather than a
-verdict, because "not reproducible" has several causes and most of them are
-boring.
+**Reproducibility is a property of the release, not of the checker.** Roadmap
+item 56 can only report what it finds. If a build here and the published build
+differ, that is a finding to publish, not a bug in the tool to paper over --
+and the first version will print both hashes and the differing file names
+rather than a verdict, because "not reproducible" has several causes and most
+of them are boring.
 
-**The one thing marker 55 does not do is install the compiler.** It reports
-the Rust toolchain like any other dependency, found or missing and with the
-version, and points at rustup, which is how the Rust project ships it. It
+**The one thing roadmap item 55 does not do is install the compiler.** It
+reports the Rust toolchain like any other dependency, found or missing and with
+the version, and points at rustup, which is how the Rust project ships it. It
 does not run that installer. rustup downloads a compiler, writes to the home
 directory and edits the shell profile, and all three belong to the person whose
 machine it is rather than to a program acting for them. Every other dependency
@@ -523,18 +524,19 @@ was present; the build would then have failed. There is no honest probe for it,
 because cargo finds MSVC through the registry rather than `PATH`, so it now says
 it cannot tell and lets the build be the judge. Recorded as F-68.
 
-**Markers 48 and 63 are each half-built, and stay open until both halves are.**
-Marker 48's per-speaker seeding is done: every speaker gets its own seed and
-its own destination, so there is nothing shared between them. What is missing
-is the *randomised interval inside a range the user sets*, which is marker 28
-and is still open. Marker 63's levels are done and run in the terminal during
-`veilvoice live`; the wave **per speaker** is not, because it needs per-speaker
-capture, which live mode does not have. Rounding either of these up to done
-would be the overstatement this project's second rule exists to prevent.
+**Roadmap items 48 and 63 are each half-built, and stay open until both halves
+are.** Roadmap item 48's per-speaker seeding is done: every speaker gets its
+own seed and its own destination, so there is nothing shared between them. What
+is missing is the *randomised interval inside a range the user sets*, which is
+roadmap item 28 and is still open. Roadmap item 63's levels are done and run in
+the terminal during `veilvoice live`; the wave **per speaker** is not, because
+it needs per-speaker capture, which live mode does not have. Rounding either of
+these up to done would be the overstatement this project's second rule exists
+to prevent.
 
-**A reproducibility checker that always says no is worse than none.** Marker
-56's first version ran `cargo build --release` and nothing else, so it would
-have reported every user's build as differing from the published one, for
+**A reproducibility checker that always says no is worse than none.** Roadmap
+item 56's first version ran `cargo build --release` and nothing else, so it
+would have reported every user's build as differing from the published one, for
 the dull reason this repository has documented since before the checker
 existed: absolute paths are baked into panic messages and debug info, and
 removing them is the build environment's job. Two builds of this tree in two
@@ -548,22 +550,22 @@ result. A test compares the flags against `release.yml` itself, so changing one
 and not the other fails the build. Recorded as F-70.
 
 **Installing build dependencies means running somebody else's package manager.**
-Marker 58. That is the same trade the companion setup already makes and it gets
-the same rule, which predates this roadmap: detect what is there, say what each
-thing is and who ships it, and install only on an explicit yes -- never
-silently, never ticked by default. What it will not do is add a network client
-to VeilVoice: it shells out to the tool the platform already has, exactly as the
-verifier does for downloads today, so the guarantee that this project's own
-dependency graph contains no HTTP client is unchanged.
+Roadmap item 58. That is the same trade the companion setup already makes and
+it gets the same rule, which predates this roadmap: detect what is there, say
+what each thing is and who ships it, and install only on an explicit yes --
+never silently, never ticked by default. What it will not do is add a network
+client to VeilVoice: it shells out to the tool the platform already has,
+exactly as the verifier does for downloads today, so the guarantee that this
+project's own dependency graph contains no HTTP client is unchanged.
 
 **"Nothing" is a real verbosity level and needs the exit status to carry the
-answer.** Marker 60. A tool that prints nothing and returns zero on failure is
-worse than a noisy one. Every operation gets a distinct non-zero status, and
-they are documented, before the quiet mode exists.
+answer.** Roadmap item 60. A tool that prints nothing and returns zero on
+failure is worse than a noisy one. Every operation gets a distinct non-zero
+status, and they are documented, before the quiet mode exists.
 
-**"Every engine" is a claim only one engine has been asked about.** Marker 53.
-The mobile half is done and was done by measurement: twelve pages at five
-viewport widths, with and without scripts, and eight separate causes of
+**"Every engine" is a claim only one engine has been asked about.** Roadmap
+item 53. The mobile half is done and was done by measurement: twelve pages at
+five viewport widths, with and without scripts, and eight separate causes of
 horizontal scrolling found and fixed -- a grid item's default minimum width, an
 unshrinkable table of code names, a tooltip that pushed the front page sideways
 while closed, two sections missing their gutters, and a note in the header that
@@ -575,8 +577,8 @@ fallbacks written *for* those engines -- `-webkit-backdrop-filter` for Safari 17
 and earlier, a solid colour before every `color-mix`, `:focus-visible` split
 into its own rule -- and `tools/site-tests/css.test.js` checks that each is
 still there. That is reading the specification carefully; it is not the same as
-having looked. The marker stays open until something other than Chromium has
-drawn the page.
+having looked. The roadmap item stays open until something other than Chromium
+has drawn the page.
 
 **A seed cannot roll faster than a frame, and a frame is 5.3 ms.** The
 request was for a rolling interval between 0.7 ms and 2.7 ms. The engine
@@ -603,22 +605,22 @@ machine without it. What will not happen is a silent dependency on a program
 the user did not know they were running.
 
 **Hiding VeilVoice's own window from a screen recorder needs `unsafe`.**
-Marker 34. Excluding a window from capture is `SetWindowDisplayAffinity` on
-Windows, and the equivalents on macOS and under Wayland; all of them are
+Roadmap item 34. Excluding a window from capture is `SetWindowDisplayAffinity`
+on Windows, and the equivalents on macOS and under Wayland; all of them are
 foreign-function calls, and every crate in this workspace carries
 `#![forbid(unsafe_code)]`, which is on the front page and is one of the things
 a reader can check in ten seconds. The trade is the maintainer's: a documented
 `unsafe` shim in one file, or a window that can be recorded. **Until it is
 made, the honest state is written where a user will read it**: VeilVoice does
-not hide itself, `veilvoice capture` says so, and marker 33 shipped without
-pretending otherwise. Nothing about it is hard except the decision.
+not hide itself, `veilvoice capture` says so, and roadmap item 33 shipped
+without pretending otherwise. Nothing about it is hard except the decision.
 
 Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
 the thing VeilVoice protects, the recording, is a file rather than a picture of a
 window.
 
-**Marker 39 ships the administrator version and reports the difference; it
+**Roadmap item 39 ships the administrator version and reports the difference; it
 does not acquire anything.** `veilvoice privilege` says what VeilVoice is
 running with, what that level can and cannot see, and prints the command to run
 it the other way. It never re-launches itself elevated, installs a service, or
@@ -654,23 +656,24 @@ and it invites a reader to think the numbers say something about the people.
 
 **In a live session, who is talking is a different question and an honest one
 to refuse.** One microphone carries one signal, and telling two voices apart
-inside it is diarisation, which is markers 43 and 64 and is blocked for the
-reason recorded there. The path that does work is one microphone per person,
-which is marker 63's other half.
+inside it is diarisation, which is roadmap items 43 and 64 and is blocked for
+the reason recorded there. The path that does work is one microphone per
+person, which is roadmap item 63's other half.
 
-**Marker 63 is split in two, because one half shipped and the other cannot
+**Roadmap item 63 is split in two, because one half shipped and the other cannot
 start.** The maintainer confirmed the live output is what was wanted and that
 showing it is right, so the levels are marked done under their own number and
-the diarisation half is marker 63b, which stays blocked for the reason below.
-Carrying both under one number meant a finished feature reading as blocked.
+the diarisation half is roadmap item 63b, which stays blocked for the reason
+below. Carrying both under one number meant a finished feature reading as
+blocked.
 
 The *levels* are done and have been for some time:
 `veilvoice live` draws them in the terminal and the desktop application draws
 them beside the devices, both with peak-hold. The **wave per speaker** is a
 different thing entirely: it needs the live input separated by who is talking,
-which is diarisation, which is markers 43 and 64 and is blocked for the reason
-recorded there: real speaker separation means shipping a trained model, and
-locked decision 5 says this project does not.
+which is diarisation, which is roadmap items 43 and 64 and is blocked for the
+reason recorded there: real speaker separation means shipping a trained model,
+and locked decision 5 says this project does not.
 
 Leaving it marked *planned* would imply an estimate exists for work that cannot
 start, which is the same overstatement in the other direction. What could be
@@ -678,37 +681,37 @@ built without diarisation, a wave per speaker in a *rendered* conversation
 where the plan already says who speaks when, exists, and is what the video
 output and the HTML player draw.
 
-**Marker 29 moves to blocked, because it is a decision rather than a task.**
-One executable that opens a window when double-clicked and takes subcommands
-when given them needs `AttachConsole` and `FreeConsole` on Windows: a PE
-declares exactly one subsystem, so a console binary that opened a window would
-flash a console every time, and a windowed one would send its output nowhere
-when run from a terminal. Switching at run time is FFI, and every crate here
-carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
-maintainer's call and not something to slip in, so it waits for one.
+**Roadmap item 29 moves to blocked, because it is a decision rather than a
+task.** One executable that opens a window when double-clicked and takes
+subcommands when given them needs `AttachConsole` and `FreeConsole` on Windows:
+a PE declares exactly one subsystem, so a console binary that opened a window
+would flash a console every time, and a windowed one would send its output
+nowhere when run from a terminal. Switching at run time is FFI, and every crate
+here carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is
+the maintainer's call and not something to slip in, so it waits for one.
 
-**Markers 81 to 85 are two encryption tools and one honest sentence about what
-stacking them buys.**
+**Roadmap items 81 to 85 are two encryption tools and one honest sentence about
+what stacking them buys.**
 
 The request is that VeilVoice notice an installed Cryptomator or VeraCrypt,
 offer to put every exported file inside one, support VeraCrypt's hidden
 volumes, guide the user by hand when it cannot manage the integration itself,
 and say plainly that the disk underneath should be encrypted too. Each of those
-is a separate marker because each can be finished, shipped and judged on its
-own, and because the first one being impossible on some platform must not stop
-the last one being written.
+is a separate roadmap item because each can be finished, shipped and judged on
+its own, and because the first one being impossible on some platform must not
+stop the last one being written.
 
-*Detection is reading, never driving.* Marker 81 finds what is installed and
-what is currently mounted, and does nothing else. It does not launch either
+*Detection is reading, never driving.* Roadmap item 81 finds what is installed
+and what is currently mounted, and does nothing else. It does not launch either
 program, does not ask either to mount or unlock anything, and never handles a
-volume passphrase. VeilVoice already refuses to acquire privilege (marker 39)
-and this is the same rule in a new place: mounting somebody's encrypted volume
-is their act, taken in the tool they chose, not something a voice de-identifier
-does on their behalf. A mounted Cryptomator vault and a mounted VeraCrypt
-volume are both just directories by the time VeilVoice sees them, which is
-exactly why this can be honest and small.
+volume passphrase. VeilVoice already refuses to acquire privilege (roadmap item
+39) and this is the same rule in a new place: mounting somebody's encrypted
+volume is their act, taken in the tool they chose, not something a voice
+de-identifier does on their behalf. A mounted Cryptomator vault and a mounted
+VeraCrypt volume are both just directories by the time VeilVoice sees them,
+which is exactly why this can be honest and small.
 
-*Writing into one is a destination, not a mode.* Marker 82 is a remembered
+*Writing into one is a destination, not a mode.* Roadmap item 82 is a remembered
 output directory with a label saying what kind of volume it is. The encryption
 is entirely the other tool's, and calling it "VeilVoice encryption" would be
 the overclaim this project refuses. What VeilVoice adds is that the export
@@ -721,13 +724,13 @@ passphrase and reveal an outer volume. Writing to the outer volume of a
 container that has a hidden one can destroy the hidden data, because the outer
 filesystem does not know the hidden one is there. VeilVoice cannot tell the two
 apart by looking, and no amount of cleverness will change that: it is the
-design of the feature that they are indistinguishable. So marker 83 asks, once,
-before the first write, and stores the answer with the destination. It never
-infers, never defaults to "probably fine", and refuses to write until it has an
-answer. A tool that quietly guessed wrong here would destroy exactly the data
-its user was most careful about.
+design of the feature that they are indistinguishable. So roadmap item 83 asks,
+once, before the first write, and stores the answer with the destination. It
+never infers, never defaults to "probably fine", and refuses to write until it
+has an answer. A tool that quietly guessed wrong here would destroy exactly the
+data its user was most careful about.
 
-*Marker 84 exists because detection will fail.* Portable installs, custom
+*Roadmap item 84 exists because detection will fail.* Portable installs, custom
 paths, a distribution that packages either tool somewhere unexpected, a
 platform neither supports. The answer is not a silent fallback to writing
 somewhere unencrypted: it is instructions, a directory the user picks by hand,
@@ -735,7 +738,7 @@ and a confirmation step that will not continue until they have said which
 volume they mean and what kind it is. The failure mode to avoid is a user who
 believes their exports are in a vault and finds them beside it.
 
-*Marker 85 is a sentence, and it is the most important one in the group.*
+*Roadmap item 85 is a sentence, and it is the most important one in the group.*
 Cryptomator and VeraCrypt protect files at rest inside a container. They do not
 protect the temporary files an operating system writes, the swap or hibernation
 image the kernel writes, the thumbnails a file manager writes, or the recently-
@@ -757,14 +760,15 @@ A veiled recording written into a Cryptomator vault is encrypted twice, by two
 independent tools, and the useful property of that is not extra strength but
 independence: a defect in one is not a defect in both.
 
-**Markers 87, 88, 89 and 93 turned out to be one thing: an interview, start to
-finish, and most of it already existed.**
+**Roadmap items 87, 88, 89 and 93 turned out to be one thing: an interview,
+start to finish, and most of it already existed.**
 
-Marker 89 asked for the interviewee to be veiled in post through the group plan.
-`veilvoice conversation render` has done exactly that for several releases: a
-voice per speaker, every voiceprint destroyed, subtitles and a player beside it.
-Nothing needed building. What was missing was that nobody could find it, which
-is marker 93, and the two are answered by the same page rather than by two.
+Roadmap item 89 asked for the interviewee to be veiled in post through the
+group plan. `veilvoice conversation render` has done exactly that for several
+releases: a voice per speaker, every voiceprint destroyed, subtitles and a
+player beside it. Nothing needed building. What was missing was that nobody
+could find it, which is roadmap item 93, and the two are answered by the same
+page rather than by two.
 
 So `USER_GUIDE.md` section 5.9 is the whole sequence in the order it happens:
 take the sound out of the OBS recording, write a plan, check the plan, render
@@ -772,7 +776,7 @@ it, make a video of it. Each step names the one before it. A person who has
 just finished recording an interview now has a path to follow instead of five
 commands to discover separately.
 
-*Markers 87 and 88 are two ffmpeg commands, and the shape is the one this
+*Roadmap items 87 and 88 are two ffmpeg commands, and the shape is the one this
 project already settled on for video.* VeilVoice ships no codec and no demuxer,
 for the reason `veilvoice-video` has always given, so both prepare the exact
 command and run it when ffmpeg is there, print it when it is not, and never
@@ -790,11 +794,11 @@ tested against what they emit, and no video has been produced here, because
 and reports honestly. Somebody with ffmpeg should run both once before the next
 release.
 
-**Marker 90 puts the GnuPG commands where the question is already being asked.**
-The verify tab is where somebody is working out whether a download is genuine,
-and the honest answer to that question includes "and here is how to ask
-something other than me". The commands are copyable and they are not run: this
-project checks signatures with a key compiled into itself, which is a
+**Roadmap item 90 puts the GnuPG commands where the question is already being
+asked.** The verify tab is where somebody is working out whether a download is
+genuine, and the honest answer to that question includes "and here is how to
+ask something other than me". The commands are copyable and they are not run:
+this project checks signatures with a key compiled into itself, which is a
 convenience with an obvious circularity, and a window that shelled out to `gpg`
 and reported what it said would not have escaped it.
 
@@ -802,8 +806,8 @@ The body of the recipe moved into `veilvoice-check`, which the portable verifier
 and the window already share for the checking itself, so the two cannot drift
 into printing different commands. A test holds that.
 
-**Marker 91 reports the archive and the extracted folder separately, and that
-separation is the whole of the thinking.**
+**Roadmap item 91 reports the archive and the extracted folder separately, and
+that separation is the whole of the thinking.**
 
 `auto` already found the release and checked the archive. What was asked for on
 top is that it check what came out of the archive, and that GnuPG be available
@@ -836,7 +840,8 @@ its own subcommand rather than a footnote under `auto`, because somebody who
 wants the independent answer should not have to be told the answer by this
 binary first.
 
-**Markers 81 to 85 are built, and two things were learned in the building.**
+**Roadmap items 81 to 85 are built, and two things were learned in the
+building.**
 
 The first is that the hidden-volume question is worth more than the feature
 around it. Everything else here is a remembered output directory; that question
@@ -850,18 +855,18 @@ a recording outside a vault while its owner believes it is inside one.
 
 The second was found by writing it. The panel called `still_there`, a stat
 syscall, once per frame, for an answer that changes when somebody unlocks a
-volume. That is precisely what marker 79 taught the draw path to refuse, and it
-went straight into a new module where that guard test does not look. The answer
-is cached at refresh now and a second guard test lives beside the panel.
+volume. That is precisely what roadmap item 79 taught the draw path to refuse,
+and it went straight into a new module where that guard test does not look. The
+answer is cached at refresh now and a second guard test lives beside the panel.
 
-Detection stayed read-only throughout, as marker 39 requires, and a test refuses
-`Command::new` in the shipped half of the module. Verified on this machine end
-to end: a real binary on `PATH` is found, a mount table produces the two
-volumes and none of the ordinary mounts, and a VeraCrypt volume is refused until
-answered.
+Detection stayed read-only throughout, as roadmap item 39 requires, and a test
+refuses `Command::new` in the shipped half of the module. Verified on this
+machine end to end: a real binary on `PATH` is found, a mount table produces
+the two volumes and none of the ordinary mounts, and a VeraCrypt volume is
+refused until answered.
 
-**Marker 86 reverses a decision this project has documented and defended, and
-it is written down that way rather than quietly.**
+**Roadmap item 86 reverses a decision this project has documented and defended,
+and it is written down that way rather than quietly.**
 
 The request is that the app lock stop being only a password check and become a
 key, so that every file VeilVoice veils is encrypted automatically without
@@ -884,7 +889,7 @@ lock *deliberately* does not derive a key that encrypts recordings, and
 single passphrase did both, then opening the application would be the same act
 as unsealing everything it had ever written. Somebody who is compelled to
 unlock VeilVoice in front of another person currently reveals the session; with
-marker 86 they reveal the archive as well.
+roadmap item 86 they reveal the archive as well.
 
 So this is a genuine trade, not a free improvement, and it goes in with three
 things attached or it does not go in:
@@ -909,10 +914,11 @@ not asked for this keeps the previous behaviour exactly, where the passphrase
 is wiped the instant it has been checked. A test holds that, because the lazy
 version of this change is one line and holds the passphrase for everybody.
 
-**Marker 80 is the work a roadmap marker does not describe, and it found a
-defect.** Every marker above being finished is not the same as a tree being
-ready to release, and the difference is the list `docs/AUDIT.md` keeps under
-"Still open": things nobody had run rather than things nobody had written.
+**Roadmap item 80 is the work a roadmap roadmap item does not describe, and it
+found a defect.** Every roadmap item above being finished is not the same as a
+tree being ready to release, and the difference is the list `docs/AUDIT.md`
+keeps under "Still open": things nobody had run rather than things nobody had
+written.
 
 Four of them were runnable and were run. The RPM builds, which turns a spec
 file from a draft into a package and proves the one thing a parse cannot, that
@@ -932,9 +938,9 @@ reach that path without a person choosing the file produced F-92: two more
 places using the ceiling meant for a file somebody was sent, one of which this
 cycle had itself made automatic.
 
-**Marker 75 seals the record with the only secret the program ever has, and
-that decides when it can run.** Sealing needs a passphrase, and a window that
-has just opened has none. The app-lock passphrase is the one secret this
+**Roadmap item 75 seals the record with the only secret the program ever has,
+and that decides when it can run.** Sealing needs a passphrase, and a window
+that has just opened has none. The app-lock passphrase is the one secret this
 program is ever given, so that is what the record is sealed with, and the
 unlock is therefore when the check runs. With no app lock set there is nothing
 to seal with, so the record is written in the clear and the tab says so in
@@ -950,24 +956,24 @@ record into the administrator's directory describing a check nobody performs.
 There is no per-user moment during a package install, so the first launch is
 that moment.
 
-**Marker 78 was already built and was not findable, which is a different
+**Roadmap item 78 was already built and was not findable, which is a different
 fault.** Every one of the website's nine palettes has been in the application
-since marker 26, with the swatches and the contrast measured rather than
+since roadmap item 26, with the swatches and the contrast measured rather than
 assumed, and the picker was on a page inside Settings. Somebody looks there
 only if they already believe there is something to find. The website puts its
 picker in the header of every page; so does this now, and Settings keeps the
 fuller panel. Nothing was added to the engine and one control was moved into
 sight.
 
-**Marker 79 is done as far as a machine with no screen can take it.** The draw
-path was read for the calls that wait, and there are none:
-everything that can block already runs on its own thread and reports back
-through a channel, which a test now holds rather than a comment. The repaint
-cadence was one number, 50 ms, for a live session and a download alike, and
-twenty frames a second is fine for a progress line and is not fine for a meter
-following a voice: at that rate it steps rather than sweeps, and a window whose
-only moving part is stepping reads as one that is struggling. A live session
-asks for 16 ms now and everything else keeps 50.
+**Roadmap item 79 is done as far as a machine with no screen can take it.** The
+draw path was read for the calls that wait, and there are none: everything that
+can block already runs on its own thread and reports back through a channel,
+which a test now holds rather than a comment. The repaint cadence was one
+number, 50 ms, for a live session and a download alike, and twenty frames a
+second is fine for a progress line and is not fine for a meter following a
+voice: at that rate it steps rather than sweeps, and a window whose only moving
+part is stepping reads as one that is struggling. A live session asks for 16 ms
+now and everything else keeps 50.
 
 *Compilation was asked about and was already at the ceiling.* The release
 profile builds at `opt-level = 3` with fat link-time optimisation, one codegen
@@ -995,35 +1001,35 @@ machine cannot reach: a compositor, a driver, a scaling factor. The window
 clear colour was checked against the panel fill, which is the one flicker cause
 that lives in this code, and they already match.
 
-**Markers 74 to 79, and the two places they meet a rule this project already
-has.**
+**Roadmap items 74 to 79, and the two places they meet a rule this project
+already has.**
 
 *Storing the lock where only an administrator can write it* is worth having and
-it runs into marker 39's decision, which is that VeilVoice **never acquires
-privilege**: it does not re-launch itself elevated, install a service, or ask
-for a password, because those are changes to somebody's machine and they belong
-to the person whose machine it is. The shape that keeps both, and the shape
-that shipped: the *second* copy goes to an administrator-owned directory when
-VeilVoice is already running with enough privilege to make one, and stays in
-the user's own directory when it is not. Putting the *first* copy there would
-have broken the rate limit, because an unelevated run has to be able to write
-down a failed attempt. The test for privilege is the attempt itself, which
-avoids a platform call in each case and asks the only question that matters.
-On Windows the equivalent needs an access-control list this project does not
-link the API to set, so there the second copy is a second copy and is described
-as one.
+it runs into roadmap item 39's decision, which is that VeilVoice **never
+acquires privilege**: it does not re-launch itself elevated, install a service,
+or ask for a password, because those are changes to somebody's machine and they
+belong to the person whose machine it is. The shape that keeps both, and the
+shape that shipped: the *second* copy goes to an administrator-owned directory
+when VeilVoice is already running with enough privilege to make one, and stays
+in the user's own directory when it is not. Putting the *first* copy there
+would have broken the rate limit, because an unelevated run has to be able to
+write down a failed attempt. The test for privilege is the attempt itself,
+which avoids a platform call in each case and asks the only question that
+matters. On Windows the equivalent needs an access-control list this project
+does not link the API to set, so there the second copy is a second copy and is
+described as one.
 
-*The authentication tag is the part of marker 76 that is not obscurity, and it
-is smaller than it sounds.* One Argon2id run is split by HKDF into the verifier
-that goes on disk and a tag key that never does, so an edit made by somebody
-without the passphrase cannot be made to look authentic. That catches the
-swapped password and the weakened cost. It does not catch deletion, which is
-what the second copy answers, and it does not catch a lock replaced wholesale
-with the attacker's own, which nothing here answers. The failed-attempt counter
-had to be left outside the tag entirely: it is written at the one moment the
-tag key does not exist, so covering it would have meant reporting every honest
-typo as tampering. The rate limit is therefore exactly as editable as it was
-before, and the documentation says so in as many words.
+*The authentication tag is the part of roadmap item 76 that is not obscurity,
+and it is smaller than it sounds.* One Argon2id run is split by HKDF into the
+verifier that goes on disk and a tag key that never does, so an edit made by
+somebody without the passphrase cannot be made to look authentic. That catches
+the swapped password and the weakened cost. It does not catch deletion, which
+is what the second copy answers, and it does not catch a lock replaced
+wholesale with the attacker's own, which nothing here answers. The
+failed-attempt counter had to be left outside the tag entirely: it is written
+at the one moment the tag key does not exist, so covering it would have meant
+reporting every honest typo as tampering. The rate limit is therefore exactly
+as editable as it was before, and the documentation says so in as many words.
 
 *Hiding the file's name and contents* is obscurity, and obscurity is not a
 security property. Randomising where the lock lives and what it looks like
@@ -1032,15 +1038,15 @@ local attacker with a debugger will do. The names come from an index file at a
 fixed, obvious path, because something has to be findable or the program could
 never open its own lock again, so anybody who reads that index recomputes both
 names at once. It is worth doing for the first case and it must not be
-described as protection against the second. Marker 77 is that sentence, written
-where a user reads it, and marker 74 is the decision that the *lock screen* is
-not the place for it: telling somebody standing at a locked window what the
-lock cannot do is helping the one person who should not be told. The
-interference report follows the same rule and is drawn on the security tab, not
-on the lock screen, because telling whoever is holding the machine that their
-edit was noticed tells them to try a different one.
+described as protection against the second. Roadmap item 77 is that sentence,
+written where a user reads it, and roadmap item 74 is the decision that the
+*lock screen* is not the place for it: telling somebody standing at a locked
+window what the lock cannot do is helping the one person who should not be
+told. The interference report follows the same rule and is drawn on the
+security tab, not on the lock screen, because telling whoever is holding the
+machine that their edit was noticed tells them to try a different one.
 
-**Marker 71 is an animation rather than an encoded file, and that is a
+**Roadmap item 71 is an animation rather than an encoded file, and that is a
 decision.** A video was asked for and a video is the right shape for it:
 something to watch rather than a picture with a long dead pause in it. What it
 is not is a reason to put an H.264 file in this repository. This project ships
@@ -1051,37 +1057,38 @@ bytes depend on which build of which encoder made it, so it could not be
 regenerated and compared the way every other picture here is. The result plays
 in any browser with no plugin and no download, weighs a few kilobytes, takes
 the reader's colour scheme, and is generated from this file so it cannot show a
-marker as finished that is not. The command to turn it into a file is printed
-under it for anybody who wants one.
+roadmap item as finished that is not. The command to turn it into a file is
+printed under it for anybody who wants one.
 
-**Markers 67 to 73 are one request in seven parts, and the order matters.**
-The demonstration and the questions page come first because they are what
-somebody meets before they have installed anything, and the roadmap page and
-its video come next because "what is finished" is a question this project keeps
-being asked and keeps answering in a file only a developer reads. The pictures
-and the animation follow, because they are polish on something that already
-works rather than a claim about what it does.
+**Roadmap items 67 to 73 are one request in seven parts, and the order
+matters.** The demonstration and the questions page come first because they are
+what somebody meets before they have installed anything, and the roadmap page
+and its video come next because "what is finished" is a question this project
+keeps being asked and keeps answering in a file only a developer reads. The
+pictures and the animation follow, because they are polish on something that
+already works rather than a claim about what it does.
 
-**Marker 73 is deliberately last, and it is last for a reason rather than by
-accident.** An audit run before the code stops moving is an audit of code that
-no longer exists. Nine rounds have each found real defects in code a previous
-round called clean, and the two most recent found them in code that three
-rounds had read: the fuzzing campaign turned up an unbounded Argon2 time cost
-and a tamper report that could be made to lie. So the audit goes at the end,
-after the last feature and before the deploy, and the estimate is the widest on
-this page because the audit's estimate is the number that has historically been
-wrong.
+**Roadmap item 73 is deliberately last, and it is last for a reason rather than
+by accident.** An audit run before the code stops moving is an audit of code
+that no longer exists. Nine rounds have each found real defects in code a
+previous round called clean, and the two most recent found them in code that
+three rounds had read: the fuzzing campaign turned up an unbounded Argon2 time
+cost and a tamper report that could be made to lie. So the audit goes at the
+end, after the last feature and before the deploy, and the estimate is the
+widest on this page because the audit's estimate is the number that has
+historically been wrong.
 
-**Marker 66 is shipped, and the honest part is what it does not tell you.** The
-monitor shows the level going in and the level coming out, on every tab, so the
-question "is it still hearing me" is answered without navigating anywhere. What
-a level cannot answer is whether the voice has been changed: a working meter and
-a bypassed engine draw exactly the same bar. That sentence is printed beside the
-meters in both front ends rather than left to be worked out, and the answer to
-the question it raises is the preview, which sends the veiled voice to your own
-headphones and to nothing else so you can hear that it is not your voice.
+**Roadmap item 66 is shipped, and the honest part is what it does not tell
+you.** The monitor shows the level going in and the level coming out, on every
+tab, so the question "is it still hearing me" is answered without navigating
+anywhere. What a level cannot answer is whether the voice has been changed: a
+working meter and a bypassed engine draw exactly the same bar. That sentence is
+printed beside the meters in both front ends rather than left to be worked out,
+and the answer to the question it raises is the preview, which sends the veiled
+voice to your own headphones and to nothing else so you can hear that it is not
+your voice.
 
-**Marker 27 opens the source here rather than sending the reader away, and
+**Roadmap item 27 opens the source here rather than sending the reader away, and
 what it does not do is guess.** Every box in every flowchart was a link to a
 blob on GitHub: correct for a README, which is read on GitHub, and wrong for a
 reference page where somebody has chosen a theme and is halfway through a call
@@ -1114,8 +1121,8 @@ the wording on the front page, which states one platform's total with nothing
 beside it, and that is a change to the page's own voice rather than to a
 generator.
 
-**Marker 53 is done for the engine it can be tested on, and says which.** The
-mobile half was measured: twelve pages at five widths, with and without
+**Roadmap item 53 is done for the engine it can be tested on, and says which.**
+The mobile half was measured: twelve pages at five widths, with and without
 scripts, eight separate causes of horizontal scrolling found and fixed. The
 deployed site was checked again at 375 across and the page itself does not
 scroll sideways at all; the wide things inside it, tables and code blocks,
@@ -1128,19 +1135,19 @@ fallbacks written for both and the suite refuses several constructs that break
 on older engines, which is reasoning rather than evidence. This page will not
 say those two work until somebody has looked.
 
-**Marker 54's audit rounds are done and its deploy has been happening all
+**Roadmap item 54's audit rounds are done and its deploy has been happening all
 along.** Ten rounds, eighty-four defects, and releases published from tags
 with reproducibility checked per platform. There was never a single production
 deploy to save up for.
 
-**Marker 65, Failsafe, is the one feature here that is on by default**, and
-the reason is the shape of the accident it guards against. You are talking
+**Roadmap item 65, Failsafe, is the one feature here that is on by default**,
+and the reason is the shape of the accident it guards against. You are talking
 through VeilVoice, veiled. You plug in a headset. The operating system offers
 the new microphone, the calling program takes it, and from that moment your
-**real voice** is going out, with the veiled window still open in front of
-you, meters still moving, looking exactly as it did a second earlier. Nobody
-notices that, because there is nothing to notice. It is not carelessness; it
-is a decision the operating system makes on somebody's behalf.
+**real voice** is going out, with the veiled window still open in front of you,
+meters still moving, looking exactly as it did a second earlier. Nobody notices
+that, because there is nothing to notice. It is not carelessness; it is a
+decision the operating system makes on somebody's behalf.
 
 So the default is on, and the default also **closes** the offending program,
 because a warning nobody has read yet does not stop a voice going out.
@@ -1159,7 +1166,7 @@ again in the only function that acts. Every close is written down, because a
 program that vanishes with nothing to explain it is indistinguishable from a
 crash.
 
-**Marker 37 is a baseline, and it is named honestly everywhere but its own
+**Roadmap item 37 is a baseline, and it is named honestly everywhere but its own
 title.** `veilvoice-appctl` learns what normally runs here, then tells you when
 something runs that was not in that picture. **It does not block anything and
 cannot.** Real enforcement needs a kernel driver or a signed system policy and
@@ -1184,15 +1191,15 @@ closed, and a `check` while a stray process ran named `timeout.exe` and
 `smartscreen.exe`, the second one started by Windows itself, which is exactly
 the case this is for.
 
-**Marker 41's contrast is computed against the colour actually on screen.**
-A translucent card is a colour laid *over* the panel behind it, so measuring
-the card's own tint answers a question nobody asked. The blend is computed, the
-WCAG ratio is taken against that, the text colour is chosen by measuring every
-candidate in the palette rather than assuming black or white, and if nothing
-reaches 4.5:1, the card is drawn **opaque** instead of shipped illegible.
-Translucency is a nicety; reading a warning is not. The preferences panel shows
-the measured ratio and says when it had to give translucency up, rather than
-letting a quietly solid card look like a design choice.
+**Roadmap item 41's contrast is computed against the colour actually on
+screen.** A translucent card is a colour laid *over* the panel behind it, so
+measuring the card's own tint answers a question nobody asked. The blend is
+computed, the WCAG ratio is taken against that, the text colour is chosen by
+measuring every candidate in the palette rather than assuming black or white,
+and if nothing reaches 4.5:1, the card is drawn **opaque** instead of shipped
+illegible. Translucency is a nicety; reading a warning is not. The preferences
+panel shows the measured ratio and says when it had to give translucency up,
+rather than letting a quietly solid card look like a design choice.
 
 The third mode is *off*, and it is offered for a reason: a monitor that
 interrupts somebody every thirty seconds is one they switch off at the
@@ -1202,7 +1209,7 @@ window, because a system notification needs a registered application identity on
 of the three platforms, and this project is published under a pseudonym on
 purpose. That limit is printed beside the setting.
 
-**Markers 28 and 48 were finished by finding out the engine already did it
+**Roadmap items 28 and 48 were finished by finding out the engine already did it
 and nothing asked.** The randomised ratchet range was written, documented and
 tested inside `veilvoice-core`, and the doc comment on it said *"the front ends
 call this at launch"*. Neither front end did. It was reached by nothing but its
@@ -1214,7 +1221,7 @@ Both front ends now draw a range from the operating system's random source at
 launch, and a test reads their source and fails the build if either stops. The
 interval is user-configurable through `--reseed-range 250,1800` and a checkbox
 in the application, and **anything that is not a usable range is refused with
-the reason**, never adjusted to fit, which is marker 28's wording and
+the reason**, never adjusted to fit, which is roadmap item 28's wording and
 the reason the parser returns six distinct refusals rather than a clamp. What
 is displayed is the *effective* range, quantised to whole frames, because the
 ratchet can only fire on a frame boundary and showing the request would
@@ -1223,15 +1230,15 @@ describe a spread that does not exist.
 Measured: three consecutive runs reported 16-69 ms, 773-1963 ms and
 1088-1120 ms.
 
-**Marker 35 detects what *can* watch, and says so; it does not claim to detect
-keyloggers.** Nothing can. The mechanisms a logger uses are the mechanisms
-accessibility software, password managers and remote-support tools use, and
-software written to hide is written to hide from a process list too. So
-`veilvoice input` names the programs running that are **able** to see keyboard
-and mouse, says what each is for, and prints -- with every result, found or not
--- that a clean answer proves nothing. Somebody who reads "nothing found" as
-"nothing there" has been made less safe by running it, and that sentence is the
-most important thing the crate outputs.
+**Roadmap item 35 detects what *can* watch, and says so; it does not claim to
+detect keyloggers.** Nothing can. The mechanisms a logger uses are the
+mechanisms accessibility software, password managers and remote-support tools
+use, and software written to hide is written to hide from a process list too.
+So `veilvoice input` names the programs running that are **able** to see
+keyboard and mouse, says what each is for, and prints -- with every result,
+found or not -- that a clean answer proves nothing. Somebody who reads "nothing
+found" as "nothing there" has been made less safe by running it, and that
+sentence is the most important thing the crate outputs.
 
 It also does not hook the keyboard to find out. Detecting input monitoring by
 monitoring input would make it the thing it warns about, and on Windows it
@@ -1245,12 +1252,12 @@ extracted into `veilvoice-proc` rather than copied or borrowed. Depending on
 table of screen recorders, which is what the note at the top of this section
 says these crates must not do.
 
-**Marker 42 shipped half of what it asked for, and the other half is refused.**
-This was described here as the most dangerous thing on the list, with three
-conditions before anything shipped: what happens when it is typed by mistake,
-what "securely erased" is really worth on flash, and what an attacker who
-learns the trigger can make it do. Working through those is what decided the
-shape.
+**Roadmap item 42 shipped half of what it asked for, and the other half is
+refused.** This was described here as the most dangerous thing on the list,
+with three conditions before anything shipped: what happens when it is typed by
+mistake, what "securely erased" is really worth on flash, and what an attacker
+who learns the trigger can make it do. Working through those is what decided
+the shape.
 
 **The decoy is shipped.** A second passphrase opens VeilVoice with nothing in
 it: a way to comply with somebody standing over you without handing over your

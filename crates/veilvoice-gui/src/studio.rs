@@ -7,7 +7,7 @@
 //! one module because they are one vault, and a vault opened in two places is
 //! two chances to get the unlocking wrong.
 //!
-//! # Marker 130: this is also where veiling as it runs happens
+//! # Roadmap item 130: this is also where veiling as it runs happens
 //!
 //! Live scramble was a tab of its own, and it did not need to be. The Studio
 //! has always recorded through the same [`veilvoice_audio::LiveSession`] that
@@ -62,7 +62,7 @@
 //! recorder are the **veiled** ones. That is the default and it is what
 //! [`Keep::Veiled`] means.
 //!
-//! **Marker 131** adds the other two. The microphone can be kept as well, or
+//! **Roadmap item 131** adds the other two. The microphone can be kept as well, or
 //! instead, and the reasoning for allowing it at all is on [`Keep`]: refusing
 //! would not stop somebody who needs the real recording, it would move them to
 //! a phone on the table, which is a plaintext file on a device with none of
@@ -134,7 +134,7 @@ enum Phase {
 
 /// Who is speaking into a session.
 ///
-/// **Marker 147.** One microphone or several, and the choice is this enum
+/// **Roadmap item 147.** One microphone or several, and the choice is this enum
 /// rather than a pair of fields, so "never both" is a thing that cannot be
 /// written rather than a thing to remember.
 #[derive(Clone)]
@@ -172,7 +172,7 @@ struct Setup {
 
 /// The session the Studio has open, and there is at most one.
 ///
-/// **Marker 147.** Two fields would be two things to clear, and a room left
+/// **Roadmap item 147.** Two fields would be two things to clear, and a room left
 /// running beside a single session is two streams on one output with every
 /// guest's voice arriving twice. This is one field, so the invariant holds by
 /// construction rather than by every path remembering to clear the other.
@@ -186,7 +186,7 @@ enum Running {
 /// One guest in a room: the name their take is filed under, and the microphone
 /// they speak into.
 ///
-/// **Marker 147.** A room is a list of these. It is edited while nothing is
+/// **Roadmap item 147.** A room is a list of these. It is edited while nothing is
 /// running and read when a session starts.
 #[derive(Clone, Default)]
 pub struct RoomGuest {
@@ -252,7 +252,7 @@ pub fn sharing_a_microphone(guests: &[RoomGuest]) -> Option<String> {
 
 /// Whose voice one recording of a take is.
 ///
-/// **Marker 147.** A take used to be one recording, or two when the real voice
+/// **Roadmap item 147.** A take used to be one recording, or two when the real voice
 /// was kept as well. A room take is the mix plus one or two per guest, which is
 /// up to seventeen recordings landing in one vault under one take name, and the
 /// only thing telling them apart is what they are called.
@@ -303,19 +303,19 @@ struct GuestTake {
     name: String,
     /// Their veiled voice, when it is being kept.
     veiled: Option<veilvoice_audio::record::Recorder>,
-    /// Their real voice, when it is being kept. Marker 131's warning applies
+    /// Their real voice, when it is being kept. Roadmap item 131's warning applies
     /// once per guest.
     plain: Option<veilvoice_audio::record::Recorder>,
 }
 
 /// What a running session last reported about itself.
 ///
-/// **Marker 147.** One microphone reports [`veilvoice_audio::LiveStats`] and a
+/// **Roadmap item 147.** One microphone reports [`veilvoice_audio::LiveStats`] and a
 /// room reports [`veilvoice_audio::RoomStats`], which is a different shape
 /// because it has one entry per guest. The window matches on this rather than
 /// being handed a single-microphone reading a room would have to be flattened
 /// into, because flattening it is exactly what loses the per-guest bars the
-/// marker asked for.
+/// roadmap item asked for.
 pub enum Reading {
     /// One person.
     One(veilvoice_audio::LiveStats),
@@ -348,7 +348,7 @@ pub struct Studio {
     /// What that session was started with, and `None` when none is running.
     setup: Option<Setup>,
     /// The last thing the platform said about either stream, and how many it
-    /// has said. **Marker 132.**
+    /// has said. **Roadmap item 132.**
     trouble: Option<veilvoice_audio::Interference>,
     /// How many interruptions this session has reported, so a new one is
     /// noticed rather than the same one being shown again every frame.
@@ -371,7 +371,7 @@ pub struct Studio {
     plain: Option<veilvoice_audio::record::Recorder>,
 
     // --- the room ---
-    /// **Marker 147.** Whether the form is set to a room rather than to one
+    /// **Roadmap item 147.** Whether the form is set to a room rather than to one
     /// microphone. Beside the guest list rather than in the window, because the
     /// two are one answer and splitting them would let the window ask for a
     /// room of nobody.
@@ -443,7 +443,7 @@ impl Studio {
     ///
     /// The window asks, so that closing it, or locking, does not silently
     /// abandon a recording somebody is in the middle of making. A session
-    /// running with nothing attached to it is not a recording: since marker 130
+    /// running with nothing attached to it is not a recording: since roadmap item 130
     /// the Studio veils whether or not it is keeping anything, and treating
     /// those as the same thing would refuse to close a window over a call
     /// nobody was recording.
@@ -459,7 +459,7 @@ impl Studio {
         self.running.is_some()
     }
 
-    /// Whether the form is set to a room. **Marker 147.**
+    /// Whether the form is set to a room. **Roadmap item 147.**
     pub fn wants_a_room(&self) -> bool {
         self.room_wanted
     }
@@ -525,7 +525,7 @@ impl Studio {
 
     /// What the audio path last reported about itself, and whether it is new.
     ///
-    /// **Marker 132.** The platform reports a stream error on a callback of
+    /// **Roadmap item 132.** The platform reports a stream error on a callback of
     /// its own; before this the only thing done with one was a print to a
     /// console the window does not have. Now the window asks, once a frame,
     /// and says so.
@@ -542,10 +542,10 @@ impl Studio {
 
     /// Record which programs are holding the microphone right now.
     ///
-    /// **Marker 132.** Called by the window only while a take is running:
+    /// **Roadmap item 132.** Called by the window only while a take is running:
     /// outside one this is the Monitor tab's question and the safety catch's,
     /// and building a list every frame for a question nobody is asking is what
-    /// marker 126 is about.
+    /// roadmap item 126 is about.
     ///
     /// VeilVoice itself is holding the microphone whenever this is called, so
     /// it is not an intruder in its own recording. It is matched by name
@@ -608,7 +608,7 @@ impl Studio {
         };
         self.levels.update(input, output);
 
-        // **Marker 132.** The count is a number and is read every frame; the
+        // **Roadmap item 132.** The count is a number and is read every frame; the
         // report itself holds a string and is asked for only when the count
         // has moved.
         if interfered > self.troubles_seen {
@@ -626,7 +626,7 @@ impl Studio {
         Some(reading)
     }
 
-    /// **Marker 145.** The Studio's own failsafe, and what it is for.
+    /// **Roadmap item 145.** The Studio's own failsafe, and what it is for.
     ///
     /// Separate from [`veilvoice_failsafe`], which is the application's and is
     /// about *other programs* taking the microphone. This one is about this
@@ -636,7 +636,7 @@ impl Studio {
     ///
     /// The device a take is being recorded from stops existing: unplugged,
     /// switched away by the operating system, taken by something with more
-    /// authority. Marker 132 made that visible, and visible was as far as it
+    /// authority. Roadmap item 132 made that visible, and visible was as far as it
     /// went: the take carried on, recording silence, until somebody looked at
     /// the screen. A recording that continues after there is nothing to record
     /// is worse than one that stops, because it looks like it worked.
@@ -725,7 +725,7 @@ impl Studio {
         self.start_session(setup, veilvoice_audio::Keeping::default());
     }
 
-    /// **Marker 147.** Start veiling a room, keeping nothing.
+    /// **Roadmap item 147.** Start veiling a room, keeping nothing.
     ///
     /// One microphone per guest, each veiled into a voice of their own and the
     /// results mixed into `output`. The guests are [`Studio::room_guests`]
@@ -925,7 +925,7 @@ impl Studio {
 
     /// Start, or restart, the live session `setup` describes.
     ///
-    /// **The one place in the window a session is started.** Marker 130 moved
+    /// **The one place in the window a session is started.** Roadmap item 130 moved
     /// live scramble here, and one starter is most of what that is worth: two
     /// of them meant two opens of the same microphone, and on the platforms
     /// that allow that at all the second stream gets a copy of the input
@@ -1131,7 +1131,7 @@ impl Studio {
         // sealing the first does not leave the second holding audio.
         let veiled = self.recorder.take();
         let plain = self.plain.take();
-        // **Marker 147.** A room's mix and its guests, taken before any of them
+        // **Roadmap item 147.** A room's mix and its guests, taken before any of them
         // is stored, for the reason the pair above is: a failure sealing the
         // first must not leave the rest holding audio.
         let mixed = self.mixed.take();
@@ -1180,7 +1180,7 @@ impl Studio {
             return;
         }
 
-        // **Marker 132.** What happened to the audio while this was being
+        // **Roadmap item 132.** What happened to the audio while this was being
         // recorded, said with the take rather than left in a log. A recording
         // made while the microphone was taken away, or while another program
         // was also holding it, is a recording somebody should know that about
@@ -1512,7 +1512,7 @@ impl Studio {
     ///
     /// The voice half, which is the devices, the engine settings, the meters
     /// and the buttons that start and stop the veiling, is drawn above this by
-    /// the window: marker 130 moved live scramble into this tab, and the device
+    /// the window: roadmap item 130 moved live scramble into this tab, and the device
     /// lists and the settings widgets it needs are the window's rather than
     /// this module's. What is here is everything to do with the vault.
     ///
@@ -1572,7 +1572,7 @@ impl Studio {
                 // recorded.
                 let mut seconds = 0.0f32;
                 let mut dropped = 0u64;
-                // **Marker 147.** A room take is the mix plus one or two
+                // **Roadmap item 147.** A room take is the mix plus one or two
                 // recorders per guest, and every one of them is on the same
                 // rule: drained here or quietly short. Chained rather than
                 // repeated, because the loop is what makes that true and a
@@ -1598,7 +1598,7 @@ impl Studio {
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("● recording").color(p::red()).strong());
                     ui.label(RichText::new(length(seconds as f64)).color(p::fg()));
-                    // **Marker 145**: whether what is being recorded is veiled,
+                    // **Roadmap item 145**: whether what is being recorded is veiled,
                     // said *while* it is being recorded and not only before it
                     // started. The choice is made on the form above and then
                     // the form is gone, so a take that keeps somebody's real
@@ -1617,7 +1617,7 @@ impl Studio {
                 });
 
                 // The two bars used to be drawn here as well. They are not any
-                // more, and nothing was lost: since marker 130 the voice half
+                // more, and nothing was lost: since roadmap item 130 the voice half
                 // of this tab draws them whether or not a take is running, so
                 // drawing them again under the clock would be the same meter
                 // twice on one screen. The reading is taken once a frame by the
@@ -1979,7 +1979,7 @@ impl Studio {
 
     /// Which side of the engine to keep, asked before anything starts.
     ///
-    /// **Marker 131.** Before the button rather than after it, because the
+    /// **Roadmap item 131.** Before the button rather than after it, because the
     /// answer cannot be changed once a take has been made: a recording of
     /// somebody's real voice is not something to discover having made.
     ///
@@ -2099,7 +2099,7 @@ impl Studio {
 
 /// Which side of the engine a take keeps.
 ///
-/// **Marker 131.** Three, and the order they are written in is the order they
+/// **Roadmap item 131.** Three, and the order they are written in is the order they
 /// are offered: the safe one first, and the one that records the real voice
 /// last.
 ///

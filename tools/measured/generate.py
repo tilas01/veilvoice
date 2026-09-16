@@ -39,7 +39,7 @@ stays. The typing was the defect: every change to any Rust file moves the
 functional line count, so a commit that touched code and not those ten places
 failed a check that had nothing to do with what the commit was for. It happened
 four times in round thirty-three alone, which is the measurement that made this
-worth doing. Marker 152.
+worth doing. Roadmap item 152.
 
 So the writer and the checker read the same anchors, and a claim can now drift
 only if this tool is not run -- which ``tools/verify.py`` and CI both do.

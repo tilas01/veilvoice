@@ -55,7 +55,7 @@
 <div>
 <section id="s-about">
 <p>The release contents list parser, coverage-guided.</p>
-<p><strong>Marker 97.</strong> <code>CONTENTS.sha256</code> lists every file inside every release archive with its SHA-256, and a verifier reads it to decide which paths on disk to open and what to compare them against. It is covered by the signed <code>SHA256SUMS</code>, and every caller is told to check that before parsing.</p>
+<p><strong>Roadmap item 97.</strong> <code>CONTENTS.sha256</code> lists every file inside every release archive with its SHA-256, and a verifier reads it to decide which paths on disk to open and what to compare them against. It is covered by the signed <code>SHA256SUMS</code>, and every caller is told to check that before parsing.</p>
 <p>&quot;Every caller is told to&quot; is not a property of the code. A caller can get the order wrong, a future front end can be written by somebody who did not read the note, and the consequence would be a file of somebody else&#x27;s choosing deciding which paths a verifier opens. So the parser is fuzzed as though nothing had checked it, which is the only assumption that stays true.</p>
 <p>What this is looking for, specifically: a path that escapes the release directory, a panic on a line that is not what the release job writes, and a digest that is accepted without being one.</p>
 </section>

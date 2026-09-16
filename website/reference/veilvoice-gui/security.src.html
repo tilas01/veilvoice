@@ -140,7 +140,7 @@
 <span class="ln" id="L86">    <span class="tok-com">/// Argon2id over the **app-lock** passphrase, so everything VeilVoice</span></span>
 <span class="ln" id="L87">    <span class="tok-com">/// writes is sealed without anybody choosing a second secret.</span></span>
 <span class="ln" id="L88">    <span class="tok-com">///</span></span>
-<span class="ln" id="L89">    <span class="tok-com">/// **Marker 86.** This reverses a decision the crypto crate states in as</span></span>
+<span class="ln" id="L89">    <span class="tok-com">/// **Roadmap item 86.** This reverses a decision the crypto crate states in as</span></span>
 <span class="ln" id="L90">    <span class="tok-com">/// many words, and the reversal is deliberate rather than accidental, so</span></span>
 <span class="ln" id="L91">    <span class="tok-com">/// the cost is written here as well as in the documentation: one passphrase</span></span>
 <span class="ln" id="L92">    <span class="tok-com">/// now opens the application *and* everything it has ever written.</span></span>
@@ -540,7 +540,7 @@
 <span class="ln" id="L446">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(<span class="tok-kw">mut</span> carried) = <span class="tok-kw">self</span>.just_unlocked.<span class="tok-fn">take</span>() {</span>
 <span class="ln" id="L447">            carried.<span class="tok-fn">zeroize</span>();</span>
 <span class="ln" id="L448">        }</span>
-<span class="ln" id="L449">        <span class="tok-com">// Marker 86&#x27;s session copy of the app-lock passphrase goes with</span></span>
+<span class="ln" id="L449">        <span class="tok-com">// Roadmap item 86&#x27;s session copy of the app-lock passphrase goes with</span></span>
 <span class="ln" id="L450">        <span class="tok-com">// everything else. Locking the window has to put back the state a</span></span>
 <span class="ln" id="L451">        <span class="tok-com">// fresh launch would be in, or &quot;lock&quot; is a picture of a lock.</span></span>
 <span class="ln" id="L452">        <span class="tok-kw">self</span>.app_secret = None;</span>
@@ -664,7 +664,7 @@
 <span class="ln" id="L560">                <span class="tok-com">// responsible for wiping it; `take_unlock_passphrase` says so,</span></span>
 <span class="ln" id="L561">                <span class="tok-com">// and `wipe_secrets` catches the case where nobody does.</span></span>
 <span class="ln" id="L562">                <span class="tok-kw">let</span> opened = std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.entry);</span>
-<span class="ln" id="L563">                <span class="tok-com">// Marker 86. Kept for the session only when the mode that</span></span>
+<span class="ln" id="L563">                <span class="tok-com">// Roadmap item 86. Kept for the session only when the mode that</span></span>
 <span class="ln" id="L564">                <span class="tok-com">// needs it is already chosen. A user who has not asked for</span></span>
 <span class="ln" id="L565">                <span class="tok-com">// this keeps the old behaviour exactly: the passphrase is</span></span>
 <span class="ln" id="L566">                <span class="tok-com">// wiped the moment it has been checked, and never sits in</span></span>
@@ -807,7 +807,7 @@
 <span class="ln" id="L695">        });</span>
 <span class="ln" id="L696">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">24.0</span>);</span>
 <span class="ln" id="L697"></span>
-<span class="ln" id="L698">        <span class="tok-com">// **Marker 74.** A locked window says it is locked and nothing else.</span></span>
+<span class="ln" id="L698">        <span class="tok-com">// **Roadmap item 74.** A locked window says it is locked and nothing else.</span></span>
 <span class="ln" id="L699">        <span class="tok-com">//</span></span>
 <span class="ln" id="L700">        <span class="tok-com">// It used to say a great deal: what the lock is and is not worth, where</span></span>
 <span class="ln" id="L701">        <span class="tok-com">// the file lives, and that deleting that file starts over and is not a</span></span>
@@ -892,7 +892,7 @@
 <span class="src-item" id="fn-security-interference_banner">
 <span class="ln" id="L779">    <span class="tok-com">/// The standing report that the lock file was interfered with.</span></span>
 <span class="ln" id="L780">    <span class="tok-com">///</span></span>
-<span class="ln" id="L781">    <span class="tok-com">/// **Marker 76.** It is drawn here rather than on the lock screen, and the</span></span>
+<span class="ln" id="L781">    <span class="tok-com">/// **Roadmap item 76.** It is drawn here rather than on the lock screen, and the</span></span>
 <span class="ln" id="L782">    <span class="tok-com">/// distinction matters. The lock screen is read by whoever is holding the</span></span>
 <span class="ln" id="L783">    <span class="tok-com">/// machine, and telling them their edit was noticed tells them to try</span></span>
 <span class="ln" id="L784">    <span class="tok-com">/// something else. This side of the lock is read only by somebody who has</span></span>
@@ -1831,7 +1831,7 @@
 <span class="ln" id="L1678">        }</span>
 <span class="ln" id="L1679">    }</span>
 <span class="ln" id="L1680"></span>
-<span class="ln" id="L1681">    <span class="tok-com">/// **Marker 74.** The locked window explains nothing.</span></span>
+<span class="ln" id="L1681">    <span class="tok-com">/// **Roadmap item 74.** The locked window explains nothing.</span></span>
 <span class="ln" id="L1682">    <span class="tok-com">///</span></span>
 <span class="ln" id="L1683">    <span class="tok-com">/// It used to explain a great deal: what the lock is and is not worth,</span></span>
 <span class="ln" id="L1684">    <span class="tok-com">/// where its file lives, and that deleting that file starts over. All true,</span></span>
@@ -1843,7 +1843,7 @@
 <span class="ln" id="L1690">    <span class="tok-com">/// because what is being held is that certain sentences are not reachable</span></span>
 <span class="ln" id="L1691">    <span class="tok-com">/// from that function at all. A rendering test would only prove they were</span></span>
 <span class="ln" id="L1692">    <span class="tok-com">/// absent from one frame.</span></span>
-<span class="ln" id="L1693">    <span class="tok-com">/// Marker 86. The passphrase is kept only for the mode that needs it.</span></span>
+<span class="ln" id="L1693">    <span class="tok-com">/// Roadmap item 86. The passphrase is kept only for the mode that needs it.</span></span>
 <span class="ln" id="L1694">    <span class="tok-com">///</span></span>
 <span class="ln" id="L1695">    <span class="tok-com">/// A user who has not asked for app-lock sealing must keep the old</span></span>
 <span class="ln" id="L1696">    <span class="tok-com">/// behaviour exactly: the passphrase is wiped the instant it has been</span></span>
@@ -1901,7 +1901,7 @@
 <span class="ln" id="L1748">        }</span>
 <span class="ln" id="L1749">    }</span>
 <span class="ln" id="L1750"></span>
-<span class="ln" id="L1751">    <span class="tok-com">/// Marker 86. Locking the window must put the state back where a fresh</span></span>
+<span class="ln" id="L1751">    <span class="tok-com">/// Roadmap item 86. Locking the window must put the state back where a fresh</span></span>
 <span class="ln" id="L1752">    <span class="tok-com">/// launch would leave it, or the lock is a picture of a lock.</span></span>
 <span class="ln" id="L1753">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L1754">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_the_window_drops_the_sealing_passphrase</span>() {</span>
@@ -1918,7 +1918,7 @@
 <span class="ln" id="L1765">        );</span>
 <span class="ln" id="L1766">    }</span>
 <span class="ln" id="L1767"></span>
-<span class="ln" id="L1768">    <span class="tok-com">/// Marker 86. The plan has to be a password plan, because that is what</span></span>
+<span class="ln" id="L1768">    <span class="tok-com">/// Roadmap item 86. The plan has to be a password plan, because that is what</span></span>
 <span class="ln" id="L1769">    <span class="tok-com">/// keeps the recordings openable after the lock is gone.</span></span>
 <span class="ln" id="L1770">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L1771">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock_sealing_produces_a_container_that_outlives_the_lock</span>() {</span>
@@ -1954,7 +1954,7 @@
 <span class="ln" id="L1801">        );</span>
 <span class="ln" id="L1802">    }</span>
 <span class="ln" id="L1803"></span>
-<span class="ln" id="L1804">    <span class="tok-com">/// Marker 76. The report has to be reachable from the tab and only from</span></span>
+<span class="ln" id="L1804">    <span class="tok-com">/// Roadmap item 76. The report has to be reachable from the tab and only from</span></span>
 <span class="ln" id="L1805">    <span class="tok-com">/// the tab, and clearing it has to go through the passphrase rather than</span></span>
 <span class="ln" id="L1806">    <span class="tok-com">/// through a flag the drawing code can set.</span></span>
 <span class="ln" id="L1807">    <span class="tok-attr">#[test</span>]</span>
@@ -2016,7 +2016,7 @@
 <span class="ln" id="L1863">            <span class="tok-str">&quot;path.display()&quot;</span>,</span>
 <span class="ln" id="L1864">            <span class="tok-str">&quot;Delete the lock file&quot;</span>,</span>
 <span class="ln" id="L1865">            <span class="tok-str">&quot;failed attempt&quot;</span>,</span>
-<span class="ln" id="L1866">            <span class="tok-com">// Marker 76. The interference report is the same mistake in a new</span></span>
+<span class="ln" id="L1866">            <span class="tok-com">// Roadmap item 76. The interference report is the same mistake in a new</span></span>
 <span class="ln" id="L1867">            <span class="tok-com">// shape: telling whoever is holding the machine that their last</span></span>
 <span class="ln" id="L1868">            <span class="tok-com">// edit was noticed tells them to try a different one.</span></span>
 <span class="ln" id="L1869">            <span class="tok-str">&quot;interference_banner&quot;</span>,</span>
