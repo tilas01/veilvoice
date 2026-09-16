@@ -1912,7 +1912,7 @@ fn run(command: Command) -> Result<(), String> {
     }
 }
 
-/// Markers 87 and 88. Run an ffmpeg command, or print it when there is no
+/// Roadmap items 87 and 88. Run an ffmpeg command, or print it when there is no
 /// ffmpeg to run.
 ///
 /// The same bargain the rest of this project makes about other people's
@@ -1992,7 +1992,7 @@ fn run_ffmpeg(
 
 /// Report the encrypted volumes this machine is offering.
 ///
-/// Markers 81 to 85, from the command line. Reporting only: the same rule the
+/// Roadmap items 81 to 85, from the command line. Reporting only: the same rule the
 /// window follows, and for the same reason. A hidden-volume question cannot be
 /// answered here because there is nothing to remember it against, so this
 /// prints what a volume would need before the desktop application would write
@@ -2610,7 +2610,7 @@ fn live(
         } else {
             String::new()
         };
-        // **Marker 132.** The platform's own report about the streams, on the
+        // **Roadmap item 132.** The platform's own report about the streams, on the
         // line somebody is already watching. It is also printed in full, on
         // its own line, by the error callback; this is the part that stays on
         // screen, because a line that scrolled past is a line that was not

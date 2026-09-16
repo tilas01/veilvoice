@@ -225,7 +225,7 @@ flowchart TD
 | `Settings::theme_picker` <sub>pub fn</sub> | [794](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L794) | The colour scheme, as a compact control for the window header. |
 | `Settings::appearance_page` <sub>fn</sub> | [819](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L819) |  |
 | `Settings::motion_page` <sub>fn</sub> | [856](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L856) |  |
-| `Settings::security_page` <sub>fn</sub> | [993](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L993) | Marker 92. |
+| `Settings::security_page` <sub>fn</sub> | [993](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L993) | Roadmap item 92. |
 | `Settings::storage_page` <sub>fn</sub> | [1092](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1092) |  |
 | `section` <sub>fn</sub> | [1153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1153) | A titled group with a one-line explanation under it. |
 | `swatches` <sub>fn</sub> | [1161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1161) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |

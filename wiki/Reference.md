@@ -36,7 +36,7 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 - [[`meter.rs`|File-veilvoice-audio-meter]] &middot; The scale a level meter is drawn on.
 - [[`playback.rs`|File-veilvoice-audio-playback]] &middot; Playing a recording that is only in memory, and never on disk.
 - [[`record.rs`|File-veilvoice-audio-record]] &middot; Recording the veiled voice without it ever reaching unprotected memory.
-- [[`room.rs`|File-veilvoice-audio-room]] &middot; Marker 147.
+- [[`room.rs`|File-veilvoice-audio-room]] &middot; Roadmap item 147.
 
 ## [[veilvoice-capture|Crate-veilvoice-capture]]
 
@@ -280,7 +280,7 @@ Verify a VeilVoice release without GnuPG installed
 - [[`lib.rs`|File-veilvoice-verify-lib]] &middot; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`report.rs`|File-veilvoice-verify-report]] &middot; How much this program says, and what it returns when it says nothing.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &middot; The verifier's own tests.
-- [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] &middot; Marker 97.
+- [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] &middot; Roadmap item 97.
 
 ## [[veilvoice-video|Crate-veilvoice-video]]
 

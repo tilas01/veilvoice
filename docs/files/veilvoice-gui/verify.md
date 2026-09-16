@@ -17,7 +17,7 @@
 
 - [Why this exists here rather than in the verifier](#why-this-exists-here-rather-than-in-the-verifier)
 - [Three files, and the tab says so before it is given any](#three-files-and-the-tab-says-so-before-it-is-given-any)
-- [Marker 97: one press, three answers](#marker-97-one-press-three-answers)
+- [Roadmap item 97: one press, three answers](#roadmap-item-97-one-press-three-answers)
 - [Nothing here downloads anything](#nothing-here-downloads-anything)
 - [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
@@ -49,7 +49,7 @@ people that verification is fiddly rather than that it needs three things.
 All three slots are visible from the start, and a drop fills whichever one
 the file's name says it is.
 
-# Marker 97: one press, three answers
+# Roadmap item 97: one press, three answers
 
 The tab used to answer one question, and it was not the question somebody
 actually has. "Is this zip the published one" is a step; "is the program I
@@ -234,17 +234,17 @@ flowchart TD
 | `Verify::body` <sub>fn</sub> | [357](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L357) |  |
 | `Verify::drop_target` <sub>fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L500) | The rectangle that lights up while files are over the window. |
 | `Verify::slot_row` <sub>fn</sub> | [536](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L536) | One file slot: what it is, what is in it, and a way to change it. |
-| `Verify::gnupg_section` <sub>fn</sub> | [599](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L599) | Marker 90. |
+| `Verify::gnupg_section` <sub>fn</sub> | [599](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L599) | Roadmap item 90. |
 | `Verify::checker_section` <sub>fn</sub> | [710](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L710) | Which implementation checks the signature, and the choice behind it. |
 | `Verify::copyable_command` <sub>fn</sub> | [830](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L830) | One command, shown as it would be typed, with a button that copies it and says it did. |
 | `Verify::verdict` <sub>fn</sub> | [842](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L842) | The answer, in the colour it deserves. |
-| `Verify::contents_verdict` <sub>fn</sub> | [853](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L853) | Marker 97. |
-| `Verify::gnupg_verdict` <sub>fn</sub> | [900](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L900) | Marker 97. |
+| `Verify::contents_verdict` <sub>fn</sub> | [853](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L853) | Roadmap item 97. |
+| `Verify::gnupg_verdict` <sub>fn</sub> | [900](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L900) | Roadmap item 97. |
 | `Verify::archive_verdict` <sub>fn</sub> | [938](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L938) | The archive against the signed hash list. |
 | `Verify::start` <sub>fn</sub> | [997](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L997) | Run the check on a thread of its own. |
 | `examine` <sub>fn</sub> | [1020](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1020) | The whole check, off the drawing thread. |
-| `examine_contents` <sub>fn</sub> | [1054](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1054) | Marker 97. |
-| `examine_gnupg` <sub>fn</sub> | [1151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1151) | Marker 97. |
+| `examine_contents` <sub>fn</sub> | [1054](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1054) | Roadmap item 97. |
+| `examine_gnupg` <sub>fn</sub> | [1151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1151) | Roadmap item 97. |
 
 ---
 

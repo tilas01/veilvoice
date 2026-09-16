@@ -8,7 +8,7 @@ There is no `--check`: this tool only reads. Reporting and checking are the
 same run, so there is no mode in which it passes quietly over a dependency
 nobody explained.
 
-Marker 126. A dependency is a decision: it is code this project ships and does
+Roadmap item 126. A dependency is a decision: it is code this project ships and does
 not review, it is build time on every machine that compiles this, and on the
 BSDs and the 32-bit targets it is one more thing that has to work. The decision
 is worth one sentence at the moment it is made, and the moment it is made is

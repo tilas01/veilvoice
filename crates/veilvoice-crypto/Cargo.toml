@@ -27,7 +27,7 @@ region = "3"
 # `deny.toml` exists to notice. None of the newer versions fixes a
 # vulnerability: they are API generations, and `cargo audit` is clean on this
 # one. The whole line moves together the day `pgp` moves, or the day the
-# signature check stops needing it (marker 149).
+# signature check stops needing it (roadmap item 149).
 argon2 = "0.5"
 # Deriving the separate keys each container, lock and vault uses from one
 # secret, with a distinct info string for each.

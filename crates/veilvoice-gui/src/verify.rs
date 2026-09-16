@@ -24,7 +24,7 @@
 //! All three slots are visible from the start, and a drop fills whichever one
 //! the file's name says it is.
 //!
-//! # Marker 97: one press, three answers
+//! # Roadmap item 97: one press, three answers
 //!
 //! The tab used to answer one question, and it was not the question somebody
 //! actually has. "Is this zip the published one" is a step; "is the program I
@@ -105,7 +105,7 @@ fn slot_for(path: &Path) -> Slot {
 
 /// Everything one press of **check** found out.
 ///
-/// **Marker 97.** The tab used to answer one question -- is this archive the
+/// **Roadmap item 97.** The tab used to answer one question -- is this archive the
 /// published one -- and it now answers three, because the other two are what
 /// somebody actually wants to know and both were being left to the command
 /// line. The extra work is done on the same worker thread and reported in the
@@ -587,7 +587,7 @@ impl Verify {
         }
     }
 
-    /// Marker 90. The same check, with a GnuPG this project did not write.
+    /// Roadmap item 90. The same check, with a GnuPG this project did not write.
     ///
     /// Here rather than on its own tab because this is where somebody is
     /// already asking "is this download genuine", and the honest answer to that
@@ -849,7 +849,7 @@ impl Verify {
         self.gnupg_verdict(ui, report);
     }
 
-    /// Marker 97. Every extracted file against the signed contents list.
+    /// Roadmap item 97. Every extracted file against the signed contents list.
     fn contents_verdict(&self, ui: &mut Ui, report: &Report) {
         let Some(contents) = &report.contents else {
             return;
@@ -896,7 +896,7 @@ impl Verify {
         }
     }
 
-    /// Marker 97. What this machine's own GnuPG made of the same signature.
+    /// Roadmap item 97. What this machine's own GnuPG made of the same signature.
     fn gnupg_verdict(&self, ui: &mut Ui, report: &Report) {
         let Some(gnupg) = &report.gnupg else {
             return;
@@ -1046,7 +1046,7 @@ fn examine(download: &Path, sums_path: &Path, signature_path: &Path) -> Report {
     }
 }
 
-/// Marker 97. Every file in the extracted folder, against the signed list.
+/// Roadmap item 97. Every file in the extracted folder, against the signed list.
 ///
 /// The order is the one the whole project keeps: `CONTENTS.sha256` is checked
 /// against the signed hash list **before** it is parsed, because it decides
@@ -1147,7 +1147,7 @@ fn examine_contents(
     })
 }
 
-/// Marker 97. The same signature, through the GnuPG this machine already has.
+/// Roadmap item 97. The same signature, through the GnuPG this machine already has.
 fn examine_gnupg(sums: &Path, signature: &Path) -> Gnupg {
     let gpg = match veilvoice_gnupg::Gnupg::found() {
         Err(why) => {
@@ -1439,7 +1439,7 @@ mod tests {
         );
     }
 
-    /// Marker 90. The window and the command line must print the same GnuPG
+    /// Roadmap item 90. The window and the command line must print the same GnuPG
     /// recipe, which is why the body of it lives in `veilvoice-check` and both
     /// call it rather than each keeping a copy.
     #[test]
@@ -1484,7 +1484,7 @@ mod tests {
         assert!(matches!(error, Error::Malformed(_)), "{error:?}");
     }
 
-    /// **Marker 97.** A release with no contents list produces no row about
+    /// **Roadmap item 97.** A release with no contents list produces no row about
     /// one. Everything published before v0.1.15 is in that position, and a
     /// panel that reported the absence of an optional file would teach people
     /// to worry about it.
@@ -1513,7 +1513,7 @@ mod tests {
         std::fs::remove_dir_all(&room).ok();
     }
 
-    /// **Marker 97.** A contents list that is not the signed one is refused,
+    /// **Roadmap item 97.** A contents list that is not the signed one is refused,
     /// and nothing in the folder is reported on. Parsing it first and checking
     /// afterwards would be letting a downloaded text file choose which paths
     /// get read.
@@ -1543,7 +1543,7 @@ mod tests {
         std::fs::remove_dir_all(&room).ok();
     }
 
-    /// **Marker 97.** A GnuPG that cannot run is never drawn as a failure of
+    /// **Roadmap item 97.** A GnuPG that cannot run is never drawn as a failure of
     /// the download. The distinction is the one this is most tempted to get
     /// wrong, and getting it wrong tells somebody not to run a sound release.
     #[test]
@@ -1569,7 +1569,7 @@ mod tests {
         assert!(muted < red, "the not-answered case must be decided first");
     }
 
-    /// **Marker 97.** The extracted folder is only looked at once the archive
+    /// **Roadmap item 97.** The extracted folder is only looked at once the archive
     /// itself has passed. Reporting on a folder after the archive failed would
     /// be answering a question nobody should still be asking.
     #[test]

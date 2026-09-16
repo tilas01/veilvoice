@@ -356,7 +356,7 @@ fn the_repository_pins_its_line_endings() {
     }
 }
 
-/// **Marker 97.** The contents list decides which paths get read and what they
+/// **Roadmap item 97.** The contents list decides which paths get read and what they
 /// are compared against, so it is checked against the signed hash list *before*
 /// it is parsed.
 ///
@@ -426,7 +426,7 @@ fn matches_name(manifest: &Manifest) -> &'static str {
     }
 }
 
-/// **Marker 97.** GnuPG being unusable is not a statement about the download.
+/// **Roadmap item 97.** GnuPG being unusable is not a statement about the download.
 ///
 /// The distinction is the one a verifier is most tempted to get wrong: a
 /// missing keyring directory reads like a failure, and reporting it as one
@@ -1117,7 +1117,7 @@ fn only_the_session_builds_a_recorder() {
     );
 }
 
-/// **Marker 130.** One place in the window starts a live session.
+/// **Roadmap item 130.** One place in the window starts a live session.
 ///
 /// There were two: the live tab and the Studio, each with a session of its own,
 /// so veiling on one and recording on the other opened the same microphone
@@ -1165,7 +1165,7 @@ fn the_desktop_starts_a_live_session_in_exactly_one_place() {
             if trimmed.starts_with("//") {
                 continue;
             }
-            // **Marker 147.** A room is a session too, and is under the same
+            // **Roadmap item 147.** A room is a session too, and is under the same
             // rule: the microphone it opens is opened once or not at all.
             for needle in [
                 "LiveSession::start(",
@@ -1210,7 +1210,7 @@ fn the_desktop_starts_a_live_session_in_exactly_one_place() {
     }
 }
 
-/// **Marker 126.** Nothing in an audio callback allocates, locks or prints.
+/// **Roadmap item 126.** Nothing in an audio callback allocates, locks or prints.
 ///
 /// A callback runs on the operating system's audio thread with a deadline
 /// measured in milliseconds. Allocating in one takes a global lock in the

@@ -98,7 +98,7 @@ pub struct Outputs {
     pub subtitles: bool,
     /// The self-contained page that plays all of it together.
     pub page: bool,
-    /// **Marker 139.** The video file, with the picture drawn rather than black.
+    /// **Roadmap item 139.** The video file, with the picture drawn rather than black.
     ///
     /// Off by default, and the only one of the four that is. The other three
     /// are files this program writes on its own; this one needs `ffmpeg`, which
@@ -229,7 +229,7 @@ pub struct Group {
 
     /// The worker, while a render is running.
     job: Option<mpsc::Receiver<Result<Vec<PathBuf>, String>>>,
-    /// What that worker is doing, while it does it. **Marker 133.**
+    /// What that worker is doing, while it does it. **Roadmap item 133.**
     ///
     /// Shared with the render threads, which write to it, and read here every
     /// frame while the render is running. `None` when nothing is rendering.
@@ -898,7 +898,7 @@ impl Group {
             ui.checkbox(&mut self.outputs.audio, "audio");
             ui.checkbox(&mut self.outputs.subtitles, "subtitles");
             ui.checkbox(&mut self.outputs.page, "page");
-            // **Marker 139.** Off unless asked, because this is the one output
+            // **Roadmap item 139.** Off unless asked, because this is the one output
             // that needs a tool VeilVoice does not ship.
             ui.checkbox(&mut self.outputs.video, "video");
         });
@@ -1141,7 +1141,7 @@ impl Group {
             }
         });
 
-        // **Marker 133.** Two bars per speaker while the render walks the file:
+        // **Roadmap item 133.** Two bars per speaker while the render walks the file:
         // what went in, and what the engine produced from it. One bar answers
         // "is something being written" and not "is this person being veiled",
         // which is the question somebody rendering an interview is asking.
@@ -1244,7 +1244,7 @@ impl Group {
             config,
         };
 
-        // **Marker 133.** One slot per person the panel is showing. The plan
+        // **Roadmap item 133.** One slot per person the panel is showing. The plan
         // comes off disk and may name more; `render_watched` drops what this
         // cannot hold rather than refusing to render, because a bar with
         // nowhere to go is not worth a failed render.
@@ -1401,7 +1401,7 @@ fn render_now(job: &Job, watching: &render::Progress) -> Result<Vec<PathBuf>, St
     Ok(written)
 }
 
-/// **Marker 139.** Draw the frames, then have `ffmpeg` make the video of them.
+/// **Roadmap item 139.** Draw the frames, then have `ffmpeg` make the video of them.
 ///
 /// The pictures go into a directory beside the output and are **left there**
 /// rather than cleaned up. Two reasons, and the second is the one that decided
@@ -1668,7 +1668,7 @@ mod tests {
         assert!(error.contains("line break"), "{error}");
     }
 
-    /// **Marker 133.** Two bars per speaker, drawn while the render runs.
+    /// **Roadmap item 133.** Two bars per speaker, drawn while the render runs.
     ///
     /// Read out of the source rather than driven, for the reason every guard in
     /// this crate is: drawing a panel needs a window, and a test that opened one

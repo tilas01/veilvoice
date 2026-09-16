@@ -234,7 +234,7 @@
 <span class="ln" id="L180">        } <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L181">            String::<span class="tok-fn">new</span>()</span>
 <span class="ln" id="L182">        };</span>
-<span class="ln" id="L183">        <span class="tok-com">// **Marker 132.** What the platform said about the streams, on the</span></span>
+<span class="ln" id="L183">        <span class="tok-com">// **Roadmap item 132.** What the platform said about the streams, on the</span></span>
 <span class="ln" id="L184">        <span class="tok-com">// line already being watched. A recording made while the microphone</span></span>
 <span class="ln" id="L185">        <span class="tok-com">// was taken away is a recording somebody has to know that about, and</span></span>
 <span class="ln" id="L186">        <span class="tok-com">// the report is repeated when it is stored.</span></span>
@@ -303,7 +303,7 @@
 <span class="ln" id="L247"><span class="tok-kw">fn</span> <span class="tok-fn">report</span>(recorder: &amp;record::Recorder, seconds: f32, bytes: usize, interfered: u64) {</span>
 <span class="ln" id="L248">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;length&quot;</span>, &amp;format!(<span class="tok-str">&quot;{seconds:.1} s&quot;</span>)));</span>
 <span class="ln" id="L249">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;size&quot;</span>, &amp;format!(<span class="tok-str">&quot;{} KiB&quot;</span>, bytes / <span class="tok-num">1024</span>)));</span>
-<span class="ln" id="L250">    <span class="tok-com">// **Marker 132.** Said here as well as on the meter line, because the</span></span>
+<span class="ln" id="L250">    <span class="tok-com">// **Roadmap item 132.** Said here as well as on the meter line, because the</span></span>
 <span class="ln" id="L251">    <span class="tok-com">// meter line is gone by the time this is read and this is the moment</span></span>
 <span class="ln" id="L252">    <span class="tok-com">// somebody decides whether to keep what was recorded.</span></span>
 <span class="ln" id="L253">    <span class="tok-kw">if</span> interfered &gt; <span class="tok-num">0</span> {</span>

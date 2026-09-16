@@ -75,7 +75,7 @@
 <span class="ln" id="L24"><span class="tok-com">//! All three slots are visible from the start, and a drop fills whichever one</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! the file&#x27;s name says it is.</span></span>
 <span class="ln" id="L26"><span class="tok-com">//!</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! # Marker 97: one press, three answers</span></span>
+<span class="ln" id="L27"><span class="tok-com">//! # Roadmap item 97: one press, three answers</span></span>
 <span class="ln" id="L28"><span class="tok-com">//!</span></span>
 <span class="ln" id="L29"><span class="tok-com">//! The tab used to answer one question, and it was not the question somebody</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! actually has. &quot;Is this zip the published one&quot; is a step; &quot;is the program I</span></span>
@@ -161,7 +161,7 @@
 <span class="src-item" id="fn-report">
 <span class="ln" id="L106"><span class="tok-com">/// Everything one press of **check** found out.</span></span>
 <span class="ln" id="L107"><span class="tok-com">///</span></span>
-<span class="ln" id="L108"><span class="tok-com">/// **Marker 97.** The tab used to answer one question -- is this archive the</span></span>
+<span class="ln" id="L108"><span class="tok-com">/// **Roadmap item 97.** The tab used to answer one question -- is this archive the</span></span>
 <span class="ln" id="L109"><span class="tok-com">/// published one -- and it now answers three, because the other two are what</span></span>
 <span class="ln" id="L110"><span class="tok-com">/// somebody actually wants to know and both were being left to the command</span></span>
 <span class="ln" id="L111"><span class="tok-com">/// line. The extra work is done on the same worker thread and reported in the</span></span>
@@ -683,7 +683,7 @@
 </span>
 <span class="ln" id="L589"></span>
 <span class="src-item" id="fn-verify-gnupg_section">
-<span class="ln" id="L590">    <span class="tok-com">/// Marker 90. The same check, with a GnuPG this project did not write.</span></span>
+<span class="ln" id="L590">    <span class="tok-com">/// Roadmap item 90. The same check, with a GnuPG this project did not write.</span></span>
 <span class="ln" id="L591">    <span class="tok-com">///</span></span>
 <span class="ln" id="L592">    <span class="tok-com">/// Here rather than on its own tab because this is where somebody is</span></span>
 <span class="ln" id="L593">    <span class="tok-com">/// already asking &quot;is this download genuine&quot;, and the honest answer to that</span></span>
@@ -953,7 +953,7 @@
 </span>
 <span class="ln" id="L851"></span>
 <span class="src-item" id="fn-verify-contents_verdict">
-<span class="ln" id="L852">    <span class="tok-com">/// Marker 97. Every extracted file against the signed contents list.</span></span>
+<span class="ln" id="L852">    <span class="tok-com">/// Roadmap item 97. Every extracted file against the signed contents list.</span></span>
 <span class="ln" id="L853">    <span class="tok-kw">fn</span> <span class="tok-fn">contents_verdict</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, report: &amp;Report) {</span>
 <span class="ln" id="L854">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(contents) = &amp;report.contents <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L855">            <span class="tok-kw">return</span>;</span>
@@ -1002,7 +1002,7 @@
 </span>
 <span class="ln" id="L898"></span>
 <span class="src-item" id="fn-verify-gnupg_verdict">
-<span class="ln" id="L899">    <span class="tok-com">/// Marker 97. What this machine&#x27;s own GnuPG made of the same signature.</span></span>
+<span class="ln" id="L899">    <span class="tok-com">/// Roadmap item 97. What this machine&#x27;s own GnuPG made of the same signature.</span></span>
 <span class="ln" id="L900">    <span class="tok-kw">fn</span> <span class="tok-fn">gnupg_verdict</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, report: &amp;Report) {</span>
 <span class="ln" id="L901">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(gnupg) = &amp;report.gnupg <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L902">            <span class="tok-kw">return</span>;</span>
@@ -1160,7 +1160,7 @@
 </span>
 <span class="ln" id="L1048"></span>
 <span class="src-item" id="fn-examine_contents">
-<span class="ln" id="L1049"><span class="tok-com">/// Marker 97. Every file in the extracted folder, against the signed list.</span></span>
+<span class="ln" id="L1049"><span class="tok-com">/// Roadmap item 97. Every file in the extracted folder, against the signed list.</span></span>
 <span class="ln" id="L1050"><span class="tok-com">///</span></span>
 <span class="ln" id="L1051"><span class="tok-com">/// The order is the one the whole project keeps: `CONTENTS.sha256` is checked</span></span>
 <span class="ln" id="L1052"><span class="tok-com">/// against the signed hash list **before** it is parsed, because it decides</span></span>
@@ -1263,7 +1263,7 @@
 </span>
 <span class="ln" id="L1149"></span>
 <span class="src-item" id="fn-examine_gnupg">
-<span class="ln" id="L1150"><span class="tok-com">/// Marker 97. The same signature, through the GnuPG this machine already has.</span></span>
+<span class="ln" id="L1150"><span class="tok-com">/// Roadmap item 97. The same signature, through the GnuPG this machine already has.</span></span>
 <span class="ln" id="L1151"><span class="tok-kw">fn</span> <span class="tok-fn">examine_gnupg</span>(sums: &amp;Path, signature: &amp;Path) -&gt; Gnupg {</span>
 <span class="ln" id="L1152">    <span class="tok-kw">let</span> gpg = <span class="tok-kw">match</span> veilvoice_gnupg::Gnupg::<span class="tok-fn">found</span>() {</span>
 <span class="ln" id="L1153">        <span class="tok-fn">Err</span>(why) =&gt; {</span>
@@ -1556,7 +1556,7 @@
 <span class="ln" id="L1439">        );</span>
 <span class="ln" id="L1440">    }</span>
 <span class="ln" id="L1441"></span>
-<span class="ln" id="L1442">    <span class="tok-com">/// Marker 90. The window and the command line must print the same GnuPG</span></span>
+<span class="ln" id="L1442">    <span class="tok-com">/// Roadmap item 90. The window and the command line must print the same GnuPG</span></span>
 <span class="ln" id="L1443">    <span class="tok-com">/// recipe, which is why the body of it lives in `veilvoice-check` and both</span></span>
 <span class="ln" id="L1444">    <span class="tok-com">/// call it rather than each keeping a copy.</span></span>
 <span class="ln" id="L1445">    <span class="tok-attr">#[test</span>]</span>
@@ -1601,7 +1601,7 @@
 <span class="ln" id="L1484">        assert!(matches!(error, Error::<span class="tok-fn">Malformed</span>(_)), <span class="tok-str">&quot;{error:?}&quot;</span>);</span>
 <span class="ln" id="L1485">    }</span>
 <span class="ln" id="L1486"></span>
-<span class="ln" id="L1487">    <span class="tok-com">/// **Marker 97.** A release with no contents list produces no row about</span></span>
+<span class="ln" id="L1487">    <span class="tok-com">/// **Roadmap item 97.** A release with no contents list produces no row about</span></span>
 <span class="ln" id="L1488">    <span class="tok-com">/// one. Everything published before v0.1.15 is in that position, and a</span></span>
 <span class="ln" id="L1489">    <span class="tok-com">/// panel that reported the absence of an optional file would teach people</span></span>
 <span class="ln" id="L1490">    <span class="tok-com">/// to worry about it.</span></span>
@@ -1630,7 +1630,7 @@
 <span class="ln" id="L1513">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
 <span class="ln" id="L1514">    }</span>
 <span class="ln" id="L1515"></span>
-<span class="ln" id="L1516">    <span class="tok-com">/// **Marker 97.** A contents list that is not the signed one is refused,</span></span>
+<span class="ln" id="L1516">    <span class="tok-com">/// **Roadmap item 97.** A contents list that is not the signed one is refused,</span></span>
 <span class="ln" id="L1517">    <span class="tok-com">/// and nothing in the folder is reported on. Parsing it first and checking</span></span>
 <span class="ln" id="L1518">    <span class="tok-com">/// afterwards would be letting a downloaded text file choose which paths</span></span>
 <span class="ln" id="L1519">    <span class="tok-com">/// get read.</span></span>
@@ -1660,7 +1660,7 @@
 <span class="ln" id="L1543">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
 <span class="ln" id="L1544">    }</span>
 <span class="ln" id="L1545"></span>
-<span class="ln" id="L1546">    <span class="tok-com">/// **Marker 97.** A GnuPG that cannot run is never drawn as a failure of</span></span>
+<span class="ln" id="L1546">    <span class="tok-com">/// **Roadmap item 97.** A GnuPG that cannot run is never drawn as a failure of</span></span>
 <span class="ln" id="L1547">    <span class="tok-com">/// the download. The distinction is the one this is most tempted to get</span></span>
 <span class="ln" id="L1548">    <span class="tok-com">/// wrong, and getting it wrong tells somebody not to run a sound release.</span></span>
 <span class="ln" id="L1549">    <span class="tok-attr">#[test</span>]</span>
@@ -1686,7 +1686,7 @@
 <span class="ln" id="L1569">        assert!(muted &lt; red, <span class="tok-str">&quot;the not-answered case must be decided first&quot;</span>);</span>
 <span class="ln" id="L1570">    }</span>
 <span class="ln" id="L1571"></span>
-<span class="ln" id="L1572">    <span class="tok-com">/// **Marker 97.** The extracted folder is only looked at once the archive</span></span>
+<span class="ln" id="L1572">    <span class="tok-com">/// **Roadmap item 97.** The extracted folder is only looked at once the archive</span></span>
 <span class="ln" id="L1573">    <span class="tok-com">/// itself has passed. Reporting on a folder after the archive failed would</span></span>
 <span class="ln" id="L1574">    <span class="tok-com">/// be answering a question nobody should still be asking.</span></span>
 <span class="ln" id="L1575">    <span class="tok-attr">#[test</span>]</span>

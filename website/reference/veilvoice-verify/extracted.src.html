@@ -52,7 +52,7 @@
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
 <span class="ln" id="L2"><span class="tok-com">//! What came out of the archive, and the GnuPG somebody already has.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
-<span class="ln" id="L4"><span class="tok-com">//! **Marker 91.** Two halves of the same request: check the extracted copy as</span></span>
+<span class="ln" id="L4"><span class="tok-com">//! **Roadmap item 91.** Two halves of the same request: check the extracted copy as</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! well as the archive, and offer the check through GnuPG for anybody who would</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! rather trust their own tools than this binary.</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
@@ -232,8 +232,8 @@
 <span class="ln" id="L165"></span>
 <span class="ln" id="L166"><span class="tok-com">/// The commands that check this release with somebody else&#x27;s GnuPG.</span></span>
 <span class="ln" id="L167"><span class="tok-com">///</span></span>
-<span class="ln" id="L168"><span class="tok-com">/// Marker 90 moved the body out of this binary so the desktop application&#x27;s</span></span>
-<span class="ln" id="L169"><span class="tok-com">/// verify tab prints the same commands; marker 97 moved it again, into</span></span>
+<span class="ln" id="L168"><span class="tok-com">/// Roadmap item 90 moved the body out of this binary so the desktop application&#x27;s</span></span>
+<span class="ln" id="L169"><span class="tok-com">/// verify tab prints the same commands; roadmap item 97 moved it again, into</span></span>
 <span class="ln" id="L170"><span class="tok-com">/// `veilvoice-gnupg`, which also *runs* them. Re-exported here rather than</span></span>
 <span class="ln" id="L171"><span class="tok-com">/// called through at every site, which keeps this module the one place the</span></span>
 <span class="ln" id="L172"><span class="tok-com">/// verifier looks for anything about extracted releases and GnuPG.</span></span>
@@ -327,7 +327,7 @@
 <span class="ln" id="L260">        assert!(short[<span class="tok-num">0</span>].<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;gpg --verify&quot;</span>));</span>
 <span class="ln" id="L261">    }</span>
 <span class="ln" id="L262"></span>
-<span class="ln" id="L263">    <span class="tok-com">/// Marker 91. The extracted report must never run when the archive itself</span></span>
+<span class="ln" id="L263">    <span class="tok-com">/// Roadmap item 91. The extracted report must never run when the archive itself</span></span>
 <span class="ln" id="L264">    <span class="tok-com">/// failed. &quot;The archive is bad, and here are the programs in the folder</span></span>
 <span class="ln" id="L265">    <span class="tok-com">/// beside it&quot; reads as reassurance, and there is none to give: an archive</span></span>
 <span class="ln" id="L266">    <span class="tok-com">/// that failed its signature says nothing good about anything unpacked</span></span>
@@ -339,7 +339,7 @@
 <span class="ln" id="L272">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn command_auto(&quot;</span>)</span>
 <span class="ln" id="L273">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_auto exists&quot;</span>);</span>
 <span class="ln" id="L274">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L275">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// Marker 91. What is in the folder&quot;</span>)</span>
+<span class="ln" id="L275">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// Roadmap item 91. What is in the folder&quot;</span>)</span>
 <span class="ln" id="L276">            .<span class="tok-fn">map</span>(|at| start + at)</span>
 <span class="ln" id="L277">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
 <span class="ln" id="L278">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>

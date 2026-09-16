@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! The signed list of what is inside each release archive.
 //!
-//! **Marker 97.** `SHA256SUMS` covers the archives. That proves a download is
+//! **Roadmap item 97.** `SHA256SUMS` covers the archives. That proves a download is
 //! the one that was published, and it says nothing at all about the folder
 //! somebody unzipped it into, which is the copy they actually run.
 //!

@@ -526,7 +526,7 @@ fn the_studio_meters_what_goes_in_as_well_as_what_comes_out() {
     // One output meter answers "is something being recorded" and not "is it
     // being veiled", which is the question somebody at this tab is asking.
     //
-    // Read out of `app.rs` rather than out of this module since marker 130:
+    // Read out of `app.rs` rather than out of this module since roadmap item 130:
     // the voice half of the tab, which is where the meters are, is drawn by
     // the window, because the device lists and the settings widgets it sits
     // beside are the window's. The property is unchanged and so is this test;
@@ -566,7 +566,7 @@ fn the_studio_meters_what_goes_in_as_well_as_what_comes_out() {
 
 #[test]
 fn a_new_studio_keeps_the_veiled_voice_and_nothing_else() {
-    // The default is the whole safety property of marker 131: nothing reaches a
+    // The default is the whole safety property of roadmap item 131: nothing reaches a
     // recording of somebody's real voice without being asked for.
     let studio = Studio::default();
     assert_eq!(studio.keep, Keep::Veiled);
@@ -641,7 +641,7 @@ fn the_unveiled_take_is_named_so_it_can_be_told_from_the_other() {
     assert_eq!(take_name("chat", Whose::Only, true), "chat");
     assert_eq!(take_name("chat", Whose::Only, false), "chat (unveiled)");
 
-    // **Marker 147.** A room take is the mix and one or two per guest, so the
+    // **Roadmap item 147.** A room take is the mix and one or two per guest, so the
     // names have to separate the guests from each other as well as the two
     // sides of each of them.
     assert_eq!(
@@ -736,7 +736,7 @@ fn every_recorder_that_is_running_is_drained_every_frame() {
             "the veiled take would be short and its clock would sit at zero",
         ),
         ("self.plain", "an unveiled take would be quietly short"),
-        // **Marker 147.** A room take is the mix and one or two per guest, on
+        // **Roadmap item 147.** A room take is the mix and one or two per guest, on
         // the same rule, drained by the same loop: a second loop somewhere
         // else is how one of them gets missed.
         (
@@ -756,7 +756,7 @@ fn every_recorder_that_is_running_is_drained_every_frame() {
     }
 }
 
-/// **Marker 145.** The Studio's own failsafe stops the Studio, not the take.
+/// **Roadmap item 145.** The Studio's own failsafe stops the Studio, not the take.
 ///
 /// A device that has gone does not come back and will not produce another
 /// sample, so a take left running on it records silence and looks like it
@@ -868,7 +868,7 @@ fn the_failsafe_stores_rather_than_discarding_or_retrying() {
     }
 }
 
-/// **Marker 145.** A take says what it is keeping while it is being made.
+/// **Roadmap item 145.** A take says what it is keeping while it is being made.
 ///
 /// The choice is made on a form that is gone the moment recording starts, so a
 /// take keeping somebody's real voice looked exactly like one that does not for
@@ -894,7 +894,7 @@ fn a_running_take_says_which_voice_it_is_keeping() {
     );
 }
 
-/// **Marker 147.** Two guests on one microphone is refused, and says why.
+/// **Roadmap item 147.** Two guests on one microphone is refused, and says why.
 ///
 /// One microphone carrying two people is one signal. Veiling it gives both of
 /// them the same voice, which is the exact thing a microphone each was for, and
@@ -996,7 +996,7 @@ fn a_room_starts_with_two_and_stops_at_the_audio_layers_limit() {
     assert_eq!(studio.room_guests().len(), veilvoice_audio::MAX_GUESTS);
 }
 
-/// **Marker 147.** One session or the other, and never both.
+/// **Roadmap item 147.** One session or the other, and never both.
 ///
 /// Two fields would be two things to clear, and a room left running beside a
 /// single session is two streams on one output with every guest arriving twice.

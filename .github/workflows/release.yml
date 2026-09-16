@@ -632,7 +632,7 @@ jobs:
           path: staging
           merge-multiple: true
 
-      # **Marker 97.** A signed list of what is inside every archive.
+      # **Roadmap item 97.** A signed list of what is inside every archive.
       #
       # `SHA256SUMS` covers the archives. That proves a download is the one that
       # was published and says nothing whatever about the folder somebody
