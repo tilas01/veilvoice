@@ -19,10 +19,10 @@
 //!
 //! The output callback runs every guest's engine before it returns. They share
 //! a deadline of a few milliseconds, so the cost is the sum, and this is the
-//! honest account the marker asked for rather than a paragraph promising it is
-//! fine: [`RoomStats::load`] is that sum measured against that deadline, drawn
-//! where somebody can see it. At 1.0 the engines have used the whole of the
-//! time the block had, and what follows is dropouts.
+//! honest account the roadmap item asked for rather than a paragraph promising
+//! it is fine: [`RoomStats::load`] is that sum measured against that deadline,
+//! drawn where somebody can see it. At 1.0 the engines have used the whole of
+//! the time the block had, and what follows is dropouts.
 //!
 //! It is a measurement rather than a limit, because the number of guests a
 //! machine can carry is a fact about the machine. [`MAX_GUESTS`] is a bound on

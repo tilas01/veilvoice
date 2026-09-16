@@ -344,9 +344,12 @@ def html_page(colours, rel, text, fingerprint):
     lines = text.count("\n") + 1
 
     body = []
+    # Sized from the drawing, so the heading under it does not move when the
+    # banner arrives and a link to that heading lands above it.
+    banner_w, banner_h = docs.banner_size(os.path.join("..", "sources", "%s.svg" % slug))
     body.append(
-        '<p><img src="../../assets/sources/%s.svg" alt="%s" '
-        'style="width:100%%;height:auto"></p>' % (slug, docs.esc(rel))
+        '<p><img src="../../assets/sources/%s.svg" alt="%s" width="%d" height="%d" '
+        'style="width:100%%;height:auto"></p>' % (slug, docs.esc(rel), banner_w, banner_h)
     )
     body.append("<h1><code>%s</code></h1>" % docs.esc(rel))
     body.append(

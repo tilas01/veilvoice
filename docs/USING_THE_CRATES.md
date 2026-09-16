@@ -53,15 +53,28 @@ argument is that you can check what you are running.
 | `veilvoice-crypto` | the `.veil` container, Argon2id, hybrid PQ key exchange, secure erase |
 | `veilvoice-audio` | decoding, WAV writing, device enumeration, live capture |
 | `veilvoice-meta` | stripping tags, EXIF and GPS |
-| `veilvoice-guard` | file-integrity manifests and tamper reporting |
-| `veilvoice-watch` | which applications hold the microphone or camera |
-| `veilvoice-setup` | a per-user install that is reversible, and detection of optional companion software |
-| `veilvoice-sentry` | canary files, and how much of a directory changed between two looks |
-| `veilvoice-policy` | settings somebody else fixed, sealed under a passphrase, and only ever stricter |
-| `veilvoice-drivers` | the loaded kernel drivers, and what changed since you last looked |
-| `veilvoice-capture` | which screen recorders are running, with an allowlist so they stop nagging |
 | `veilvoice-conversation` | several speakers in one recording, a voice each, and subtitles |
+| `veilvoice-video` | the same conversation drawn: a waveform, a circle per speaker, subtitles, and ffmpeg to mux it |
+| `veilvoice-workspace` | named profiles and saved projects, so a recording can be repeated exactly |
+| `veilvoice-policy` | settings somebody else fixed, sealed under a passphrase, and only ever stricter |
+| `veilvoice-decoy` | a second passphrase that opens an empty VeilVoice, and what that is honestly worth |
+| `veilvoice-setup` | a per-user install that is reversible, and detection of optional companion software |
+| `veilvoice-update` | whether a newer release exists, asked only when you ask; nothing is fetched or installed |
+| `veilvoice-check` | a hash, a line in a signed list, and a detached signature, with no GnuPG on the machine |
+| `veilvoice-gnupg` | the same three checks through the GnuPG you already have, read from its status output |
 | `veilvoice-verify` | the verifier behind `veilvoice verify`; a library since 0.1.18, when it stopped being a binary of its own |
+| `veilvoice-guard` | file-integrity manifests and tamper reporting |
+| `veilvoice-sentry` | canary files, and how much of a directory changed between two looks |
+| `veilvoice-watch` | which applications hold the microphone or camera |
+| `veilvoice-failsafe` | another program taking a real microphone while you are being veiled, noticed and acted on |
+| `veilvoice-capture` | which screen recorders are running, with an allowlist so they stop nagging |
+| `veilvoice-input` | which programs can see your keyboard and mouse, and why a clean answer proves nothing |
+| `veilvoice-drivers` | the loaded kernel drivers, and what changed since you last looked |
+| `veilvoice-proc` | the process list on each platform, with the limits of that answer |
+| `veilvoice-appctl` | what normally runs here, what does not, and grants that expire |
+| `veilvoice-priv` | the privilege level you are running at, reported and never raised |
+| `veilvoice-accel` | the graphics hardware, what of it encodes video, and why the audio path uses none of it |
+| `veilvoice-gui` | the desktop application; a library so its own tests can reach it, rather than something to build on |
 
 ---
 

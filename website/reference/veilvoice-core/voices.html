@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,9 +46,9 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-core/voices.svg" alt="voices.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-core/voices.svg" alt="voices.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/voices.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 867 lines &middot; <a href="voices.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 872 lines &middot; <a href="voices.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -96,7 +97,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>867 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>872 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Voice</code> <span style="color:var(--muted)">line 134</span> &middot; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
 </ul>
@@ -110,13 +111,13 @@
 </li>
 <li><code>voice</code> <span style="color:var(--muted)">line 326</span> &middot; The destination voice for slot index.
 </li>
-<li><code>clear_voices</code> <span style="color:var(--muted)">line 407</span> &middot; How many voices can be handed out before two of them are too alike.
+<li><code>clear_voices</code> <span style="color:var(--muted)">line 412</span> &middot; How many voices can be handed out before two of them are too alike.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>closest_pair</code> <span style="color:var(--muted)">line 427</span> &middot; The closest pair among the first count voices, as a ratio.
+<li><code>closest_pair</code> <span style="color:var(--muted)">line 432</span> &middot; The closest pair among the first count voices, as a ratio.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>distinct_voices</code> <span style="color:var(--muted)">line 453</span> &middot; How many of the ten are still distinguishable under config.
+<li><code>distinct_voices</code> <span style="color:var(--muted)">line 458</span> &middot; How many of the ten are still distinguishable under config.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code></span>
 </li>
 </ul>
@@ -184,17 +185,17 @@
 <a href="voices.src.html#fn-clear_voices">
 <rect x="72.4" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="134.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clear_voices</text>
-<text x="134.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 407</text>
+<text x="134.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 412</text>
 </a>
 <a href="voices.src.html#fn-closest_pair">
 <rect x="223.1" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="285.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">closest_pair</text>
-<text x="285.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
+<text x="285.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 432</text>
 </a>
 <a href="voices.src.html#fn-distinct_voices">
 <rect x="373.8" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="448.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">distinct_voices</text>
-<text x="448.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 453</text>
+<text x="448.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 458</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -219,9 +220,9 @@ flowchart TD
     n_voice([&quot;voice&lt;br/&gt;line 326&quot;])
     n_all[&quot;all&lt;br/&gt;line 337&quot;]
     n_separation[&quot;separation&lt;br/&gt;line 363&quot;]
-    n_clear_voices([&quot;clear_voices&lt;br/&gt;line 407&quot;])
-    n_closest_pair([&quot;closest_pair&lt;br/&gt;line 427&quot;])
-    n_distinct_voices([&quot;distinct_voices&lt;br/&gt;line 453&quot;])
+    n_clear_voices([&quot;clear_voices&lt;br/&gt;line 412&quot;])
+    n_closest_pair([&quot;closest_pair&lt;br/&gt;line 432&quot;])
+    n_distinct_voices([&quot;distinct_voices&lt;br/&gt;line 458&quot;])
     n_clear_voices --&gt; n_all
     n_clear_voices --&gt; n_separation
     n_closest_pair --&gt; n_all
@@ -237,9 +238,9 @@ flowchart TD
     click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L326&quot; &quot;open the source&quot;
     click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L337&quot; &quot;open the source&quot;
     click n_separation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L363&quot; &quot;open the source&quot;
-    click n_clear_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L407&quot; &quot;open the source&quot;
-    click n_closest_pair href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L427&quot; &quot;open the source&quot;
-    click n_distinct_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L453&quot; &quot;open the source&quot;
+    click n_clear_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L412&quot; &quot;open the source&quot;
+    click n_closest_pair href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L432&quot; &quot;open the source&quot;
+    click n_distinct_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L458&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_checked,n_describe,n_voice,n_clear_voices,n_closest_pair,n_distinct_voices entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -269,10 +270,10 @@ flowchart TD
 <tr><td><code>voice</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-voice-2">326</a></td><td>The destination voice for slot index.</td></tr>
 <tr><td><code>all</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-all">337</a></td><td>Every destination voice, in the order they are handed out.</td></tr>
 <tr><td><code>separation</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-separation">363</a></td><td>How far apart two voices are, as the larger of their two separations.</td></tr>
-<tr><td><code>CLEAR_SEPARATION</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-clear_separation">395</a></td><td>The separation below which two voices should not be handed to two people.</td></tr>
-<tr><td><code>clear_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-clear_voices">407</a></td><td>How many voices can be handed out before two of them are too alike.</td></tr>
-<tr><td><code>closest_pair</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-closest_pair">427</a></td><td>The closest pair among the first count voices, as a ratio.</td></tr>
-<tr><td><code>distinct_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-distinct_voices">453</a></td><td>How many of the ten are still distinguishable under config.</td></tr>
+<tr><td><code>CLEAR_SEPARATION</code> <sub>pub const</sub></td><td><a href="voices.src.html#fn-clear_separation">400</a></td><td>The separation below which two voices should not be handed to two people.</td></tr>
+<tr><td><code>clear_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-clear_voices">412</a></td><td>How many voices can be handed out before two of them are too alike.</td></tr>
+<tr><td><code>closest_pair</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-closest_pair">432</a></td><td>The closest pair among the first count voices, as a ratio.</td></tr>
+<tr><td><code>distinct_voices</code> <sub>pub fn</sub></td><td><a href="voices.src.html#fn-distinct_voices">458</a></td><td>How many of the ten are still distinguishable under config.</td></tr>
 </tbody></table>
 </section>
 </div></div>

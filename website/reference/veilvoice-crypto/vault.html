@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,9 +46,9 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-crypto/vault.svg" alt="vault.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-crypto/vault.svg" alt="vault.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/vault.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 680 lines &middot; <a href="vault.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 688 lines &middot; <a href="vault.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-real-here-and-what-is-only-awkward">What is real here and what is only awkward</a>
@@ -73,7 +74,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>680 lines defining <strong>12 functions</strong> (8 public), <strong>2 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>688 lines defining <strong>12 functions</strong> (8 public), <strong>2 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Found</code> <span style="color:var(--muted)">line 76</span> &middot; What Vault::load found when it went looking.</li>
 <li><code>struct Vault</code> <span style="color:var(--muted)">line 103</span> &middot; The two files a lock lives in, and the index that names them.</li>
@@ -96,7 +97,7 @@
 </li>
 <li><code>Vault::clear</code> <span style="color:var(--muted)">line 240</span> &middot; Remove both copies, and the index with them.
 </li>
-<li><code>admin_dir</code> <span style="color:var(--muted)">line 328</span> &middot; A directory only an administrator can write to, if this process can make one there.
+<li><code>admin_dir</code> <span style="color:var(--muted)">line 336</span> &middot; A directory only an administrator can write to, if this process can make one there.
 </li>
 </ul>
 </section>
@@ -157,27 +158,27 @@
 <a href="vault.src.html#fn-vault-write_one">
 <rect x="71.2" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="149.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::write_one</text>
-<text x="149.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 256</text>
+<text x="149.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
 </a>
 <a href="vault.src.html#fn-vault-read_masked">
 <rect x="254.1" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="340.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::read_masked</text>
-<text x="340.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 271</text>
+<text x="340.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
 </a>
 <a href="vault.src.html#fn-name_for">
 <rect x="453.2" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="499.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">name_for</text>
-<text x="499.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+<text x="499.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
 </a>
 <a href="vault.src.html#fn-mask">
 <rect x="262.2" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="308.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">mask</text>
-<text x="308.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 298</text>
+<text x="308.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 306</text>
 </a>
 <a href="vault.src.html#fn-admin_dir">
 <rect x="480.2" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="530.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">admin_dir</text>
-<text x="530.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 328</text>
+<text x="530.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -201,11 +202,11 @@ flowchart TD
     n_load([&quot;Vault::load&lt;br/&gt;line 184&quot;])
     n_store([&quot;Vault::store&lt;br/&gt;line 233&quot;])
     n_clear([&quot;Vault::clear&lt;br/&gt;line 240&quot;])
-    n_write_one[&quot;Vault::write_one&lt;br/&gt;line 256&quot;]
-    n_read_masked[&quot;Vault::read_masked&lt;br/&gt;line 271&quot;]
-    n_name_for[&quot;name_for&lt;br/&gt;line 279&quot;]
-    n_mask[&quot;mask&lt;br/&gt;line 298&quot;]
-    n_admin_dir([&quot;admin_dir&lt;br/&gt;line 328&quot;])
+    n_write_one[&quot;Vault::write_one&lt;br/&gt;line 260&quot;]
+    n_read_masked[&quot;Vault::read_masked&lt;br/&gt;line 279&quot;]
+    n_name_for[&quot;name_for&lt;br/&gt;line 287&quot;]
+    n_mask[&quot;mask&lt;br/&gt;line 306&quot;]
+    n_admin_dir([&quot;admin_dir&lt;br/&gt;line 336&quot;])
     n_at --&gt; n_name_for
     n_load --&gt; n_read_masked
     n_load --&gt; n_write_one
@@ -219,11 +220,11 @@ flowchart TD
     click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L184&quot; &quot;open the source&quot;
     click n_store href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L233&quot; &quot;open the source&quot;
     click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L240&quot; &quot;open the source&quot;
-    click n_write_one href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L256&quot; &quot;open the source&quot;
-    click n_read_masked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L271&quot; &quot;open the source&quot;
-    click n_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L279&quot; &quot;open the source&quot;
-    click n_mask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L298&quot; &quot;open the source&quot;
-    click n_admin_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L328&quot; &quot;open the source&quot;
+    click n_write_one href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L260&quot; &quot;open the source&quot;
+    click n_read_masked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L279&quot; &quot;open the source&quot;
+    click n_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287&quot; &quot;open the source&quot;
+    click n_mask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L306&quot; &quot;open the source&quot;
+    click n_admin_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L336&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_at,n_primary,n_shadow,n_index,n_load,n_store,n_clear,n_admin_dir entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -249,11 +250,11 @@ flowchart TD
 <tr><td><code>Vault::load</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-load">184</a></td><td>Read the lock, restoring one copy from the other if it has to.</td></tr>
 <tr><td><code>Vault::store</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-store">233</a></td><td>Write both copies, and say whether the spare is now current.</td></tr>
 <tr><td><code>Vault::clear</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-clear">240</a></td><td>Remove both copies, and the index with them.</td></tr>
-<tr><td><code>Vault::write_one</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-write_one">256</a></td><td></td></tr>
-<tr><td><code>Vault::read_masked</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-read_masked">271</a></td><td></td></tr>
-<tr><td><code>name_for</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-name_for">279</a></td><td>The file name derived from site under label.</td></tr>
-<tr><td><code>mask</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-mask">298</a></td><td>Exclusive-or bytes with a keystream derived from site.</td></tr>
-<tr><td><code>admin_dir</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-admin_dir">328</a></td><td>A directory only an administrator can write to, if this process can make one there.</td></tr>
+<tr><td><code>Vault::write_one</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-write_one">260</a></td><td>Mask bytes for this site and write them at path, creating the directory if it is not there.</td></tr>
+<tr><td><code>Vault::read_masked</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-read_masked">279</a></td><td>Read one file back and unmask it, or None if it is not a lock.</td></tr>
+<tr><td><code>name_for</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-name_for">287</a></td><td>The file name derived from site under label.</td></tr>
+<tr><td><code>mask</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-mask">306</a></td><td>Exclusive-or bytes with a keystream derived from site.</td></tr>
+<tr><td><code>admin_dir</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-admin_dir">336</a></td><td>A directory only an administrator can write to, if this process can make one there.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,9 +46,9 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-crypto/privatefile.svg" alt="privatefile.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-crypto/privatefile.svg" alt="privatefile.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/privatefile.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 308 lines &middot; <a href="privatefile.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 313 lines &middot; <a href="privatefile.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-not-stdfswrite-plus-a-chmod">Why this is not std::fs::write plus a chmod</a>
@@ -74,7 +75,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>308 lines defining <strong>5 functions</strong> (4 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>313 lines defining <strong>5 functions</strong> (4 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>write_owner_only</code> <span style="color:var(--muted)">line 56</span> &middot; Create path containing bytes, readable only by the current user.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>write_inner</code></span>
@@ -128,7 +129,7 @@
 <a href="privatefile.src.html#fn-write_inner">
 <rect x="247.3" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="305.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_inner</text>
-<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 148</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -149,7 +150,7 @@ flowchart TD
     n_write_owner_only_new([&quot;write_owner_only_new&lt;br/&gt;line 67&quot;])
     n_replace_owner_only([&quot;replace_owner_only&lt;br/&gt;line 86&quot;])
     n_tighten([&quot;tighten&lt;br/&gt;line 130&quot;])
-    n_write_inner[&quot;write_inner&lt;br/&gt;line 143&quot;]
+    n_write_inner[&quot;write_inner&lt;br/&gt;line 148&quot;]
     n_replace_owner_only --&gt; n_write_inner
     n_write_owner_only --&gt; n_write_inner
     n_write_owner_only_new --&gt; n_write_inner
@@ -157,7 +158,7 @@ flowchart TD
     click n_write_owner_only_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67&quot; &quot;open the source&quot;
     click n_replace_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L86&quot; &quot;open the source&quot;
     click n_tighten href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L130&quot; &quot;open the source&quot;
-    click n_write_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L143&quot; &quot;open the source&quot;
+    click n_write_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L148&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only,n_tighten entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -172,7 +173,7 @@ flowchart TD
 <tr><td><code>write_owner_only_new</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-write_owner_only_new">67</a></td><td>As write_owner_only, but fail if anything is already at path.</td></tr>
 <tr><td><code>replace_owner_only</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-replace_owner_only">86</a></td><td>Replace path with bytes in one step, or leave what was there.</td></tr>
 <tr><td><code>tighten</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-tighten">130</a></td><td>Make an existing file readable only by its owner.</td></tr>
-<tr><td><code>write_inner</code> <sub>fn</sub></td><td><a href="privatefile.src.html#fn-write_inner">143</a></td><td></td></tr>
+<tr><td><code>write_inner</code> <sub>fn</sub></td><td><a href="privatefile.src.html#fn-write_inner">148</a></td><td>Create or replace a file that only its owner can read.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -312,6 +312,10 @@ impl Studio {
         Ok(())
     }
 
+    /// Seal the index and replace the file on disk with it.
+    ///
+    /// Replaced rather than rewritten in place, so a crash halfway through leaves
+    /// the old index rather than half of the new one.
     fn write_index(&self, entries: &[Entry]) -> Result<(), Error> {
         let text = render_index(entries);
         let sealed = self.seal(text.as_bytes(), b"veilvoice/studio/index")?;
@@ -330,6 +334,10 @@ impl Studio {
         Ok(out)
     }
 
+    /// Open what [`Studio::seal`] produced, with the same associated data.
+    ///
+    /// The nonce is the first bytes of the file, so a file shorter than one is
+    /// truncated rather than something to attempt.
     fn unseal(&self, sealed: &[u8], aad: &[u8]) -> Result<Vec<u8>, Error> {
         if sealed.len() < crate::aead::NONCE_LEN {
             return Err(Error::Truncated);
@@ -409,6 +417,12 @@ fn render_index(entries: &[Entry]) -> String {
     out
 }
 
+/// Read the index back: one entry per line, four tab-separated fields.
+///
+/// Every field is read from inside the sealed region, so this parses text that
+/// has already been authenticated. It still refuses a line it cannot read
+/// rather than filling in a default, because a record that says the wrong
+/// thing is worse than one that is missing.
 fn parse_index(text: &str) -> Result<Vec<Entry>, Error> {
     let mut out = Vec::new();
     for line in text.lines() {

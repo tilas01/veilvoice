@@ -253,6 +253,10 @@ impl Vault {
         Ok(())
     }
 
+    /// Mask `bytes` for this site and write them at `path`, creating the
+    /// directory if it is not there.
+    ///
+    /// Replaced rather than truncated and rewritten, for the reason in the body.
     fn write_one(&self, path: &Path, bytes: &[u8]) -> Result<(), Error> {
         if let Some(parent) = path.parent() {
             if !parent.as_os_str().is_empty() {
@@ -268,6 +272,10 @@ impl Vault {
         crate::privatefile::replace_owner_only(path, &masked).map_err(|_| Error::AppLockStore)
     }
 
+    /// Read one file back and unmask it, or `None` if it is not a lock.
+    ///
+    /// A decoy fails to parse here, which is how the real file is found among
+    /// them without anything on disk saying which it is.
     fn read_masked(&self, path: &Path) -> Option<lock::AppLock> {
         let mut bytes = std::fs::read(path).ok()?;
         mask(&self.site, &mut bytes);

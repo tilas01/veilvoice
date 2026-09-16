@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/deps.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 650 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 652 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs)
 
 ## Contents
 
@@ -72,7 +72,7 @@ with, so you can see exactly what is being run.
 
 ## What this file contains
 
-650 lines defining **12 functions** (7 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+652 lines defining **12 functions** (7 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -89,7 +89,7 @@ with, so you can see exactly what is being run.
   - reaches: `detect_alsa`, `detect_linker`, `program_version`, `which`
 - `Need::route` (line 220) -- What could be done about it here.
   - reaches: `linux_package`, `which`
-- `missing` (line 421) -- What is missing, split by whether a build stops without it.
+- `missing` (line 423) -- What is missing, split by whether a build stops without it.
   - reaches: `for_this_platform`
 
 ## What calls what
@@ -114,10 +114,10 @@ flowchart TD
     n_for_this_platform["for_this_platform<br/>line 282"]
     n_linux_package["linux_package<br/>line 293"]
     n_which["which<br/>line 327"]
-    n_program_version["program_version<br/>line 350"]
-    n_detect_linker["detect_linker<br/>line 361"]
-    n_detect_alsa["detect_alsa<br/>line 391"]
-    n_missing(["missing<br/>line 421"])
+    n_program_version["program_version<br/>line 352"]
+    n_detect_linker["detect_linker<br/>line 363"]
+    n_detect_alsa["detect_alsa<br/>line 393"]
+    n_missing(["missing<br/>line 423"])
     n_detect --> n_detect_alsa
     n_detect --> n_detect_linker
     n_detect --> n_program_version
@@ -134,10 +134,10 @@ flowchart TD
     click n_for_this_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L282" "open the source"
     click n_linux_package href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L293" "open the source"
     click n_which href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L327" "open the source"
-    click n_program_version href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L350" "open the source"
-    click n_detect_linker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L361" "open the source"
-    click n_detect_alsa href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L391" "open the source"
-    click n_missing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L421" "open the source"
+    click n_program_version href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L352" "open the source"
+    click n_detect_linker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L363" "open the source"
+    click n_detect_alsa href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L393" "open the source"
+    click n_missing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L423" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_satisfied,n_describe,n_command_line,n_detect,n_route,n_missing entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -164,7 +164,7 @@ flowchart TD
 | `for_this_platform` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L282) | What this platform needs, in the order to report them. |
 | `linux_package` <sub>fn</sub> | [293](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L293) | A package under the three names the major families give it. |
 | `which` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L327) | Whether a program is on PATH, and where. |
-| `program_version` <sub>fn</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L350) | The first line a program prints when asked its version. |
-| `detect_linker` <sub>fn</sub> | [361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L361) | A linker, by whichever name this platform calls it. |
-| `detect_alsa` <sub>fn</sub> | [391](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L391) | ALSA's headers, through the tool the build script itself uses. |
-| `missing` <sub>pub fn</sub> | [421](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L421) | What is missing, split by whether a build stops without it. |
+| `program_version` <sub>fn</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L352) | The first line a program prints when asked its version. |
+| `detect_linker` <sub>fn</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L363) | A linker, by whichever name this platform calls it. |
+| `detect_alsa` <sub>fn</sub> | [393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L393) | ALSA's headers, through the tool the build script itself uses. |
+| `missing` <sub>pub fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs#L423) | What is missing, split by whether a build stops without it. |

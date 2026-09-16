@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -46,7 +47,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-core/src/stft.rs</code></h1>
-<p style="color:var(--muted)"><a href="stft.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 259 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="stft.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 264 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -211,113 +212,118 @@
 </span>
 <span class="ln" id="L153"></span>
 <span class="src-item" id="fn-stftengine-process_frame">
-<span class="ln" id="L154">    <span class="tok-kw">fn</span> process_frame&lt;F: <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> [Complex&lt;f32&gt;], &amp;[f32])&gt;(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, transform: &amp;<span class="tok-kw">mut</span> F) {</span>
-<span class="ln" id="L155">        <span class="tok-com">// analysis window</span></span>
-<span class="ln" id="L156">        <span class="tok-kw">for</span> k <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-kw">self</span>.n {</span>
-<span class="ln" id="L157">            <span class="tok-kw">self</span>.frame_in[k] = <span class="tok-kw">self</span>.in_fifo[k] * <span class="tok-kw">self</span>.window[k];</span>
-<span class="ln" id="L158">        }</span>
-<span class="ln" id="L159">        <span class="tok-kw">self</span>.r2c</span>
-<span class="ln" id="L160">            .<span class="tok-fn">process_with_scratch</span>(</span>
-<span class="ln" id="L161">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.frame_in,</span>
-<span class="ln" id="L162">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum,</span>
-<span class="ln" id="L163">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.fwd_scratch,</span>
-<span class="ln" id="L164">            )</span>
-<span class="ln" id="L165">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;forward FFT&quot;</span>);</span>
-<span class="ln" id="L166"></span>
-<span class="ln" id="L167">        <span class="tok-com">// De-identification transform on the spectrum, alongside the raw frame</span></span>
-<span class="ln" id="L168">        <span class="tok-com">// it was computed from (disjoint field borrows).</span></span>
-<span class="ln" id="L169">        <span class="tok-fn">transform</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum, &amp;<span class="tok-kw">self</span>.in_fifo);</span>
-<span class="ln" id="L170"></span>
-<span class="ln" id="L171">        <span class="tok-com">// inverse FFT (destroys spectrum contents, which is fine: rebuilt each frame)</span></span>
-<span class="ln" id="L172">        <span class="tok-kw">self</span>.c2r</span>
-<span class="ln" id="L173">            .<span class="tok-fn">process_with_scratch</span>(</span>
-<span class="ln" id="L174">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum,</span>
-<span class="ln" id="L175">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.frame_out,</span>
-<span class="ln" id="L176">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.inv_scratch,</span>
-<span class="ln" id="L177">            )</span>
-<span class="ln" id="L178">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;inverse FFT&quot;</span>);</span>
-<span class="ln" id="L179"></span>
-<span class="ln" id="L180">        <span class="tok-com">// windowed overlap-add with FFT + OLA normalisation</span></span>
-<span class="ln" id="L181">        <span class="tok-kw">let</span> scale = <span class="tok-kw">self</span>.norm / <span class="tok-kw">self</span>.n <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L182">        <span class="tok-kw">for</span> k <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-kw">self</span>.n {</span>
-<span class="ln" id="L183">            <span class="tok-kw">self</span>.out_accum[k] += <span class="tok-kw">self</span>.window[k] * <span class="tok-kw">self</span>.frame_out[k] * scale;</span>
-<span class="ln" id="L184">        }</span>
-<span class="ln" id="L185"></span>
-<span class="ln" id="L186">        <span class="tok-com">// emit `hop` finished samples, then slide accumulators/fifo by `hop`</span></span>
-<span class="ln" id="L187">        <span class="tok-kw">self</span>.out_fifo[..<span class="tok-kw">self</span>.hop].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-kw">self</span>.out_accum[..<span class="tok-kw">self</span>.hop]);</span>
-<span class="ln" id="L188">        <span class="tok-kw">self</span>.out_accum.<span class="tok-fn">copy_within</span>(<span class="tok-kw">self</span>.hop..<span class="tok-kw">self</span>.hop + <span class="tok-kw">self</span>.n, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L189">        <span class="tok-kw">for</span> v <span class="tok-kw">in</span> &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.out_accum[<span class="tok-kw">self</span>.n..<span class="tok-kw">self</span>.n + <span class="tok-kw">self</span>.hop] {</span>
-<span class="ln" id="L190">            *v = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L191">        }</span>
-<span class="ln" id="L192">        <span class="tok-kw">self</span>.in_fifo.<span class="tok-fn">copy_within</span>(<span class="tok-kw">self</span>.hop..<span class="tok-kw">self</span>.n, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L193">    }</span>
+<span class="ln" id="L154">    <span class="tok-com">/// Window, transform, hand the spectrum to `transform`, and overlap-add</span></span>
+<span class="ln" id="L155">    <span class="tok-com">/// the result back into the output queue.</span></span>
+<span class="ln" id="L156">    <span class="tok-com">///</span></span>
+<span class="ln" id="L157">    <span class="tok-com">/// Every buffer this touches was sized when the chain was built. It is called</span></span>
+<span class="ln" id="L158">    <span class="tok-com">/// from the audio callback, so it allocates nothing and locks nothing.</span></span>
+<span class="ln" id="L159">    <span class="tok-kw">fn</span> process_frame&lt;F: <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> [Complex&lt;f32&gt;], &amp;[f32])&gt;(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, transform: &amp;<span class="tok-kw">mut</span> F) {</span>
+<span class="ln" id="L160">        <span class="tok-com">// analysis window</span></span>
+<span class="ln" id="L161">        <span class="tok-kw">for</span> k <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-kw">self</span>.n {</span>
+<span class="ln" id="L162">            <span class="tok-kw">self</span>.frame_in[k] = <span class="tok-kw">self</span>.in_fifo[k] * <span class="tok-kw">self</span>.window[k];</span>
+<span class="ln" id="L163">        }</span>
+<span class="ln" id="L164">        <span class="tok-kw">self</span>.r2c</span>
+<span class="ln" id="L165">            .<span class="tok-fn">process_with_scratch</span>(</span>
+<span class="ln" id="L166">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.frame_in,</span>
+<span class="ln" id="L167">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum,</span>
+<span class="ln" id="L168">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.fwd_scratch,</span>
+<span class="ln" id="L169">            )</span>
+<span class="ln" id="L170">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;forward FFT&quot;</span>);</span>
+<span class="ln" id="L171"></span>
+<span class="ln" id="L172">        <span class="tok-com">// De-identification transform on the spectrum, alongside the raw frame</span></span>
+<span class="ln" id="L173">        <span class="tok-com">// it was computed from (disjoint field borrows).</span></span>
+<span class="ln" id="L174">        <span class="tok-fn">transform</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum, &amp;<span class="tok-kw">self</span>.in_fifo);</span>
+<span class="ln" id="L175"></span>
+<span class="ln" id="L176">        <span class="tok-com">// inverse FFT (destroys spectrum contents, which is fine: rebuilt each frame)</span></span>
+<span class="ln" id="L177">        <span class="tok-kw">self</span>.c2r</span>
+<span class="ln" id="L178">            .<span class="tok-fn">process_with_scratch</span>(</span>
+<span class="ln" id="L179">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum,</span>
+<span class="ln" id="L180">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.frame_out,</span>
+<span class="ln" id="L181">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.inv_scratch,</span>
+<span class="ln" id="L182">            )</span>
+<span class="ln" id="L183">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;inverse FFT&quot;</span>);</span>
+<span class="ln" id="L184"></span>
+<span class="ln" id="L185">        <span class="tok-com">// windowed overlap-add with FFT + OLA normalisation</span></span>
+<span class="ln" id="L186">        <span class="tok-kw">let</span> scale = <span class="tok-kw">self</span>.norm / <span class="tok-kw">self</span>.n <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L187">        <span class="tok-kw">for</span> k <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-kw">self</span>.n {</span>
+<span class="ln" id="L188">            <span class="tok-kw">self</span>.out_accum[k] += <span class="tok-kw">self</span>.window[k] * <span class="tok-kw">self</span>.frame_out[k] * scale;</span>
+<span class="ln" id="L189">        }</span>
+<span class="ln" id="L190"></span>
+<span class="ln" id="L191">        <span class="tok-com">// emit `hop` finished samples, then slide accumulators/fifo by `hop`</span></span>
+<span class="ln" id="L192">        <span class="tok-kw">self</span>.out_fifo[..<span class="tok-kw">self</span>.hop].<span class="tok-fn">copy_from_slice</span>(&amp;<span class="tok-kw">self</span>.out_accum[..<span class="tok-kw">self</span>.hop]);</span>
+<span class="ln" id="L193">        <span class="tok-kw">self</span>.out_accum.<span class="tok-fn">copy_within</span>(<span class="tok-kw">self</span>.hop..<span class="tok-kw">self</span>.hop + <span class="tok-kw">self</span>.n, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L194">        <span class="tok-kw">for</span> v <span class="tok-kw">in</span> &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.out_accum[<span class="tok-kw">self</span>.n..<span class="tok-kw">self</span>.n + <span class="tok-kw">self</span>.hop] {</span>
+<span class="ln" id="L195">            *v = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L196">        }</span>
+<span class="ln" id="L197">        <span class="tok-kw">self</span>.in_fifo.<span class="tok-fn">copy_within</span>(<span class="tok-kw">self</span>.hop..<span class="tok-kw">self</span>.n, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L198">    }</span>
 </span>
-<span class="ln" id="L194">}</span>
-<span class="ln" id="L195"></span>
-<span class="ln" id="L196"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L197"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L198">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L199"></span>
-<span class="ln" id="L200">    <span class="tok-com">/// With an identity spectral transform the engine must reconstruct its input</span></span>
-<span class="ln" id="L201">    <span class="tok-com">/// (delayed by the algorithmic latency) to high accuracy. This validates</span></span>
-<span class="ln" id="L202">    <span class="tok-com">/// the windowing/overlap-add/normalisation maths.</span></span>
-<span class="ln" id="L203">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L204">    <span class="tok-kw">fn</span> <span class="tok-fn">identity_reconstructs_input</span>() {</span>
-<span class="ln" id="L205">        <span class="tok-kw">let</span> n = <span class="tok-num">1024</span>;</span>
-<span class="ln" id="L206">        <span class="tok-kw">let</span> hop = n / <span class="tok-num">4</span>;</span>
-<span class="ln" id="L207">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> eng = StftEngine::<span class="tok-fn">new</span>(n, hop);</span>
-<span class="ln" id="L208">        <span class="tok-kw">let</span> lat = eng.<span class="tok-fn">latency_samples</span>();</span>
-<span class="ln" id="L209"></span>
-<span class="ln" id="L210">        <span class="tok-kw">let</span> total = <span class="tok-num">8192</span>;</span>
-<span class="ln" id="L211">        <span class="tok-kw">let</span> input: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..total)</span>
-<span class="ln" id="L212">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.05</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.4</span> + (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.011</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.2</span>)</span>
-<span class="ln" id="L213">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L214">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = vec![<span class="tok-num">0.0</span>; total];</span>
-<span class="ln" id="L215">        eng.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> output, |_spec, _frame| { <span class="tok-com">/* identity */</span> });</span>
-<span class="ln" id="L216"></span>
-<span class="ln" id="L217">        <span class="tok-com">// The analysis/synthesis path delays the signal by exactly one frame.</span></span>
-<span class="ln" id="L218">        assert_eq!(lat, n, <span class="tok-str">&quot;reported latency should equal one frame&quot;</span>);</span>
-<span class="ln" id="L219">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> max_err = <span class="tok-num">0</span>.0f32;</span>
-<span class="ln" id="L220">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> (<span class="tok-num">3</span> * n)..(total - n) {</span>
-<span class="ln" id="L221">            max_err = max_err.<span class="tok-fn">max</span>((output[i] - input[i - lat]).<span class="tok-fn">abs</span>());</span>
-<span class="ln" id="L222">        }</span>
-<span class="ln" id="L223">        assert!(max_err &lt; 1e-<span class="tok-num">3</span>, <span class="tok-str">&quot;reconstruction error too high: {max_err}&quot;</span>);</span>
-<span class="ln" id="L224">    }</span>
-<span class="ln" id="L225"></span>
-<span class="ln" id="L226">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L227">    <span class="tok-kw">fn</span> <span class="tok-fn">output_is_finite</span>() {</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> eng = StftEngine::<span class="tok-fn">new</span>(<span class="tok-num">512</span>, <span class="tok-num">128</span>);</span>
-<span class="ln" id="L229">        <span class="tok-kw">let</span> input: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">4096</span>).<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.1</span>).<span class="tok-fn">sin</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L230">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = vec![<span class="tok-num">0.0</span>; <span class="tok-num">4096</span>];</span>
-<span class="ln" id="L231">        eng.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> output, |spec, _frame| {</span>
-<span class="ln" id="L232">            <span class="tok-kw">for</span> c <span class="tok-kw">in</span> spec.<span class="tok-fn">iter_mut</span>() {</span>
-<span class="ln" id="L233">                *c *= <span class="tok-num">0.9</span>;</span>
-<span class="ln" id="L234">            }</span>
-<span class="ln" id="L235">        });</span>
-<span class="ln" id="L236">        assert!(output.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
-<span class="ln" id="L237">    }</span>
-<span class="ln" id="L238"></span>
-<span class="ln" id="L239">    <span class="tok-com">/// The frame handed to the closure must be the exact analysis window, so the</span></span>
-<span class="ln" id="L240">    <span class="tok-com">/// pitch tracker stays aligned with the spectrum it accompanies.</span></span>
-<span class="ln" id="L241">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L242">    <span class="tok-kw">fn</span> <span class="tok-fn">callback_frame_matches_the_analysed_window</span>() {</span>
-<span class="ln" id="L243">        <span class="tok-kw">let</span> (n, hop) = (256usize, 64usize);</span>
-<span class="ln" id="L244">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> eng = StftEngine::<span class="tok-fn">new</span>(n, hop);</span>
-<span class="ln" id="L245">        <span class="tok-kw">let</span> input: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">2048</span>).<span class="tok-fn">map</span>(|i| i <span class="tok-kw">as</span> f32).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L246">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = vec![<span class="tok-num">0.0</span>; <span class="tok-num">2048</span>];</span>
-<span class="ln" id="L247">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;f32&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L248">        eng.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> output, |_spec, frame| {</span>
-<span class="ln" id="L249">            assert_eq!(frame.<span class="tok-fn">len</span>(), n);</span>
-<span class="ln" id="L250">            seen.<span class="tok-fn">push</span>(frame[n - <span class="tok-num">1</span>]);</span>
-<span class="ln" id="L251">        });</span>
-<span class="ln" id="L252">        <span class="tok-com">// Each frame consumes exactly `hop` new samples, so the newest sample</span></span>
-<span class="ln" id="L253">        <span class="tok-com">// advances by `hop` every call.</span></span>
-<span class="ln" id="L254">        assert!(seen.<span class="tok-fn">len</span>() &gt; <span class="tok-num">4</span>);</span>
-<span class="ln" id="L255">        <span class="tok-kw">for</span> w <span class="tok-kw">in</span> seen.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>) {</span>
-<span class="ln" id="L256">            assert_eq!(w[<span class="tok-num">1</span>] - w[<span class="tok-num">0</span>], hop <span class="tok-kw">as</span> f32, <span class="tok-str">&quot;frames must advance by one hop&quot;</span>);</span>
-<span class="ln" id="L257">        }</span>
-<span class="ln" id="L258">    }</span>
-<span class="ln" id="L259">}</span>
+<span class="ln" id="L199">}</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L202"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L203">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L204"></span>
+<span class="ln" id="L205">    <span class="tok-com">/// With an identity spectral transform the engine must reconstruct its input</span></span>
+<span class="ln" id="L206">    <span class="tok-com">/// (delayed by the algorithmic latency) to high accuracy. This validates</span></span>
+<span class="ln" id="L207">    <span class="tok-com">/// the windowing/overlap-add/normalisation maths.</span></span>
+<span class="ln" id="L208">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L209">    <span class="tok-kw">fn</span> <span class="tok-fn">identity_reconstructs_input</span>() {</span>
+<span class="ln" id="L210">        <span class="tok-kw">let</span> n = <span class="tok-num">1024</span>;</span>
+<span class="ln" id="L211">        <span class="tok-kw">let</span> hop = n / <span class="tok-num">4</span>;</span>
+<span class="ln" id="L212">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> eng = StftEngine::<span class="tok-fn">new</span>(n, hop);</span>
+<span class="ln" id="L213">        <span class="tok-kw">let</span> lat = eng.<span class="tok-fn">latency_samples</span>();</span>
+<span class="ln" id="L214"></span>
+<span class="ln" id="L215">        <span class="tok-kw">let</span> total = <span class="tok-num">8192</span>;</span>
+<span class="ln" id="L216">        <span class="tok-kw">let</span> input: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..total)</span>
+<span class="ln" id="L217">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.05</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.4</span> + (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.011</span>).<span class="tok-fn">sin</span>() * <span class="tok-num">0.2</span>)</span>
+<span class="ln" id="L218">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L219">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = vec![<span class="tok-num">0.0</span>; total];</span>
+<span class="ln" id="L220">        eng.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> output, |_spec, _frame| { <span class="tok-com">/* identity */</span> });</span>
+<span class="ln" id="L221"></span>
+<span class="ln" id="L222">        <span class="tok-com">// The analysis/synthesis path delays the signal by exactly one frame.</span></span>
+<span class="ln" id="L223">        assert_eq!(lat, n, <span class="tok-str">&quot;reported latency should equal one frame&quot;</span>);</span>
+<span class="ln" id="L224">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> max_err = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L225">        <span class="tok-kw">for</span> i <span class="tok-kw">in</span> (<span class="tok-num">3</span> * n)..(total - n) {</span>
+<span class="ln" id="L226">            max_err = max_err.<span class="tok-fn">max</span>((output[i] - input[i - lat]).<span class="tok-fn">abs</span>());</span>
+<span class="ln" id="L227">        }</span>
+<span class="ln" id="L228">        assert!(max_err &lt; 1e-<span class="tok-num">3</span>, <span class="tok-str">&quot;reconstruction error too high: {max_err}&quot;</span>);</span>
+<span class="ln" id="L229">    }</span>
+<span class="ln" id="L230"></span>
+<span class="ln" id="L231">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L232">    <span class="tok-kw">fn</span> <span class="tok-fn">output_is_finite</span>() {</span>
+<span class="ln" id="L233">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> eng = StftEngine::<span class="tok-fn">new</span>(<span class="tok-num">512</span>, <span class="tok-num">128</span>);</span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> input: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">4096</span>).<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 * <span class="tok-num">0.1</span>).<span class="tok-fn">sin</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L235">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = vec![<span class="tok-num">0.0</span>; <span class="tok-num">4096</span>];</span>
+<span class="ln" id="L236">        eng.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> output, |spec, _frame| {</span>
+<span class="ln" id="L237">            <span class="tok-kw">for</span> c <span class="tok-kw">in</span> spec.<span class="tok-fn">iter_mut</span>() {</span>
+<span class="ln" id="L238">                *c *= <span class="tok-num">0.9</span>;</span>
+<span class="ln" id="L239">            }</span>
+<span class="ln" id="L240">        });</span>
+<span class="ln" id="L241">        assert!(output.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
+<span class="ln" id="L242">    }</span>
+<span class="ln" id="L243"></span>
+<span class="ln" id="L244">    <span class="tok-com">/// The frame handed to the closure must be the exact analysis window, so the</span></span>
+<span class="ln" id="L245">    <span class="tok-com">/// pitch tracker stays aligned with the spectrum it accompanies.</span></span>
+<span class="ln" id="L246">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L247">    <span class="tok-kw">fn</span> <span class="tok-fn">callback_frame_matches_the_analysed_window</span>() {</span>
+<span class="ln" id="L248">        <span class="tok-kw">let</span> (n, hop) = (256usize, 64usize);</span>
+<span class="ln" id="L249">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> eng = StftEngine::<span class="tok-fn">new</span>(n, hop);</span>
+<span class="ln" id="L250">        <span class="tok-kw">let</span> input: Vec&lt;f32&gt; = (<span class="tok-num">0</span>..<span class="tok-num">2048</span>).<span class="tok-fn">map</span>(|i| i <span class="tok-kw">as</span> f32).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L251">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = vec![<span class="tok-num">0.0</span>; <span class="tok-num">2048</span>];</span>
+<span class="ln" id="L252">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen: Vec&lt;f32&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L253">        eng.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> output, |_spec, frame| {</span>
+<span class="ln" id="L254">            assert_eq!(frame.<span class="tok-fn">len</span>(), n);</span>
+<span class="ln" id="L255">            seen.<span class="tok-fn">push</span>(frame[n - <span class="tok-num">1</span>]);</span>
+<span class="ln" id="L256">        });</span>
+<span class="ln" id="L257">        <span class="tok-com">// Each frame consumes exactly `hop` new samples, so the newest sample</span></span>
+<span class="ln" id="L258">        <span class="tok-com">// advances by `hop` every call.</span></span>
+<span class="ln" id="L259">        assert!(seen.<span class="tok-fn">len</span>() &gt; <span class="tok-num">4</span>);</span>
+<span class="ln" id="L260">        <span class="tok-kw">for</span> w <span class="tok-kw">in</span> seen.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>) {</span>
+<span class="ln" id="L261">            assert_eq!(w[<span class="tok-num">1</span>] - w[<span class="tok-num">0</span>], hop <span class="tok-kw">as</span> f32, <span class="tok-str">&quot;frames must advance by one hop&quot;</span>);</span>
+<span class="ln" id="L262">        }</span>
+<span class="ln" id="L263">    }</span>
+<span class="ln" id="L264">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

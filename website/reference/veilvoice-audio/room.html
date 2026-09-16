@@ -15,12 +15,13 @@
 <script src="../../js/theme.js"></script>
 <script src="../../js/prefetch.js" defer></script>
 <script src="../../js/legal.js" defer></script>
+<script src="../../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../../assets/icon-32.png" alt="">
+      <img src="../../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,7 +46,7 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../../assets/banners/veilvoice-audio/room.svg" alt="room.rs" style="width:100%;height:auto"></p>
+<p><img src="../../assets/banners/veilvoice-audio/room.svg" alt="room.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/room.rs</code></h1>
 <p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 614 lines &middot; <a href="room.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
@@ -66,7 +67,7 @@
 <p>An interview with everybody in the room on their own microphone. Each guest gets their own engine with their own seed and their own destination voice, exactly as a group <em>render</em> gives them, and the veiled results are mixed into the one output the call or the recorder is listening to.</p>
 <p><code>live</code>(crate::live) opens one input. That is the right shape for one person on a call and the wrong shape for a room, because one microphone carrying four people is one signal: whatever it is turned into, everybody in it is turned into the same thing, and a listener can no longer follow who is speaking.</p>
 <h2 id="one-engine-per-guest-is-one-fft-chain-per-guest-on-one-deadline">One engine per guest is one FFT chain per guest, on one deadline</h2>
-<p>The output callback runs every guest&#x27;s engine before it returns. They share a deadline of a few milliseconds, so the cost is the sum, and this is the honest account the marker asked for rather than a paragraph promising it is fine: <code>RoomStats::load</code> is that sum measured against that deadline, drawn where somebody can see it. At 1.0 the engines have used the whole of the time the block had, and what follows is dropouts.</p>
+<p>The output callback runs every guest&#x27;s engine before it returns. They share a deadline of a few milliseconds, so the cost is the sum, and this is the honest account the roadmap item asked for rather than a paragraph promising it is fine: <code>RoomStats::load</code> is that sum measured against that deadline, drawn where somebody can see it. At 1.0 the engines have used the whole of the time the block had, and what follows is dropouts.</p>
 <p>It is a measurement rather than a limit, because the number of guests a machine can carry is a fact about the machine. <code>MAX_GUESTS</code> is a bound on the arithmetic, not a claim about performance.</p>
 <h2 id="the-mix-is-summed-and-clipped-and-never-limited">The mix is summed and clipped, and never limited</h2>
 <p>Two people talking at once is two signals added together, which can go past full scale. A render fixes that afterwards by scaling the whole file by one factor, which a live path cannot do because it cannot see the rest of the conversation.</p>

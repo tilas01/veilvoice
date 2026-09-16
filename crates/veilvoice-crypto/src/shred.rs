@@ -72,6 +72,8 @@ pub enum Passes {
 }
 
 impl Passes {
+    /// How many overwriting passes this setting means, with a custom count
+    /// held between 1 and 32. Zero passes would be a shred that shreds nothing.
     fn count(self) -> u8 {
         match self {
             Self::Single => 1,
