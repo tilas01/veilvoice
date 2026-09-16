@@ -127,6 +127,10 @@ GENERATORS = [
     ("questions page", [sys.executable, "tools/site/faq.py"]),
     # After the split, whose header this borrows, and before the index walks it.
     ("releases page", [sys.executable, "tools/site/releases.py"]),
+    # After every generator that writes a page, because it reads each page's
+    # own title and description and writes the addresses from them. Before
+    # the index, which walks the result.
+    ("addresses and the sitemap", [sys.executable, "tools/site/seo.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
 ]
 
@@ -225,6 +229,8 @@ CHECKS = [
      [sys.executable, "tools/site/faq.py", "--check"]),
     ("the releases page matches CHANGELOG.md",
      [sys.executable, "tools/site/releases.py", "--check"]),
+    ("every page says where it lives, and the sitemap lists it",
+     [sys.executable, "tools/site/seo.py", "--check"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
     ("measured numbers match the tree",
      [sys.executable, "tools/measured/generate.py", "--check"]),

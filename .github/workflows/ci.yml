@@ -331,6 +331,12 @@ jobs:
       - name: Every crate must appear in every table that lists the crates
         run: python tools/audit/crate_tables.py
 
+      # The canonical address, the preview picture and the sitemap entry each
+      # page carries. They used to be typed into each page, which is how the
+      # preview picture came to be a relative URL that no crawler resolves.
+      - name: Every page must say where it lives
+        run: python tools/site/seo.py --check
+
       # F-185. `.gitignore` matches `target/` at any depth, which is right and
       # also means a build directory inside the repository never appears in
       # `git status`, never appears in a diff and is never cleaned. One was

@@ -1,0 +1,5 @@
+# VeilVoice. Everything here is meant to be read.
+User-agent: *
+Allow: /
+
+Sitemap: https://tilas01.github.io/veilvoice/sitemap.xml
