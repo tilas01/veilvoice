@@ -67,6 +67,8 @@ pub struct SoftClip {
 }
 
 impl SoftClip {
+    /// Build a shaper. `drive` is clamped away from zero so the normalisation
+    /// below cannot divide by it, and `mix` to the dry/wet range.
     pub fn new(drive: f32, mix: f32) -> Self {
         let drive = drive.max(0.01);
         Self {
@@ -75,6 +77,9 @@ impl SoftClip {
             norm: drive.tanh(),
         }
     }
+    /// Shape one sample. Dividing by `tanh(drive)` keeps the loudest output
+    /// at the same level whatever the drive is, so turning it up changes the
+    /// timbre without changing the volume.
     #[inline]
     pub fn process(&self, x: f32) -> f32 {
         let wet = (self.drive * x).tanh() / self.norm;
@@ -94,6 +99,9 @@ struct DelayVoice {
 }
 
 impl DelayVoice {
+    /// One delay line, sized once here for the deepest sweep it can be asked
+    /// for. The buffer is rounded up to a power of two so the read and write
+    /// positions wrap with a mask rather than a division.
     fn new(sample_rate: f32, base_ms: f32, depth_ms: f32, rate_hz: f32, phase: f32) -> Self {
         let base_delay = base_ms * 0.001 * sample_rate;
         let depth = depth_ms * 0.001 * sample_rate;
@@ -107,6 +115,9 @@ impl DelayVoice {
             lfo_inc: TAU * rate_hz / sample_rate,
         }
     }
+    /// Write one sample and read one back from where the sweep currently
+    /// points, interpolating between the two neighbouring samples so the
+    /// moving read position does not step audibly.
     #[inline]
     fn process(&mut self, x: f32) -> f32 {
         let mask = self.buf.len() - 1;
@@ -131,6 +142,8 @@ pub struct Chorus {
 }
 
 impl Chorus {
+    /// Build the ensemble. Every buffer it will ever use is allocated here,
+    /// because [`Chorus::process`] runs in the audio callback.
     pub fn new(sample_rate: f32, mix: f32) -> Self {
         // Three voices at different rates and phases: cheap but effective spread.
         let voices = vec![
@@ -143,6 +156,7 @@ impl Chorus {
             mix: mix.clamp(0.0, 1.0),
         }
     }
+    /// Sum the voices, average them, and blend that against the dry sample.
     #[inline]
     pub fn process(&mut self, x: f32) -> f32 {
         let mut wet = 0.0;
@@ -167,6 +181,8 @@ pub struct Reverb {
 }
 
 impl Reverb {
+    /// Size both delay lines for this sample rate, once. The lengths are the
+    /// classic Schroeder figures: 29.7ms for the comb, 5ms for the all-pass.
     pub fn new(sample_rate: f32, mix: f32) -> Self {
         let comb_len = ((0.0297 * sample_rate) as usize).max(1);
         let ap_len = ((0.0050 * sample_rate) as usize).max(1);
@@ -180,6 +196,9 @@ impl Reverb {
             mix: mix.clamp(0.0, 1.0),
         }
     }
+    /// One sample through the comb and then the all-pass, blended against the
+    /// dry sample. Both delay lines are already the right size, so nothing
+    /// here allocates.
     #[inline]
     pub fn process(&mut self, x: f32) -> f32 {
         // comb

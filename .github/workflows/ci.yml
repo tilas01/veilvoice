@@ -324,6 +324,13 @@ jobs:
       - name: Every public item must be reached by something
         run: python tools/audit/reachable.py
 
+      # Three documents list the crates, and a crate is added somewhere else.
+      # They had drifted to thirteen, twelve and thirteen of twenty-seven, and
+      # the website renders the README, so the shortest of them was the public
+      # description of what this project contains.
+      - name: Every crate must appear in every table that lists the crates
+        run: python tools/audit/crate_tables.py
+
       # F-185. `.gitignore` matches `target/` at any depth, which is right and
       # also means a build directory inside the repository never appears in
       # `git status`, never appears in a diff and is never cleaned. One was

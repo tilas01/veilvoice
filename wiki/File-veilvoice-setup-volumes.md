@@ -26,9 +26,9 @@ clear out.
 It does **not drive either program**. No launching, no mounting, no
 unlocking, and it never sees a volume passphrase. Mounting somebody's
 encrypted volume is their act, taken in the tool they chose, and a voice
-de-identifier is not the program to be doing it for them. This is marker
-39's rule about privilege in a second place: use what is already there, ask
-for nothing.
+de-identifier is not the program to be doing it for them. This is roadmap
+item 39's rule about privilege in a second place: use what is already
+there, ask for nothing.
 
 It does **not decide whether a volume is hidden**. VeraCrypt's hidden
 volumes exist so that somebody under compulsion can hand over one passphrase

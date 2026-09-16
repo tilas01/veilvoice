@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/weave.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1699 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1727 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs)
 
 ## Contents
 
@@ -106,7 +106,7 @@ dump, a swap file -- what escapes does not read as anything.
 
 ## What this file contains
 
-1699 lines defining **21 functions** (10 public), **1 type** and **18 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1727 lines defining **21 functions** (10 public), **1 type** and **18 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -157,17 +157,17 @@ flowchart TD
     n_undo(["Weave::undo<br/>line 545"])
     n_encode(["encode<br/>line 728"])
     n_decode(["decode<br/>line 734"])
-    n_nibble["nibble<br/>line 738"]
-    n_base32_encode["base32_encode<br/>line 786"]
-    n_base32_decode["base32_decode<br/>line 806"]
-    n_base45_encode["base45_encode<br/>line 831"]
-    n_base45_decode["base45_decode<br/>line 848"]
-    n_base85_encode["base85_encode<br/>line 873"]
-    n_base85_decode["base85_decode<br/>line 894"]
-    n_base91_encode["base91_encode<br/>line 934"]
-    n_base91_decode["base91_decode<br/>line 963"]
-    n_sixbit_encode["sixbit_encode<br/>line 989"]
-    n_sixbit_decode["sixbit_decode<br/>line 1009"]
+    n_nibble["nibble<br/>line 741"]
+    n_base32_encode["base32_encode<br/>line 793"]
+    n_base32_decode["base32_decode<br/>line 816"]
+    n_base45_encode["base45_encode<br/>line 843"]
+    n_base45_decode["base45_decode<br/>line 863"]
+    n_base85_encode["base85_encode<br/>line 890"]
+    n_base85_decode["base85_decode<br/>line 914"]
+    n_base91_encode["base91_encode<br/>line 956"]
+    n_base91_decode["base91_decode<br/>line 987"]
+    n_sixbit_encode["sixbit_encode<br/>line 1015"]
+    n_sixbit_decode["sixbit_decode<br/>line 1036"]
     n_apply --> n_base32_encode
     n_apply --> n_base45_encode
     n_apply --> n_base85_encode
@@ -190,17 +190,17 @@ flowchart TD
     click n_undo href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L545" "open the source"
     click n_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L728" "open the source"
     click n_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L734" "open the source"
-    click n_nibble href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L738" "open the source"
-    click n_base32_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L786" "open the source"
-    click n_base32_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L806" "open the source"
-    click n_base45_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L831" "open the source"
-    click n_base45_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L848" "open the source"
-    click n_base85_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L873" "open the source"
-    click n_base85_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L894" "open the source"
-    click n_base91_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L934" "open the source"
-    click n_base91_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L963" "open the source"
-    click n_sixbit_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L989" "open the source"
-    click n_sixbit_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1009" "open the source"
+    click n_nibble href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L741" "open the source"
+    click n_base32_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L793" "open the source"
+    click n_base32_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L816" "open the source"
+    click n_base45_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L843" "open the source"
+    click n_base45_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L863" "open the source"
+    click n_base85_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L890" "open the source"
+    click n_base85_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L914" "open the source"
+    click n_base91_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L956" "open the source"
+    click n_base91_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L987" "open the source"
+    click n_sixbit_encode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1015" "open the source"
+    click n_sixbit_decode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1036" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_id,n_from_id,n_preserves_length,n_random_length_preserving,n_for_name,n_apply,n_undo,n_encode,n_decode entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -228,33 +228,33 @@ flowchart TD
 | `Weave::undo` <sub>pub fn</sub> | [545](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L545) | Decode. |
 | `encode` <sub>pub fn</sub> | [728](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L728) | Encode with a randomly chosen encoding, returning it so it can be undone. |
 | `decode` <sub>pub fn</sub> | [734](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L734) | Undo encode. |
-| `nibble` <sub>fn</sub> | [738](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L738) |  |
-| `HEX` <sub>const</sub> | [747](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L747) |  |
-| `HEX_UPPER` <sub>const</sub> | [748](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L748) |  |
-| `B32` <sub>const</sub> | [749](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L749) |  |
-| `B32HEX` <sub>const</sub> | [750](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L750) |  |
-| `ZB32` <sub>const</sub> | [751](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L751) |  |
-| `CROCKFORD` <sub>const</sub> | [752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L752) |  |
-| `B45` <sub>const</sub> | [753](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L753) |  |
-| `A85` <sub>const</sub> | [754](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L754) |  |
-| `Z85A` <sub>const</sub> | [755](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L755) |  |
-| `UU` <sub>const</sub> | [756](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L756) |  |
-| `XX` <sub>const</sub> | [757](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L757) |  |
-| `XX_ALPHABET` <sub>const</sub> | [758](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L758) |  |
-| `Z85_ALPHABET` <sub>const</sub> | [759](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L759) |  |
-| `SBOX` <sub>const</sub> | [766](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L766) | A fixed permutation of every byte value, and its inverse. |
-| `UNSBOX` <sub>const</sub> | [776](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L776) |  |
-| `base32_encode` <sub>fn</sub> | [786](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L786) |  |
-| `base32_decode` <sub>fn</sub> | [806](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L806) |  |
-| `base45_encode` <sub>fn</sub> | [831](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L831) |  |
-| `base45_decode` <sub>fn</sub> | [848](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L848) |  |
-| `base85_encode` <sub>fn</sub> | [873](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L873) |  |
-| `base85_decode` <sub>fn</sub> | [894](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L894) |  |
-| `B91` <sub>const</sub> | [931](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L931) |  |
-| `base91_encode` <sub>fn</sub> | [934](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L934) |  |
-| `base91_decode` <sub>fn</sub> | [963](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L963) |  |
-| `sixbit_encode` <sub>fn</sub> | [989](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L989) |  |
-| `sixbit_decode` <sub>fn</sub> | [1009](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1009) |  |
+| `nibble` <sub>fn</sub> | [741](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L741) | One hex digit as a number, in either case. |
+| `HEX` <sub>const</sub> | [750](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L750) |  |
+| `HEX_UPPER` <sub>const</sub> | [751](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L751) |  |
+| `B32` <sub>const</sub> | [752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L752) |  |
+| `B32HEX` <sub>const</sub> | [753](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L753) |  |
+| `ZB32` <sub>const</sub> | [754](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L754) |  |
+| `CROCKFORD` <sub>const</sub> | [755](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L755) |  |
+| `B45` <sub>const</sub> | [756](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L756) |  |
+| `A85` <sub>const</sub> | [757](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L757) |  |
+| `Z85A` <sub>const</sub> | [758](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L758) |  |
+| `UU` <sub>const</sub> | [759](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L759) |  |
+| `XX` <sub>const</sub> | [760](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L760) |  |
+| `XX_ALPHABET` <sub>const</sub> | [761](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L761) |  |
+| `Z85_ALPHABET` <sub>const</sub> | [762](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L762) |  |
+| `SBOX` <sub>const</sub> | [769](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L769) | A fixed permutation of every byte value, and its inverse. |
+| `UNSBOX` <sub>const</sub> | [779](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L779) |  |
+| `base32_encode` <sub>fn</sub> | [793](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L793) | Five bytes to eight characters, over whichever 32-character alphabet was chosen. |
+| `base32_decode` <sub>fn</sub> | [816](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L816) | Undo base32_encode over the same alphabet. |
+| `base45_encode` <sub>fn</sub> | [843](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L843) | Two bytes to three characters, over the 45-character alphabet the QR standard uses. |
+| `base45_decode` <sub>fn</sub> | [863](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L863) | Undo base45_encode. |
+| `base85_encode` <sub>fn</sub> | [890](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L890) | Four bytes to five characters. |
+| `base85_decode` <sub>fn</sub> | [914](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L914) | Undo base85_encode with the same flavour and offset. |
+| `B91` <sub>const</sub> | [951](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L951) |  |
+| `base91_encode` <sub>fn</sub> | [956](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L956) | Thirteen or fourteen bits at a time, over 91 characters, which is the densest of these that stays printable ASCII. |
+| `base91_decode` <sub>fn</sub> | [987](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L987) | Undo base91_encode. |
+| `sixbit_encode` <sub>fn</sub> | [1015](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1015) | Three bytes to four characters over a 64-character alphabet, in the shape uuencode and xxencode use. |
+| `sixbit_decode` <sub>fn</sub> | [1036](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs#L1036) | Undo sixbit_encode with the same flavour. |
 
 ---
 

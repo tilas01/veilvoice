@@ -15,12 +15,13 @@
 <script src="../js/theme.js"></script>
 <script src="../js/prefetch.js" defer></script>
 <script src="../js/legal.js" defer></script>
+<script src="../js/teleport.js" defer></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="../assets/icon-32.png" alt="">
+      <img src="../assets/icon-32.png" alt="" width="32" height="32">
       <a href="../index.html">VEILVOICE</a>
     </div>
     <nav class="links">
@@ -45,7 +46,7 @@
   </div>
 </header>
 <main class="wrap" style="padding-top:30px">
-<p><img src="../assets/banners/veilvoice-failsafe.svg" alt="veilvoice-failsafe" style="width:100%;height:auto"></p>
+<p><img src="../assets/banners/veilvoice-failsafe.svg" alt="veilvoice-failsafe" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1>veilvoice-failsafe</h1>
 <p class="lede">The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it.</p>
 <p style="color:var(--muted)"><a href="index.html">reference</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/README.md" rel="noopener noreferrer">the same page on GitHub</a></p>
@@ -101,7 +102,7 @@
 <a href="veilvoice-failsafe/lib.src.html">
 <rect x="70.1" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="120.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="120.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">682 lines</text>
+<text x="120.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">744 lines</text>
 </a>
 <a href="veilvoice-failsafe/act.src.html">
 <rect x="196.7" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -117,7 +118,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;682 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;744 lines&quot;])
     n_act[&quot;act.rs&lt;br/&gt;516 lines&quot;]
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/lib.rs&quot; &quot;open the source&quot;
     click n_act href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs&quot; &quot;open the source&quot;</code></pre>
@@ -128,7 +129,7 @@ flowchart TD
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-failsafe/act.html"><code>act.rs</code></a></td><td>516</td><td>Actually closing a program, kept apart from deciding to.</td></tr>
-<tr><td><a href="veilvoice-failsafe/lib.html"><code>lib.rs</code></a></td><td>682</td><td>Failsafe: nothing leaves this machine in your own voice by accident.</td></tr>
+<tr><td><a href="veilvoice-failsafe/lib.html"><code>lib.rs</code></a></td><td>744</td><td>Failsafe: nothing leaves this machine in your own voice by accident.</td></tr>
 </tbody></table>
 </section>
 </div></div>

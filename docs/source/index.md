@@ -20,8 +20,9 @@ own: what it does, and the same thing in plain words.
 | [`website/js/reveal.js`](website-js-reveal-js.md) | 125 | Reveal-on-scroll, with one rule that outranks every other consideration: **content must never stay invisible.** |
 | [`website/js/search.js`](website-js-search-js.md) | 496 | Search across the whole repository and this website |
 | [`website/js/sessions.js`](website-js-sessions-js.md) | 219 | The command line, on the page, typed out |
+| [`website/js/teleport.js`](website-js-teleport-js.md) | 310 | Following a link to a section of the page lands on that section's heading, with the heading visible |
 | [`website/js/theme.js`](website-js-theme-js.md) | 104 | Theme switching |
 | [`website/js/verify.js`](website-js-verify-js.md) | 211 | In-browser SHA-256 verification for downloaded release archives |
 | [`website/js/walkthrough.js`](website-js-walkthrough-js.md) | 162 | Every screen of the application as a photograph you pick between, and the command line as a list of jobs rather than a list of flags |
-| [`website/css/main.css`](website-css-main-css.md) | 2493 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
+| [`website/css/main.css`](website-css-main-css.md) | 2530 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
 | [`website/css/themes.css`](website-css-themes-css.md) | 174 | Colour schemes |

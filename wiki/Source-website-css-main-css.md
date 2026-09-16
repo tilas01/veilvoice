@@ -3,7 +3,7 @@
 
 # `website/css/main.css`
 
-[[The website's source|Source-index]] &middot; 2493 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css)
+[[The website's source|Source-index]] &middot; 2530 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css)
 
 ## What it does
 
@@ -23,27 +23,27 @@ There is no framework and no font downloaded from anywhere else. Every remote th
 |---|---:|
 | header | 102 |
 | header on a phone | 166 |
-| hero | 248 |
-| the banner, drawn in CSS | 287 |
-| the journey: a file in, a file out | 468 |
-| the demonstration | 682 |
-| the questions page | 899 |
-| the recorded terminal | 927 |
-| tooltips | 1019 |
-| the cycling fact line | 1149 |
-| the veil animation | 1216 |
-| reveal on scroll | 1253 |
-| the walkthrough | 1272 |
-| buttons | 1333 |
-| sections | 1359 |
-| verifier | 1471 |
-| repo panel | 1519 |
-| the repository panel, while it loads | 1526 |
-| the screenshot gallery | 1577 |
-| wiki | 1642 |
-| a source file, on this site | 1733 |
-| the releases page | 1802 |
-| footer | 1837 |
-| welcome / legal gate | 1862 |
-| search | 1979 |
-| the JavaScript edition toggle | 2149 |
+| hero | 285 |
+| the banner, drawn in CSS | 324 |
+| the journey: a file in, a file out | 505 |
+| the demonstration | 719 |
+| the questions page | 936 |
+| the recorded terminal | 964 |
+| tooltips | 1056 |
+| the cycling fact line | 1186 |
+| the veil animation | 1253 |
+| reveal on scroll | 1290 |
+| the walkthrough | 1309 |
+| buttons | 1370 |
+| sections | 1396 |
+| verifier | 1508 |
+| repo panel | 1556 |
+| the repository panel, while it loads | 1563 |
+| the screenshot gallery | 1614 |
+| wiki | 1679 |
+| a source file, on this site | 1770 |
+| the releases page | 1839 |
+| footer | 1874 |
+| welcome / legal gate | 1899 |
+| search | 2016 |
+| the JavaScript edition toggle | 2186 |

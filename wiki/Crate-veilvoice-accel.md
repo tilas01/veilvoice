@@ -80,7 +80,7 @@ copy of ffmpeg you have.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>589 lines"])
+    n_lib(["lib.rs<br/>649 lines"])
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-accel/src/lib.rs" "open the source"
 ```
 
@@ -90,9 +90,9 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-accel-lib]] | 589 | What hardware this machine has, and the one place VeilVoice can use it. |
+| [[`lib.rs`|File-veilvoice-accel-lib]] | 649 | What hardware this machine has, and the one place VeilVoice can use it. |
 
-**427 functional lines of Rust** in this crate. A functional line is a line
+**474 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

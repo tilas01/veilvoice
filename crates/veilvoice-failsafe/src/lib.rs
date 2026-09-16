@@ -679,4 +679,66 @@ mod tests {
         assert!(guard.log()[0].closed);
         assert!(guard.log()[0].detail.contains("Headset Microphone"));
     }
+
+    /// Failsafe knows no program by name except the ones it refuses to close.
+    ///
+    /// The tests above use real application names as fixtures, because a test
+    /// reads better with one, and reading this file it is easy to come away
+    /// thinking a particular chat program is wired in. It is not, and this is
+    /// what keeps it that way: the decision is made about whatever holder the
+    /// caller found, and the only names written down anywhere in the working
+    /// half of this file are the operating system's own.
+    #[test]
+    fn no_program_is_known_here_by_name_except_the_protected_ones() {
+        let source = include_str!("lib.rs").replace("\r\n", "\n");
+        let working = source
+            .split_once("\nmod tests {")
+            .map(|(before, _)| before)
+            .expect("the test module marks the end of the working half");
+
+        let mut named = Vec::new();
+        for (number, line) in working.lines().enumerate() {
+            for candidate in line.split('"').skip(1).step_by(2) {
+                let name = candidate.to_ascii_lowercase();
+                let executable = name.ends_with(".exe");
+                if executable && !PROTECTED.contains(&name.as_str()) {
+                    named.push(format!("line {}: {candidate}", number + 1));
+                }
+            }
+        }
+        assert!(
+            named.is_empty(),
+            "these name a program Failsafe has no business knowing about. It \
+             acts on what the caller found, on every platform, and a list of \
+             applications is a list that is wrong on the next machine:\n{}",
+            named.join("\n")
+        );
+    }
+
+    /// A program nobody has ever heard of is handled like any other.
+    #[test]
+    fn an_unheard_of_program_is_treated_like_any_other() {
+        let guard = veiling_guard();
+        for app in [
+            "Discord.exe",
+            "zoom.us",
+            "some-recorder-written-tomorrow",
+            "/opt/whatever/bin/Talk",
+            "C:\\Program Files\\Nobody\\Nobody.exe",
+            "obs",
+        ] {
+            let found = guard.look(&[holder(app, Some("Headset Microphone"))], &[]);
+            match &found {
+                Finding::Foreign {
+                    app: seen,
+                    closeable,
+                    ..
+                } => {
+                    assert_eq!(seen, app);
+                    assert!(closeable, "{app} is not protected, so it is closeable");
+                }
+                other => panic!("{app} should have been the alarm, got {other:?}"),
+            }
+        }
+    }
 }

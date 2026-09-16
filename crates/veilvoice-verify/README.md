@@ -95,7 +95,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>1889 lines"])
     n_builder["builder.rs<br/>1210 lines"]
-    n_deps["deps.rs<br/>650 lines"]
+    n_deps["deps.rs<br/>652 lines"]
     n_discover["discover.rs<br/>460 lines"]
     n_extracted["extracted.rs<br/>316 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
@@ -122,7 +122,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1210 | Build VeilVoice here, and compare what came out against what was published. |
-| [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 650 | What this machine needs before it can build VeilVoice, and who ships it. |
+| [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 652 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 316 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
@@ -131,7 +131,7 @@ flowchart TD
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 1373 | The verifier's own tests. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Roadmap item 97. |
 
-**4,422 functional lines of Rust** in this crate. A functional line is a line
+**4,421 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

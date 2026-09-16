@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/aead.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 276 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 280 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs)
 
 ## Contents
 
@@ -36,16 +36,16 @@ any alteration at all means it will not open, and says so.
 
 ## What this file contains
 
-276 lines defining **5 functions** (4 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+280 lines defining **5 functions** (4 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `random_nonce` (line 35) -- Draw a fresh random nonce from the OS CSPRNG.
-- `seal` (line 51) -- Encrypt plaintext, authenticating aad alongside it.
+- `seal` (line 55) -- Encrypt plaintext, authenticating aad alongside it.
   - reaches: `cipher`
-- `open` (line 70) -- Decrypt and verify.
+- `open` (line 74) -- Decrypt and verify.
   - reaches: `cipher`
-- `open_secret` (line 117) -- Decrypt and verify into protected memory, never into an ordinary Vec.
+- `open_secret` (line 121) -- Decrypt and verify into protected memory, never into an ordinary Vec.
   - reaches: `cipher`
 
 ## What calls what
@@ -63,18 +63,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_random_nonce(["random_nonce<br/>line 35"])
-    n_cipher["cipher<br/>line 41"]
-    n_seal(["seal<br/>line 51"])
-    n_open(["open<br/>line 70"])
-    n_open_secret(["open_secret<br/>line 117"])
+    n_cipher["cipher<br/>line 45"]
+    n_seal(["seal<br/>line 55"])
+    n_open(["open<br/>line 74"])
+    n_open_secret(["open_secret<br/>line 121"])
     n_open --> n_cipher
     n_open_secret --> n_cipher
     n_seal --> n_cipher
     click n_random_nonce href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L35" "open the source"
-    click n_cipher href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41" "open the source"
-    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51" "open the source"
-    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70" "open the source"
-    click n_open_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L117" "open the source"
+    click n_cipher href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L45" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L55" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L74" "open the source"
+    click n_open_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L121" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_random_nonce,n_seal,n_open,n_open_secret entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -90,7 +90,7 @@ flowchart TD
 | `NONCE_LEN` <sub>pub const</sub> | [30](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L30) | Nonce length for XChaCha20-Poly1305, in bytes. |
 | `TAG_LEN` <sub>pub const</sub> | [32](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L32) | Poly1305 authentication tag length, in bytes. |
 | `random_nonce` <sub>pub fn</sub> | [35](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L35) | Draw a fresh random nonce from the OS CSPRNG. |
-| `cipher` <sub>fn</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41) |  |
-| `seal` <sub>pub fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51) | Encrypt plaintext, authenticating aad alongside it. |
-| `open` <sub>pub fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70) | Decrypt and verify. |
-| `open_secret` <sub>pub fn</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L117) | Decrypt and verify into protected memory, never into an ordinary Vec. |
+| `cipher` <sub>fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L45) | The cipher for this key, refusing a key that is not 32 bytes. |
+| `seal` <sub>pub fn</sub> | [55](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L55) | Encrypt plaintext, authenticating aad alongside it. |
+| `open` <sub>pub fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L74) | Decrypt and verify. |
+| `open_secret` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L121) | Decrypt and verify into protected memory, never into an ordinary Vec. |

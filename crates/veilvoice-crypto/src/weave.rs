@@ -735,6 +735,9 @@ pub fn decode(chosen: Weave, input: &[u8]) -> Result<Vec<u8>, Error> {
     Weave::Substitute.undo(&chosen.undo(input)?)
 }
 
+/// One hex digit as a number, in either case. Anything else is a header this
+/// cannot read, which is the only verdict a decoder should reach about input
+/// it does not recognise.
 fn nibble(c: u8) -> Result<u8, Error> {
     match c {
         b'0'..=b'9' => Ok(c - b'0'),
@@ -783,6 +786,10 @@ const UNSBOX: [u8; 256] = {
     table
 };
 
+/// Five bytes to eight characters, over whichever 32-character alphabet was
+/// chosen. A short final chunk emits only the characters its bits reach, so
+/// nothing is padded and the length of the output still says only what the
+/// length of the input says.
 fn base32_encode(input: &[u8], alphabet: &[u8; 32]) -> Vec<u8> {
     let mut out = Vec::with_capacity(input.len().div_ceil(5) * 8);
     for chunk in input.chunks(5) {
@@ -803,6 +810,9 @@ fn base32_encode(input: &[u8], alphabet: &[u8; 32]) -> Vec<u8> {
     out
 }
 
+/// Undo [`base32_encode`] over the same alphabet. A character outside the
+/// alphabet is refused rather than skipped: silently ignoring input is how a
+/// decoder accepts two different texts as the same bytes.
 fn base32_decode(input: &[u8], alphabet: &[u8; 32]) -> Result<Vec<u8>, Error> {
     let mut out = Vec::new();
     for chunk in input.chunks(8) {
@@ -828,6 +838,8 @@ fn base32_decode(input: &[u8], alphabet: &[u8; 32]) -> Result<Vec<u8>, Error> {
     Ok(out)
 }
 
+/// Two bytes to three characters, over the 45-character alphabet the QR
+/// standard uses. An odd final byte becomes two characters.
 fn base45_encode(input: &[u8]) -> Vec<u8> {
     let mut out = Vec::new();
     for pair in input.chunks(2) {
@@ -845,6 +857,9 @@ fn base45_encode(input: &[u8]) -> Vec<u8> {
     out
 }
 
+/// Undo [`base45_encode`]. Refuses a value that does not fit the two bytes it
+/// is supposed to represent, which is the case a length check alone would
+/// miss.
 fn base45_decode(input: &[u8]) -> Result<Vec<u8>, Error> {
     let value = |c: &u8| {
         B45.iter()
@@ -870,6 +885,8 @@ fn base45_decode(input: &[u8]) -> Result<Vec<u8>, Error> {
     Ok(out)
 }
 
+/// Four bytes to five characters. `flavour` picks between Ascii85 and Z85, and
+/// `offset` is where Ascii85's alphabet starts in ASCII, which is `!`.
 fn base85_encode(input: &[u8], flavour: u8, offset: u8) -> Vec<u8> {
     let mut out = Vec::new();
     for chunk in input.chunks(4) {
@@ -891,6 +908,9 @@ fn base85_encode(input: &[u8], flavour: u8, offset: u8) -> Vec<u8> {
     out
 }
 
+/// Undo [`base85_encode`] with the same flavour and offset. The accumulator
+/// multiplies and adds with checked arithmetic, so a group whose digits do not
+/// fit four bytes is refused rather than wrapping into a different four.
 fn base85_decode(input: &[u8], flavour: u8, offset: u8) -> Result<Vec<u8>, Error> {
     let value = |c: u8| -> Result<u32, Error> {
         if flavour == Z85A {
@@ -931,6 +951,8 @@ fn base85_decode(input: &[u8], flavour: u8, offset: u8) -> Result<Vec<u8>, Error
 const B91: &[u8; 91] =
     b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~\"";
 
+/// Thirteen or fourteen bits at a time, over 91 characters, which is the
+/// densest of these that stays printable ASCII.
 fn base91_encode(input: &[u8]) -> Vec<u8> {
     let mut out = Vec::new();
     let (mut queue, mut bits) = (0u32, 0u32);
@@ -960,6 +982,8 @@ fn base91_encode(input: &[u8]) -> Vec<u8> {
     out
 }
 
+/// Undo [`base91_encode`]. A trailing partial group is completed from what
+/// bits are there, and anything outside the alphabet is refused.
 fn base91_decode(input: &[u8]) -> Result<Vec<u8>, Error> {
     let mut out = Vec::new();
     let (mut queue, mut bits) = (0u32, 0u32);
@@ -986,6 +1010,8 @@ fn base91_decode(input: &[u8]) -> Result<Vec<u8>, Error> {
     Ok(out)
 }
 
+/// Three bytes to four characters over a 64-character alphabet, in the shape
+/// uuencode and xxencode use. `flavour` chooses between the two.
 fn sixbit_encode(input: &[u8], flavour: u8) -> Vec<u8> {
     let mut out = Vec::new();
     for chunk in input.chunks(3) {
@@ -1006,6 +1032,7 @@ fn sixbit_encode(input: &[u8], flavour: u8) -> Vec<u8> {
     out
 }
 
+/// Undo [`sixbit_encode`] with the same flavour.
 fn sixbit_decode(input: &[u8], flavour: u8) -> Result<Vec<u8>, Error> {
     let value = |c: u8| -> Result<u32, Error> {
         if flavour == XX {
@@ -1234,7 +1261,8 @@ mod tests {
         }
     }
 
-    /// The decoder, on input built from its alphabet rather than from the encoder.
+    /// The decoder, on input built from its alphabet rather than from the
+    /// encoder.
     ///
     /// A round trip is blind to any change the pair still agrees on, and `undo`
     /// is fed bytes read back from disk, not only what `apply` wrote. `}A` is

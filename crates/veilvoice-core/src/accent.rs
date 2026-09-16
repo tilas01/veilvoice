@@ -420,10 +420,14 @@ fn log_centroid(env: &[f32], lo: usize, hi: usize, bin_hz: f32) -> Option<f32> {
     c.is_finite().then_some(c)
 }
 
+/// A linear gain as decibels. The tiny addition keeps the logarithm of
+/// silence finite rather than negative infinity.
 fn gain_to_db(x: f32) -> f32 {
     20.0 * (x.abs() + 1e-9).log10()
 }
 
+/// Decibels back to a linear gain. The inverse of [`gain_to_db`] for
+/// everything except exact silence.
 fn db_to_gain(db: f32) -> f32 {
     10f32.powf(db / 20.0)
 }

@@ -238,7 +238,10 @@ fn bucket_for(len: usize) -> usize {
             return b;
         }
     }
-    len.div_ceil(1_048_576) * 1_048_576
+    // Saturating for the same reason the caller checks its multiplication: a
+    // length near the top of the address space would otherwise round up to a
+    // smaller number than it started at.
+    len.div_ceil(1_048_576).saturating_mul(1_048_576)
 }
 
 /// What an audit found.
@@ -321,6 +324,11 @@ impl Hoard {
         Ok(())
     }
 
+    /// Encode, seal and write one record under its obfuscated name.
+    ///
+    /// The steps and the reason for each are in the body: what is written is not
+    /// the caller's bytes, is not stored under the caller's name, and is not the
+    /// size of the caller's data.
     fn write_raw(&self, logical: &str, data: &[u8]) -> Result<(), Error> {
         let name = self.name_for(logical)?;
 
@@ -347,7 +355,16 @@ impl Hoard {
         // be up to three times the size it strictly needs. These files are
         // settings and measurements, a few kilobytes at most, and a stable
         // size is worth more than a small one.
-        let padded_len = bucket_for(MARKER + LEN_PREFIX + data.len() * MAX_EXPANSION);
+        // Checked, because this is a length from a caller multiplied by a
+        // constant. On the 32-bit targets this project ships, a record over
+        // about 512 MiB wraps it, and `bucket_for` would then size the buffer
+        // from a number smaller than the data.
+        let padded_len = data
+            .len()
+            .checked_mul(MAX_EXPANSION)
+            .and_then(|n| n.checked_add(MARKER + LEN_PREFIX))
+            .map(bucket_for)
+            .ok_or(Error::Encrypt)?;
         if MARKER + LEN_PREFIX + body.len() > padded_len {
             // Unreachable while `MAX_EXPANSION` is honest, and checked rather
             // than trusted: a new encoding that expands further would
@@ -415,6 +432,10 @@ impl Hoard {
         self.open_bytes(logical, &bytes).map(Some)
     }
 
+    /// Undo [`Hoard::write_raw`] for bytes already read off the disk.
+    ///
+    /// Split out from the read so that a record can be opened from memory, which
+    /// is what the tests do rather than going through the filesystem.
     fn open_bytes(&self, logical: &str, bytes: &[u8]) -> Result<Vec<u8>, Error> {
         if bytes.len() < OUTER_MARKER + aead::NONCE_LEN + aead::TAG_LEN + MARKER + LEN_PREFIX {
             return Err(Error::Truncated);
@@ -486,6 +507,11 @@ impl Hoard {
             .collect())
     }
 
+    /// Write the list of logical names, itself as an ordinary record.
+    ///
+    /// The roster goes through the same encoding, sealing and padding as anything
+    /// else, so the file that says what is stored is not distinguishable from the
+    /// files it names.
     fn save_roster(&self, names: &BTreeSet<String>) -> Result<(), Error> {
         let text = names
             .iter()
@@ -580,6 +606,11 @@ fn is_hoard_shaped(name: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
 }
 
+/// Fill `buf` from the operating system, treating a refusal as an error
+/// rather than falling back to anything.
+///
+/// An empty buffer is a no-op: `getrandom` is within its rights to refuse a
+/// zero-length request, and asking for nothing is not a failure.
 fn fill_random(buf: &mut [u8]) -> Result<(), Error> {
     if buf.is_empty() {
         return Ok(());
@@ -590,6 +621,37 @@ fn fill_random(buf: &mut [u8]) -> Result<(), Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Sizing the padded buffer cannot wrap on a 32-bit target.
+    ///
+    /// `bucket_for` is fed a record length times eight, and this project ships
+    /// i686 and armv7 builds where that wraps above about 512 MiB. No test can
+    /// allocate that much, so the arithmetic is checked here directly.
+    #[test]
+    fn the_padding_size_is_refused_rather_than_wrapping() {
+        // What the real path computes, at a length that wraps on 32 bits.
+        let huge = usize::MAX / 4;
+        assert!(
+            huge.checked_mul(MAX_EXPANSION).is_none(),
+            "this length is meant to overflow the multiplication"
+        );
+
+        // And a workable length still rounds up to a bucket that holds it.
+        for len in [0usize, 1, 100, 4096, 1_000_000] {
+            let padded = len
+                .checked_mul(MAX_EXPANSION)
+                .and_then(|n| n.checked_add(MARKER + LEN_PREFIX))
+                .map(bucket_for)
+                .expect("an ordinary record size must not overflow");
+            assert!(
+                padded >= MARKER + LEN_PREFIX + len,
+                "a {len} byte record was padded to {padded}, which cannot hold it"
+            );
+        }
+
+        // `bucket_for`'s own rounding saturates rather than wrapping to zero.
+        assert!(bucket_for(usize::MAX) >= usize::MAX - 1_048_576);
+    }
 
     fn hoard(dir: &std::path::Path) -> Hoard {
         let mut raw = [7u8; kdf::KEY_LEN];

@@ -1396,6 +1396,25 @@ BANNER_H = 150
 BANNER_LINE = 19.0
 
 
+def banner_size(relative):
+    """The pixel size of a banner that has already been written.
+
+    The `<img>` tags carry it so the browser can reserve the space before the
+    file arrives. Without that, every heading below a banner moves down when it
+    loads, and a reader who followed a link to one of those headings lands
+    above it. Read from the drawing rather than written down here, because a
+    banner whose subtitle runs to a third line is taller than the rest.
+    """
+    path = os.path.join(repo_root(), "website", "assets", "banners", relative)
+    try:
+        with io.open(path, encoding="utf-8") as handle:
+            head = handle.read(400)
+    except OSError:
+        return BANNER_W, BANNER_H
+    box = re.search(r'viewBox="0 0 ([0-9]+) ([0-9]+)"', head)
+    return (int(box.group(1)), int(box.group(2))) if box else (BANNER_W, BANNER_H)
+
+
 def banner_svg(colours, title, subtitle, kind):
     """A banner for a crate or a file.
 
@@ -2383,12 +2402,17 @@ def html_page(colours, depth, title, description, body, fingerprint):
     add('<script src="%sjs/theme.js"></script>' % up)
     add('<script src="%sjs/prefetch.js" defer></script>' % up)
     add('<script src="%sjs/legal.js" defer></script>' % up)
+    # These pages carry heading ids a reader can link to, and the header here
+    # is a different height from the one on the hand-written pages. The offset
+    # that clears it is measured rather than written down, so the script that
+    # measures it is loaded here too.
+    add('<script src="%sjs/teleport.js" defer></script>' % up)
     add('</head>')
     add('<body>')
     add('<header class="top">')
     add('  <div class="wrap">')
     add('    <div class="brand">')
-    add('      <img src="%sassets/icon-32.png" alt="">' % up)
+    add('      <img src="%sassets/icon-32.png" alt="" width="32" height="32">' % up)
     add('      <a href="%sindex.html">VEILVOICE</a>' % up)
     add('    </div>')
     # The same thirteen links every hand-written page carries, in the same
@@ -2693,8 +2717,10 @@ def html_crate(colours, model, fingerprint, links):
                 if entry["stem"] in ("lib", "main")), None)
 
     body = []
-    body.append('<p><img src="../assets/banners/%s.svg" alt="%s" '
-                'style="width:100%%;height:auto"></p>' % (crate, esc(crate)))
+    banner_w, banner_h = banner_size("%s.svg" % crate)
+    body.append('<p><img src="../assets/banners/%s.svg" alt="%s" width="%d" '
+                'height="%d" style="width:100%%;height:auto"></p>'
+                % (crate, esc(crate), banner_w, banner_h))
     body.append("<h1>%s</h1>" % esc(crate))
     if model["description"]:
         body.append('<p class="lede">%s</p>' % esc(model["description"]))
@@ -2751,9 +2777,10 @@ def html_file(colours, model, entry, fingerprint, links):
     nodes, edges, truncated, total = file_graph(entry)
 
     body = []
+    banner_w, banner_h = banner_size(os.path.join(crate, "%s.svg" % entry["stem"]))
     body.append('<p><img src="../../assets/banners/%s/%s.svg" alt="%s" '
-                'style="width:100%%;height:auto"></p>'
-                % (crate, entry["stem"], esc(entry["name"])))
+                'width="%d" height="%d" style="width:100%%;height:auto"></p>'
+                % (crate, entry["stem"], esc(entry["name"]), banner_w, banner_h))
     body.append("<h1><code>%s</code></h1>" % esc(entry["rel"]))
     body.append('<p style="color:var(--muted)"><a href="../%s.html">%s</a> '
                 '&middot; %d lines &middot; '

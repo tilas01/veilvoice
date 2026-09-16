@@ -153,6 +153,12 @@ CHECKS = [
     # it, which is exactly the shape the compiler cannot report.
     ("every public item is reached by something",
      [sys.executable, "tools/audit/reachable.py"]),
+    # Three documents list the crates and they listed thirteen, twelve and
+    # thirteen of the twenty-seven. The front page of the website renders the
+    # README, so the shortest of the three was what the site said this project
+    # was made of.
+    ("every crate appears in every table that lists the crates",
+     [sys.executable, "tools/audit/crate_tables.py"]),
     # F-185. A build directory inside the repository is invisible to git,
     # because `.gitignore` matches `target/` at any depth, so it is never
     # reported and never cleaned. One had been rebuilt by this very tool on
