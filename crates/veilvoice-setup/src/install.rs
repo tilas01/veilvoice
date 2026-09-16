@@ -171,6 +171,7 @@ pub fn status() -> Status {
     }
 }
 
+/// A program's file name on this platform.
 fn exe_name(stem: &str) -> String {
     if cfg!(windows) {
         format!("{stem}.exe")
@@ -342,6 +343,10 @@ fn read_user_path() -> Result<UserPath, String> {
     Err("could not parse the PATH value reg.exe printed. Refusing to change it.".to_string())
 }
 
+/// The Unix half: report that nothing was written, because nothing was.
+///
+/// Answering `Ok(false)` rather than doing it is the decision, and the body
+/// says why. The caller prints the line for the person to add themselves.
 #[cfg(not(windows))]
 fn add_to_path(dir: &Path) -> Result<bool, String> {
     // On Unix the convention is a line in a shell profile, and rewriting
@@ -391,11 +396,19 @@ fn register_uninstall(prefix: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// The Unix half: nothing to register. There is no Add/Remove Programs here,
+/// and `veilvoice uninstall` is the reversal on these platforms.
 #[cfg(not(windows))]
 fn register_uninstall(_prefix: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// Take this directory back out of the user's `PATH`, leaving the rest of it
+/// exactly as it was.
+///
+/// The same care as [`add_to_path`], for the same reason: the variable is read
+/// and rewritten rather than replaced, and a `PATH` that never had this
+/// directory in it is left untouched rather than rewritten to itself.
 #[cfg(windows)]
 fn remove_from_path(dir: &Path) -> Result<bool, String> {
     let current = match read_user_path()? {
@@ -441,11 +454,17 @@ fn remove_from_path(dir: &Path) -> Result<bool, String> {
     Ok(true)
 }
 
+/// The Unix half: nothing was written to a profile, so nothing is taken out.
 #[cfg(not(windows))]
 fn remove_from_path(_dir: &Path) -> Result<bool, String> {
     Ok(false)
 }
 
+/// Take the Add/Remove Programs entry away again.
+///
+/// A failure is ignored on purpose: the entry not being there is the outcome
+/// wanted, and refusing to finish an uninstall because the registry key was
+/// already gone would leave the person with a half-removed program.
 #[cfg(windows)]
 fn unregister_uninstall() -> Result<(), String> {
     let key = format!(r"HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{NAME}");
@@ -455,6 +474,7 @@ fn unregister_uninstall() -> Result<(), String> {
     Ok(())
 }
 
+/// The Unix half: nothing was registered, so nothing is unregistered.
 #[cfg(not(windows))]
 fn unregister_uninstall() -> Result<(), String> {
     Ok(())

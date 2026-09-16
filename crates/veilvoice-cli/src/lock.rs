@@ -127,6 +127,7 @@ pub fn wrap(text: &str, width: usize) -> Vec<String> {
     lines
 }
 
+/// Dispatch `veilvoice lock` to the subcommand that was asked for.
 pub fn run(action: Action, path: Option<PathBuf>) -> Result<(), String> {
     let site = Site::resolve(path)?;
     println!("{}", heading("App lock"));

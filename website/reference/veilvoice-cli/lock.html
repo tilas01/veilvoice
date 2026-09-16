@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/lock.svg" alt="lock.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/lock.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 329 lines &middot; <a href="lock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 330 lines &middot; <a href="lock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -83,13 +83,13 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>329 lines defining <strong>12 functions</strong> (2 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>330 lines defining <strong>12 functions</strong> (2 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Action</code> <span style="color:var(--muted)">line 30</span></li>
 <li><code>enum Site</code> <span style="color:var(--muted)">line 50</span> &middot; Where the lock is kept for this invocation.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>run</code> <span style="color:var(--muted)">line 130</span>
+<li><code>run</code> <span style="color:var(--muted)">line 131</span> &middot; Dispatch veilvoice lock to the subcommand that was asked for.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>change</code>, <code>remove</code>, <code>resolve</code>, <code>set</code>, <code>status</code>, <code>open_or_explain</code>, <code>print_scope</code>, <code>wrap</code></span>
 </li>
 </ul>
@@ -150,32 +150,32 @@
 <a href="lock.src.html#fn-run">
 <rect x="337.6" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="383.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="383.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
+<text x="383.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
 </a>
 <a href="lock.src.html#fn-status">
 <rect x="147.8" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="194.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="194.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="194.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
 </a>
 <a href="lock.src.html#fn-set">
 <rect x="266.2" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">set</text>
-<text x="312.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
+<text x="312.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
 </a>
 <a href="lock.src.html#fn-change">
 <rect x="384.7" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="431.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">change</text>
-<text x="431.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 236</text>
+<text x="431.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
 </a>
 <a href="lock.src.html#fn-remove">
 <rect x="503.2" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="549.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove</text>
-<text x="549.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
+<text x="549.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
 </a>
 <a href="lock.src.html#fn-open_or_explain">
 <rect x="238.0" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_or_explain</text>
-<text x="312.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 259</text>
+<text x="312.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -200,12 +200,12 @@ flowchart TD
     n_create[&quot;Site::create&lt;br/&gt;line 92&quot;]
     n_print_scope[&quot;print_scope&lt;br/&gt;line 103&quot;]
     n_wrap[&quot;wrap&lt;br/&gt;line 112&quot;]
-    n_run([&quot;run&lt;br/&gt;line 130&quot;])
-    n_status[&quot;status&lt;br/&gt;line 143&quot;]
-    n_set[&quot;set&lt;br/&gt;line 194&quot;]
-    n_change[&quot;change&lt;br/&gt;line 236&quot;]
-    n_remove[&quot;remove&lt;br/&gt;line 248&quot;]
-    n_open_or_explain[&quot;open_or_explain&lt;br/&gt;line 259&quot;]
+    n_run([&quot;run&lt;br/&gt;line 131&quot;])
+    n_status[&quot;status&lt;br/&gt;line 144&quot;]
+    n_set[&quot;set&lt;br/&gt;line 195&quot;]
+    n_change[&quot;change&lt;br/&gt;line 237&quot;]
+    n_remove[&quot;remove&lt;br/&gt;line 249&quot;]
+    n_open_or_explain[&quot;open_or_explain&lt;br/&gt;line 260&quot;]
     n_change --&gt; n_open_or_explain
     n_print_scope --&gt; n_wrap
     n_remove --&gt; n_open_or_explain
@@ -222,12 +222,12 @@ flowchart TD
     click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L92&quot; &quot;open the source&quot;
     click n_print_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L103&quot; &quot;open the source&quot;
     click n_wrap href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L112&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L130&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L143&quot; &quot;open the source&quot;
-    click n_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L194&quot; &quot;open the source&quot;
-    click n_change href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L236&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L248&quot; &quot;open the source&quot;
-    click n_open_or_explain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L259&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L131&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L144&quot; &quot;open the source&quot;
+    click n_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L195&quot; &quot;open the source&quot;
+    click n_change href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L237&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L249&quot; &quot;open the source&quot;
+    click n_open_or_explain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L260&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -248,12 +248,12 @@ flowchart TD
 <tr><td><code>Site::create</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-site-create">92</a></td><td></td></tr>
 <tr><td><code>print_scope</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-print_scope">103</a></td><td>Print the honest scope note, wrapped for a terminal.</td></tr>
 <tr><td><code>wrap</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-wrap">112</a></td><td>Greedy word wrap.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-run">130</a></td><td></td></tr>
-<tr><td><code>status</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-status">143</a></td><td></td></tr>
-<tr><td><code>set</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-set">194</a></td><td></td></tr>
-<tr><td><code>change</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-change">236</a></td><td></td></tr>
-<tr><td><code>remove</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-remove">248</a></td><td></td></tr>
-<tr><td><code>open_or_explain</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-open_or_explain">259</a></td><td></td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-run">131</a></td><td>Dispatch veilvoice lock to the subcommand that was asked for.</td></tr>
+<tr><td><code>status</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-status">144</a></td><td></td></tr>
+<tr><td><code>set</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-set">195</a></td><td></td></tr>
+<tr><td><code>change</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-change">237</a></td><td></td></tr>
+<tr><td><code>remove</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-remove">249</a></td><td></td></tr>
+<tr><td><code>open_or_explain</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-open_or_explain">260</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

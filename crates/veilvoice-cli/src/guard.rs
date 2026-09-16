@@ -111,6 +111,7 @@ fn default_targets() -> Vec<PathBuf> {
     targets
 }
 
+/// Dispatch `veilvoice guard` to the subcommand that was asked for.
 pub fn run(action: Action, path: Option<PathBuf>) -> Result<(), String> {
     let store = manifest_path(path)?;
     println!("{}", heading("Integrity"));
