@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/capture.svg" alt="capture.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/capture.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 330 lines &middot; <a href="capture.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 336 lines &middot; <a href="capture.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-allowlist-lives">Where the allowlist lives</a>
@@ -90,22 +90,22 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>330 lines defining <strong>10 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>336 lines defining <strong>10 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>status</code> <span style="color:var(--muted)">line 75</span> &middot; What is running, what is allowed, and what this cannot see.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
 <li><code>calls</code> <span style="color:var(--muted)">line 127</span> &middot; Every program in the table, whether it is running or not.
 </li>
-<li><code>list</code> <span style="color:var(--muted)">line 204</span>
+<li><code>list</code> <span style="color:var(--muted)">line 210</span> &middot; veilvoice capture list: the screen recorders this build knows how to name.
 </li>
-<li><code>allow</code> <span style="color:var(--muted)">line 237</span> &middot; Stop notifying about one program.
+<li><code>allow</code> <span style="color:var(--muted)">line 243</span> &middot; Stop notifying about one program.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>save</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
-<li><code>deny</code> <span style="color:var(--muted)">line 254</span> &middot; Start notifying about one program again.
+<li><code>deny</code> <span style="color:var(--muted)">line 260</span> &middot; Start notifying about one program again.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>save</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 270</span> &middot; Look now, and let the exit code answer.
+<li><code>check</code> <span style="color:var(--muted)">line 276</span> &middot; Look now, and let the exit code answer.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
 </ul>
@@ -165,22 +165,22 @@
 <a href="capture.src.html#fn-list">
 <rect x="154.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="200.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list</text>
-<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
+<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
 </a>
 <a href="capture.src.html#fn-allow">
 <rect x="273.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="319.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">allow</text>
-<text x="319.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
+<text x="319.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 243</text>
 </a>
 <a href="capture.src.html#fn-deny">
 <rect x="391.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="437.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">deny</text>
-<text x="437.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
+<text x="437.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
 </a>
 <a href="capture.src.html#fn-check">
 <rect x="510.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="556.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="556.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
+<text x="556.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -205,10 +205,10 @@ flowchart TD
     n_save[&quot;save&lt;br/&gt;line 67&quot;]
     n_status([&quot;status&lt;br/&gt;line 75&quot;])
     n_calls([&quot;calls&lt;br/&gt;line 127&quot;])
-    n_list([&quot;list&lt;br/&gt;line 204&quot;])
-    n_allow([&quot;allow&lt;br/&gt;line 237&quot;])
-    n_deny([&quot;deny&lt;br/&gt;line 254&quot;])
-    n_check([&quot;check&lt;br/&gt;line 270&quot;])
+    n_list([&quot;list&lt;br/&gt;line 210&quot;])
+    n_allow([&quot;allow&lt;br/&gt;line 243&quot;])
+    n_deny([&quot;deny&lt;br/&gt;line 260&quot;])
+    n_check([&quot;check&lt;br/&gt;line 276&quot;])
     n_allow --&gt; n_load
     n_allow --&gt; n_save
     n_allow_path --&gt; n_capture_dir
@@ -224,10 +224,10 @@ flowchart TD
     click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L67&quot; &quot;open the source&quot;
     click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L75&quot; &quot;open the source&quot;
     click n_calls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L127&quot; &quot;open the source&quot;
-    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L204&quot; &quot;open the source&quot;
-    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L237&quot; &quot;open the source&quot;
-    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L254&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L270&quot; &quot;open the source&quot;
+    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L210&quot; &quot;open the source&quot;
+    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L243&quot; &quot;open the source&quot;
+    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L260&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L276&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_calls,n_list,n_allow,n_deny,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -246,10 +246,10 @@ flowchart TD
 <tr><td><code>save</code> <sub>fn</sub></td><td><a href="capture.src.html#fn-save">67</a></td><td></td></tr>
 <tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-status">75</a></td><td>What is running, what is allowed, and what this cannot see.</td></tr>
 <tr><td><code>calls</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-calls">127</a></td><td>Every program in the table, whether it is running or not.</td></tr>
-<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-list">204</a></td><td></td></tr>
-<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-allow">237</a></td><td>Stop notifying about one program.</td></tr>
-<tr><td><code>deny</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-deny">254</a></td><td>Start notifying about one program again.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-check">270</a></td><td>Look now, and let the exit code answer.</td></tr>
+<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-list">210</a></td><td>veilvoice capture list: the screen recorders this build knows how to name.</td></tr>
+<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-allow">243</a></td><td>Stop notifying about one program.</td></tr>
+<tr><td><code>deny</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-deny">260</a></td><td>Start notifying about one program again.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="capture.src.html#fn-check">276</a></td><td>Look now, and let the exit code answer.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -61,6 +61,12 @@ impl Field {
         }
     }
 
+    /// The field a key in the file names, or `None` for one this version does
+    /// not know.
+    ///
+    /// An unknown key is not an error here: it is a file written by a newer
+    /// VeilVoice, and refusing to read the rest of it would lose settings this
+    /// version does understand.
     fn from_key(key: &str) -> Option<Self> {
         match key {
             "app-lock" => Some(Self::AppLock),
@@ -103,6 +109,12 @@ impl Default for Mandate {
     }
 }
 
+/// The clock as seconds since the epoch, without panicking on a clock set
+/// before it.
+///
+/// A machine whose clock is behind 1970 gives a negative answer rather than an
+/// error, because a timestamp in the history is a record of when something
+/// happened and a broken clock is not a reason to refuse to record it.
 fn now() -> i64 {
     match SystemTime::now().duration_since(UNIX_EPOCH) {
         Ok(d) => d.as_secs().min(i64::MAX as u64) as i64,
@@ -148,6 +160,12 @@ impl Mandate {
         self.set_at(field, value, now())
     }
 
+    /// Set one field as of `at`, answering whether anything actually changed.
+    ///
+    /// Taking the time as an argument rather than reading the clock is what
+    /// lets the history be tested. An unchanged value writes nothing, so
+    /// re-applying a setting does not fill the log with entries that say
+    /// nothing happened.
     fn set_at(&mut self, field: Field, value: bool, at: i64) -> bool {
         let slot = match field {
             Field::AppLock => &mut self.require_app_lock,
@@ -172,6 +190,11 @@ impl Mandate {
         self.reset_at(now())
     }
 
+    /// Turn every requirement on as of `at`, answering whether anything
+    /// changed.
+    ///
+    /// Every field here only ever tightens, so the reset is to the strictest
+    /// position rather than to a default.
     fn reset_at(&mut self, at: i64) -> bool {
         let a = self.set_at(Field::AppLock, true, at);
         let b = self.set_at(Field::Encryption, true, at);
@@ -282,6 +305,10 @@ pub fn default_path() -> Option<PathBuf> {
     veilvoice_crypto::lock::default_path().map(|lock| lock.with_file_name("mandate.conf"))
 }
 
+/// A yes or no in any of the spellings a person might write, or `None`.
+///
+/// Anything unrecognised is refused rather than read as false: a policy file
+/// with a typo in it must not quietly become a policy that requires nothing.
 fn parse_bool(value: &str) -> Option<bool> {
     match value.to_ascii_lowercase().as_str() {
         "yes" | "true" | "on" | "1" => Some(true),
@@ -290,6 +317,7 @@ fn parse_bool(value: &str) -> Option<bool> {
     }
 }
 
+/// A boolean in the spelling this file is written in.
 fn yesno(value: bool) -> &'static str {
     if value {
         "yes"

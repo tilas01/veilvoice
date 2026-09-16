@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-policy/src/mandate.rs`
 
-[`veilvoice-policy`](../../../crates/veilvoice-policy/README.md) &middot; 511 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs)
+[`veilvoice-policy`](../../../crates/veilvoice-policy/README.md) &middot; 539 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs)
 
 ## Contents
 
@@ -63,32 +63,32 @@ what it was before, so the choice is never a mystery later.
 
 ## What this file contains
 
-511 lines defining **24 functions** (16 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+539 lines defining **24 functions** (16 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Field` (line 48) -- Which requirement a change concerns.
-- `struct Change` (line 75) -- One recorded change.
-- `struct Mandate` (line 88) -- The current requirements, and the log of how they got there.
+- `struct Change` (line 81) -- One recorded change.
+- `struct Mandate` (line 94) -- The current requirements, and the log of how they got there.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `Field::key` (line 57) -- The word used in the file and on the command line.
-- `Mandate::requires_app_lock` (line 115) -- Whether an app lock is required.
-- `Mandate::requires_encryption` (line 120) -- Whether encryption of recordings at rest is required.
-- `Mandate::requires` (line 125) -- The value of one field.
-- `Mandate::is_default` (line 133) -- Whether this is still the default: both required, nothing turned off.
-- `Mandate::history` (line 138) -- The change log, oldest first.
-- `Mandate::set` (line 147) -- Set one requirement, recording the change if it is actually a change.
+- `Mandate::requires_app_lock` (line 127) -- Whether an app lock is required.
+- `Mandate::requires_encryption` (line 132) -- Whether encryption of recordings at rest is required.
+- `Mandate::requires` (line 137) -- The value of one field.
+- `Mandate::is_default` (line 145) -- Whether this is still the default: both required, nothing turned off.
+- `Mandate::history` (line 150) -- The change log, oldest first.
+- `Mandate::set` (line 159) -- Set one requirement, recording the change if it is actually a change.
   - reaches: `now`, `set_at`
-- `Mandate::reset` (line 171) -- Return to the default (both required), recording the changes.
+- `Mandate::reset` (line 189) -- Return to the default (both required), recording the changes.
   - reaches: `now`, `reset_at`, `set_at`
-- `Mandate::load` (line 262) -- Load from path, or the default if it is not there.
+- `Mandate::load` (line 285) -- Load from path, or the default if it is not there.
   - reaches: `default`, `parse`, `from_key`, `parse_bool`
-- `Mandate::save` (line 271) -- Write to path, owner-only.
+- `Mandate::save` (line 294) -- Write to path, owner-only.
   - reaches: `to_text`, `yesno`
-- `default_path` (line 281) -- Where the mandate file lives: beside the app lock, under its own name.
-- `Change::describe` (line 308) -- A whole sentence describing the change, for a log a person reads.
+- `default_path` (line 304) -- Where the mandate file lives: beside the app lock, under its own name.
+- `Change::describe` (line 336) -- A whole sentence describing the change, for a log a person reads.
   - reaches: `when`, `utc`, `civil_from_days`
 
 ## What calls what
@@ -115,27 +115,27 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_key(["Field::key<br/>line 57"])
-    n_from_key["Field::from_key<br/>line 64"]
-    n_default["Mandate::default<br/>line 97"]
-    n_now["now<br/>line 106"]
-    n_requires_app_lock(["Mandate::requires_app_lock<br/>line 115"])
-    n_requires_encryption(["Mandate::requires_encryption<br/>line 120"])
-    n_requires(["Mandate::requires<br/>line 125"])
-    n_is_default(["Mandate::is_default<br/>line 133"])
-    n_set(["Mandate::set<br/>line 147"])
-    n_set_at["Mandate::set_at<br/>line 151"]
-    n_reset(["Mandate::reset<br/>line 171"])
-    n_reset_at["Mandate::reset_at<br/>line 175"]
-    n_parse["Mandate::parse<br/>line 182"]
-    n_to_text["Mandate::to_text<br/>line 232"]
-    n_load(["Mandate::load<br/>line 262"])
-    n_save(["Mandate::save<br/>line 271"])
-    n_parse_bool["parse_bool<br/>line 285"]
-    n_yesno["yesno<br/>line 293"]
-    n_when["Change::when<br/>line 303"]
-    n_describe(["Change::describe<br/>line 308"])
-    n_utc["utc<br/>line 331"]
-    n_civil_from_days["civil_from_days<br/>line 352"]
+    n_from_key["Field::from_key<br/>line 70"]
+    n_default["Mandate::default<br/>line 103"]
+    n_now["now<br/>line 118"]
+    n_requires_app_lock(["Mandate::requires_app_lock<br/>line 127"])
+    n_requires_encryption(["Mandate::requires_encryption<br/>line 132"])
+    n_requires(["Mandate::requires<br/>line 137"])
+    n_is_default(["Mandate::is_default<br/>line 145"])
+    n_set(["Mandate::set<br/>line 159"])
+    n_set_at["Mandate::set_at<br/>line 169"]
+    n_reset(["Mandate::reset<br/>line 189"])
+    n_reset_at["Mandate::reset_at<br/>line 198"]
+    n_parse["Mandate::parse<br/>line 205"]
+    n_to_text["Mandate::to_text<br/>line 255"]
+    n_load(["Mandate::load<br/>line 285"])
+    n_save(["Mandate::save<br/>line 294"])
+    n_parse_bool["parse_bool<br/>line 312"]
+    n_yesno["yesno<br/>line 321"]
+    n_when["Change::when<br/>line 331"]
+    n_describe(["Change::describe<br/>line 336"])
+    n_utc["utc<br/>line 359"]
+    n_civil_from_days["civil_from_days<br/>line 380"]
     n_describe --> n_when
     n_load --> n_default
     n_load --> n_parse
@@ -151,27 +151,27 @@ flowchart TD
     n_utc --> n_civil_from_days
     n_when --> n_utc
     click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L57" "open the source"
-    click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L64" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L97" "open the source"
-    click n_now href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L106" "open the source"
-    click n_requires_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L115" "open the source"
-    click n_requires_encryption href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L120" "open the source"
-    click n_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L125" "open the source"
-    click n_is_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L133" "open the source"
-    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L147" "open the source"
-    click n_set_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L151" "open the source"
-    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L171" "open the source"
-    click n_reset_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L175" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L182" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L232" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L262" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L271" "open the source"
-    click n_parse_bool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L285" "open the source"
-    click n_yesno href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L293" "open the source"
-    click n_when href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L303" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L308" "open the source"
-    click n_utc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L331" "open the source"
-    click n_civil_from_days href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L352" "open the source"
+    click n_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L70" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L103" "open the source"
+    click n_now href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L118" "open the source"
+    click n_requires_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L127" "open the source"
+    click n_requires_encryption href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L132" "open the source"
+    click n_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L137" "open the source"
+    click n_is_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L145" "open the source"
+    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L159" "open the source"
+    click n_set_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L169" "open the source"
+    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L189" "open the source"
+    click n_reset_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L198" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L205" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L255" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L285" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L294" "open the source"
+    click n_parse_bool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L312" "open the source"
+    click n_yesno href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L321" "open the source"
+    click n_when href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L331" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L336" "open the source"
+    click n_utc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L359" "open the source"
+    click n_civil_from_days href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L380" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_requires_app_lock,n_requires_encryption,n_requires,n_is_default,n_set,n_reset,n_load,n_save,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -189,31 +189,31 @@ flowchart TD
 | `MAGIC` <sub>const</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L44) | The magic on the first line, so a stray file is not mistaken for this one. |
 | `Field` <sub>pub enum</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L48) | Which requirement a change concerns. |
 | `Field::key` <sub>pub fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L57) | The word used in the file and on the command line. |
-| `Field::from_key` <sub>fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L64) |  |
-| `Change` <sub>pub struct</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L75) | One recorded change. |
-| `Mandate` <sub>pub struct</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L88) | The current requirements, and the log of how they got there. |
-| `Mandate::default` <sub>fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L97) | Both required. |
-| `now` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L106) |  |
-| `Mandate::requires_app_lock` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L115) | Whether an app lock is required. |
-| `Mandate::requires_encryption` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L120) | Whether encryption of recordings at rest is required. |
-| `Mandate::requires` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L125) | The value of one field. |
-| `Mandate::is_default` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L133) | Whether this is still the default: both required, nothing turned off. |
-| `Mandate::history` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L138) | The change log, oldest first. |
-| `Mandate::set` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L147) | Set one requirement, recording the change if it is actually a change. |
-| `Mandate::set_at` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L151) |  |
-| `Mandate::reset` <sub>pub fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L171) | Return to the default (both required), recording the changes. |
-| `Mandate::reset_at` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L175) |  |
-| `Mandate::parse` <sub>pub fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L182) | Parse the file format. |
-| `Mandate::to_text` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L232) | Render the file format. |
-| `Mandate::load` <sub>pub fn</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L262) | Load from path, or the default if it is not there. |
-| `Mandate::save` <sub>pub fn</sub> | [271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L271) | Write to path, owner-only. |
-| `default_path` <sub>pub fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L281) | Where the mandate file lives: beside the app lock, under its own name. |
-| `parse_bool` <sub>fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L285) |  |
-| `yesno` <sub>fn</sub> | [293](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L293) |  |
-| `Change::when` <sub>pub fn</sub> | [303](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L303) | When the change was made, as a UTC civil timestamp. |
-| `Change::describe` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L308) | A whole sentence describing the change, for a log a person reads. |
-| `utc` <sub>pub fn</sub> | [331](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L331) | Unix seconds as YYYY-MM-DD HH:MM:SS UTC. |
-| `civil_from_days` <sub>fn</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L352) | Days since 1970-01-01 to a civil year, month and day. |
+| `Field::from_key` <sub>fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L70) | The field a key in the file names, or None for one this version does not know. |
+| `Change` <sub>pub struct</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L81) | One recorded change. |
+| `Mandate` <sub>pub struct</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L94) | The current requirements, and the log of how they got there. |
+| `Mandate::default` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L103) | Both required. |
+| `now` <sub>fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L118) | The clock as seconds since the epoch, without panicking on a clock set before it. |
+| `Mandate::requires_app_lock` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L127) | Whether an app lock is required. |
+| `Mandate::requires_encryption` <sub>pub fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L132) | Whether encryption of recordings at rest is required. |
+| `Mandate::requires` <sub>pub fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L137) | The value of one field. |
+| `Mandate::is_default` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L145) | Whether this is still the default: both required, nothing turned off. |
+| `Mandate::history` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L150) | The change log, oldest first. |
+| `Mandate::set` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L159) | Set one requirement, recording the change if it is actually a change. |
+| `Mandate::set_at` <sub>fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L169) | Set one field as of at, answering whether anything actually changed. |
+| `Mandate::reset` <sub>pub fn</sub> | [189](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L189) | Return to the default (both required), recording the changes. |
+| `Mandate::reset_at` <sub>fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L198) | Turn every requirement on as of at, answering whether anything changed. |
+| `Mandate::parse` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L205) | Parse the file format. |
+| `Mandate::to_text` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L255) | Render the file format. |
+| `Mandate::load` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L285) | Load from path, or the default if it is not there. |
+| `Mandate::save` <sub>pub fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L294) | Write to path, owner-only. |
+| `default_path` <sub>pub fn</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L304) | Where the mandate file lives: beside the app lock, under its own name. |
+| `parse_bool` <sub>fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L312) | A yes or no in any of the spellings a person might write, or None. |
+| `yesno` <sub>fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L321) | A boolean in the spelling this file is written in. |
+| `Change::when` <sub>pub fn</sub> | [331](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L331) | When the change was made, as a UTC civil timestamp. |
+| `Change::describe` <sub>pub fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L336) | A whole sentence describing the change, for a log a person reads. |
+| `utc` <sub>pub fn</sub> | [359](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L359) | Unix seconds as YYYY-MM-DD HH:MM:SS UTC. |
+| `civil_from_days` <sub>fn</sub> | [380](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L380) | Days since 1970-01-01 to a civil year, month and day. |
 
 ---
 

@@ -329,6 +329,7 @@ worth something and is not the same as somebody else checking it.
 // Reporting
 // ---------------------------------------------------------------------------
 
+/// One line of a passing check, in the shape every other line here uses.
 fn good(message: &str) {
     out!("  ok    {message}");
 }
@@ -432,10 +433,16 @@ fn usage(reason: &str, detail: &[&str]) -> ExitCode {
 // Commands
 // ---------------------------------------------------------------------------
 
+/// A file as text, with the path in the error rather than just the reason.
 fn read_text(path: &Path) -> Result<String, String> {
     std::fs::read_to_string(path).map_err(|e| format!("cannot read {}: {e}", path.display()))
 }
 
+/// `veilvoice verify key`: what the key compiled into this binary is.
+///
+/// Printed so a reader can compare it against the fingerprint published on the
+/// website and in the README before trusting anything this program says about
+/// a signature.
 fn command_key() -> ExitCode {
     match embedded_key() {
         Err(why) => deny("the key compiled into VeilVoice is not usable", &[&why]),
@@ -455,6 +462,10 @@ fn command_key() -> ExitCode {
     }
 }
 
+/// `veilvoice verify sums`: the signature over a hash list, and nothing else.
+///
+/// The narrowest of the checks. It says the list was signed by the key this
+/// binary carries; it says nothing about whether any file matches it.
 fn command_sums(sums_path: &Path, sig_path: &Path) -> ExitCode {
     let key = match embedded_key() {
         Ok(key) => key,
@@ -493,6 +504,11 @@ fn command_sums(sums_path: &Path, sig_path: &Path) -> ExitCode {
     }
 }
 
+/// `veilvoice verify file`: the whole chain for one download.
+///
+/// The signature over the list, the file's own SHA-256, and that digest's line
+/// in the list. All three have to hold, and each is reported separately so a
+/// failure says which link broke.
 fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> ExitCode {
     let key = match embedded_key() {
         Ok(key) => key,
@@ -583,6 +599,12 @@ fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> 
     ExitCode::SUCCESS
 }
 
+/// `veilvoice verify file --sha256`: one file against one hash typed by hand.
+///
+/// No signature is involved, so this proves only that the bytes are the ones
+/// whoever gave you that hash meant. The refusal for a malformed hash is
+/// deliberate: silently treating a typo as a mismatch would read as a failed
+/// download.
 fn command_file_against_hash(file: &Path, expected: &str) -> ExitCode {
     let cleaned = expected.trim();
     if cleaned.len() != 64 || !cleaned.chars().all(|c| c.is_ascii_hexdigit()) {
@@ -635,6 +657,10 @@ fn command_file_against_hash(file: &Path, expected: &str) -> ExitCode {
     ExitCode::SUCCESS
 }
 
+/// `veilvoice verify hash`: print a file's SHA-256 and stop.
+///
+/// No verdict, because there is nothing to compare against. It is the half of
+/// the check somebody does by eye against a number from elsewhere.
 fn command_hash(file: &Path) -> ExitCode {
     match sha256_file(file) {
         Ok(digest) => {
@@ -652,6 +678,7 @@ fn command_hash(file: &Path) -> ExitCode {
 // Arguments
 // ---------------------------------------------------------------------------
 
+/// The value after a flag, or a message naming the flag that is missing one.
 fn take_value(args: &[String], index: usize, flag: &str) -> Result<String, String> {
     args.get(index + 1)
         .cloned()

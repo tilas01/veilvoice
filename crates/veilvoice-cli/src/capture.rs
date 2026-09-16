@@ -201,6 +201,12 @@ pub fn calls() -> Result<(), String> {
     Ok(())
 }
 
+/// `veilvoice capture list`: the screen recorders this build knows how to
+/// name.
+///
+/// Prints the limit with the list, because a program not on it is not reported
+/// and a reader who does not know that would take an empty result for an
+/// all-clear.
 pub fn list() -> Result<(), String> {
     println!("{}", heading("Programs this build knows"));
     println!("  Anything not on this list is not reported. The list will never be");
