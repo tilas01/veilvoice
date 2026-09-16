@@ -47,6 +47,14 @@ in a comment somewhere: anything not on it must be identical.
 The verifier session checks a published release, which means the archive, the
 hash list and the signature have to exist and be downloaded. That is a
 maintainer step and it needs the network, so `--check` does not re-run it.
+
+That gives the release one ordering rule, and it is written here because the
+check that enforces it cannot state it at the moment it fails. This transcript
+records the verifier checking a release that is **already published**, so it
+cannot be made until the release exists. The order is bump, tag, publish,
+re-record, commit, and between the bump and the publication this check is
+expected to fail. `tools/verify.py` is the only thing that runs it, so a
+release commit still goes through CI green.
 Instead it holds the transcript to what the repository can prove about it: the
 fingerprint in it must be the fingerprint of the signing key committed here,
 the version in it must be the workspace version, and it must contain the
@@ -375,8 +383,19 @@ def check_witnessed(name, transcript):
     elif fingerprint not in transcript:
         problems.append("does not name the signing key %s that README.md publishes" % fingerprint)
     if version and version not in transcript:
-        problems.append("does not mention the workspace version %s, so it is from an older release"
-                        % version)
+        # Expected between a version bump and the publication of that version,
+        # and the message says so rather than leaving a maintainer to work out
+        # whether they have broken something. This transcript is a recording of
+        # the verifier checking a *published* release, so it cannot be made
+        # until the release exists. The order is: bump, tag, publish, re-record
+        # here, commit. `tools/verify.py` is the only thing that runs this
+        # check, so a release commit still goes through CI green.
+        problems.append(
+            "does not mention the workspace version %s, so it is from an older "
+            "release. If %s has not been published yet, this is the expected "
+            "state: download the release and re-record with\n"
+            "      python tools/shots/sessions.py --record --release <folder>"
+            % (version, version))
     for required in ("ok    signature over the hash list is good",
                      "ok    sha256 matches",
                      "INTACT."):
