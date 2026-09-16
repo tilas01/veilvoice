@@ -42,6 +42,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import seo  # noqa: E402  the addresses and preview tags every page carries
+
 # The sections worth their own page, and what to call each one.
 #
 # `repo` is deliberately absent: it is a live panel that fetches from GitHub and
@@ -303,7 +306,7 @@ def build(root):
 
 def main():
     root = repo_root()
-    files = build(root)
+    files = seo.finished(build(root))
     check = "--check" in sys.argv
 
     problems = []

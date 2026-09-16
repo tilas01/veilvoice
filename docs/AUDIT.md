@@ -501,6 +501,58 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-194: the picture every link to this site was supposed to show, as a relative URL
+
+Every page carried `<meta property="og:image" content="assets/banner.png">`.
+That tag is read by crawlers, not by browsers, and a crawler does not resolve a
+relative URL against the page it came from. So every link to this site posted
+anywhere, in any chat application and on any social network, showed no picture
+at all, and had never shown one.
+
+Nothing about it looked wrong. The tag was present, it was spelled correctly,
+and it named a file that exists. It could only be found by asking what reads it
+rather than by reading the page.
+
+Three more things in the same place. There was no `og:url` and no canonical
+link, so a page reachable at more than one address is more than one page as far
+as an index is concerned; `404.html` and `wiki.html` carried no tags of any
+kind; and the no-JavaScript page's preview title read `VeilVoice &amp;middot;
+no-JavaScript edition`, because the title it was copied from was already HTML
+and had been escaped a second time.
+
+The cause is the same one this project has a rule about: the tags were typed
+into each page. They are built now, by `tools/site/seo.py`, from what the page
+already says. The title comes from its `<title>`, the description from its
+`<meta name="description">`, the address from where the file is, and the site's
+own address from the `repository` field of `Cargo.toml`, which is where this
+project already says where it lives. Every generator that writes a page calls
+the same function, so a page cannot be produced without them.
+
+The site also said nothing at all to a crawler. There was no `robots.txt` and
+no sitemap, so the only way in was a link from somewhere else. Both are
+generated now: `robots.txt` allows everything and names the sitemap, and the
+sitemap is produced by walking the site, so a page that is added is listed and
+a page that is deleted stops being listed. All 398 pages are in it.
+
+That is the whole of what a site can do from its own side, and it is worth
+being plain that it is not the same as being found. A sitemap asks to be read.
+Nothing in a repository can ask to be ranked.
+
+Checked twice, on purpose. `tools/site/seo.py --check` asks whether each page
+is exactly what the generator would write. `tools/site-tests/addresses.test.js`
+asks whether what the generator writes is correct: one canonical address per
+page, every address absolute, every page in the sitemap. A generator that
+started emitting relative URLs again would pass the first and fail the second.
+
+One test had to be narrowed to let the canonical link through, and the
+narrowing is an improvement rather than a concession. `html.test.js` refused
+any `<script>`, `<link>` or `<img>` pointing at an absolute URL, on the ground
+that a privacy tool's site loading a third-party asset would undercut its own
+argument. That rule is right, and a `<link rel="canonical">` fetches nothing:
+it is a statement about this page's address, which has to be absolute to be a
+statement at all. The rule now applies to the values of `rel` that make a
+request, and still fails on a stylesheet from a CDN.
+
 ### F-193: seventeen images with no size, and everything under them moving
 
 Following on from F-191, and found by the same measurement: a landing that was
@@ -5921,7 +5973,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1654 tests across 27 crates, plus doctests and 19 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1654 tests across 27 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -7569,7 +7621,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ninety-three defects found and fixed (F-1 to F-193), across
+**One hundred and ninety-four defects found and fixed (F-1 to F-194), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

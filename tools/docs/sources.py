@@ -58,7 +58,8 @@ ROOTS = ["website/js", "website/css"]
 PLAIN_HEADING = "In plain words"
 
 sys.path.insert(0, HERE)
-import generate as docs  # noqa: E402  (the path has to be set first)
+import generate as docs
+import seo  # noqa: E402  the addresses every page carries  # noqa: E402  (the path has to be set first)
 
 
 # --- reading a file ---------------------------------------------------------
@@ -626,6 +627,7 @@ def main():
     args = parser.parse_args()
 
     files, missing = outputs()
+    files = seo.finished(files)
     if missing:
         print("  these files have no '%s' section in their header comment:" % PLAIN_HEADING)
         for rel in missing:
