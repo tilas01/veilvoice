@@ -112,6 +112,8 @@ GENERATORS = [
     # After the documentation generator, which owns the wiki directory:
     # these are per-program views of the user guide and land in it too.
     ("per-program guides", [sys.executable, "tools/docs/guides.py"]),
+    # After the guides, because the wiki's landing page links to them.
+    ("wiki landing and documents", [sys.executable, "tools/docs/wiki.py"]),
     # The website's own source, which `generate.py` does not cover: it reads
     # Rust doc comments, and these are JavaScript and CSS. Imports the same
     # module for the palette and the drawing code, so it goes after it.
@@ -231,6 +233,13 @@ CHECKS = [
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
     ("per-program guides match the user guide",
      [sys.executable, "tools/docs/guides.py", "--check"]),
+    # Two questions in one: whether the wiki's prose pages still match the
+    # documents they are converted from, and whether every `[[link]]` in the
+    # whole wiki names a page that exists. The second matters because a wiki
+    # link to a missing page does not fail loudly: GitHub renders it as an
+    # invitation to create that page, so a typo looks like a feature.
+    ("the wiki matches the documents, and every link in it resolves",
+     [sys.executable, "tools/docs/wiki.py", "--check"]),
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),

@@ -391,6 +391,14 @@ jobs:
       - name: The per-program guides must match the user guide
         run: python tools/docs/guides.py --check
 
+      # The wiki is the same documents with their links rewritten for a flat
+      # namespace, so it can go stale the same way. This also walks every
+      # `[[link]]` in all 202 pages: a wiki link to a page that does not
+      # exist renders as an invitation to create it rather than as an error,
+      # so nothing else would ever notice.
+      - name: The wiki must match the documents, and every link must resolve
+        run: python tools/docs/wiki.py --check
+
       - name: The questions page must match docs/FAQ.md
         run: python tools/site/faq.py --check
 

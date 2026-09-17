@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Publish `wiki/` to the repository's GitHub wiki.
+#
+# A GitHub wiki is a git repository of its own, at `<repo>.wiki.git`, holding
+# flat Markdown pages and nothing else. The pages in `wiki/` are generated into
+# the main repository by `tools/docs/generate.py`, `tools/docs/guides.py` and
+# `tools/docs/wiki.py`, and CI already fails if they have drifted from the
+# source. This is the step that puts them where a reader looks.
+#
+# Why a copy rather than a symlink or a submodule: the wiki repository cannot
+# contain either. It is flat Markdown, so the pages are written into it.
+#
+# The wiki repository does not exist until the first page is created through
+# the web interface. Enabling the wiki in Settings is not enough on its own, so
+# the clone below says exactly that when it fails, rather than leaving somebody
+# reading a git error about a repository that was never initialised.
+
+name: wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wiki/**'
+      - '.github/workflows/wiki.yml'
+  workflow_dispatch:
+
+# Pushing to the wiki is a write to this repository's content.
+permissions:
+  contents: write
+
+# One at a time. Two runs racing to push to the same wiki repository is a
+# rejected push and a red workflow for no reason anybody can act on.
+concurrency:
+  group: wiki
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: publish the wiki
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Clone the wiki repository
+        run: |
+          set -euo pipefail
+          if ! git clone \
+              "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git" \
+              wiki-repo 2>/tmp/clone.log; then
+            cat /tmp/clone.log
+            echo "::error::Could not clone ${{ github.repository }}.wiki.git."
+            echo "A GitHub wiki repository is not created when the wiki is"
+            echo "enabled in Settings. It is created when the first page is"
+            echo "saved through the web interface. Open the repository's Wiki"
+            echo "tab, create a page with any content, save it, and re-run"
+            echo "this workflow: everything it holds is overwritten from"
+            echo "wiki/ on the first successful run, so what that first page"
+            echo "says does not matter."
+            exit 1
+          fi
+
+      - name: Copy the generated pages in
+        run: |
+          set -euo pipefail
+          # Every page in the wiki is generated, so the wiki is replaced rather
+          # than merged into: a page deleted here must not survive there. The
+          # `.git` directory is what makes this a delete-and-copy rather than a
+          # fresh `git init`, because the history is worth keeping.
+          find wiki-repo -maxdepth 1 -name '*.md' -delete
+          cp wiki/*.md wiki-repo/
+          echo "pages now in the wiki: $(ls wiki-repo/*.md | wc -l)"
+
+      - name: Commit and push, if anything changed
+        working-directory: wiki-repo
+        run: |
+          set -euo pipefail
+          git config user.name  "tilas01"
+          git config user.email "tilas01@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "the wiki already matches the repository, nothing to push"
+            exit 0
+          fi
+          git commit -m "Publish the wiki from ${{ github.sha }}
+
+          Generated in the main repository and copied here. Every page has a
+          source file there, and CI fails if the two disagree, so editing a
+          page here would be overwritten by the next run."
+          git push
+          echo "pushed"
