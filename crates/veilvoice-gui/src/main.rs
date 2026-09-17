@@ -75,7 +75,7 @@ const USAGE: &str = "\
 veilvoice-gui - the VeilVoice desktop application
 
 Usage:
-  veilvoice-gui [--tab <NAME>] [--size <W>x<H>]
+  veilvoice-gui [--tab <NAME>] [--settings-page <NAME>] [--size <W>x<H>]
 
 Options:
   --tab <NAME>  Open on a named tab rather than the last one used.
@@ -86,8 +86,15 @@ Options:
   --size <W>x<H>  Open at this size in logical pixels rather than the
                 default 1100x720. Both are clamped to the window's
                 minimum of 720x520.
+  --settings-page <NAME>
+                Open the Settings tab on a named page rather than the
+                first one: appearance, motion, interface, security,
+                storage. Only has an effect with --tab settings.
   --tabs        List the tab names, one per line, and exit. What the
                 screenshot scripts read so they need no copy of the list.
+  --settings-pages
+                List the settings page names, one per line, and exit.
+                The same thing, one level down.
   --typeface    Say which face the window would draw with, and exit.
                 `JetBrains Mono` and its path, or `built-in monospace`.
                 The screenshot scripts check this before capturing.
@@ -132,6 +139,15 @@ fn answered_without_a_window() -> bool {
         if arg == "--tabs" {
             for tab in veilvoice_gui::tabs() {
                 println!("{tab}");
+            }
+            return true;
+        }
+        // And the pages inside the Settings tab, for the same reason: the
+        // capture scripts photograph each one and must not hold a list of
+        // them.
+        if arg == "--settings-pages" {
+            for page in veilvoice_gui::settings_pages() {
+                println!("{page}");
             }
             return true;
         }

@@ -65,6 +65,46 @@ impl Page {
         (Page::Security, "security", "Locking"),
         (Page::Storage, "storage", "Where this is kept"),
     ];
+
+    /// The page the window opens Settings on when nobody has said otherwise.
+    ///
+    /// Read from the list rather than named, so the first page is whichever
+    /// one the menu puts first. The screenshot script skips this page for the
+    /// same reason: the picture of the Settings tab already is it.
+    pub const OPENS_ON: Page = Self::ALL[0].0;
+
+    /// The page a name asks for, or nothing.
+    ///
+    /// The names are the ones the menu shows, so `--settings-page motion`
+    /// names what a reader sees rather than an internal spelling.
+    pub fn from_key(name: &str) -> Option<Page> {
+        let wanted = name.trim().to_ascii_lowercase();
+        Self::ALL
+            .iter()
+            .find(|(_, key, _)| *key == wanted)
+            .map(|(page, _, _)| *page)
+    }
+
+    /// Which page the command line asked to open on, if it asked.
+    ///
+    /// `veilvoice-gui --tab settings --settings-page storage`. It exists for
+    /// the same reason `--tab` does: the capture scripts drive nothing and
+    /// click nothing, so a screen they cannot reach with an argument is a
+    /// screen that has no picture. A deep link into a settings page is worth
+    /// having on its own account too, which is why it is a documented
+    /// argument rather than a hidden one.
+    fn from_arguments() -> Option<Page> {
+        let mut args = std::env::args().skip(1);
+        while let Some(arg) = args.next() {
+            if let Some(value) = arg.strip_prefix("--settings-page=") {
+                return Self::from_key(value);
+            }
+            if arg == "--settings-page" {
+                return Self::from_key(&args.next()?);
+            }
+        }
+        None
+    }
 }
 
 /// The settings tab's own state.
@@ -130,7 +170,7 @@ impl Settings {
             first_run,
             prefs,
             path,
-            page: Page::Appearance,
+            page: Page::from_arguments().unwrap_or(Page::OPENS_ON),
             save_error: None,
             autolock_typed: String::new(),
             autolock_error: None,
@@ -1200,6 +1240,50 @@ fn swatches(ui: &mut Ui) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every page the menu offers can be named on the command line.
+    ///
+    /// Both halves come from `Page::ALL`, so a page added tomorrow is covered
+    /// without anybody remembering this test: what would otherwise happen is
+    /// a page the menu shows, that `--settings-page` cannot reach and the
+    /// capture script therefore has no picture of.
+    #[test]
+    fn every_settings_page_answers_to_its_own_name() {
+        for (page, key, _) in Page::ALL {
+            assert_eq!(
+                Page::from_key(key),
+                Some(*page),
+                "the menu offers {key:?} and --settings-page does not take it"
+            );
+        }
+        assert_eq!(Page::from_key("  MOTION "), Some(Page::Motion));
+        assert_eq!(Page::from_key("nothing like a page"), None);
+    }
+
+    /// The page the window opens on is the first one in the menu.
+    ///
+    /// `tools/shots/gui.sh` photographs the Settings tab and then each page
+    /// *except* this one, because the tab's own picture already is it. It
+    /// works that out from `--settings-pages` and the order, so this is the
+    /// property that makes the skip right rather than a coincidence.
+    #[test]
+    fn settings_opens_on_the_first_page_in_the_menu() {
+        assert_eq!(Page::OPENS_ON, Page::ALL[0].0);
+        assert_eq!(Page::OPENS_ON, Page::Appearance);
+    }
+
+    /// The help text names the option, because the manual page is generated
+    /// from it and an option nobody can find is one nobody uses.
+    #[test]
+    fn the_help_text_mentions_the_settings_page_option() {
+        let source = include_str!("main.rs");
+        for flag in ["--settings-page ", "--settings-pages"] {
+            assert!(
+                source.contains(flag),
+                "`--help` does not mention {flag}, which the program accepts"
+            );
+        }
+    }
 
     /// Drive the settings tab once, with no window.
     fn render(settings: &mut Settings) {

@@ -59,8 +59,8 @@
 <text x="204.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 360</text>
 <rect x="277.1" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="323.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tableRow</text>
-<text x="323.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 366</text>
+<text x="323.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 369</text>
 <rect x="395.5" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="441.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cells</text>
-<text x="441.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 419</text>
+<text x="441.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 422</text>
 </svg>

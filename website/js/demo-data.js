@@ -209,6 +209,36 @@ window.VEILVOICE_DEMO = {
       "key": "about",
       "label": "About",
       "note": "The version, what this build can do on this machine, and the graphics driver that actually drew the window."
+    },
+    {
+      "image": "assets/screenshots/gui-settings-motion.png",
+      "key": "settings-motion",
+      "label": "Settings: motion",
+      "note": "Animation, the frame rate the window draws at, and whether the mark moves. It follows the system's own reduced-motion setting unless you say otherwise, and says which way it read it."
+    },
+    {
+      "image": "assets/screenshots/gui-settings-interface.png",
+      "key": "settings-interface",
+      "label": "Settings: interface",
+      "note": "Which tabs the window offers. An installed copy never shows the install tab, because a program offering to install itself when it already is tells you something untrue."
+    },
+    {
+      "image": "assets/screenshots/gui-settings-security.png",
+      "key": "settings-security",
+      "label": "Settings: security",
+      "note": "How long the window waits before locking itself, in the list or typed as `90m`. Off unless you turn it on, and a long render does not count as using the window."
+    },
+    {
+      "image": "assets/screenshots/gui-settings-storage.png",
+      "key": "settings-storage",
+      "label": "Settings: storage",
+      "note": "Where the settings file is, what is in it, and what resetting it does. Nothing is hidden behind a menu item called advanced."
+    },
+    {
+      "image": "assets/screenshots/gui-locked.png",
+      "key": "locked",
+      "label": "Locked",
+      "note": "The window with the app lock on, which is all anybody who picks your computer up gets to see: the mark, the word locked, and somewhere to type. Not the file you were working on, not where the lock lives, and not how many attempts have been made."
     }
   ],
   "tabs": [

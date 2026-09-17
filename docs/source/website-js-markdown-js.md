@@ -11,7 +11,7 @@
 
 # `website/js/markdown.js`
 
-[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/markdown.js) &middot; 489 lines
+[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/markdown.js) &middot; 553 lines
 
 ## What it does
 
@@ -54,5 +54,5 @@ resolved one, so a call made through a variable will not appear.
 | `isExternal` | 231 |
 | `inline` | 307 |
 | `render` | 360 |
-| `tableRow` | 366 |
-| `cells` | 419 |
+| `tableRow` | 369 |
+| `cells` | 422 |

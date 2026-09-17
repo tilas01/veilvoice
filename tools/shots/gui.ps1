@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Photograph every tab of the desktop application.
+# Photograph every tab of the desktop application, and every page of its
+# Settings tab.
 #
 #     powershell -ExecutionPolicy Bypass -File tools/shots/gui.ps1
 #
@@ -33,6 +34,23 @@
 # the reason the earlier versions quietly photographed the desktop wallpaper.
 #
 # The window is sized rather than maximised: see the note beside SetWindowPos.
+#
+# One picture this does not take, and why
+# ---------------------------------------
+#
+# `tools/shots/gui.sh` also photographs the locked window, which needs an app
+# lock to exist first. It sets one through `veilvoice lock set` under a
+# throwaway configuration directory, giving it a pseudo-terminal, because the
+# lock deliberately refuses to read a passphrase from anything that is not a
+# terminal.
+#
+# There is no equivalent here. On Windows that refusal is stronger: the
+# passphrase is read from `CONIN$` directly, so redirected input does not reach
+# it at all, and that is a property worth keeping rather than working around.
+# A run of this script therefore leaves `gui-locked.png` exactly as it found
+# it. It is said here rather than left to be noticed, because a script that
+# quietly produces a smaller set than its counterpart is how a picture goes
+# stale in one place only.
 
 param(
   [string]$Exe = "$env:CARGO_TARGET_DIR\release\veilvoice-gui.exe",
@@ -130,9 +148,16 @@ Set-Content -Path $settings -Value $forced -Encoding utf8
 $PW_RENDERFULLCONTENT = 2
 $problems = @()
 $prints = @{}
+$taken = 0
 
-foreach ($tab in $tabs) {
-  $proc = Start-Process -FilePath $Exe -ArgumentList "--tab", $tab -PassThru
+# Photograph the window once, with the arguments given, as `gui-<name>.png`.
+#
+# A function rather than a loop body because there are two passes over this
+# now: the tabs, and the pages inside the Settings tab. Two copies of a
+# capture-and-check block is two places for one of them to stop checking
+# something.
+function Shoot([string]$name, [string[]]$arguments) {
+  $proc = Start-Process -FilePath $Exe -ArgumentList $arguments -PassThru
 
   # Wait for this process's own window, by process id rather than by title
   # alone: another VeilVoice left open would otherwise be photographed instead.
@@ -146,9 +171,9 @@ foreach ($tab in $tabs) {
     $h = [Shot]::Found
   }
   if ($h -eq [IntPtr]::Zero) {
-    $problems += "$tab : the window never appeared"
+    $problems += "$name : the window never appeared"
     $proc | Stop-Process -Force -ErrorAction SilentlyContinue
-    continue
+    return
   }
 
   # A fitted size rather than full screen.
@@ -170,9 +195,9 @@ foreach ($tab in $tabs) {
   $w = $r.Right - $r.Left
   $hh = $r.Bottom - $r.Top
   if ($w -le 100 -or $hh -le 100) {
-    $problems += "$tab : the window measured ${w}x${hh}"
+    $problems += "$name : the window measured ${w}x${hh}"
     $proc | Stop-Process -Force -ErrorAction SilentlyContinue
-    continue
+    return
   }
 
   $bmp = New-Object System.Drawing.Bitmap $w, $hh
@@ -183,13 +208,13 @@ foreach ($tab in $tabs) {
   $g.Dispose()
 
   if (-not $drew) {
-    $problems += "$tab : PrintWindow refused"
+    $problems += "$name : PrintWindow refused"
     $bmp.Dispose()
     $proc | Stop-Process -Force -ErrorAction SilentlyContinue
-    continue
+    return
   }
 
-  $path = Join-Path $Out "gui-$tab.png"
+  $path = Join-Path $Out "gui-$name.png"
   $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
 
   # A cheap fingerprint, so two tabs coming out identical is caught rather than
@@ -204,15 +229,35 @@ foreach ($tab in $tabs) {
   }
   $print = $sb.ToString()
   if ($prints.ContainsKey($print)) {
-    $problems += "$tab : identical to $($prints[$print]) -- the tab did not change"
+    $problems += "$name : identical to $($prints[$print]) -- the screen did not change"
   } else {
-    $prints[$print] = $tab
+    $prints[$print] = $name
   }
 
   $bmp.Dispose()
-  Write-Output ("wrote gui-{0}.png  ({1}x{2})" -f $tab, $w, $hh)
+  Write-Output ("wrote gui-{0}.png  ({1}x{2})" -f $name, $w, $hh)
+  $script:taken = $script:taken + 1
   $proc | Stop-Process -Force -ErrorAction SilentlyContinue
   Start-Sleep -Milliseconds 300
+}
+
+foreach ($tab in $tabs) {
+  Shoot $tab @("--tab", $tab)
+}
+
+# Every page of the Settings tab, which one picture of the tab cannot show.
+#
+# The tab has its pages behind a menu down its left side, and photographing
+# the tab photographs whichever one the window opens on. `--settings-page` is
+# how the rest are reached, for the same reason `--tab` exists: nothing here
+# clicks. The list is asked of the application, and the page the window opens
+# on is skipped because `gui-settings.png` already is that page.
+$pages = & $exe --settings-pages
+if (-not $pages) {
+  throw "the application listed no settings pages"
+}
+foreach ($page in $pages | Select-Object -Skip 1) {
+  Shoot "settings-$page" @("--tab", "settings", "--settings-page", $page)
 }
 
 # The reader's own settings back, exactly as they were. A screenshot script that
@@ -230,4 +275,4 @@ if ($problems.Count -gt 0) {
   exit 1
 }
 Write-Output ""
-Write-Output ("{0} captures in {1}" -f $tabs.Count, (Resolve-Path $Out))
+Write-Output ("{0} captures in {1}" -f $taken, (Resolve-Path $Out))

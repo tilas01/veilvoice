@@ -57,7 +57,17 @@ const ALLOWED_LINK_HOSTS = [
   // database the audit cites by name. Both are links a reader follows on
   // purpose; neither is an asset the page loads, which the separate check
   // below still refuses outright.
-  "tilas01.github.io", "rustsec.org"
+  "tilas01.github.io", "rustsec.org",
+  // The audio routing software each platform actually uses, the registry the
+  // crates are published to, and the manual pages the BSD instructions cite.
+  // These arrived with the wiki: the documents have always named them, and
+  // until the wiki was published as pages of this site the only rendering of
+  // those documents was GitHub's. Every one is a destination a reader chooses
+  // to follow, never an asset a page loads, which the check below still
+  // refuses outright whatever is in this list.
+  "crates.io", "pipewire.org", "jackaudio.org", "sndio.org",
+  "gitlab.freedesktop.org", "man.netbsd.org",
+  "vac.muzychenko.net", "existential.audio", "rogueamoeba.com"
 ];
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input",

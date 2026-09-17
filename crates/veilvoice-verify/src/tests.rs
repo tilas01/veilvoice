@@ -792,13 +792,28 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../");
 
     // Records of the past, which are allowed to describe it.
+    //
+    // The wiki's own copy of each is the same record rendered, so it is
+    // exempted by deriving its name from this list rather than by adding a
+    // second one: `docs/CHANGELOG.md` becomes `wiki/Doc-CHANGELOG.md` and
+    // `website/wiki/Doc-CHANGELOG.html`, and a record that stops being
+    // exempt here has to stop being exempt everywhere at once.
     let history = [
         "AUDIT.md",
         "CHANGELOG.md",
+        "ROADMAP.md",
         "releases.html",
         "search.html",
         "search-index.json",
     ];
+    let rendered: Vec<String> = history
+        .iter()
+        .filter(|name| name.ends_with(".md"))
+        .flat_map(|name| {
+            let stem = name.trim_end_matches(".md").replace('_', "-");
+            [format!("Doc-{stem}.md"), format!("Doc-{stem}.html")]
+        })
+        .collect();
 
     // What follows the name when it is being run rather than named.
     let invoked = [
@@ -855,7 +870,7 @@ fn no_page_tells_a_reader_to_run_a_program_that_no_longer_exists() {
             .unwrap_or_default()
             .to_string_lossy()
             .into_owned();
-        if history.contains(&name.as_str()) {
+        if history.contains(&name.as_str()) || rendered.iter().any(|it| it == &name) {
             continue;
         }
         // This test's own explanation names the thing it forbids.
