@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/lock.rs</code></h1>
-<p style="color:var(--muted)"><a href="lock.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 330 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lock.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 347 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -126,304 +126,321 @@
 <span class="ln" id="L54"></span>
 <span class="ln" id="L55"><span class="tok-kw">impl</span> Site {</span>
 <span class="src-item" id="fn-site-resolve">
-<span class="ln" id="L56">    <span class="tok-kw">fn</span> <span class="tok-fn">resolve</span>(explicit: Option&lt;PathBuf&gt;) -&gt; Result&lt;Self, String&gt; {</span>
-<span class="ln" id="L57">        <span class="tok-kw">match</span> explicit {</span>
-<span class="ln" id="L58">            <span class="tok-fn">Some</span>(p) =&gt; <span class="tok-fn">Ok</span>(Self::<span class="tok-fn">Explicit</span>(p)),</span>
-<span class="ln" id="L59">            None =&gt; {</span>
-<span class="ln" id="L60">                lock::<span class="tok-fn">default_dir</span>().<span class="tok-fn">ok_or_else</span>(|| {</span>
-<span class="ln" id="L61">                    <span class="tok-str">&quot;cannot work out where this platform keeps configuration \</span></span>
-<span class="ln" id="L62"><span class="tok-str">                     (no APPDATA, XDG_CONFIG_HOME or HOME), so pass --path&quot;</span></span>
-<span class="ln" id="L63">                        .<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L64">                })?;</span>
-<span class="ln" id="L65">                <span class="tok-fn">Ok</span>(Self::Default)</span>
-<span class="ln" id="L66">            }</span>
-<span class="ln" id="L67">        }</span>
-<span class="ln" id="L68">    }</span>
+<span class="ln" id="L56">    <span class="tok-com">/// Where the lock is kept: the path given on the command line, or the</span></span>
+<span class="ln" id="L57">    <span class="tok-com">/// platform default.</span></span>
+<span class="ln" id="L58">    <span class="tok-kw">fn</span> <span class="tok-fn">resolve</span>(explicit: Option&lt;PathBuf&gt;) -&gt; Result&lt;Self, String&gt; {</span>
+<span class="ln" id="L59">        <span class="tok-kw">match</span> explicit {</span>
+<span class="ln" id="L60">            <span class="tok-fn">Some</span>(p) =&gt; <span class="tok-fn">Ok</span>(Self::<span class="tok-fn">Explicit</span>(p)),</span>
+<span class="ln" id="L61">            None =&gt; {</span>
+<span class="ln" id="L62">                lock::<span class="tok-fn">default_dir</span>().<span class="tok-fn">ok_or_else</span>(|| {</span>
+<span class="ln" id="L63">                    <span class="tok-str">&quot;cannot work out where this platform keeps configuration \</span></span>
+<span class="ln" id="L64"><span class="tok-str">                     (no APPDATA, XDG_CONFIG_HOME or HOME), so pass --path&quot;</span></span>
+<span class="ln" id="L65">                        .<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L66">                })?;</span>
+<span class="ln" id="L67">                <span class="tok-fn">Ok</span>(Self::Default)</span>
+<span class="ln" id="L68">            }</span>
+<span class="ln" id="L69">        }</span>
+<span class="ln" id="L70">    }</span>
 </span>
-<span class="ln" id="L69"></span>
+<span class="ln" id="L71"></span>
 <span class="src-item" id="fn-site-describe">
-<span class="ln" id="L70">    <span class="tok-com">/// What to print as the location. The vault&#x27;s own file names are derived</span></span>
-<span class="ln" id="L71">    <span class="tok-com">/// and would mean nothing to a reader, so the directory is what is shown.</span></span>
-<span class="ln" id="L72">    <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L73">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L74">            Self::<span class="tok-fn">Explicit</span>(p) =&gt; p.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L75">            Self::Default =&gt; <span class="tok-kw">match</span> lock::<span class="tok-fn">default_dir</span>() {</span>
-<span class="ln" id="L76">                <span class="tok-fn">Some</span>(d) =&gt; format!(<span class="tok-str">&quot;{} (two copies, derived names)&quot;</span>, d.<span class="tok-fn">display</span>()),</span>
-<span class="ln" id="L77">                None =&gt; <span class="tok-str">&quot;unknown&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L78">            },</span>
-<span class="ln" id="L79">        }</span>
-<span class="ln" id="L80">    }</span>
+<span class="ln" id="L72">    <span class="tok-com">/// What to print as the location. The vault&#x27;s own file names are derived</span></span>
+<span class="ln" id="L73">    <span class="tok-com">/// and would mean nothing to a reader, so the directory is what is shown.</span></span>
+<span class="ln" id="L74">    <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L75">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L76">            Self::<span class="tok-fn">Explicit</span>(p) =&gt; p.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L77">            Self::Default =&gt; <span class="tok-kw">match</span> lock::<span class="tok-fn">default_dir</span>() {</span>
+<span class="ln" id="L78">                <span class="tok-fn">Some</span>(d) =&gt; format!(<span class="tok-str">&quot;{} (two copies, derived names)&quot;</span>, d.<span class="tok-fn">display</span>()),</span>
+<span class="ln" id="L79">                None =&gt; <span class="tok-str">&quot;unknown&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L80">            },</span>
+<span class="ln" id="L81">        }</span>
+<span class="ln" id="L82">    }</span>
 </span>
-<span class="ln" id="L81"></span>
+<span class="ln" id="L83"></span>
 <span class="src-item" id="fn-site-open">
-<span class="ln" id="L82">    <span class="tok-com">/// Open the lock, and say whether a missing copy had to be rebuilt.</span></span>
-<span class="ln" id="L83">    <span class="tok-kw">fn</span> <span class="tok-fn">open</span>(&amp;<span class="tok-kw">self</span>) -&gt; Result&lt;(Option&lt;LockStore&gt;, bool), String&gt; {</span>
-<span class="ln" id="L84">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L85">            Self::<span class="tok-fn">Explicit</span>(p) =&gt; LockStore::<span class="tok-fn">open</span>(p)</span>
-<span class="ln" id="L86">                .<span class="tok-fn">map</span>(|s| (s, false))</span>
-<span class="ln" id="L87">                .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L88">            Self::Default =&gt; lock::<span class="tok-fn">open_default</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L89">        }</span>
-<span class="ln" id="L90">    }</span>
+<span class="ln" id="L84">    <span class="tok-com">/// Open the lock, and say whether a missing copy had to be rebuilt.</span></span>
+<span class="ln" id="L85">    <span class="tok-kw">fn</span> <span class="tok-fn">open</span>(&amp;<span class="tok-kw">self</span>) -&gt; Result&lt;(Option&lt;LockStore&gt;, bool), String&gt; {</span>
+<span class="ln" id="L86">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L87">            Self::<span class="tok-fn">Explicit</span>(p) =&gt; LockStore::<span class="tok-fn">open</span>(p)</span>
+<span class="ln" id="L88">                .<span class="tok-fn">map</span>(|s| (s, false))</span>
+<span class="ln" id="L89">                .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L90">            Self::Default =&gt; lock::<span class="tok-fn">open_default</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L91">        }</span>
+<span class="ln" id="L92">    }</span>
 </span>
-<span class="ln" id="L91"></span>
+<span class="ln" id="L93"></span>
 <span class="src-item" id="fn-site-create">
-<span class="ln" id="L92">    <span class="tok-kw">fn</span> <span class="tok-fn">create</span>(&amp;<span class="tok-kw">self</span>, password: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L93">        <span class="tok-kw">let</span> params = kdf::KdfParams::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L94">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L95">            Self::<span class="tok-fn">Explicit</span>(p) =&gt; LockStore::<span class="tok-fn">create</span>(p, password, params).<span class="tok-fn">map</span>(|_| ()),</span>
-<span class="ln" id="L96">            Self::Default =&gt; lock::<span class="tok-fn">create_default</span>(password, params).<span class="tok-fn">map</span>(|_| ()),</span>
-<span class="ln" id="L97">        }</span>
-<span class="ln" id="L98">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L99">    }</span>
+<span class="ln" id="L94">    <span class="tok-com">/// Make a lock here for the first time, deriving the verifier from</span></span>
+<span class="ln" id="L95">    <span class="tok-com">/// `password`.</span></span>
+<span class="ln" id="L96">    <span class="tok-kw">fn</span> <span class="tok-fn">create</span>(&amp;<span class="tok-kw">self</span>, password: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L97">        <span class="tok-kw">let</span> params = kdf::KdfParams::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L98">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L99">            Self::<span class="tok-fn">Explicit</span>(p) =&gt; LockStore::<span class="tok-fn">create</span>(p, password, params).<span class="tok-fn">map</span>(|_| ()),</span>
+<span class="ln" id="L100">            Self::Default =&gt; lock::<span class="tok-fn">create_default</span>(password, params).<span class="tok-fn">map</span>(|_| ()),</span>
+<span class="ln" id="L101">        }</span>
+<span class="ln" id="L102">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L103">    }</span>
 </span>
-<span class="ln" id="L100">}</span>
-<span class="ln" id="L101"></span>
+<span class="ln" id="L104">}</span>
+<span class="ln" id="L105"></span>
 <span class="src-item" id="fn-print_scope">
-<span class="ln" id="L102"><span class="tok-com">/// Print the honest scope note, wrapped for a terminal.</span></span>
-<span class="ln" id="L103"><span class="tok-kw">fn</span> <span class="tok-fn">print_scope</span>() {</span>
-<span class="ln" id="L104">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  What this is worth:&quot;</span>));</span>
-<span class="ln" id="L105">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-fn">wrap</span>(lock::SCOPE, <span class="tok-num">66</span>) {</span>
-<span class="ln" id="L106">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;    {line}&quot;</span>)));</span>
-<span class="ln" id="L107">    }</span>
-<span class="ln" id="L108">}</span>
+<span class="ln" id="L106"><span class="tok-com">/// Print the honest scope note, wrapped for a terminal.</span></span>
+<span class="ln" id="L107"><span class="tok-kw">fn</span> <span class="tok-fn">print_scope</span>() {</span>
+<span class="ln" id="L108">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  What this is worth:&quot;</span>));</span>
+<span class="ln" id="L109">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-fn">wrap</span>(lock::SCOPE, <span class="tok-num">66</span>) {</span>
+<span class="ln" id="L110">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;    {line}&quot;</span>)));</span>
+<span class="ln" id="L111">    }</span>
+<span class="ln" id="L112">}</span>
 </span>
-<span class="ln" id="L109"></span>
+<span class="ln" id="L113"></span>
 <span class="src-item" id="fn-wrap">
-<span class="ln" id="L110"><span class="tok-com">/// Greedy word wrap. The scope note is single-sourced from the crypto crate, so</span></span>
-<span class="ln" id="L111"><span class="tok-com">/// it arrives as one long string and has to be broken here rather than there.</span></span>
-<span class="ln" id="L112"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">wrap</span>(text: &amp;str, width: usize) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L113">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L114">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L115">    <span class="tok-kw">for</span> word <span class="tok-kw">in</span> text.<span class="tok-fn">split_whitespace</span>() {</span>
-<span class="ln" id="L116">        <span class="tok-kw">if</span> !current.<span class="tok-fn">is_empty</span>() &amp;&amp; current.<span class="tok-fn">len</span>() + <span class="tok-num">1</span> + word.<span class="tok-fn">len</span>() &gt; width {</span>
-<span class="ln" id="L117">            lines.<span class="tok-fn">push</span>(std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> current));</span>
-<span class="ln" id="L118">        }</span>
-<span class="ln" id="L119">        <span class="tok-kw">if</span> !current.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L120">            current.<span class="tok-fn">push</span>(<span class="tok-str">&#x27; &#x27;</span>);</span>
-<span class="ln" id="L121">        }</span>
-<span class="ln" id="L122">        current.<span class="tok-fn">push_str</span>(word);</span>
-<span class="ln" id="L123">    }</span>
-<span class="ln" id="L124">    <span class="tok-kw">if</span> !current.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L125">        lines.<span class="tok-fn">push</span>(current);</span>
-<span class="ln" id="L126">    }</span>
-<span class="ln" id="L127">    lines</span>
-<span class="ln" id="L128">}</span>
+<span class="ln" id="L114"><span class="tok-com">/// Greedy word wrap. The scope note is single-sourced from the crypto crate, so</span></span>
+<span class="ln" id="L115"><span class="tok-com">/// it arrives as one long string and has to be broken here rather than there.</span></span>
+<span class="ln" id="L116"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">wrap</span>(text: &amp;str, width: usize) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L117">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L118">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L119">    <span class="tok-kw">for</span> word <span class="tok-kw">in</span> text.<span class="tok-fn">split_whitespace</span>() {</span>
+<span class="ln" id="L120">        <span class="tok-kw">if</span> !current.<span class="tok-fn">is_empty</span>() &amp;&amp; current.<span class="tok-fn">len</span>() + <span class="tok-num">1</span> + word.<span class="tok-fn">len</span>() &gt; width {</span>
+<span class="ln" id="L121">            lines.<span class="tok-fn">push</span>(std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> current));</span>
+<span class="ln" id="L122">        }</span>
+<span class="ln" id="L123">        <span class="tok-kw">if</span> !current.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L124">            current.<span class="tok-fn">push</span>(<span class="tok-str">&#x27; &#x27;</span>);</span>
+<span class="ln" id="L125">        }</span>
+<span class="ln" id="L126">        current.<span class="tok-fn">push_str</span>(word);</span>
+<span class="ln" id="L127">    }</span>
+<span class="ln" id="L128">    <span class="tok-kw">if</span> !current.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L129">        lines.<span class="tok-fn">push</span>(current);</span>
+<span class="ln" id="L130">    }</span>
+<span class="ln" id="L131">    lines</span>
+<span class="ln" id="L132">}</span>
 </span>
-<span class="ln" id="L129"></span>
+<span class="ln" id="L133"></span>
 <span class="src-item" id="fn-run">
-<span class="ln" id="L130"><span class="tok-com">/// Dispatch `veilvoice lock` to the subcommand that was asked for.</span></span>
-<span class="ln" id="L131"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(action: Action, path: Option&lt;PathBuf&gt;) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L132">    <span class="tok-kw">let</span> site = Site::<span class="tok-fn">resolve</span>(path)?;</span>
-<span class="ln" id="L133">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;App lock&quot;</span>));</span>
-<span class="ln" id="L134">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;File&quot;</span>, &amp;site.<span class="tok-fn">describe</span>()));</span>
-<span class="ln" id="L135"></span>
-<span class="ln" id="L136">    <span class="tok-kw">match</span> action {</span>
-<span class="ln" id="L137">        Action::Status =&gt; <span class="tok-fn">status</span>(&amp;site),</span>
-<span class="ln" id="L138">        Action::Set =&gt; <span class="tok-fn">set</span>(&amp;site),</span>
-<span class="ln" id="L139">        Action::Change =&gt; <span class="tok-fn">change</span>(&amp;site),</span>
-<span class="ln" id="L140">        Action::Remove =&gt; <span class="tok-fn">remove</span>(&amp;site),</span>
-<span class="ln" id="L141">    }</span>
-<span class="ln" id="L142">}</span>
+<span class="ln" id="L134"><span class="tok-com">/// Dispatch `veilvoice lock` to the subcommand that was asked for.</span></span>
+<span class="ln" id="L135"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(action: Action, path: Option&lt;PathBuf&gt;) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L136">    <span class="tok-kw">let</span> site = Site::<span class="tok-fn">resolve</span>(path)?;</span>
+<span class="ln" id="L137">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;App lock&quot;</span>));</span>
+<span class="ln" id="L138">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;File&quot;</span>, &amp;site.<span class="tok-fn">describe</span>()));</span>
+<span class="ln" id="L139"></span>
+<span class="ln" id="L140">    <span class="tok-kw">match</span> action {</span>
+<span class="ln" id="L141">        Action::Status =&gt; <span class="tok-fn">status</span>(&amp;site),</span>
+<span class="ln" id="L142">        Action::Set =&gt; <span class="tok-fn">set</span>(&amp;site),</span>
+<span class="ln" id="L143">        Action::Change =&gt; <span class="tok-fn">change</span>(&amp;site),</span>
+<span class="ln" id="L144">        Action::Remove =&gt; <span class="tok-fn">remove</span>(&amp;site),</span>
+<span class="ln" id="L145">    }</span>
+<span class="ln" id="L146">}</span>
 </span>
-<span class="ln" id="L143"></span>
+<span class="ln" id="L147"></span>
 <span class="src-item" id="fn-status">
-<span class="ln" id="L144"><span class="tok-kw">fn</span> <span class="tok-fn">status</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L145">    <span class="tok-kw">let</span> (store, restored) = site.<span class="tok-fn">open</span>()?;</span>
-<span class="ln" id="L146">    <span class="tok-kw">match</span> store {</span>
-<span class="ln" id="L147">        None =&gt; {</span>
-<span class="ln" id="L148">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;not set&quot;</span>));</span>
-<span class="ln" id="L149">            println!();</span>
-<span class="ln" id="L150">            println!(</span>
-<span class="ln" id="L151">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L152">                <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Set one with: veilvoice lock set&quot;</span>)</span>
-<span class="ln" id="L153">            );</span>
-<span class="ln" id="L154">        }</span>
-<span class="ln" id="L155">        <span class="tok-fn">Some</span>(store) =&gt; {</span>
-<span class="ln" id="L156">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;set&quot;</span>));</span>
-<span class="ln" id="L157">            println!(</span>
-<span class="ln" id="L158">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L159">                <span class="tok-fn">field</span>(<span class="tok-str">&quot;Failed attempts&quot;</span>, &amp;store.<span class="tok-fn">failures</span>().<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L160">            );</span>
-<span class="ln" id="L161">            <span class="tok-kw">match</span> store.<span class="tok-fn">cooldown</span>() {</span>
-<span class="ln" id="L162">                <span class="tok-fn">Some</span>(wait) =&gt; println!(</span>
-<span class="ln" id="L163">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L164">                    <span class="tok-fn">warn</span>(&amp;format!(</span>
-<span class="ln" id="L165">                        <span class="tok-str">&quot;rate limited, {} s before the next attempt&quot;</span>,</span>
-<span class="ln" id="L166">                        wait.<span class="tok-fn">as_secs</span>()</span>
-<span class="ln" id="L167">                    ))</span>
-<span class="ln" id="L168">                ),</span>
-<span class="ln" id="L169">                None =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Rate limit&quot;</span>, <span class="tok-str">&quot;not currently in force&quot;</span>)),</span>
-<span class="ln" id="L170">            }</span>
-<span class="ln" id="L171">            <span class="tok-kw">if</span> !store.<span class="tok-fn">every_copy_current</span>() {</span>
-<span class="ln" id="L172">                println!();</span>
-<span class="ln" id="L173">                println!(</span>
-<span class="ln" id="L174">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L175">                    <span class="tok-fn">warn</span>(</span>
-<span class="ln" id="L176">                        <span class="tok-str">&quot;the administrator-owned copy of this lock still holds the \</span></span>
-<span class="ln" id="L177"><span class="tok-str">                         previous password; run once as an administrator to finish&quot;</span></span>
-<span class="ln" id="L178">                    )</span>
-<span class="ln" id="L179">                );</span>
-<span class="ln" id="L180">            }</span>
-<span class="ln" id="L181">            <span class="tok-kw">if</span> store.<span class="tok-fn">tampered</span>() || restored {</span>
-<span class="ln" id="L182">                println!();</span>
-<span class="ln" id="L183">                println!(</span>
-<span class="ln" id="L184">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L185">                    <span class="tok-fn">warn</span>(<span class="tok-str">&quot;this lock reports interference; open the app to read it&quot;</span>)</span>
-<span class="ln" id="L186">                );</span>
-<span class="ln" id="L187">            }</span>
-<span class="ln" id="L188">        }</span>
-<span class="ln" id="L189">    }</span>
-<span class="ln" id="L190">    println!();</span>
-<span class="ln" id="L191">    <span class="tok-fn">print_scope</span>();</span>
-<span class="ln" id="L192">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L193">}</span>
+<span class="ln" id="L148"><span class="tok-com">/// `veilvoice lock status`: whether a lock is set, and where it lives.</span></span>
+<span class="ln" id="L149"><span class="tok-com">///</span></span>
+<span class="ln" id="L150"><span class="tok-com">/// Says nothing about the passphrase, not even how long it is. What a reader</span></span>
+<span class="ln" id="L151"><span class="tok-com">/// learns here is what somebody holding the machine already knows.</span></span>
+<span class="ln" id="L152"><span class="tok-kw">fn</span> <span class="tok-fn">status</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L153">    <span class="tok-kw">let</span> (store, restored) = site.<span class="tok-fn">open</span>()?;</span>
+<span class="ln" id="L154">    <span class="tok-kw">match</span> store {</span>
+<span class="ln" id="L155">        None =&gt; {</span>
+<span class="ln" id="L156">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;not set&quot;</span>));</span>
+<span class="ln" id="L157">            println!();</span>
+<span class="ln" id="L158">            println!(</span>
+<span class="ln" id="L159">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L160">                <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Set one with: veilvoice lock set&quot;</span>)</span>
+<span class="ln" id="L161">            );</span>
+<span class="ln" id="L162">        }</span>
+<span class="ln" id="L163">        <span class="tok-fn">Some</span>(store) =&gt; {</span>
+<span class="ln" id="L164">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;set&quot;</span>));</span>
+<span class="ln" id="L165">            println!(</span>
+<span class="ln" id="L166">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L167">                <span class="tok-fn">field</span>(<span class="tok-str">&quot;Failed attempts&quot;</span>, &amp;store.<span class="tok-fn">failures</span>().<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L168">            );</span>
+<span class="ln" id="L169">            <span class="tok-kw">match</span> store.<span class="tok-fn">cooldown</span>() {</span>
+<span class="ln" id="L170">                <span class="tok-fn">Some</span>(wait) =&gt; println!(</span>
+<span class="ln" id="L171">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L172">                    <span class="tok-fn">warn</span>(&amp;format!(</span>
+<span class="ln" id="L173">                        <span class="tok-str">&quot;rate limited, {} s before the next attempt&quot;</span>,</span>
+<span class="ln" id="L174">                        wait.<span class="tok-fn">as_secs</span>()</span>
+<span class="ln" id="L175">                    ))</span>
+<span class="ln" id="L176">                ),</span>
+<span class="ln" id="L177">                None =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Rate limit&quot;</span>, <span class="tok-str">&quot;not currently in force&quot;</span>)),</span>
+<span class="ln" id="L178">            }</span>
+<span class="ln" id="L179">            <span class="tok-kw">if</span> !store.<span class="tok-fn">every_copy_current</span>() {</span>
+<span class="ln" id="L180">                println!();</span>
+<span class="ln" id="L181">                println!(</span>
+<span class="ln" id="L182">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L183">                    <span class="tok-fn">warn</span>(</span>
+<span class="ln" id="L184">                        <span class="tok-str">&quot;the administrator-owned copy of this lock still holds the \</span></span>
+<span class="ln" id="L185"><span class="tok-str">                         previous password; run once as an administrator to finish&quot;</span></span>
+<span class="ln" id="L186">                    )</span>
+<span class="ln" id="L187">                );</span>
+<span class="ln" id="L188">            }</span>
+<span class="ln" id="L189">            <span class="tok-kw">if</span> store.<span class="tok-fn">tampered</span>() || restored {</span>
+<span class="ln" id="L190">                println!();</span>
+<span class="ln" id="L191">                println!(</span>
+<span class="ln" id="L192">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L193">                    <span class="tok-fn">warn</span>(<span class="tok-str">&quot;this lock reports interference; open the app to read it&quot;</span>)</span>
+<span class="ln" id="L194">                );</span>
+<span class="ln" id="L195">            }</span>
+<span class="ln" id="L196">        }</span>
+<span class="ln" id="L197">    }</span>
+<span class="ln" id="L198">    println!();</span>
+<span class="ln" id="L199">    <span class="tok-fn">print_scope</span>();</span>
+<span class="ln" id="L200">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L201">}</span>
 </span>
-<span class="ln" id="L194"></span>
+<span class="ln" id="L202"></span>
 <span class="src-item" id="fn-set">
-<span class="ln" id="L195"><span class="tok-kw">fn</span> <span class="tok-fn">set</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L196">    <span class="tok-kw">if</span> site.<span class="tok-fn">open</span>()?.<span class="tok-num">0</span>.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L197">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;a lock is already set here, so use `veilvoice lock change`&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L198">    }</span>
-<span class="ln" id="L199">    println!();</span>
-<span class="ln" id="L200">    <span class="tok-fn">print_scope</span>();</span>
-<span class="ln" id="L201">    println!();</span>
-<span class="ln" id="L202">    println!(</span>
-<span class="ln" id="L203">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L204">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L205">            colour::MUTED,</span>
-<span class="ln" id="L206">            <span class="tok-str">&quot;  This password unlocks the app. Do NOT reuse the passphrase you&quot;</span></span>
-<span class="ln" id="L207">        )</span>
-<span class="ln" id="L208">    );</span>
-<span class="ln" id="L209">    println!(</span>
-<span class="ln" id="L210">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L211">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L212">            colour::MUTED,</span>
-<span class="ln" id="L213">            <span class="tok-str">&quot;  use for encrypted recordings. They are deliberately separate,&quot;</span></span>
-<span class="ln" id="L214">        )</span>
-<span class="ln" id="L215">    );</span>
+<span class="ln" id="L203"><span class="tok-com">/// `veilvoice lock set`: make a lock, asking for the passphrase twice.</span></span>
+<span class="ln" id="L204"><span class="tok-com">///</span></span>
+<span class="ln" id="L205"><span class="tok-com">/// Refuses if one is already set rather than replacing it. Overwriting a lock</span></span>
+<span class="ln" id="L206"><span class="tok-com">/// is `change`, which asks for the old passphrase first, and the difference</span></span>
+<span class="ln" id="L207"><span class="tok-com">/// matters: a `set` that silently replaced would lock somebody out of their</span></span>
+<span class="ln" id="L208"><span class="tok-com">/// own vault.</span></span>
+<span class="ln" id="L209"><span class="tok-kw">fn</span> <span class="tok-fn">set</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L210">    <span class="tok-kw">if</span> site.<span class="tok-fn">open</span>()?.<span class="tok-num">0</span>.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L211">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;a lock is already set here, so use `veilvoice lock change`&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L212">    }</span>
+<span class="ln" id="L213">    println!();</span>
+<span class="ln" id="L214">    <span class="tok-fn">print_scope</span>();</span>
+<span class="ln" id="L215">    println!();</span>
 <span class="ln" id="L216">    println!(</span>
 <span class="ln" id="L217">        <span class="tok-str">&quot;{}&quot;</span>,</span>
 <span class="ln" id="L218">        <span class="tok-fn">paint</span>(</span>
 <span class="ln" id="L219">            colour::MUTED,</span>
-<span class="ln" id="L220">            <span class="tok-str">&quot;  so that unlocking the app does not unseal the recordings.&quot;</span></span>
+<span class="ln" id="L220">            <span class="tok-str">&quot;  This password unlocks the app. Do NOT reuse the passphrase you&quot;</span></span>
 <span class="ln" id="L221">        )</span>
 <span class="ln" id="L222">    );</span>
-<span class="ln" id="L223"></span>
-<span class="ln" id="L224">    <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
-<span class="ln" id="L225">    println!(</span>
-<span class="ln" id="L226">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L227">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L228">            colour::MUTED,</span>
-<span class="ln" id="L229">            <span class="tok-str">&quot;  Deriving verifier (Argon2id, deliberately slow)...&quot;</span></span>
-<span class="ln" id="L230">        )</span>
-<span class="ln" id="L231">    );</span>
-<span class="ln" id="L232">    site.<span class="tok-fn">create</span>(password.<span class="tok-fn">expose</span>())?;</span>
-<span class="ln" id="L233">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock set&quot;</span>));</span>
-<span class="ln" id="L234">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L235">}</span>
+<span class="ln" id="L223">    println!(</span>
+<span class="ln" id="L224">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L225">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L226">            colour::MUTED,</span>
+<span class="ln" id="L227">            <span class="tok-str">&quot;  use for encrypted recordings. They are deliberately separate,&quot;</span></span>
+<span class="ln" id="L228">        )</span>
+<span class="ln" id="L229">    );</span>
+<span class="ln" id="L230">    println!(</span>
+<span class="ln" id="L231">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L232">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L233">            colour::MUTED,</span>
+<span class="ln" id="L234">            <span class="tok-str">&quot;  so that unlocking the app does not unseal the recordings.&quot;</span></span>
+<span class="ln" id="L235">        )</span>
+<span class="ln" id="L236">    );</span>
+<span class="ln" id="L237"></span>
+<span class="ln" id="L238">    <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
+<span class="ln" id="L239">    println!(</span>
+<span class="ln" id="L240">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L241">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L242">            colour::MUTED,</span>
+<span class="ln" id="L243">            <span class="tok-str">&quot;  Deriving verifier (Argon2id, deliberately slow)...&quot;</span></span>
+<span class="ln" id="L244">        )</span>
+<span class="ln" id="L245">    );</span>
+<span class="ln" id="L246">    site.<span class="tok-fn">create</span>(password.<span class="tok-fn">expose</span>())?;</span>
+<span class="ln" id="L247">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock set&quot;</span>));</span>
+<span class="ln" id="L248">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L249">}</span>
 </span>
-<span class="ln" id="L236"></span>
+<span class="ln" id="L250"></span>
 <span class="src-item" id="fn-change">
-<span class="ln" id="L237"><span class="tok-kw">fn</span> <span class="tok-fn">change</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L238">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = <span class="tok-fn">open_or_explain</span>(site)?;</span>
-<span class="ln" id="L239">    <span class="tok-kw">let</span> current = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Current password: &quot;</span>)?;</span>
-<span class="ln" id="L240">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Now the new one.&quot;</span>));</span>
-<span class="ln" id="L241">    <span class="tok-kw">let</span> new = <span class="tok-fn">read_new_password</span>()?;</span>
-<span class="ln" id="L242">    store</span>
-<span class="ln" id="L243">        .<span class="tok-fn">change_password</span>(current.<span class="tok-fn">expose</span>(), new.<span class="tok-fn">expose</span>())</span>
-<span class="ln" id="L244">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L245">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock password changed&quot;</span>));</span>
-<span class="ln" id="L246">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L247">}</span>
+<span class="ln" id="L251"><span class="tok-com">/// `veilvoice lock change`: replace the passphrase, after proving the old one.</span></span>
+<span class="ln" id="L252"><span class="tok-kw">fn</span> <span class="tok-fn">change</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L253">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = <span class="tok-fn">open_or_explain</span>(site)?;</span>
+<span class="ln" id="L254">    <span class="tok-kw">let</span> current = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Current password: &quot;</span>)?;</span>
+<span class="ln" id="L255">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Now the new one.&quot;</span>));</span>
+<span class="ln" id="L256">    <span class="tok-kw">let</span> new = <span class="tok-fn">read_new_password</span>()?;</span>
+<span class="ln" id="L257">    store</span>
+<span class="ln" id="L258">        .<span class="tok-fn">change_password</span>(current.<span class="tok-fn">expose</span>(), new.<span class="tok-fn">expose</span>())</span>
+<span class="ln" id="L259">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L260">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock password changed&quot;</span>));</span>
+<span class="ln" id="L261">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L262">}</span>
 </span>
-<span class="ln" id="L248"></span>
+<span class="ln" id="L263"></span>
 <span class="src-item" id="fn-remove">
-<span class="ln" id="L249"><span class="tok-kw">fn</span> <span class="tok-fn">remove</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L250">    <span class="tok-kw">let</span> store = <span class="tok-fn">open_or_explain</span>(site)?;</span>
-<span class="ln" id="L251">    <span class="tok-kw">let</span> current = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Current password: &quot;</span>)?;</span>
-<span class="ln" id="L252">    store.<span class="tok-fn">remove</span>(current.<span class="tok-fn">expose</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L253">    println!(</span>
-<span class="ln" id="L254">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L255">        <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock removed, and VeilVoice will open freely again&quot;</span>)</span>
-<span class="ln" id="L256">    );</span>
-<span class="ln" id="L257">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L258">}</span>
+<span class="ln" id="L264"><span class="tok-com">/// `veilvoice lock remove`: take the lock off, after proving the passphrase.</span></span>
+<span class="ln" id="L265"><span class="tok-kw">fn</span> <span class="tok-fn">remove</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L266">    <span class="tok-kw">let</span> store = <span class="tok-fn">open_or_explain</span>(site)?;</span>
+<span class="ln" id="L267">    <span class="tok-kw">let</span> current = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Current password: &quot;</span>)?;</span>
+<span class="ln" id="L268">    store.<span class="tok-fn">remove</span>(current.<span class="tok-fn">expose</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L269">    println!(</span>
+<span class="ln" id="L270">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L271">        <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock removed, and VeilVoice will open freely again&quot;</span>)</span>
+<span class="ln" id="L272">    );</span>
+<span class="ln" id="L273">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L274">}</span>
 </span>
-<span class="ln" id="L259"></span>
+<span class="ln" id="L275"></span>
 <span class="src-item" id="fn-open_or_explain">
-<span class="ln" id="L260"><span class="tok-kw">fn</span> <span class="tok-fn">open_or_explain</span>(site: &amp;Site) -&gt; Result&lt;LockStore, String&gt; {</span>
-<span class="ln" id="L261">    site.<span class="tok-fn">open</span>()?</span>
-<span class="ln" id="L262">        .<span class="tok-num">0</span></span>
-<span class="ln" id="L263">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no lock is set here, so use `veilvoice lock set`&quot;</span>.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L264">}</span>
+<span class="ln" id="L276"><span class="tok-com">/// The lock store, or a message saying what to do rather than a bare error.</span></span>
+<span class="ln" id="L277"><span class="tok-kw">fn</span> <span class="tok-fn">open_or_explain</span>(site: &amp;Site) -&gt; Result&lt;LockStore, String&gt; {</span>
+<span class="ln" id="L278">    site.<span class="tok-fn">open</span>()?</span>
+<span class="ln" id="L279">        .<span class="tok-num">0</span></span>
+<span class="ln" id="L280">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no lock is set here, so use `veilvoice lock set`&quot;</span>.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L281">}</span>
 </span>
-<span class="ln" id="L265"></span>
-<span class="ln" id="L266"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L267"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L268">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L269"></span>
-<span class="ln" id="L270">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L271">    <span class="tok-kw">fn</span> <span class="tok-fn">wrapping_keeps_every_word_and_respects_the_width</span>() {</span>
-<span class="ln" id="L272">        <span class="tok-kw">let</span> lines = <span class="tok-fn">wrap</span>(lock::SCOPE, <span class="tok-num">40</span>);</span>
-<span class="ln" id="L273">        assert!(lines.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
-<span class="ln" id="L274">        assert!(lines.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|l| l.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">40</span> || !l.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>)));</span>
-<span class="ln" id="L275">        <span class="tok-kw">let</span> rejoined = lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
-<span class="ln" id="L276">        <span class="tok-kw">let</span> original: Vec&lt;&amp;str&gt; = lock::SCOPE.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L277">        assert_eq!(rejoined.<span class="tok-fn">split_whitespace</span>().collect::&lt;Vec&lt;_&gt;&gt;(), original);</span>
-<span class="ln" id="L278">    }</span>
-<span class="ln" id="L279"></span>
-<span class="ln" id="L280">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L281">    <span class="tok-kw">fn</span> <span class="tok-fn">wrapping_handles_an_empty_string</span>() {</span>
-<span class="ln" id="L282">        assert!(<span class="tok-fn">wrap</span>(<span class="tok-str">&quot;&quot;</span>, <span class="tok-num">20</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L283">    }</span>
-<span class="ln" id="L284"></span>
-<span class="ln" id="L285">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L286">    <span class="tok-kw">fn</span> <span class="tok-fn">an_explicit_path_wins_over_the_platform_default</span>() {</span>
-<span class="ln" id="L287">        <span class="tok-kw">let</span> chosen = PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;somewhere/else.bin&quot;</span>);</span>
-<span class="ln" id="L288">        <span class="tok-kw">let</span> site = Site::<span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(chosen.<span class="tok-fn">clone</span>())).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L289">        assert!(matches!(&amp;site, Site::<span class="tok-fn">Explicit</span>(p) <span class="tok-kw">if</span> p == &amp;chosen));</span>
-<span class="ln" id="L290">        assert_eq!(site.<span class="tok-fn">describe</span>(), chosen.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L291">    }</span>
-<span class="ln" id="L292"></span>
-<span class="ln" id="L293">    <span class="tok-com">/// Without `--path` the command must go to the vault, not to the single</span></span>
-<span class="ln" id="L294">    <span class="tok-com">/// file the vault replaced. Getting this wrong would leave the CLI and the</span></span>
-<span class="ln" id="L295">    <span class="tok-com">/// window looking at two different locks.</span></span>
-<span class="ln" id="L296">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L297">    <span class="tok-kw">fn</span> <span class="tok-fn">no_path_means_the_vault_rather_than_one_named_file</span>() {</span>
-<span class="ln" id="L298">        <span class="tok-kw">if</span> lock::<span class="tok-fn">default_dir</span>().<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L299">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L300">        }</span>
-<span class="ln" id="L301">        <span class="tok-kw">let</span> site = Site::<span class="tok-fn">resolve</span>(None).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L302">        assert!(matches!(site, Site::Default));</span>
-<span class="ln" id="L303">        assert!(site.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;two copies&quot;</span>));</span>
-<span class="ln" id="L304">    }</span>
-<span class="ln" id="L305"></span>
-<span class="ln" id="L306">    <span class="tok-com">/// The lock lifecycle through the same store the subcommands drive. The</span></span>
-<span class="ln" id="L307">    <span class="tok-com">/// prompts themselves need a terminal, so this exercises the layer beneath.</span></span>
-<span class="ln" id="L308">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L309">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_can_be_set_proven_and_removed</span>() {</span>
-<span class="ln" id="L310">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L311">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
-<span class="ln" id="L312">        <span class="tok-kw">let</span> weak = kdf::KdfParams::<span class="tok-fn">weak_for_tests</span>();</span>
-<span class="ln" id="L313"></span>
-<span class="ln" id="L314">        <span class="tok-kw">let</span> site = Site::<span class="tok-fn">Explicit</span>(path.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L315">        assert!(LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L316">        LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;app password&quot;</span>, weak).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L317">        assert!(<span class="tok-fn">status</span>(&amp;site).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L318"></span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L320">        assert!(store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;recording password&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L321">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;app password&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L282"></span>
+<span class="ln" id="L283"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L284"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L285">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L286"></span>
+<span class="ln" id="L287">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L288">    <span class="tok-kw">fn</span> <span class="tok-fn">wrapping_keeps_every_word_and_respects_the_width</span>() {</span>
+<span class="ln" id="L289">        <span class="tok-kw">let</span> lines = <span class="tok-fn">wrap</span>(lock::SCOPE, <span class="tok-num">40</span>);</span>
+<span class="ln" id="L290">        assert!(lines.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>);</span>
+<span class="ln" id="L291">        assert!(lines.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|l| l.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">40</span> || !l.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>)));</span>
+<span class="ln" id="L292">        <span class="tok-kw">let</span> rejoined = lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
+<span class="ln" id="L293">        <span class="tok-kw">let</span> original: Vec&lt;&amp;str&gt; = lock::SCOPE.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L294">        assert_eq!(rejoined.<span class="tok-fn">split_whitespace</span>().collect::&lt;Vec&lt;_&gt;&gt;(), original);</span>
+<span class="ln" id="L295">    }</span>
+<span class="ln" id="L296"></span>
+<span class="ln" id="L297">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L298">    <span class="tok-kw">fn</span> <span class="tok-fn">wrapping_handles_an_empty_string</span>() {</span>
+<span class="ln" id="L299">        assert!(<span class="tok-fn">wrap</span>(<span class="tok-str">&quot;&quot;</span>, <span class="tok-num">20</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L300">    }</span>
+<span class="ln" id="L301"></span>
+<span class="ln" id="L302">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L303">    <span class="tok-kw">fn</span> <span class="tok-fn">an_explicit_path_wins_over_the_platform_default</span>() {</span>
+<span class="ln" id="L304">        <span class="tok-kw">let</span> chosen = PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;somewhere/else.bin&quot;</span>);</span>
+<span class="ln" id="L305">        <span class="tok-kw">let</span> site = Site::<span class="tok-fn">resolve</span>(<span class="tok-fn">Some</span>(chosen.<span class="tok-fn">clone</span>())).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L306">        assert!(matches!(&amp;site, Site::<span class="tok-fn">Explicit</span>(p) <span class="tok-kw">if</span> p == &amp;chosen));</span>
+<span class="ln" id="L307">        assert_eq!(site.<span class="tok-fn">describe</span>(), chosen.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L308">    }</span>
+<span class="ln" id="L309"></span>
+<span class="ln" id="L310">    <span class="tok-com">/// Without `--path` the command must go to the vault, not to the single</span></span>
+<span class="ln" id="L311">    <span class="tok-com">/// file the vault replaced. Getting this wrong would leave the CLI and the</span></span>
+<span class="ln" id="L312">    <span class="tok-com">/// window looking at two different locks.</span></span>
+<span class="ln" id="L313">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L314">    <span class="tok-kw">fn</span> <span class="tok-fn">no_path_means_the_vault_rather_than_one_named_file</span>() {</span>
+<span class="ln" id="L315">        <span class="tok-kw">if</span> lock::<span class="tok-fn">default_dir</span>().<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L316">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L317">        }</span>
+<span class="ln" id="L318">        <span class="tok-kw">let</span> site = Site::<span class="tok-fn">resolve</span>(None).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L319">        assert!(matches!(site, Site::Default));</span>
+<span class="ln" id="L320">        assert!(site.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;two copies&quot;</span>));</span>
+<span class="ln" id="L321">    }</span>
 <span class="ln" id="L322"></span>
-<span class="ln" id="L323">        LockStore::<span class="tok-fn">open</span>(&amp;path)</span>
-<span class="ln" id="L324">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L325">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L326">            .<span class="tok-fn">remove</span>(b<span class="tok-str">&quot;app password&quot;</span>)</span>
-<span class="ln" id="L327">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L328">        assert!(!path.<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L329">    }</span>
-<span class="ln" id="L330">}</span>
+<span class="ln" id="L323">    <span class="tok-com">/// The lock lifecycle through the same store the subcommands drive. The</span></span>
+<span class="ln" id="L324">    <span class="tok-com">/// prompts themselves need a terminal, so this exercises the layer beneath.</span></span>
+<span class="ln" id="L325">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L326">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_can_be_set_proven_and_removed</span>() {</span>
+<span class="ln" id="L327">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L328">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;applock.bin&quot;</span>);</span>
+<span class="ln" id="L329">        <span class="tok-kw">let</span> weak = kdf::KdfParams::<span class="tok-fn">weak_for_tests</span>();</span>
+<span class="ln" id="L330"></span>
+<span class="ln" id="L331">        <span class="tok-kw">let</span> site = Site::<span class="tok-fn">Explicit</span>(path.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L332">        assert!(LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L333">        LockStore::<span class="tok-fn">create</span>(&amp;path, b<span class="tok-str">&quot;app password&quot;</span>, weak).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L334">        assert!(<span class="tok-fn">status</span>(&amp;site).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L335"></span>
+<span class="ln" id="L336">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = LockStore::<span class="tok-fn">open</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L337">        assert!(store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;recording password&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L338">        store.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;app password&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L339"></span>
+<span class="ln" id="L340">        LockStore::<span class="tok-fn">open</span>(&amp;path)</span>
+<span class="ln" id="L341">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L342">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L343">            .<span class="tok-fn">remove</span>(b<span class="tok-str">&quot;app password&quot;</span>)</span>
+<span class="ln" id="L344">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L345">        assert!(!path.<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L346">    }</span>
+<span class="ln" id="L347">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

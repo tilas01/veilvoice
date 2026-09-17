@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/settings.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1424 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1429 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ choice applies as you make it and is remembered.
 
 ## What this file contains
 
-1424 lines defining **43 functions** (33 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1429 lines defining **43 functions** (33 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -72,32 +72,32 @@ choice applies as you make it and is remembered.
 
 - `Settings::load` (line 121) -- Load preferences from this platform's config directory and apply the chosen theme to ctx.
 - `Settings::needs_first_run` (line 154) -- Whether the first-run choice has still to be made.
-- `Settings::save_error` (line 179) -- Whether the app should open in group mode, and a way to change it.
-- `Settings::show_install_tab` (line 190) -- Whether the install tab should be offered at all.
-- `Settings::hide_install_tab` (line 195) -- Whether the install tab is hidden by preference.
-- `Settings::acceleration` (line 213) -- Whether the window asks the platform for a hardware-drawn context.
-- `Settings::show_frame_rate` (line 242) -- Whether the header carries a live frame-rate readout.
-- `Settings::always_group` (line 247) -- Whether the app should open in group mode.
-- `Settings::seal_with_app_lock` (line 276) -- Whether every recording is sealed with the app-lock passphrase.
-- `Settings::destination` (line 281) -- The remembered encrypted destination, rebuilt from the settings file.
-- `Settings::set_destination` (line 290) -- Remember a destination, including the answer to the hidden question.
+- `Settings::save_error` (line 180) -- Whether the app should open in group mode, and a way to change it.
+- `Settings::show_install_tab` (line 191) -- Whether the install tab should be offered at all.
+- `Settings::hide_install_tab` (line 196) -- Whether the install tab is hidden by preference.
+- `Settings::acceleration` (line 214) -- Whether the window asks the platform for a hardware-drawn context.
+- `Settings::show_frame_rate` (line 243) -- Whether the header carries a live frame-rate readout.
+- `Settings::always_group` (line 248) -- Whether the app should open in group mode.
+- `Settings::seal_with_app_lock` (line 277) -- Whether every recording is sealed with the app-lock passphrase.
+- `Settings::destination` (line 282) -- The remembered encrypted destination, rebuilt from the settings file.
+- `Settings::set_destination` (line 291) -- Remember a destination, including the answer to the hidden question.
   - reaches: `persist`
-- `Settings::set_always_group` (line 349) -- Record whether the app should open in group mode.
+- `Settings::set_always_group` (line 350) -- Record whether the app should open in group mode.
   - reaches: `persist`
-- `Settings::set_seal_with_app_lock` (line 363) -- Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
+- `Settings::set_seal_with_app_lock` (line 364) -- Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
   - reaches: `persist`
-- `Settings::toured_tabs` (line 578) -- The tabs the tour has already covered.
-- `Settings::mark_toured` (line 589) -- Record that the tour has covered these tabs, and save.
+- `Settings::toured_tabs` (line 579) -- The tabs the tour has already covered.
+- `Settings::mark_toured` (line 590) -- Record that the tour has covered these tabs, and save.
   - reaches: `persist`
-- `Settings::first_run_appearance` (line 603) -- The first-run panel: offered once, with animation already on.
+- `Settings::first_run_appearance` (line 604) -- The first-run panel: offered once, with animation already on.
   - reaches: `persist`
-- `Settings::first_run_autolock` (line 630) -- The autolock switch and delay, for the first-run setup to place.
+- `Settings::first_run_autolock` (line 631) -- The autolock switch and delay, for the first-run setup to place.
   - reaches: `persist`
-- `Settings::finish_first_run` (line 658) -- Mark the first run answered.
+- `Settings::finish_first_run` (line 659) -- Mark the first run answered.
   - reaches: `persist`
-- `Settings::tab` (line 665) -- The settings tab.
+- `Settings::tab` (line 666) -- The settings tab.
   - reaches: `appearance_page`, `interface_page`, `motion_page`, `security_page`, `storage_page`, `custom_palette_help`, `persist`, `section`, `swatches`, `failsafe`, `live_monitor`, `notify_style`
-- `Settings::theme_picker` (line 794) -- The colour scheme, as a compact control for the window header.
+- `Settings::theme_picker` (line 795) -- The colour scheme, as a compact control for the window header.
   - reaches: `persist`
 
 ## What calls what
@@ -124,53 +124,53 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_motion["Settings::motion<br/>line 149"]
-    n_set_hide_install_tab["Settings::set_hide_install_tab<br/>line 200"]
-    n_set_acceleration["Settings::set_acceleration<br/>line 218"]
-    n_frame_target["Settings::frame_target<br/>line 227"]
-    n_set_frame_target["Settings::set_frame_target<br/>line 232"]
-    n_autolock["Settings::autolock<br/>line 252"]
-    n_set_autolock["Settings::set_autolock<br/>line 263"]
-    n_set_destination(["Settings::set_destination<br/>line 290"])
-    n_failsafe["Settings::failsafe<br/>line 307"]
-    n_set_failsafe["Settings::set_failsafe<br/>line 312"]
-    n_notify_style["Settings::notify_style<br/>line 321"]
-    n_set_notify_style["Settings::set_notify_style<br/>line 326"]
-    n_live_monitor["Settings::live_monitor<br/>line 335"]
-    n_set_live_monitor["Settings::set_live_monitor<br/>line 340"]
-    n_set_always_group(["Settings::set_always_group<br/>line 349"])
-    n_set_seal_with_app_lock(["Settings::<br/>set_seal_with_app_lock<br/>line 363"])
-    n_mark_toured(["Settings::mark_toured<br/>line 589"])
-    n_first_run_appearance(["Settings::first_run_appearance<br/>line 603"])
-    n_first_run_autolock(["Settings::first_run_autolock<br/>line 630"])
-    n_finish_first_run(["Settings::finish_first_run<br/>line 658"])
-    n_tab(["Settings::tab<br/>line 665"])
-    n_theme_picker(["Settings::theme_picker<br/>line 794"])
+    n_set_hide_install_tab["Settings::set_hide_install_tab<br/>line 201"]
+    n_set_acceleration["Settings::set_acceleration<br/>line 219"]
+    n_frame_target["Settings::frame_target<br/>line 228"]
+    n_set_frame_target["Settings::set_frame_target<br/>line 233"]
+    n_autolock["Settings::autolock<br/>line 253"]
+    n_set_autolock["Settings::set_autolock<br/>line 264"]
+    n_set_destination(["Settings::set_destination<br/>line 291"])
+    n_failsafe["Settings::failsafe<br/>line 308"]
+    n_set_failsafe["Settings::set_failsafe<br/>line 313"]
+    n_notify_style["Settings::notify_style<br/>line 322"]
+    n_set_notify_style["Settings::set_notify_style<br/>line 327"]
+    n_live_monitor["Settings::live_monitor<br/>line 336"]
+    n_set_live_monitor["Settings::set_live_monitor<br/>line 341"]
+    n_set_always_group(["Settings::set_always_group<br/>line 350"])
+    n_set_seal_with_app_lock(["Settings::<br/>set_seal_with_app_lock<br/>line 364"])
+    n_mark_toured(["Settings::mark_toured<br/>line 590"])
+    n_first_run_appearance(["Settings::first_run_appearance<br/>line 604"])
+    n_first_run_autolock(["Settings::first_run_autolock<br/>line 631"])
+    n_finish_first_run(["Settings::finish_first_run<br/>line 659"])
+    n_tab(["Settings::tab<br/>line 666"])
+    n_theme_picker(["Settings::theme_picker<br/>line 795"])
     n_set_autolock --> n_autolock
     n_set_failsafe --> n_failsafe
     n_set_live_monitor --> n_live_monitor
     n_set_notify_style --> n_notify_style
     click n_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L149" "open the source"
-    click n_set_hide_install_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L200" "open the source"
-    click n_set_acceleration href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L218" "open the source"
-    click n_frame_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L227" "open the source"
-    click n_set_frame_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L232" "open the source"
-    click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L252" "open the source"
-    click n_set_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L263" "open the source"
-    click n_set_destination href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L290" "open the source"
-    click n_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L307" "open the source"
-    click n_set_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L312" "open the source"
-    click n_notify_style href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L321" "open the source"
-    click n_set_notify_style href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L326" "open the source"
-    click n_live_monitor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L335" "open the source"
-    click n_set_live_monitor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L340" "open the source"
-    click n_set_always_group href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L349" "open the source"
-    click n_set_seal_with_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L363" "open the source"
-    click n_mark_toured href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L589" "open the source"
-    click n_first_run_appearance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L603" "open the source"
-    click n_first_run_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L630" "open the source"
-    click n_finish_first_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L658" "open the source"
-    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L665" "open the source"
-    click n_theme_picker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L794" "open the source"
+    click n_set_hide_install_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L201" "open the source"
+    click n_set_acceleration href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L219" "open the source"
+    click n_frame_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L228" "open the source"
+    click n_set_frame_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L233" "open the source"
+    click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L253" "open the source"
+    click n_set_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L264" "open the source"
+    click n_set_destination href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L291" "open the source"
+    click n_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L308" "open the source"
+    click n_set_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L313" "open the source"
+    click n_notify_style href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L322" "open the source"
+    click n_set_notify_style href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L327" "open the source"
+    click n_live_monitor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L336" "open the source"
+    click n_set_live_monitor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L341" "open the source"
+    click n_set_always_group href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L350" "open the source"
+    click n_set_seal_with_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L364" "open the source"
+    click n_mark_toured href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L590" "open the source"
+    click n_first_run_appearance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L604" "open the source"
+    click n_first_run_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L631" "open the source"
+    click n_finish_first_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L659" "open the source"
+    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L666" "open the source"
+    click n_theme_picker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L795" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_set_destination,n_set_always_group,n_set_seal_with_app_lock,n_mark_toured,n_first_run_appearance,n_first_run_autolock,n_finish_first_run,n_tab,n_theme_picker entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -190,45 +190,45 @@ flowchart TD
 | `Settings::load` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L121) | Load preferences from this platform's config directory and apply the chosen theme to ctx. |
 | `Settings::motion` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L149) | How much movement is allowed this frame. |
 | `Settings::needs_first_run` <sub>pub fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L154) | Whether the first-run choice has still to be made. |
-| `Settings::persist` <sub>fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L158) |  |
-| `Settings::save_error` <sub>pub fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L179) | Whether the app should open in group mode, and a way to change it. |
-| `Settings::show_install_tab` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L190) | Whether the install tab should be offered at all. |
-| `Settings::hide_install_tab` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L195) | Whether the install tab is hidden by preference. |
-| `Settings::set_hide_install_tab` <sub>pub fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L200) | Record whether to hide the install tab on a portable copy. |
-| `Settings::acceleration` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L213) | Whether the window asks the platform for a hardware-drawn context. |
-| `Settings::set_acceleration` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L218) | Record whether to ask for acceleration. |
-| `Settings::frame_target` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L227) | How often the window draws while something in it is moving. |
-| `Settings::set_frame_target` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L232) | Record a new frame-rate target. |
-| `Settings::show_frame_rate` <sub>pub fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L242) | Whether the header carries a live frame-rate readout. |
-| `Settings::always_group` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L247) | Whether the app should open in group mode. |
-| `Settings::autolock` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L252) | How the autolock is configured, brought into range. |
-| `Settings::set_autolock` <sub>pub fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L263) | Remember an autolock setting. |
-| `Settings::seal_with_app_lock` <sub>pub fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L276) | Whether every recording is sealed with the app-lock passphrase. |
-| `Settings::destination` <sub>pub fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L281) | The remembered encrypted destination, rebuilt from the settings file. |
-| `Settings::set_destination` <sub>pub fn</sub> | [290](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L290) | Remember a destination, including the answer to the hidden question. |
-| `Settings::failsafe` <sub>pub fn</sub> | [307](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L307) | The Failsafe posture in force. |
-| `Settings::set_failsafe` <sub>pub fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L312) | Record the Failsafe posture. |
-| `Settings::notify_style` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L321) | How notifications should be shown. |
-| `Settings::set_notify_style` <sub>pub fn</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L326) | Record how notifications should be shown. |
-| `Settings::live_monitor` <sub>pub fn</sub> | [335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L335) | Where the live monitor sits, or whether it is shown. |
-| `Settings::set_live_monitor` <sub>pub fn</sub> | [340](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L340) | Record where the live monitor sits. |
-| `Settings::set_always_group` <sub>pub fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L349) | Record whether the app should open in group mode. |
-| `Settings::set_seal_with_app_lock` <sub>pub fn</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L363) | Remember, or stop remembering, that recordings are sealed with the app-lock passphrase. |
-| `Settings::interface_page` <sub>fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L372) | Which tabs the window offers. |
-| `Settings::toured_tabs` <sub>pub fn</sub> | [578](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L578) | The tabs the tour has already covered. |
-| `Settings::mark_toured` <sub>pub fn</sub> | [589](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L589) | Record that the tour has covered these tabs, and save. |
-| `Settings::first_run_appearance` <sub>pub fn</sub> | [603](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L603) | The first-run panel: offered once, with animation already on. |
-| `Settings::first_run_autolock` <sub>pub fn</sub> | [630](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L630) | The autolock switch and delay, for the first-run setup to place. |
-| `Settings::finish_first_run` <sub>pub fn</sub> | [658](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L658) | Mark the first run answered. |
-| `Settings::tab` <sub>pub fn</sub> | [665](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L665) | The settings tab. |
-| `Settings::custom_palette_help` <sub>fn</sub> | [720](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L720) | Explain where custom palettes go, and say what was refused and why. |
-| `Settings::theme_picker` <sub>pub fn</sub> | [794](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L794) | The colour scheme, as a compact control for the window header. |
-| `Settings::appearance_page` <sub>fn</sub> | [819](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L819) |  |
-| `Settings::motion_page` <sub>fn</sub> | [856](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L856) |  |
-| `Settings::security_page` <sub>fn</sub> | [993](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L993) | Roadmap item 92. |
-| `Settings::storage_page` <sub>fn</sub> | [1092](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1092) |  |
-| `section` <sub>fn</sub> | [1153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1153) | A titled group with a one-line explanation under it. |
-| `swatches` <sub>fn</sub> | [1161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1161) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
+| `Settings::persist` <sub>fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L159) | Write the settings out, encrypted and obfuscated as they are at rest. |
+| `Settings::save_error` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L180) | Whether the app should open in group mode, and a way to change it. |
+| `Settings::show_install_tab` <sub>pub fn</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L191) | Whether the install tab should be offered at all. |
+| `Settings::hide_install_tab` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L196) | Whether the install tab is hidden by preference. |
+| `Settings::set_hide_install_tab` <sub>pub fn</sub> | [201](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L201) | Record whether to hide the install tab on a portable copy. |
+| `Settings::acceleration` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L214) | Whether the window asks the platform for a hardware-drawn context. |
+| `Settings::set_acceleration` <sub>pub fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L219) | Record whether to ask for acceleration. |
+| `Settings::frame_target` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L228) | How often the window draws while something in it is moving. |
+| `Settings::set_frame_target` <sub>pub fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L233) | Record a new frame-rate target. |
+| `Settings::show_frame_rate` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L243) | Whether the header carries a live frame-rate readout. |
+| `Settings::always_group` <sub>pub fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L248) | Whether the app should open in group mode. |
+| `Settings::autolock` <sub>pub fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L253) | How the autolock is configured, brought into range. |
+| `Settings::set_autolock` <sub>pub fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L264) | Remember an autolock setting. |
+| `Settings::seal_with_app_lock` <sub>pub fn</sub> | [277](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L277) | Whether every recording is sealed with the app-lock passphrase. |
+| `Settings::destination` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L282) | The remembered encrypted destination, rebuilt from the settings file. |
+| `Settings::set_destination` <sub>pub fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L291) | Remember a destination, including the answer to the hidden question. |
+| `Settings::failsafe` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L308) | The Failsafe posture in force. |
+| `Settings::set_failsafe` <sub>pub fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L313) | Record the Failsafe posture. |
+| `Settings::notify_style` <sub>pub fn</sub> | [322](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L322) | How notifications should be shown. |
+| `Settings::set_notify_style` <sub>pub fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L327) | Record how notifications should be shown. |
+| `Settings::live_monitor` <sub>pub fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L336) | Where the live monitor sits, or whether it is shown. |
+| `Settings::set_live_monitor` <sub>pub fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L341) | Record where the live monitor sits. |
+| `Settings::set_always_group` <sub>pub fn</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L350) | Record whether the app should open in group mode. |
+| `Settings::set_seal_with_app_lock` <sub>pub fn</sub> | [364](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L364) | Remember, or stop remembering, that recordings are sealed with the app-lock passphrase. |
+| `Settings::interface_page` <sub>fn</sub> | [373](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L373) | Which tabs the window offers. |
+| `Settings::toured_tabs` <sub>pub fn</sub> | [579](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L579) | The tabs the tour has already covered. |
+| `Settings::mark_toured` <sub>pub fn</sub> | [590](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L590) | Record that the tour has covered these tabs, and save. |
+| `Settings::first_run_appearance` <sub>pub fn</sub> | [604](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L604) | The first-run panel: offered once, with animation already on. |
+| `Settings::first_run_autolock` <sub>pub fn</sub> | [631](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L631) | The autolock switch and delay, for the first-run setup to place. |
+| `Settings::finish_first_run` <sub>pub fn</sub> | [659](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L659) | Mark the first run answered. |
+| `Settings::tab` <sub>pub fn</sub> | [666](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L666) | The settings tab. |
+| `Settings::custom_palette_help` <sub>fn</sub> | [721](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L721) | Explain where custom palettes go, and say what was refused and why. |
+| `Settings::theme_picker` <sub>pub fn</sub> | [795](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L795) | The colour scheme, as a compact control for the window header. |
+| `Settings::appearance_page` <sub>fn</sub> | [821](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L821) | The appearance page: palette, and what each one changes. |
+| `Settings::motion_page` <sub>fn</sub> | [860](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L860) | The motion page, including honouring the system's reduced-motion setting. |
+| `Settings::security_page` <sub>fn</sub> | [997](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L997) | Roadmap item 92. |
+| `Settings::storage_page` <sub>fn</sub> | [1097](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1097) | The storage page: where files go, and the portable or installed choice. |
+| `section` <sub>fn</sub> | [1158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1158) | A titled group with a one-line explanation under it. |
+| `swatches` <sub>fn</sub> | [1166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1166) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
 
 ---
 

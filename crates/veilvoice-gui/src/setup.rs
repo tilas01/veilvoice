@@ -233,6 +233,8 @@ impl Setup {
 
     // --- the state of this copy --------------------------------------------
 
+    /// Say whether this copy is portable or installed, and where its files
+    /// are.
     fn where_this_copy_lives(&mut self, ui: &mut Ui) {
         ui.label(RichText::new("This copy").color(p::blue()).small());
         ui.add_space(6.0);
@@ -300,6 +302,8 @@ impl Setup {
 
     // --- install and uninstall ---------------------------------------------
 
+    /// The install and uninstall buttons, and what each will do before it is
+    /// pressed.
     fn install_controls(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         ui.label(
             RichText::new("Install for this user")
@@ -549,6 +553,7 @@ impl Setup {
 
     // --- the companions ----------------------------------------------------
 
+    /// One row per companion: whether it is here, and how to get it if not.
     fn companion_rows(&mut self, ui: &mut Ui) {
         ui.label(RichText::new("Companion software").color(p::blue()).small());
         ui.add_space(6.0);
@@ -757,6 +762,7 @@ fn can_install(
     somewhere_to_install && !already_running_installed && (!portable || carry.is_some())
 }
 
+/// Everything installing alters, listed so the button is never a surprise.
 fn install_changes() -> Vec<&'static str> {
     let mut lines = vec![
         "copies the VeilVoice programs beside this one into your own program directory",
@@ -769,6 +775,7 @@ fn install_changes() -> Vec<&'static str> {
     lines
 }
 
+/// One labelled read-only value, in the shape this tab uses throughout.
 fn field(ui: &mut Ui, label: &str, value: &str) {
     ui.horizontal(|ui| {
         ui.label(RichText::new(format!("{label:<18}")).color(p::muted()));

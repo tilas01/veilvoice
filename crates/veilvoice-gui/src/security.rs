@@ -416,6 +416,11 @@ impl Security {
         self.lock_inner(true);
     }
 
+    /// Lock, remembering whether the person did it or the idle timer did.
+    ///
+    /// The distinction is carried because the lock screen says which, and
+    /// "locked after twenty minutes idle" answers a question that "locked"
+    /// leaves open.
     fn lock_inner(&mut self, by_idle: bool) {
         if self.store.is_some() {
             self.locked = true;
@@ -513,6 +518,11 @@ impl Security {
         }
     }
 
+    /// Run a lock operation on a thread, so the window keeps drawing.
+    ///
+    /// Argon2id at 256 MiB takes long enough to be felt. Doing it on the
+    /// drawing thread would freeze the window for the duration, which reads as
+    /// a crash.
     fn spawn(&mut self, op: Op, password: String, replacement: String) {
         let store = self.store.take();
         let path = self.path.clone();
@@ -618,12 +628,16 @@ impl Security {
         true
     }
 
+    /// Clear what was typed, so a passphrase does not sit in a field after
+    /// use.
     fn wipe_form(&mut self) {
         self.current.zeroize();
         self.fresh.zeroize();
         self.repeat.zeroize();
     }
 
+    /// Whether an operation is in flight, so the panel can refuse a second
+    /// one.
     fn busy(&self) -> bool {
         self.pending.is_some()
     }
@@ -1498,6 +1512,7 @@ fn run_op(
     outcome
 }
 
+/// Re-open the lock store from disk, or `None` when there is nothing to open.
 fn reopen(path: Option<&std::path::Path>) -> Option<LockStore> {
     path.and_then(|p| LockStore::open(p).ok().flatten())
 }
@@ -1553,6 +1568,7 @@ fn button_column<R>(ui: &mut egui::Ui, contents: impl FnOnce(&mut egui::Ui) -> R
     .inner
 }
 
+/// One passphrase field with its label, at the shared width.
 fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) -> egui::Response {
     ui.horizontal(|ui| {
         ui.allocate_ui_with_layout(
