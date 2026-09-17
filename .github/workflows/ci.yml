@@ -745,27 +745,4 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Fail if any crate reaching pgp gains a private-key code path
-        run: |
-          set -euo pipefail
-          PATTERN='SignedSecretKey|SecretKeyParams|decrypt|sign_binary_data|sign_text_data'
-
-          # Every crate whose manifest names `pgp`, found rather than listed.
-          mapfile -t CRATES < <(grep -l '^pgp = ' crates/*/Cargo.toml | xargs -n1 dirname)
-          if [ "${#CRATES[@]}" -eq 0 ]; then
-            echo "::error::no crate depends on pgp any more; this job is checking nothing."
-            exit 1
-          fi
-          echo "crates reaching pgp: ${CRATES[*]}"
-
-          failed=0
-          for crate in "${CRATES[@]}"; do
-            if grep -RnE "$PATTERN" "$crate/src/"; then
-              echo "::error::$crate appears to perform a private-key operation."
-              failed=1
-            fi
-          done
-          if [ "$failed" -ne 0 ]; then
-            echo "RUSTSEC-2023-0071 is accepted in .cargo/audit.toml only because it does not."
-            exit 1
-          fi
-          echo "verification only: no secret-key or decryption API in ${CRATES[*]}"
+        run: python tools/audit/rsa_usage.py

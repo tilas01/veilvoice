@@ -51,7 +51,6 @@
 //! is not proof it will work: that also depends on your drivers and on the
 //! copy of ffmpeg you have.
 
-use std::path::{Path, PathBuf};
 use std::process::Command;
 
 /// Who made a graphics device.
@@ -299,7 +298,9 @@ fn windows_adapters() -> Found {
 /// A bare program name is a search, and anything earlier on the path that
 /// happens to share the name is what runs.
 #[cfg(target_os = "linux")]
-fn tool(name: &str) -> Option<PathBuf> {
+fn tool(name: &str) -> Option<std::path::PathBuf> {
+    use std::path::Path;
+
     for directory in ["/usr/bin", "/bin", "/usr/sbin", "/sbin", "/usr/local/bin"] {
         let candidate = Path::new(directory).join(name);
         if candidate.is_file() {
