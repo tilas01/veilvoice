@@ -254,13 +254,13 @@
 <span class="ln" id="L171">    <span class="tok-com">/// The same shape as the single-microphone path&#x27;s, and not a realtime</span></span>
 <span class="ln" id="L172">    <span class="tok-com">/// callback: cpal calls this when something has gone wrong rather than</span></span>
 <span class="ln" id="L173">    <span class="tok-com">/// every block.</span></span>
-<span class="ln" id="L174">    <span class="tok-kw">fn</span> <span class="tok-fn">report</span>(&amp;<span class="tok-kw">self</span>, side: <span class="tok-kw">crate</span>::live::Side, error: &amp;cpal::StreamError) {</span>
+<span class="ln" id="L174">    <span class="tok-kw">fn</span> <span class="tok-fn">report</span>(&amp;<span class="tok-kw">self</span>, side: <span class="tok-kw">crate</span>::live::Side, error: &amp;cpal::Error) {</span>
 <span class="ln" id="L175">        <span class="tok-kw">let</span> count = <span class="tok-kw">self</span>.troubles.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed) + <span class="tok-num">1</span>;</span>
 <span class="ln" id="L176">        eprintln!(<span class="tok-str">&quot;veilvoice: {} stream error: {error}&quot;</span>, side.<span class="tok-fn">word</span>());</span>
 <span class="ln" id="L177">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> held) = <span class="tok-kw">self</span>.trouble.<span class="tok-fn">lock</span>() {</span>
 <span class="ln" id="L178">            *held = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::live::Interference {</span>
 <span class="ln" id="L179">                side,</span>
-<span class="ln" id="L180">                device_gone: matches!(error, cpal::StreamError::DeviceNotAvailable),</span>
+<span class="ln" id="L180">                device_gone: matches!(error.<span class="tok-fn">kind</span>(), cpal::ErrorKind::DeviceNotAvailable),</span>
 <span class="ln" id="L181">                said: error.<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L182">                count,</span>
 <span class="ln" id="L183">            });</span>
@@ -315,7 +315,7 @@
 <span class="ln" id="L228">        <span class="tok-kw">let</span> devices: Vec&lt;&amp;cpal::Device&gt; = guests.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|guest| guest.device).<span class="tok-fn">collect</span>();</span>
 <span class="ln" id="L229">        <span class="tok-kw">let</span> (in_cfgs, out_cfg) = <span class="tok-kw">crate</span>::live::<span class="tok-fn">agree_on_a_rate_for</span>(&amp;devices, output)?;</span>
 <span class="ln" id="L230"></span>
-<span class="ln" id="L231">        <span class="tok-kw">let</span> sample_rate = out_cfg.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span>;</span>
+<span class="ln" id="L231">        <span class="tok-kw">let</span> sample_rate = out_cfg.<span class="tok-fn">sample_rate</span>();</span>
 <span class="ln" id="L232">        <span class="tok-kw">let</span> out_channels = out_cfg.<span class="tok-fn">channels</span>() <span class="tok-kw">as</span> usize;</span>
 <span class="ln" id="L233">        <span class="tok-kw">let</span> capacity =</span>
 <span class="ln" id="L234">            ((sample_rate <span class="tok-kw">as</span> f32 * <span class="tok-kw">crate</span>::live::RING_MILLIS / <span class="tok-num">1000.0</span>) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">2048</span>);</span>
@@ -364,7 +364,7 @@
 <span class="ln" id="L277">            <span class="tok-kw">let</span> stream = guest</span>
 <span class="ln" id="L278">                .device</span>
 <span class="ln" id="L279">                .<span class="tok-fn">build_input_stream</span>(</span>
-<span class="ln" id="L280">                    &amp;in_cfg.<span class="tok-fn">config</span>(),</span>
+<span class="ln" id="L280">                    in_cfg.<span class="tok-fn">config</span>(),</span>
 <span class="ln" id="L281">                    <span class="tok-kw">move</span> |data: &amp;[f32], _| {</span>
 <span class="ln" id="L282">                        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> peak = <span class="tok-num">0</span>.0f32;</span>
 <span class="ln" id="L283">                        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> dropped = 0u64;</span>
@@ -426,7 +426,7 @@
 <span class="ln" id="L339"></span>
 <span class="ln" id="L340">        <span class="tok-kw">let</span> output_stream = output</span>
 <span class="ln" id="L341">            .<span class="tok-fn">build_output_stream</span>(</span>
-<span class="ln" id="L342">                &amp;out_cfg.<span class="tok-fn">config</span>(),</span>
+<span class="ln" id="L342">                out_cfg.<span class="tok-fn">config</span>(),</span>
 <span class="ln" id="L343">                <span class="tok-kw">move</span> |data: &amp;<span class="tok-kw">mut</span> [f32], _| {</span>
 <span class="ln" id="L344">                    <span class="tok-kw">let</span> frames = (data.<span class="tok-fn">len</span>() / out_channels.<span class="tok-fn">max</span>(<span class="tok-num">1</span>)).<span class="tok-fn">min</span>(max_frames);</span>
 <span class="ln" id="L345">                    mix[..frames].<span class="tok-fn">fill</span>(<span class="tok-num">0.0</span>);</span>

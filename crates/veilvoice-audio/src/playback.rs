@@ -137,17 +137,17 @@ pub fn start(samples: Vec<f32>, rate: u32, device: Option<&str>) -> Result<Playi
     // one. Where the device will not take the recording's rate this refuses and
     // says so, and the export path is the way to hear it in something that does
     // resample properly.
-    if cfg.sample_rate().0 != rate {
+    if cfg.sample_rate() != rate {
         return Err(Error::Device(format!(
             "this recording is {rate} Hz and the output device wants {}. \
              Take it out of the vault to play it somewhere that can convert.",
-            cfg.sample_rate().0
+            cfg.sample_rate()
         )));
     }
 
     let stream = out
         .build_output_stream(
-            &cfg.config(),
+            cfg.config(),
             move |data: &mut [f32], _| {
                 let start = callback_shared.at.load(Ordering::Relaxed);
                 let frames = data.len() / channels.max(1);

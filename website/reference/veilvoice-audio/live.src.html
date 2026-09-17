@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/live.rs</code></h1>
-<p style="color:var(--muted)"><a href="live.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 860 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="live.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 859 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -276,7 +276,7 @@
 <span class="ln" id="L187">    <span class="tok-com">/// block, so allocating a string and taking a lock here costs nothing that</span></span>
 <span class="ln" id="L188">    <span class="tok-com">/// is being timed. The guard that forbids both reads the data callbacks</span></span>
 <span class="ln" id="L189">    <span class="tok-com">/// and is right not to object to this one.</span></span>
-<span class="ln" id="L190">    <span class="tok-kw">fn</span> <span class="tok-fn">report</span>(&amp;<span class="tok-kw">self</span>, side: Side, error: &amp;cpal::StreamError) {</span>
+<span class="ln" id="L190">    <span class="tok-kw">fn</span> <span class="tok-fn">report</span>(&amp;<span class="tok-kw">self</span>, side: Side, error: &amp;cpal::Error) {</span>
 <span class="ln" id="L191">        <span class="tok-kw">let</span> count = <span class="tok-kw">self</span>.troubles.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed) + <span class="tok-num">1</span>;</span>
 <span class="ln" id="L192">        <span class="tok-com">// Still printed. The command line has a console and somebody watching</span></span>
 <span class="ln" id="L193">        <span class="tok-com">// it, and this is the only place `veilvoice live` can say anything</span></span>
@@ -285,7 +285,7 @@
 <span class="ln" id="L196">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> held) = <span class="tok-kw">self</span>.trouble.<span class="tok-fn">lock</span>() {</span>
 <span class="ln" id="L197">            *held = <span class="tok-fn">Some</span>(Interference {</span>
 <span class="ln" id="L198">                side,</span>
-<span class="ln" id="L199">                device_gone: matches!(error, cpal::StreamError::DeviceNotAvailable),</span>
+<span class="ln" id="L199">                device_gone: matches!(error.<span class="tok-fn">kind</span>(), cpal::ErrorKind::DeviceNotAvailable),</span>
 <span class="ln" id="L200">                said: error.<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L201">                count,</span>
 <span class="ln" id="L202">            });</span>
@@ -349,7 +349,7 @@
 <span class="ln" id="L256">    <span class="tok-fn">Ok</span>(device</span>
 <span class="ln" id="L257">        .<span class="tok-fn">supported_input_configs</span>()</span>
 <span class="ln" id="L258">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Device</span>(e.<span class="tok-fn">to_string</span>()))?</span>
-<span class="ln" id="L259">        .<span class="tok-fn">map</span>(|range| (range.<span class="tok-fn">min_sample_rate</span>().<span class="tok-num">0</span>, range.<span class="tok-fn">max_sample_rate</span>().<span class="tok-num">0</span>))</span>
+<span class="ln" id="L259">        .<span class="tok-fn">map</span>(|range| (range.<span class="tok-fn">min_sample_rate</span>(), range.<span class="tok-fn">max_sample_rate</span>()))</span>
 <span class="ln" id="L260">        .<span class="tok-fn">collect</span>())</span>
 <span class="ln" id="L261">}</span>
 </span>
@@ -368,7 +368,7 @@
 <span class="ln" id="L273">) -&gt; Option&lt;cpal::SupportedStreamConfig&gt; {</span>
 <span class="ln" id="L274">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> anything = None;</span>
 <span class="ln" id="L275">    <span class="tok-kw">for</span> range <span class="tok-kw">in</span> ranges {</span>
-<span class="ln" id="L276">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(config) = range.<span class="tok-fn">try_with_sample_rate</span>(cpal::<span class="tok-fn">SampleRate</span>(rate)) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L276">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(config) = range.<span class="tok-fn">try_with_sample_rate</span>(rate) <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L277">            continue;</span>
 <span class="ln" id="L278">        };</span>
 <span class="ln" id="L279">        <span class="tok-kw">if</span> config.<span class="tok-fn">sample_format</span>() == cpal::SampleFormat::F32 {</span>
@@ -443,18 +443,18 @@
 <span class="ln" id="L344">    <span class="tok-kw">let</span> out_ranges: Vec&lt;(u32, u32)&gt; = output</span>
 <span class="ln" id="L345">        .<span class="tok-fn">supported_output_configs</span>()</span>
 <span class="ln" id="L346">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Device</span>(e.<span class="tok-fn">to_string</span>()))?</span>
-<span class="ln" id="L347">        .<span class="tok-fn">map</span>(|range| (range.<span class="tok-fn">min_sample_rate</span>().<span class="tok-num">0</span>, range.<span class="tok-fn">max_sample_rate</span>().<span class="tok-num">0</span>))</span>
+<span class="ln" id="L347">        .<span class="tok-fn">map</span>(|range| (range.<span class="tok-fn">min_sample_rate</span>(), range.<span class="tok-fn">max_sample_rate</span>()))</span>
 <span class="ln" id="L348">        .<span class="tok-fn">collect</span>();</span>
 <span class="ln" id="L349">    <span class="tok-kw">let</span> reported: Vec&lt;(u32, Vec&lt;(u32, u32)&gt;)&gt; = inputs</span>
 <span class="ln" id="L350">        .<span class="tok-fn">iter</span>()</span>
 <span class="ln" id="L351">        .<span class="tok-fn">zip</span>(&amp;defaults)</span>
-<span class="ln" id="L352">        .<span class="tok-fn">map</span>(|(device, cfg)| <span class="tok-fn">Ok</span>((cfg.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span>, <span class="tok-fn">input_ranges</span>(device)?)))</span>
+<span class="ln" id="L352">        .<span class="tok-fn">map</span>(|(device, cfg)| <span class="tok-fn">Ok</span>((cfg.<span class="tok-fn">sample_rate</span>(), <span class="tok-fn">input_ranges</span>(device)?)))</span>
 <span class="ln" id="L353">        .collect::&lt;Result&lt;_, Error&gt;&gt;()?;</span>
 <span class="ln" id="L354"></span>
-<span class="ln" id="L355">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rate) = <span class="tok-fn">rate_they_agree_on</span>(out_default.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span>, &amp;out_ranges, &amp;reported) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L355">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rate) = <span class="tok-fn">rate_they_agree_on</span>(out_default.<span class="tok-fn">sample_rate</span>(), &amp;out_ranges, &amp;reported) <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L356">        <span class="tok-kw">let</span> rates: Vec&lt;String&gt; = defaults</span>
 <span class="ln" id="L357">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L358">            .<span class="tok-fn">map</span>(|cfg| format!(<span class="tok-str">&quot;{} Hz&quot;</span>, cfg.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span>))</span>
+<span class="ln" id="L358">            .<span class="tok-fn">map</span>(|cfg| format!(<span class="tok-str">&quot;{} Hz&quot;</span>, cfg.<span class="tok-fn">sample_rate</span>()))</span>
 <span class="ln" id="L359">            .<span class="tok-fn">collect</span>();</span>
 <span class="ln" id="L360">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Device</span>(format!(</span>
 <span class="ln" id="L361">            <span class="tok-str">&quot;the microphone side runs at {} and this output at {} Hz, and there is no \</span></span>
@@ -462,13 +462,13 @@
 <span class="ln" id="L363"><span class="tok-str">             them together and quietly shift a voice: set them to the same rate in your \</span></span>
 <span class="ln" id="L364"><span class="tok-str">             system&#x27;s sound settings, or choose devices that already agree.&quot;</span>,</span>
 <span class="ln" id="L365">            rates.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
-<span class="ln" id="L366">            out_default.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span></span>
+<span class="ln" id="L366">            out_default.<span class="tok-fn">sample_rate</span>()</span>
 <span class="ln" id="L367">        )));</span>
 <span class="ln" id="L368">    };</span>
 <span class="ln" id="L369"></span>
 <span class="ln" id="L370">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> chosen_inputs = Vec::<span class="tok-fn">with_capacity</span>(inputs.<span class="tok-fn">len</span>());</span>
 <span class="ln" id="L371">    <span class="tok-kw">for</span> (device, default) <span class="tok-kw">in</span> inputs.<span class="tok-fn">iter</span>().<span class="tok-fn">zip</span>(defaults) {</span>
-<span class="ln" id="L372">        chosen_inputs.<span class="tok-fn">push</span>(<span class="tok-kw">if</span> default.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span> == rate {</span>
+<span class="ln" id="L372">        chosen_inputs.<span class="tok-fn">push</span>(<span class="tok-kw">if</span> default.<span class="tok-fn">sample_rate</span>() == rate {</span>
 <span class="ln" id="L373">            default</span>
 <span class="ln" id="L374">        } <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L375">            <span class="tok-fn">at_rate</span>(</span>
@@ -484,7 +484,7 @@
 <span class="ln" id="L385">            })?</span>
 <span class="ln" id="L386">        });</span>
 <span class="ln" id="L387">    }</span>
-<span class="ln" id="L388">    <span class="tok-kw">let</span> chosen_out = <span class="tok-kw">if</span> out_default.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span> == rate {</span>
+<span class="ln" id="L388">    <span class="tok-kw">let</span> chosen_out = <span class="tok-kw">if</span> out_default.<span class="tok-fn">sample_rate</span>() == rate {</span>
 <span class="ln" id="L389">        out_default</span>
 <span class="ln" id="L390">    } <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L391">        <span class="tok-fn">at_rate</span>(</span>
@@ -563,7 +563,7 @@
 <span class="ln" id="L460">        <span class="tok-com">// compared.</span></span>
 <span class="ln" id="L461">        <span class="tok-kw">let</span> (in_cfg, out_cfg) = <span class="tok-fn">agree_on_a_rate</span>(input, output)?;</span>
 <span class="ln" id="L462"></span>
-<span class="ln" id="L463">        <span class="tok-kw">let</span> sample_rate = out_cfg.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span>;</span>
+<span class="ln" id="L463">        <span class="tok-kw">let</span> sample_rate = out_cfg.<span class="tok-fn">sample_rate</span>();</span>
 <span class="ln" id="L464">        config.sample_rate = sample_rate <span class="tok-kw">as</span> f32;</span>
 <span class="ln" id="L465">        <span class="tok-kw">let</span> in_channels = in_cfg.<span class="tok-fn">channels</span>() <span class="tok-kw">as</span> usize;</span>
 <span class="ln" id="L466">        <span class="tok-kw">let</span> out_channels = out_cfg.<span class="tok-fn">channels</span>() <span class="tok-kw">as</span> usize;</span>
@@ -602,7 +602,7 @@
 <span class="ln" id="L499"></span>
 <span class="ln" id="L500">        <span class="tok-kw">let</span> input_stream = input</span>
 <span class="ln" id="L501">            .<span class="tok-fn">build_input_stream</span>(</span>
-<span class="ln" id="L502">                &amp;in_cfg.<span class="tok-fn">config</span>(),</span>
+<span class="ln" id="L502">                in_cfg.<span class="tok-fn">config</span>(),</span>
 <span class="ln" id="L503">                <span class="tok-kw">move</span> |data: &amp;[f32], _| {</span>
 <span class="ln" id="L504">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> peak = <span class="tok-num">0</span>.0f32;</span>
 <span class="ln" id="L505">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> dropped = 0u64;</span>
@@ -648,7 +648,7 @@
 <span class="ln" id="L545"></span>
 <span class="ln" id="L546">        <span class="tok-kw">let</span> output_stream = output</span>
 <span class="ln" id="L547">            .<span class="tok-fn">build_output_stream</span>(</span>
-<span class="ln" id="L548">                &amp;out_cfg.<span class="tok-fn">config</span>(),</span>
+<span class="ln" id="L548">                out_cfg.<span class="tok-fn">config</span>(),</span>
 <span class="ln" id="L549">                <span class="tok-kw">move</span> |data: &amp;<span class="tok-kw">mut</span> [f32], _| {</span>
 <span class="ln" id="L550">                    <span class="tok-kw">let</span> frames = data.<span class="tok-fn">len</span>() / out_channels.<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
 <span class="ln" id="L551">                    <span class="tok-kw">let</span> frames = frames.<span class="tok-fn">min</span>(max_frames);</span>
@@ -927,45 +927,44 @@
 <span class="ln" id="L819">        <span class="tok-kw">let</span> shared = Shared::<span class="tok-fn">default</span>();</span>
 <span class="ln" id="L820">        assert!(shared.trouble.<span class="tok-fn">lock</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>).<span class="tok-fn">is_none</span>());</span>
 <span class="ln" id="L821"></span>
-<span class="ln" id="L822">        shared.<span class="tok-fn">report</span>(Side::Input, &amp;cpal::StreamError::DeviceNotAvailable);</span>
-<span class="ln" id="L823">        <span class="tok-kw">let</span> first = shared</span>
-<span class="ln" id="L824">            .trouble</span>
-<span class="ln" id="L825">            .<span class="tok-fn">lock</span>()</span>
-<span class="ln" id="L826">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>)</span>
-<span class="ln" id="L827">            .<span class="tok-fn">clone</span>()</span>
-<span class="ln" id="L828">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
-<span class="ln" id="L829">        assert_eq!(first.side, Side::Input);</span>
-<span class="ln" id="L830">        assert!(first.device_gone, <span class="tok-str">&quot;a device that has gone says so&quot;</span>);</span>
-<span class="ln" id="L831">        assert_eq!(first.count, <span class="tok-num">1</span>);</span>
-<span class="ln" id="L832"></span>
-<span class="ln" id="L833">        shared.<span class="tok-fn">report</span>(</span>
-<span class="ln" id="L834">            Side::Output,</span>
-<span class="ln" id="L835">            &amp;cpal::StreamError::BackendSpecific {</span>
-<span class="ln" id="L836">                err: cpal::BackendSpecificError {</span>
-<span class="ln" id="L837">                    description: <span class="tok-str">&quot;the mixer said no&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L838">                },</span>
-<span class="ln" id="L839">            },</span>
-<span class="ln" id="L840">        );</span>
-<span class="ln" id="L841">        <span class="tok-kw">let</span> second = shared</span>
-<span class="ln" id="L842">            .trouble</span>
-<span class="ln" id="L843">            .<span class="tok-fn">lock</span>()</span>
-<span class="ln" id="L844">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>)</span>
-<span class="ln" id="L845">            .<span class="tok-fn">clone</span>()</span>
-<span class="ln" id="L846">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
-<span class="ln" id="L847">        assert_eq!(second.side, Side::Output);</span>
-<span class="ln" id="L848">        assert!(</span>
-<span class="ln" id="L849">            !second.device_gone,</span>
-<span class="ln" id="L850">            <span class="tok-str">&quot;only a missing device is a missing device&quot;</span></span>
-<span class="ln" id="L851">        );</span>
-<span class="ln" id="L852">        assert!(</span>
-<span class="ln" id="L853">            second.said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
-<span class="ln" id="L854">            <span class="tok-str">&quot;what the platform said is passed through rather than summarised, \</span></span>
-<span class="ln" id="L855"><span class="tok-str">             and it said {:?}&quot;</span>,</span>
-<span class="ln" id="L856">            second.said</span>
-<span class="ln" id="L857">        );</span>
-<span class="ln" id="L858">        assert_eq!(second.count, <span class="tok-num">2</span>, <span class="tok-str">&quot;the count is of both streams together&quot;</span>);</span>
-<span class="ln" id="L859">    }</span>
-<span class="ln" id="L860">}</span>
+<span class="ln" id="L822">        shared.<span class="tok-fn">report</span>(</span>
+<span class="ln" id="L823">            Side::Input,</span>
+<span class="ln" id="L824">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceNotAvailable),</span>
+<span class="ln" id="L825">        );</span>
+<span class="ln" id="L826">        <span class="tok-kw">let</span> first = shared</span>
+<span class="ln" id="L827">            .trouble</span>
+<span class="ln" id="L828">            .<span class="tok-fn">lock</span>()</span>
+<span class="ln" id="L829">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>)</span>
+<span class="ln" id="L830">            .<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L831">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
+<span class="ln" id="L832">        assert_eq!(first.side, Side::Input);</span>
+<span class="ln" id="L833">        assert!(first.device_gone, <span class="tok-str">&quot;a device that has gone says so&quot;</span>);</span>
+<span class="ln" id="L834">        assert_eq!(first.count, <span class="tok-num">1</span>);</span>
+<span class="ln" id="L835"></span>
+<span class="ln" id="L836">        shared.<span class="tok-fn">report</span>(</span>
+<span class="ln" id="L837">            Side::Output,</span>
+<span class="ln" id="L838">            &amp;cpal::Error::<span class="tok-fn">with_message</span>(cpal::ErrorKind::Other, <span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
+<span class="ln" id="L839">        );</span>
+<span class="ln" id="L840">        <span class="tok-kw">let</span> second = shared</span>
+<span class="ln" id="L841">            .trouble</span>
+<span class="ln" id="L842">            .<span class="tok-fn">lock</span>()</span>
+<span class="ln" id="L843">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>)</span>
+<span class="ln" id="L844">            .<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L845">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
+<span class="ln" id="L846">        assert_eq!(second.side, Side::Output);</span>
+<span class="ln" id="L847">        assert!(</span>
+<span class="ln" id="L848">            !second.device_gone,</span>
+<span class="ln" id="L849">            <span class="tok-str">&quot;only a missing device is a missing device&quot;</span></span>
+<span class="ln" id="L850">        );</span>
+<span class="ln" id="L851">        assert!(</span>
+<span class="ln" id="L852">            second.said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
+<span class="ln" id="L853">            <span class="tok-str">&quot;what the platform said is passed through rather than summarised, \</span></span>
+<span class="ln" id="L854"><span class="tok-str">             and it said {:?}&quot;</span>,</span>
+<span class="ln" id="L855">            second.said</span>
+<span class="ln" id="L856">        );</span>
+<span class="ln" id="L857">        assert_eq!(second.count, <span class="tok-num">2</span>, <span class="tok-str">&quot;the count is of both streams together&quot;</span>);</span>
+<span class="ln" id="L858">    }</span>
+<span class="ln" id="L859">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -187,7 +187,7 @@ impl Shared {
     /// block, so allocating a string and taking a lock here costs nothing that
     /// is being timed. The guard that forbids both reads the data callbacks
     /// and is right not to object to this one.
-    fn report(&self, side: Side, error: &cpal::StreamError) {
+    fn report(&self, side: Side, error: &cpal::Error) {
         let count = self.troubles.fetch_add(1, Ordering::Relaxed) + 1;
         // Still printed. The command line has a console and somebody watching
         // it, and this is the only place `veilvoice live` can say anything
@@ -196,7 +196,7 @@ impl Shared {
         if let Ok(mut held) = self.trouble.lock() {
             *held = Some(Interference {
                 side,
-                device_gone: matches!(error, cpal::StreamError::DeviceNotAvailable),
+                device_gone: matches!(error.kind(), cpal::ErrorKind::DeviceNotAvailable),
                 said: error.to_string(),
                 count,
             });
@@ -256,7 +256,7 @@ pub(crate) fn input_ranges(device: &cpal::Device) -> Result<Vec<(u32, u32)>, Err
     Ok(device
         .supported_input_configs()
         .map_err(|e| Error::Device(e.to_string()))?
-        .map(|range| (range.min_sample_rate().0, range.max_sample_rate().0))
+        .map(|range| (range.min_sample_rate(), range.max_sample_rate()))
         .collect())
 }
 
@@ -273,7 +273,7 @@ fn at_rate(
 ) -> Option<cpal::SupportedStreamConfig> {
     let mut anything = None;
     for range in ranges {
-        let Some(config) = range.try_with_sample_rate(cpal::SampleRate(rate)) else {
+        let Some(config) = range.try_with_sample_rate(rate) else {
             continue;
         };
         if config.sample_format() == cpal::SampleFormat::F32 {
@@ -344,18 +344,18 @@ pub(crate) fn agree_on_a_rate_for(
     let out_ranges: Vec<(u32, u32)> = output
         .supported_output_configs()
         .map_err(|e| Error::Device(e.to_string()))?
-        .map(|range| (range.min_sample_rate().0, range.max_sample_rate().0))
+        .map(|range| (range.min_sample_rate(), range.max_sample_rate()))
         .collect();
     let reported: Vec<(u32, Vec<(u32, u32)>)> = inputs
         .iter()
         .zip(&defaults)
-        .map(|(device, cfg)| Ok((cfg.sample_rate().0, input_ranges(device)?)))
+        .map(|(device, cfg)| Ok((cfg.sample_rate(), input_ranges(device)?)))
         .collect::<Result<_, Error>>()?;
 
-    let Some(rate) = rate_they_agree_on(out_default.sample_rate().0, &out_ranges, &reported) else {
+    let Some(rate) = rate_they_agree_on(out_default.sample_rate(), &out_ranges, &reported) else {
         let rates: Vec<String> = defaults
             .iter()
-            .map(|cfg| format!("{} Hz", cfg.sample_rate().0))
+            .map(|cfg| format!("{} Hz", cfg.sample_rate()))
             .collect();
         return Err(Error::Device(format!(
             "the microphone side runs at {} and this output at {} Hz, and there is no \
@@ -363,13 +363,13 @@ pub(crate) fn agree_on_a_rate_for(
              them together and quietly shift a voice: set them to the same rate in your \
              system's sound settings, or choose devices that already agree.",
             rates.join(", "),
-            out_default.sample_rate().0
+            out_default.sample_rate()
         )));
     };
 
     let mut chosen_inputs = Vec::with_capacity(inputs.len());
     for (device, default) in inputs.iter().zip(defaults) {
-        chosen_inputs.push(if default.sample_rate().0 == rate {
+        chosen_inputs.push(if default.sample_rate() == rate {
             default
         } else {
             at_rate(
@@ -385,7 +385,7 @@ pub(crate) fn agree_on_a_rate_for(
             })?
         });
     }
-    let chosen_out = if out_default.sample_rate().0 == rate {
+    let chosen_out = if out_default.sample_rate() == rate {
         out_default
     } else {
         at_rate(
@@ -460,7 +460,7 @@ impl LiveSession {
         // compared.
         let (in_cfg, out_cfg) = agree_on_a_rate(input, output)?;
 
-        let sample_rate = out_cfg.sample_rate().0;
+        let sample_rate = out_cfg.sample_rate();
         config.sample_rate = sample_rate as f32;
         let in_channels = in_cfg.channels() as usize;
         let out_channels = out_cfg.channels() as usize;
@@ -499,7 +499,7 @@ impl LiveSession {
 
         let input_stream = input
             .build_input_stream(
-                &in_cfg.config(),
+                in_cfg.config(),
                 move |data: &[f32], _| {
                     let mut peak = 0.0f32;
                     let mut dropped = 0u64;
@@ -545,7 +545,7 @@ impl LiveSession {
 
         let output_stream = output
             .build_output_stream(
-                &out_cfg.config(),
+                out_cfg.config(),
                 move |data: &mut [f32], _| {
                     let frames = data.len() / out_channels.max(1);
                     let frames = frames.min(max_frames);
@@ -819,7 +819,10 @@ mod tests {
         let shared = Shared::default();
         assert!(shared.trouble.lock().expect("a fresh lock").is_none());
 
-        shared.report(Side::Input, &cpal::StreamError::DeviceNotAvailable);
+        shared.report(
+            Side::Input,
+            &cpal::Error::new(cpal::ErrorKind::DeviceNotAvailable),
+        );
         let first = shared
             .trouble
             .lock()
@@ -832,11 +835,7 @@ mod tests {
 
         shared.report(
             Side::Output,
-            &cpal::StreamError::BackendSpecific {
-                err: cpal::BackendSpecificError {
-                    description: "the mixer said no".to_string(),
-                },
-            },
+            &cpal::Error::with_message(cpal::ErrorKind::Other, "the mixer said no"),
         );
         let second = shared
             .trouble

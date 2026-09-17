@@ -218,17 +218,17 @@
 <span class="ln" id="L137">    <span class="tok-com">// one. Where the device will not take the recording&#x27;s rate this refuses and</span></span>
 <span class="ln" id="L138">    <span class="tok-com">// says so, and the export path is the way to hear it in something that does</span></span>
 <span class="ln" id="L139">    <span class="tok-com">// resample properly.</span></span>
-<span class="ln" id="L140">    <span class="tok-kw">if</span> cfg.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span> != rate {</span>
+<span class="ln" id="L140">    <span class="tok-kw">if</span> cfg.<span class="tok-fn">sample_rate</span>() != rate {</span>
 <span class="ln" id="L141">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Device</span>(format!(</span>
 <span class="ln" id="L142">            <span class="tok-str">&quot;this recording is {rate} Hz and the output device wants {}. \</span></span>
 <span class="ln" id="L143"><span class="tok-str">             Take it out of the vault to play it somewhere that can convert.&quot;</span>,</span>
-<span class="ln" id="L144">            cfg.<span class="tok-fn">sample_rate</span>().<span class="tok-num">0</span></span>
+<span class="ln" id="L144">            cfg.<span class="tok-fn">sample_rate</span>()</span>
 <span class="ln" id="L145">        )));</span>
 <span class="ln" id="L146">    }</span>
 <span class="ln" id="L147"></span>
 <span class="ln" id="L148">    <span class="tok-kw">let</span> stream = out</span>
 <span class="ln" id="L149">        .<span class="tok-fn">build_output_stream</span>(</span>
-<span class="ln" id="L150">            &amp;cfg.<span class="tok-fn">config</span>(),</span>
+<span class="ln" id="L150">            cfg.<span class="tok-fn">config</span>(),</span>
 <span class="ln" id="L151">            <span class="tok-kw">move</span> |data: &amp;<span class="tok-kw">mut</span> [f32], _| {</span>
 <span class="ln" id="L152">                <span class="tok-kw">let</span> start = callback_shared.at.<span class="tok-fn">load</span>(Ordering::Relaxed);</span>
 <span class="ln" id="L153">                <span class="tok-kw">let</span> frames = data.<span class="tok-fn">len</span>() / channels.<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
