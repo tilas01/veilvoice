@@ -83,7 +83,7 @@ another thread, so the window keeps answering while it is busy.
 flowchart TD
     n_lib(["lib.rs<br/>136 lines"])
     n_main(["main.rs<br/>231 lines"])
-    n_app["app.rs<br/>3569 lines"]
+    n_app["app.rs<br/>3584 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
@@ -94,7 +94,7 @@ flowchart TD
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2110 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
-    n_layout["layout.rs<br/>280 lines"]
+    n_layout["layout.rs<br/>473 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_pace["pace.rs<br/>509 lines"]
@@ -103,8 +103,8 @@ flowchart TD
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>730 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
-    n_security["security.rs<br/>2285 lines"]
-    n_settings["settings.rs<br/>1429 lines"]
+    n_security["security.rs<br/>2403 lines"]
+    n_settings["settings.rs<br/>1434 lines"]
     n_setup["setup.rs<br/>1038 lines"]
     n_soundbar["soundbar.rs<br/>779 lines"]
     n_storage["storage.rs<br/>659 lines"]
@@ -124,6 +124,7 @@ flowchart TD
     n_app --> n_graphics
     n_app --> n_group
     n_app --> n_integrity
+    n_app --> n_layout
     n_app --> n_monitor
     n_app --> n_notify
     n_app --> n_pace
@@ -158,6 +159,7 @@ flowchart TD
     n_group --> n_monitor
     n_group --> n_settings
     n_group --> n_theme
+    n_layout --> n_theme
     n_monitor --> n_theme
     n_notify --> n_palettes
     n_notify --> n_theme
@@ -180,6 +182,7 @@ flowchart TD
     n_security --> n_soundbar
     n_security --> n_theme
     n_settings --> n_autolock
+    n_settings --> n_layout
     n_settings --> n_monitor
     n_settings --> n_notify
     n_settings --> n_pace
@@ -250,7 +253,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 3569 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 3584 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`autolock.rs`|File-veilvoice-gui-autolock]] | 369 | Locking the window again after a period of no use. |
 | [[`avnotice.rs`|File-veilvoice-gui-avnotice]] | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 447 | Make a failure that produces no output produce some. |
@@ -261,7 +264,7 @@ flowchart TD
 | [[`graphics.rs`|File-veilvoice-gui-graphics]] | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [[`group.rs`|File-veilvoice-gui-group]] | 2110 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`integrity.rs`|File-veilvoice-gui-integrity]] | 386 | The integrity record, taken and checked by the window rather than by hand. |
-| [[`layout.rs`|File-veilvoice-gui-layout]] | 280 | Centring a row of widgets, which egui does not do by nesting. |
+| [[`layout.rs`|File-veilvoice-gui-layout]] | 473 | Centring a row of widgets, which egui does not do by nesting. |
 | [[`lib.rs`|File-veilvoice-gui-lib]] | 136 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [[`main.rs`|File-veilvoice-gui-main]] | 231 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`monitor.rs`|File-veilvoice-gui-monitor]] | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
@@ -272,8 +275,8 @@ flowchart TD
 | [[`policy.rs`|File-veilvoice-gui-policy]] | 320 | The policy in force, and what the interface does about it. |
 | [[`prefs.rs`|File-veilvoice-gui-prefs]] | 730 | What the user has chosen about how the app looks and moves. |
 | [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] | 348 | Whether the operating system has been asked to reduce motion. |
-| [[`security.rs`|File-veilvoice-gui-security]] | 2285 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [[`settings.rs`|File-veilvoice-gui-settings]] | 1429 | The settings panel: a menu of pages, each a titled group of choices. |
+| [[`security.rs`|File-veilvoice-gui-security]] | 2403 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [[`settings.rs`|File-veilvoice-gui-settings]] | 1434 | The settings panel: a menu of pages, each a titled group of choices. |
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 1038 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 779 | The animated mark: a row of bars that rise and fall. |
 | [[`storage.rs`|File-veilvoice-gui-storage]] | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
@@ -286,7 +289,7 @@ flowchart TD
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 412 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 244 | How big the window opens, and why it is not a constant. |
 
-**18,456 functional lines of Rust** in this crate. A functional line is a line
+**18,674 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

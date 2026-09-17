@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/security.svg" alt="security.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2285 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2403 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-passwords-and-why">Two passwords, and why</a>
@@ -103,12 +103,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>2285 lines defining <strong>44 functions</strong> (26 public), <strong>4 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2403 lines defining <strong>45 functions</strong> (26 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Sealing</code> <span style="color:var(--muted)">line 81</span> &middot; How the recording that comes out of a job is protected.</li>
 <li><code>enum Op</code> <span style="color:var(--muted)">line 106</span> &middot; What a background lock operation was trying to do.</li>
 <li><code>struct Security</code> <span style="color:var(--muted)">line 129</span> &middot; Everything about locking the app and sealing its output.</li>
-<li><code>enum Plan</code> <span style="color:var(--muted)">line 1364</span> &middot; What a finished job should do with its bytes.</li>
+<li><code>enum Plan</code> <span style="color:var(--muted)">line 1357</span> &middot; What a finished job should do with its bytes.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Security::load</code> <span style="color:var(--muted)">line 279</span> &middot; Read the lock file for this machine and start locked if one is set.
@@ -146,26 +146,26 @@
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code></span>
 </li>
 <li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 652</span> &middot; The full-window unlock screen.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>unlock_row</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::tab</code> <span style="color:var(--muted)">line 861</span> &middot; The security tab: manage the lock, and see what it is worth.
+<li><code>Security::tab</code> <span style="color:var(--muted)">line 854</span> &middot; The security tab: manage the lock, and see what it is worth.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>button_column</code>, <code>has_lock</code>, <code>interference_banner</code>, <code>lock_now</code>, <code>password_row</code>, <code>poll</code>, <code>spawn</code>, <code>lock_inner</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code></span>
 </li>
-<li><code>Security::load_mandate</code> <span style="color:var(--muted)">line 1038</span> &middot; Read the baseline from disk and apply it to the checkbox.
+<li><code>Security::load_mandate</code> <span style="color:var(--muted)">line 1031</span> &middot; Read the baseline from disk and apply it to the checkbox.
 </li>
-<li><code>Security::mandate_requires_app_lock</code> <span style="color:var(--muted)">line 1053</span> &middot; Whether the baseline insists on the app lock.
+<li><code>Security::mandate_requires_app_lock</code> <span style="color:var(--muted)">line 1046</span> &middot; Whether the baseline insists on the app lock.
 </li>
-<li><code>Security::mandate_requires_encryption</code> <span style="color:var(--muted)">line 1058</span> &middot; Whether the baseline insists on encryption at rest.
+<li><code>Security::mandate_requires_encryption</code> <span style="color:var(--muted)">line 1051</span> &middot; Whether the baseline insists on encryption at rest.
 </li>
-<li><code>Security::mandate_history</code> <span style="color:var(--muted)">line 1063</span> &middot; The change log, for the panel that shows it.
+<li><code>Security::mandate_history</code> <span style="color:var(--muted)">line 1056</span> &middot; The change log, for the panel that shows it.
 </li>
-<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 1086</span> &middot; The at-rest controls that sit inside the file tab.
+<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 1079</span> &middot; The at-rest controls that sit inside the file tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code>, <code>mandate_history_panel</code>, <code>password_row</code>, <code>record</code>, <code>mandate_history_rows</code></span>
 </li>
-<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1306</span> &middot; The dialogue shown when the user turns at-rest encryption off.
+<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1299</span> &middot; The dialogue shown when the user turns at-rest encryption off.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>record</code></span>
 </li>
-<li><code>Plan::write</code> <span style="color:var(--muted)">line 1389</span> &middot; Seal wav if the plan says to, and write it.
+<li><code>Plan::write</code> <span style="color:var(--muted)">line 1382</span> &middot; Seal wav if the plan says to, and write it.
 </li>
 </ul>
 </section>
@@ -301,17 +301,17 @@
 <a href="security.src.html#fn-security-tab">
 <rect x="358.9" y="637.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="425.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::tab</text>
-<text x="425.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 861</text>
+<text x="425.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 854</text>
 </a>
 <a href="security.src.html#fn-security-recording_controls">
 <rect x="47.0" y="737.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="173.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::recording_controls</text>
-<text x="173.8" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1086</text>
+<text x="173.8" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1079</text>
 </a>
 <a href="security.src.html#fn-security-disable_dialogue">
 <rect x="326.7" y="737.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="445.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::disable_dialogue</text>
-<text x="445.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1306</text>
+<text x="445.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1299</text>
 </a>
 <rect x="20.0" y="1021.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1030.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -323,11 +323,11 @@
 <text x="35.0" y="1078.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1100.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
 <text x="20.0" y="1115.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 44 functions are drawn; the diagram is</text>
+<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 45 functions are drawn; the diagram is</text>
 <text x="20.0" y="1145.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 44 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 45 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
@@ -350,9 +350,9 @@ flowchart TD
     n_busy[&quot;Security::busy&lt;br/&gt;line 641&quot;]
     n_is_busy([&quot;Security::is_busy&lt;br/&gt;line 647&quot;])
     n_unlock_screen([&quot;Security::unlock_screen&lt;br/&gt;line 652&quot;])
-    n_tab([&quot;Security::tab&lt;br/&gt;line 861&quot;])
-    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 1086&quot;])
-    n_disable_dialogue([&quot;Security::disable_dialogue&lt;br/&gt;line 1306&quot;])
+    n_tab([&quot;Security::tab&lt;br/&gt;line 854&quot;])
+    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 1079&quot;])
+    n_disable_dialogue([&quot;Security::disable_dialogue&lt;br/&gt;line 1299&quot;])
     n_blocked_reason --&gt; n_ready_to_write
     n_drop --&gt; n_wipe_secrets
     n_is_busy --&gt; n_busy
@@ -392,9 +392,9 @@ flowchart TD
     click n_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L641&quot; &quot;open the source&quot;
     click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L647&quot; &quot;open the source&quot;
     click n_unlock_screen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L652&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L861&quot; &quot;open the source&quot;
-    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1086&quot; &quot;open the source&quot;
-    click n_disable_dialogue href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1306&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L854&quot; &quot;open the source&quot;
+    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1079&quot; &quot;open the source&quot;
+    click n_disable_dialogue href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1299&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load,n_set_lock_from_setup,n_set_recording_passphrase,n_lock_after_idle,n_blocked_reason,n_is_busy,n_unlock_screen,n_tab,n_recording_controls,n_disable_dialogue entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -438,26 +438,28 @@ flowchart TD
 <tr><td><code>Security::busy</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-busy">641</a></td><td>Whether an operation is in flight, so the panel can refuse a second one.</td></tr>
 <tr><td><code>Security::is_busy</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-is_busy">647</a></td><td>Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</td></tr>
 <tr><td><code>Security::unlock_screen</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-unlock_screen">652</a></td><td>The full-window unlock screen.</td></tr>
-<tr><td><code>Security::interference_banner</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-interference_banner">805</a></td><td>The standing report that the lock file was interfered with.</td></tr>
-<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tab">861</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
-<tr><td><code>Security::load_mandate</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-load_mandate">1038</a></td><td>Read the baseline from disk and apply it to the checkbox.</td></tr>
-<tr><td><code>Security::mandate_requires_app_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_app_lock">1053</a></td><td>Whether the baseline insists on the app lock.</td></tr>
-<tr><td><code>Security::mandate_requires_encryption</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_encryption">1058</a></td><td>Whether the baseline insists on encryption at rest.</td></tr>
-<tr><td><code>Security::mandate_history</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_history">1063</a></td><td>The change log, for the panel that shows it.</td></tr>
-<tr><td><code>Security::record</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-record">1073</a></td><td>Record a change to the baseline, and write it down.</td></tr>
-<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-recording_controls">1086</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
-<tr><td><code>Security::mandate_history_panel</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_panel">1276</a></td><td>The log of every time a requirement was turned off or back on.</td></tr>
-<tr><td><code>Security::mandate_history_rows</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_rows">1295</a></td><td>One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off.</td></tr>
-<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">1306</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
-<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">1348</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
-<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">1364</a></td><td>What a finished job should do with its bytes.</td></tr>
-<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">1389</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
-<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1436</a></td><td></td></tr>
-<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1447</a></td><td>Run one lock operation, off the UI thread.</td></tr>
-<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1516</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
-<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1523</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
-<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1557</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
-<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1572</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
+<tr><td><code>Security::interference_banner</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-interference_banner">798</a></td><td>The standing report that the lock file was interfered with.</td></tr>
+<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tab">854</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
+<tr><td><code>Security::load_mandate</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-load_mandate">1031</a></td><td>Read the baseline from disk and apply it to the checkbox.</td></tr>
+<tr><td><code>Security::mandate_requires_app_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_app_lock">1046</a></td><td>Whether the baseline insists on the app lock.</td></tr>
+<tr><td><code>Security::mandate_requires_encryption</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_encryption">1051</a></td><td>Whether the baseline insists on encryption at rest.</td></tr>
+<tr><td><code>Security::mandate_history</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_history">1056</a></td><td>The change log, for the panel that shows it.</td></tr>
+<tr><td><code>Security::record</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-record">1066</a></td><td>Record a change to the baseline, and write it down.</td></tr>
+<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-recording_controls">1079</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
+<tr><td><code>Security::mandate_history_panel</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_panel">1269</a></td><td>The log of every time a requirement was turned off or back on.</td></tr>
+<tr><td><code>Security::mandate_history_rows</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_rows">1288</a></td><td>One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off.</td></tr>
+<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">1299</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
+<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">1341</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
+<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">1357</a></td><td>What a finished job should do with its bytes.</td></tr>
+<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">1382</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
+<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1429</a></td><td></td></tr>
+<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1440</a></td><td>Run one lock operation, off the UI thread.</td></tr>
+<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1509</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
+<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1516</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
+<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1521</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
+<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1555</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
+<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1570</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
+<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">1615</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
 </tbody></table>
 </section>
 </div></div>

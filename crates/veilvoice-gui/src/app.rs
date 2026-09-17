@@ -909,7 +909,7 @@ impl VeilVoiceApp {
     }
 }
 
-/// A small-text button drawn to the height of the control beside it.
+/// A small-text button drawn to the size of the control beside it.
 ///
 /// **Finding F-178.** The header's right-hand controls sit in one centred row,
 /// and the theme picker is the tallest thing in it. A button around small text
@@ -918,17 +918,24 @@ impl VeilVoiceApp {
 /// not quite lining up, and nothing anywhere said the two should match.
 ///
 /// So the height is passed in from the picker's own rectangle rather than
-/// written down: whatever the picker turns out to be, the button is that. The
-/// width is left alone, because a button as wide as the picker would be a
-/// different complaint.
+/// written down: whatever the picker turns out to be, the button is that.
+///
+/// **Finding F-196.** The width was left alone, on the reasoning that a button
+/// as wide as the picker would be a different complaint. It was the same
+/// complaint: a 46-point button against a 132-point dropdown, sharing a middle
+/// and agreeing on nothing else, is what "not aligned" was describing. It is
+/// drawn at [`crate::layout::LOCK_WIDTH`] now, which is the picker's width and
+/// the unlock button's width too.
 fn header_button(
     ui: &mut egui::Ui,
     text: &str,
     colour: egui::Color32,
     height: f32,
 ) -> egui::Response {
-    let same = egui::vec2(0.0, height);
-    ui.add(egui::Button::new(RichText::new(text).color(colour).small()).min_size(same))
+    ui.add(crate::layout::lock_button(
+        RichText::new(text).color(colour).small(),
+        height,
+    ))
 }
 
 impl eframe::App for VeilVoiceApp {
@@ -2828,7 +2835,7 @@ mod header_layout_tests {
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         picker = egui::ComboBox::from_id_salt("header-theme")
                             .selected_text(RichText::new("Tokyo Night").small())
-                            .width(132.0)
+                            .width(crate::layout::LOCK_WIDTH)
                             .show_ui(ui, |_| {})
                             .response
                             .rect;
@@ -2853,6 +2860,14 @@ mod header_layout_tests {
             "the lock button sits {:.1} pixels off the picker's middle",
             picker.center().y - button.center().y
         );
+        // **Finding F-196.** And the same width, which is the half the first
+        // fix left out and the half that was still visible.
+        assert!(
+            (picker.width() - button.width()).abs() < 0.5,
+            "the two controls are different widths: {:.1} against {:.1}",
+            picker.width(),
+            button.width()
+        );
     }
 
     /// And the shape this corrects, so the assertion above is known to be able
@@ -2870,7 +2885,7 @@ mod header_layout_tests {
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         picker = egui::ComboBox::from_id_salt("header-theme")
                             .selected_text(RichText::new("Tokyo Night").small())
-                            .width(132.0)
+                            .width(crate::layout::LOCK_WIDTH)
                             .show_ui(ui, |_| {})
                             .response
                             .rect;

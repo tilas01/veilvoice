@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/settings.svg" alt="settings.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1429 lines &middot; <a href="settings.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1434 lines &middot; <a href="settings.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-menu-rather-than-one-long-list">Why a menu rather than one long list</a>
@@ -91,7 +91,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1429 lines defining <strong>43 functions</strong> (33 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1434 lines defining <strong>43 functions</strong> (33 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Page</code> <span style="color:var(--muted)">line 46</span> &middot; Which page of the settings menu is showing.</li>
 <li><code>struct Settings</code> <span style="color:var(--muted)">line 71</span> &middot; The settings tab&#x27;s own state.</li>
@@ -143,7 +143,7 @@
 <li><code>Settings::tab</code> <span style="color:var(--muted)">line 666</span> &middot; The settings tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>appearance_page</code>, <code>interface_page</code>, <code>motion_page</code>, <code>security_page</code>, <code>storage_page</code>, <code>custom_palette_help</code>, <code>persist</code>, <code>section</code>, <code>swatches</code>, <code>failsafe</code>, <code>live_monitor</code>, <code>notify_style</code></span>
 </li>
-<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 795</span> &middot; The colour scheme, as a compact control for the window header.
+<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 800</span> &middot; The colour scheme, as a compact control for the window header.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
 </ul>
@@ -274,7 +274,7 @@
 <a href="settings.src.html#fn-settings-theme_picker">
 <rect x="255.3" y="1037.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="358.0" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::theme_picker</text>
-<text x="358.0" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 795</text>
+<text x="358.0" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 800</text>
 </a>
 <rect x="20.0" y="1121.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -313,7 +313,7 @@ flowchart TD
     n_first_run_autolock([&quot;Settings::first_run_autolock&lt;br/&gt;line 631&quot;])
     n_finish_first_run([&quot;Settings::finish_first_run&lt;br/&gt;line 659&quot;])
     n_tab([&quot;Settings::tab&lt;br/&gt;line 666&quot;])
-    n_theme_picker([&quot;Settings::theme_picker&lt;br/&gt;line 795&quot;])
+    n_theme_picker([&quot;Settings::theme_picker&lt;br/&gt;line 800&quot;])
     n_set_autolock --&gt; n_autolock
     n_set_failsafe --&gt; n_failsafe
     n_set_live_monitor --&gt; n_live_monitor
@@ -339,7 +339,7 @@ flowchart TD
     click n_first_run_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L631&quot; &quot;open the source&quot;
     click n_finish_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L659&quot; &quot;open the source&quot;
     click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L666&quot; &quot;open the source&quot;
-    click n_theme_picker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L795&quot; &quot;open the source&quot;
+    click n_theme_picker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L800&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_set_destination,n_set_always_group,n_set_seal_with_app_lock,n_mark_toured,n_first_run_appearance,n_first_run_autolock,n_finish_first_run,n_tab,n_theme_picker entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -389,13 +389,13 @@ flowchart TD
 <tr><td><code>Settings::finish_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-finish_first_run">659</a></td><td>Mark the first run answered.</td></tr>
 <tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-tab">666</a></td><td>The settings tab.</td></tr>
 <tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-custom_palette_help">721</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
-<tr><td><code>Settings::theme_picker</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-theme_picker">795</a></td><td>The colour scheme, as a compact control for the window header.</td></tr>
-<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-appearance_page">821</a></td><td>The appearance page: palette, and what each one changes.</td></tr>
-<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-motion_page">860</a></td><td>The motion page, including honouring the system&#x27;s reduced-motion setting.</td></tr>
-<tr><td><code>Settings::security_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-security_page">997</a></td><td>Roadmap item 92.</td></tr>
-<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-storage_page">1097</a></td><td>The storage page: where files go, and the portable or installed choice.</td></tr>
-<tr><td><code>section</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-section">1158</a></td><td>A titled group with a one-line explanation under it.</td></tr>
-<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-swatches">1166</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
+<tr><td><code>Settings::theme_picker</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-theme_picker">800</a></td><td>The colour scheme, as a compact control for the window header.</td></tr>
+<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-appearance_page">826</a></td><td>The appearance page: palette, and what each one changes.</td></tr>
+<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-motion_page">865</a></td><td>The motion page, including honouring the system&#x27;s reduced-motion setting.</td></tr>
+<tr><td><code>Settings::security_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-security_page">1002</a></td><td>Roadmap item 92.</td></tr>
+<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-storage_page">1102</a></td><td>The storage page: where files go, and the portable or installed choice.</td></tr>
+<tr><td><code>section</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-section">1163</a></td><td>A titled group with a one-line explanation under it.</td></tr>
+<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-swatches">1171</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
 </tbody></table>
 </section>
 </div></div>
