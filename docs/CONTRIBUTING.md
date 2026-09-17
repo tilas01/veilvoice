@@ -4,7 +4,7 @@
 ## Before anything else
 
 **A security problem does not go here.** Report it privately, the way
-[`docs/SECURITY.md`](docs/SECURITY.md) describes. The ordinary issue tracker is
+[`docs/SECURITY.md`](SECURITY.md) describes. The ordinary issue tracker is
 right for everything else, including a bug that is merely embarrassing.
 
 ## Getting it building
