@@ -183,12 +183,24 @@ pub struct Verify {
     /// `None` is not "decide for me": it is the ordinary state, and it means
     /// the check built into this binary. See [`veilvoice_verify::gnupg::backend`].
     checker: Option<Checker>,
-    /// What is installed, once somebody has asked. `None` means nobody has.
+    /// What is installed. `None` means the first look has not come back yet.
     ///
-    /// Not filled in at launch, because on Windows finding out whether GnuPG
-    /// is inside WSL means starting WSL, and starting a Linux distribution
-    /// because a window opened is not a thing to do.
+    /// This used to stay `None` until somebody pressed "look again", and the
+    /// reason was sound as far as it went: on Windows, finding out whether
+    /// GnuPG is inside WSL means starting WSL, and starting a Linux
+    /// distribution because a window opened is not a thing to do on the
+    /// thread that draws.
+    ///
+    /// The answer was the wrong half of it, though. Somebody who opens the
+    /// Verify tab is asking whether their download is genuine, and being told
+    /// "nothing has been looked for yet" is the program declining to answer a
+    /// question it could have answered before being asked. The look happens at
+    /// launch now, on a thread, so the expensive half costs the window
+    /// nothing: `survey_job` carries the result back and is polled with
+    /// `try_recv`, never waited on.
     survey: Option<Survey>,
+    /// The first look, running on its own thread.
+    survey_job: Option<mpsc::Receiver<Survey>>,
     /// When the commands were last copied, so the button can say it happened.
     copied: Option<f64>,
 }
@@ -710,7 +722,54 @@ impl Verify {
     /// check is made by a program that came out of the download it is
     /// checking, and the others are not. See [`veilvoice_verify::gnupg::backend`] for
     /// why an installed GnuPG is still not used until it is chosen.
+    /// Look for GnuPG, on a thread, and never twice at once.
+    ///
+    /// On a thread because on Windows the WSL half starts a Linux
+    /// distribution, which takes as long as it takes. The window must not
+    /// wait for that, so it does not: the result comes back through a channel
+    /// that is only ever polled.
+    fn start_survey(&mut self) {
+        if self.survey_job.is_some() {
+            return;
+        }
+        let (tx, rx) = mpsc::channel();
+        std::thread::spawn(move || {
+            let mut fresh = backend::look();
+            // Only Windows has WSL, and `look` only reports one there, so this
+            // is a no-op everywhere else rather than a platform check.
+            if let Some(wsl) = fresh.wsl.as_mut() {
+                wsl.gpg = backend::look_in_wsl(&wsl.program);
+            }
+            let _ = tx.send(fresh);
+        });
+        self.survey_job = Some(rx);
+    }
+
+    /// Take the result if it has arrived, without ever waiting for it.
+    ///
+    /// `try_recv` rather than `recv`: this runs on the thread that draws, and
+    /// blocking it on a WSL start is the whole thing being avoided.
+    fn poll_survey(&mut self) {
+        let Some(rx) = &self.survey_job else { return };
+        match rx.try_recv() {
+            Ok(fresh) => {
+                self.survey = Some(fresh);
+                self.survey_job = None;
+            }
+            Err(mpsc::TryRecvError::Disconnected) => self.survey_job = None,
+            Err(mpsc::TryRecvError::Empty) => {}
+        }
+    }
+
     fn checker_section(&mut self, ui: &mut Ui) {
+        // The first look starts itself. Somebody who opens this tab is asking
+        // whether their download is genuine, and a program that could have
+        // found GnuPG before being asked should have.
+        self.poll_survey();
+        if self.survey.is_none() && self.survey_job.is_none() {
+            self.start_survey();
+        }
+
         ui.add_space(12.0);
         ui.label(
             RichText::new("Which program does the checking")
@@ -747,21 +806,15 @@ impl Verify {
                 }
             }
             if ui.button("look again").clicked() {
-                let mut fresh = backend::look();
-                // Asking WSL what it has means starting WSL, so it happens
-                // here, when somebody pressed a button, and not at launch.
-                if let Some(wsl) = fresh.wsl.as_mut() {
-                    wsl.gpg = backend::look_in_wsl(&wsl.program);
-                }
-                self.survey = Some(fresh);
+                self.start_survey();
             }
         });
 
         if self.survey.is_none() {
             ui.label(
                 RichText::new(
-                    "Nothing has been looked for yet. \"look again\" checks this \
-                     machine, and on Windows asks WSL as well, which starts it.",
+                    "Looking for GnuPG on this machine, and on Windows inside \
+                     WSL as well. This finishes on its own.",
                 )
                 .color(p::muted())
                 .small(),
