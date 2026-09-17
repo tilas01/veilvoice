@@ -85,6 +85,10 @@ def main():
     parser.add_argument("--remote", default="origin", help="the remote to work on")
     parser.add_argument("--go", action="store_true",
                         help="actually delete; without it, only say what would go")
+    parser.add_argument("--including", metavar="BRANCH", action="append", default=[],
+                        help="also delete this branch even though it is not "
+                             "contained in main, naming it explicitly. Repeatable. "
+                             "What it would lose is printed first.")
     args = parser.parse_args()
 
     print("fetching %s" % args.remote)
@@ -99,6 +103,29 @@ def main():
     for branch in branches:
         (merged if contained_in_main(args.remote, branch) else unmerged).append(branch)
 
+    # A branch named explicitly moves from the left-alone list to the delete
+    # list, and what deleting it loses is printed rather than implied. This is
+    # the escape hatch for a branch whose work arrived by another route: a
+    # Dependabot branch whose upgrade was applied by hand, for instance, is
+    # never contained in `main` and is still finished with.
+    named = set(args.including)
+    unknown = named - set(branches)
+    if unknown:
+        print("no such branch on %s: %s" % (args.remote, ", ".join(sorted(unknown))))
+        return 1
+    chosen = [b for b in unmerged if b in named]
+    unmerged = [b for b in unmerged if b not in named]
+    merged += chosen
+
+    if chosen:
+        print("\nnamed explicitly, and NOT contained in main. Deleting these")
+        print("loses the commits listed, which exist nowhere else:")
+        for branch in sorted(chosen):
+            ahead = git("rev-list", "--count",
+                        "%s/main..%s/%s" % (args.remote, args.remote, branch))
+            print("  %-46s %s commit(s) not in main" % (branch, ahead))
+            print("  %-46s %s" % ("", last_commit(args.remote, branch)))
+
     if unmerged:
         print("\nleft alone, because they are not contained in main:")
         for branch in sorted(unmerged):
@@ -108,9 +135,11 @@ def main():
         print("\nnothing to delete")
         return 0
 
-    print("\ncontained in main, so deleting loses nothing:")
-    for branch in sorted(merged):
-        print("  %-46s %s" % (branch, last_commit(args.remote, branch)))
+    contained = [b for b in merged if b not in named]
+    if contained:
+        print("\ncontained in main, so deleting loses nothing:")
+        for branch in sorted(contained):
+            print("  %-46s %s" % (branch, last_commit(args.remote, branch)))
 
     if not args.go:
         print("\n%d branch(es) would go. Pass --go to delete them." % len(merged))
