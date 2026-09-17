@@ -370,6 +370,13 @@ jobs:
       - name: Every action a workflow runs must be pinned to a commit
         run: python tools/audit/actions.py
 
+      # The seed that does the veiling is what stands between a recording and
+      # the voice it came from, and a nonce reused is an AEAD broken. Neither
+      # degrades visibly: weak randomness looks exactly like strong randomness
+      # from the outside, so nothing downstream ever notices.
+      - name: Every random draw must come from the OS CSPRNG
+        run: python tools/audit/randomness.py
+
       # F-170. A release is a claim that these binaries came from this source,
       # and the tag is the load-bearing part of it. Creating a release for a
       # tag that does not exist yet makes GitHub create the tag, and with no

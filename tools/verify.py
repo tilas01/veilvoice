@@ -201,6 +201,12 @@ CHECKS = [
     # before pushing.
     ("no crate reaching pgp performs a private-key operation",
      [sys.executable, "tools/audit/rsa_usage.py"]),
+    # A de-identifier whose randomness is predictable does not work, and a weak
+    # draw produces output that looks exactly like a strong one. Rust puts the
+    # three names that do not promise a cryptographic draw, `thread_rng`,
+    # `SmallRng` and `StdRng`, in the most obvious crate.
+    ("every random draw comes from the OS CSPRNG",
+     [sys.executable, "tools/audit/randomness.py"]),
     # A tag is a label, not a version: whoever owns the action can move it, and
     # two of the ones here were branches rather than tags. An unpinned action
     # runs whatever it points at that morning, on a runner holding a checkout

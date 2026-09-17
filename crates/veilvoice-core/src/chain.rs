@@ -453,13 +453,33 @@ impl DeidConfig {
     /// over the *ratchet* -- which is forward secrecy, not irreversibility --
     /// would be trading the whole feature for a nicety.
     pub fn with_random_reseed_range(mut self) -> Self {
-        let mut bytes = [0u8; 4];
+        // Eight bytes, four per end, rather than the two per end this used to
+        // take. Two gave each end 16 bits and the pair 32, so two launches drew
+        // the same interval after about eighty thousand of them: that is the
+        // birthday bound for 32 bits and it is exactly what a uniform draw
+        // looks like, not a defect.
+        //
+        // It is widened anyway, and the reason is worth being exact about,
+        // because it is *not* that the old draw was crackable. The seed that
+        // does the veiling is 256 bits and is drawn separately in
+        // `Deidentifier::new`; nothing here feeds it. What this sets is the
+        // roll interval, which VeilVoice prints on purpose in `veilvoice info`
+        // and which is therefore not a secret at all.
+        //
+        // What a shared interval is, is a weak session fingerprint: two
+        // sessions carrying the same one are marginally more linkable by
+        // somebody watching both. Four more bytes, once, at launch, moves that
+        // collision from 2^32 to 2^64 and costs nothing measurable. A cheap
+        // removal of a weak signal, not a repair.
+        let mut bytes = [0u8; 8];
         if getrandom::getrandom(&mut bytes).is_err() {
             return self;
         }
-        let a = u16::from_le_bytes([bytes[0], bytes[1]]) as f32 / u16::MAX as f32;
-        let b = u16::from_le_bytes([bytes[2], bytes[3]]) as f32 / u16::MAX as f32;
-        self.reseed_range_ms = Some(reseed_range_from(a, b, self.frame_ms()));
+        let a =
+            u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]) as f64 / u32::MAX as f64;
+        let b =
+            u32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]) as f64 / u32::MAX as f64;
+        self.reseed_range_ms = Some(reseed_range_from(a as f32, b as f32, self.frame_ms()));
         self
     }
 
