@@ -38,7 +38,7 @@
 //! be measured: a run of frames requested back to back under vsync settles at
 //! the display's rate, and the median interval over the last thirty-two frames
 //! is a number a single slow frame cannot move. That median, rounded and
-//! clamped to 30..=240, is what the About tab reports as the display and what
+//! clamped to 30..=1000, is what the About tab reports as the display and what
 //! "match the display" means in Settings.
 //!
 //! # Dropped frames
@@ -66,13 +66,33 @@ use std::time::Duration;
 pub const DISPLAY_FLOOR: u32 = 30;
 
 /// The highest rate the window will run at, display or setting.
-pub const DISPLAY_CEILING: u32 = 240;
+///
+/// This was 240, which was wrong twice. It was a cap on what the measurement
+/// could *report*, so a 360 Hz display was described as a 240 Hz one in the
+/// About tab, and it was a cap on what "match the display" could ask for, so
+/// that display was driven at 240. Both are now well clear of any panel sold:
+/// 500 Hz exists, 1000 Hz is the number the research displays quote, and a
+/// ceiling that has to be raised again in two years is a ceiling in the wrong
+/// place.
+///
+/// It stays a ceiling rather than becoming no limit because the measurement is
+/// a median of observed intervals, and a window starved to a handful of
+/// microsecond frames should be reported as fast, not as impossible.
+pub const DISPLAY_CEILING: u32 = 1000;
 
 /// The rate assumed until the display has been measured.
 pub const ASSUMED: u32 = 60;
 
 /// The targets Settings offers, besides "match the display".
-pub const TARGETS: &[u32] = &[30, 60, 90, 120, 144, 165, 240];
+///
+/// The rates panels are actually sold at, plus the two at the top for displays
+/// that are ahead of that list. "Match the display" remains the default and
+/// covers every one of these without being asked, so this is for somebody who
+/// wants to pin it lower to save power, or higher than their panel to see what
+/// the window can do.
+pub const TARGETS: &[u32] = &[
+    30, 60, 90, 120, 144, 165, 180, 240, 280, 360, 390, 480, 500, 540, 750, 1000,
+];
 
 /// How many intervals the median is taken over.
 const WINDOW: usize = 32;
@@ -387,7 +407,7 @@ mod tests {
 
     #[test]
     fn the_display_is_measured_from_the_frames_it_paced() {
-        for hz in [60.0, 120.0, 144.0, 165.0, 240.0] {
+        for hz in [60.0, 120.0, 144.0, 165.0, 240.0, 360.0, 500.0, 1000.0] {
             let mut pace = Pace::new(Target::Display);
             run(&mut pace, hz, WINDOW + 2);
             assert_eq!(pace.display_hz(), Some(hz as u32), "{hz}");

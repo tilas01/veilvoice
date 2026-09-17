@@ -741,9 +741,17 @@ between frames while something is animating *is* the display's rate, and the
 middle value of the last thirty-two of them is the figure the About tab
 reports. A single slow frame cannot move it.
 
-**Settings can lower it**, under animation: 30, 60, 90, 120, 144, 165 or 240 a
-second instead of matching the display. That is a choice to make for a battery
-rather than for smoothness, since the window waits for the screen either way.
+**Settings can pin it**, under animation, to anything from 30 a second up to
+1000 instead of matching the display: the rates panels are sold at, and two
+above them for displays ahead of that list. Lowering it is a choice to make
+for a battery rather than for smoothness, since the window waits for the
+screen either way. Raising it above what the panel does changes nothing you
+can see, for the same reason.
+
+Matching the display is the default and needs no help: the measurement covers
+every rate in that list, so a 360 Hz or a 500 Hz panel is found and used
+without being told. Until the first thirty-two frames have been timed the
+window assumes 60.
 
 The About tab shows what it is aiming at, what it measured the display to be,
 how many frames it is drawing a second and how many arrived late. A frame that

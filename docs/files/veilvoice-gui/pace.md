@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/pace.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 489 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 509 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs)
 
 ## Contents
 
@@ -63,7 +63,7 @@ Neither `egui` nor `eframe` says what the display's refresh rate is. It can
 be measured: a run of frames requested back to back under vsync settles at
 the display's rate, and the median interval over the last thirty-two frames
 is a number a single slow frame cannot move. That median, rounded and
-clamped to 30..=240, is what the About tab reports as the display and what
+clamped to 30..=1000, is what the About tab reports as the display and what
 "match the display" means in Settings.
 
 # Dropped frames
@@ -85,31 +85,31 @@ file.
 
 ## What this file contains
 
-489 lines defining **19 functions** (16 public), **2 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+509 lines defining **19 functions** (16 public), **2 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Target` (line 121) -- What a person chose in Settings.
-- `struct Pace` (line 157) -- The measurement, kept across frames.
+- `enum Target` (line 141) -- What a person chose in Settings.
+- `struct Pace` (line 177) -- The measurement, kept across frames.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `next_frame` (line 109) -- Ask for the next frame the way the current target wants it asked for.
-- `Target::from_setting` (line 130) -- From the preference as stored: zero is the display.
-- `Target::to_setting` (line 139) -- The preference to store.
-- `Target::label` (line 147) -- The words Settings shows for it.
-- `Pace::set_target` (line 206) -- Change the target, keeping what has been measured.
+- `next_frame` (line 129) -- Ask for the next frame the way the current target wants it asked for.
+- `Target::from_setting` (line 150) -- From the preference as stored: zero is the display.
+- `Target::to_setting` (line 159) -- The preference to store.
+- `Target::label` (line 167) -- The words Settings shows for it.
+- `Pace::set_target` (line 226) -- Change the target, keeping what has been measured.
   - reaches: `publish`
-- `Pace::target` (line 212) -- The target as chosen.
-- `Pace::display_hz` (line 225) -- The display's rate as measured, if it has been.
-- `Pace::fps` (line 230) -- Frames a second over the last whole second of drawing.
-- `Pace::dropped_total` (line 235) -- Every frame counted as dropped since the window opened.
-- `Pace::dropped_last_second` (line 240) -- Frames dropped in the last whole second.
-- `Pace::is_dropping` (line 251) -- Whether frames are being dropped steadily enough to be worth saying.
-- `Pace::dropping_seconds` (line 256) -- How many consecutive seconds have been dropping frames.
-- `Pace::frame` (line 268) -- Record that a frame is being drawn at time, egui's clock in seconds.
+- `Pace::target` (line 232) -- The target as chosen.
+- `Pace::display_hz` (line 245) -- The display's rate as measured, if it has been.
+- `Pace::fps` (line 250) -- Frames a second over the last whole second of drawing.
+- `Pace::dropped_total` (line 255) -- Every frame counted as dropped since the window opened.
+- `Pace::dropped_last_second` (line 260) -- Frames dropped in the last whole second.
+- `Pace::is_dropping` (line 271) -- Whether frames are being dropped steadily enough to be worth saying.
+- `Pace::dropping_seconds` (line 276) -- How many consecutive seconds have been dropping frames.
+- `Pace::frame` (line 288) -- Record that a frame is being drawn at time, egui's clock in seconds.
   - reaches: `median_hz`, `publish`, `target_hz`
-- `Pace::interval` (line 360) -- The interval animations currently pace by, for tests and the About tab.
+- `Pace::interval` (line 380) -- The interval animations currently pace by, for tests and the About tab.
 
 ## What calls what
 
@@ -131,49 +131,49 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_next_frame(["next_frame<br/>line 109"])
-    n_from_setting(["Target::from_setting<br/>line 130"])
-    n_to_setting(["Target::to_setting<br/>line 139"])
-    n_label(["Target::label<br/>line 147"])
-    n_default["Pace::default<br/>line 178"]
-    n_new["Pace::new<br/>line 185"]
-    n_set_target(["Pace::set_target<br/>line 206"])
-    n_target(["Pace::target<br/>line 212"])
-    n_target_hz["Pace::target_hz<br/>line 217"]
-    n_display_hz(["Pace::display_hz<br/>line 225"])
-    n_fps(["Pace::fps<br/>line 230"])
-    n_dropped_total(["Pace::dropped_total<br/>line 235"])
-    n_dropped_last_second(["Pace::dropped_last_second<br/>line 240"])
-    n_is_dropping(["Pace::is_dropping<br/>line 251"])
-    n_dropping_seconds(["Pace::dropping_seconds<br/>line 256"])
-    n_frame(["Pace::frame<br/>line 268"])
-    n_median_hz["Pace::median_hz<br/>line 327"]
-    n_publish["Pace::publish<br/>line 350"]
-    n_interval(["Pace::interval<br/>line 360"])
+    n_next_frame(["next_frame<br/>line 129"])
+    n_from_setting(["Target::from_setting<br/>line 150"])
+    n_to_setting(["Target::to_setting<br/>line 159"])
+    n_label(["Target::label<br/>line 167"])
+    n_default["Pace::default<br/>line 198"]
+    n_new["Pace::new<br/>line 205"]
+    n_set_target(["Pace::set_target<br/>line 226"])
+    n_target(["Pace::target<br/>line 232"])
+    n_target_hz["Pace::target_hz<br/>line 237"]
+    n_display_hz(["Pace::display_hz<br/>line 245"])
+    n_fps(["Pace::fps<br/>line 250"])
+    n_dropped_total(["Pace::dropped_total<br/>line 255"])
+    n_dropped_last_second(["Pace::dropped_last_second<br/>line 260"])
+    n_is_dropping(["Pace::is_dropping<br/>line 271"])
+    n_dropping_seconds(["Pace::dropping_seconds<br/>line 276"])
+    n_frame(["Pace::frame<br/>line 288"])
+    n_median_hz["Pace::median_hz<br/>line 347"]
+    n_publish["Pace::publish<br/>line 370"]
+    n_interval(["Pace::interval<br/>line 380"])
     n_default --> n_new
     n_frame --> n_median_hz
     n_frame --> n_publish
     n_frame --> n_target_hz
     n_set_target --> n_publish
-    click n_next_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L109" "open the source"
-    click n_from_setting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L130" "open the source"
-    click n_to_setting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L139" "open the source"
-    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L147" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L178" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L185" "open the source"
-    click n_set_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L206" "open the source"
-    click n_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L212" "open the source"
-    click n_target_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L217" "open the source"
-    click n_display_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L225" "open the source"
-    click n_fps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L230" "open the source"
-    click n_dropped_total href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L235" "open the source"
-    click n_dropped_last_second href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L240" "open the source"
-    click n_is_dropping href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L251" "open the source"
-    click n_dropping_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L256" "open the source"
-    click n_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L268" "open the source"
-    click n_median_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L327" "open the source"
-    click n_publish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L350" "open the source"
-    click n_interval href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L360" "open the source"
+    click n_next_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L129" "open the source"
+    click n_from_setting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L150" "open the source"
+    click n_to_setting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L159" "open the source"
+    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L167" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L198" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L205" "open the source"
+    click n_set_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L226" "open the source"
+    click n_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L232" "open the source"
+    click n_target_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L237" "open the source"
+    click n_display_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L245" "open the source"
+    click n_fps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L250" "open the source"
+    click n_dropped_total href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L255" "open the source"
+    click n_dropped_last_second href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L260" "open the source"
+    click n_is_dropping href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L271" "open the source"
+    click n_dropping_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L276" "open the source"
+    click n_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L288" "open the source"
+    click n_median_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L347" "open the source"
+    click n_publish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L370" "open the source"
+    click n_interval href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L380" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_next_frame,n_from_setting,n_to_setting,n_label,n_set_target,n_target,n_display_hz,n_fps,n_dropped_total,n_dropped_last_second,n_is_dropping,n_dropping_seconds,n_frame,n_interval entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -189,35 +189,35 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `DISPLAY_FLOOR` <sub>pub const</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L66) | The lowest rate a display is believed to have. |
-| `DISPLAY_CEILING` <sub>pub const</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L69) | The highest rate the window will run at, display or setting. |
-| `ASSUMED` <sub>pub const</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L72) | The rate assumed until the display has been measured. |
-| `TARGETS` <sub>pub const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L75) | The targets Settings offers, besides "match the display". |
-| `WINDOW` <sub>const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L78) | How many intervals the median is taken over. |
-| `DROPPED_AT` <sub>const</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L81) | A frame this much later than expected is a dropped one. |
-| `NOTICE_AT` <sub>const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L84) | More drops than this inside one second is worth saying out loud. |
-| `INTERVAL_MICROS` <sub>static</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L93) | The interval every animation in the window paces itself by, in microseconds. |
-| `ANIMATING` <sub>static</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L102) | Set by next_frame, read and cleared once per frame by Pace::frame. |
-| `next_frame` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L109) | Ask for the next frame the way the current target wants it asked for. |
-| `Target` <sub>pub enum</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L121) | What a person chose in Settings. |
-| `Target::from_setting` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L130) | From the preference as stored: zero is the display. |
-| `Target::to_setting` <sub>pub fn</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L139) | The preference to store. |
-| `Target::label` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L147) | The words Settings shows for it. |
-| `Pace` <sub>pub struct</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L157) | The measurement, kept across frames. |
-| `Pace::default` <sub>fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L178) |  |
-| `Pace::new` <sub>pub fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L185) | A fresh measurement with this target. |
-| `Pace::set_target` <sub>pub fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L206) | Change the target, keeping what has been measured. |
-| `Pace::target` <sub>pub fn</sub> | [212](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L212) | The target as chosen. |
-| `Pace::target_hz` <sub>pub fn</sub> | [217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L217) | The rate the window is aiming at right now, in frames a second. |
-| `Pace::display_hz` <sub>pub fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L225) | The display's rate as measured, if it has been. |
-| `Pace::fps` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L230) | Frames a second over the last whole second of drawing. |
-| `Pace::dropped_total` <sub>pub fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L235) | Every frame counted as dropped since the window opened. |
-| `Pace::dropped_last_second` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L240) | Frames dropped in the last whole second. |
-| `Pace::is_dropping` <sub>pub fn</sub> | [251](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L251) | Whether frames are being dropped steadily enough to be worth saying. |
-| `Pace::dropping_seconds` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L256) | How many consecutive seconds have been dropping frames. |
-| `Pace::frame` <sub>pub fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L268) | Record that a frame is being drawn at time, egui's clock in seconds. |
-| `Pace::median_hz` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L327) | The display's rate from the median interval, clamped to sense. |
-| `Pace::publish` <sub>fn</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L350) | Tell the animations what to ask for. |
-| `Pace::interval` <sub>pub fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L360) | The interval animations currently pace by, for tests and the About tab. |
+| `DISPLAY_CEILING` <sub>pub const</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L81) | The highest rate the window will run at, display or setting. |
+| `ASSUMED` <sub>pub const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L84) | The rate assumed until the display has been measured. |
+| `TARGETS` <sub>pub const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L93) | The targets Settings offers, besides "match the display". |
+| `WINDOW` <sub>const</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L98) | How many intervals the median is taken over. |
+| `DROPPED_AT` <sub>const</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L101) | A frame this much later than expected is a dropped one. |
+| `NOTICE_AT` <sub>const</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L104) | More drops than this inside one second is worth saying out loud. |
+| `INTERVAL_MICROS` <sub>static</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L113) | The interval every animation in the window paces itself by, in microseconds. |
+| `ANIMATING` <sub>static</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L122) | Set by next_frame, read and cleared once per frame by Pace::frame. |
+| `next_frame` <sub>pub fn</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L129) | Ask for the next frame the way the current target wants it asked for. |
+| `Target` <sub>pub enum</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L141) | What a person chose in Settings. |
+| `Target::from_setting` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L150) | From the preference as stored: zero is the display. |
+| `Target::to_setting` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L159) | The preference to store. |
+| `Target::label` <sub>pub fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L167) | The words Settings shows for it. |
+| `Pace` <sub>pub struct</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L177) | The measurement, kept across frames. |
+| `Pace::default` <sub>fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L198) |  |
+| `Pace::new` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L205) | A fresh measurement with this target. |
+| `Pace::set_target` <sub>pub fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L226) | Change the target, keeping what has been measured. |
+| `Pace::target` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L232) | The target as chosen. |
+| `Pace::target_hz` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L237) | The rate the window is aiming at right now, in frames a second. |
+| `Pace::display_hz` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L245) | The display's rate as measured, if it has been. |
+| `Pace::fps` <sub>pub fn</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L250) | Frames a second over the last whole second of drawing. |
+| `Pace::dropped_total` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L255) | Every frame counted as dropped since the window opened. |
+| `Pace::dropped_last_second` <sub>pub fn</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L260) | Frames dropped in the last whole second. |
+| `Pace::is_dropping` <sub>pub fn</sub> | [271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L271) | Whether frames are being dropped steadily enough to be worth saying. |
+| `Pace::dropping_seconds` <sub>pub fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L276) | How many consecutive seconds have been dropping frames. |
+| `Pace::frame` <sub>pub fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L288) | Record that a frame is being drawn at time, egui's clock in seconds. |
+| `Pace::median_hz` <sub>fn</sub> | [347](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L347) | The display's rate from the median interval, clamped to sense. |
+| `Pace::publish` <sub>fn</sub> | [370](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L370) | Tell the animations what to ask for. |
+| `Pace::interval` <sub>pub fn</sub> | [380](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L380) | The interval animations currently pace by, for tests and the About tab. |
 
 ---
 
