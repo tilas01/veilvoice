@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/pace.svg" alt="pace.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/pace.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 489 lines &middot; <a href="pace.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 509 lines &middot; <a href="pace.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-number-this-replaces">The number this replaces</a>
@@ -85,7 +85,7 @@
 <h2 id="what-this-does-instead">What this does instead</h2>
 <p>While something is moving, the window asks for the next frame <strong>now</strong>, and lets vsync decide when that is. Under vsync a frame cannot be drawn faster than the display shows it, so this costs one frame per display refresh and not one more, and the rate is the display&#x27;s own, whatever it is. Somebody who wants fewer frames than that, on a battery or a machine that struggles, sets a target in Settings and the window asks for a frame every <code>1/target</code> seconds instead, which is the old behaviour with the number chosen rather than hard-coded. Idle still draws nothing; this only decides the spacing of frames that were going to be drawn anyway.</p>
 <h2 id="the-displays-rate-is-measured-not-asked-for">The display&#x27;s rate is measured, not asked for</h2>
-<p>Neither <code>egui</code> nor <code>eframe</code> says what the display&#x27;s refresh rate is. It can be measured: a run of frames requested back to back under vsync settles at the display&#x27;s rate, and the median interval over the last thirty-two frames is a number a single slow frame cannot move. That median, rounded and clamped to 30..=240, is what the About tab reports as the display and what &quot;match the display&quot; means in Settings.</p>
+<p>Neither <code>egui</code> nor <code>eframe</code> says what the display&#x27;s refresh rate is. It can be measured: a run of frames requested back to back under vsync settles at the display&#x27;s rate, and the median interval over the last thirty-two frames is a number a single slow frame cannot move. That median, rounded and clamped to 30..=1000, is what the About tab reports as the display and what &quot;match the display&quot; means in Settings.</p>
 <h2 id="dropped-frames">Dropped frames</h2>
 <p>A frame that arrives more than one and a half times the expected interval after the one before it is counted as dropped. The count is shown beside the frame rate, and when more than a handful drop inside one second the window says so in the header, with whether it is on software rendering, because that is the first thing to check and the About tab is not where somebody looks while it is happening.</p>
 <h2 id="realtime">Realtime</h2>
@@ -93,41 +93,41 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>489 lines defining <strong>19 functions</strong> (16 public), <strong>2 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>509 lines defining <strong>19 functions</strong> (16 public), <strong>2 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Target</code> <span style="color:var(--muted)">line 121</span> &middot; What a person chose in Settings.</li>
-<li><code>struct Pace</code> <span style="color:var(--muted)">line 157</span> &middot; The measurement, kept across frames.</li>
+<li><code>enum Target</code> <span style="color:var(--muted)">line 141</span> &middot; What a person chose in Settings.</li>
+<li><code>struct Pace</code> <span style="color:var(--muted)">line 177</span> &middot; The measurement, kept across frames.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>next_frame</code> <span style="color:var(--muted)">line 109</span> &middot; Ask for the next frame the way the current target wants it asked for.
+<li><code>next_frame</code> <span style="color:var(--muted)">line 129</span> &middot; Ask for the next frame the way the current target wants it asked for.
 </li>
-<li><code>Target::from_setting</code> <span style="color:var(--muted)">line 130</span> &middot; From the preference as stored: zero is the display.
+<li><code>Target::from_setting</code> <span style="color:var(--muted)">line 150</span> &middot; From the preference as stored: zero is the display.
 </li>
-<li><code>Target::to_setting</code> <span style="color:var(--muted)">line 139</span> &middot; The preference to store.
+<li><code>Target::to_setting</code> <span style="color:var(--muted)">line 159</span> &middot; The preference to store.
 </li>
-<li><code>Target::label</code> <span style="color:var(--muted)">line 147</span> &middot; The words Settings shows for it.
+<li><code>Target::label</code> <span style="color:var(--muted)">line 167</span> &middot; The words Settings shows for it.
 </li>
-<li><code>Pace::set_target</code> <span style="color:var(--muted)">line 206</span> &middot; Change the target, keeping what has been measured.
+<li><code>Pace::set_target</code> <span style="color:var(--muted)">line 226</span> &middot; Change the target, keeping what has been measured.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>publish</code></span>
 </li>
-<li><code>Pace::target</code> <span style="color:var(--muted)">line 212</span> &middot; The target as chosen.
+<li><code>Pace::target</code> <span style="color:var(--muted)">line 232</span> &middot; The target as chosen.
 </li>
-<li><code>Pace::display_hz</code> <span style="color:var(--muted)">line 225</span> &middot; The display&#x27;s rate as measured, if it has been.
+<li><code>Pace::display_hz</code> <span style="color:var(--muted)">line 245</span> &middot; The display&#x27;s rate as measured, if it has been.
 </li>
-<li><code>Pace::fps</code> <span style="color:var(--muted)">line 230</span> &middot; Frames a second over the last whole second of drawing.
+<li><code>Pace::fps</code> <span style="color:var(--muted)">line 250</span> &middot; Frames a second over the last whole second of drawing.
 </li>
-<li><code>Pace::dropped_total</code> <span style="color:var(--muted)">line 235</span> &middot; Every frame counted as dropped since the window opened.
+<li><code>Pace::dropped_total</code> <span style="color:var(--muted)">line 255</span> &middot; Every frame counted as dropped since the window opened.
 </li>
-<li><code>Pace::dropped_last_second</code> <span style="color:var(--muted)">line 240</span> &middot; Frames dropped in the last whole second.
+<li><code>Pace::dropped_last_second</code> <span style="color:var(--muted)">line 260</span> &middot; Frames dropped in the last whole second.
 </li>
-<li><code>Pace::is_dropping</code> <span style="color:var(--muted)">line 251</span> &middot; Whether frames are being dropped steadily enough to be worth saying.
+<li><code>Pace::is_dropping</code> <span style="color:var(--muted)">line 271</span> &middot; Whether frames are being dropped steadily enough to be worth saying.
 </li>
-<li><code>Pace::dropping_seconds</code> <span style="color:var(--muted)">line 256</span> &middot; How many consecutive seconds have been dropping frames.
+<li><code>Pace::dropping_seconds</code> <span style="color:var(--muted)">line 276</span> &middot; How many consecutive seconds have been dropping frames.
 </li>
-<li><code>Pace::frame</code> <span style="color:var(--muted)">line 268</span> &middot; Record that a frame is being drawn at time, egui&#x27;s clock in seconds.
+<li><code>Pace::frame</code> <span style="color:var(--muted)">line 288</span> &middot; Record that a frame is being drawn at time, egui&#x27;s clock in seconds.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>median_hz</code>, <code>publish</code>, <code>target_hz</code></span>
 </li>
-<li><code>Pace::interval</code> <span style="color:var(--muted)">line 360</span> &middot; The interval animations currently pace by, for tests and the About tab.
+<li><code>Pace::interval</code> <span style="color:var(--muted)">line 380</span> &middot; The interval animations currently pace by, for tests and the About tab.
 </li>
 </ul>
 </section>
@@ -152,97 +152,97 @@
 <a href="pace.src.html#fn-next_frame">
 <rect x="40.1" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">next_frame</text>
-<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
+<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 129</text>
 </a>
 <a href="pace.src.html#fn-target-from_setting">
 <rect x="174.8" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="269.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Target::from_setting</text>
-<text x="269.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
+<text x="269.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </a>
 <a href="pace.src.html#fn-target-to_setting">
 <rect x="390.0" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="476.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Target::to_setting</text>
-<text x="476.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
+<text x="476.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
 </a>
 <a href="pace.src.html#fn-target-label">
 <rect x="64.3" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="130.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Target::label</text>
-<text x="130.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+<text x="130.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 167</text>
 </a>
 <a href="pace.src.html#fn-pace-default">
 <rect x="223.1" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="289.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::default</text>
-<text x="289.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 178</text>
+<text x="289.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
 </a>
 <a href="pace.src.html#fn-pace-new">
 <rect x="84.5" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="134.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::new</text>
-<text x="134.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
+<text x="134.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 205</text>
 </a>
 <a href="pace.src.html#fn-pace-set_target">
 <rect x="381.9" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="460.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::set_target</text>
-<text x="460.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 206</text>
+<text x="460.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
 </a>
 <a href="pace.src.html#fn-pace-target">
 <rect x="60.3" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="122.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::target</text>
-<text x="122.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
+<text x="122.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
 </a>
 <a href="pace.src.html#fn-pace-target_hz">
 <rect x="211.0" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="285.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::target_hz</text>
-<text x="285.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
+<text x="285.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
 </a>
 <a href="pace.src.html#fn-pace-display_hz">
 <rect x="385.9" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="464.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::display_hz</text>
-<text x="464.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 225</text>
+<text x="464.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
 </a>
 <a href="pace.src.html#fn-pace-fps">
 <rect x="20.0" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="70.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::fps</text>
-<text x="70.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 230</text>
+<text x="70.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 250</text>
 </a>
 <a href="pace.src.html#fn-pace-dropped_total">
 <rect x="146.5" y="320.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="237.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::dropped_total</text>
-<text x="237.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
+<text x="237.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 255</text>
 </a>
 <a href="pace.src.html#fn-pace-dropped_last_second">
 <rect x="353.7" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="468.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::dropped_last_second</text>
-<text x="468.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
+<text x="468.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
 </a>
 <a href="pace.src.html#fn-pace-is_dropping">
 <rect x="32.1" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="114.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::is_dropping</text>
-<text x="114.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 251</text>
+<text x="114.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 271</text>
 </a>
 <a href="pace.src.html#fn-pace-dropping_seconds">
 <rect x="223.1" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="325.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::dropping_seconds</text>
-<text x="325.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 256</text>
+<text x="325.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
 </a>
 <a href="pace.src.html#fn-pace-frame">
 <rect x="454.4" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="512.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::frame</text>
-<text x="512.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
+<text x="512.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
 </a>
 <a href="pace.src.html#fn-pace-median_hz">
 <rect x="211.0" y="620.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="285.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::median_hz</text>
-<text x="285.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
+<text x="285.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 347</text>
 </a>
 <a href="pace.src.html#fn-pace-publish">
 <rect x="385.9" y="620.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="452.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::publish</text>
-<text x="452.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 350</text>
+<text x="452.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 370</text>
 </a>
 <a href="pace.src.html#fn-pace-interval">
 <rect x="231.2" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="301.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Pace::interval</text>
-<text x="301.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 360</text>
+<text x="301.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 380</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -261,49 +261,49 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_next_frame([&quot;next_frame&lt;br/&gt;line 109&quot;])
-    n_from_setting([&quot;Target::from_setting&lt;br/&gt;line 130&quot;])
-    n_to_setting([&quot;Target::to_setting&lt;br/&gt;line 139&quot;])
-    n_label([&quot;Target::label&lt;br/&gt;line 147&quot;])
-    n_default[&quot;Pace::default&lt;br/&gt;line 178&quot;]
-    n_new[&quot;Pace::new&lt;br/&gt;line 185&quot;]
-    n_set_target([&quot;Pace::set_target&lt;br/&gt;line 206&quot;])
-    n_target([&quot;Pace::target&lt;br/&gt;line 212&quot;])
-    n_target_hz[&quot;Pace::target_hz&lt;br/&gt;line 217&quot;]
-    n_display_hz([&quot;Pace::display_hz&lt;br/&gt;line 225&quot;])
-    n_fps([&quot;Pace::fps&lt;br/&gt;line 230&quot;])
-    n_dropped_total([&quot;Pace::dropped_total&lt;br/&gt;line 235&quot;])
-    n_dropped_last_second([&quot;Pace::dropped_last_second&lt;br/&gt;line 240&quot;])
-    n_is_dropping([&quot;Pace::is_dropping&lt;br/&gt;line 251&quot;])
-    n_dropping_seconds([&quot;Pace::dropping_seconds&lt;br/&gt;line 256&quot;])
-    n_frame([&quot;Pace::frame&lt;br/&gt;line 268&quot;])
-    n_median_hz[&quot;Pace::median_hz&lt;br/&gt;line 327&quot;]
-    n_publish[&quot;Pace::publish&lt;br/&gt;line 350&quot;]
-    n_interval([&quot;Pace::interval&lt;br/&gt;line 360&quot;])
+    n_next_frame([&quot;next_frame&lt;br/&gt;line 129&quot;])
+    n_from_setting([&quot;Target::from_setting&lt;br/&gt;line 150&quot;])
+    n_to_setting([&quot;Target::to_setting&lt;br/&gt;line 159&quot;])
+    n_label([&quot;Target::label&lt;br/&gt;line 167&quot;])
+    n_default[&quot;Pace::default&lt;br/&gt;line 198&quot;]
+    n_new[&quot;Pace::new&lt;br/&gt;line 205&quot;]
+    n_set_target([&quot;Pace::set_target&lt;br/&gt;line 226&quot;])
+    n_target([&quot;Pace::target&lt;br/&gt;line 232&quot;])
+    n_target_hz[&quot;Pace::target_hz&lt;br/&gt;line 237&quot;]
+    n_display_hz([&quot;Pace::display_hz&lt;br/&gt;line 245&quot;])
+    n_fps([&quot;Pace::fps&lt;br/&gt;line 250&quot;])
+    n_dropped_total([&quot;Pace::dropped_total&lt;br/&gt;line 255&quot;])
+    n_dropped_last_second([&quot;Pace::dropped_last_second&lt;br/&gt;line 260&quot;])
+    n_is_dropping([&quot;Pace::is_dropping&lt;br/&gt;line 271&quot;])
+    n_dropping_seconds([&quot;Pace::dropping_seconds&lt;br/&gt;line 276&quot;])
+    n_frame([&quot;Pace::frame&lt;br/&gt;line 288&quot;])
+    n_median_hz[&quot;Pace::median_hz&lt;br/&gt;line 347&quot;]
+    n_publish[&quot;Pace::publish&lt;br/&gt;line 370&quot;]
+    n_interval([&quot;Pace::interval&lt;br/&gt;line 380&quot;])
     n_default --&gt; n_new
     n_frame --&gt; n_median_hz
     n_frame --&gt; n_publish
     n_frame --&gt; n_target_hz
     n_set_target --&gt; n_publish
-    click n_next_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L109&quot; &quot;open the source&quot;
-    click n_from_setting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L130&quot; &quot;open the source&quot;
-    click n_to_setting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L139&quot; &quot;open the source&quot;
-    click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L147&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L178&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L185&quot; &quot;open the source&quot;
-    click n_set_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L206&quot; &quot;open the source&quot;
-    click n_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L212&quot; &quot;open the source&quot;
-    click n_target_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L217&quot; &quot;open the source&quot;
-    click n_display_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L225&quot; &quot;open the source&quot;
-    click n_fps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L230&quot; &quot;open the source&quot;
-    click n_dropped_total href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L235&quot; &quot;open the source&quot;
-    click n_dropped_last_second href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L240&quot; &quot;open the source&quot;
-    click n_is_dropping href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L251&quot; &quot;open the source&quot;
-    click n_dropping_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L256&quot; &quot;open the source&quot;
-    click n_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L268&quot; &quot;open the source&quot;
-    click n_median_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L327&quot; &quot;open the source&quot;
-    click n_publish href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L350&quot; &quot;open the source&quot;
-    click n_interval href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L360&quot; &quot;open the source&quot;
+    click n_next_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L129&quot; &quot;open the source&quot;
+    click n_from_setting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L150&quot; &quot;open the source&quot;
+    click n_to_setting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L159&quot; &quot;open the source&quot;
+    click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L167&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L198&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L205&quot; &quot;open the source&quot;
+    click n_set_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L226&quot; &quot;open the source&quot;
+    click n_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L232&quot; &quot;open the source&quot;
+    click n_target_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L237&quot; &quot;open the source&quot;
+    click n_display_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L245&quot; &quot;open the source&quot;
+    click n_fps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L250&quot; &quot;open the source&quot;
+    click n_dropped_total href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L255&quot; &quot;open the source&quot;
+    click n_dropped_last_second href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L260&quot; &quot;open the source&quot;
+    click n_is_dropping href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L271&quot; &quot;open the source&quot;
+    click n_dropping_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L276&quot; &quot;open the source&quot;
+    click n_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L288&quot; &quot;open the source&quot;
+    click n_median_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L347&quot; &quot;open the source&quot;
+    click n_publish href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L370&quot; &quot;open the source&quot;
+    click n_interval href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/pace.rs#L380&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_next_frame,n_from_setting,n_to_setting,n_label,n_set_target,n_target,n_display_hz,n_fps,n_dropped_total,n_dropped_last_second,n_is_dropping,n_dropping_seconds,n_frame,n_interval entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -317,35 +317,35 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>DISPLAY_FLOOR</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-display_floor">66</a></td><td>The lowest rate a display is believed to have.</td></tr>
-<tr><td><code>DISPLAY_CEILING</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-display_ceiling">69</a></td><td>The highest rate the window will run at, display or setting.</td></tr>
-<tr><td><code>ASSUMED</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-assumed">72</a></td><td>The rate assumed until the display has been measured.</td></tr>
-<tr><td><code>TARGETS</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-targets">75</a></td><td>The targets Settings offers, besides &quot;match the display&quot;.</td></tr>
-<tr><td><code>WINDOW</code> <sub>const</sub></td><td><a href="pace.src.html#fn-window">78</a></td><td>How many intervals the median is taken over.</td></tr>
-<tr><td><code>DROPPED_AT</code> <sub>const</sub></td><td><a href="pace.src.html#fn-dropped_at">81</a></td><td>A frame this much later than expected is a dropped one.</td></tr>
-<tr><td><code>NOTICE_AT</code> <sub>const</sub></td><td><a href="pace.src.html#fn-notice_at">84</a></td><td>More drops than this inside one second is worth saying out loud.</td></tr>
-<tr><td><code>INTERVAL_MICROS</code> <sub>static</sub></td><td><a href="pace.src.html#fn-interval_micros">93</a></td><td>The interval every animation in the window paces itself by, in microseconds.</td></tr>
-<tr><td><code>ANIMATING</code> <sub>static</sub></td><td><a href="pace.src.html#fn-animating">102</a></td><td>Set by next_frame, read and cleared once per frame by Pace::frame.</td></tr>
-<tr><td><code>next_frame</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-next_frame">109</a></td><td>Ask for the next frame the way the current target wants it asked for.</td></tr>
-<tr><td><code>Target</code> <sub>pub enum</sub></td><td><a href="pace.src.html#fn-target">121</a></td><td>What a person chose in Settings.</td></tr>
-<tr><td><code>Target::from_setting</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-target-from_setting">130</a></td><td>From the preference as stored: zero is the display.</td></tr>
-<tr><td><code>Target::to_setting</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-target-to_setting">139</a></td><td>The preference to store.</td></tr>
-<tr><td><code>Target::label</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-target-label">147</a></td><td>The words Settings shows for it.</td></tr>
-<tr><td><code>Pace</code> <sub>pub struct</sub></td><td><a href="pace.src.html#fn-pace">157</a></td><td>The measurement, kept across frames.</td></tr>
-<tr><td><code>Pace::default</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-default">178</a></td><td></td></tr>
-<tr><td><code>Pace::new</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-new">185</a></td><td>A fresh measurement with this target.</td></tr>
-<tr><td><code>Pace::set_target</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-set_target">206</a></td><td>Change the target, keeping what has been measured.</td></tr>
-<tr><td><code>Pace::target</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-target">212</a></td><td>The target as chosen.</td></tr>
-<tr><td><code>Pace::target_hz</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-target_hz">217</a></td><td>The rate the window is aiming at right now, in frames a second.</td></tr>
-<tr><td><code>Pace::display_hz</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-display_hz">225</a></td><td>The display&#x27;s rate as measured, if it has been.</td></tr>
-<tr><td><code>Pace::fps</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-fps">230</a></td><td>Frames a second over the last whole second of drawing.</td></tr>
-<tr><td><code>Pace::dropped_total</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropped_total">235</a></td><td>Every frame counted as dropped since the window opened.</td></tr>
-<tr><td><code>Pace::dropped_last_second</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropped_last_second">240</a></td><td>Frames dropped in the last whole second.</td></tr>
-<tr><td><code>Pace::is_dropping</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-is_dropping">251</a></td><td>Whether frames are being dropped steadily enough to be worth saying.</td></tr>
-<tr><td><code>Pace::dropping_seconds</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropping_seconds">256</a></td><td>How many consecutive seconds have been dropping frames.</td></tr>
-<tr><td><code>Pace::frame</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-frame">268</a></td><td>Record that a frame is being drawn at time, egui&#x27;s clock in seconds.</td></tr>
-<tr><td><code>Pace::median_hz</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-median_hz">327</a></td><td>The display&#x27;s rate from the median interval, clamped to sense.</td></tr>
-<tr><td><code>Pace::publish</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-publish">350</a></td><td>Tell the animations what to ask for.</td></tr>
-<tr><td><code>Pace::interval</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-interval">360</a></td><td>The interval animations currently pace by, for tests and the About tab.</td></tr>
+<tr><td><code>DISPLAY_CEILING</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-display_ceiling">81</a></td><td>The highest rate the window will run at, display or setting.</td></tr>
+<tr><td><code>ASSUMED</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-assumed">84</a></td><td>The rate assumed until the display has been measured.</td></tr>
+<tr><td><code>TARGETS</code> <sub>pub const</sub></td><td><a href="pace.src.html#fn-targets">93</a></td><td>The targets Settings offers, besides &quot;match the display&quot;.</td></tr>
+<tr><td><code>WINDOW</code> <sub>const</sub></td><td><a href="pace.src.html#fn-window">98</a></td><td>How many intervals the median is taken over.</td></tr>
+<tr><td><code>DROPPED_AT</code> <sub>const</sub></td><td><a href="pace.src.html#fn-dropped_at">101</a></td><td>A frame this much later than expected is a dropped one.</td></tr>
+<tr><td><code>NOTICE_AT</code> <sub>const</sub></td><td><a href="pace.src.html#fn-notice_at">104</a></td><td>More drops than this inside one second is worth saying out loud.</td></tr>
+<tr><td><code>INTERVAL_MICROS</code> <sub>static</sub></td><td><a href="pace.src.html#fn-interval_micros">113</a></td><td>The interval every animation in the window paces itself by, in microseconds.</td></tr>
+<tr><td><code>ANIMATING</code> <sub>static</sub></td><td><a href="pace.src.html#fn-animating">122</a></td><td>Set by next_frame, read and cleared once per frame by Pace::frame.</td></tr>
+<tr><td><code>next_frame</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-next_frame">129</a></td><td>Ask for the next frame the way the current target wants it asked for.</td></tr>
+<tr><td><code>Target</code> <sub>pub enum</sub></td><td><a href="pace.src.html#fn-target">141</a></td><td>What a person chose in Settings.</td></tr>
+<tr><td><code>Target::from_setting</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-target-from_setting">150</a></td><td>From the preference as stored: zero is the display.</td></tr>
+<tr><td><code>Target::to_setting</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-target-to_setting">159</a></td><td>The preference to store.</td></tr>
+<tr><td><code>Target::label</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-target-label">167</a></td><td>The words Settings shows for it.</td></tr>
+<tr><td><code>Pace</code> <sub>pub struct</sub></td><td><a href="pace.src.html#fn-pace">177</a></td><td>The measurement, kept across frames.</td></tr>
+<tr><td><code>Pace::default</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-default">198</a></td><td></td></tr>
+<tr><td><code>Pace::new</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-new">205</a></td><td>A fresh measurement with this target.</td></tr>
+<tr><td><code>Pace::set_target</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-set_target">226</a></td><td>Change the target, keeping what has been measured.</td></tr>
+<tr><td><code>Pace::target</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-target">232</a></td><td>The target as chosen.</td></tr>
+<tr><td><code>Pace::target_hz</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-target_hz">237</a></td><td>The rate the window is aiming at right now, in frames a second.</td></tr>
+<tr><td><code>Pace::display_hz</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-display_hz">245</a></td><td>The display&#x27;s rate as measured, if it has been.</td></tr>
+<tr><td><code>Pace::fps</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-fps">250</a></td><td>Frames a second over the last whole second of drawing.</td></tr>
+<tr><td><code>Pace::dropped_total</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropped_total">255</a></td><td>Every frame counted as dropped since the window opened.</td></tr>
+<tr><td><code>Pace::dropped_last_second</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropped_last_second">260</a></td><td>Frames dropped in the last whole second.</td></tr>
+<tr><td><code>Pace::is_dropping</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-is_dropping">271</a></td><td>Whether frames are being dropped steadily enough to be worth saying.</td></tr>
+<tr><td><code>Pace::dropping_seconds</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-dropping_seconds">276</a></td><td>How many consecutive seconds have been dropping frames.</td></tr>
+<tr><td><code>Pace::frame</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-frame">288</a></td><td>Record that a frame is being drawn at time, egui&#x27;s clock in seconds.</td></tr>
+<tr><td><code>Pace::median_hz</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-median_hz">347</a></td><td>The display&#x27;s rate from the median interval, clamped to sense.</td></tr>
+<tr><td><code>Pace::publish</code> <sub>fn</sub></td><td><a href="pace.src.html#fn-pace-publish">370</a></td><td>Tell the animations what to ask for.</td></tr>
+<tr><td><code>Pace::interval</code> <sub>pub fn</sub></td><td><a href="pace.src.html#fn-pace-interval">380</a></td><td>The interval animations currently pace by, for tests and the About tab.</td></tr>
 </tbody></table>
 </section>
 </div></div>
