@@ -107,7 +107,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>89 lines"])
     n_accent["accent.rs<br/>701 lines"]
-    n_chain["chain.rs<br/>1721 lines"]
+    n_chain["chain.rs<br/>1741 lines"]
     n_effects["effects.rs<br/>245 lines"]
     n_modulation["modulation.rs<br/>323 lines"]
     n_pitch["pitch.rs<br/>286 lines"]
@@ -145,7 +145,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 701 | Accent and speaker-trait neutralisation. |
-| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1721 | The assembled de-identification chain and its live performance statistics. |
+| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1741 | The assembled de-identification chain and its live performance statistics. |
 | [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 245 | Light time-domain effects applied after resynthesis. |
 | [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [`modulation.rs`](../../docs/files/veilvoice-core/modulation.md) | 323 | Cryptographically-seeded modulation of the effect parameters. |
@@ -158,7 +158,7 @@ flowchart TD
 | [`veil_a_buffer.rs`](../../docs/files/veilvoice-core/examples-veil_a_buffer.md) | 54 | _no module documentation yet_ |
 | [`hostile_audio.rs`](../../docs/files/veilvoice-core/tests-hostile_audio.md) | 389 | The engine against input that is not well-behaved audio. |
 
-**3,139 functional lines of Rust** in this crate. A functional line is a line
+**3,141 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
