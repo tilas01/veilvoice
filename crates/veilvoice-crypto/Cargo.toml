@@ -16,6 +16,16 @@ zeroize.workspace = true
 subtle = "2"
 # Page-locking wrapper. The one place this crate steps outside `forbid(unsafe)`;
 # see the `amnesia` module for why and how it is contained.
+#
+# Held at 3 deliberately. Version 4 made `region::unlock` an `unsafe` function,
+# and this crate unlocks explicitly rather than through the RAII guard, for the
+# reason the `amnesia` module gives at length: the guard's destructor fails
+# loudly when Windows drops pages from a working set on its own, and a type
+# whose whole job is holding key material must not abort while being dropped.
+# Taking 4 would therefore put an `unsafe` block into a crate whose
+# `#![forbid(unsafe_code)]` is a promise made on the website and in the
+# security notes, to buy no-std support this project does not use. `cargo
+# audit` reports nothing against 3, so there is no security reason to move.
 region = "3"
 # --- key derivation ---
 #

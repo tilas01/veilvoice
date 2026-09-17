@@ -15,7 +15,7 @@ description = "A watchable version of a veiled conversation: a waveform, a circl
 # already in this tree underneath `flate2` (which `lofty` and `pgp` both pull
 # in), so naming it here adds nothing to the graph that was not compiled
 # already.
-miniz_oxide = "0.8"
+miniz_oxide = "0.9"
 # The plan the preview page is drawn from: who speaks, when, and in which
 # colour.
 veilvoice-conversation = { path = "../veilvoice-conversation" }
