@@ -13,8 +13,8 @@
 # `Gemfile` added here would declare no dependencies, and a manifest that says
 # nothing is one more file that has to be kept true.
 #
-# `Cargo.toml` is this project's package.json. There are 28 of them: the
-# workspace root, 27 crates, and `fuzz/`.
+# `Cargo.toml` is this project's package.json. There are 15 of them: the
+# workspace root, 13 crates, and `fuzz/`.
 #
 # # This file is checked rather than remembered
 #
@@ -23,6 +23,38 @@
 # added outside the workspace, or a second workflow directory, would otherwise
 # stop being monitored silently, which is the kind of gap that is noticed a
 # year later. It runs in CI beside `tools/audit/dependencies.py`.
+
+# # Why an upgrade here cannot break the project abruptly
+#
+# Four things hold at once, and the point is that no single one of them is
+# trusted on its own:
+#
+#   1. **Nothing merges itself.** There is no auto-merge. Every pull request
+#      below waits for a person, and CI has to be green before that person can
+#      sensibly say yes.
+#   2. **CI is the gate, and it is not a smoke test.** Thirteen jobs: the
+#      workspace built and tested on Linux, macOS and Windows, two 32-bit
+#      targets, the offline proof, the parser campaigns, the advisory scan and
+#      every generated file checked against its source.
+#   3. **A major is never grouped.** Minor and patch arrive batched, because
+#      twenty of those a week is noise. A major arrives alone, because it can
+#      change behaviour, drop a platform or raise the minimum Rust version, and
+#      this project builds on the BSDs and on 32-bit targets where that matters
+#      more than it usually does. `cpal` 0.15 to 0.18 was thirty-seven compile
+#      errors across four files in the realtime path: exactly the kind of thing
+#      that must arrive as its own decision.
+#   4. **A decision already made does not reopen every week.** The `ignore`
+#      list below is majors that have been considered and refused, each with
+#      the reason written where the dependency is declared. Minors and patches
+#      still arrive for every one of them, which is the half that matters for
+#      security: an advisory is almost always fixed in a patch.
+#
+# The fourth point is the one with a sharp edge, so it is worth being exact:
+# an `ignore` entry suppresses the security update for that dependency at that
+# update type too. That is why every entry below is scoped to
+# `version-update:semver-major` and never to a whole dependency. A bare
+# `dependency-name` with no `update-types` would silence the advisory as well,
+# which is the opposite of what this file is for.
 
 version: 2
 
@@ -91,6 +123,16 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "getrandom"
         update-types: ["version-update:semver-major"]
+      # Not part of the cryptographic generation above, and refused on its own
+      # grounds: `region` 4 made `region::unlock` an `unsafe` function, and this
+      # crate unlocks explicitly rather than through the RAII guard, for the
+      # reason `veilvoice-crypto`'s `amnesia` module gives at length. Taking it
+      # would put an `unsafe` block into a crate whose `#![forbid(unsafe_code)]`
+      # is a promise made on the website, to buy `no_std` this project does not
+      # use. The full argument is beside the dependency in
+      # `crates/veilvoice-crypto/Cargo.toml`. Patches and minors still arrive.
+      - dependency-name: "region"
+        update-types: ["version-update:semver-major"]
     labels:
       - dependencies
       - rust
@@ -134,9 +176,15 @@ updates:
       prefix: "ci"
       include: scope
     groups:
+      # Same rule as the crates: batched when it is routine, alone when it is a
+      # decision. A major version of an action can change its inputs or its
+      # outputs, and these actions check out the code, build it and publish
+      # signed artefacts, so one arriving inside a group of eight is one nobody
+      # reads. Majors are left ungrouped deliberately.
       actions:
-        patterns:
-          - "*"
+        update-types:
+          - minor
+          - patch
     labels:
       - dependencies
       - ci

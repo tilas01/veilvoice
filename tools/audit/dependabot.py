@@ -87,6 +87,62 @@ def entries():
     return found
 
 
+def ignored():
+    """Every `ignore` entry: the dependency, and the update types it silences.
+
+    Line by line, for the same reason `entries` is: this file is read by
+    something that is not here, so the check has to read what is written
+    rather than what a YAML library can be talked into.
+    """
+    out, name, types, inside = [], None, None, False
+    with open(CONFIG, "r", encoding="utf-8") as handle:
+        for line in handle:
+            stripped = line.strip()
+            if stripped.startswith("#"):
+                continue
+            if stripped == "ignore:":
+                inside = True
+                continue
+            if inside and stripped and not stripped.startswith(("-", "update-types:")):
+                # Any other key at this level ends the ignore block.
+                if ":" in stripped and not stripped.startswith("dependency-name:"):
+                    if name is not None:
+                        out.append((name, types))
+                        name, types = None, None
+                    inside = False
+                    continue
+            if not inside:
+                continue
+            if "dependency-name:" in stripped:
+                if name is not None:
+                    out.append((name, types))
+                    types = None
+                name = stripped.split("dependency-name:", 1)[1].strip().strip("\"'")
+            elif stripped.startswith("update-types:"):
+                types = stripped.split("update-types:", 1)[1].strip()
+    if name is not None:
+        out.append((name, types))
+    return out
+
+
+def declared_dependencies():
+    """Every dependency name any manifest in this tree asks for."""
+    names = set()
+    for current, directories, files in os.walk(ROOT):
+        directories[:] = [d for d in directories if d not in SKIP]
+        if "Cargo.toml" not in files:
+            continue
+        with open(os.path.join(current, "Cargo.toml"), "r", encoding="utf-8") as handle:
+            for line in handle:
+                stripped = line.strip()
+                if stripped.startswith("#") or "=" not in stripped:
+                    continue
+                key = stripped.split("=", 1)[0].strip().strip("\"'")
+                if key and all(c.isalnum() or c in "-_" for c in key):
+                    names.add(key)
+    return names
+
+
 def workspace_members():
     """The directories the root `Cargo.toml` already covers through the workspace.
 
@@ -181,21 +237,49 @@ def main():
                 "%s names %s, which is not in this tree any more" % (ecosystem, where)
             )
 
+    # And the `ignore` list, which is the part of this file that can quietly
+    # stop doing what it says. Two ways it goes wrong, both silent:
+    #
+    #   * an entry naming a dependency that is no longer in any manifest. It
+    #     does nothing, and it reads as evidence of a decision about something
+    #     this project still uses.
+    #   * an entry with no `update-types`. That silences *every* update for
+    #     that dependency, including the security update, which is the exact
+    #     opposite of what this file exists to do. Every entry here is meant to
+    #     hold back a major while letting patches through.
+    have_dependency = declared_dependencies()
+    for name, types in ignored():
+        if name not in have_dependency:
+            gaps.append(
+                "the ignore list names %s, which no manifest asks for any more"
+                % name
+            )
+        if not types:
+            gaps.append(
+                "the ignore for %s has no update-types, so it silences that "
+                "dependency's security updates too" % name
+            )
+
     if gaps:
         print("the Dependabot configuration and this tree disagree:")
         for gap in gaps:
             print("  %s" % gap)
         print()
         print(
-            "Add an entry to .github/dependabot.yml, or take out the one that "
-            "names a directory that has gone. A manifest nothing watches is "
-            "worse than one with a known problem, because nobody is looking."
+            "Fix .github/dependabot.yml. Add an entry for a manifest nothing "
+            "covers, take out one naming a directory that has gone, drop an "
+            "ignore for a dependency this tree no longer asks for, or give a "
+            "bare ignore its update-types. A manifest nothing watches is worse "
+            "than one with a known problem, because nobody is looking, and an "
+            "ignore with no update-types is worse still: it looks like a "
+            "held-back major and silences the advisory as well."
         )
         return 1
 
     print(
-        "  %d Dependabot entries, covering every manifest in the tree"
-        % len(declared)
+        "  %d Dependabot entries, covering every manifest in the tree; "
+        "%d held-back major(s), every one still used and none silencing a "
+        "security update" % (len(declared), len(ignored()))
     )
     for ecosystem, where in declared:
         print("    %-16s %s" % (ecosystem, where))

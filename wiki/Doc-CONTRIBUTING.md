@@ -73,6 +73,19 @@ sentence, at the moment the decision is made. `tools/audit/dependencies.py`
 fails the build on a bare name. If there is no sentence to write, that is the
 answer, and it does not go in.
 
+**Upgrades arrive continuously and never land on their own.** Dependabot
+watches every manifest weekly, and `.github/workflows/ci.yml` is the gate:
+nothing auto-merges, so every bump waits for a person looking at green CI.
+Minor and patch versions arrive batched, because twenty a week is noise. A
+major arrives alone, because it is a decision rather than an update: `cpal`
+0.15 to 0.18 was thirty-seven compile errors across four files in the realtime
+path. A handful of majors are held back in `.github/dependabot.yml`, each
+scoped to `version-update:semver-major` so patches and security fixes still
+come through, and each with its reason written where the dependency is
+declared. `tools/audit/dependabot.py` fails the build if one of those holds
+names a dependency the tree no longer uses, or if one is missing its
+`update-types` and would therefore silence an advisory.
+
 **Work that can be done once is done once, and a comment says what made it
 constant.** A value computed per frame or per sample that does not change per
 frame or per sample is a defect.
