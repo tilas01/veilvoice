@@ -11,6 +11,14 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Least privilege for every job below. A workflow with no `permissions` block
+# inherits the repository default, which can be write for every scope, and this
+# one checks out code, builds it and runs tests: none of that needs to be able
+# to push a commit, move a tag or open an issue. The one job that needs more
+# asks for it on its own, so the grant is visible next to the thing using it.
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
   # A fresh clone must build with no secrets. Nothing here reads one.
@@ -26,7 +34,7 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       # cpal needs ALSA headers, and eframe needs the X11/Wayland stack.
       - name: Install Linux audio and windowing headers
@@ -41,7 +49,7 @@ jobs:
       - name: Install the pinned toolchain
         run: rustup show   # rust-toolchain.toml selects and installs it
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
 
       - name: Formatting
         run: cargo fmt --all -- --check
@@ -148,7 +156,7 @@ jobs:
       CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_RUNNER: qemu-arm-static
       QEMU_LD_PREFIX: /usr/arm-linux-gnueabihf
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Install the cross toolchain for ${{ matrix.target }}
         run: |
@@ -164,7 +172,7 @@ jobs:
       - name: Add the target
         run: rustup target add ${{ matrix.target }}
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
           key: ${{ matrix.target }}
 
@@ -204,8 +212,8 @@ jobs:
       matrix:
         python: ['3.11', '3.13']
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: ${{ matrix.python }}
       # Compares decoded pixels, not compressed bytes: zlib's output differs
@@ -355,6 +363,13 @@ jobs:
       - name: Every manifest must be covered by a Dependabot entry
         run: python tools/audit/dependabot.py
 
+      # And the supply-chain half. `uses: owner/action@v2` names a label, not a
+      # version, and the owner can move it whenever they like: two of the ones
+      # this repository used were branches. Whatever it points at on the day is
+      # executed on a runner holding a checkout of this repository and a token.
+      - name: Every action a workflow runs must be pinned to a commit
+        run: python tools/audit/actions.py
+
       # F-170. A release is a claim that these binaries came from this source,
       # and the tag is the load-bearing part of it. Creating a release for a
       # tag that does not exist yet makes GitHub create the tag, and with no
@@ -391,8 +406,8 @@ jobs:
     name: website tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22'
       - name: Characters, structure, rendering, hostile input, scroll reveal
@@ -417,9 +432,9 @@ jobs:
     name: parser campaigns
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: rustup show
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       # Debug, not release: the release profile disables overflow checks, and
       # an arithmetic overflow on hostile input is exactly what is being looked
       # for here.
@@ -434,9 +449,16 @@ jobs:
   audit:
     name: dependency advisories
     runs-on: ubuntu-latest
+    # Over the top-level `contents: read`, because `audit-check` reports what it
+    # finds as a check run and opens an issue for a new advisory. Without these
+    # it still scans and still fails the job; it just cannot say where.
+    permissions:
+      contents: read
+      checks: write
+      issues: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: rustsec/audit-check@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998 # v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       # The three questions cargo-audit does not ask: whether every licence in
@@ -446,7 +468,7 @@ jobs:
       # as `.cargo/audit.toml`'s, and `tools/audit/dependencies.py` fails if
       # the two files stop agreeing.
       - name: Licences, sources and duplicate versions
-        uses: EmbarkStudios/cargo-deny-action@v2
+        uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2
         with:
           command: check
 
@@ -457,9 +479,9 @@ jobs:
     name: no network dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: rustup show
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Fail if a networking crate appears in the tree
         run: |
           cargo tree --workspace --edges normal --prefix none --format '{p}' \
@@ -561,9 +583,9 @@ jobs:
     name: the built program opens no network socket
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: rustup show
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Install the windowing headers and the tracers
         run: |
           sudo apt-get update
@@ -721,7 +743,7 @@ jobs:
     name: no RSA private-key operations
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Fail if any crate reaching pgp gains a private-key code path
         run: |
           set -euo pipefail
