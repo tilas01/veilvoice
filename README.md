@@ -789,15 +789,22 @@ Roadmap and open work: [`ROADMAP.md`](ROADMAP.md).
 
 ## Credits
 
-Written and maintained by **tilas01**, who holds the copyright and is the sole
-author for licensing purposes.
+**Written and maintained by tilas01**, who holds the copyright and is the sole
+author for licensing purposes. The architecture, every decision about what this
+program does and refuses to do, and a great deal of the code are theirs
+directly.
 
-Much of the code, the documentation and this website were drafted with the help
-of **Claude**, Anthropic's assistant, working to tilas01's direction. Nothing
-reaches a release unread: every change is reviewed, built and tested before it
-is committed, and the audit rounds in [`docs/AUDIT.md`](docs/AUDIT.md) are the
-record of that review finding its own mistakes. The credit is stated here, in
-the open, rather than scattered through the commit log.
+Some of the code, the documentation and this website were drafted with the help
+of **Claude**, Anthropic's assistant, working to that direction. Nothing reaches
+a release unread: every change is reviewed, built and tested before it is
+committed, and the audit rounds in [`docs/AUDIT.md`](docs/AUDIT.md) are the
+record of that review finding its own mistakes.
+
+The credit is stated here, and once more in the "Who wrote it" answer on the
+[questions page](https://tilas01.github.io/veilvoice/faq.html). Those are the
+two places somebody looking for it will look. It is deliberately not repeated
+in the footer of every page or scattered through the commit log, where an
+acknowledgement turns into a badge.
 
 ## Licence
 

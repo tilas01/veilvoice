@@ -149,6 +149,13 @@ Windows and macOS needs a certificate issued to a verified legal identity, and
 so does macOS notarisation. Those are unavailable here, and the roadmap says so
 rather than describing them as future work.
 
+tilas01 is the developer: the architecture, the decisions about what this does
+and refuses to do, and a great deal of the code are theirs directly. Some of the
+code, the documentation and this website were drafted with the help of Claude,
+Anthropic's assistant, working to that direction. Nothing reaches a release
+unread. Every change is reviewed, built and tested first, and the audit rounds
+in `docs/AUDIT.md` are the record of that review finding its own mistakes.
+
 ## How do I know the download is the one that was published?
 
 Run `veilvoice verify` in the folder you downloaded to, or drop the archive on

@@ -2429,10 +2429,15 @@ def html_page(colours, depth, title, description, body, fingerprint):
     add('<footer class="wrap" style="padding:40px 20px;color:var(--muted)">')
     add('<p>Generated from the source by <code>tools/docs/generate.py</code>. '
         'Releases are signed with key <code>%s</code>.</p>' % esc(fingerprint))
+    # Every page carries this, so it carries the author and nothing else. The
+    # AI-assistance credit is a real one and is stated in two places a reader
+    # looking for it will find, the README's Credits section and the "Who wrote
+    # it" answer on the questions page, rather than in a line repeated 346
+    # times where it reads as a badge rather than as an acknowledgement.
     add('<p class="credit">Written and maintained by '
         '<a href="https://github.com/tilas01" rel="noopener noreferrer">tilas01</a>, '
-        'who holds the copyright. Drafted with help from Claude, '
-        "Anthropic's assistant, and reviewed, built and tested before release.</p>")
+        'who holds the copyright. Every change is reviewed, built and tested '
+        'before release.</p>')
     add('</footer>')
     add('</body>')
     add('</html>')
