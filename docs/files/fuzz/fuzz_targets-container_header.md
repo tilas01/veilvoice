@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/fuzz/fuzz_targets-container_header.svg" alt="container_header.rs" width="100%">
+  <img src="../../../assets/banners/fuzz/fuzz_targets-container_header.svg" alt="container_header.rs" width="62%">
 </p>
 
 # `fuzz/fuzz_targets/container_header.rs`

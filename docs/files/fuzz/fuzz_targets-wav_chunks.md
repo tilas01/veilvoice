@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/fuzz/fuzz_targets-wav_chunks.svg" alt="wav_chunks.rs" width="100%">
+  <img src="../../../assets/banners/fuzz/fuzz_targets-wav_chunks.svg" alt="wav_chunks.rs" width="62%">
 </p>
 
 # `fuzz/fuzz_targets/wav_chunks.rs`

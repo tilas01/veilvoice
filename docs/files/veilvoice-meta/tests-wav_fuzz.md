@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-meta/tests-wav_fuzz.svg" alt="wav_fuzz.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-meta/tests-wav_fuzz.svg" alt="wav_fuzz.rs" width="62%">
 </p>
 
 # `crates/veilvoice-meta/tests/wav_fuzz.rs`

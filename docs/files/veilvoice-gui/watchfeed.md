@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-gui/watchfeed.svg" alt="watchfeed.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-gui/watchfeed.svg" alt="watchfeed.rs" width="62%">
 </p>
 
 # `crates/veilvoice-gui/src/watchfeed.rs`

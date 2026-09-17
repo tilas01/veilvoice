@@ -2190,6 +2190,20 @@ def tidy(text):
     return text.rstrip("\n") + "\n"
 
 
+# How wide a banner is drawn in a Markdown document.
+#
+# It was `100%`, which on GitHub means the full width of the reading column and
+# makes the strip at the top of a file page taller than the first paragraph
+# under it. A banner is a label, not a picture somebody came to look at, and at
+# full width it reads as the page's content rather than as its heading.
+#
+# Centred and around three fifths, so it is plainly a title bar with the
+# document beginning under it. One number, used by the crate pages and the file
+# pages alike, because two banners at two widths in one set of documents is the
+# thing that looks like a mistake.
+BANNER_WIDTH = "62%"
+
+
 def markdown_crate(colours, model, links):
     crate = model["crate"]
     nodes, edges = crate_graph(model)
@@ -2198,8 +2212,8 @@ def markdown_crate(colours, model, links):
 
     out = [BANNER_NOTE]
     out.append('<p align="center">\n'
-               '  <img src="../../assets/banners/%s.svg" alt="%s" width="100%%">\n'
-               '</p>\n' % (crate, crate))
+               '  <img src="../../assets/banners/%s.svg" alt="%s" width="%s">\n'
+               '</p>\n' % (crate, crate, BANNER_WIDTH))
     out.append("# %s\n" % crate)
     if model["description"]:
         out.append("> %s\n" % model["description"])
@@ -2277,8 +2291,8 @@ def markdown_file(colours, model, entry, links):
 
     out = [BANNER_NOTE]
     out.append('<p align="center">\n'
-               '  <img src="../../../assets/banners/%s/%s.svg" alt="%s" width="100%%">\n'
-               '</p>\n' % (crate, entry["stem"], entry["name"]))
+               '  <img src="../../../assets/banners/%s/%s.svg" alt="%s" width="%s">\n'
+               '</p>\n' % (crate, entry["stem"], entry["name"], BANNER_WIDTH))
     out.append("# `%s`\n" % entry["rel"])
     out.append("[`%s`](../../../%s/README.md) &middot; %d lines &middot; "
                "[read the source](https://github.com/%s/blob/%s/%s)\n"

@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/fuzz/fuzz_targets-wav_preflight.svg" alt="wav_preflight.rs" width="100%">
+  <img src="../../../assets/banners/fuzz/fuzz_targets-wav_preflight.svg" alt="wav_preflight.rs" width="62%">
 </p>
 
 # `fuzz/fuzz_targets/wav_preflight.rs`

@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-crypto/aead.svg" alt="aead.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-crypto/aead.svg" alt="aead.rs" width="62%">
 </p>
 
 # `crates/veilvoice-crypto/src/aead.rs`
